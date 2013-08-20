@@ -16,6 +16,9 @@ module CZ {
             loginPanelLogin: string;
             context: Object;
             allowRedirect: bool;
+            collectionTheme: string;
+            collectionThemeInput: string;
+            collectionThemeWrapper: string;
         }
 
         export class FormEditProfile extends CZ.UI.FormUpdateEntity {
@@ -31,6 +34,9 @@ module CZ {
             private profilePanel: JQuery;
             private loginPanelLogin: JQuery;
             private allowRedirect: bool;
+            private collectionTheme: string;
+            private collectionThemeInput: JQuery;
+            private collectionThemeWrapper: JQuery;
 
 
             constructor(container: JQuery, formInfo: FormEditProfileInfo) {
@@ -44,6 +50,9 @@ module CZ {
                 this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
+                this.collectionTheme = formInfo.collectionTheme;
+                this.collectionThemeInput = container.find(formInfo.collectionThemeInput);
+                this.collectionThemeWrapper = container.find(formInfo.collectionThemeWrapper);
 
                 this.usernameInput.off("keypress");
                 this.emailInput.off("keypress");
@@ -55,7 +64,7 @@ module CZ {
                 // Maximum length is 254: http://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
                 if (String(e).length > 254)
                     return false;
-                var filter = /^([\w^_]+(?:([-_\.\+][\w^_]+)|)|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
+                var filter = /^([\w^_]+((?:([-_.\+][\w^_]+)|))+|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             }
 
@@ -67,6 +76,11 @@ module CZ {
 
             private initialize(): void {
                 var profile = CZ.Service.getProfile();
+
+                if (this.collectionThemeWrapper) {
+                    this.collectionThemeWrapper.show();
+                }
+
                 profile.done(data => {
                     if (data.DisplayName != null) {
                         this.usernameInput.val(data.DisplayName);
@@ -105,6 +119,8 @@ module CZ {
                         emailAddress = this.emailInput.val();
                     }
 
+                    this.collectionTheme = this.collectionThemeInput.val();
+
                     Service.getProfile().done((curUser) => {
                         Service.getProfile(this.usernameInput.val()).done((getUser) => {
                             if (curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
@@ -114,12 +130,23 @@ module CZ {
                             }
                             CZ.Service.putProfile(this.usernameInput.val(), emailAddress).then(
                                 success => {
-                                    // Redirect to personal collection.
-                                    if (this.allowRedirect) {
-                                        window.location.assign("/" + success);
+                                    if (this.collectionTheme) {
+                                        CZ.Service.putCollection(this.usernameInput.val(), this.usernameInput.val(), { theme: this.collectionTheme }).then(() => {
+                                            if (this.allowRedirect) {
+                                                window.location.assign("/" + success);
+                                            }
+                                            else {
+                                                this.close();
+                                            }
+                                        });
                                     }
                                     else {
-                                        this.close();
+                                        if (this.allowRedirect) {
+                                            window.location.assign("/" + success);
+                                        }
+                                        else {
+                                            this.close();
+                                        }
                                     }
                                 },
                                 function (error) {
@@ -153,6 +180,7 @@ module CZ {
                     duration: 500
                 });
 
+                this.collectionThemeInput.val(this.collectionTheme);
                 this.activationSource.addClass("active");
             }
 
@@ -164,6 +192,10 @@ module CZ {
                 });
 
                 this.activationSource.removeClass("active");
+            }
+
+            public setTheme(theme: string) {
+                this.collectionTheme = theme;
             }
         }
     }

@@ -74,7 +74,8 @@ module CZ {
                 }
                 this.saveButton.click(event => {
                     
-
+                    this.startDate.setDate("d");
+                    var result = this.startDate.getDate();
                     this.errorMessage.empty();
                     var isDataValid = false;
                     isDataValid = CZ.Authoring.validateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
@@ -103,11 +104,16 @@ module CZ {
                                 self.isCancel = false;
                                 self.close();
                                 
-                                //Move to new created timeline                              
+                                //Move to new created timeline
                                 self.timeline.onmouseclick();
                             },
                             function (error) {
-                                alert("Unable to save changes. Please try again later.");
+                                if (error !== undefined && error !== null) {
+                                    self.errorMessage.text(error);
+                                }
+                                else {
+                                    alert("Unable to save changes. Please try again later.");
+                                }
                                 console.log(error);
                             }
                         ).always(() => {
@@ -118,6 +124,7 @@ module CZ {
 
                 this.deleteButton.click(event => {
                     if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
+                        var isDataValid = true;
                         CZ.Authoring.removeTimeline(this.timeline);
                         this.close();
                     }

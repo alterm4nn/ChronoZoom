@@ -53,7 +53,7 @@ module CZ {
             return coord;
         }
 
-        export function getYMDFromCoordinate(coord) {
+        export function getYMDFromCoordinate(coord, MarkerCorrection = false) {
             var absCoord = Math.abs(coord),
                 floorCoord = Math.floor(coord),
                 sign = (coord === 0) ? 1 : coord / absCoord,
@@ -68,6 +68,7 @@ module CZ {
             //       in case of the last day in a year. Do not increment day in
             //       in this case.
             day = Math.round(daysFraction * daysInYear);
+            if (MarkerCorrection) day = Math.floor(daysFraction * daysInYear);
             day += +(day < daysInYear);
 
             // Evaluate day and month of the year.
@@ -109,25 +110,28 @@ module CZ {
                 year: coordinate,
                 regime: "CE"
             }
-
-            if (coordinate < -999999999) {
-                year.year = (year.year ) / (-1000000000);
+            var eps_const = 100000;
+            if (coordinate <= -999999999) {
+                year.year = (year.year - 1) / (-1000000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ga';
-            } else if (coordinate < -999999) {
-                year.year = (year.year) / (-1000000);
+            } else if (coordinate <= -999999) {
+                year.year = (year.year - 1) / (-1000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ma';
-            } else if (coordinate < -9999) {
-                year.year = (year.year) / (-1000);
+            } else if (coordinate <= -9999) {
+                year.year = (year.year - 1) / (-1000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ka';
             } else if (coordinate < 1) {
-                year.year = (year.year) / (-1);
+                year.year = (year.year - 1) / (-1);
                 // remove fraction part of year
                 year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             }
             else {
                 // remove fraction part of year
-                year.year = Math.floor(year.year);
+                 year.year = Math.floor(year.year);
             }
             //if (year.regime === 'BCE') {
             //    year.year += 2;

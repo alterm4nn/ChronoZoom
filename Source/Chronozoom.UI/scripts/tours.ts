@@ -1,5 +1,6 @@
 ﻿/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
 /// <reference path='../ui/tourslist-form.ts' />
+/// <reference path='../ui/tour-caption-form.ts' />
 /// <reference path='urlnav.ts'/>
 /// <reference path='common.ts'/>
 
@@ -10,7 +11,7 @@ module CZ {
         private isBookmarksWindowVisible = false;
         private isBookmarksWindowExpanded = true;
         private isBookmarksTextShown = true;
-        private isNarrationOn = true;
+        export var isNarrationOn = true;
 
         export var tours; // list of loaded tours
         export var tour; //an active tour. Undefined if no tour is active
@@ -22,6 +23,11 @@ module CZ {
         private bookmarkAnimation; // current animation of bookmark' description text sliding
 
         var isToursDebugEnabled = false; // enables rebug output
+
+        export var TourEndMessage = "Thank you for watching this tour!"; // message for user in the end of tour
+
+        export var tourCaptionFormContainer: JQuery;
+        export var tourCaptionForm: CZ.UI.FormTourCaption;
 
         /* TourBookmark represents a place in the virtual space with associated audio.
         @param url  (string) Url that contains a state of the virtual canvas
@@ -76,7 +82,7 @@ module CZ {
 
             private isAudioLoaded = false; //is set automaticly after the audio track is loaded
             private isAudioEnabled = false; //to be changed by toggleAudio function
-            private audioElement; // audio element of this tour
+            public audioElement; // audio element of this tour
 
             private timerOnBookmarkIsOver;  // timer id which is set for bookmark complete event (stored to be able to cancel it if paused)
 
@@ -171,7 +177,7 @@ module CZ {
                     });
                     self.audioElement.addEventListener("progress", function () {
                         if (self.audioElement && self.audioElement.buffered.length > 0)
-                            if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration)));
+                            if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audioElement.buffered.end(self.audioElement.buffered.length - 1) / self.audioElement.duration)));
                     });
 
                     self.audioElement.controls = false;
@@ -253,6 +259,17 @@ module CZ {
 
                     if (isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark));
 
+                    var targetVisible = getBookmarkVisible(bookmark);
+                    
+                    // bookmark was removed from canvas
+                    if (!targetVisible) {
+                        if (isToursDebugEnabled && window.console && console.log("bookmark index " + newBookmark + " references to nonexistent item"));
+                        // skip nonexistent bookmark
+                        goBack ? self.prev() : self.next();
+                        return; 
+                        //self.goToTheNextBookmark(goBack);
+                    }
+
                     // start new EllipticalZoom animation if needed
                     self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
                 }
@@ -263,7 +280,7 @@ module CZ {
                 */
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
                     if (!self.audio) return;
-                    if (isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc));
+                    if (isToursDebugEnabled && window.console && console.log("playing source: " + self.audioElement.currentSrc));
 
                     self.audioElement.pause();
 
@@ -366,8 +383,15 @@ module CZ {
                     self.state = 'play';
 
                     var visible = self.vc.virtualCanvas("getViewport").visible;
+                    var bookmarkVisible = getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]);
 
-                    if (self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]))) {
+                    // skip bookmark if it references to nonexistent element
+                    if (bookmarkVisible === null) {
+                        self.next();
+                        return;
+                    }
+
+                    if (self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, bookmarkVisible)) {
                         // current visible is equal to visible of bookmark
                         self.currentPlace = <Place>{ type: 'bookmark', bookmark: self.currentPlace.bookmark };
                     } else {
@@ -439,23 +463,20 @@ module CZ {
                         bookmark.elapsed += (new Date().getTime() - self.currentPlace.startTime) / 1000; // sec
                 };
 
-                self.next = function next() { // goes to the next bookmark
-                    // ignore if last bookmark
-                    if (self.currentPlace.bookmark != self.bookmarks.length - 1) {
-                        if (self.state === 'play') {
-                            // clear active bookmark timer
-                            if (self.timerOnBookmarkIsOver) clearTimeout(self.timerOnBookmarkIsOver);
-                            self.timerOnBookmarkIsOver = undefined;
-                        }
-
-                        self.onBookmarkIsOver(false); // goes to the next bookmark            
+                self.next = function next() { // goes to the next bookmark. Ends tour if last bookmark
+                    if (self.state === 'play') {
+                        // clear active bookmark timer
+                        if (self.timerOnBookmarkIsOver) clearTimeout(self.timerOnBookmarkIsOver);
+                        self.timerOnBookmarkIsOver = undefined;
                     }
+
+                    self.onBookmarkIsOver(false); // goes to the next bookmark
                 };
 
                 self.prev = function prev() { // goes to the previous bookmark
                     // ignore if first bookmark
                     if (self.currentPlace.bookmark == 0) {
-                        //self.currentPlace = { type: 'goto', bookmark: 0, animationId: self.currentPlace.animationId };
+                        //self.currentPlace = <Place>{ type: 'bookmark', bookmark: self.currentPlace.bookmark };
                         return;
                     }
                     if (self.state === 'play') {
@@ -512,13 +533,11 @@ module CZ {
             if (isAudioEnabled == undefined) isAudioEnabled = isNarrationOn;
 
             if (newTour != undefined) {
-                var tourControlDiv = document.getElementById("tour_control");
-                tourControlDiv.style.display = "block";
                 tour = newTour;
 
                 // add new tourFinished callback function
                 tour.tour_TourFinished.push(function (tour) {
-                    hideBookmark(tour);
+                    showTourEndMessage();
                     tourPause();
                     hideBookmarks();
                 });
@@ -553,8 +572,6 @@ module CZ {
             }
 
             // hide tour' UI
-            var tourControlDiv = document.getElementById("tour_control");
-            tourControlDiv.style.display = "none";
             if (tour) {
                 hideBookmarks();
                 $("#bookmarks .header").text("");
@@ -590,6 +607,7 @@ module CZ {
         switch the tour in the paused state
         */
         export function tourPause() {
+            tourCaptionForm.setPlayPauseButtonState("play");
             if (tour != undefined) {
                 $("#tour_playpause").attr("src", "/images/tour_play_off.jpg");
 
@@ -606,7 +624,8 @@ module CZ {
         /*
         switch the tour in the running state
         */
-        function tourResume() {
+        export function tourResume() {
+            tourCaptionForm.setPlayPauseButtonState("pause");
             $("#tour_playpause").attr("src", "/images/tour_pause_off.jpg");
             tour.play();
         }
@@ -643,8 +662,9 @@ module CZ {
             isBookmarksWindowVisible = false;
 
             var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
+            if (curURL.hash.params["tour"]) {
+                delete curURL.hash.params["tour"];
+            }
             CZ.UrlNav.setURL(curURL);
         }
 
@@ -663,53 +683,18 @@ module CZ {
         Hides bookmark description text.
         */
         function hideBookmark(tour) {
-            if (isBookmarksWindowExpanded && isBookmarksTextShown) {
-                // end active sliding animation
-                if (bookmarkAnimation)
-                    bookmarkAnimation.stop(true, true);
+            tourCaptionForm.hideBookmark();
+        }
 
-                // start new animation
-                bookmarkAnimation = $("#bookmarks .slideText").hide("drop", {}, 'slow', function () {
-                    bookmarkAnimation = undefined;
-                });
-
-                $("#bookmarks .slideHeader").text("");
-                isBookmarksTextShown = false;
-            }
+        function showTourEndMessage() {
+            tourCaptionForm.showTourEndMessage();
         }
 
         /*
         Shows bookmark description text.
         */
         function showBookmark(tour: Tour, bookmark: TourBookmark) {
-            if (!isBookmarksWindowVisible) {
-                isBookmarksWindowVisible = true;
-                // todo: check whether the bookmarks are expanded
-                $("#bookmarks .slideText").text(bookmark.text);
-                $("#bookmarks").show('slide', {}, 'slow');
-            }
-
-            $("#bookmarks .header").text(tour.title);
-            $("#bookmarks .slideHeader").text(bookmark.caption);
-            $("#bookmarks .slideFooter").text(bookmark.number + '/' + tour.bookmarks.length);
-
-            if (isBookmarksWindowExpanded) {
-                $("#bookmarks .slideText").text(bookmark.text);
-                if (!isBookmarksTextShown) {
-
-                    // stop active sliding animation
-                    if (bookmarkAnimation)
-                        bookmarkAnimation.stop(true, true);
-
-                    // start new animation
-                    bookmarkAnimation = $("#bookmarks .slideText").show("drop", {}, 'slow', function () {
-                        bookmarkAnimation = undefined;
-                    });
-                    isBookmarksTextShown = true;
-                }
-            } else {
-                $("#bookmarks .slideText").text(bookmark.text);
-            }
+            tourCaptionForm.showBookmark(bookmark);
         }
 
         /*

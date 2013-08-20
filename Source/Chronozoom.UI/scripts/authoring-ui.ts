@@ -30,6 +30,20 @@ module CZ {
                     return;
                 }
 
+                CZ.Authoring.showMessageWindow(
+                    "Click and drag to set the approximate length of the timeline.",
+                    "Create Timeline"
+                );
+
+                var prevIsActive = CZ.Authoring.isActive;
+                var prevMode = CZ.Authoring.mode;
+                var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
+
+                messageForm.closeButton.click(event => {
+                    CZ.Authoring.isActive = prevIsActive;
+                    CZ.Authoring.mode = prevMode;
+                });
+
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createTimeline";
             }
@@ -49,6 +63,20 @@ module CZ {
                 if (CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
+
+                CZ.Authoring.showMessageWindow(
+                    "Click inside a timeline to set the approximate date of the exhibit.",
+                    "Create Exhibit"
+                );
+
+                var prevIsActive = CZ.Authoring.isActive;
+                var prevMode = CZ.Authoring.mode;
+                var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
+
+                messageForm.closeButton.click(event => {
+                    CZ.Authoring.isActive = prevIsActive;
+                    CZ.Authoring.mode = prevMode;
+                });
 
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createExhibit";

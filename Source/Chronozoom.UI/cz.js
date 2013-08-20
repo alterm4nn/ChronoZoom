@@ -9,7 +9,7 @@
         Settings.zoomSpeedFactor = 2.0;
         Settings.zoomLevelFactor = 1.4;
         Settings.allowedVisibileImprecision = 0.00001;
-        Settings.allowedMathImprecision = 0.0000001;
+        Settings.allowedMathImprecision = 0.000001;
         Settings.allowedMathImprecisionDecimals = parseInt(Settings.allowedMathImprecision.toExponential().split("-")[1]);
         Settings.canvasElementAnimationTime = 1300;
         Settings.canvasElementFadeInTime = 400;
@@ -33,6 +33,9 @@
         Settings.timelineHoveredBoxBorderColor = 'rgb(232,232,232)';
         Settings.timelineBreadCrumbBorderOffset = 50;
         Settings.timelineCenterOffsetAcceptableImplicity = 0.00001;
+        Settings.timelineColor = null;
+        Settings.timelineHoverAnimation = 3 / 60.0;
+        Settings.timelineGradientFillStyle = null;
         Settings.infodotShowContentZoomLevel = 9;
         Settings.infodotShowContentThumbZoomLevel = 2;
         Settings.infoDotHoveredBorderWidth = 40.0 / 450;
@@ -166,6 +169,7 @@
         Settings.signinUrlMicrosoft = "";
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
+        Settings.sessionTime = 3600;
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
         Settings.ie = ((function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];
@@ -174,6 +178,59 @@
             }
             return (v > 4) ? v : undefined;
         })());
+        Settings.theme;
+        function applyTheme(theme) {
+            if(!theme) {
+                theme = "cosmos";
+            }
+            this.theme = theme;
+            var themeData = {
+                "cosmos": {
+                    "background": "url('/images/background.jpg')",
+                    "backgroundColor": "#232323",
+                    "timelineColor": null,
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(92,92,92)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                    "timelineGradientFillStyle": null
+                },
+                "gray": {
+                    "background": "none",
+                    "backgroundColor": "#bebebe",
+                    "timelineColor": null,
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(92,92,92)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                    "timelineGradientFillStyle": "#9e9e9e"
+                },
+                "aqua": {
+                    "background": "none",
+                    "backgroundColor": "rgb(238, 238, 238)",
+                    "timelineColor": "rgba(52, 76, 130, 0.5)",
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(55,84,123)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail-Aqua.png',
+                    "timelineGradientFillStyle": "rgb(80,123,175)"
+                }
+            };
+            var themeSettings = themeData[theme];
+            $('#vc').css('background-image', themeSettings.background);
+            $('#vc').css('background-color', themeSettings.backgroundColor);
+            CZ.Settings.timelineColor = themeSettings.timelineColor;
+            CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;
+            CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;
+            CZ.Settings.fallbackImageUri = themeSettings.fallbackImageUri;
+            CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
+        }
+        Settings.applyTheme = applyTheme;
+        Settings.defaultBingSearchTop = 50;
+        Settings.defaultBingSearchSkip = 0;
+        Settings.mediapickerImageThumbnailMaxWidth = 240;
+        Settings.mediapickerImageThumbnailMaxHeight = 155;
+        Settings.mediapickerVideoThumbnailMaxWidth = 190;
+        Settings.mediapickerVideoThumbnailMaxHeight = 130;
+        Settings.WLAPIClientID = "0000000040101FFA";
+        Settings.WLAPIRedirectUrl = "http://test.chronozoom.com/";
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -198,6 +255,7 @@ var CZ;
                 this.navButton = this.container.find(formInfo.navButton);
                 this.closeButton = this.container.find(formInfo.closeButton);
                 this.titleTextblock = this.container.find(formInfo.titleTextblock);
+                this.contentContainer = this.container.find(formInfo.contentContainer);
                 this.container.data("form", this);
                 if(this.prevForm) {
                     this.navButton.show();
@@ -605,6 +663,110 @@ var CZ;
 ;
 var CZ;
 (function (CZ) {
+    (function (Extensions) {
+        (function (RIN) {
+            function getScript() {
+                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js";
+            }
+            RIN.getScript = getScript;
+            function getExtension(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload) {
+                var rinDiv;
+                if(!rinDiv) {
+                    rinDiv = document.createElement('div');
+                    rinDiv.setAttribute("id", id);
+                    rinDiv.setAttribute("class", "rinPlayer");
+                    rinDiv.addEventListener("mousemove", CZ.Common.preventbubble, false);
+                    rinDiv.addEventListener("mousedown", CZ.Common.preventbubble, false);
+                    rinDiv.addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
+                    rinDiv.addEventListener("mousewheel", CZ.Common.preventbubble, false);
+                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/').then(function () {
+                        var playerElement = document.getElementById(id);
+                        var playerControl = rin.getPlayerControl(rinDiv);
+                        var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
+                        playerControl.load(contentSource);
+                    });
+                } else {
+                    rinDiv.isAdded = false;
+                }
+                return new RINPlayer(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload, rinDiv);
+            }
+            RIN.getExtension = getExtension;
+            function RINPlayer(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload, rinDiv) {
+                this.base = CZ.VCContent.CanvasDomItem;
+                this.base(vc, layerid, id, vx, vy, vw, vh, z);
+                this.initializeContent(rinDiv);
+                this.onRemove = function () {
+                    var rinplayerControl = rin.getPlayerControl(rinDiv);
+                    if(rinplayerControl) {
+                        rinplayerControl.pause();
+                        if(rinplayerControl.unload) {
+                            rinplayerControl.unload();
+                        }
+                        rinplayerControl = null;
+                    }
+                    this.prototype.onRemove.call(this);
+                };
+                this.prototype = new CZ.VCContent.CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+            }
+        })(Extensions.RIN || (Extensions.RIN = {}));
+        var RIN = Extensions.RIN;
+    })(CZ.Extensions || (CZ.Extensions = {}));
+    var Extensions = CZ.Extensions;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Extensions) {
+        var extensions = [];
+        function mediaTypeIsExtension(mediaType) {
+            return mediaType.toLowerCase().indexOf('extension-') === 0;
+        }
+        Extensions.mediaTypeIsExtension = mediaTypeIsExtension;
+        function registerExtensions() {
+            registerExtension("RIN", CZ.Extensions.RIN.getExtension, "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js");
+        }
+        Extensions.registerExtensions = registerExtensions;
+        function registerExtension(name, initializer, script) {
+            extensions[name.toLowerCase()] = {
+                "initializer": initializer,
+                "script": script
+            };
+        }
+        function activateExtension(mediaType) {
+            if(!mediaTypeIsExtension(mediaType)) {
+                return;
+            }
+            var extensionName = extensionNameFromMediaType(mediaType);
+            addScript(extensionName, getScriptFromExtensionName(extensionName));
+        }
+        Extensions.activateExtension = activateExtension;
+        function getInitializer(mediaType) {
+            var extensionName = extensionNameFromMediaType(mediaType);
+            return extensions[extensionName.toLowerCase()].initializer;
+        }
+        Extensions.getInitializer = getInitializer;
+        function extensionNameFromMediaType(mediaType) {
+            var extensionIndex = 'extension-'.length;
+            return mediaType.substring(extensionIndex, mediaType.length);
+        }
+        function addScript(extensionName, scriptPath) {
+            var scriptId = "extension-" + extensionName;
+            if(document.getElementById(scriptId)) {
+                return;
+            }
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = scriptPath;
+            script.id = scriptId;
+            document.getElementsByTagName("head")[0].appendChild(script);
+        }
+        function getScriptFromExtensionName(name) {
+            return extensions[name.toLowerCase()].script;
+        }
+    })(CZ.Extensions || (CZ.Extensions = {}));
+    var Extensions = CZ.Extensions;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
     (function (VCContent) {
         var elementclick = ($).Event("elementclick");
         function getVisibleForElement(element, scale, viewport, use_margin) {
@@ -683,6 +845,13 @@ var CZ;
             }
             return VCContent.addChild(element, new SeadragonImage(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
+        VCContent.addExtension = function (extensionName, element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
+            if(vw <= 0 || vh <= 0) {
+                throw "Extension size must be positive";
+            }
+            var initializer = CZ.Extensions.getInitializer(extensionName);
+            return VCContent.addChild(element, initializer(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
+        };
         VCContent.addVideo = function (element, layerid, id, videoSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasVideoItem(element.vc, layerid, id, videoSource, vx, vy, vw, vh, z), false);
         };
@@ -691,6 +860,12 @@ var CZ;
         };
         var addAudio = function (element, layerid, id, audioSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
+        };
+        VCContent.addSkydriveDocument = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasSkydriveDocumentItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+        };
+        VCContent.addSkydriveImage = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
         function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw) {
             return VCContent.addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
@@ -1101,7 +1276,11 @@ var CZ;
             this.title = this.titleObject.text;
             this.regime = timelineinfo.regime;
             this.settings.gradientOpacity = 0;
-            this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            if(CZ.Settings.timelineGradientFillStyle) {
+                this.settings.gradientFillStyle = CZ.Settings.timelineGradientFillStyle;
+            } else {
+                this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            }
             this.reactsOnMouse = true;
             this.tooltipEnabled = true;
             this.tooltipIsShown = false;
@@ -1121,7 +1300,7 @@ var CZ;
                 this.settings.strokeStyle = CZ.Settings.timelineHoveredBoxBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineHoveredLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHoveredHeaderFontColor;
-                this.settings.hoverAnimationDelta = 3 / 60.0;
+                this.settings.hoverAnimationDelta = CZ.Settings.timelineHoverAnimation;
                 this.vc.requestInvalidate();
                 if(this.titleObject.initialized == false) {
                     var vp = this.vc.getViewport();
@@ -1178,7 +1357,8 @@ var CZ;
                 this.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHeaderFontColor;
-                this.settings.hoverAnimationDelta = -3 / 60.0;
+                this.settings.hoverAnimationDelta = -CZ.Settings.timelineHoverAnimation;
+                ;
                 this.vc.requestInvalidate();
             };
             this.base_render = this.render;
@@ -1192,9 +1372,11 @@ var CZ;
                     this.editButton = VCContent.addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y, this.titleObject.height, this.titleObject.height, "/images/edit.svg");
                     this.editButton.reactsOnMouse = true;
                     this.editButton.onmouseclick = function () {
-                        CZ.Authoring.isActive = true;
-                        CZ.Authoring.mode = "editTimeline";
-                        CZ.Authoring.selectedTimeline = this.parent;
+                        if(CZ.Common.vc.virtualCanvas("getHoveredInfodot").x == undefined) {
+                            CZ.Authoring.isActive = true;
+                            CZ.Authoring.mode = "editTimeline";
+                            CZ.Authoring.selectedTimeline = this.parent;
+                        }
                         return true;
                     };
                     this.editButton.onmousehover = function () {
@@ -1356,6 +1538,14 @@ var CZ;
                                             currentLine += ' ' + words[iw];
                                         }
                                         lineWidth = newWidth;
+                                    }
+                                    var NewWordWidth;
+                                    if((words.length == 1) && (wsize.width > size_p.x)) {
+                                        var NewWordWidth = wsize.width;
+                                        while(NewWordWidth > size_p.x) {
+                                            fontSize /= 1.5;
+                                            NewWordWidth /= 1.5;
+                                        }
                                     }
                                 }
                                 lines.push(currentLine);
@@ -1655,6 +1845,7 @@ var CZ;
             };
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
+        VCContent.CanvasDomItem = CanvasDomItem;
         function CanvasScrollTextItem(vc, layerid, id, vx, vy, vw, vh, text, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
@@ -1730,6 +1921,50 @@ var CZ;
             elem.setAttribute("visible", 'true');
             elem.setAttribute("controls", 'true');
             this.initializeContent(elem);
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+        function CanvasSkydriveDocumentItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+            var elem = document.createElement('iframe');
+            elem.setAttribute("id", id);
+            elem.setAttribute("src", embededSrc);
+            this.initializeContent(elem);
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+        function CanvasSkydriveImageItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+            var srcData = embededSrc.split(" ");
+            var elem = document.createElement('iframe');
+            elem.setAttribute("id", id);
+            elem.setAttribute("src", srcData[0]);
+            elem.setAttribute("scrolling", "no");
+            elem.setAttribute("frameborder", "0");
+            this.initializeContent(elem);
+            this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                if(!this.content) {
+                    return;
+                }
+                var p = viewport2d.pointVirtualToScreen(this.x, this.y);
+                var width = parseFloat(srcData[1]);
+                var height = parseFloat(srcData[2]);
+                var scale = size_p.x / width;
+                if(height / width > size_p.y / size_p.x) {
+                    scale = size_p.y / height;
+                }
+                this.content.style.left = (p.x + size_p.x / 2) + 'px';
+                this.content.style.top = (p.y + size_p.y / 2) + 'px';
+                this.content.style.marginLeft = (-width / 2) + 'px';
+                this.content.style.marginTop = (-height / 2) + 'px';
+                this.content.style.width = width + 'px';
+                this.content.style.height = height + 'px';
+                this.content.style.opacity = opacity;
+                this.content.style.filter = 'alpha(opacity=' + (opacity * 100) + ')';
+                this.content.style.webkitTransform = "scale(" + scale + ")";
+                this.content.style.msTransform = "scale(" + scale + ")";
+                this.content.style.MozTransform = "scale(" + scale + ")";
+            };
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
         function SeadragonImage(vc, parent, layerid, id, imageSource, vx, vy, vw, vh, z, onload) {
@@ -1828,7 +2063,7 @@ var CZ;
             var timeline = VCContent.addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
                 strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineStrokeStyle,
                 lineWidth: CZ.Settings.timelineLineWidth,
-                fillStyle: timelineinfo.fillStyle,
+                fillStyle: CZ.Settings.timelineColor ? CZ.Settings.timelineColor : timelineinfo.fillStyle,
                 opacity: typeof timelineinfo.opacity !== 'undefined' ? timelineinfo.opacity : 1
             }, timelineinfo), true);
             return timeline;
@@ -1898,6 +2133,12 @@ var CZ;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive-document') {
+                        VCContent.addSkydriveDocument(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive-image') {
+                        VCContent.addSkydriveImage(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
+                        VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
                     var titleText = this.contentItem.title;
                     addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0, 0.9 * titleHeight, titleText, {
@@ -2142,7 +2383,14 @@ var CZ;
                     var title = '';
                     if(infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        if((exhibitDate.regime == "CE") || (exhibitDate.regime == "BCE")) {
+                            var date_number = Number(infodotDescription.date);
+                            var exhibitDate = CZ.Dates.convertCoordinateToYear(date_number);
+                            date_number = Math.abs(date_number);
+                            title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        } else {
+                            title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        }
                     }
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight, title, {
                         fontName: CZ.Settings.contentItemHeaderFontName,
@@ -2944,8 +3192,7 @@ var CZ;
                         _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
                             self.tour = tour;
                             CZ.Tours.tours.push(tour);
-                            self.initializeAsEdit();
-                            alert("Tour created.");
+                            _this.hide();
                         }).fail(function (f) {
                             if(console && console.error) {
                                 console.error("Failed to create a tour: " + f.status + " " + f.statusText);
@@ -2959,7 +3206,7 @@ var CZ;
                             if(CZ.Tours.tours[i] === _this.tour) {
                                 _this.putTourAsync(i).done(function (tour) {
                                     _this.tour = CZ.Tours.tours[i] = tour;
-                                    alert("Tour updated.");
+                                    _this.hide();
                                 }).fail(function (f) {
                                     if(console && console.error) {
                                         console.error("Failed to update a tour: " + f.status + " " + f.statusText);
@@ -3189,6 +3436,7 @@ var CZ;
         Service.collectionName = "";
         Service.superCollectionName = "";
         function getTimelines(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
             request.addParameter("supercollection", Service.superCollectionName);
@@ -3203,9 +3451,10 @@ var CZ;
             });
         }
         Service.getTimelines = getTimelines;
-        function getCollections() {
+        function getCollections(superCollectionName) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
+            request.addToPath(superCollectionName);
             request.addToPath("collections");
             return $.ajax({
                 type: "GET",
@@ -3216,6 +3465,7 @@ var CZ;
         }
         Service.getCollections = getCollections;
         function getStructure(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3230,6 +3480,7 @@ var CZ;
         }
         Service.getStructure = getStructure;
         function postData(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3244,10 +3495,11 @@ var CZ;
             });
         }
         Service.postData = postData;
-        function putCollection(c) {
+        function putCollection(superCollectionName, collectionName, c) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(c.name);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -3259,6 +3511,7 @@ var CZ;
         }
         Service.putCollection = putCollection;
         function deleteCollection(c) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(c.name);
@@ -3272,6 +3525,7 @@ var CZ;
         }
         Service.deleteCollection = deleteCollection;
         function putTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3288,6 +3542,7 @@ var CZ;
         }
         Service.putTimeline = putTimeline;
         function deleteTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3303,6 +3558,7 @@ var CZ;
         }
         Service.deleteTimeline = deleteTimeline;
         function putExhibit(e) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3319,6 +3575,7 @@ var CZ;
         }
         Service.putExhibit = putExhibit;
         function deleteExhibit(e) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3334,6 +3591,7 @@ var CZ;
         }
         Service.deleteExhibit = deleteExhibit;
         function putContentItem(ci) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3350,6 +3608,7 @@ var CZ;
         }
         Service.putContentItem = putContentItem;
         function deleteContentItem(ci) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3365,6 +3624,7 @@ var CZ;
         }
         Service.deleteContentItem = deleteContentItem;
         function putTour2(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3381,6 +3641,7 @@ var CZ;
         }
         Service.putTour2 = putTour2;
         function deleteTour(tourId) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3399,10 +3660,12 @@ var CZ;
         }
         Service.deleteTour = deleteTour;
         function getTours() {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("tours");
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -3412,6 +3675,7 @@ var CZ;
         }
         Service.getTours = getTours;
         function getSearch(query) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("Search");
             var data = {
@@ -3419,6 +3683,7 @@ var CZ;
                 supercollection: CZ.Service.superCollectionName,
                 collection: CZ.Service.collectionName
             };
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -3429,7 +3694,94 @@ var CZ;
             });
         }
         Service.getSearch = getSearch;
+        function getBingImages(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getImages");
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingImages = getBingImages;
+        function getBingVideos(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getVideos");
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingVideos = getBingVideos;
+        function getBingDocuments(query, doctype, top, skip) {
+            if (typeof doctype === "undefined") { doctype = undefined; }
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getDocuments");
+            var data = {
+                query: query,
+                doctype: doctype,
+                top: top,
+                skip: skip
+            };
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingDocuments = getBingDocuments;
+        function getRecentTweets() {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("twitter/getRecentTweets");
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getRecentTweets = getRecentTweets;
         function getServiceInformation() {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("info");
             return $.ajax({
@@ -3441,6 +3793,7 @@ var CZ;
         }
         Service.getServiceInformation = getServiceInformation;
         function getContentPath(reference) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -3455,6 +3808,7 @@ var CZ;
         }
         Service.getContentPath = getContentPath;
         function putExhibitContent(e, oldContentItems) {
+            CZ.Authoring.resetSessionTimer();
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
@@ -3471,6 +3825,7 @@ var CZ;
         }
         Service.putExhibitContent = putExhibitContent;
         function putProfile(displayName, email) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             var user = {
@@ -3487,6 +3842,7 @@ var CZ;
         }
         Service.putProfile = putProfile;
         function deleteProfile(displayName) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             var user = {
@@ -3503,6 +3859,7 @@ var CZ;
         Service.deleteProfile = deleteProfile;
         function getProfile(displayName) {
             if (typeof displayName === "undefined") { displayName = ""; }
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             if(displayName != "") {
@@ -3521,6 +3878,29 @@ var CZ;
             });
         }
         Service.getProfile = getProfile;
+        function getMimeTypeByUrl(url) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("getmimetypebyurl");
+            if(url == "") {
+                return result;
+            }
+            request.addParameter("url", url);
+            $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                async: false
+            }).done(function (mime) {
+                if(mime) {
+                    result = mime;
+                }
+            });
+            return result;
+        }
+        Service.getMimeTypeByUrl = getMimeTypeByUrl;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));
@@ -3566,9 +3946,13 @@ var CZ;
             return coord;
         }
         Dates.getCoordinateFromYMD = getCoordinateFromYMD;
-        function getYMDFromCoordinate(coord) {
+        function getYMDFromCoordinate(coord, MarkerCorrection) {
+            if (typeof MarkerCorrection === "undefined") { MarkerCorrection = false; }
             var absCoord = Math.abs(coord), floorCoord = Math.floor(coord), sign = (coord === 0) ? 1 : coord / absCoord, day = 0, month = 0, year = (coord >= 1) ? floorCoord : floorCoord - 1, isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, daysFraction = sign * (absCoord - Math.abs(floorCoord));
             day = Math.round(daysFraction * daysInYear);
+            if(MarkerCorrection) {
+                day = Math.floor(daysFraction * daysInYear);
+            }
             day += +(day < daysInYear);
             while(day > Dates.daysInMonth[month] + (+(isLeap && month === 1))) {
                 day -= Dates.daysInMonth[month];
@@ -3599,17 +3983,21 @@ var CZ;
                 year: coordinate,
                 regime: "CE"
             };
-            if(coordinate < -999999999) {
-                year.year = (year.year) / (-1000000000);
+            var eps_const = 100000;
+            if(coordinate <= -999999999) {
+                year.year = (year.year - 1) / (-1000000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ga';
-            } else if(coordinate < -999999) {
-                year.year = (year.year) / (-1000000);
+            } else if(coordinate <= -999999) {
+                year.year = (year.year - 1) / (-1000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ma';
-            } else if(coordinate < -9999) {
-                year.year = (year.year) / (-1000);
+            } else if(coordinate <= -9999) {
+                year.year = (year.year - 1) / (-1000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ka';
             } else if(coordinate < 1) {
-                year.year = (year.year) / (-1);
+                year.year = (year.year - 1) / (-1);
                 year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             } else {
@@ -3716,6 +4104,7 @@ var CZ;
         Authoring.showMessageWindow = null;
         Authoring.hideMessageWindow = null;
         Authoring.callback = null;
+        Authoring.timer;
         function isIntersecting(te, obj) {
             switch(obj.type) {
                 case "timeline":
@@ -3979,6 +4368,7 @@ var CZ;
         }
         Authoring.initialize = initialize;
         function updateTimeline(t, prop) {
+            var deffered = new jQuery.Deferred();
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
@@ -3990,22 +4380,35 @@ var CZ;
                 t.x = temp.x;
                 t.width = temp.width;
                 t.endDate = prop.end;
-            }
-            t.title = prop.title;
-            updateTimelineTitle(t);
-            return CZ.Service.putTimeline(t).then(function (success) {
-                t.id = "t" + success;
-                t.guid = success;
-                t.titleObject.id = "t" + success + "__header__";
-                if(!t.parent.guid) {
-                    document.location.reload(true);
-                } else {
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                if(t.children.length < 3) {
+                    t.height = Math.min.apply(Math, [
+                        t.parent.height * CZ.Layout.timelineHeightRate, 
+                        t.width * CZ.Settings.timelineMinAspect, 
+                        t.height
+                    ]);
                 }
-            }, function (error) {
-            });
+                t.title = prop.title;
+                updateTimelineTitle(t);
+                CZ.Service.putTimeline(t).then(function (success) {
+                    t.id = "t" + success;
+                    t.guid = success;
+                    t.titleObject.id = "t" + success + "__header__";
+                    if(!t.parent.guid) {
+                        document.location.reload(true);
+                    } else {
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+                    deffered.resolve(t);
+                }, function (error) {
+                    deffered.reject(error);
+                });
+            } else {
+                deffered.reject('Timeline intersects with parent timeline or other siblings');
+            }
+            return deffered.promise();
         }
         Authoring.updateTimeline = updateTimeline;
+        ;
         function removeTimeline(t) {
             var deferred = $.Deferred();
             CZ.Service.deleteTimeline(t).then(function (updateCanvas) {
@@ -4149,11 +4552,15 @@ var CZ;
             while(contentItems[i] != null) {
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
+                var mime = CZ.Service.getMimeTypeByUrl(ci.uri);
+                console.log("mime:" + mime);
                 if(ci.mediaType.toLowerCase() === "image") {
-                    var imageReg = /\.(jpg|jpeg|png)$/i;
+                    var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
-                        alert("Sorry, only JPG/PNG images are supported");
-                        isValid = false;
+                        if(mime != "image/jpg" && mime != "image/jpeg" && mime != "image/gif" && mime != "image/png") {
+                            alert("Sorry, only JPG/PNG/GIF images are supported.");
+                            isValid = false;
+                        }
                     }
                 } else if(ci.mediaType.toLowerCase() === "video") {
                     var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&]+&v=|\/user\/\S+))([^\/&#]{10,12})/;
@@ -4167,13 +4574,30 @@ var CZ;
                         ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
                     } else if(vimeoEmbed.test(ci.uri)) {
                     } else {
-                        alert("Sorry, only YouTube or Vimeo videos are supported");
+                        alert("Sorry, only YouTube or Vimeo videos are supported.");
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
-                    var pdf = /\.(pdf)$/i;
+                    var pdf = /\.(pdf)$|\.(pdf)\?/i;
                     if(!pdf.test(ci.uri)) {
-                        alert("Sorry, only PDF extension is supported");
+                        if(mime != "application/pdf") {
+                            alert("Sorry, only PDF extension is supported.");
+                            isValid = false;
+                        }
+                    }
+                } else if(ci.mediaType.toLowerCase() === "skydrive-document") {
+                    var skydrive = /skydrive\.live\.com\/embed/;
+                    if(!skydrive.test(ci.uri)) {
+                        alert("This is not a Skydrive embed link.");
+                        isValid = false;
+                    }
+                } else if(ci.mediaType.toLowerCase() === "skydrive-image") {
+                    var splited = ci.uri.split(' ');
+                    var skydrive = /skydrive\.live\.com\/embed/;
+                    var width = /[0-9]/;
+                    var height = /[0-9]/;
+                    if(!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
+                        alert("This is not a Skydrive embed link.");
                         isValid = false;
                     }
                 }
@@ -4185,6 +4609,19 @@ var CZ;
             return isValid;
         }
         Authoring.validateContentItems = validateContentItems;
+        function showSessionForm() {
+            CZ.HomePageViewModel.sessionForm.show();
+        }
+        Authoring.showSessionForm = showSessionForm;
+        function resetSessionTimer() {
+            if(CZ.Authoring.timer != null) {
+                clearTimeout(CZ.Authoring.timer);
+                CZ.Authoring.timer = setTimeout(function () {
+                    showSessionForm();
+                }, (CZ.Settings.sessionTime - 60) * 1000);
+            }
+        }
+        Authoring.resetSessionTimer = resetSessionTimer;
     })(CZ.Authoring || (CZ.Authoring = {}));
     var Authoring = CZ.Authoring;
 })(CZ || (CZ = {}));
@@ -4346,6 +4783,177 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
+    (function (UI) {
+        var TourPlayer = (function () {
+            function TourPlayer(container, playerInfo) {
+                this.container = container;
+                this.tour = playerInfo.context;
+                this.playPauseButton = this.container.find(playerInfo.playPauseButton);
+                this.nextButton = this.container.find(playerInfo.nextButton);
+                this.prevButton = this.container.find(playerInfo.prevButton);
+                this.volButton = this.container.find(playerInfo.volButton);
+                this.playPauseButton.off();
+                this.nextButton.off();
+                this.prevButton.off();
+                this.volButton.off();
+                this.initialize();
+            }
+            TourPlayer.prototype.initialize = function () {
+                var _this = this;
+                this.playPauseButton.attr("state", "pause");
+                this.volButton.attr("state", "on");
+                this.playPauseButton.click(function (event) {
+                    var state = _this.playPauseButton.attr("state");
+                    var stateHandlers = {
+                        play: function () {
+                            _this.play();
+                        },
+                        pause: function () {
+                            _this.pause();
+                        }
+                    };
+                    stateHandlers[state]();
+                });
+                this.nextButton.click(function (event) {
+                    _this.next();
+                });
+                this.prevButton.click(function (event) {
+                    _this.prev();
+                });
+                this.volButton.click(function (event) {
+                    var state = _this.volButton.attr("state");
+                    var stateHandlers = {
+                        on: function () {
+                            _this.volumeOff();
+                        },
+                        off: function () {
+                            _this.volumeOn();
+                        }
+                    };
+                    stateHandlers[state]();
+                });
+            };
+            TourPlayer.prototype.play = function () {
+                this.playPauseButton.attr("state", "pause");
+                CZ.Tours.tourResume();
+            };
+            TourPlayer.prototype.pause = function () {
+                this.playPauseButton.attr("state", "play");
+                CZ.Tours.tourPause();
+            };
+            TourPlayer.prototype.next = function () {
+                CZ.Tours.tourNext();
+            };
+            TourPlayer.prototype.prev = function () {
+                CZ.Tours.tourPrev();
+            };
+            TourPlayer.prototype.exit = function () {
+                CZ.Tours.tourAbort();
+            };
+            TourPlayer.prototype.volumeOn = function () {
+                this.volButton.attr("state", "on");
+                CZ.Tours.isNarrationOn = true;
+                this.tour.audioElement.volume = 1;
+            };
+            TourPlayer.prototype.volumeOff = function () {
+                this.volButton.attr("state", "off");
+                CZ.Tours.isNarrationOn = false;
+                this.tour.audioElement.volume = 0;
+            };
+            return TourPlayer;
+        })();
+        UI.TourPlayer = TourPlayer;        
+        var FormTourCaption = (function (_super) {
+            __extends(FormTourCaption, _super);
+            function FormTourCaption(container, formInfo) {
+                        _super.call(this, container, formInfo);
+                this.minButton = this.container.find(formInfo.minButton);
+                this.captionTextarea = this.container.find(formInfo.captionTextarea);
+                this.tourPlayerContainer = this.container.find(formInfo.tourPlayerContainer);
+                this.bookmarksCount = this.container.find(formInfo.bookmarksCount);
+                this.tour = formInfo.context;
+                this.tourPlayer = new CZ.UI.TourPlayer(this.tourPlayerContainer, {
+                    playPauseButton: "div:nth-child(2)",
+                    nextButton: "div:nth-child(3)",
+                    prevButton: "div:nth-child(1)",
+                    volButton: "div:nth-child(4)",
+                    context: this.tour
+                });
+                this.minButton.off();
+                this.initialize();
+            }
+            FormTourCaption.prototype.initialize = function () {
+                var _this = this;
+                this.titleTextblock.text(this.tour.title);
+                this.bookmarksCount.text("Slide 1 of " + this.tour.bookmarks.length);
+                this.captionTextarea.css("opacity", 0);
+                this.isMinimized = false;
+                this.minButton.click(function (event) {
+                    _this.minimize();
+                });
+            };
+            FormTourCaption.prototype.hideBookmark = function () {
+                this.captionTextarea.css("opacity", 0);
+            };
+            FormTourCaption.prototype.showBookmark = function (bookmark) {
+                this.captionTextarea.text(bookmark.text);
+                this.bookmarksCount.text("Slide " + bookmark.number + " of " + this.tour.bookmarks.length);
+                this.captionTextarea.stop();
+                this.captionTextarea.animate({
+                    opacity: 1
+                });
+            };
+            FormTourCaption.prototype.showTourEndMessage = function () {
+                this.captionTextarea.text(CZ.Tours.TourEndMessage);
+                this.bookmarksCount.text("Start a tour");
+            };
+            FormTourCaption.prototype.setPlayPauseButtonState = function (state) {
+                this.tourPlayer.playPauseButton.attr("state", state);
+            };
+            FormTourCaption.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.addClass("active");
+            };
+            FormTourCaption.prototype.close = function () {
+                var _this = this;
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.tourPlayer.exit();
+                    }
+                });
+                this.activationSource.removeClass("active");
+            };
+            FormTourCaption.prototype.minimize = function () {
+                if(this.isMinimized) {
+                    this.contentContainer.show({
+                        effect: "slide",
+                        direction: "up",
+                        duration: 500
+                    });
+                } else {
+                    this.contentContainer.hide({
+                        effect: "slide",
+                        direction: "up",
+                        duration: 500
+                    });
+                }
+                this.isMinimized = !this.isMinimized;
+            };
+            return FormTourCaption;
+        })(CZ.UI.FormBase);
+        UI.FormTourCaption = FormTourCaption;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
     (function (Tours) {
         Tours.isTourWindowVisible = false;
         Tours.isBookmarksWindowVisible = false;
@@ -4359,6 +4967,9 @@ var CZ;
         Tours.pauseTourAtAnyAnimation = false;
         Tours.bookmarkAnimation;
         var isToursDebugEnabled = false;
+        Tours.TourEndMessage = "Thank you for watching this tour!";
+        Tours.tourCaptionFormContainer;
+        Tours.tourCaptionForm;
         var TourBookmark = (function () {
             function TourBookmark(url, caption, lapseTime, text) {
                 this.url = url;
@@ -4462,7 +5073,7 @@ var CZ;
                     });
                     self.audioElement.addEventListener("progress", function () {
                         if(self.audioElement && self.audioElement.buffered.length > 0) {
-                            if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration))) {
+                            if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audioElement.buffered.end(self.audioElement.buffered.length - 1) / self.audioElement.duration))) {
                                 ;
                             }
                         }
@@ -4522,13 +5133,21 @@ var CZ;
                     if(isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark)) {
                         ;
                     }
+                    var targetVisible = getBookmarkVisible(bookmark);
+                    if(!targetVisible) {
+                        if(isToursDebugEnabled && window.console && console.log("bookmark index " + newBookmark + " references to nonexistent item")) {
+                            ;
+                        }
+                        goBack ? self.prev() : self.next();
+                        return;
+                    }
                     self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
                 };
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
                     if(!self.audio) {
                         return;
                     }
-                    if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc)) {
+                    if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audioElement.currentSrc)) {
                         ;
                     }
                     self.audioElement.pause();
@@ -4612,7 +5231,12 @@ var CZ;
                     }
                     self.state = 'play';
                     var visible = self.vc.virtualCanvas("getViewport").visible;
-                    if(self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]))) {
+                    var bookmarkVisible = getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]);
+                    if(bookmarkVisible === null) {
+                        self.next();
+                        return;
+                    }
+                    if(self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, bookmarkVisible)) {
                         self.currentPlace = {
                             type: 'bookmark',
                             bookmark: self.currentPlace.bookmark
@@ -4675,15 +5299,13 @@ var CZ;
                     }
                 };
                 self.next = function next() {
-                    if(self.currentPlace.bookmark != self.bookmarks.length - 1) {
-                        if(self.state === 'play') {
-                            if(self.timerOnBookmarkIsOver) {
-                                clearTimeout(self.timerOnBookmarkIsOver);
-                            }
-                            self.timerOnBookmarkIsOver = undefined;
+                    if(self.state === 'play') {
+                        if(self.timerOnBookmarkIsOver) {
+                            clearTimeout(self.timerOnBookmarkIsOver);
                         }
-                        self.onBookmarkIsOver(false);
+                        self.timerOnBookmarkIsOver = undefined;
                     }
+                    self.onBookmarkIsOver(false);
                 };
                 self.prev = function prev() {
                     if(self.currentPlace.bookmark == 0) {
@@ -4736,11 +5358,9 @@ var CZ;
                 isAudioEnabled = Tours.isNarrationOn;
             }
             if(newTour != undefined) {
-                var tourControlDiv = document.getElementById("tour_control");
-                tourControlDiv.style.display = "block";
                 Tours.tour = newTour;
                 Tours.tour.tour_TourFinished.push(function (tour) {
-                    hideBookmark(tour);
+                    showTourEndMessage();
                     tourPause();
                     hideBookmarks();
                 });
@@ -4762,8 +5382,6 @@ var CZ;
                 tourPause();
                 Tours.tour.isTourPlayRequested = false;
             }
-            var tourControlDiv = document.getElementById("tour_control");
-            tourControlDiv.style.display = "none";
             if(Tours.tour) {
                 hideBookmarks();
                 $("#bookmarks .header").text("");
@@ -4787,6 +5405,7 @@ var CZ;
         }
         Tours.tourNext = tourNext;
         function tourPause() {
+            Tours.tourCaptionForm.setPlayPauseButtonState("play");
             if(Tours.tour != undefined) {
                 $("#tour_playpause").attr("src", "/images/tour_play_off.jpg");
                 Tours.tour.pause();
@@ -4797,9 +5416,11 @@ var CZ;
         }
         Tours.tourPause = tourPause;
         function tourResume() {
+            Tours.tourCaptionForm.setPlayPauseButtonState("pause");
             $("#tour_playpause").attr("src", "/images/tour_pause_off.jpg");
             Tours.tour.play();
         }
+        Tours.tourResume = tourResume;
         function tourPlayPause() {
             if(Tours.tour != undefined) {
                 if(Tours.tour.state == "pause") {
@@ -4815,8 +5436,9 @@ var CZ;
             $("#bookmarks").hide();
             Tours.isBookmarksWindowVisible = false;
             var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
+            if(curURL.hash.params["tour"]) {
+                delete curURL.hash.params["tour"];
+            }
             CZ.UrlNav.setURL(curURL);
         }
         Tours.tourAbort = tourAbort;
@@ -4832,43 +5454,13 @@ var CZ;
         }
         Tours.initializeToursContent = initializeToursContent;
         function hideBookmark(tour) {
-            if(Tours.isBookmarksWindowExpanded && Tours.isBookmarksTextShown) {
-                if(Tours.bookmarkAnimation) {
-                    Tours.bookmarkAnimation.stop(true, true);
-                }
-                Tours.bookmarkAnimation = $("#bookmarks .slideText").hide("drop", {
-                }, 'slow', function () {
-                    Tours.bookmarkAnimation = undefined;
-                });
-                $("#bookmarks .slideHeader").text("");
-                Tours.isBookmarksTextShown = false;
-            }
+            Tours.tourCaptionForm.hideBookmark();
+        }
+        function showTourEndMessage() {
+            Tours.tourCaptionForm.showTourEndMessage();
         }
         function showBookmark(tour, bookmark) {
-            if(!Tours.isBookmarksWindowVisible) {
-                Tours.isBookmarksWindowVisible = true;
-                $("#bookmarks .slideText").text(bookmark.text);
-                $("#bookmarks").show('slide', {
-                }, 'slow');
-            }
-            $("#bookmarks .header").text(tour.title);
-            $("#bookmarks .slideHeader").text(bookmark.caption);
-            $("#bookmarks .slideFooter").text(bookmark.number + '/' + tour.bookmarks.length);
-            if(Tours.isBookmarksWindowExpanded) {
-                $("#bookmarks .slideText").text(bookmark.text);
-                if(!Tours.isBookmarksTextShown) {
-                    if(Tours.bookmarkAnimation) {
-                        Tours.bookmarkAnimation.stop(true, true);
-                    }
-                    Tours.bookmarkAnimation = $("#bookmarks .slideText").show("drop", {
-                    }, 'slow', function () {
-                        Tours.bookmarkAnimation = undefined;
-                    });
-                    Tours.isBookmarksTextShown = true;
-                }
-            } else {
-                $("#bookmarks .slideText").text(bookmark.text);
-            }
+            Tours.tourCaptionForm.showBookmark(bookmark);
         }
         function hideBookmarks() {
             $("#bookmarks").hide();
@@ -5704,8 +6296,11 @@ var CZ;
                 return sinh(x) / cosh(x);
             }
             this.u = function (s) {
-                var val = this.startScale / Math.pow(this.ro, 2) * cosh(this.r0) * tanh(this.ro * s + this.r0) - this.startScale / Math.pow(this.ro, 2) * sinh(this.r0) + this.u0;
-                return val;
+                var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
+                if(this.uS < this.pathLen) {
+                    val = val * this.uSRatio;
+                }
+                return Math.min(val, this.pathLen);
             };
             this.scale = function (t) {
                 return this.startScale * cosh(this.r0) / cosh(this.ro * (t * this.S) + this.r0);
@@ -5789,6 +6384,10 @@ var CZ;
                     return this.startScale + (this.endScale - this.startScale) * s;
                 };
             }
+            this.coshR0 = cosh(this.r0);
+            this.sinhR0 = sinh(this.r0);
+            this.uS = this.u(this.S);
+            this.uSRatio = this.pathLen / this.uS;
         }
         ViewportAnimation.EllipticalZoom = EllipticalZoom;
         function animationEase(t) {
@@ -5805,6 +6404,7 @@ var CZ;
         Layout.animatingElements = {
             length: 0
         };
+        Layout.timelineHeightRate = 0.4;
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
             this.left = left;
@@ -5826,6 +6426,9 @@ var CZ;
             if(timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (exhibit) {
                     exhibit.x = CZ.Dates.getCoordinateFromDecimalYear(exhibit.time);
+                    exhibit.contentItems.forEach(function (contentItem) {
+                        CZ.Extensions.activateExtension(contentItem.mediaType);
+                    });
                 });
             }
             if(timeline.timelines instanceof Array) {
@@ -5838,7 +6441,7 @@ var CZ;
             if(timeline.Height) {
                 timeline.Height /= 100;
             } else if(!timeline.AspectRatio && !timeline.Height) {
-                timeline.Height = 0.4;
+                timeline.Height = CZ.Layout.timelineHeightRate;
             }
         }
         function GenerateAspect(timeline) {
@@ -6888,8 +7491,21 @@ var CZ;
         } else if(!(container instanceof jQuery && container.is("div"))) {
             throw "Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV.";
         }
+        var mouse_clicked = false;
+        var mouse_hovered = false;
+        container.mouseup(function (e) {
+            mouse_clicked = false;
+        });
+        container.mousedown(function (e) {
+            mouse_clicked = true;
+        });
         container.mousemove(function (e) {
+            mouse_hovered = true;
             mouseMove(e);
+        });
+        container.mouseleave(function (e) {
+            mouse_hovered = false;
+            mouse_clicked = false;
         });
         var that = this;
         var _container = container;
@@ -6906,6 +7522,7 @@ var CZ;
         var _width;
         var _height;
         var _canvasHeight;
+        var _markerPosition;
         var _tickSources = {
             "cosmos": new CZ.CosmosTickSource(),
             "calendar": new CZ.CalendarTickSource(),
@@ -6917,16 +7534,6 @@ var CZ;
         var marker = $("<div id='timescale_marker' class='cz-timescale-marker'></div>");
         var markerText = $("<div id='marker-text'></div>");
         var markertriangle = $("<div id='marker-triangle'></div>");
-        var leftDatePanel = $("<div class='cz-timescale-panel cz-timescale-left'></div>");
-        var leftDate = $("<p id='timescale_left_border'></p>");
-        var rightDatePanel = $("<div class='cz-timescale-panel cz-timescale-right'></div>");
-        var rightDate = $("<p id='timescale_right_border'></p>");
-        var rightDateInput = $("<input class='timescale_right_border_input' style='display: none' type='text'/>");
-        var leftDateInput = $("<input class='timescale_left_border_input' style='display: none' type='text'/>");
-        var RightInputShown = false;
-        var old_right_val;
-        var LeftInputShown = false;
-        var old_left_val;
         var canvasSize = CZ.Settings.tickLength + CZ.Settings.timescaleThickness;
         var text_size;
         var fontSize;
@@ -6983,52 +7590,25 @@ var CZ;
                 get: function () {
                     return _tickSources[_mode];
                 }
-            }
-        });
-        rightDatePanel.dblclick(function (e) {
-            RightPanInput();
-        });
-        leftDatePanel.dblclick(function (e) {
-            LeftPanInput();
-        });
-        marker.dblclick(function (e) {
-            var point = CZ.Common.getXBrowserMouseOrigin(container, e);
-            var k = (_range.max - _range.min) / _width;
-            var time = _range.max - k * (_width - point.x);
-            var test1 = CZ.Dates.getYMDFromCoordinate(time);
-            var test2 = CZ.Dates.getCoordinateFromYMD(test1.year, test1.month, test1.day);
-            var test3 = CZ.Dates.getYMDFromCoordinate(test2);
-            console.log(time, test1, test2, test3);
-            if(time <= _range.min + CZ.Settings.panelWidth * k) {
-                marker.css("display", "none");
-                LeftPanInput();
-            }
-            if(time >= _range.max - CZ.Settings.panelWidth * k) {
-                marker.css("display", "none");
-                RightPanInput();
+            },
+            markerPosition: {
+                configurable: false,
+                get: function () {
+                    return _markerPosition;
+                }
             }
         });
         function init() {
             _container.addClass("cz-timescale");
             _container.addClass("unselectable");
-            rightDatePanel.addClass("cz-timescale-right");
-            rightDatePanel.addClass("cz-timescale-panel");
-            leftDatePanel.addClass("cz-timescale-left");
-            leftDatePanel.addClass("cz-timescale-panel");
             marker.addClass("cz-timescale-marker");
             markertriangle.addClass("cz-timescale-marker-triangle");
             labelsDiv.addClass("cz-timescale-labels-container");
             marker[0].appendChild(markerText[0]);
             marker[0].appendChild(markertriangle[0]);
-            leftDatePanel[0].appendChild(leftDate[0]);
-            leftDatePanel[0].appendChild(leftDateInput[0]);
-            rightDatePanel[0].appendChild(rightDate[0]);
-            rightDatePanel[0].appendChild(rightDateInput[0]);
             _container[0].appendChild(labelsDiv[0]);
             _container[0].appendChild(canvas[0]);
             _container[0].appendChild(marker[0]);
-            _container[0].appendChild(leftDatePanel[0]);
-            _container[0].appendChild(rightDatePanel[0]);
             (canvas[0]).height = canvasSize;
             text_size = -1;
             strokeStyle = _container ? _container.css("color") : "Black";
@@ -7323,47 +7903,23 @@ var CZ;
             var k = (_range.max - _range.min) / _width;
             var time = _range.max - k * (_width - point.x);
             that.setTimeMarker(time);
-            that.setTimeBorders();
         }
-        this.markerPosition = -1;
-        this.setTimeMarker = function (time) {
-            if(time > CZ.Settings.maxPermitedTimeRange.right) {
-                time = CZ.Settings.maxPermitedTimeRange.right;
+        this.setTimeMarker = function (time, vcGesture) {
+            if (typeof vcGesture === "undefined") { vcGesture = false; }
+            if((!mouse_clicked) && ((!vcGesture) || ((vcGesture) && (!mouse_hovered)))) {
+                if(time > CZ.Settings.maxPermitedTimeRange.right) {
+                    time = CZ.Settings.maxPermitedTimeRange.right;
+                }
+                if(time < CZ.Settings.maxPermitedTimeRange.left) {
+                    time = CZ.Settings.maxPermitedTimeRange.left;
+                }
+                var k = (_range.max - _range.min) / _width;
+                var point = (time - _range.max) / k + _width;
+                var text = _tickSources[_mode].getMarkerLabel(_range, time);
+                _markerPosition = point;
+                markerText.text(text);
+                marker.css("left", point - marker.width() / 2);
             }
-            if(time < CZ.Settings.maxPermitedTimeRange.left) {
-                time = CZ.Settings.maxPermitedTimeRange.left;
-            }
-            var k = (_range.max - _range.min) / _width;
-            var point = (time - _range.max) / k + _width;
-            this.markerPosition = point;
-            var markerWidth = parseFloat($('#timescale_marker').css("width"));
-            $('#timescale_marker').css("left", point - markerWidth / 2);
-            var text = _tickSources[_mode].getMarkerLabel(_range, time);
-            document.getElementById('marker-text').innerHTML = text;
-        };
-        this.setTimeBorders = function () {
-            var k = (_range.max - _range.min) / _width;
-            var left_time = _range.min + CZ.Settings.panelWidth * k;
-            var right_time = _range.max - CZ.Settings.panelWidth * k;
-            if(right_time > CZ.Settings.maxPermitedTimeRange.right) {
-                right_time = CZ.Settings.maxPermitedTimeRange.right;
-                var right_pos = (right_time - _range.max) / k + _width;
-            } else {
-                var right_pos = (right_time - _range.max) / k + _width;
-            }
-            if(left_time < CZ.Settings.maxPermitedTimeRange.left) {
-                left_time = CZ.Settings.maxPermitedTimeRange.left;
-                var left_pos = (left_time - _range.max) / k + _width;
-            } else {
-                var left_pos = (left_time - _range.max) / k + _width;
-            }
-            var left_text = _tickSources[_mode].getPanelLabel(_range, left_time);
-            var right_text = _tickSources[_mode].getPanelLabel(_range, right_time);
-            document.getElementById('timescale_left_border').innerHTML = left_text;
-            document.getElementById('timescale_right_border').innerHTML = right_text;
-        };
-        this.MarkerPosition = function () {
-            return this.markerPosition;
         };
         function render() {
             setMode();
@@ -7380,79 +7936,6 @@ var CZ;
             renderBaseLine();
             renderMajorTicks();
             renderSmallTicks();
-        }
-        function LeftPanInput() {
-            if(!LeftInputShown) {
-                leftDateInput.val(document.getElementById('timescale_left_border').innerHTML);
-                old_left_val = leftDateInput.val();
-                leftDateInput.css("display", "table-cell");
-                leftDate.css("display", "none");
-                LeftInputShown = true;
-            } else {
-                var right_pan_val = document.getElementById('timescale_right_border').innerHTML;
-                var left_pan_val = leftDateInput.val();
-                var timerange;
-                timerange = _tickSources[_mode].getLeftPanelVirtualCoord(left_pan_val, right_pan_val, old_left_val, _range);
-                leftDateInput.css("display", "none");
-                leftDate.css("display", "table-cell");
-                LeftInputShown = false;
-                var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var latestVisible = vp.visible;
-                var newVis = _tickSources[_mode].getVisibleForElement({
-                    x: timerange.left,
-                    y: latestVisible.centerY - vp.height / 2,
-                    width: (timerange.right - timerange.left),
-                    height: vp.height
-                }, 1.0, vp, false);
-                CZ.Common.vc.virtualCanvas("setVisible", newVis);
-                vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var lt = vp.pointScreenToVirtual(0, 0);
-                var rb = vp.pointScreenToVirtual(vp.width, vp.height);
-                var newrange = {
-                    min: lt.x,
-                    max: rb.x
-                };
-                that.update(newrange);
-                marker.css("display", "table");
-            }
-        }
-        function RightPanInput() {
-            if(!RightInputShown) {
-                rightDateInput.val(document.getElementById('timescale_right_border').innerHTML);
-                old_right_val = rightDateInput.val();
-                rightDateInput.css("display", "table-cell");
-                rightDate.css("display", "none");
-                RightInputShown = true;
-            } else {
-                var left_pan_val = document.getElementById('timescale_left_border').innerHTML;
-                var right_pan_val = rightDateInput.val();
-                var timerange;
-                timerange = _tickSources[_mode].getRightPanelVirtualCoord(left_pan_val, right_pan_val, old_right_val, _range);
-                if(timerange != null) {
-                    rightDateInput.css("display", "none");
-                    rightDate.css("display", "table-cell");
-                    RightInputShown = false;
-                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    var latestVisible = vp.visible;
-                    var width1 = timerange.right - timerange.left;
-                    var newVis = _tickSources[_mode].getVisibleForElement({
-                        x: timerange.left,
-                        y: latestVisible.centerY - vp.height / 2,
-                        width: width1,
-                        height: vp.height
-                    }, 1.0, vp, false);
-                    CZ.Common.vc.virtualCanvas("setVisible", newVis);
-                    vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    var lt = vp.pointScreenToVirtual(0, 0);
-                    var rb = vp.pointScreenToVirtual(vp.width, vp.height);
-                    var newrange = {
-                        min: lt.x,
-                        max: rb.x
-                    };
-                    that.update(newrange);
-                    marker.css("display", "table");
-                }
-            }
         }
         this.getCoordinateFromTick = function (x) {
             var delta = _deltaRange;
@@ -7477,10 +7960,6 @@ var CZ;
         this.update = function (range) {
             _range = range;
             render();
-            var k = (_range.max - _range.min) / _width;
-            var time = _range.max - k * (_width / 2);
-            that.setTimeMarker(time);
-            this.setTimeBorders();
         };
         this.destroy = function () {
             _container[0].innerHTML = "";
@@ -7624,12 +8103,6 @@ var CZ;
         this.getMarkerLabel = function (range, time) {
             return time;
         };
-        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_right_val, range) {
-            return rightstr;
-        };
-        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_left_val, range) {
-            return leftstr;
-        };
     }
     CZ.TickSource = TickSource;
     ;
@@ -7640,11 +8113,11 @@ var CZ;
         this.getLabel = function (x) {
             var text;
             var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4);
-            text = -x / this.level;
+            text = Math.abs(x) / this.level;
             if(n < 0) {
                 text = (new Number(text)).toFixed(-n);
             }
-            text += " " + this.regime;
+            text += " " + (x < 0 ? this.regime : String(this.regime).charAt(0));
             return text;
         };
         this.getRegime = function (l, r) {
@@ -7748,81 +8221,18 @@ var CZ;
             var labelText;
             this.getRegime(range.min, range.max);
             var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
-            labelText = (-time / this.level).toFixed(Math.abs(numOfDigits));
-            labelText += " " + this.regime;
+            labelText = (Math.abs(time / this.level)).toFixed(Math.abs(numOfDigits));
+            var localPresent = CZ.Dates.getPresent();
+            var presentDate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            if(time == presentDate) {
+                if(this.regime !== "ka") {
+                    labelText = 0;
+                } else {
+                    labelText = 2;
+                }
+            }
+            labelText += " " + (time < 0 ? this.regime : String(this.regime).charAt(0));
             return labelText;
-        };
-        this.getPanelLabel = function (range, time) {
-            var labelText;
-            this.getRegime(range.min, range.max);
-            var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
-            var labelText = (new Number(-time / this.level)).toFixed(Math.abs(numOfDigits));
-            labelText += " " + this.regime;
-            return labelText;
-        };
-        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
-            var left_val = parseFloat(leftstr);
-            var left_reg = leftstr.split(/\W+/g);
-            var right_val = parseFloat(rightstr);
-            var right_reg = rightstr.split(/\W+/g);
-            var old_right_val = parseFloat(old_rightstr);
-            var old_right_reg = old_rightstr.split(/\W+/g);
-            var left_regime = left_reg[left_reg.length - 1];
-            var right_regime = right_reg[right_reg.length - 1];
-            var old_right_regime = old_right_reg[old_right_reg.length - 1];
-            var k = (right_val - left_val) / (old_right_val - left_val);
-            if(range.min < this.range.min) {
-                range.min = this.range.min;
-            }
-            if(range.max > this.range.max) {
-                range.max = this.range.max;
-            }
-            var val = range.min + k * (range.max - range.min);
-            if(val < range.min) {
-                return null;
-            }
-            if((right_regime != "Ga") && (right_regime != "Ma") && (right_regime != "ka")) {
-                return null;
-            }
-            if(isNaN(Number(right_val))) {
-                return null;
-            }
-            return {
-                left: range.min,
-                right: val
-            };
-        };
-        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_leftstr, range) {
-            var left_val = parseFloat(leftstr);
-            var left_reg = leftstr.split(/\W+/g);
-            var right_val = parseFloat(rightstr);
-            var right_reg = rightstr.split(/\W+/g);
-            var old_left_val = parseFloat(old_leftstr);
-            var old_left_reg = old_leftstr.split(/\W+/g);
-            var left_regime = left_reg[left_reg.length - 1];
-            var right_regime = right_reg[right_reg.length - 1];
-            var old_left_regime = old_left_reg[old_left_reg.length - 1];
-            var k = (right_val - left_val) / (right_val - old_left_val);
-            if(range.min < this.range.min) {
-                range.min = this.range.min;
-            }
-            if(range.max > this.range.max) {
-                range.max = this.range.max;
-            }
-            var val = range.max - k * (range.max - range.min);
-            if(val > range.max) {
-                return null;
-            }
-            if((left_regime != "Ga") && (left_regime != "Ma") && (left_regime != "ka")) {
-                return null;
-            }
-            if(isNaN(Number(right_val))) {
-                return null;
-            }
-            return {
-                left: val,
-                right: range.max
-            };
         };
         this.getVisibleForElement = function (element, scale, viewport, use_margin) {
             var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
@@ -7979,93 +8389,6 @@ var CZ;
                 labelText += " " + "CE";
             }
             return labelText;
-        };
-        this.getPanelLabel = function (range, time) {
-            this.getRegime(range.min, range.max);
-            var labelText = parseFloat(new Number(time - this.firstYear).toFixed(2));
-            labelText += (labelText > 0 ? -0.5 : -1.5);
-            labelText = Math.round(labelText);
-            if(labelText < 0) {
-                labelText = -labelText;
-            } else if(labelText == 0) {
-                labelText = 1;
-            }
-            if(time < this.firstYear + 1) {
-                labelText += " " + "BCE";
-            } else {
-                labelText += " " + "CE";
-            }
-            return labelText;
-        };
-        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
-            var left_val = parseFloat(leftstr);
-            var left_reg = leftstr.split(/\W+/g);
-            var right_val = parseFloat(rightstr);
-            var right_reg = rightstr.split(/\W+/g);
-            var old_right_val = parseFloat(old_rightstr);
-            var old_right_reg = old_rightstr.split(/\W+/g);
-            var left_regime = left_reg[left_reg.length - 1];
-            var right_regime = right_reg[right_reg.length - 1];
-            var old_right_regime = old_right_reg[old_right_reg.length - 1];
-            if((old_right_regime === "CE") && (left_regime === "BCE")) {
-                left_val = -left_val;
-            }
-            var k = (right_val - left_val) / (old_right_val - left_val);
-            if(range.min < this.range.min) {
-                range.min = this.range.min;
-            }
-            if(range.max > this.range.max) {
-                range.max = this.range.max;
-            }
-            var val = range.min + k * (range.max - range.min);
-            if(val < range.min) {
-                return null;
-            }
-            if((right_regime != "BCE") && (right_regime != "CE")) {
-                return null;
-            }
-            if(isNaN(Number(right_val))) {
-                return null;
-            }
-            return {
-                left: range.min,
-                right: val
-            };
-        };
-        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_leftstr, range) {
-            var left_val = parseFloat(leftstr);
-            var left_reg = leftstr.split(/\W+/g);
-            var right_val = parseFloat(rightstr);
-            var right_reg = rightstr.split(/\W+/g);
-            var old_left_val = parseFloat(old_leftstr);
-            var old_left_reg = old_leftstr.split(/\W+/g);
-            var left_regime = left_reg[left_reg.length - 1];
-            var right_regime = right_reg[right_reg.length - 1];
-            var old_left_regime = old_left_reg[old_left_reg.length - 1];
-            if((old_left_regime === "BCE") && (right_regime === "CE")) {
-                right_val = -right_val;
-            }
-            var k = (right_val - left_val) / (right_val - old_left_val);
-            if(range.min < this.range.min) {
-                range.min = this.range.min;
-            }
-            if(range.max > this.range.max) {
-                range.max = this.range.max;
-            }
-            var val = range.max - k * (range.max - range.min);
-            if(val > range.max) {
-                return null;
-            }
-            if((left_regime != "BCE") && (left_regime != "CE")) {
-                return null;
-            }
-            if(isNaN(Number(right_val))) {
-                return null;
-            }
-            return {
-                left: val,
-                right: range.max
-            };
         };
         this.getVisibleForElement = function (element, scale, viewport, use_margin) {
             var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
@@ -8323,123 +8646,9 @@ var CZ;
         };
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var date = CZ.Dates.getYMDFromCoordinate(time);
+            var date = CZ.Dates.getYMDFromCoordinate(time, true);
             var labelText = date.year + "." + (date.month + 1) + "." + date.day;
             return labelText;
-        };
-        this.getPanelLabel = function (range, time) {
-            this.getRegime(range.min, range.max);
-            var date = CZ.Dates.getYMDFromCoordinate(time);
-            var labelText = date.year + "." + (date.month + 1) + "." + date.day;
-            return labelText;
-        };
-        this.getRightPanelVirtualCoord = function (leftstr, rightstr, old_rightstr, range) {
-            var left_year_val = this.parseYear(leftstr);
-            var left_month_val = this.parseMonth(leftstr) - 1;
-            var left_date_val = this.parseDate(leftstr);
-            var right_year_val = this.parseYear(rightstr);
-            var right_month_val = this.parseMonth(rightstr) - 1;
-            var right_date_val = this.parseDate(rightstr);
-            var old_right_year_val = this.parseYear(old_rightstr);
-            var old_right_month_val = this.parseMonth(old_rightstr) - 1;
-            var old_right_date_val = this.parseDate(old_rightstr);
-            if(right_year_val <= 0) {
-                right_year_val++;
-            }
-            if(old_right_year_val <= 0) {
-                old_right_year_val++;
-            }
-            if(left_year_val <= 0) {
-                left_year_val++;
-            }
-            var right_val = CZ.Dates.getCoordinateFromYMD(right_year_val, right_month_val, right_date_val);
-            var left_val = CZ.Dates.getCoordinateFromYMD(left_year_val, left_month_val, left_date_val);
-            var old_right_val = CZ.Dates.getCoordinateFromYMD(old_right_year_val, old_right_month_val, old_right_date_val);
-            if(range.min < this.range.min) {
-                range.min = this.range.min;
-            }
-            if(range.max > this.range.max) {
-                range.max = this.range.max;
-            }
-            if(right_val < range.min) {
-                return null;
-            }
-            if(isNaN(Number(right_val))) {
-                return null;
-            }
-            return {
-                left: range.min,
-                right: right_val
-            };
-        };
-        this.getLeftPanelVirtualCoord = function (leftstr, rightstr, old_leftstr, range) {
-            var left_year_val = this.parseYear(leftstr);
-            var left_month_val = this.parseMonth(leftstr) - 1;
-            var left_date_val = this.parseDate(leftstr);
-            var right_year_val = this.parseYear(rightstr);
-            var right_month_val = this.parseMonth(rightstr) - 1;
-            var right_date_val = this.parseDate(rightstr);
-            var old_left_year_val = this.parseYear(old_leftstr);
-            var old_left_month_val = this.parseMonth(old_leftstr) - 1;
-            var old_left_date_val = this.parseDate(old_leftstr);
-            if(right_year_val <= 0) {
-                right_year_val++;
-            }
-            if(old_left_year_val <= 0) {
-                old_left_year_val++;
-            }
-            if(left_year_val <= 0) {
-                left_year_val++;
-            }
-            var right_val = CZ.Dates.getCoordinateFromYMD(right_year_val, right_month_val, right_date_val);
-            var left_val = CZ.Dates.getCoordinateFromYMD(left_year_val, left_month_val, left_date_val);
-            var old_left_val = CZ.Dates.getCoordinateFromYMD(old_left_year_val, old_left_month_val, old_left_date_val);
-            if(range.min < this.range.min) {
-                range.min = this.range.min;
-            }
-            if(range.max > this.range.max) {
-                range.max = this.range.max;
-            }
-            if(left_val > range.max) {
-                return null;
-            }
-            if(isNaN(Number(left_val))) {
-                return null;
-            }
-            return {
-                left: left_val,
-                right: range.max
-            };
-        };
-        this.parseDate = function (str) {
-            var temp = str.split(/([_\W])/);
-            if(temp.length === 7) {
-                return (-parseFloat(temp[6]));
-            }
-            if(temp.length === 5) {
-                return (parseFloat(temp[4]));
-            }
-            return null;
-        };
-        this.parseMonth = function (str) {
-            var temp = str.split(/([_\W])/);
-            if(temp.length === 7) {
-                return (-parseFloat(temp[4]));
-            }
-            if(temp.length === 5) {
-                return (parseFloat(temp[2]));
-            }
-            return null;
-        };
-        this.parseYear = function (str) {
-            var temp = str.split(/([_\W])/);
-            if(temp.length === 7) {
-                return (-parseFloat(temp[2]));
-            }
-            if(temp.length === 5) {
-                return (parseFloat(temp[0]));
-            }
-            return null;
         };
         this.getVisibleForElement = function (element, scale, viewport, use_margin) {
             var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
@@ -8970,7 +9179,7 @@ var CZ;
                     switch(mode) {
                         case "year":
                             _this.editModeYear();
-                            _this.setDate(_this.coordinate, false);
+                            _this.setDate_YearMode(_this.coordinate, false);
                             break;
                         case "date":
                             _this.editModeDate();
@@ -8999,37 +9208,50 @@ var CZ;
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
-            DatePicker.prototype.setDate = function (coordinate, InfinityConvertation) {
-                if (typeof InfinityConvertation === "undefined") { InfinityConvertation = false; }
+            DatePicker.prototype.setDate = function (coordinate, ZeroYearConversation) {
+                if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
                 if(!this.validateNumber(coordinate)) {
                     return false;
                 }
                 coordinate = Number(coordinate);
                 this.coordinate = coordinate;
-                var mode = this.modeSelector.find(":selected").val();
+                var regime = CZ.Dates.convertCoordinateToYear(this.coordinate).regime;
                 if(this.coordinate === this.INFINITY_VALUE) {
-                    if(InfinityConvertation) {
-                        this.regimeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find("option").each(function () {
+                        if($(this).val() === "infinite") {
+                            $(this).attr("selected", "selected");
+                            return;
+                        }
+                    });
+                    this.editModeInfinite();
+                    return;
+                }
+                switch(regime.toLowerCase()) {
+                    case "ga":
+                    case "ma":
+                    case "ka":
+                        this.modeSelector.find(":selected").attr("selected", "false");
                         this.modeSelector.find("option").each(function () {
-                            if($(this).val() === "infinite") {
+                            if($(this).val() === "year") {
                                 $(this).attr("selected", "selected");
                                 return;
                             }
                         });
-                        this.editModeInfinite();
-                    } else {
-                        var localPresent = CZ.Dates.getPresent();
-                        coordinate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-                    }
-                }
-                switch(mode) {
-                    case "year":
-                        this.setDate_YearMode(coordinate);
+                        this.editModeYear();
+                        this.setDate_YearMode(coordinate, ZeroYearConversation);
                         break;
-                    case "date":
+                    case "bce":
+                    case "ce":
+                        this.modeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if($(this).val() === "date") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        });
+                        this.editModeDate();
                         this.setDate_DateMode(coordinate);
-                        break;
-                    case "infinite":
                         break;
                 }
             };
@@ -9116,8 +9338,11 @@ var CZ;
                     this.yearSelector.val(parseFloat(this.yearSelector.val()).toFixed());
                 }
             };
-            DatePicker.prototype.setDate_YearMode = function (coordinate) {
+            DatePicker.prototype.setDate_YearMode = function (coordinate, ZeroYearConversation) {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
+                if((date.regime.toLowerCase() == "bce") && (ZeroYearConversation)) {
+                    date.year--;
+                }
                 this.yearSelector.val(date.year);
                 this.regimeSelector.find(":selected").attr("selected", "false");
                 this.regimeSelector.find("option").each(function () {
@@ -9188,6 +9413,14 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
+                CZ.Authoring.showMessageWindow("Click and drag to set the approximate length of the timeline.", "Create Timeline");
+                var prevIsActive = CZ.Authoring.isActive;
+                var prevMode = CZ.Authoring.mode;
+                var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
+                messageForm.closeButton.click(function (event) {
+                    CZ.Authoring.isActive = prevIsActive;
+                    CZ.Authoring.mode = prevMode;
+                });
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createTimeline";
             }
@@ -9204,6 +9437,14 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
+                CZ.Authoring.showMessageWindow("Click inside a timeline to set the approximate date of the exhibit.", "Create Exhibit");
+                var prevIsActive = CZ.Authoring.isActive;
+                var prevMode = CZ.Authoring.mode;
+                var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
+                messageForm.closeButton.click(function (event) {
+                    CZ.Authoring.isActive = prevIsActive;
+                    CZ.Authoring.mode = prevMode;
+                });
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createExhibit";
             }
@@ -9409,11 +9650,11 @@ var CZ;
             });
         }
         function createZoomSubject(vc) {
-            vc.mousewheel(function (objEvent, intDelta) {
-                var event = ($).Event("xbrowserwheel");
-                event.delta = intDelta;
-                event.origin = CZ.Common.getXBrowserMouseOrigin(vc, objEvent);
-                vc.trigger(event);
+            vc.mousewheel(function (event, delta, deltaX, deltaY) {
+                var xevent = ($).Event("xbrowserwheel");
+                xevent.delta = delta;
+                xevent.origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
+                vc.trigger(xevent);
             });
             var mouseWheel = vc.toObservable("xbrowserwheel");
             var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
@@ -10087,8 +10328,7 @@ var CZ;
         }
         Common.setVisible = setVisible;
         function updateMarker() {
-            Common.axis.setTimeMarker(Common.vc.virtualCanvas("getCursorPosition"));
-            Common.axis.setTimeBorders();
+            Common.axis.setTimeMarker(Common.vc.virtualCanvas("getCursorPosition"), true);
         }
         Common.updateMarker = updateMarker;
         function loadDataUrl() {
@@ -10283,7 +10523,11 @@ var CZ;
         function loadHtml(selector, filepath) {
             var container = $(selector);
             var promise = new $.Deferred();
-            if(!selector || !filepath || !container.length) {
+            if(!filepath) {
+                promise.resolve(container);
+                return promise;
+            }
+            if(!selector || !container.length) {
                 throw "Unable to load " + filepath + " " + selector;
             }
             container.load(filepath, function () {
@@ -10304,6 +10548,618 @@ var CZ;
         UILoader.loadAll = loadAll;
     })(CZ.UILoader || (CZ.UILoader = {}));
     var UILoader = CZ.UILoader;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Media) {
+        var BingMediaPicker = (function () {
+            function BingMediaPicker(container, context) {
+                this.container = container;
+                this.contentItem = context;
+                this.editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                this.searchTextbox = this.container.find(".cz-bing-search-input");
+                this.mediaTypeRadioButtons = this.container.find(":radio");
+                this.progressBar = this.container.find(".cz-form-progress-bar");
+                this.searchResultsBox = this.container.find(".cz-bing-search-results");
+                this.searchButton = this.container.find(".cz-bing-search-button");
+                this.initialize();
+            }
+            BingMediaPicker.setup = function setup(context) {
+                var mediaPickerContainer = CZ.Media.mediaPickersViews["bing"];
+                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context);
+                var formContainer = $(".cz-form-bing-mediapicker");
+                if(formContainer.length === 0) {
+                    formContainer = $("#mediapicker-form").clone().removeAttr("id").addClass("cz-form-bing-mediapicker").appendTo($("#content"));
+                }
+                var form = new CZ.UI.FormMediaPicker(formContainer, mediaPickerContainer, "Import from Bing", {
+                    activationSource: $(),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    contentContainer: ".cz-form-content"
+                });
+                $(form).on("showcompleted", function (event) {
+                    mediaPicker.searchTextbox.focus();
+                });
+                $(mediaPicker).on("resultclick", function (event) {
+                    form.close();
+                });
+                var onWindowResize = function () {
+                    return mediaPicker.onWindowResize();
+                };
+                $(window).on("resize", onWindowResize);
+                $(form).on("closecompleted", function (event) {
+                    $(window).off("resize", onWindowResize);
+                });
+                form.show();
+            };
+            BingMediaPicker.prototype.initialize = function () {
+                var _this = this;
+                this.progressBar.css("opacity", 0);
+                this.searchTextbox.off();
+                this.searchButton.off();
+                $(this).off();
+                this.searchTextbox.keypress(function (event) {
+                    var code = event.which || event.keyCode;
+                    if(code === 13) {
+                        event.preventDefault();
+                        _this.search();
+                    }
+                });
+                this.searchButton.click(function (event) {
+                    _this.search();
+                });
+                $(this).on("resultclick", function (event, mediaInfo) {
+                    _this.onSearchResultClick(mediaInfo);
+                });
+            };
+            BingMediaPicker.prototype.onSearchResultClick = function (mediaInfo) {
+                $.extend(this.contentItem, mediaInfo);
+                this.editContentItemForm.updateMediaInfo();
+            };
+            BingMediaPicker.prototype.getMediaType = function () {
+                return this.mediaTypeRadioButtons.filter(":checked").val();
+            };
+            BingMediaPicker.prototype.convertResultToMediaInfo = function (result, mediaType) {
+                var mediaInfoMap = {
+                    image: {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.SourceUrl,
+                        attribution: result.SourceUrl
+                    },
+                    video: {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.MediaUrl,
+                        attribution: result.MediaUrl
+                    },
+                    pdf: {
+                        uri: result.Url,
+                        mediaType: mediaType,
+                        mediaSource: result.Url,
+                        attribution: result.Url
+                    }
+                };
+                return mediaInfoMap[mediaType];
+            };
+            BingMediaPicker.prototype.search = function () {
+                var query = this.searchTextbox.val();
+                var mediaType = this.getMediaType();
+                if(query.trim() === "") {
+                    return;
+                }
+                this.searchResultsBox.empty();
+                this.showProgressBar();
+                switch(mediaType) {
+                    case "image":
+                        this.searchImages(query);
+                        break;
+                    case "video":
+                        this.searchVideos(query);
+                        break;
+                    case "document":
+                        this.searchDocuments(query);
+                        break;
+                }
+            };
+            BingMediaPicker.prototype.searchImages = function (query) {
+                var _this = this;
+                CZ.Service.getBingImages(query).done(function (response) {
+                    _this.hideProgressBar();
+                    if(response.d.length === 0) {
+                        _this.showNoResults();
+                        return;
+                    }
+                    for(var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = _this.createImageResult(result);
+                        _this.searchResultsBox.append(resultContainer);
+                        _this.alignThumbnails();
+                    }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
+                });
+            };
+            BingMediaPicker.prototype.searchVideos = function (query) {
+                var _this = this;
+                query += " (+site:youtube.com OR +site:vimeo.com)";
+                CZ.Service.getBingVideos(query).done(function (response) {
+                    _this.hideProgressBar();
+                    if(response.d.length === 0) {
+                        _this.showNoResults();
+                        return;
+                    }
+                    for(var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = _this.createVideoResult(result);
+                        _this.searchResultsBox.append(resultContainer);
+                        _this.alignThumbnails();
+                    }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
+                });
+            };
+            BingMediaPicker.prototype.searchDocuments = function (query) {
+                var _this = this;
+                CZ.Service.getBingDocuments(query, "pdf").done(function (response) {
+                    _this.hideProgressBar();
+                    if(response.d.length === 0) {
+                        _this.showNoResults();
+                        return;
+                    }
+                    for(var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = _this.createDocumentResult(result);
+                        _this.searchResultsBox.append(resultContainer);
+                    }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
+                });
+            };
+            BingMediaPicker.prototype.createImageResult = function (result) {
+                var _this = this;
+                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerImageThumbnailMaxWidth, CZ.Settings.mediapickerImageThumbnailMaxHeight);
+                var imageOffset = (CZ.Settings.mediapickerImageThumbnailMaxHeight - rectangle.height) / 2;
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: rectangle.width,
+                    "data-actual-width": rectangle.width
+                });
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title,
+                    title: result.Title
+                });
+                var size = $("<div></div>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.Width + "x" + result.Height + " - " + Math.round(result.FileSize / 8 / 1024) + " KB"
+                });
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.DisplayUrl,
+                    href: result.MediaUrl,
+                    title: result.DisplayUrl,
+                    "media-source": result.SourceUrl,
+                    target: "_blank"
+                });
+                var thumbnailContainer = $("<div></div>", {
+                    width: "100%",
+                    height: CZ.Settings.mediapickerImageThumbnailMaxHeight
+                });
+                var thumbnail = $("<img></img>", {
+                    class: "cz-bing-result-thumbnail",
+                    src: result.Thumbnail.MediaUrl,
+                    height: rectangle.height,
+                    width: "100%"
+                });
+                thumbnail.css("padding-top", imageOffset + "px");
+                thumbnailContainer.add(title).add(size).click(function (event) {
+                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "image"));
+                });
+                thumbnailContainer.append(thumbnail);
+                return container.append(thumbnailContainer).append(title).append(size).append(url);
+            };
+            BingMediaPicker.prototype.createVideoResult = function (result) {
+                var _this = this;
+                result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
+                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerVideoThumbnailMaxWidth, CZ.Settings.mediapickerVideoThumbnailMaxHeight);
+                var imageOffset = (CZ.Settings.mediapickerVideoThumbnailMaxHeight - rectangle.height) / 2;
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: rectangle.width,
+                    "data-actual-width": rectangle.width
+                });
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title,
+                    title: result.Title
+                });
+                var size = $("<div></div>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: "Duration - " + (result.RunTime / 1000) + " seconds"
+                });
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.MediaUrl,
+                    href: result.MediaUrl,
+                    title: result.MediaUrl,
+                    target: "_blank"
+                });
+                var thumbnailContainer = $("<div></div>", {
+                    width: "100%",
+                    height: CZ.Settings.mediapickerVideoThumbnailMaxHeight
+                });
+                var thumbnail = $("<img></img>", {
+                    class: "cz-bing-result-thumbnail",
+                    src: result.Thumbnail.MediaUrl,
+                    height: rectangle.height,
+                    width: "100%"
+                });
+                thumbnail.css("padding-top", imageOffset + "px");
+                thumbnailContainer.add(title).add(size).click(function (event) {
+                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "video"));
+                });
+                thumbnailContainer.append(thumbnail);
+                return container.append(thumbnailContainer).append(title).append(size).append(url);
+            };
+            BingMediaPicker.prototype.createDocumentResult = function (result) {
+                var _this = this;
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: 300
+                });
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title,
+                    title: result.Title
+                });
+                var descr = $("<div></div>", {
+                    class: "cz-bing-result-doc-description cz-lightgray",
+                    height: 100,
+                    text: result.Description
+                });
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.DisplayUrl,
+                    href: result.Url,
+                    title: result.DisplayUrl,
+                    target: "_blank"
+                });
+                title.add(descr).click(function (event) {
+                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "pdf"));
+                });
+                return container.append(title).append(descr).append(url);
+            };
+            BingMediaPicker.prototype.showProgressBar = function () {
+                this.progressBar.animate({
+                    opacity: 1
+                });
+            };
+            BingMediaPicker.prototype.hideProgressBar = function () {
+                this.progressBar.animate({
+                    opacity: 0
+                });
+            };
+            BingMediaPicker.prototype.showNoResults = function () {
+                this.searchResultsBox.text("No results.");
+            };
+            BingMediaPicker.prototype.createDefaultThumbnail = function () {
+                return {
+                    ContentType: "image/png",
+                    FileSize: 4638,
+                    Width: 500,
+                    Height: 500,
+                    MediaUrl: "/images/Temp-Thumbnail2.png"
+                };
+            };
+            BingMediaPicker.prototype.showErrorMessage = function (error) {
+                var errorMessagesByStatus = {
+                    "400": "The search request is formed badly. Please contact developers about the error.",
+                    "403": "Please sign in to ChronoZoom to use Bing search.",
+                    "500": "We are sorry, but something went wrong. Please try again later."
+                };
+                var errorMessage = $("<span></span>", {
+                    class: "cz-red",
+                    text: errorMessagesByStatus[error.status]
+                });
+                this.searchResultsBox.append(errorMessage);
+            };
+            BingMediaPicker.prototype.onWindowResize = function () {
+                this.alignThumbnails();
+            };
+            BingMediaPicker.prototype.alignThumbnails = function () {
+                var container = this.searchResultsBox;
+                var elements = container.children();
+                if(elements.length === 0) {
+                    return;
+                }
+                var rowWidth = container.width();
+                var currentRow = {
+                    elements: [],
+                    width: 0
+                };
+                for(var i = 0, len = elements.length; i < len; i++) {
+                    var curElement = $(elements[i]);
+                    var curElementActualWidth = +curElement.attr("data-actual-width");
+                    var curElementOuterWidth = curElement.outerWidth(true);
+                    var curElementInnerWidth = curElement.innerWidth();
+                    if(rowWidth < currentRow.width + curElementActualWidth) {
+                        var delta = rowWidth - currentRow.width;
+                        for(var j = 0, rowLen = currentRow.elements.length; j < rowLen; j++) {
+                            var rowElement = currentRow.elements[j];
+                            var rowElementActualWidth = +rowElement.attr("data-actual-width");
+                            rowElement.width(rowElementActualWidth + delta / rowLen);
+                        }
+                        currentRow.elements = [];
+                        currentRow.elements.push(curElement);
+                        currentRow.width = Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                    } else {
+                        currentRow.elements.push(curElement);
+                        currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                    }
+                }
+            };
+            BingMediaPicker.prototype.fitThumbnailToContainer = function (aspectRatio, maxWidth, maxHeight) {
+                var maxAspectRatio = maxWidth / maxHeight;
+                var output = {
+                    width: maxHeight * aspectRatio,
+                    height: maxHeight
+                };
+                if(aspectRatio > maxAspectRatio) {
+                    output.width = maxWidth;
+                    output.height = maxWidth / aspectRatio;
+                }
+                return output;
+            };
+            return BingMediaPicker;
+        })();
+        Media.BingMediaPicker = BingMediaPicker;        
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Media) {
+        (function (SkyDriveMediaPicker) {
+            var editContentItemForm;
+            var contentItem;
+            SkyDriveMediaPicker.filePicker;
+            SkyDriveMediaPicker.filePickerIframe;
+            SkyDriveMediaPicker.logoutButton;
+            SkyDriveMediaPicker.isEnabled;
+            SkyDriveMediaPicker.helperText;
+            var mediaType;
+            function setup(context) {
+                contentItem = context;
+                editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                SkyDriveMediaPicker.logoutButton = $("<button></button>", {
+                    text: "Logout",
+                    class: "cz-skydrive-logout-button",
+                    click: onLogout
+                });
+                SkyDriveMediaPicker.helperText = $("<label></label>", {
+                    text: "Selected items will be automatically shared",
+                    class: "cz-skydrive-help-text"
+                });
+                SkyDriveMediaPicker.filePicker = showFilePicker().then(onFilePick, onError);
+            }
+            SkyDriveMediaPicker.setup = setup;
+            function showFilePicker() {
+                watchFilePicker(onFilePickerLoad);
+                return WL.fileDialog({
+                    mode: "open",
+                    select: "single"
+                });
+            }
+            function onFilePick(response) {
+                onFilePickerClose();
+                getEmbed(response).then(onContentReceive, onError);
+            }
+            function getEmbed(response) {
+                switch(response.data.files[0].type) {
+                    case "photo":
+                        mediaType = "skydrive-image";
+                        break;
+                    default:
+                        mediaType = "skydrive-document";
+                        break;
+                }
+                return WL.api({
+                    path: response.data.files[0].id + "/embed",
+                    method: "GET"
+                });
+            }
+            function onContentReceive(response) {
+                var src = response.embed_html.match(/src=\"(.*?)\"/i)[1];
+                var uri = src;
+                if(mediaType === "skydrive-image") {
+                    var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    uri += ' ' + width + ' ' + height;
+                }
+                var mediaInfo = {
+                    uri: uri,
+                    mediaType: mediaType,
+                    mediaSource: src,
+                    attribution: src
+                };
+                $.extend(contentItem, mediaInfo);
+                editContentItemForm.updateMediaInfo();
+            }
+            function onError(response) {
+                var error = response.error;
+                if(error.code === "user_canceled" || error.code === "request_canceled") {
+                    onFilePickerClose();
+                } else {
+                    console.log(error.message);
+                }
+            }
+            function onLogout() {
+                if(window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
+                    SkyDriveMediaPicker.logoutButton.hide();
+                    SkyDriveMediaPicker.helperText.hide();
+                    SkyDriveMediaPicker.filePicker.cancel();
+                    WL.logout();
+                    window.location.assign("https://login.live.com/oauth20_logout.srf?client_id=" + CZ.Settings.WLAPIClientID + "&redirect_uri=" + window.location.toString());
+                }
+            }
+            function watchFilePicker(callback) {
+                SkyDriveMediaPicker.filePickerIframe = $("iframe[sutra=picker]");
+                if(SkyDriveMediaPicker.filePickerIframe.length > 0) {
+                    callback();
+                } else {
+                    setTimeout(watchFilePicker, 50, callback);
+                }
+            }
+            function onFilePickerLoad() {
+                SkyDriveMediaPicker.logoutButton.appendTo("body");
+                SkyDriveMediaPicker.helperText.appendTo("body");
+                $(window).on("resize", onWindowResize);
+                SkyDriveMediaPicker.filePickerIframe.load(function () {
+                    onWindowResize();
+                    SkyDriveMediaPicker.filePickerIframe.animate({
+                        opacity: 1
+                    });
+                    SkyDriveMediaPicker.logoutButton.animate({
+                        opacity: 1
+                    });
+                    SkyDriveMediaPicker.helperText.animate({
+                        opacity: 1
+                    });
+                });
+            }
+            function onFilePickerClose() {
+                SkyDriveMediaPicker.logoutButton.remove();
+                SkyDriveMediaPicker.helperText.remove();
+                $(window).off("resize", onWindowResize);
+            }
+            function onWindowResize() {
+                var skyDriveFooterHeight = 56;
+                var iframeOffset = SkyDriveMediaPicker.filePickerIframe.offset();
+                var iframeHeight = SkyDriveMediaPicker.filePickerIframe.outerHeight(true);
+                var buttonLeftMargin = parseInt(SkyDriveMediaPicker.logoutButton.css("margin-left"), 10);
+                var buttonTopMargin = parseInt(SkyDriveMediaPicker.logoutButton.css("margin-top"), 10);
+                SkyDriveMediaPicker.logoutButton.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin,
+                    left: iframeOffset.left + buttonLeftMargin
+                });
+                SkyDriveMediaPicker.helperText.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin + 1,
+                    left: iframeOffset.left + buttonLeftMargin + 90
+                });
+            }
+        })(Media.SkyDriveMediaPicker || (Media.SkyDriveMediaPicker = {}));
+        var SkyDriveMediaPicker = Media.SkyDriveMediaPicker;
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Media) {
+        var _mediaPickers = {
+        };
+        var _mediaPickersViews = {
+        };
+        Object.defineProperties(CZ.Media, {
+            mediaPickers: {
+                get: function () {
+                    return _mediaPickers;
+                }
+            },
+            mediaPickersViews: {
+                get: function () {
+                    return _mediaPickersViews;
+                }
+            }
+        });
+        function initialize() {
+            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
+            if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x150.png", CZ.Media.SkyDriveMediaPicker).done(function () {
+                    WL.init({
+                        client_id: CZ.Settings.WLAPIClientID,
+                        redirect_uri: CZ.Settings.WLAPIRedirectUrl,
+                        response_type: "token",
+                        scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
+                    });
+                });
+            }
+        }
+        Media.initialize = initialize;
+        function registerMediaPicker(title, iconUrl, type, viewUrl, selector) {
+            var order = Object.keys(_mediaPickers).length;
+            var setup = type.setup;
+            selector = selector || "$('<div></div>')";
+            _mediaPickers[title] = {
+            };
+            return CZ.UILoader.loadHtml(selector, viewUrl).always(function (view) {
+                _mediaPickersViews[title] = view;
+                _mediaPickers[title] = {
+                    title: title,
+                    iconUrl: iconUrl,
+                    order: order,
+                    setup: setup
+                };
+            });
+        }
+        Media.registerMediaPicker = registerMediaPicker;
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var MediaList = (function () {
+            function MediaList(container, mediaPickers, context) {
+                this.container = container;
+                this.mediaPickers = mediaPickers;
+                this.context = context;
+                this.container.addClass("cz-medialist");
+                this.fillListOfLinks();
+            }
+            MediaList.prototype.fillListOfLinks = function () {
+                var _this = this;
+                var sortedMediaPickersKeys = Object.keys(this.mediaPickers).sort(function (key1, key2) {
+                    return (_this.mediaPickers[key1].order - _this.mediaPickers[key2].order) > 0;
+                });
+                sortedMediaPickersKeys.forEach(function (key) {
+                    if(_this.mediaPickers.hasOwnProperty(key)) {
+                        var mp = _this.mediaPickers[key];
+                        var link = _this.createMediaPickerLink(mp);
+                        _this.container.append(link);
+                    }
+                });
+            };
+            MediaList.prototype.createMediaPickerLink = function (mp) {
+                var _this = this;
+                var container = $("<div></div>", {
+                    class: "cz-medialist-item",
+                    title: mp.title,
+                    "media-picker": mp.title
+                });
+                var icon = $("<img></img>", {
+                    class: "cz-medialist-item-icon",
+                    src: mp.iconUrl
+                });
+                container.click(function (event) {
+                    mp.setup(_this.context);
+                });
+                container.append(icon);
+                return container;
+            };
+            MediaList.prototype.remove = function () {
+                this.container.empty();
+                this.container.removeClass("cz-medialist");
+            };
+            return MediaList;
+        })();
+        UI.MediaList = MediaList;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -10348,6 +11204,8 @@ var CZ;
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
                 this.saveButton.click(function (event) {
+                    _this.startDate.setDate("d");
+                    var result = _this.startDate.getDate();
                     _this.errorMessage.empty();
                     var isDataValid = false;
                     isDataValid = CZ.Authoring.validateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
@@ -10371,7 +11229,11 @@ var CZ;
                             self.close();
                             self.timeline.onmouseclick();
                         }, function (error) {
-                            alert("Unable to save changes. Please try again later.");
+                            if(error !== undefined && error !== null) {
+                                self.errorMessage.text(error);
+                            } else {
+                                alert("Unable to save changes. Please try again later.");
+                            }
                             console.log(error);
                         }).always(function () {
                             _this.saveButton.prop('disabled', false);
@@ -10380,6 +11242,7 @@ var CZ;
                 });
                 this.deleteButton.click(function (event) {
                     if(confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
+                        var isDataValid = true;
                         CZ.Authoring.removeTimeline(_this.timeline);
                         _this.close();
                     }
@@ -10527,16 +11390,24 @@ var CZ;
                 delete this.exhibitCopy.children;
                 this.mode = CZ.Authoring.mode;
                 this.isCancel = true;
+                this.isModified = false;
                 this.initUI();
             }
             FormEditExhibit.prototype.initUI = function () {
                 var _this = this;
                 this.saveButton.prop('disabled', false);
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.datePicker.datePicker.change(function () {
+                    _this.isModified = true;
+                });
                 if(this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("create exhibit");
                     this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(this.exhibit.infodotDescription.date || "");
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
+                    console.log("this.datePicker.");
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -10562,7 +11433,7 @@ var CZ;
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("update exhibit");
                     this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(this.exhibit.infodotDescription.date || "");
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -10593,6 +11464,7 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onCreateArtifact = function () {
+                this.isModified = true;
                 if(this.exhibit.contentItems.length < CZ.Settings.infodotMaxContentItemsCount) {
                     this.exhibit.title = this.titleInput.val() || "";
                     this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
@@ -10622,10 +11494,24 @@ var CZ;
             };
             FormEditExhibit.prototype.onSave = function () {
                 var _this = this;
+                var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
+                var exhibit_y = this.exhibit.y;
+                if(exhibit_x + this.exhibit.width >= this.exhibit.parent.x + this.exhibit.parent.width) {
+                    exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
+                }
+                if(exhibit_x <= this.exhibit.parent.x) {
+                    exhibit_x = this.exhibit.parent.x;
+                }
+                if(exhibit_y + this.exhibit.height >= this.exhibit.parent.y + this.exhibit.parent.height) {
+                    exhibit_y = this.exhibit.parent.y + this.exhibit.parent.height - this.exhibit.height;
+                }
+                if(exhibit_y <= this.exhibit.parent.y) {
+                    exhibit_y = this.exhibit.parent.y;
+                }
                 var newExhibit = {
                     title: this.titleInput.val() || "",
-                    x: this.datePicker.getDate() - this.exhibit.width / 2,
-                    y: this.exhibit.y,
+                    x: exhibit_x,
+                    y: exhibit_y,
                     height: this.exhibit.height,
                     width: this.exhibit.width,
                     infodotDescription: {
@@ -10638,6 +11524,7 @@ var CZ;
                     this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
+                        _this.isModified = false;
                         _this.close();
                         _this.exhibit.id = arguments[0].id;
                         _this.exhibit.onmouseclick();
@@ -10660,6 +11547,7 @@ var CZ;
                 if(confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
                     CZ.Authoring.removeExhibit(this.exhibit);
                     this.isCancel = false;
+                    this.isModified = false;
                     this.close();
                 }
             };
@@ -10688,6 +11576,7 @@ var CZ;
             };
             FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
                 var idx;
+                this.isModified = true;
                 if(typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
                     idx = item.data.order;
                 } else if(typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
@@ -10707,6 +11596,7 @@ var CZ;
                 }
             };
             FormEditExhibit.prototype.onContentItemMove = function (item, indexStart, indexStop) {
+                this.isModified = true;
                 var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
                 this.exhibit.contentItems.splice(indexStop, 0, ci);
                 for(var i = 0; i < this.exhibit.contentItems.length; i++) {
@@ -10738,6 +11628,13 @@ var CZ;
             FormEditExhibit.prototype.close = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
+                if(this.isModified) {
+                    if(window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    } else {
+                        return;
+                    }
+                }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
@@ -10783,54 +11680,74 @@ var CZ;
                 this.descriptionInput = container.find(formInfo.descriptionInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.prevForm = formInfo.prevForm;
                 this.exhibit = formInfo.context.exhibit;
                 this.contentItem = formInfo.context.contentItem;
                 this.mode = CZ.Authoring.mode;
                 this.isCancel = true;
+                this.isModified = false;
                 this.initUI();
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
                 this.saveButton.prop('disabled', false);
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaSourceInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaTypeInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.attributionInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.descriptionInput.change(function () {
+                    _this.isModified = true;
+                });
+                if(CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
+                    $("<option></option>", {
+                        value: "skydrive-image",
+                        text: " Skydrive Image "
+                    }).appendTo(this.mediaTypeInput);
+                    $("<option></option>", {
+                        value: "skydrive-document",
+                        text: " Skydrive Document "
+                    }).appendTo(this.mediaTypeInput);
+                }
+                this.titleInput.val(this.contentItem.title || "");
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
+                this.descriptionInput.val(this.contentItem.description || "");
+                this.saveButton.off();
+                this.saveButton.click(function () {
+                    return _this.onSave();
+                });
                 if(CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
-                    this.titleInput.val(this.contentItem.title || "");
-                    this.mediaInput.val(this.contentItem.uri || "");
-                    this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                    this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                    this.attributionInput.val(this.contentItem.attribution || "");
-                    this.descriptionInput.val(this.contentItem.description || "");
                     this.closeButton.hide();
-                    this.saveButton.show();
-                    this.saveButton.off();
-                    this.saveButton.click(function () {
-                        return _this.onSave();
-                    });
                 } else if(CZ.Authoring.contentItemMode === "editContentItem") {
                     this.titleTextblock.text("Edit");
                     this.saveButton.text("update artifact");
-                    this.titleInput.val(this.contentItem.title || "");
-                    this.mediaInput.val(this.contentItem.uri || "");
-                    this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                    this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                    this.attributionInput.val(this.contentItem.attribution || "");
-                    this.descriptionInput.val(this.contentItem.description || "");
                     if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                         this.closeButton.hide();
                     } else {
                         this.closeButton.show();
                     }
-                    this.saveButton.show();
-                    this.saveButton.off();
-                    this.saveButton.click(function () {
-                        return _this.onSave();
-                    });
                 } else {
                     console.log("Unexpected authoring mode in content item form.");
                     this.close();
                 }
+                this.saveButton.show();
             };
             FormEditCI.prototype.onSave = function () {
                 var _this = this;
@@ -10853,6 +11770,7 @@ var CZ;
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
                             this.back();
                         }
                     } else if(CZ.Authoring.contentItemMode === "editContentItem") {
@@ -10864,12 +11782,15 @@ var CZ;
                             clickedListItem.descrTextblock.text(newContentItem.description);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                            (this.prevForm).isModified = true;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
                             this.back();
                         } else {
                             this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
                                 _this.isCancel = false;
+                                _this.isModified = false;
                                 _this.close();
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
@@ -10881,6 +11802,12 @@ var CZ;
                 } else {
                     this.errorMessage.show().delay(7000).fadeOut();
                 }
+            };
+            FormEditCI.prototype.updateMediaInfo = function () {
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
             };
             FormEditCI.prototype.show = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
@@ -10895,10 +11822,21 @@ var CZ;
             };
             FormEditCI.prototype.close = function (noAnimation) {
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
+                if(this.isModified) {
+                    if(window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    } else {
+                        return;
+                    }
+                }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 500,
+                    complete: function () {
+                        _this.mediaList.remove();
+                    }
                 });
                 if(this.isCancel) {
                     if(CZ.Authoring.contentItemMode === "createContentItem") {
@@ -10982,6 +11920,9 @@ var CZ;
                 this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
+                this.collectionTheme = formInfo.collectionTheme;
+                this.collectionThemeInput = container.find(formInfo.collectionThemeInput);
+                this.collectionThemeWrapper = container.find(formInfo.collectionThemeWrapper);
                 this.usernameInput.off("keypress");
                 this.emailInput.off("keypress");
                 this.initialize();
@@ -10990,7 +11931,7 @@ var CZ;
                 if(String(e).length > 254) {
                     return false;
                 }
-                var filter = /^([\w^_]+(?:([-_\.\+][\w^_]+)|)|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
+                var filter = /^([\w^_]+((?:([-_.\+][\w^_]+)|))+|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             };
             FormEditProfile.prototype.validUsername = function (e) {
@@ -11000,6 +11941,9 @@ var CZ;
             FormEditProfile.prototype.initialize = function () {
                 var _this = this;
                 var profile = CZ.Service.getProfile();
+                if(this.collectionThemeWrapper) {
+                    this.collectionThemeWrapper.show();
+                }
                 profile.done(function (data) {
                     if(data.DisplayName != null) {
                         _this.usernameInput.val(data.DisplayName);
@@ -11033,6 +11977,7 @@ var CZ;
                         }
                         emailAddress = _this.emailInput.val();
                     }
+                    _this.collectionTheme = _this.collectionThemeInput.val();
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
                             if(curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
@@ -11040,10 +11985,22 @@ var CZ;
                                 return;
                             }
                             CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
-                                if(_this.allowRedirect) {
-                                    window.location.assign("/" + success);
+                                if(_this.collectionTheme) {
+                                    CZ.Service.putCollection(_this.usernameInput.val(), _this.usernameInput.val(), {
+                                        theme: _this.collectionTheme
+                                    }).then(function () {
+                                        if(_this.allowRedirect) {
+                                            window.location.assign("/" + success);
+                                        } else {
+                                            _this.close();
+                                        }
+                                    });
                                 } else {
-                                    _this.close();
+                                    if(_this.allowRedirect) {
+                                        window.location.assign("/" + success);
+                                    } else {
+                                        _this.close();
+                                    }
                                 }
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
@@ -11069,6 +12026,7 @@ var CZ;
                     direction: "right",
                     duration: 500
                 });
+                this.collectionThemeInput.val(this.collectionTheme);
                 this.activationSource.addClass("active");
             };
             FormEditProfile.prototype.close = function () {
@@ -11078,6 +12036,9 @@ var CZ;
                     duration: 500
                 });
                 this.activationSource.removeClass("active");
+            };
+            FormEditProfile.prototype.setTheme = function (theme) {
+                this.collectionTheme = theme;
             };
             return FormEditProfile;
         })(CZ.UI.FormUpdateEntity);
@@ -11171,6 +12132,7 @@ var CZ;
                 return (query === "") ? $.Deferred().resolve(null).promise() : CZ.Service.getSearch(query);
             };
             FormHeaderSearch.prototype.updateSearchResults = function () {
+                var _this = this;
                 this.clearResultSections();
                 if(this.searchResults === null) {
                     this.hideSearchResults();
@@ -11196,6 +12158,7 @@ var CZ;
                     contentItem: ""
                 };
                 this.searchResults.forEach(function (item) {
+                    var form = _this;
                     var resultType = resultTypes[item.objectType];
                     var resultId = idPrefixes[resultType] + item.id;
                     var resultTitle = item.title;
@@ -11207,6 +12170,7 @@ var CZ;
                         click: function () {
                             var self = $(this);
                             CZ.Search.goToSearchResult(self.attr("result-id"), self.attr("result-type"));
+                            form.close();
                         }
                     }));
                 });
@@ -11320,14 +12284,18 @@ var CZ;
                     });
                     preloadedlist.forEach(function (preloaded) {
                         var li = $('<li></li>').css("margin-left", 10).css("margin-bottom", "3px").height(22).appendTo(existingTimSeriesList);
-                        var link = $('<a></a>').addClass("cz-form-btn").appendTo(li);
-                        link.css("color", "#25a1ea");
+                        var link = $('<a></a>').addClass("cz-form-preloadedrecord").appendTo(li);
+                        link.css("color", "#0464a2");
+                        link.css("font-size", "16px");
                         link.css("float", "left");
+                        link.css("width", "140px");
+                        link.css("cursor", "pointer");
                         link.text(preloaded.name);
-                        var div = $("<div></div>").addClass("cz-form-preloadedrecord").appendTo(li);
+                        var div = $("<span></span>").addClass("cz-form-preloadedrecord").appendTo(li);
                         div.text("Source:");
                         var sourceDiv = $("<a></a>").addClass("cz-form-preloadedrecord").appendTo(li);
-                        sourceDiv.css("color", "blue");
+                        sourceDiv.css("color", "#0464a2");
+                        sourceDiv.css("cursor", "pointer");
                         sourceDiv.text(preloaded.source);
                         sourceDiv.prop("href", preloaded.link);
                         link.click(function (e) {
@@ -11443,39 +12411,159 @@ var CZ;
             prevForm: null,
             navButton: ".cz-form-nav",
             closeButton: ".cz-form-close-btn > .cz-form-btn",
-            titleTextblock: ".cz-form-title"
+            titleTextblock: ".cz-form-title",
+            contentContainer: ".cz-form-content"
         });
-                var tourTitleInput = this.container.find(".cz-form-label");
-                tourTitleInput.text(message);
+                this.tourTitleInput = this.container.find(".cz-form-label");
                 this.titleTextblock.text(title || "ChronoZoom");
+                this.tourTitleInput.text(message);
+                this.setHeight();
             }
             MessageWindow.prototype.show = function () {
+                var _this = this;
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 300,
+                    complete: function () {
+                        $(document).on("keyup", _this, _this.onDocumentKeyPress);
+                    }
                 });
-                $(document).bind("keypress", this, this.onDocumentKeyPress);
             };
             MessageWindow.prototype.close = function () {
-                $(document).unbind("keypress", this.onDocumentKeyPress);
+                var _this = this;
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "left",
-                    duration: 100,
+                    duration: 300,
                     complete: function () {
+                        $(document).off("keyup", _this.onDocumentKeyPress);
                     }
                 });
             };
             MessageWindow.prototype.onDocumentKeyPress = function (e) {
                 var self = e.data;
                 if(e.which == 27 && self.isFormVisible) {
-                    self.close();
+                    self.closeButton.click();
                 }
+            };
+            MessageWindow.prototype.setHeight = function () {
+                this.container.show();
+                var messageHeight = this.tourTitleInput.outerHeight(true);
+                this.contentContainer.height(messageHeight);
+                this.container.hide();
             };
             return MessageWindow;
         })(CZ.UI.FormBase);
         UI.MessageWindow = MessageWindow;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormHeaderSessionExpired = (function (_super) {
+            __extends(FormHeaderSessionExpired, _super);
+            function FormHeaderSessionExpired(container, formInfo) {
+                        _super.call(this, container, formInfo);
+                this.time = 60;
+                this.sessionTimeSpan = container.find(formInfo.sessionTimeSpan);
+                this.sessionButton = container.find(formInfo.sessionButton);
+                this.initialize();
+            }
+            FormHeaderSessionExpired.prototype.initialize = function () {
+                var _this = this;
+                this.sessionButton.click(function () {
+                    CZ.Service.getProfile();
+                    clearTimeout(_this.timer);
+                    _this.time = 60;
+                    _this.close();
+                    _this.sessionTimeSpan.html(_this.time.toString());
+                    CZ.Authoring.resetSessionTimer();
+                    return false;
+                });
+            };
+            FormHeaderSessionExpired.prototype.onTimer = function () {
+                var _this = this;
+                if(this.time > 0) {
+                    this.time--;
+                    this.sessionTimeSpan.html(this.time.toString());
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(function () {
+                        _this.onTimer();
+                    }, 1000);
+                } else {
+                    clearTimeout(this.timer);
+                    this.close();
+                    document.location.href = "/account/logout";
+                }
+            };
+            FormHeaderSessionExpired.prototype.show = function () {
+                var _this = this;
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                    }
+                });
+                this.timer = setTimeout(function () {
+                    _this.onTimer();
+                }, 1000);
+                this.activationSource.addClass("active");
+            };
+            FormHeaderSessionExpired.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            return FormHeaderSessionExpired;
+        })(CZ.UI.FormBase);
+        UI.FormHeaderSessionExpired = FormHeaderSessionExpired;        
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormMediaPicker = (function (_super) {
+            __extends(FormMediaPicker, _super);
+            function FormMediaPicker(container, mediaPickerContainer, title, formInfo) {
+                        _super.call(this, container, formInfo);
+                this.titleTextblock.text(title);
+                this.contentContainer.append(mediaPickerContainer);
+                $(this).off();
+            }
+            FormMediaPicker.prototype.show = function () {
+                var _this = this;
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        $(_this).trigger("showcompleted");
+                    }
+                });
+                this.activationSource.addClass("active");
+            };
+            FormMediaPicker.prototype.close = function () {
+                var _this = this;
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        $(_this).trigger("closecompleted");
+                    }
+                });
+                this.activationSource.removeClass("active");
+            };
+            return FormMediaPicker;
+        })(CZ.UI.FormBase);
+        UI.FormMediaPicker = FormMediaPicker;        
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
@@ -11501,7 +12589,10 @@ var CZ;
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
             "#message-window": "/ui/message-window.html",
-            "#header-search-form": "/ui/header-search-form.html"
+            "#header-search-form": "/ui/header-search-form.html",
+            "#header-session-expired-form": "/ui/header-session-expired-form.html",
+            "#tour-caption-form": "/ui/tour-caption-form.html",
+            "#mediapicker-form": "/ui/mediapicker-form.html"
         };
         (function (FeatureActivation) {
             FeatureActivation._map = [];
@@ -11517,6 +12608,7 @@ var CZ;
             FeatureActivation.NotProduction = 4;
         })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
         var FeatureActivation = HomePageViewModel.FeatureActivation;
+        HomePageViewModel.sessionForm;
         var _featureMap = [
             {
                 Name: "Login",
@@ -11540,7 +12632,7 @@ var CZ;
             }, 
             {
                 Name: "TourAuthoring",
-                Activation: FeatureActivation.NotProduction,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".cz-form-create-tour"
             }, 
             {
@@ -11567,6 +12659,14 @@ var CZ;
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-breadcrumbs"
             }, 
+            {
+                Name: "Themes",
+                Activation: FeatureActivation.NotProduction
+            }, 
+            {
+                Name: "Skydrive",
+                Activation: FeatureActivation.NotProduction
+            }, 
             
         ];
         HomePageViewModel.rootCollection;
@@ -11580,11 +12680,29 @@ var CZ;
             return true;
         }
         function InitializeToursUI(profile, forms) {
+            CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+            var onTakeTour = function (tour) {
+                CZ.HomePageViewModel.closeAllForms();
+                CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
+                    activationSource: $(".tour-icon"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-tour-form-title",
+                    contentContainer: ".cz-form-content",
+                    minButton: ".cz-tour-form-min-btn > .cz-form-btn",
+                    captionTextarea: ".cz-form-tour-caption",
+                    tourPlayerContainer: ".cz-form-tour-player",
+                    bookmarksCount: ".cz-form-tour-bookmarks-count",
+                    narrationToggle: ".cz-toggle-narration",
+                    context: tour
+                });
+                CZ.Tours.tourCaptionForm.show();
+                CZ.Tours.removeActiveTour();
+                CZ.Tours.activateTour(tour, undefined);
+            };
             var onToursInitialized = function () {
-                CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
-                    CZ.Tours.removeActiveTour();
                     var toursListForm = getFormById("#toursList");
                     if(toursListForm.isFormVisible) {
                         toursListForm.close();
@@ -11597,10 +12715,7 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             tourTemplate: forms[10],
                             tours: CZ.Tours.tours,
-                            takeTour: function (tour) {
-                                CZ.Tours.removeActiveTour();
-                                CZ.Tours.activateTour(tour, undefined);
-                            },
+                            takeTour: onTakeTour,
                             editTour: allowEditing ? function (tour) {
                                 if(CZ.Authoring.showEditTourForm) {
                                     CZ.Authoring.showEditTourForm(tour);
@@ -11636,6 +12751,15 @@ var CZ;
             })();
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
+            var url = CZ.UrlNav.getURL();
+            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
+            CZ.Common.initialContent = url.content;
+            ApplyFeatureActivation();
+            CZ.Extensions.registerExtensions();
+            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
+            CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
@@ -11743,6 +12867,7 @@ var CZ;
                         form.show();
                     },
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.hideMessageWindow();
                         CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
@@ -11776,6 +12901,7 @@ var CZ;
                         form.show();
                     },
                     showCreateExhibitForm: function (exhibit) {
+                        CZ.Authoring.hideMessageWindow();
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -11826,6 +12952,7 @@ var CZ;
                             descriptionInput: ".cz-form-item-descr",
                             attributionInput: ".cz-form-item-attribution",
                             mediaTypeInput: ".cz-form-item-media-type",
+                            mediaListContainer: ".cz-form-medialist",
                             context: {
                                 exhibit: e,
                                 contentItem: ci
@@ -11837,6 +12964,24 @@ var CZ;
                 if(canvasIsEmpty) {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
+                HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
+                    activationSource: $("#header-session-expired-form"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: "",
+                    sessionTimeSpan: "#session-time",
+                    sessionButton: "#session-button"
+                });
+                CZ.Service.getProfile().done(function (data) {
+                    if(data != "") {
+                        CZ.Authoring.timer = setTimeout(function () {
+                            CZ.Authoring.showSessionForm();
+                        }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+                }).fail(function (error) {
+                });
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
@@ -11852,7 +12997,10 @@ var CZ;
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    collectionTheme: CZ.Settings.theme,
+                    collectionThemeInput: "#collection-theme",
+                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
                 });
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
@@ -11866,6 +13014,7 @@ var CZ;
                     event.preventDefault();
                     if(!profileForm.isFormVisible) {
                         closeAllForms();
+                        profileForm.setTheme(CZ.Settings.theme);
                         profileForm.show();
                     } else {
                         profileForm.close();
@@ -11881,6 +13030,7 @@ var CZ;
                             $("#profile-panel input#username").focus();
                             if(!profileForm.isFormVisible) {
                                 closeAllForms();
+                                profileForm.setTheme(CZ.Settings.theme);
                                 profileForm.show();
                             } else {
                                 profileForm.close();
@@ -11918,41 +13068,23 @@ var CZ;
                 CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
-            var url = CZ.UrlNav.getURL();
-            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
-            CZ.Service.superCollectionName = url.superCollectionName;
-            CZ.Service.collectionName = url.collectionName;
-            CZ.Common.initialContent = url.content;
+            CZ.Settings.applyTheme(null);
+            if(CZ.Service.superCollectionName) {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+                    $(response).each(function (index) {
+                        if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                            CZ.Settings.applyTheme(response[index].theme);
+                        }
+                    });
+                });
+            }
             $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
             $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
-            $('#tour_prev').mouseout(function () {
-                CZ.Common.toggleOffImage('tour_prev');
-            }).mouseover(function () {
-                CZ.Common.toggleOnImage('tour_prev');
-            }).click(CZ.Tours.tourPrev);
-            $('#tour_playpause').mouseout(function () {
-                CZ.Common.toggleOffImage('tour_playpause');
-            }).mouseover(function () {
-                CZ.Common.toggleOnImage('tour_playpause');
-            }).click(CZ.Tours.tourPlayPause);
-            $('#tour_next').mouseout(function () {
-                CZ.Common.toggleOffImage('tour_next');
-            }).mouseover(function () {
-                CZ.Common.toggleOnImage('tour_next');
-            }).click(CZ.Tours.tourNext);
-            $('#tour_exit').mouseout(function () {
-                CZ.Common.toggleOffImage('tour_exit');
-            }).mouseover(function () {
-                CZ.Common.toggleOnImage('tour_exit');
-            }).click(CZ.Tours.tourAbort);
-            $('#tours-narration').click(CZ.Tours.onNarrationClick);
-            $('#bookmarksCollapse').click(CZ.Tours.onBookmarksCollapse);
             $('#biblCloseButton').mouseout(function () {
                 CZ.Common.toggleOffImage('biblCloseButton', 'png');
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
-            ApplyFeatureActivation();
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();
@@ -11986,7 +13118,7 @@ var CZ;
             var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var markerPos = CZ.Common.axis.MarkerPosition();
+                var markerPos = CZ.Common.axis.markerPosition;
                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
                 CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
                 CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
@@ -11997,7 +13129,7 @@ var CZ;
                 }
                 var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
                 var actAni = CZ.Common.controller.activeAnimation != undefined;
-                if(actAni && !hoveredInfodot.id) {
+                if(actAni) {
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }
@@ -12121,11 +13253,12 @@ var CZ;
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');
-                if(form) {
+                if(form && form.isFormVisible === true) {
                     form.close();
                 }
             });
         }
+        HomePageViewModel.closeAllForms = closeAllForms;
         function getFormById(name) {
             var form = $(name).data("form");
             if(form) {
@@ -12134,6 +13267,7 @@ var CZ;
                 return false;
             }
         }
+        HomePageViewModel.getFormById = getFormById;
         function showTimeSeriesChart() {
             $('#timeSeriesContainer').height('30%');
             $('#timeSeriesContainer').show();

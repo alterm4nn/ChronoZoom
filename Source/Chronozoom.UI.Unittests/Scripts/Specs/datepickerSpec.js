@@ -42,9 +42,9 @@ describe("CZ datepicker", function () {
         });
 
         // set date as inifinity, 'infinite' edit mode wasn't added to datepicker
-        it("should set datepicker mode to 'year' mode if 9999 is date to set and 'infinite'" +
+        it("should set datepicker mode to 'date' mode if 9999 is date to set and 'infinite'" +
             " mode selector wasn't added to datepicker", function () {
-                var expectedMode = 'year';
+                var expectedMode = 'date';
                 datepicker.setDate(INFINITY_VALUE);
 
                 modeSelector = container.find(".cz-datepicker-mode");
@@ -73,7 +73,7 @@ describe("CZ datepicker", function () {
             it("shouldn't set date if it isn't a number", function () {
                 datepicker.setDate(incorrectDates);
                 var result = datepicker.getDate();
-                expect(1).toEqual(result);               
+                expect(0).toEqual(result);               
             });
         });
     });
@@ -82,10 +82,10 @@ describe("CZ datepicker", function () {
         // mode "year", fraction value
         it("should return integer value in 'year' edit mode", function () {
             datepicker.editModeYear();
-            datepicker.setDate("1000.5");
+            datepicker.setDate_YearMode(1000.5);
             result = datepicker.getDate();
             
-            expect("1000").toEqual(result);
+            expect(1000).toEqual(result);
         });
 
         // mode "date", integer value
@@ -95,10 +95,10 @@ describe("CZ datepicker", function () {
                 if ($(this).val === "date") {
                     $(this).selected = true;
 
-                    datepicker.setDate("1000");
+                    datepicker.setDate_DateMode(1000);
                     result = datepicker.getDate();
 
-                    expect("1000").toEqual(result);
+                    expect(1000).toEqual(result);
                 }
             });            
         });

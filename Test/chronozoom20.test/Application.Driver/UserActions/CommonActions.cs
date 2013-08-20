@@ -201,7 +201,12 @@ namespace Application.Driver.UserActions
 
         protected string GetJavaScriptExecutionResult(string script)
         {
-            return Executor.ExecuteScript("return " + script).ToString();
+            object executionResult = Executor.ExecuteScript("return " + script);
+            if (executionResult != null)
+            {
+                return executionResult.ToString();
+            }
+            return string.Empty;
         }
 
         protected bool IsElementExisted(By by)
@@ -215,11 +220,6 @@ namespace Application.Driver.UserActions
             {
                 DriverManager.GetEnvironmentInstance().SetImplicitWait(Configuration.ImplicitWait);
             }
-        }
-
-        protected void Refresh()
-        {
-            WebDriver.Navigate().Refresh();
         }
 
         protected static void InvokeChain(Func<Actions> chain)
@@ -256,11 +256,6 @@ namespace Application.Driver.UserActions
             }
         }
 
-        protected string GetCurrentWindowTitle()
-        {
-            return WebDriver.Title;
-        }
-
         protected void MoveToElementAndClick(By by)
         {
             IWebElement element = FindElement(by);
@@ -271,6 +266,11 @@ namespace Application.Driver.UserActions
         {
             IWebElement element = FindElement(by);
             InvokeChain(() => Builder.MoveToElement(element, x, y));
+        }  
+        
+        protected void ClickByCoordinates(int x, int y)
+        {
+            InvokeChain(() => Builder.MoveToElement(FindElement(By.XPath("//body")),0,0).MoveByOffset(x,y).Click());
         }
 
         protected string GetAttributeValue(By by, string attributeName)
@@ -316,33 +316,9 @@ namespace Application.Driver.UserActions
             return result;
         }
 
-        protected void CloseCurrentWindow()
-        {
-            WebDriver.Close();
-        }
-
         protected void Sleep(int sec)
         {
             Thread.Sleep(TimeSpan.FromSeconds(sec));
-        }
-
-        protected ReadOnlyCollection<string> GetHandles()
-        {
-            ReadOnlyCollection<string> handles;
-            try
-            {
-                handles = WebDriver.WindowHandles;
-            }
-            catch (Exception)
-            {
-                throw new Exception("Can not get browser handles");
-            }
-            return handles;
-        }
-
-        protected string GetCurrentHandle()
-        {
-            return WebDriver.CurrentWindowHandle;
         }
 
         protected void WaitAnimation()

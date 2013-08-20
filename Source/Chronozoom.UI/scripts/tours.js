@@ -13,6 +13,9 @@ var CZ;
         Tours.pauseTourAtAnyAnimation = false;
         Tours.bookmarkAnimation;
         var isToursDebugEnabled = false;
+        Tours.TourEndMessage = "Thank you for watching this tour!";
+        Tours.tourCaptionFormContainer;
+        Tours.tourCaptionForm;
         var TourBookmark = (function () {
             function TourBookmark(url, caption, lapseTime, text) {
                 this.url = url;
@@ -116,7 +119,7 @@ var CZ;
                     });
                     self.audioElement.addEventListener("progress", function () {
                         if(self.audioElement && self.audioElement.buffered.length > 0) {
-                            if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration))) {
+                            if(isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audioElement.buffered.end(self.audioElement.buffered.length - 1) / self.audioElement.duration))) {
                                 ;
                             }
                         }
@@ -176,13 +179,21 @@ var CZ;
                     if(isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark)) {
                         ;
                     }
+                    var targetVisible = getBookmarkVisible(bookmark);
+                    if(!targetVisible) {
+                        if(isToursDebugEnabled && window.console && console.log("bookmark index " + newBookmark + " references to nonexistent item")) {
+                            ;
+                        }
+                        goBack ? self.prev() : self.next();
+                        return;
+                    }
                     self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
                 };
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
                     if(!self.audio) {
                         return;
                     }
-                    if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc)) {
+                    if(isToursDebugEnabled && window.console && console.log("playing source: " + self.audioElement.currentSrc)) {
                         ;
                     }
                     self.audioElement.pause();
@@ -266,7 +277,12 @@ var CZ;
                     }
                     self.state = 'play';
                     var visible = self.vc.virtualCanvas("getViewport").visible;
-                    if(self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]))) {
+                    var bookmarkVisible = getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]);
+                    if(bookmarkVisible === null) {
+                        self.next();
+                        return;
+                    }
+                    if(self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, bookmarkVisible)) {
                         self.currentPlace = {
                             type: 'bookmark',
                             bookmark: self.currentPlace.bookmark
@@ -329,15 +345,13 @@ var CZ;
                     }
                 };
                 self.next = function next() {
-                    if(self.currentPlace.bookmark != self.bookmarks.length - 1) {
-                        if(self.state === 'play') {
-                            if(self.timerOnBookmarkIsOver) {
-                                clearTimeout(self.timerOnBookmarkIsOver);
-                            }
-                            self.timerOnBookmarkIsOver = undefined;
+                    if(self.state === 'play') {
+                        if(self.timerOnBookmarkIsOver) {
+                            clearTimeout(self.timerOnBookmarkIsOver);
                         }
-                        self.onBookmarkIsOver(false);
+                        self.timerOnBookmarkIsOver = undefined;
                     }
+                    self.onBookmarkIsOver(false);
                 };
                 self.prev = function prev() {
                     if(self.currentPlace.bookmark == 0) {
@@ -390,11 +404,9 @@ var CZ;
                 isAudioEnabled = Tours.isNarrationOn;
             }
             if(newTour != undefined) {
-                var tourControlDiv = document.getElementById("tour_control");
-                tourControlDiv.style.display = "block";
                 Tours.tour = newTour;
                 Tours.tour.tour_TourFinished.push(function (tour) {
-                    hideBookmark(tour);
+                    showTourEndMessage();
                     tourPause();
                     hideBookmarks();
                 });
@@ -416,8 +428,6 @@ var CZ;
                 tourPause();
                 Tours.tour.isTourPlayRequested = false;
             }
-            var tourControlDiv = document.getElementById("tour_control");
-            tourControlDiv.style.display = "none";
             if(Tours.tour) {
                 hideBookmarks();
                 $("#bookmarks .header").text("");
@@ -441,6 +451,7 @@ var CZ;
         }
         Tours.tourNext = tourNext;
         function tourPause() {
+            Tours.tourCaptionForm.setPlayPauseButtonState("play");
             if(Tours.tour != undefined) {
                 $("#tour_playpause").attr("src", "/images/tour_play_off.jpg");
                 Tours.tour.pause();
@@ -451,9 +462,11 @@ var CZ;
         }
         Tours.tourPause = tourPause;
         function tourResume() {
+            Tours.tourCaptionForm.setPlayPauseButtonState("pause");
             $("#tour_playpause").attr("src", "/images/tour_pause_off.jpg");
             Tours.tour.play();
         }
+        Tours.tourResume = tourResume;
         function tourPlayPause() {
             if(Tours.tour != undefined) {
                 if(Tours.tour.state == "pause") {
@@ -469,8 +482,9 @@ var CZ;
             $("#bookmarks").hide();
             Tours.isBookmarksWindowVisible = false;
             var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
+            if(curURL.hash.params["tour"]) {
+                delete curURL.hash.params["tour"];
+            }
             CZ.UrlNav.setURL(curURL);
         }
         Tours.tourAbort = tourAbort;
@@ -486,43 +500,13 @@ var CZ;
         }
         Tours.initializeToursContent = initializeToursContent;
         function hideBookmark(tour) {
-            if(Tours.isBookmarksWindowExpanded && Tours.isBookmarksTextShown) {
-                if(Tours.bookmarkAnimation) {
-                    Tours.bookmarkAnimation.stop(true, true);
-                }
-                Tours.bookmarkAnimation = $("#bookmarks .slideText").hide("drop", {
-                }, 'slow', function () {
-                    Tours.bookmarkAnimation = undefined;
-                });
-                $("#bookmarks .slideHeader").text("");
-                Tours.isBookmarksTextShown = false;
-            }
+            Tours.tourCaptionForm.hideBookmark();
+        }
+        function showTourEndMessage() {
+            Tours.tourCaptionForm.showTourEndMessage();
         }
         function showBookmark(tour, bookmark) {
-            if(!Tours.isBookmarksWindowVisible) {
-                Tours.isBookmarksWindowVisible = true;
-                $("#bookmarks .slideText").text(bookmark.text);
-                $("#bookmarks").show('slide', {
-                }, 'slow');
-            }
-            $("#bookmarks .header").text(tour.title);
-            $("#bookmarks .slideHeader").text(bookmark.caption);
-            $("#bookmarks .slideFooter").text(bookmark.number + '/' + tour.bookmarks.length);
-            if(Tours.isBookmarksWindowExpanded) {
-                $("#bookmarks .slideText").text(bookmark.text);
-                if(!Tours.isBookmarksTextShown) {
-                    if(Tours.bookmarkAnimation) {
-                        Tours.bookmarkAnimation.stop(true, true);
-                    }
-                    Tours.bookmarkAnimation = $("#bookmarks .slideText").show("drop", {
-                    }, 'slow', function () {
-                        Tours.bookmarkAnimation = undefined;
-                    });
-                    Tours.isBookmarksTextShown = true;
-                }
-            } else {
-                $("#bookmarks .slideText").text(bookmark.text);
-            }
+            Tours.tourCaptionForm.showBookmark(bookmark);
         }
         function hideBookmarks() {
             $("#bookmarks").hide();

@@ -19,6 +19,9 @@ var CZ;
                 this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
+                this.collectionTheme = formInfo.collectionTheme;
+                this.collectionThemeInput = container.find(formInfo.collectionThemeInput);
+                this.collectionThemeWrapper = container.find(formInfo.collectionThemeWrapper);
                 this.usernameInput.off("keypress");
                 this.emailInput.off("keypress");
                 this.initialize();
@@ -27,7 +30,7 @@ var CZ;
                 if(String(e).length > 254) {
                     return false;
                 }
-                var filter = /^([\w^_]+(?:([-_\.\+][\w^_]+)|)|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
+                var filter = /^([\w^_]+((?:([-_.\+][\w^_]+)|))+|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
                 return String(e).search(filter) != -1;
             };
             FormEditProfile.prototype.validUsername = function (e) {
@@ -37,6 +40,9 @@ var CZ;
             FormEditProfile.prototype.initialize = function () {
                 var _this = this;
                 var profile = CZ.Service.getProfile();
+                if(this.collectionThemeWrapper) {
+                    this.collectionThemeWrapper.show();
+                }
                 profile.done(function (data) {
                     if(data.DisplayName != null) {
                         _this.usernameInput.val(data.DisplayName);
@@ -70,6 +76,7 @@ var CZ;
                         }
                         emailAddress = _this.emailInput.val();
                     }
+                    _this.collectionTheme = _this.collectionThemeInput.val();
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
                             if(curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
@@ -77,10 +84,22 @@ var CZ;
                                 return;
                             }
                             CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
-                                if(_this.allowRedirect) {
-                                    window.location.assign("/" + success);
+                                if(_this.collectionTheme) {
+                                    CZ.Service.putCollection(_this.usernameInput.val(), _this.usernameInput.val(), {
+                                        theme: _this.collectionTheme
+                                    }).then(function () {
+                                        if(_this.allowRedirect) {
+                                            window.location.assign("/" + success);
+                                        } else {
+                                            _this.close();
+                                        }
+                                    });
                                 } else {
-                                    _this.close();
+                                    if(_this.allowRedirect) {
+                                        window.location.assign("/" + success);
+                                    } else {
+                                        _this.close();
+                                    }
                                 }
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
@@ -106,6 +125,7 @@ var CZ;
                     direction: "right",
                     duration: 500
                 });
+                this.collectionThemeInput.val(this.collectionTheme);
                 this.activationSource.addClass("active");
             };
             FormEditProfile.prototype.close = function () {
@@ -115,6 +135,9 @@ var CZ;
                     duration: 500
                 });
                 this.activationSource.removeClass("active");
+            };
+            FormEditProfile.prototype.setTheme = function (theme) {
+                this.collectionTheme = theme;
             };
             return FormEditProfile;
         })(CZ.UI.FormUpdateEntity);

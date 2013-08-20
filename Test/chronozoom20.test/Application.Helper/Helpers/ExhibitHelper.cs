@@ -4,12 +4,11 @@ using System.Collections.ObjectModel;
 using Application.Driver;
 using Application.Helper.Constants;
 using Application.Helper.Entities;
-using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
 namespace Application.Helper.Helpers
 {
-    public class ExhibitHelper : DependentActions
+    public class ExhibitHelper : BaseExhibitHelper
     {
 
         public void AddExhibit(Exhibit exhibit)
@@ -29,6 +28,17 @@ namespace Application.Helper.Helpers
             SetExhibitPoint();
             SetExhibitTitle(exhibit.Title);
             AddArtifacts(exhibit.ContentItems);
+            SaveAndClose();
+            Logger.Log("->");
+        }
+
+        public void AddExhibitWithSkyDriveContentItem(Exhibit exhibit)
+        {
+            Logger.Log("<- " + exhibit);
+            InitExhibitCreationMode();
+            SetExhibitPoint();
+            SetExhibitTitle(exhibit.Title);
+            HelperManager<ExhibitSkyDriveHelper>.Instance.AddSkyDriveArtifacts(exhibit.ContentItems);
             SaveAndClose();
             Logger.Log("->");
         }
@@ -62,6 +72,7 @@ namespace Application.Helper.Helpers
                 Logger.Log("- contentItem.Attribution: " + contentItem.Attribution, LogType.MessageWithoutScreenshot);
                 exhibit.ContentItems.Add(contentItem);
             }
+            WaitCondition(() => (GetJavaScriptExecutionResult(script + ".guid") != string.Empty), 15);
             exhibit.Id = new Guid(GetJavaScriptExecutionResult(script + ".guid"));
             Logger.Log("- exhibit.Id: " + exhibit.Id, LogType.MessageWithoutScreenshot);
             Logger.Log("->" + exhibit);
@@ -95,6 +106,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<- title: " + exhibit.Title);
             NavigateToExhibit(exhibit);
+            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             InitEditExhibitForm();
             ClickDeleteButton();
             ConfirmDeletion();
@@ -140,7 +152,6 @@ namespace Application.Helper.Helpers
             Logger.Log("<- title: " + exhibit.Title);
             ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('e{0}')", exhibit.Id));
             WaitAnimation();
-            MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
         }
 
@@ -150,6 +161,93 @@ namespace Application.Helper.Helpers
             string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
             Logger.Log("-> description: " + description);
             return description;
+        }
+
+        public void OpenBibliography()
+        {
+            Logger.Log("<-");
+            HelperManager<ImageHelper>.Instance.ClickOnBibliographyImage();
+            Logger.Log("->");
+        }
+
+        public bool IsBibliographyOpened()
+        {
+            return IsElementDisplayed(By.Id("bibliography"));
+        }
+
+        public Bibliography GetBibliography()
+        {
+            Logger.Log("<-");
+            OpenBibliography();
+            Bibliography bibliography = new Bibliography();
+            bibliography.Sources = new List<Source>();
+            Source bibliographySource = new Source();
+            ReadOnlyCollection<IWebElement> sources = FindElements(By.ClassName("source"));
+            foreach (IWebElement source in sources)
+            {
+                bibliographySource.Name = source.FindElement(By.ClassName("sourceName")).Text;
+                bibliographySource.Description = source.FindElement(By.ClassName("sourceDescr")).Text;
+                bibliography.Sources.Add(bibliographySource);
+            }
+            Logger.Log("->");
+            return bibliography;
+        }
+
+        public void CloseBibliography()
+        {
+            Logger.Log("<-");
+            Click(By.Id("biblCloseButton"));
+            Logger.Log("->");
+        }
+
+        public void AddExhibitWithoutFormClosing(Exhibit exhibit)
+        {
+            Logger.Log("<- " + exhibit);
+            InitExhibitCreationMode();
+            SetExhibitPoint();
+            SetExhibitTitle(exhibit.Title);
+            Logger.Log("->");
+        }
+
+        public void ClickByAddArtifact()
+        {
+            Logger.Log("->");
+            By createArtifactButton = By.XPath("//*[@class='cz-form-create-artifact cz-button']");
+            WaitForElementEnabled(createArtifactButton);
+            Click(createArtifactButton);
+            Logger.Log("<-");
+        }
+
+        public string GetCurrentImageOrVideoUrl()
+        {
+            Logger.Log("->");
+            string imageUrl = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/input[@class='cz-form-item-mediaurl cz-input']")).GetAttribute("value");
+            Logger.Log("<- imageUrl: " + imageUrl);
+            return imageUrl;
+        }
+
+        public string GetCurrentMediaSource()
+        {
+            Logger.Log("->");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/input[@class='cz-form-item-mediasource cz-input']")).GetAttribute("value");
+            Logger.Log("<- mediaSource: " + mediaSource);
+            return mediaSource;
+        }
+
+        public string GetCurrentAttribution()
+        {
+            Logger.Log("->");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/input[@class='cz-form-item-attribution cz-input']")).GetAttribute("value");
+            Logger.Log("<- attribution: " + mediaSource);
+            return mediaSource;
+        }
+
+        public string GetCurrentMediaType()
+        {
+            Logger.Log("->");
+            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/select[@class='cz-form-item-media-type cz-input']")).GetAttribute("value");
+            Logger.Log("<- attribution: " + mediaSource);
+            return mediaSource;
         }
 
         private void ConfirmDeletion()
@@ -234,28 +332,15 @@ namespace Application.Helper.Helpers
             TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-mediaurl cz-input']"), mediaSourse);
         }
 
-        private void SetDescription(string description)
-        {
-            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-descr cz-input']"), description);
-        }
-
-        private void SetTitle(string title)
-        {
-            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-title cz-input']"), title);
-        }
-
-
         private void AddArtifacts(IEnumerable<Chronozoom.Entities.ContentItem> contentItems)
         {
             Logger.Log("->");
             foreach (ContentItem contentItem in contentItems)
             {
-                Logger.Log("-- " + contentItem.ToString());
-                By createArtifactButton = By.XPath("//*[@class='cz-form-create-artifact cz-button']");
-                WaitForElementEnabled(createArtifactButton);
-                Click(createArtifactButton);
+                Logger.Log("-- " + contentItem);
+                InitArtifactForm();
                 FillArtifact(contentItem);
-                Click(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']"));
+                SaveArtifact();
             }
             Logger.Log("<-");
         }

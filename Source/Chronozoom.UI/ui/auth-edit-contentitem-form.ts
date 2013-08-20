@@ -1,6 +1,7 @@
 /// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../scripts/authoring.ts'/>
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 
 module CZ {
     export module UI {
@@ -12,6 +13,7 @@ module CZ {
             attributionInput: string;
             descriptionInput: string;
             errorMessage: string;
+            mediaListContainer: string;
             context: {
                 exhibit: Object;
                 contentItem: Object;
@@ -28,14 +30,17 @@ module CZ {
             private descriptionInput: JQuery;
             private errorMessage: JQuery;
             private saveButton: JQuery;
+            private mediaListContainer: JQuery;
 
             private prevForm: FormBase;
+            private mediaList: CZ.UI.MediaList;
 
             private exhibit: any; // CanvasInfodot
             private contentItem: any; // ContentItem Metadata
 
             private mode; // create | edit
             private isCancel: bool; // is form closed without saving changes
+            private isModified: bool;
 
             constructor(container: JQuery, formInfo: IFormEditCIInfo) {
                 super(container, formInfo);
@@ -49,6 +54,7 @@ module CZ {
                 this.descriptionInput = container.find(formInfo.descriptionInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
 
                 this.prevForm = formInfo.prevForm;
 
@@ -57,54 +63,61 @@ module CZ {
 
                 this.mode = CZ.Authoring.mode; // deep copy mode. it never changes throughout the lifecycle of the form.
                 this.isCancel = true;
-
+                this.isModified = false;
                 this.initUI();
             }
 
             private initUI() {
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
+                
                 this.saveButton.prop('disabled', false);
+
+                this.titleInput.change(() => { this.isModified = true; });
+                this.mediaInput.change(() => { this.isModified = true; });
+                this.mediaSourceInput.change(() => { this.isModified = true; });
+                this.mediaTypeInput.change(() => { this.isModified = true; });
+                this.attributionInput.change(() => { this.isModified = true; });
+                this.descriptionInput.change(() => { this.isModified = true; });
+
+                if (CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
+                    $("<option></option>", {
+                        value: "skydrive-image",
+                        text: " Skydrive Image "
+                    }).appendTo(this.mediaTypeInput);
+                    $("<option></option>", {
+                        value: "skydrive-document",
+                        text: " Skydrive Document "
+                    }).appendTo(this.mediaTypeInput);
+                }
+
+                this.titleInput.val(this.contentItem.title || "");
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "")
+                this.descriptionInput.val(this.contentItem.description || "");
+                this.saveButton.off();
+                this.saveButton.click(() => this.onSave());
+
                 if (CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
                     this.saveButton.text("create artifiact");
 
-                    this.titleInput.val(this.contentItem.title || "");
-                    this.mediaInput.val(this.contentItem.uri || "");
-                    this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                    this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                    this.attributionInput.val(this.contentItem.attribution || "")
-                    this.descriptionInput.val(this.contentItem.description || "");
-
                     this.closeButton.hide();
-                    this.saveButton.show();
-
-                    this.saveButton.off();
-                    this.saveButton.click(() => this.onSave());
-
                 } else if (CZ.Authoring.contentItemMode === "editContentItem") {
                     this.titleTextblock.text("Edit");
                     this.saveButton.text("update artifact");
-
-                    this.titleInput.val(this.contentItem.title || "");
-                    this.mediaInput.val(this.contentItem.uri || "");
-                    this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                    this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                    this.attributionInput.val(this.contentItem.attribution || "")
-                    this.descriptionInput.val(this.contentItem.description || "");
 
                     if (this.prevForm && this.prevForm instanceof FormEditExhibit)
                         this.closeButton.hide();
                     else
                         this.closeButton.show();
-
-                    this.saveButton.show();
-
-                    // this.closeButton.click() is handled by base
-                    this.saveButton.off();
-                    this.saveButton.click(() => this.onSave());
                 } else {
                     console.log("Unexpected authoring mode in content item form.");
                     this.close();
                 }
+
+                this.saveButton.show();
             }
 
             private onSave() {
@@ -125,6 +138,7 @@ module CZ {
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (<FormEditExhibit>this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
                             this.back();
                         }
                     } else if (CZ.Authoring.contentItemMode === "editContentItem") {
@@ -136,13 +150,16 @@ module CZ {
                             clickedListItem.descrTextblock.text(newContentItem.description);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
                             (<FormEditExhibit>this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                            (<FormEditExhibit>this.prevForm).isModified = true;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
                             this.back();
                         } else {
                             this.saveButton.prop('disabled', true);
                             CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(
                                 response => {
                                     this.isCancel = false;
+                                    this.isModified = false;
                                     this.close();
                                 },
                                 error => {
@@ -158,6 +175,13 @@ module CZ {
                 }
             }
 
+            public updateMediaInfo() {
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
+            }
+
             public show(noAnimation?: bool = false) {
                 CZ.Authoring.isActive = true;
                 this.activationSource.addClass("active");
@@ -170,10 +194,22 @@ module CZ {
             }
 
             public close(noAnimation?: bool = false) {
+                if (this.isModified) {
+                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    }
+                    else {
+                        return;
+                    }
+                }
+
                 super.close(noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
-                    duration: 500
+                    duration: 500,
+                    complete: () => {
+                        this.mediaList.remove();
+                    }
                 });
                 if (this.isCancel) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {

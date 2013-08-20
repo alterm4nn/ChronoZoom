@@ -32,8 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Chronozoom.Entities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Chronozoom.Entities">
       <HintPath>..\..\..\Source\Chronozoom.Entities\bin\Chronozoom.Entities.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.Unity">
@@ -58,11 +57,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\ApiConstants.cs" />
+    <Compile Include="Constants\ImageTemplateFilesLocations.cs" />
     <Compile Include="Constants\Javascripts.cs" />
+    <Compile Include="Entities\Bibliography.cs" />
+    <Compile Include="Entities\Bookmark.cs" />
     <Compile Include="Entities\ContentItem.cs" />
     <Compile Include="Entities\Exhibit.cs" />
     <Compile Include="Entities\NewExhibitApiResponse.cs" />
     <Compile Include="Entities\Timeline.cs" />
+    <Compile Include="Entities\Tour.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="HelperManager.cs" />
     <Compile Include="BrowserImpl\ChromeControls.cs" />
@@ -71,12 +74,16 @@
     <Compile Include="BrowserImpl\IeControls.cs" />
     <Compile Include="BrowserImpl\SafariControls.cs" />
     <Compile Include="Helpers\ApiHelper.cs" />
+    <Compile Include="Helpers\ArtifactSearchHelper.cs" />
     <Compile Include="Helpers\AuthorizationHelper.cs" />
+    <Compile Include="Helpers\BaseExhibitHelper.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
     <Compile Include="Helpers\BreadcrumbsHelper.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\ExhibitHelper.cs" />
+    <Compile Include="Helpers\ExhibitSkyDriveHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />
+    <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\NavigationHelper.cs" />
     <Compile Include="Helpers\SearchHelper.cs" />
     <Compile Include="Helpers\TimelineHelper.cs" />
@@ -92,12 +99,17 @@
   <ItemGroup>
     <Resource Include="Constants\Accounts.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Resource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application.Driver\Application.Driver.csproj">
       <Project>{ac1310bd-eacc-4b45-bcaf-2d8a0260e2d1}</Project>
       <Name>Application.Driver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageSearchEngine\ImageSearchEngine.csproj">
+      <Project>{6899b01e-ee1e-45cd-acd3-b44d0790975c}</Project>
+      <Name>ImageSearchEngine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

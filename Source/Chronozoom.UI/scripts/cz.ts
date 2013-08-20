@@ -6,8 +6,10 @@
 /// <reference path='tours.ts'/>
 /// <reference path='virtual-canvas.ts'/>
 /// <reference path='uiloader.ts'/>
+/// <reference path='media.ts'/>
 /// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../ui/controls/datepicker.ts'/>
+/// <reference path='../ui/controls/medialist.ts'/>
 /// <reference path='../ui/auth-edit-timeline-form.ts'/>
 /// <reference path='../ui/auth-edit-exhibit-form.ts'/>
 /// <reference path='../ui/auth-edit-contentitem-form.ts'/>
@@ -19,8 +21,13 @@
 /// <reference path='../ui/timeseries-graph-form.ts'/>
 /// <reference path='../ui/timeseries-data-form.ts'/>
 /// <reference path='../ui/tourslist-form.ts'/>
+/// <reference path='../ui/tour-caption-form.ts'/>
 /// <reference path='../ui/message-window.ts'/>
+/// <reference path='../ui/header-session-expired-form.ts'/>
+/// <reference path='../ui/mediapicker-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
+/// <reference path='extensions/extensions.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 
 var constants: any;
 
@@ -28,6 +35,7 @@ module CZ {
     export var timeSeriesChart: CZ.UI.LineChart;
     export var leftDataSet: CZ.Data.DataSet;
     export var rightDataSet: CZ.Data.DataSet;
+
 
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
@@ -46,7 +54,10 @@ module CZ {
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html", //11
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html", //12
             "#message-window": "/ui/message-window.html", // 13
-            "#header-search-form": "/ui/header-search-form.html" // 14
+            "#header-search-form": "/ui/header-search-form.html", // 14
+            "#header-session-expired-form": "/ui/header-session-expired-form.html", // 15
+            "#tour-caption-form": "/ui/tour-caption-form.html", // 16
+            "#mediapicker-form": "/ui/mediapicker-form.html" // 17
         };
 
         export enum FeatureActivation {
@@ -64,6 +75,8 @@ module CZ {
             IsEnabled: bool;
             HasBeenActivated: bool;
         }
+
+        export var sessionForm: CZ.UI.FormHeaderSessionExpired;
 
         // Basic Flight-Control (Tracks the features that are enabled)
         //
@@ -94,7 +107,7 @@ module CZ {
             },
             {
                 Name: "TourAuthoring",
-                Activation: FeatureActivation.NotProduction,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".cz-form-create-tour"
             },
             {
@@ -121,6 +134,14 @@ module CZ {
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-breadcrumbs"
             },
+            {
+                Name: "Themes",
+                Activation: FeatureActivation.NotProduction
+            },
+            {
+                Name: "Skydrive",
+                Activation: FeatureActivation.NotProduction
+            },
         ];
 
         export var rootCollection: bool;
@@ -129,7 +150,7 @@ module CZ {
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
                 return true;
             }
-            
+
             if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
                 return false
             }
@@ -138,12 +159,32 @@ module CZ {
         }
 
         function InitializeToursUI(profile, forms) {
+            CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
 
+            var onTakeTour = tour => {
+                CZ.HomePageViewModel.closeAllForms();
+                CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
+                    activationSource: $(".tour-icon"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-tour-form-title",
+                    contentContainer: ".cz-form-content",
+                    minButton: ".cz-tour-form-min-btn > .cz-form-btn",
+                    captionTextarea: ".cz-form-tour-caption",
+                    tourPlayerContainer: ".cz-form-tour-player",
+                    bookmarksCount: ".cz-form-tour-bookmarks-count",
+                    narrationToggle: ".cz-toggle-narration",
+                    context: tour
+                });
+                CZ.Tours.tourCaptionForm.show();
+
+                CZ.Tours.removeActiveTour();
+                CZ.Tours.activateTour(tour, undefined);
+            };
+
             var onToursInitialized = function () {
-                CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () { // show form
-                    CZ.Tours.removeActiveTour();
                     var toursListForm = getFormById("#toursList");
 
                     if (toursListForm.isFormVisible) {
@@ -158,10 +199,7 @@ module CZ {
                             titleTextblock: ".cz-form-title",
                             tourTemplate: forms[10],
                             tours: CZ.Tours.tours,
-                            takeTour: tour => {
-                                CZ.Tours.removeActiveTour();
-                                CZ.Tours.activateTour(tour, undefined);
-                            },
+                            takeTour: onTakeTour,
                             editTour: allowEditing ? tour => {
                                 if (CZ.Authoring.showEditTourForm)
                                     CZ.Authoring.showEditTourForm(tour);
@@ -190,6 +228,22 @@ module CZ {
 
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
+
+            var url = CZ.UrlNav.getURL();
+            rootCollection = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
+            CZ.Common.initialContent = url.content;
+
+            // Apply features
+            ApplyFeatureActivation();
+
+            // Register ChronoZoom Extensions
+            CZ.Extensions.registerExtensions();
+
+            // Register ChronoZoom Media Pickers.
+            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
+            CZ.Media.initialize();
 
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
@@ -308,6 +362,7 @@ module CZ {
                         form.show();
                     },
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.hideMessageWindow();
                         CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
@@ -341,6 +396,7 @@ module CZ {
                         form.show();
                     },
                     showCreateExhibitForm: function (exhibit) {
+                        CZ.Authoring.hideMessageWindow();
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -391,6 +447,7 @@ module CZ {
                             descriptionInput: ".cz-form-item-descr",
                             attributionInput: ".cz-form-item-attribution",
                             mediaTypeInput: ".cz-form-item-media-type",
+                            mediaListContainer: ".cz-form-medialist",
                             context: {
                                 exhibit: e,
                                 contentItem: ci
@@ -403,6 +460,24 @@ module CZ {
                 if (canvasIsEmpty) {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
+
+                sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
+                    activationSource: $("#header-session-expired-form"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: "",
+                    sessionTimeSpan: "#session-time",
+                    sessionButton: "#session-button"
+                });
+
+                CZ.Service.getProfile().done(data => {
+                    //Authorized
+                    if (data != "") {
+                        CZ.Authoring.timer = setTimeout(() => { CZ.Authoring.showSessionForm(); }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+                }).fail((error) => {  });
 
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
@@ -419,7 +494,10 @@ module CZ {
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    collectionTheme: CZ.Settings.theme,
+                    collectionThemeInput: "#collection-theme",
+                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
                 });
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
@@ -435,6 +513,7 @@ module CZ {
                     event.preventDefault();
                     if (!profileForm.isFormVisible) {
                         closeAllForms();
+                        profileForm.setTheme(CZ.Settings.theme);
                         profileForm.show();
                     }
                     else {
@@ -456,6 +535,7 @@ module CZ {
 
                             if (!profileForm.isFormVisible) {
                                 closeAllForms();
+                                profileForm.setTheme(CZ.Settings.theme);
                                 profileForm.show();
                             }
                             else {
@@ -502,45 +582,27 @@ module CZ {
                     CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
                 });
 
-            var url = CZ.UrlNav.getURL();
-            rootCollection = url.superCollectionName === undefined;
-            CZ.Service.superCollectionName = url.superCollectionName;
-            CZ.Service.collectionName = url.collectionName;
-            CZ.Common.initialContent = url.content;
+            CZ.Settings.applyTheme(null);
+
+            // If not the root URL.
+            if (CZ.Service.superCollectionName) {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(response => {
+                    $(response).each((index) => {
+                        if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                            CZ.Settings.applyTheme(response[index].theme);
+                        }
+                    });
+                });
+            }
 
             $('#breadcrumbs-nav-left')
                 .click(CZ.BreadCrumbs.breadCrumbNavLeft);
             $('#breadcrumbs-nav-right')
                 .click(CZ.BreadCrumbs.breadCrumbNavRight);
 
-            $('#tour_prev')
-                .mouseout(() => { CZ.Common.toggleOffImage('tour_prev'); })
-                .mouseover(() => { CZ.Common.toggleOnImage('tour_prev'); })
-                .click(CZ.Tours.tourPrev);
-            $('#tour_playpause')
-                .mouseout(() => { CZ.Common.toggleOffImage('tour_playpause'); })
-                .mouseover(() => { CZ.Common.toggleOnImage('tour_playpause'); })
-                .click(CZ.Tours.tourPlayPause);
-            $('#tour_next')
-                .mouseout(() => { CZ.Common.toggleOffImage('tour_next'); })
-                .mouseover(() => { CZ.Common.toggleOnImage('tour_next'); })
-                .click(CZ.Tours.tourNext);
-            $('#tour_exit')
-                .mouseout(() => { CZ.Common.toggleOffImage('tour_exit'); })
-                .mouseover(() => { CZ.Common.toggleOnImage('tour_exit'); })
-                .click(CZ.Tours.tourAbort);
-
-            $('#tours-narration')
-                .click(CZ.Tours.onNarrationClick);
-
-            $('#bookmarksCollapse')
-                .click(CZ.Tours.onBookmarksCollapse);
-
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-
-            ApplyFeatureActivation();
 
             if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 // Suppress the default iOS elastic pan/zoom actions.
@@ -579,33 +641,34 @@ module CZ {
             var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
 
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(
-                            function (visible) {
-                                var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                                var markerPos = CZ.Common.axis.MarkerPosition();
-                                var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
+                function (visible) {
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    var markerPos = CZ.Common.axis.markerPosition;
+                    var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
 
-                                CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
-                                CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
-                                vp = CZ.Common.vc.virtualCanvas("getViewport");
-                                if (CZ.Tours.pauseTourAtAnyAnimation) { //watch for the user animation during playing of some tour bookmark
-                                    CZ.Tours.tourPause();
-                                    CZ.Tours.pauseTourAtAnyAnimation = false;
-                                }
+                    CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
+                    CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
+                    vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    if (CZ.Tours.pauseTourAtAnyAnimation) { //watch for the user animation during playing of some tour bookmark
+                        CZ.Tours.tourPause();
+                        CZ.Tours.pauseTourAtAnyAnimation = false;
+                    }
 
-                                var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
-                                var actAni = CZ.Common.controller.activeAnimation != undefined;
+                    var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
+                    var actAni = CZ.Common.controller.activeAnimation != undefined;
 
-                                if (actAni && !hoveredInfodot.id) {
-                                    var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
-                                    CZ.Common.updateMarker();
-                                }
+                    if (actAni) {
+                        var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
+                        CZ.Common.updateMarker();
+                    }
 
-                                updateTimeSeriesChart(vp);
-                            },
-                            function () {
-                                return CZ.Common.vc.virtualCanvas("getViewport");
-                            },
-                            jointGesturesStream);
+                    updateTimeSeriesChart(vp);
+                },
+                function () {
+                    return CZ.Common.vc.virtualCanvas("getViewport");
+                },
+                jointGesturesStream
+            );
 
             var hashChangeFromOutside = true; // True if url is changed externally
 
@@ -667,30 +730,27 @@ module CZ {
             });
 
             //Tour: notifyng tour that the bookmark is reached
-            CZ.Common.controller.onAnimationComplete.push(
-                                function (id) {
-                                    if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
-                                        CZ.Tours.tourBookmarkTransitionCompleted(id);
-                                    if (CZ.Tours.tour != undefined && CZ.Tours.tour.state != "finished") //enabling wathcing for user activity while playing the bookmark
-                                        CZ.Tours.pauseTourAtAnyAnimation = true;
-                                });
+            CZ.Common.controller.onAnimationComplete.push(function (id) {
+                if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
+                    CZ.Tours.tourBookmarkTransitionCompleted(id);
+                if (CZ.Tours.tour != undefined && CZ.Tours.tour.state != "finished") //enabling wathcing for user activity while playing the bookmark
+                    CZ.Tours.pauseTourAtAnyAnimation = true;
+            });
             //Tour: notifyng tour that the transition was interrupted
-            CZ.Common.controller.onAnimationUpdated.push(
-                                function (oldId, newId) {
-                                    if (CZ.Tours.tour != undefined) {
-                                        if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) { //in transition
-                                            var prevState = CZ.Tours.tour.state;
-                                            CZ.Tours.tourBookmarkTransitionInterrupted(oldId);
-                                            var alteredState = CZ.Tours.tour.state;
+            CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
+                if (CZ.Tours.tour != undefined) {
+                    if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) { //in transition
+                        var prevState = CZ.Tours.tour.state;
+                        CZ.Tours.tourBookmarkTransitionInterrupted(oldId);
+                        var alteredState = CZ.Tours.tour.state;
 
-                                            if (prevState == "play" && alteredState == "pause") //interruption caused toue pausing. stop any animations, updating UI as well
-                                                CZ.Tours.tourPause();
+                        if (prevState == "play" && alteredState == "pause") //interruption caused toue pausing. stop any animations, updating UI as well
+                            CZ.Tours.tourPause();
 
-                                            CZ.Common.setNavigationStringTo = null;
-                                        }
-                                    }
-                                }
-            );
+                        CZ.Common.setNavigationStringTo = null;
+                    }
+                }
+            });
 
             CZ.Common.updateLayout();
 
@@ -754,12 +814,17 @@ module CZ {
             return feature[0].IsEnabled;
         }
 
-        function closeAllForms() {
-            $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });
+        export function closeAllForms() {
+            $('.cz-major-form').each((i, f) => {
+                var form = $(f).data('form');
+                if (form && form.isFormVisible === true) {
+                    form.close();
+                }
+            });
 
         }
 
-        function getFormById(name) {
+        export function getFormById(name) {
             var form = $(name).data("form");
             if (form)
                 return form;

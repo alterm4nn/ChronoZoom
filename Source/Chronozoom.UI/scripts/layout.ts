@@ -13,6 +13,8 @@ module CZ {
             length: 0 // length of hashmap
         };
 
+        export var timelineHeightRate = 0.4;
+
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
             this.left = left;
@@ -40,6 +42,11 @@ module CZ {
             if (timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (exhibit) {
                     exhibit.x = CZ.Dates.getCoordinateFromDecimalYear(exhibit.time);
+
+                    exhibit.contentItems.forEach(function (contentItem) {
+                        // For content items that contain an extension, activate it.
+                        CZ.Extensions.activateExtension(contentItem.mediaType);
+                    });
                 });
             }
 
@@ -54,7 +61,7 @@ module CZ {
             if (timeline.Height)
                 timeline.Height /= 100;
             else if (!timeline.AspectRatio && !timeline.Height)
-                timeline.Height = 0.4;
+                timeline.Height = CZ.Layout.timelineHeightRate;
         }
 
         function GenerateAspect(timeline) {

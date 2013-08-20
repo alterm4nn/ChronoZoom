@@ -11,14 +11,14 @@ namespace Application.Helper.Helpers
         public void HideBookmark()
         {
             Logger.Log("<-");
-            Click(By.Id("bookmarksCollapse"));
+            Click(By.ClassName("cz-tour-form-min-btn"));
             Logger.Log("->");
         }
 
         public bool IsBookmarkExpanded()
         {
             Logger.Log("<-");
-            bool result = Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Tours.isBookmarksWindowExpanded"));
+            bool result = IsElementDisplayed(By.XPath("//*[@id='tour-caption-form']//*[@class='cz-form-content']"));
             Logger.Log("-> IsBookmarkExpanded: " + result);
             return result;
         }

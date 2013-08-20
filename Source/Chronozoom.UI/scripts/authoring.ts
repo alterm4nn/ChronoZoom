@@ -58,7 +58,7 @@ module CZ {
         // Generic callback function set by the form when waits user's input (e.g. mouse click) to continue.
         export var callback: (...args: any[]) => any = null;
 
-
+        export var timer;
         /**
          * Tests a timeline/exhibit on intersection with another virtual canvas object.
          * @param  {Object}  te   A timeline/exhibit to test.
@@ -498,6 +498,8 @@ module CZ {
          * @param  {Widget} form A dialog form for editing timeline.
          */
         export function updateTimeline(t, prop) {
+            var deffered = new jQuery.Deferred();
+
             var temp = {
                 x: Number(prop.start),
                 y: t.y,
@@ -506,37 +508,55 @@ module CZ {
                 type: "rectangle"
             };
 
-            // TODO: Show error message in case of failed test!
             if (checkTimelineIntersections(t.parent, temp, true)) {
                 t.x = temp.x;
                 t.width = temp.width;
                 t.endDate = prop.end;
+
+                // Decrease height if possible to make better aspect ratio.
+                // Source: layout.js, LayoutTimeline method.
+                // NOTE: it won't cause intersection errors since height decreases
+                //       and the timeline has no any children (except CanvasImage
+                //       and CanvasText for edit button and title).
+                if (t.children.length < 3) {
+                    t.height = Math.min.apply(Math, [
+                        t.parent.height * CZ.Layout.timelineHeightRate,
+                        t.width * CZ.Settings.timelineMinAspect,
+                        t.height
+                    ]);
+                }
+
+                // Update title.
+                t.title = prop.title;
+                updateTimelineTitle(t);
+
+                CZ.Service.putTimeline(t).then(
+                    function (success) {
+                        // update ids if existing elements with returned from server
+                        t.id = "t" + success;
+                        t.guid = success;
+                        t.titleObject.id = "t" + success + "__header__";
+
+                        if (!t.parent.guid) {
+                            // Root timeline, refresh page
+                            document.location.reload(true);
+                        }
+                        else {
+                            CZ.Common.vc.virtualCanvas("requestInvalidate");
+                        }
+                        deffered.resolve(t);
+                    },
+                    function (error) {
+                        deffered.reject(error);
+                    });
+            }
+            else {
+                deffered.reject('Timeline intersects with parent timeline or other siblings');
             }
 
-            // Update title.
-            t.title = prop.title;
-            updateTimelineTitle(t);
+            return deffered.promise();
 
-            return CZ.Service.putTimeline(t).then(
-                function (success) {
-                    // update ids if existing elements with returned from server
-                    t.id = "t" + success;
-                    t.guid = success;
-                    t.titleObject.id = "t" + success + "__header__";
-
-                    if (!t.parent.guid) {
-                        // Root timeline, refresh page
-                        document.location.reload(true);
-                    }
-                    else {
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    }
-
-                },
-                function (error) {
-                }
-            );
-        }
+        };
 
         /**
          * Removes a timeline from virtual canvas.
@@ -587,7 +607,7 @@ module CZ {
                         newExhibit.id = "e" + response.ExhibitId;
 
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
-                        
+
                         deferred.resolve(newExhibit);
                     },
                             error => {
@@ -748,11 +768,18 @@ module CZ {
             while (contentItems[i] != null) {
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
+                var mime = CZ.Service.getMimeTypeByUrl(ci.uri);
+                console.log("mime:"+ mime);
                 if (ci.mediaType.toLowerCase() === "image") {
-                    var imageReg = /\.(jpg|jpeg|png)$/i;
+                    var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if (!imageReg.test(ci.uri)) {
-                        alert("Sorry, only JPG/PNG images are supported");
-                        isValid = false;
+                        if (mime != "image/jpg"
+                            && mime != "image/jpeg"
+                            && mime != "image/gif"
+                            && mime != "image/png") {
+                            alert("Sorry, only JPG/PNG/GIF images are supported.");
+                            isValid = false;
+                        }
                     }
                 } else if (ci.mediaType.toLowerCase() === "video") {
                     // Youtube
@@ -770,17 +797,44 @@ module CZ {
                     } else if (vimeoEmbed.test(ci.uri)) {
                         //Embedded link provided
                     } else {
-                        alert("Sorry, only YouTube or Vimeo videos are supported");
+                        alert("Sorry, only YouTube or Vimeo videos are supported.");
                         isValid = false;
 
                     }
 
-                } else if (ci.mediaType.toLowerCase() === "pdf") {
+                }
+                else if (ci.mediaType.toLowerCase() === "pdf") {
                     //Google PDF viewer
                     //Example: http://docs.google.com/viewer?url=http%3A%2F%2Fwww.selab.isti.cnr.it%2Fws-mate%2Fexample.pdf&embedded=true
-                    var pdf = /\.(pdf)$/i;
+                    var pdf = /\.(pdf)$|\.(pdf)\?/i;
+
                     if (!pdf.test(ci.uri)) {
-                        alert("Sorry, only PDF extension is supported");
+                        if (mime != "application/pdf") {
+                            alert("Sorry, only PDF extension is supported.");
+                            isValid = false;
+                        }
+                    }
+                } else if (ci.mediaType.toLowerCase() === "skydrive-document") {
+                    // Skydrive embed link
+                    var skydrive = /skydrive\.live\.com\/embed/;
+
+                    if (!skydrive.test(ci.uri)) {
+                        alert("This is not a Skydrive embed link.");
+                        isValid = false;
+                    }
+                } else if (ci.mediaType.toLowerCase() === "skydrive-image") {
+                    // uri pattern is - {url} {width} {height}
+                    var splited = ci.uri.split(' ');
+                    // Skydrive embed link
+                    var skydrive = /skydrive\.live\.com\/embed/;
+
+                    // validate width
+                    var width = /[0-9]/;
+                    // validate height
+                    var height = /[0-9]/;
+
+                    if (!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
+                        alert("This is not a Skydrive embed link.");
                         isValid = false;
                     }
                 }
@@ -788,6 +842,23 @@ module CZ {
                 i++;
             }
             return isValid;
+        }
+
+        /**
+        * Opens "session ends" form
+        */
+        export function showSessionForm() {
+            CZ.HomePageViewModel.sessionForm.show();
+        }
+
+        /**
+        * Resets timer to default
+        */
+        export function resetSessionTimer() {
+            if (CZ.Authoring.timer != null) {
+                clearTimeout(CZ.Authoring.timer);
+                CZ.Authoring.timer = setTimeout(() => { showSessionForm() }, (CZ.Settings.sessionTime - 60) * 1000);
+            }
         }
     }
 }

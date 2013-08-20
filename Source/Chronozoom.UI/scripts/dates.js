@@ -40,9 +40,13 @@ var CZ;
             return coord;
         }
         Dates.getCoordinateFromYMD = getCoordinateFromYMD;
-        function getYMDFromCoordinate(coord) {
+        function getYMDFromCoordinate(coord, MarkerCorrection) {
+            if (typeof MarkerCorrection === "undefined") { MarkerCorrection = false; }
             var absCoord = Math.abs(coord), floorCoord = Math.floor(coord), sign = (coord === 0) ? 1 : coord / absCoord, day = 0, month = 0, year = (coord >= 1) ? floorCoord : floorCoord - 1, isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, daysFraction = sign * (absCoord - Math.abs(floorCoord));
             day = Math.round(daysFraction * daysInYear);
+            if(MarkerCorrection) {
+                day = Math.floor(daysFraction * daysInYear);
+            }
             day += +(day < daysInYear);
             while(day > Dates.daysInMonth[month] + (+(isLeap && month === 1))) {
                 day -= Dates.daysInMonth[month];
@@ -73,17 +77,21 @@ var CZ;
                 year: coordinate,
                 regime: "CE"
             };
-            if(coordinate < -999999999) {
-                year.year = (year.year) / (-1000000000);
+            var eps_const = 100000;
+            if(coordinate <= -999999999) {
+                year.year = (year.year - 1) / (-1000000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ga';
-            } else if(coordinate < -999999) {
-                year.year = (year.year) / (-1000000);
+            } else if(coordinate <= -999999) {
+                year.year = (year.year - 1) / (-1000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ma';
-            } else if(coordinate < -9999) {
-                year.year = (year.year) / (-1000);
+            } else if(coordinate <= -9999) {
+                year.year = (year.year - 1) / (-1000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
                 year.regime = 'Ka';
             } else if(coordinate < 1) {
-                year.year = (year.year) / (-1);
+                year.year = (year.year - 1) / (-1);
                 year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             } else {

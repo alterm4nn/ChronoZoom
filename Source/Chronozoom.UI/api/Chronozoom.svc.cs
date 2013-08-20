@@ -25,6 +25,7 @@ using Chronozoom.Entities;
 
 using Chronozoom.UI.Utils;
 using System.ServiceModel.Description;
+using System.Text.RegularExpressions;
 
 namespace Chronozoom.UI
 {
@@ -122,7 +123,7 @@ namespace Chronozoom.UI
 
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
-    public class ChronozoomSVC : IChronozoomSVC
+    public partial class ChronozoomSVC : IChronozoomSVC
     {
         private static readonly StorageCache Cache = new StorageCache();
 
@@ -205,7 +206,7 @@ namespace Chronozoom.UI
         private static Guid _defaultSuperCollectionId = Guid.Empty;
 
         // error code descriptions
-        private static class ErrorDescription
+        private static partial class ErrorDescription
         {
             public const string RequestBodyEmpty = "Request body empty";
             public const string UnauthorizedUser = "Unauthorized User";
@@ -751,7 +752,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        public Guid PutCollectionName(string superCollectionName, string collectionName, Collection collectionRequest)
+        public Guid PostCollection(string superCollectionName, string collectionName, Collection collectionRequest)
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
@@ -767,7 +768,7 @@ namespace Chronozoom.UI
 
                 Guid superCollectionId = CollectionIdFromText(superCollectionName);
                 SuperCollection superCollection = RetrieveSuperCollection(storage, superCollectionId);
-                if (user == null || superCollection.User != user)
+                if (user == null || superCollection.User == null || superCollection.User.NameIdentifier != user.NameIdentifier)
                 {
                     // No ACS so treat as an anonymous user who cannot add or modify a collection.
                     SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
@@ -782,18 +783,25 @@ namespace Chronozoom.UI
                     storage.Collections.Add(collection);
                     returnValue = collectionGuid;
                 }
-                else
-                {
-                    if (collection.User != user)
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                        return Guid.Empty;
-                    }
 
-                    // Modify collection fields. However, title can't be modified since it would change the URL and break indexing.
-                }
                 storage.SaveChanges();
                 return returnValue;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public Guid PutCollection(string superCollectionName, string collectionName, Collection collectionRequest)
+        {
+            return ApiOperationUnderCollection(collectionRequest, superCollectionName, collectionName, delegate(User user, Storage storage, Collection collection)
+            {
+                Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
+
+                collection.Theme = collectionRequest.Theme;
+                
+                storage.SaveChanges();
+                return collection.Id;
             });
         }
 
@@ -1137,6 +1145,33 @@ namespace Chronozoom.UI
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1304:SpecifyCultureInfo", MessageId = "System.String.ToLower")]
         private static Boolean ValidateContentItemUrl(ContentItem contentitem)
         {
+            string contentitemURI = contentitem.Uri;
+
+            // Custom validation for Skydrive images
+            if (contentitem.MediaType == "skydrive-image")
+            {
+                // Parse url parameters. url pattern is - {url} {width} {height}
+                var splited = contentitem.Uri.Split(' ');
+
+                // Not enough parameters in url
+                if (splited.Length != 3)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                    return false;
+                }
+
+                contentitemURI = splited[0];
+
+                // Validate width and height are numbers
+                int value;
+                if (!Int32.TryParse(splited[1], out value) || !Int32.TryParse(splited[2], out value))
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                    return false;
+                }
+            }
+
+
             Uri uriResult;
 
             // If Media Source is present, validate it
@@ -1147,7 +1182,7 @@ namespace Chronozoom.UI
             }
 
             // Check if valid url
-            if (!(Uri.TryCreate(contentitem.Uri, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
+            if (!(Uri.TryCreate(contentitemURI, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
             {
                 SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
                 return false;
@@ -1764,7 +1799,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        public IEnumerable<SuperCollection> GetCollections()
+        public IEnumerable<SuperCollection> GetSuperCollections()
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
@@ -1780,6 +1815,26 @@ namespace Chronozoom.UI
                 }
 
                 return superCollections;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public IEnumerable<Collection> GetCollections(string superCollectionName)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Guid superCollectionId = CollectionIdFromText(superCollectionName);
+                SuperCollection superCollection = storage.SuperCollections.FirstOrDefault(candidate => candidate.Id == superCollectionId);
+
+                if (superCollection == null)
+                {
+                    return null;
+                }
+
+                storage.Entry(superCollection).Collection(x => x.Collections).Load();
+                return superCollection.Collections;
             });
         }
 
@@ -1987,8 +2042,28 @@ namespace Chronozoom.UI
                 SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.ParentTimelineCollectionMismatch);
                 return false;
             }
-
             return true;
+        }
+
+        public string GetMemiTypeByUrl(string url)
+        {
+            string contentType = "";
+            try
+            {
+                var request = HttpWebRequest.Create(url) as HttpWebRequest;
+                request.Method = "head";
+                if (request != null)
+                {
+                    var response = request.GetResponse() as HttpWebResponse;
+                    if (response != null)
+                        contentType = response.ContentType;
+                }
+                return contentType;
+            }
+            catch
+            {
+                return contentType;
+            }
         }
     }
 }

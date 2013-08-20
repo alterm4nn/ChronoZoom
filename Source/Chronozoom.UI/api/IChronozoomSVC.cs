@@ -194,6 +194,33 @@ namespace Chronozoom.UI
         /// </summary>
         /// <remarks>
         /// If a collection of the specified name does not exist then a new collection is created. 
+        /// The title field can't be modified because it is part of the URL (the URL can be indexed).
+        /// </remarks>
+        /// <param name="superCollectionName">The name of the parent supercollection.</param>
+        /// <param name="collectionName">The name of the collection to create.</param>
+        /// <param name="collectionRequest">[Collection](#collection) data in JSON format.</param>
+        /// <returns></returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: PUT
+        ///
+        /// URL:
+        /// http://{URL}/api/{supercollection}/{collection}
+        ///
+        /// Request body (JSON):
+        /// {
+        ///      id: "{id}",
+        ///      title: "{title}"
+        /// }
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Guid PostCollection(string superCollectionName, string collectionName, Collection collectionRequest);
+
+        /// <summary>
+        /// Modifies an existing collection.
+        /// </summary>
+        /// <remarks>
         /// If the collection exists and the authenticated user is the author then the collection is modified. 
         /// If no author is registered then the authenticated user is set as the author. 
         /// The title field can't be modified because it is part of the URL (the URL can be indexed).
@@ -217,7 +244,7 @@ namespace Chronozoom.UI
         /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        Guid PutCollectionName(string superCollectionName, string collectionName, Collection collectionRequest);
+        Guid PutCollection(string superCollectionName, string collectionName, Collection collectionRequest);
 
         /// <summary>
         /// Deletes the specified collection.
@@ -572,18 +599,126 @@ namespace Chronozoom.UI
         string GetContentPath(string superCollection, string collection, string reference);
         
         /// <summary>
+        /// Retrieve the list of all supercollections.
+        /// </summary>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/supercollections
+        /// ]]>
+        /// </example>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [OperationContract]
+        [WebGet(UriTemplate = "/supercollections", ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<SuperCollection> GetSuperCollections();
+
+        /// <summary>
         /// Retrieve the list of all collections.
         /// </summary>
         /// <example><![CDATA[ 
         /// HTTP verb: GET
         ///
         /// URL:
-        /// http://{URL}/api/collections
+        /// http://{URL}/api/{superCollection}/collections
         /// ]]>
         /// </example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebGet(UriTemplate = "/collections", ResponseFormat = WebMessageFormat.Json)]
-        IEnumerable<SuperCollection> GetCollections();
+        [WebGet(UriTemplate = "/{superCollectionName}/collections", ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<Collection> GetCollections(string superCollectionName);
+
+        /// <summary>
+        /// Retrieve file mime type by url
+        /// </summary>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/getmimetypebyurl
+        /// ]]>
+        /// </example>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/getmimetypebyurl?url={url}", ResponseFormat = WebMessageFormat.Json)]
+        string GetMemiTypeByUrl(string url);
+    }
+
+    [ServiceContract(Namespace = "")]
+    public interface IBingSearchAPI
+    {
+        /// <summary>
+        /// Performs images search for a search query via Bing Search API.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        /// <param name="top">The number of the results to return.</param>
+        /// <param name="skip">The offset requested for the srarting point of returned results.</param>
+        /// <returns>Search results (images) in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/bing/getImages?query={query}&top={top}&skip={skip}
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<Bing.ImageResult>> GetImages(string query, string top, string skip);
+
+        /// <summary>
+        /// Performs videos search for a search query via Bing Search API.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        /// <param name="top">The number of the results to return.</param>
+        /// <param name="skip">The offset requested for the srarting point of returned results.</param>
+        /// <returns>Search results (videos) in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/bing/getVideos?query={query}&top={top}&skip={skip}
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<Bing.VideoResult>> GetVideos(string query, string top, string skip);
+
+        /// <summary>
+        /// Performs documents web search for a search query via Bing Search API.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        /// <param name="doctype">The filetype to search for.</param>
+        /// <param name="top">The number of the results to return.</param>
+        /// <param name="skip">The offset requested for the srarting point of returned results.</param>
+        /// <returns>Search results (documents) in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/bing/getDocuments?query={query}&doctype={doctype}&top={top}&skip={skip}
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<Bing.WebResult>> GetDocuments(string query, string doctype, string top, string skip);
+    }
+
+    [ServiceContract(Namespace = "")]
+    public interface ITwitterAPI
+    {   
+        /// <summary>
+        /// Returns recent N timeline tweets of ChronoZoom Twitter account.
+        /// </summary>
+        /// <returns>Recent N timeline tweets of ChronoZoom Twitter account in JSON format.</returns>
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        ///
+        /// URL:
+        /// http://{URL}/api/twitter/getRecentTweets
+        /// ]]>
+        /// </example>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        BaseJsonResult<IEnumerable<TweetSharp.TwitterStatus>> GetRecentTweets();
     }
 }

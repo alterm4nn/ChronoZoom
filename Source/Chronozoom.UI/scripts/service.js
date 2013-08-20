@@ -115,6 +115,7 @@ var CZ;
         Service.collectionName = "";
         Service.superCollectionName = "";
         function getTimelines(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
             request.addParameter("supercollection", Service.superCollectionName);
@@ -129,9 +130,10 @@ var CZ;
             });
         }
         Service.getTimelines = getTimelines;
-        function getCollections() {
+        function getCollections(superCollectionName) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
+            request.addToPath(superCollectionName);
             request.addToPath("collections");
             return $.ajax({
                 type: "GET",
@@ -142,6 +144,7 @@ var CZ;
         }
         Service.getCollections = getCollections;
         function getStructure(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -156,6 +159,7 @@ var CZ;
         }
         Service.getStructure = getStructure;
         function postData(r) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -170,10 +174,11 @@ var CZ;
             });
         }
         Service.postData = postData;
-        function putCollection(c) {
+        function putCollection(superCollectionName, collectionName, c) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(c.name);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -185,6 +190,7 @@ var CZ;
         }
         Service.putCollection = putCollection;
         function deleteCollection(c) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(c.name);
@@ -198,6 +204,7 @@ var CZ;
         }
         Service.deleteCollection = deleteCollection;
         function putTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -214,6 +221,7 @@ var CZ;
         }
         Service.putTimeline = putTimeline;
         function deleteTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -229,6 +237,7 @@ var CZ;
         }
         Service.deleteTimeline = deleteTimeline;
         function putExhibit(e) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -245,6 +254,7 @@ var CZ;
         }
         Service.putExhibit = putExhibit;
         function deleteExhibit(e) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -260,6 +270,7 @@ var CZ;
         }
         Service.deleteExhibit = deleteExhibit;
         function putContentItem(ci) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -276,6 +287,7 @@ var CZ;
         }
         Service.putContentItem = putContentItem;
         function deleteContentItem(ci) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -291,6 +303,7 @@ var CZ;
         }
         Service.deleteContentItem = deleteContentItem;
         function putTour2(t) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -307,6 +320,7 @@ var CZ;
         }
         Service.putTour2 = putTour2;
         function deleteTour(tourId) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -325,10 +339,12 @@ var CZ;
         }
         Service.deleteTour = deleteTour;
         function getTours() {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("tours");
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -338,6 +354,7 @@ var CZ;
         }
         Service.getTours = getTours;
         function getSearch(query) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("Search");
             var data = {
@@ -345,6 +362,7 @@ var CZ;
                 supercollection: CZ.Service.superCollectionName,
                 collection: CZ.Service.collectionName
             };
+            console.log("[GET] " + request.url);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -355,7 +373,94 @@ var CZ;
             });
         }
         Service.getSearch = getSearch;
+        function getBingImages(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getImages");
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingImages = getBingImages;
+        function getBingVideos(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getVideos");
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingVideos = getBingVideos;
+        function getBingDocuments(query, doctype, top, skip) {
+            if (typeof doctype === "undefined") { doctype = undefined; }
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getDocuments");
+            var data = {
+                query: query,
+                doctype: doctype,
+                top: top,
+                skip: skip
+            };
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingDocuments = getBingDocuments;
+        function getRecentTweets() {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("twitter/getRecentTweets");
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getRecentTweets = getRecentTweets;
         function getServiceInformation() {
+            CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("info");
             return $.ajax({
@@ -367,6 +472,7 @@ var CZ;
         }
         Service.getServiceInformation = getServiceInformation;
         function getContentPath(reference) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
@@ -381,6 +487,7 @@ var CZ;
         }
         Service.getContentPath = getContentPath;
         function putExhibitContent(e, oldContentItems) {
+            CZ.Authoring.resetSessionTimer();
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
@@ -397,6 +504,7 @@ var CZ;
         }
         Service.putExhibitContent = putExhibitContent;
         function putProfile(displayName, email) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             var user = {
@@ -413,6 +521,7 @@ var CZ;
         }
         Service.putProfile = putProfile;
         function deleteProfile(displayName) {
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             var user = {
@@ -429,6 +538,7 @@ var CZ;
         Service.deleteProfile = deleteProfile;
         function getProfile(displayName) {
             if (typeof displayName === "undefined") { displayName = ""; }
+            CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
             if(displayName != "") {
@@ -447,6 +557,29 @@ var CZ;
             });
         }
         Service.getProfile = getProfile;
+        function getMimeTypeByUrl(url) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("getmimetypebyurl");
+            if(url == "") {
+                return result;
+            }
+            request.addParameter("url", url);
+            $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                async: false
+            }).done(function (mime) {
+                if(mime) {
+                    result = mime;
+                }
+            });
+            return result;
+        }
+        Service.getMimeTypeByUrl = getMimeTypeByUrl;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));

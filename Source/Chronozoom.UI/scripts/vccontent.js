@@ -78,6 +78,13 @@ var CZ;
             }
             return VCContent.addChild(element, new SeadragonImage(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
+        VCContent.addExtension = function (extensionName, element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
+            if(vw <= 0 || vh <= 0) {
+                throw "Extension size must be positive";
+            }
+            var initializer = CZ.Extensions.getInitializer(extensionName);
+            return VCContent.addChild(element, initializer(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
+        };
         VCContent.addVideo = function (element, layerid, id, videoSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasVideoItem(element.vc, layerid, id, videoSource, vx, vy, vw, vh, z), false);
         };
@@ -86,6 +93,12 @@ var CZ;
         };
         var addAudio = function (element, layerid, id, audioSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
+        };
+        VCContent.addSkydriveDocument = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasSkydriveDocumentItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+        };
+        VCContent.addSkydriveImage = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
         function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw) {
             return VCContent.addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
@@ -496,7 +509,11 @@ var CZ;
             this.title = this.titleObject.text;
             this.regime = timelineinfo.regime;
             this.settings.gradientOpacity = 0;
-            this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            if(CZ.Settings.timelineGradientFillStyle) {
+                this.settings.gradientFillStyle = CZ.Settings.timelineGradientFillStyle;
+            } else {
+                this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+            }
             this.reactsOnMouse = true;
             this.tooltipEnabled = true;
             this.tooltipIsShown = false;
@@ -516,7 +533,7 @@ var CZ;
                 this.settings.strokeStyle = CZ.Settings.timelineHoveredBoxBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineHoveredLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHoveredHeaderFontColor;
-                this.settings.hoverAnimationDelta = 3 / 60.0;
+                this.settings.hoverAnimationDelta = CZ.Settings.timelineHoverAnimation;
                 this.vc.requestInvalidate();
                 if(this.titleObject.initialized == false) {
                     var vp = this.vc.getViewport();
@@ -573,7 +590,8 @@ var CZ;
                 this.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                 this.settings.lineWidth = CZ.Settings.timelineLineWidth;
                 this.titleObject.settings.fillStyle = CZ.Settings.timelineHeaderFontColor;
-                this.settings.hoverAnimationDelta = -3 / 60.0;
+                this.settings.hoverAnimationDelta = -CZ.Settings.timelineHoverAnimation;
+                ;
                 this.vc.requestInvalidate();
             };
             this.base_render = this.render;
@@ -587,9 +605,11 @@ var CZ;
                     this.editButton = VCContent.addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y, this.titleObject.height, this.titleObject.height, "/images/edit.svg");
                     this.editButton.reactsOnMouse = true;
                     this.editButton.onmouseclick = function () {
-                        CZ.Authoring.isActive = true;
-                        CZ.Authoring.mode = "editTimeline";
-                        CZ.Authoring.selectedTimeline = this.parent;
+                        if(CZ.Common.vc.virtualCanvas("getHoveredInfodot").x == undefined) {
+                            CZ.Authoring.isActive = true;
+                            CZ.Authoring.mode = "editTimeline";
+                            CZ.Authoring.selectedTimeline = this.parent;
+                        }
                         return true;
                     };
                     this.editButton.onmousehover = function () {
@@ -751,6 +771,14 @@ var CZ;
                                             currentLine += ' ' + words[iw];
                                         }
                                         lineWidth = newWidth;
+                                    }
+                                    var NewWordWidth;
+                                    if((words.length == 1) && (wsize.width > size_p.x)) {
+                                        var NewWordWidth = wsize.width;
+                                        while(NewWordWidth > size_p.x) {
+                                            fontSize /= 1.5;
+                                            NewWordWidth /= 1.5;
+                                        }
                                     }
                                 }
                                 lines.push(currentLine);
@@ -1050,6 +1078,7 @@ var CZ;
             };
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
+        VCContent.CanvasDomItem = CanvasDomItem;
         function CanvasScrollTextItem(vc, layerid, id, vx, vy, vw, vh, text, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
@@ -1125,6 +1154,50 @@ var CZ;
             elem.setAttribute("visible", 'true');
             elem.setAttribute("controls", 'true');
             this.initializeContent(elem);
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+        function CanvasSkydriveDocumentItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+            var elem = document.createElement('iframe');
+            elem.setAttribute("id", id);
+            elem.setAttribute("src", embededSrc);
+            this.initializeContent(elem);
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+        function CanvasSkydriveImageItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+            var srcData = embededSrc.split(" ");
+            var elem = document.createElement('iframe');
+            elem.setAttribute("id", id);
+            elem.setAttribute("src", srcData[0]);
+            elem.setAttribute("scrolling", "no");
+            elem.setAttribute("frameborder", "0");
+            this.initializeContent(elem);
+            this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                if(!this.content) {
+                    return;
+                }
+                var p = viewport2d.pointVirtualToScreen(this.x, this.y);
+                var width = parseFloat(srcData[1]);
+                var height = parseFloat(srcData[2]);
+                var scale = size_p.x / width;
+                if(height / width > size_p.y / size_p.x) {
+                    scale = size_p.y / height;
+                }
+                this.content.style.left = (p.x + size_p.x / 2) + 'px';
+                this.content.style.top = (p.y + size_p.y / 2) + 'px';
+                this.content.style.marginLeft = (-width / 2) + 'px';
+                this.content.style.marginTop = (-height / 2) + 'px';
+                this.content.style.width = width + 'px';
+                this.content.style.height = height + 'px';
+                this.content.style.opacity = opacity;
+                this.content.style.filter = 'alpha(opacity=' + (opacity * 100) + ')';
+                this.content.style.webkitTransform = "scale(" + scale + ")";
+                this.content.style.msTransform = "scale(" + scale + ")";
+                this.content.style.MozTransform = "scale(" + scale + ")";
+            };
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
         function SeadragonImage(vc, parent, layerid, id, imageSource, vx, vy, vw, vh, z, onload) {
@@ -1223,7 +1296,7 @@ var CZ;
             var timeline = VCContent.addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
                 strokeStyle: timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineStrokeStyle,
                 lineWidth: CZ.Settings.timelineLineWidth,
-                fillStyle: timelineinfo.fillStyle,
+                fillStyle: CZ.Settings.timelineColor ? CZ.Settings.timelineColor : timelineinfo.fillStyle,
                 opacity: typeof timelineinfo.opacity !== 'undefined' ? timelineinfo.opacity : 1
             }, timelineinfo), true);
             return timeline;
@@ -1293,6 +1366,12 @@ var CZ;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive-document') {
+                        VCContent.addSkydriveDocument(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive-image') {
+                        VCContent.addSkydriveImage(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
+                        VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
                     var titleText = this.contentItem.title;
                     addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0, 0.9 * titleHeight, titleText, {
@@ -1537,7 +1616,14 @@ var CZ;
                     var title = '';
                     if(infodotDescription && infodotDescription.title && infodotDescription.date) {
                         var exhibitDate = CZ.Dates.convertCoordinateToYear(infodotDescription.date);
-                        title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        if((exhibitDate.regime == "CE") || (exhibitDate.regime == "BCE")) {
+                            var date_number = Number(infodotDescription.date);
+                            var exhibitDate = CZ.Dates.convertCoordinateToYear(date_number);
+                            date_number = Math.abs(date_number);
+                            title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        } else {
+                            title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                        }
                     }
                     var infodotTitle = addText(contentItem, layerid, id + "__title", time - titleWidth / 2, titleTop, titleTop, titleHeight, title, {
                         fontName: CZ.Settings.contentItemHeaderFontName,

@@ -48,6 +48,13 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
+        public void AuthenticateAsMicrosoftUserToSkyDrive()
+        {
+            Logger.Log("<-");
+            var user = new User { Type = UserType.Microsoft };
+            LoginUser(user);
+            Logger.Log("->", LogType.MessageWithoutScreenshot);
+        }
 
         public void Logout()
         {
@@ -114,7 +121,7 @@ namespace Application.Helper.Helpers
             {
                 DeleteCookieByName(userCookieName);
             }
-        } 
+        }
 
         public void ClickOnUserName()
         {
@@ -200,7 +207,7 @@ namespace Application.Helper.Helpers
                     Click(By.XPath("//*[@id='idSIButton9']"));
                     break;
             }
-            Logger.Log("->");
+            Logger.Log("->",LogType.MessageWithoutScreenshot);
         }
 
         private string GetValidAcountsXmlPath()
@@ -244,7 +251,7 @@ namespace Application.Helper.Helpers
             Logger.Log(user.ToString());
             SetUserInfoAndSubmit(user);
             AcceptSecurityWarning();
-            Logger.Log("->");
+            Logger.Log("->",LogType.MessageWithoutScreenshot);
         }
 
         private void OpenIdentityProviderPage(User user)
@@ -281,7 +288,7 @@ namespace Application.Helper.Helpers
 
         public void LogoutByUrl()
         {
-            OpenUrl("http://test.chronozoom.com/pages/logoff.aspx");
+            OpenUrl(Configuration.BaseUrl+"/pages/logoff.aspx");
         }
     }
 }

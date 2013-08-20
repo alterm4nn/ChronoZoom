@@ -2,7 +2,7 @@
     export module Settings {
         export var czDataSource = 'db'; // possible values: db, relay, dump
         // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
-
+        
         export var czVersion = "main"; //can be main or mobile.is needed for threshold rendering
 
         export var ellipticalZoomZoomoutFactor = 0.5; //configures how high the elliptic zoom zooms out while changing visible region
@@ -11,7 +11,7 @@
         export var zoomSpeedFactor = 2.0;  //the factor of how fast the image pursuing the mouse while zooming
         export var zoomLevelFactor = 1.4;  //the step of the zooming
         export var allowedVisibileImprecision = 0.00001; // allowed imprecision in compare of two visibles
-        export var allowedMathImprecision = 0.0000001; // allowed imprecision in float (10^-7)
+        export var allowedMathImprecision = 0.000001; // allowed imprecision in float (10^-7)
         export var allowedMathImprecisionDecimals = parseInt(allowedMathImprecision.toExponential().split("-")[1]); // allowedMathImprecision in decimals places
         export var canvasElementAnimationTime = 1300; //duration of animation of resize or transition of canvas element
         export var canvasElementFadeInTime = 400; // duration of fade in animation of newly added canvas element
@@ -41,6 +41,9 @@
         export var timelineHoveredBoxBorderColor = 'rgb(232,232,232)';
         export var timelineBreadCrumbBorderOffset = 50; // maximum allowed offset of timeline from canvas edge to show breadcrumb
         export var timelineCenterOffsetAcceptableImplicity = 0.00001; // acceptable implicity in position of center of canvas inside timeline
+        export var timelineColor = null; // the default timeline color, this overrides regime colors
+        export var timelineHoverAnimation = 3 / 60.0; // the animation time during hover on a timeline
+        export var timelineGradientFillStyle = null; // the gradient style applied on hover
 
         export var infodotShowContentZoomLevel = 9; // zoom level (log_2 of size in pixel) when all content is shown
         export var infodotShowContentThumbZoomLevel = 2; // zoom level (log_2 of size in pixel) when thumbnails for all content items are shown
@@ -157,10 +160,11 @@
         export var signinUrlMicrosoft = "";
         export var signinUrlGoogle = "";
         export var signinUrlYahoo = "";
+        export var sessionTime = 3600; //seconds
 
         // General constants
         export var guidEmpty = "00000000-0000-0000-0000-000000000000";
-
+        
         // NOTE: IE version detection.
         //       https://gist.github.com/padolsey/527683
         export var ie = (function() {
@@ -168,5 +172,68 @@
             while (div.innerHTML = '<!--[if gt IE '+(++v)+']><br><![endif]-->', a[0]); 
             return (v > 4) ? v : undefined;
         }());
+
+        // Theme constants
+        export var theme;
+        export function applyTheme(theme: string) {
+            if (!theme) {
+                theme = "cosmos";
+            }
+
+            this.theme = theme;
+            var themeData = {
+                "cosmos": {
+                    "background": "url('/images/background.jpg')",
+                    "backgroundColor": "#232323",
+                    "timelineColor": null,
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(92,92,92)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                    "timelineGradientFillStyle": null
+                },
+                "gray": {
+                    "background": "none",
+                    "backgroundColor": "#bebebe",
+                    "timelineColor": null,
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(92,92,92)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                    "timelineGradientFillStyle": "#9e9e9e"
+                },
+                "aqua": {
+                    "background": "none",
+                    "backgroundColor": "rgb(238, 238, 238)",
+                    "timelineColor": "rgba(52, 76, 130, 0.5)",
+                    "timelineHoverAnimation": 3 / 60.0,
+                    "infoDotFillColor": 'rgb(55,84,123)',
+                    "fallbackImageUri": '/images/Temp-Thumbnail-Aqua.png',
+                    "timelineGradientFillStyle": "rgb(80,123,175)"
+                }
+            }
+
+            var themeSettings = themeData[theme];
+            $('#vc').css('background-image', themeSettings.background);
+            $('#vc').css('background-color', themeSettings.backgroundColor);
+            CZ.Settings.timelineColor = themeSettings.timelineColor;
+            CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;
+            CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;
+            CZ.Settings.fallbackImageUri = themeSettings.fallbackImageUri;
+            CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
+        }
+
+        // Bing search API constants
+        export var defaultBingSearchTop = 50; // the number of the results to return
+        export var defaultBingSearchSkip = 0; // offset requested for the srarting point of returned results
+
+        // Authoring mediapicker constants
+        export var mediapickerImageThumbnailMaxWidth = 240; // the max allowed width of thumbnail
+        export var mediapickerImageThumbnailMaxHeight = 155; // the max allowed height of thumbnail
+
+        export var mediapickerVideoThumbnailMaxWidth = 190; // the max allowed width of thumbnail
+        export var mediapickerVideoThumbnailMaxHeight = 130; // the max allowed height of thumbnail
+
+        // WL API constants
+        export var WLAPIClientID = "0000000040101FFA";
+        export var WLAPIRedirectUrl = "http://test.chronozoom.com/";
     }
 }

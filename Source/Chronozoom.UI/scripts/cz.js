@@ -20,7 +20,10 @@ var CZ;
             "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
             "#message-window": "/ui/message-window.html",
-            "#header-search-form": "/ui/header-search-form.html"
+            "#header-search-form": "/ui/header-search-form.html",
+            "#header-session-expired-form": "/ui/header-session-expired-form.html",
+            "#tour-caption-form": "/ui/tour-caption-form.html",
+            "#mediapicker-form": "/ui/mediapicker-form.html"
         };
         (function (FeatureActivation) {
             FeatureActivation._map = [];
@@ -36,6 +39,7 @@ var CZ;
             FeatureActivation.NotProduction = 4;
         })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
         var FeatureActivation = HomePageViewModel.FeatureActivation;
+        HomePageViewModel.sessionForm;
         var _featureMap = [
             {
                 Name: "Login",
@@ -59,7 +63,7 @@ var CZ;
             }, 
             {
                 Name: "TourAuthoring",
-                Activation: FeatureActivation.NotProduction,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".cz-form-create-tour"
             }, 
             {
@@ -86,6 +90,14 @@ var CZ;
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-breadcrumbs"
             }, 
+            {
+                Name: "Themes",
+                Activation: FeatureActivation.NotProduction
+            }, 
+            {
+                Name: "Skydrive",
+                Activation: FeatureActivation.NotProduction
+            }, 
             
         ];
         HomePageViewModel.rootCollection;
@@ -99,11 +111,29 @@ var CZ;
             return true;
         }
         function InitializeToursUI(profile, forms) {
+            CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+            var onTakeTour = function (tour) {
+                CZ.HomePageViewModel.closeAllForms();
+                CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
+                    activationSource: $(".tour-icon"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-tour-form-title",
+                    contentContainer: ".cz-form-content",
+                    minButton: ".cz-tour-form-min-btn > .cz-form-btn",
+                    captionTextarea: ".cz-form-tour-caption",
+                    tourPlayerContainer: ".cz-form-tour-player",
+                    bookmarksCount: ".cz-form-tour-bookmarks-count",
+                    narrationToggle: ".cz-toggle-narration",
+                    context: tour
+                });
+                CZ.Tours.tourCaptionForm.show();
+                CZ.Tours.removeActiveTour();
+                CZ.Tours.activateTour(tour, undefined);
+            };
             var onToursInitialized = function () {
-                CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () {
-                    CZ.Tours.removeActiveTour();
                     var toursListForm = getFormById("#toursList");
                     if(toursListForm.isFormVisible) {
                         toursListForm.close();
@@ -116,10 +146,7 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             tourTemplate: forms[10],
                             tours: CZ.Tours.tours,
-                            takeTour: function (tour) {
-                                CZ.Tours.removeActiveTour();
-                                CZ.Tours.activateTour(tour, undefined);
-                            },
+                            takeTour: onTakeTour,
                             editTour: allowEditing ? function (tour) {
                                 if(CZ.Authoring.showEditTourForm) {
                                     CZ.Authoring.showEditTourForm(tour);
@@ -155,6 +182,15 @@ var CZ;
             })();
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
+            var url = CZ.UrlNav.getURL();
+            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
+            CZ.Common.initialContent = url.content;
+            ApplyFeatureActivation();
+            CZ.Extensions.registerExtensions();
+            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
+            CZ.Media.initialize();
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
@@ -262,6 +298,7 @@ var CZ;
                         form.show();
                     },
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.hideMessageWindow();
                         CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
@@ -295,6 +332,7 @@ var CZ;
                         form.show();
                     },
                     showCreateExhibitForm: function (exhibit) {
+                        CZ.Authoring.hideMessageWindow();
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -345,6 +383,7 @@ var CZ;
                             descriptionInput: ".cz-form-item-descr",
                             attributionInput: ".cz-form-item-attribution",
                             mediaTypeInput: ".cz-form-item-media-type",
+                            mediaListContainer: ".cz-form-medialist",
                             context: {
                                 exhibit: e,
                                 contentItem: ci
@@ -356,6 +395,24 @@ var CZ;
                 if(canvasIsEmpty) {
                     CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
                 }
+                HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
+                    activationSource: $("#header-session-expired-form"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: "",
+                    sessionTimeSpan: "#session-time",
+                    sessionButton: "#session-button"
+                });
+                CZ.Service.getProfile().done(function (data) {
+                    if(data != "") {
+                        CZ.Authoring.timer = setTimeout(function () {
+                            CZ.Authoring.showSessionForm();
+                        }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+                }).fail(function (error) {
+                });
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
@@ -371,7 +428,10 @@ var CZ;
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
+                    collectionTheme: CZ.Settings.theme,
+                    collectionThemeInput: "#collection-theme",
+                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
                 });
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
@@ -385,6 +445,7 @@ var CZ;
                     event.preventDefault();
                     if(!profileForm.isFormVisible) {
                         closeAllForms();
+                        profileForm.setTheme(CZ.Settings.theme);
                         profileForm.show();
                     } else {
                         profileForm.close();
@@ -400,6 +461,7 @@ var CZ;
                             $("#profile-panel input#username").focus();
                             if(!profileForm.isFormVisible) {
                                 closeAllForms();
+                                profileForm.setTheme(CZ.Settings.theme);
                                 profileForm.show();
                             } else {
                                 profileForm.close();
@@ -437,41 +499,23 @@ var CZ;
                 CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
-            var url = CZ.UrlNav.getURL();
-            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
-            CZ.Service.superCollectionName = url.superCollectionName;
-            CZ.Service.collectionName = url.collectionName;
-            CZ.Common.initialContent = url.content;
+            CZ.Settings.applyTheme(null);
+            if(CZ.Service.superCollectionName) {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+                    $(response).each(function (index) {
+                        if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                            CZ.Settings.applyTheme(response[index].theme);
+                        }
+                    });
+                });
+            }
             $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
             $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
-            $('#tour_prev').mouseout(function () {
-                CZ.Common.toggleOffImage('tour_prev');
-            }).mouseover(function () {
-                CZ.Common.toggleOnImage('tour_prev');
-            }).click(CZ.Tours.tourPrev);
-            $('#tour_playpause').mouseout(function () {
-                CZ.Common.toggleOffImage('tour_playpause');
-            }).mouseover(function () {
-                CZ.Common.toggleOnImage('tour_playpause');
-            }).click(CZ.Tours.tourPlayPause);
-            $('#tour_next').mouseout(function () {
-                CZ.Common.toggleOffImage('tour_next');
-            }).mouseover(function () {
-                CZ.Common.toggleOnImage('tour_next');
-            }).click(CZ.Tours.tourNext);
-            $('#tour_exit').mouseout(function () {
-                CZ.Common.toggleOffImage('tour_exit');
-            }).mouseover(function () {
-                CZ.Common.toggleOnImage('tour_exit');
-            }).click(CZ.Tours.tourAbort);
-            $('#tours-narration').click(CZ.Tours.onNarrationClick);
-            $('#bookmarksCollapse').click(CZ.Tours.onBookmarksCollapse);
             $('#biblCloseButton').mouseout(function () {
                 CZ.Common.toggleOffImage('biblCloseButton', 'png');
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
-            ApplyFeatureActivation();
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();
@@ -505,7 +549,7 @@ var CZ;
             var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var markerPos = CZ.Common.axis.MarkerPosition();
+                var markerPos = CZ.Common.axis.markerPosition;
                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
                 CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
                 CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
@@ -516,7 +560,7 @@ var CZ;
                 }
                 var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
                 var actAni = CZ.Common.controller.activeAnimation != undefined;
-                if(actAni && !hoveredInfodot.id) {
+                if(actAni) {
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }
@@ -640,11 +684,12 @@ var CZ;
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');
-                if(form) {
+                if(form && form.isFormVisible === true) {
                     form.close();
                 }
             });
         }
+        HomePageViewModel.closeAllForms = closeAllForms;
         function getFormById(name) {
             var form = $(name).data("form");
             if(form) {
@@ -653,6 +698,7 @@ var CZ;
                 return false;
             }
         }
+        HomePageViewModel.getFormById = getFormById;
         function showTimeSeriesChart() {
             $('#timeSeriesContainer').height('30%');
             $('#timeSeriesContainer').show();
