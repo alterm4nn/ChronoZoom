@@ -44,9 +44,6 @@ A timeline is a visual representation of a time period. Timelines can contain ot
 8. Click **create timeline** to create the timeline.
 
 ## Create an Exhibit ##
-<<<<<<< HEAD
->>>>>>> 9d728ff... Added more screen captures; text updates.
-=======
 An exhibit consists of a set of content items (artifacts), and is contained by either a timeline or a collection. Content items can be one of the following types:
 - Image
 - PDF
@@ -65,4 +62,3 @@ An exhibit consists of a set of content items (artifacts), and is contained by e
 6. Click **create artifact** to add the content item. The exhibit will list the artifacts that have been created:
 ![Create Exhibit with artifacts](images/auth_guide_create-exhibit-2.png)
 7. Click **create exhibit** to create the exhibit.
->>>>>>> 334d5fe... this should be up to date now
