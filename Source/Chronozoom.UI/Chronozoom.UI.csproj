@@ -274,6 +274,7 @@
     <Content Include="images\edit-icon.png" />
     <Content Include="images\media\bing-import-50x150.png" />
     <Content Include="images\media\bing-import-50x50.png" />
+    <Content Include="images\media\SkyDrive-Import-50X150.png" />
     <Content Include="images\media\skydrive-import-50x50.png" />
     <Content Include="images\narration-off.png" />
     <Content Include="images\narration-on.png" />
