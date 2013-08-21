@@ -22,7 +22,6 @@ namespace Application.Helper.Helpers
                 if (!isLoginToSkyDrive)
                 {
                     LoginToSkyDrive();
-
                 }
                 if (contentItem.SkyDriveFileType == ContentItem.SkyDriveType.Document)
                 {
@@ -49,9 +48,11 @@ namespace Application.Helper.Helpers
         private void LoginToSkyDrive()
         {
             Logger.Log("->");
+            string currentWindowName = GetPageTitle();
+            Logger.Log("- window name: " + currentWindowName);
             SwitchToWindow("Sign in to your Microsoft account");
             HelperManager<AuthorizationHelper>.Instance.AuthenticateAsMicrosoftUserToSkyDrive();
-            SwitchToWindow("Cosmos - ChronoZoom");
+            SwitchToWindow(currentWindowName);
             Logger.Log("<-");
         }
 
