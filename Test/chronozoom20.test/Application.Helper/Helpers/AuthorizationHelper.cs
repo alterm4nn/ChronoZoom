@@ -22,6 +22,13 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
+        public void AuthenticateAsExistedGoogleUser()
+        {
+            Logger.Log("<-");
+            LoginToAcsProvider("chronozoomer@gmail.com");
+            Logger.Log("->");
+        }
+
         public void AuthenticateAsGoogleUser()
         {
             Logger.Log("<-");
@@ -44,13 +51,6 @@ namespace Application.Helper.Helpers
             var user = new User { Login = "chronozoom@outlook.com" };
             LoginToAcsProvider(user);
             Logger.Log("->");
-        }
-
-        private void LoginToAcsProvider(User user)
-        {
-            FillUserCredentials(user);
-            OpenIdentityProviderPage(user);
-            LoginUser(user);
         }
 
         public void AuthenticateAsMicrosoftUserToSkyDrive()
@@ -165,6 +165,13 @@ namespace Application.Helper.Helpers
             return IsElementExisted(By.ClassName("auth-panel-login"));
         }
 
+        public void LogoutFromSkyDrive()
+        {
+            Logger.Log("<-");
+            OpenUrl("https://login.live.com/oauth20_logout.srf");
+            Logger.Log("->");
+        }
+
         private void FillUserCredentials(User user)
         {
             IEnumerable<User> users = GetUsersFromJson();
@@ -179,7 +186,6 @@ namespace Application.Helper.Helpers
                     }
                 }
         }
-
         private IEnumerable<User> GetUsersFromJson()
         {
             StreamReader stream = new StreamReader(GetValidAcountsJsonPath());
@@ -233,7 +239,7 @@ namespace Application.Helper.Helpers
             Logger.Log(user.ToString());
             SetUserInfoAndSubmit(user);
             AcceptSecurityWarning();
-            Logger.Log("->",LogType.MessageWithoutScreenshot);
+            Logger.Log("->", LogType.MessageWithoutScreenshot);
         }
 
         private void SetUserInfoAndSubmit(User user)
@@ -289,13 +295,29 @@ namespace Application.Helper.Helpers
         private void SetEmail(string email)
         {
             Logger.Log("<- email: " + email);
-            TypeText(By.Id("email"),email);
+            TypeText(By.Id("email"), email);
             Logger.Log("->");
         }
 
         public void LogoutByUrl()
         {
-            OpenUrl(Configuration.BaseUrl+"/pages/logoff.aspx");
+            OpenUrl(Configuration.BaseUrl + "/pages/logoff.aspx");
         }
+
+        private void LoginToAcsProvider(string email)
+        {
+            var user = new User { Login = email };
+            LoginToAcsProvider(user);
+        }
+
+        private void LoginToAcsProvider(User user)
+        {
+            Logger.Log("<-");
+            FillUserCredentials(user);
+            OpenIdentityProviderPage(user);
+            LoginUser(user);
+            Logger.Log("->");
+        }
+
     }
 }

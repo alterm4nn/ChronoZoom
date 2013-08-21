@@ -63,12 +63,6 @@ namespace Application.Helper.Helpers
 
             exhibit.Timeline_ID = new Guid(CosmosGuidTemplate);
 
-            //using (MemoryStream ms = new MemoryStream())
-            //{
-            //    exhibitSerializer.WriteObject(ms, exhibit);
-            //    var ttt = Encoding.Default.GetString(ms.ToArray());
-            //}
-
             HttpWebRequest request = MakePutRequest(ExhibitApiServiceUrl);
             Stream requestStream = request.GetRequestStream();
             exhibitSerializer.WriteObject(requestStream, exhibit);
