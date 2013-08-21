@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthoringSkyDriveTests.cs" />
     <Compile Include="AuthoringTests.cs" />
     <Compile Include="AuthoringTour.cs" />
     <Compile Include="AuthorizationTests.cs" />
