@@ -36,7 +36,7 @@ namespace Chronozoom.UI
         /// HTTP verb: GET
         ///
         /// URL:
-        /// http://{URL}/api/{supercollection}/{collection}/timelines?start={year}&end={year}
+        /// http://{URL}/api/gettimelines?supercollection={supercollection}&collection={collection}&start={year}&end={year}
         /// ]]>
         /// </example>
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "End")]
@@ -284,8 +284,11 @@ namespace Chronozoom.UI
         ///
         /// Request body (JSON):
         /// {
-        ///      id: "0123456789",
-        ///      title: "A New Title"
+        ///      ParentTimelineId: "ff5214e1-1bf4-4af5-8835-96cff2ce2cfd",
+        ///      Regime: null - optional,
+        ///      end: -377.945205,
+        ///      start: -597.542466,
+        ///      title: "Timeline Title"
         /// }
         /// ]]>
         /// </example>
@@ -338,11 +341,11 @@ namespace Chronozoom.UI
         ///
         /// Request body (JSON):
         /// {
-        ///      id: "0123456789",
-        ///      title: "Mars Exploration",
-        ///      threshold: "{threshold}",
-        ///      regime: "{regime}",
-        ///      contentItems: "{contentItems}" 
+        ///     ParentTimelineId: "123456"
+        ///     id: "0123456789",
+        ///     title: "Mars Exploration",
+        ///     contentItems: "{contentItems}" 
+        ///     time: 565
         /// }
         /// ]]>
         /// </example>
@@ -418,31 +421,6 @@ namespace Chronozoom.UI
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void DeleteContentItem(string superCollectionName, string collectionName, ContentItem contentItemRequest);
 
-        /// <summary>
-        /// Creates a new tour with bookmark support.
-        /// </summary>
-        /// <remarks>
-        /// Do not specify the tour ID, this value is automatically generated.
-        /// All bookmarks in a tour must belong to the same collection and the user 
-        /// must have permission to modify that collection.
-        /// POST is used to create a new tour. 
-        /// </remarks>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
-        /// <param name="collectionName">The name of the collection to modify.</param>
-        /// <param name="tourRequest">The tour data in JSON format.</param>
-        /// <returns>A list of guids of tour guid followed by bookmark guids in JSON format.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: POST
-        ///
-        /// URL:
-        /// http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour
-        ///
-        /// Request body:
-        /// {
-        ///          
-        /// }
-        /// ]]>
-        /// </example>
         [OperationContract]
         [WebInvoke(Method = "POST", UriTemplate = "/{superCollectionName}/{collectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         TourResult PostTour(string superCollectionName, string collectionName, Tour tourRequest);
@@ -525,7 +503,7 @@ namespace Chronozoom.UI
         /// HTTP verb: DELETE
         ///
         /// URL:
-        /// http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour
+        /// http://{URL}/api/{supercollection}/{collection}/tour2
         ///
         /// Request body:
         /// {
@@ -569,7 +547,7 @@ namespace Chronozoom.UI
         /// HTTP verb: DELETE
         ///
         /// URL:
-        /// http://{URL}/api/{supercollection}/{collection}/{collectionName}/bookmark
+        /// http://{URL}/api/{supercollection}/{collection}/bookmark
         ///
         /// Request body:
         /// {
