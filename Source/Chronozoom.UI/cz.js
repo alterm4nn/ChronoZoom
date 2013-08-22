@@ -2386,8 +2386,13 @@ var CZ;
                         if((exhibitDate.regime == "CE") || (exhibitDate.regime == "BCE")) {
                             var date_number = Number(infodotDescription.date);
                             var exhibitDate = CZ.Dates.convertCoordinateToYear(date_number);
+                            var exhibitYMD = CZ.Dates.getYMDFromCoordinate(date_number);
                             date_number = Math.abs(date_number);
-                            title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                            if(date_number == Math.floor(date_number)) {
+                                title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                            } else {
+                                title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + exhibitYMD.month + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
+                            }
                         } else {
                             title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                         }
@@ -11693,6 +11698,7 @@ var CZ;
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
+                var that = this;
                 this.saveButton.prop('disabled', false);
                 this.titleInput.change(function () {
                     _this.isModified = true;
@@ -11711,6 +11717,18 @@ var CZ;
                 });
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
+                });
+                this.descriptionInput.on('keyup', function (e) {
+                    if(e.which == 13) {
+                        that.saveButton.click(function () {
+                            return that.onSave();
+                        });
+                    }
+                });
+                this.descriptionInput.on('keydown', function (e) {
+                    if(e.which == 13) {
+                        that.saveButton.off();
+                    }
                 });
                 if(CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
                     $("<option></option>", {
