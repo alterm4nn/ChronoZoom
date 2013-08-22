@@ -25,6 +25,7 @@ using Chronozoom.Entities;
 
 using Chronozoom.UI.Utils;
 using System.ServiceModel.Description;
+using System.Text.RegularExpressions;
 
 namespace Chronozoom.UI
 {
@@ -1144,6 +1145,33 @@ namespace Chronozoom.UI
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1304:SpecifyCultureInfo", MessageId = "System.String.ToLower")]
         private static Boolean ValidateContentItemUrl(ContentItem contentitem)
         {
+            string contentitemURI = contentitem.Uri;
+
+            // Custom validation for Skydrive images
+            if (contentitem.MediaType == "skydrive-image")
+            {
+                // Parse url parameters. url pattern is - {url} {width} {height}
+                var splited = contentitem.Uri.Split(' ');
+
+                // Not enough parameters in url
+                if (splited.Length != 3)
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                    return false;
+                }
+
+                contentitemURI = splited[0];
+
+                // Validate width and height are numbers
+                int value;
+                if (!Int32.TryParse(splited[1], out value) || !Int32.TryParse(splited[2], out value))
+                {
+                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                    return false;
+                }
+            }
+
+
             Uri uriResult;
 
             // If Media Source is present, validate it
@@ -1154,7 +1182,7 @@ namespace Chronozoom.UI
             }
 
             // Check if valid url
-            if (!(Uri.TryCreate(contentitem.Uri, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
+            if (!(Uri.TryCreate(contentitemURI, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
             {
                 SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
                 return false;
@@ -2014,8 +2042,28 @@ namespace Chronozoom.UI
                 SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.ParentTimelineCollectionMismatch);
                 return false;
             }
-
             return true;
+        }
+
+        public string GetMemiTypeByUrl(string url)
+        {
+            string contentType = "";
+            try
+            {
+                var request = HttpWebRequest.Create(url) as HttpWebRequest;
+                request.Method = "head";
+                if (request != null)
+                {
+                    var response = request.GetResponse() as HttpWebResponse;
+                    if (response != null)
+                        contentType = response.ContentType;
+                }
+                return contentType;
+            }
+            catch
+            {
+                return contentType;
+            }
         }
     }
 }

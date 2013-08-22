@@ -81,6 +81,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Hammock.ClientProfile">
+      <HintPath>..\..\External\TweetSharp\Hammock.ClientProfile.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.0.0-rc2\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
@@ -207,9 +210,15 @@
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Reference Include="TweetSharp">
+      <HintPath>..\..\External\TweetSharp\TweetSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\Bing.svc.cs">
+      <DependentUpon>chronozoom.svc</DependentUpon>
+    </Compile>
+    <Compile Include="api\Twitter.svc.cs">
       <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
     <Compile Include="api\errorhandler.cs" />
@@ -265,6 +274,7 @@
     <Content Include="images\edit-icon.png" />
     <Content Include="images\media\bing-import-50x150.png" />
     <Content Include="images\media\bing-import-50x50.png" />
+    <Content Include="images\media\SkyDrive-Import-50X150.png" />
     <Content Include="images\media\skydrive-import-50x50.png" />
     <Content Include="images\narration-off.png" />
     <Content Include="images\narration-on.png" />

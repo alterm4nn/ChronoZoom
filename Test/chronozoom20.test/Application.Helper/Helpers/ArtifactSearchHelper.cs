@@ -16,6 +16,7 @@ namespace Application.Helper.Helpers
 
         public void FindAndSelectRandomImage(out string imageUrl, out string imageSource)
         {
+            Logger.Log("<-");
             SelectBingSearch();
             SelectImageFilter();
             TypeSearchQwery("test");
@@ -26,10 +27,12 @@ namespace Application.Helper.Helpers
             imageSource = GetMediaSourceByIndex(randomImageIndex);
             imageUrl = GetResultUrlByIndex(randomImageIndex);
             ClickByResult(randomImageIndex);
+            Logger.Log("->");
         }
 
         public void FindAndSelectRandomVideo(out string videoUrlFromSearchResult)
         {
+            Logger.Log("<-");
             SelectBingSearch();
             SelectVideoFilter();
             TypeSearchQwery("test");
@@ -39,10 +42,12 @@ namespace Application.Helper.Helpers
             int randomVideoIndex = Random.Next(1, resultsCount);
             videoUrlFromSearchResult = GetResultUrlByIndex(randomVideoIndex);
             ClickByResult(randomVideoIndex);
+            Logger.Log("->");
         }
 
         public void FindAndSelectRandomPdf(out string pdfUrlFromSearchResult)
         {
+            Logger.Log("<-");
             SelectBingSearch();
             SelectPdfFilter();
             TypeSearchQwery("test");
@@ -52,12 +57,13 @@ namespace Application.Helper.Helpers
             int randomPdfIndex = Random.Next(1, resultsCount);
             pdfUrlFromSearchResult = GetResultUrlByIndex(randomPdfIndex);
             ClickByResult(randomPdfIndex);
+            Logger.Log("->");
         }
 
         private string GetMediaSourceByIndex(int index)
         {
             Logger.Log("<-");
-            string url = FindElement(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[2]/div[" + index + "]/a")).GetAttribute("media-source");
+            string url = FindElement(By.XPath("//*[@id='bing-search-results']/div["+ index +"]/a")).GetAttribute("media-source");
             Logger.Log("-> imageUrl: " + url);
             return url;
         }
@@ -65,7 +71,7 @@ namespace Application.Helper.Helpers
         private string GetResultUrlByIndex(int index)
         {
             Logger.Log("<-");
-            string url = FindElement(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[2]/div[" + index + "]/a")).GetAttribute("href");
+            string url = FindElement(By.XPath("//*[@id='bing-search-results']/div[" + index + "]/a")).GetAttribute("href");
             Logger.Log("-> imageUrl: " + url);
             return url;
         }
@@ -73,7 +79,7 @@ namespace Application.Helper.Helpers
         private int GetResultsCount()
         {
             Logger.Log("<-");
-            int count = FindElements(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[2]/div[*]")).Count;
+            int count = GetItemsCount(By.XPath("//div[@class='cz-bing-result-container']"));
             Logger.Log("-> count: " + count);
             return count;
         }
@@ -81,14 +87,14 @@ namespace Application.Helper.Helpers
         private void ClickByResult(int randomResultIndex)
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[2]/div[" + randomResultIndex + "]/div[1]"));
+            Click(By.XPath("//*[@id='bing-search-results']/div[" + randomResultIndex + "]/div[@class='cz-bing-result-title cz-darkgray']"));
             Logger.Log("->");
         }
 
         private void SelectBingSearch()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='auth-edit-contentitem-form']/div[3]/div[1]/div/img"));
+            Click(By.XPath("//*/div[@class='cz-form-medialist cz-medialist']/div[@title='bing']"));
             Logger.Log("->");
         }
 
@@ -115,7 +121,9 @@ namespace Application.Helper.Helpers
 
         private void TypeSearchQwery(string text)
         {
+            Logger.Log("<-");
             TypeText(By.Id("bing-search-input"), text);
+            Logger.Log("->");
         }
 
         private void ClickSearchButton()
@@ -128,7 +136,7 @@ namespace Application.Helper.Helpers
         private void WaitWhileResultsIsRender()
         {
             Logger.Log("<-");
-            WaitForElementIsNotDisplayed(By.XPath("//*[@id='content']/div[21]/div[2]/div/div[1]/img"));
+            WaitForElementIsNotDisplayed(By.Id("bing-search-progress-bar"));
             Logger.Log("->");
         }
 

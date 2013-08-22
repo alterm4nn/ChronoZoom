@@ -31,6 +31,7 @@ var CZ;
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
+                var that = this;
                 this.saveButton.prop('disabled', false);
                 this.titleInput.change(function () {
                     _this.isModified = true;
@@ -50,10 +51,26 @@ var CZ;
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
                 });
-                if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                this.descriptionInput.on('keyup', function (e) {
+                    if(e.which == 13) {
+                        that.saveButton.click(function () {
+                            return that.onSave();
+                        });
+                    }
+                });
+                this.descriptionInput.on('keydown', function (e) {
+                    if(e.which == 13) {
+                        that.saveButton.off();
+                    }
+                });
+                if(CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
                     $("<option></option>", {
-                        value: "skydrive",
-                        text: " Skydrive "
+                        value: "skydrive-image",
+                        text: " Skydrive Image "
+                    }).appendTo(this.mediaTypeInput);
+                    $("<option></option>", {
+                        value: "skydrive-document",
+                        text: " Skydrive Document "
                     }).appendTo(this.mediaTypeInput);
                 }
                 this.titleInput.val(this.contentItem.title || "");

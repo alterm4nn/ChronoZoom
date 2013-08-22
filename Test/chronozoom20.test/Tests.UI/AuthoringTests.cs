@@ -53,7 +53,6 @@ namespace Tests
         [TestMethod]
         public void timeline_should_be_created_in_date_mode()
         {
-            Logger.Log("Bug: https://github.com/alterm4nn/ChronoZoom/issues/528", LogType.Debug);
             _timeline = new Timeline { Title = "WebdriverTitleDayMode" };
             TimelineHelper.AddTimelineWithDayMode(_timeline);
             _newTimeline = TimelineHelper.GetLastTimeline();
@@ -67,15 +66,17 @@ namespace Tests
             {
                 Title = "ContentItemImage",
                 MediaType = "Image",
-                Uri = "http://i.telegraph.co.uk/multimedia/archive/02429/eleanor_scriven_2429776k.jpg"
-
+                Uri = "http://i.telegraph.co.uk/multimedia/archive/02429/eleanor_scriven_2429776k.jpg",
+                Attribution = "Image",
+                Caption = "Description"
             };
             var contentItemMusic = new ContentItem
             {
                 Title = "ContentItemMusic",
                 MediaType = "Image",
-                Uri = "http://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Aeroflot_Airbus_A330_Kustov_edit.jpg/800px-Aeroflot_Airbus_A330_Kustov_edit.jpg"
-
+                Uri = "http://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Aeroflot_Airbus_A330_Kustov_edit.jpg/800px-Aeroflot_Airbus_A330_Kustov_edit.jpg",
+                Attribution = "Image2",
+                Caption = "Description2"
             };
             var exhibit = new Exhibit
             {

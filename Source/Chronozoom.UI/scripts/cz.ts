@@ -226,6 +226,7 @@ module CZ {
                 return c;
             })();
 
+
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
 
@@ -815,7 +816,12 @@ module CZ {
         }
 
         export function closeAllForms() {
-            $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });
+            $('.cz-major-form').each((i, f) => {
+                var form = $(f).data('form');
+                if (form && form.isFormVisible === true) {
+                    form.close();
+                }
+            });
 
         }
 

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Net;
 using System.Text;
 using Application.Driver;
@@ -11,8 +8,6 @@ using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using System.IO;
 using System.Runtime.Serialization.Json;
-using Chronozoom.Entities;
-using ContentItem = Chronozoom.Entities.ContentItem;
 using Exhibit = Application.Helper.Entities.Exhibit;
 using Timeline = Application.Helper.Entities.Timeline;
 using Tour = Application.Helper.Entities.Tour;
@@ -67,12 +62,6 @@ namespace Application.Helper.Helpers
             DataContractJsonSerializer guidSerializer = new DataContractJsonSerializer(typeof(NewExhibitApiResponse));
 
             exhibit.Timeline_ID = new Guid(CosmosGuidTemplate);
-
-            //using (MemoryStream ms = new MemoryStream())
-            //{
-            //    exhibitSerializer.WriteObject(ms, exhibit);
-            //    var ttt = Encoding.Default.GetString(ms.ToArray());
-            //}
 
             HttpWebRequest request = MakePutRequest(ExhibitApiServiceUrl);
             Stream requestStream = request.GetRequestStream();

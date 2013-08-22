@@ -294,6 +294,7 @@ var CZ;
                         };
                     }
                     var bookmark = self.bookmarks[self.currentPlace.bookmark];
+                    showBookmark(Tours.tour, bookmark);
                     var isInTransitionToFirstBookmark = (self.currentPlace.bookmark == 0 && self.currentPlace.type == 'goto');
                     if(self.currentPlace.type == 'bookmark' || self.currentPlace.bookmark != 0) {
                         self.RaiseBookmarkStarted(bookmark);
@@ -482,8 +483,9 @@ var CZ;
             $("#bookmarks").hide();
             Tours.isBookmarksWindowVisible = false;
             var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
+            if(curURL.hash.params["tour"]) {
+                delete curURL.hash.params["tour"];
+            }
             CZ.UrlNav.setURL(curURL);
         }
         Tours.tourAbort = tourAbort;

@@ -1,6 +1,7 @@
 ﻿/// <reference path='../../scripts/cz.ts'/>
 /// <reference path='../../scripts/media.ts'/>
 /// <reference path='../../ui/controls/formbase.ts'/>
+/// <reference path='../../scripts/settings.ts'/>
 /// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 
 module CZ {
@@ -14,6 +15,8 @@ module CZ {
             export var filePickerIframe: JQuery;
             export var logoutButton: JQuery;
             export var isEnabled: bool;
+            export var helperText: JQuery;
+            var mediaType: string;
 
             export function setup(context: any) {
                 contentItem = context;
@@ -23,6 +26,11 @@ module CZ {
                     text: "Logout",
                     class: "cz-skydrive-logout-button",
                     click: onLogout
+                });
+                
+                helperText = $("<label></label>", {
+                    text: "Selected items will be automatically shared",
+                    class: "cz-skydrive-help-text",
                 });
 
                 filePicker = showFilePicker().then(onFilePick, onError);
@@ -55,6 +63,15 @@ module CZ {
              * @return {Promise}          Request's promise.
              */
             function getEmbed(response) {
+                switch (response.data.files[0].type) {
+                    case "photo":
+                        mediaType = "skydrive-image";
+                        break;
+                    default:
+                        mediaType = "skydrive-document";
+                        break;
+                }
+
                 return WL.api({
                     path: response.data.files[0].id + "/embed",
                     method: "GET"
@@ -67,9 +84,18 @@ module CZ {
              */
             function onContentReceive(response) {
                 var src = response.embed_html.match(/src=\"(.*?)\"/i)[1];
+                
+                var uri = src;
+
+                if (mediaType === "skydrive-image") {
+                    var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    uri += ' ' + width + ' ' + height;
+                }
+
                 var mediaInfo = <CZ.Media.MediaInfo> {
-                    uri: src,
-                    mediaType: "skydrive",
+                    uri: uri,
+                    mediaType: mediaType,
                     mediaSource: src,
                     attribution: src
                 };
@@ -95,21 +121,16 @@ module CZ {
              * Logout and closes file picker and opens login dialog.
              */
             function onLogout() {
-                var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-                logoutButton.hide();
-                filePicker.cancel();
-                WL.logout();
-
-                // Immediate call causes login with previous user without Sign In popup.
-                // NOTE: Async call causes popup to be blocked in Chrome and IE.
-                //       More info: http://stackoverflow.com/a/7060302/1211780
-                if (isFirefox) {
-                    setTimeout(setup, 500, contentItem);
-                } else {
-                    // Sync imitation of setTimeout 500ms.
-                    var start = + new Date();
-                    while (+ new Date() - start < 500);
-                    setup(contentItem);
+                if (window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
+                    logoutButton.hide();
+                helperText.hide();
+                    filePicker.cancel();
+                    WL.logout();
+                    
+                    // send response to login.live.com/oatuh20_logout.srf to logout from Skydrive
+                    // More info: http://social.msdn.microsoft.com/Forums/live/en-US/4fd9a484-54d7-4c59-91c4-081f4deee2c7/how-to-sign-out-by-rest-api
+                    window.location.assign("https://login.live.com/oauth20_logout.srf?client_id=" +
+                        CZ.Settings.WLAPIClientID + "&redirect_uri=" + window.location.toString());
                 }
             }
 
@@ -133,6 +154,8 @@ module CZ {
                 // Append logout button to file picker.
                 logoutButton.appendTo("body");
 
+                helperText.appendTo("body");
+
                 $(window).on("resize", onWindowResize);
 
                 filePickerIframe.load(() => {
@@ -143,6 +166,9 @@ module CZ {
                     logoutButton.animate({
                         opacity: 1
                     });
+                    helperText.animate({
+                        opacity: 1
+                    });
                 });
             }
 
@@ -151,6 +177,7 @@ module CZ {
              */
             function onFilePickerClose() {
                 logoutButton.remove();
+                helperText.remove();
                 $(window).off("resize", onWindowResize);                
             }
 
@@ -168,6 +195,10 @@ module CZ {
                 logoutButton.offset({
                     top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin,
                     left: iframeOffset.left + buttonLeftMargin
+                });
+                helperText.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin + 1,
+                    left: iframeOffset.left + buttonLeftMargin + 90
                 });
             }
         }

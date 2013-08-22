@@ -157,7 +157,7 @@ module CZ {
 
         // .../{superCollectionName}/collections
         // NOTE: Not implemented in current API.
-        export function getCollections (superCollectionName : string) {
+        export function getCollections(superCollectionName: string) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
@@ -213,7 +213,7 @@ module CZ {
         */
 
         // .../{supercollection}/{collection}
-        export function putCollection(superCollectionName : string, collectionName : string, c) {
+        export function putCollection(superCollectionName: string, collectionName: string, c) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
@@ -523,6 +523,24 @@ module CZ {
             });
         }
 
+        // .../twitter/getRecentTweets
+        export function getRecentTweets() {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("twitter/getRecentTweets");
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                success: function (response) {
+                }
+            });
+        }
+
         // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         export function getServiceInformation() {
             CZ.Authoring.resetSessionTimer();
@@ -645,6 +663,26 @@ module CZ {
 
                 return profile;
             });
+        }
+
+        export function getMimeTypeByUrl(url): string {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("getmimetypebyurl");
+            if (url == "") return result;
+            request.addParameter("url", url);
+            $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                async: false
+            }).done(mime => {
+                if(mime)
+                    result = mime;
+            });
+            return result;
         }
     }
 }

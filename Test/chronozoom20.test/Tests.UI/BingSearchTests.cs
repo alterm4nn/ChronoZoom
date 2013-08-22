@@ -20,7 +20,7 @@ namespace Tests
             BrowserStateManager.RefreshState();
             HomePageHelper.OpenPage();
             AuthorizationHelper.OpenLoginPage();
-            AuthorizationHelper.AuthenticateAsGoogleUser();
+            AuthorizationHelper.AuthenticateAsMicrosoftUser(); //authenticate as existing cz user
             HomePageHelper.DeleteAllElementsLocally();
             var exhibit = new Exhibit { Title = "WebdriverExhibitWithContent" };
             ExhibitHelper.AddExhibitWithoutFormClosing(exhibit);
@@ -37,6 +37,7 @@ namespace Tests
         public void TestCleanup()
         {
             CreateScreenshotsIfTestFail(TestContext);
+            AuthorizationHelper.LogoutByUrl();
         }
 
         #endregion
