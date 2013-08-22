@@ -226,6 +226,7 @@ module CZ {
                 return c;
             })();
 
+
             $('.bubbleInfo').hide();
             var canvasIsEmpty;
 

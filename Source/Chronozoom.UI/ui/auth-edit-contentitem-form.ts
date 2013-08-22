@@ -44,7 +44,7 @@ module CZ {
 
             constructor(container: JQuery, formInfo: IFormEditCIInfo) {
                 super(container, formInfo);
-
+                
                 this.titleTextblock = container.find(formInfo.titleTextblock);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.mediaInput = container.find(formInfo.mediaInput);
@@ -69,7 +69,7 @@ module CZ {
 
             private initUI() {
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
-                
+                var that = this;
                 this.saveButton.prop('disabled', false);
 
                 this.titleInput.change(() => { this.isModified = true; });
@@ -78,6 +78,10 @@ module CZ {
                 this.mediaTypeInput.change(() => { this.isModified = true; });
                 this.attributionInput.change(() => { this.isModified = true; });
                 this.descriptionInput.change(() => { this.isModified = true; });
+
+
+                this.descriptionInput.on('keyup', function (e) { if (e.which == 13) { that.saveButton.click(() => that.onSave()); } });
+                this.descriptionInput.on('keydown', function (e) { if (e.which == 13) { that.saveButton.off(); } });
 
                 if (CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
                     $("<option></option>", {
