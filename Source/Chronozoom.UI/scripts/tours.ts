@@ -401,6 +401,8 @@ module CZ {
 
                     var bookmark = self.bookmarks[self.currentPlace.bookmark];
 
+                    showBookmark(tour, bookmark);
+
                     // indicates if animation to first bookmark is required
                     var isInTransitionToFirstBookmark = (self.currentPlace.bookmark == 0 && self.currentPlace.type == 'goto');
 
