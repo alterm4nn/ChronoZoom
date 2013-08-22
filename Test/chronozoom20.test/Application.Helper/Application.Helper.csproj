@@ -52,7 +52,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WebDriver">
-      <HintPath>..\packages\Selenium.WebDriver.2.33.0\lib\net40\WebDriver.dll</HintPath>
+      <HintPath>..\packages\Selenium.WebDriver.2.35.0\lib\net40\WebDriver.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -76,10 +76,12 @@
     <Compile Include="Helpers\ApiHelper.cs" />
     <Compile Include="Helpers\ArtifactSearchHelper.cs" />
     <Compile Include="Helpers\AuthorizationHelper.cs" />
+    <Compile Include="Helpers\BaseExhibitHelper.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
     <Compile Include="Helpers\BreadcrumbsHelper.cs" />
     <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\ExhibitHelper.cs" />
+    <Compile Include="Helpers\ExhibitSkyDriveHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\NavigationHelper.cs" />
@@ -95,11 +97,6 @@
     <Compile Include="UserActions\DependentActions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Constants\Accounts.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Application.Driver\Application.Driver.csproj">
       <Project>{ac1310bd-eacc-4b45-bcaf-2d8a0260e2d1}</Project>
       <Name>Application.Driver</Name>
@@ -110,6 +107,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Constants\Accounts.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -94,8 +94,11 @@ var CZ;
         var addAudio = function (element, layerid, id, audioSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
         };
-        VCContent.addSkydrive = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
-            return VCContent.addChild(element, new CanvasSkydriveItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+        VCContent.addSkydriveDocument = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasSkydriveDocumentItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+        };
+        VCContent.addSkydriveImage = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
         function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw) {
             return VCContent.addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
@@ -602,9 +605,11 @@ var CZ;
                     this.editButton = VCContent.addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y, this.titleObject.height, this.titleObject.height, "/images/edit.svg");
                     this.editButton.reactsOnMouse = true;
                     this.editButton.onmouseclick = function () {
-                        CZ.Authoring.isActive = true;
-                        CZ.Authoring.mode = "editTimeline";
-                        CZ.Authoring.selectedTimeline = this.parent;
+                        if(CZ.Common.vc.virtualCanvas("getHoveredInfodot").x == undefined) {
+                            CZ.Authoring.isActive = true;
+                            CZ.Authoring.mode = "editTimeline";
+                            CZ.Authoring.selectedTimeline = this.parent;
+                        }
                         return true;
                     };
                     this.editButton.onmousehover = function () {
@@ -766,6 +771,14 @@ var CZ;
                                             currentLine += ' ' + words[iw];
                                         }
                                         lineWidth = newWidth;
+                                    }
+                                    var NewWordWidth;
+                                    if((words.length == 1) && (wsize.width > size_p.x)) {
+                                        var NewWordWidth = wsize.width;
+                                        while(NewWordWidth > size_p.x) {
+                                            fontSize /= 1.5;
+                                            NewWordWidth /= 1.5;
+                                        }
                                     }
                                 }
                                 lines.push(currentLine);
@@ -1143,13 +1156,48 @@ var CZ;
             this.initializeContent(elem);
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
-        function CanvasSkydriveItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+        function CanvasSkydriveDocumentItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
             var elem = document.createElement('iframe');
             elem.setAttribute("id", id);
             elem.setAttribute("src", embededSrc);
             this.initializeContent(elem);
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+        function CanvasSkydriveImageItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+            var srcData = embededSrc.split(" ");
+            var elem = document.createElement('iframe');
+            elem.setAttribute("id", id);
+            elem.setAttribute("src", srcData[0]);
+            elem.setAttribute("scrolling", "no");
+            elem.setAttribute("frameborder", "0");
+            this.initializeContent(elem);
+            this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                if(!this.content) {
+                    return;
+                }
+                var p = viewport2d.pointVirtualToScreen(this.x, this.y);
+                var width = parseFloat(srcData[1]);
+                var height = parseFloat(srcData[2]);
+                var scale = size_p.x / width;
+                if(height / width > size_p.y / size_p.x) {
+                    scale = size_p.y / height;
+                }
+                this.content.style.left = (p.x + size_p.x / 2) + 'px';
+                this.content.style.top = (p.y + size_p.y / 2) + 'px';
+                this.content.style.marginLeft = (-width / 2) + 'px';
+                this.content.style.marginTop = (-height / 2) + 'px';
+                this.content.style.width = width + 'px';
+                this.content.style.height = height + 'px';
+                this.content.style.opacity = opacity;
+                this.content.style.filter = 'alpha(opacity=' + (opacity * 100) + ')';
+                this.content.style.webkitTransform = "scale(" + scale + ")";
+                this.content.style.msTransform = "scale(" + scale + ")";
+                this.content.style.MozTransform = "scale(" + scale + ")";
+            };
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
         function SeadragonImage(vc, parent, layerid, id, imageSource, vx, vy, vw, vh, z, onload) {
@@ -1318,8 +1366,10 @@ var CZ;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
-                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive') {
-                        VCContent.addSkydrive(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive-document') {
+                        VCContent.addSkydriveDocument(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive-image') {
+                        VCContent.addSkydriveImage(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
                         VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
@@ -1569,8 +1619,13 @@ var CZ;
                         if((exhibitDate.regime == "CE") || (exhibitDate.regime == "BCE")) {
                             var date_number = Number(infodotDescription.date);
                             var exhibitDate = CZ.Dates.convertCoordinateToYear(date_number);
+                            var exhibitYMD = CZ.Dates.getYMDFromCoordinate(date_number);
                             date_number = Math.abs(date_number);
-                            title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                            if(date_number == Math.floor(date_number)) {
+                                title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                            } else {
+                                title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + exhibitYMD.month + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
+                            }
                         } else {
                             title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                         }

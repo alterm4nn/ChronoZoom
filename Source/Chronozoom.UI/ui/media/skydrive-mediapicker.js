@@ -8,6 +8,8 @@ var CZ;
             SkyDriveMediaPicker.filePickerIframe;
             SkyDriveMediaPicker.logoutButton;
             SkyDriveMediaPicker.isEnabled;
+            SkyDriveMediaPicker.helperText;
+            var mediaType;
             function setup(context) {
                 contentItem = context;
                 editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
@@ -15,6 +17,10 @@ var CZ;
                     text: "Logout",
                     class: "cz-skydrive-logout-button",
                     click: onLogout
+                });
+                SkyDriveMediaPicker.helperText = $("<label></label>", {
+                    text: "Selected items will be automatically shared",
+                    class: "cz-skydrive-help-text"
                 });
                 SkyDriveMediaPicker.filePicker = showFilePicker().then(onFilePick, onError);
             }
@@ -31,6 +37,14 @@ var CZ;
                 getEmbed(response).then(onContentReceive, onError);
             }
             function getEmbed(response) {
+                switch(response.data.files[0].type) {
+                    case "photo":
+                        mediaType = "skydrive-image";
+                        break;
+                    default:
+                        mediaType = "skydrive-document";
+                        break;
+                }
                 return WL.api({
                     path: response.data.files[0].id + "/embed",
                     method: "GET"
@@ -38,9 +52,15 @@ var CZ;
             }
             function onContentReceive(response) {
                 var src = response.embed_html.match(/src=\"(.*?)\"/i)[1];
+                var uri = src;
+                if(mediaType === "skydrive-image") {
+                    var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    uri += ' ' + width + ' ' + height;
+                }
                 var mediaInfo = {
-                    uri: src,
-                    mediaType: "skydrive",
+                    uri: uri,
+                    mediaType: mediaType,
                     mediaSource: src,
                     attribution: src
                 };
@@ -56,18 +76,12 @@ var CZ;
                 }
             }
             function onLogout() {
-                var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-                SkyDriveMediaPicker.logoutButton.hide();
-                SkyDriveMediaPicker.filePicker.cancel();
-                WL.logout();
-                if(isFirefox) {
-                    setTimeout(setup, 500, contentItem);
-                } else {
-                    var start = +new Date();
-                    while(+new Date() - start < 500) {
-                        ;
-                    }
-                    setup(contentItem);
+                if(window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
+                    SkyDriveMediaPicker.logoutButton.hide();
+                    SkyDriveMediaPicker.helperText.hide();
+                    SkyDriveMediaPicker.filePicker.cancel();
+                    WL.logout();
+                    window.location.assign("https://login.live.com/oauth20_logout.srf?client_id=" + CZ.Settings.WLAPIClientID + "&redirect_uri=" + window.location.toString());
                 }
             }
             function watchFilePicker(callback) {
@@ -80,6 +94,7 @@ var CZ;
             }
             function onFilePickerLoad() {
                 SkyDriveMediaPicker.logoutButton.appendTo("body");
+                SkyDriveMediaPicker.helperText.appendTo("body");
                 $(window).on("resize", onWindowResize);
                 SkyDriveMediaPicker.filePickerIframe.load(function () {
                     onWindowResize();
@@ -89,10 +104,14 @@ var CZ;
                     SkyDriveMediaPicker.logoutButton.animate({
                         opacity: 1
                     });
+                    SkyDriveMediaPicker.helperText.animate({
+                        opacity: 1
+                    });
                 });
             }
             function onFilePickerClose() {
                 SkyDriveMediaPicker.logoutButton.remove();
+                SkyDriveMediaPicker.helperText.remove();
                 $(window).off("resize", onWindowResize);
             }
             function onWindowResize() {
@@ -104,6 +123,10 @@ var CZ;
                 SkyDriveMediaPicker.logoutButton.offset({
                     top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin,
                     left: iframeOffset.left + buttonLeftMargin
+                });
+                SkyDriveMediaPicker.helperText.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin + 1,
+                    left: iframeOffset.left + buttonLeftMargin + 90
                 });
             }
         })(Media.SkyDriveMediaPicker || (Media.SkyDriveMediaPicker = {}));

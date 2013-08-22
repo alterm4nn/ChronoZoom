@@ -229,6 +229,8 @@
         Settings.mediapickerImageThumbnailMaxHeight = 155;
         Settings.mediapickerVideoThumbnailMaxWidth = 190;
         Settings.mediapickerVideoThumbnailMaxHeight = 130;
+        Settings.WLAPIClientID = "0000000040101FFA";
+        Settings.WLAPIRedirectUrl = "http://test.chronozoom.com/";
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -859,8 +861,11 @@ var CZ;
         var addAudio = function (element, layerid, id, audioSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
         };
-        VCContent.addSkydrive = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
-            return VCContent.addChild(element, new CanvasSkydriveItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+        VCContent.addSkydriveDocument = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasSkydriveDocumentItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+        };
+        VCContent.addSkydriveImage = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return VCContent.addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
         function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw) {
             return VCContent.addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
@@ -1367,9 +1372,11 @@ var CZ;
                     this.editButton = VCContent.addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y, this.titleObject.height, this.titleObject.height, "/images/edit.svg");
                     this.editButton.reactsOnMouse = true;
                     this.editButton.onmouseclick = function () {
-                        CZ.Authoring.isActive = true;
-                        CZ.Authoring.mode = "editTimeline";
-                        CZ.Authoring.selectedTimeline = this.parent;
+                        if(CZ.Common.vc.virtualCanvas("getHoveredInfodot").x == undefined) {
+                            CZ.Authoring.isActive = true;
+                            CZ.Authoring.mode = "editTimeline";
+                            CZ.Authoring.selectedTimeline = this.parent;
+                        }
                         return true;
                     };
                     this.editButton.onmousehover = function () {
@@ -1531,6 +1538,14 @@ var CZ;
                                             currentLine += ' ' + words[iw];
                                         }
                                         lineWidth = newWidth;
+                                    }
+                                    var NewWordWidth;
+                                    if((words.length == 1) && (wsize.width > size_p.x)) {
+                                        var NewWordWidth = wsize.width;
+                                        while(NewWordWidth > size_p.x) {
+                                            fontSize /= 1.5;
+                                            NewWordWidth /= 1.5;
+                                        }
                                     }
                                 }
                                 lines.push(currentLine);
@@ -1908,13 +1923,48 @@ var CZ;
             this.initializeContent(elem);
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
-        function CanvasSkydriveItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+        function CanvasSkydriveDocumentItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
             var elem = document.createElement('iframe');
             elem.setAttribute("id", id);
             elem.setAttribute("src", embededSrc);
             this.initializeContent(elem);
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+        function CanvasSkydriveImageItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+            var srcData = embededSrc.split(" ");
+            var elem = document.createElement('iframe');
+            elem.setAttribute("id", id);
+            elem.setAttribute("src", srcData[0]);
+            elem.setAttribute("scrolling", "no");
+            elem.setAttribute("frameborder", "0");
+            this.initializeContent(elem);
+            this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                if(!this.content) {
+                    return;
+                }
+                var p = viewport2d.pointVirtualToScreen(this.x, this.y);
+                var width = parseFloat(srcData[1]);
+                var height = parseFloat(srcData[2]);
+                var scale = size_p.x / width;
+                if(height / width > size_p.y / size_p.x) {
+                    scale = size_p.y / height;
+                }
+                this.content.style.left = (p.x + size_p.x / 2) + 'px';
+                this.content.style.top = (p.y + size_p.y / 2) + 'px';
+                this.content.style.marginLeft = (-width / 2) + 'px';
+                this.content.style.marginTop = (-height / 2) + 'px';
+                this.content.style.width = width + 'px';
+                this.content.style.height = height + 'px';
+                this.content.style.opacity = opacity;
+                this.content.style.filter = 'alpha(opacity=' + (opacity * 100) + ')';
+                this.content.style.webkitTransform = "scale(" + scale + ")";
+                this.content.style.msTransform = "scale(" + scale + ")";
+                this.content.style.MozTransform = "scale(" + scale + ")";
+            };
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
         function SeadragonImage(vc, parent, layerid, id, imageSource, vx, vy, vw, vh, z, onload) {
@@ -2083,8 +2133,10 @@ var CZ;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
-                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive') {
-                        VCContent.addSkydrive(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive-document') {
+                        VCContent.addSkydriveDocument(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    } else if(this.contentItem.mediaType.toLowerCase() === 'skydrive-image') {
+                        VCContent.addSkydriveImage(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if(CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
                         VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
@@ -2334,8 +2386,13 @@ var CZ;
                         if((exhibitDate.regime == "CE") || (exhibitDate.regime == "BCE")) {
                             var date_number = Number(infodotDescription.date);
                             var exhibitDate = CZ.Dates.convertCoordinateToYear(date_number);
+                            var exhibitYMD = CZ.Dates.getYMDFromCoordinate(date_number);
                             date_number = Math.abs(date_number);
-                            title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                            if(date_number == Math.floor(date_number)) {
+                                title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                            } else {
+                                title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + exhibitYMD.month + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
+                            }
                         } else {
                             title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                         }
@@ -3713,6 +3770,21 @@ var CZ;
             });
         }
         Service.getBingDocuments = getBingDocuments;
+        function getRecentTweets() {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("twitter/getRecentTweets");
+            console.log("[GET] " + request.url);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getRecentTweets = getRecentTweets;
         function getServiceInformation() {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -3811,6 +3883,29 @@ var CZ;
             });
         }
         Service.getProfile = getProfile;
+        function getMimeTypeByUrl(url) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("getmimetypebyurl");
+            if(url == "") {
+                return result;
+            }
+            request.addParameter("url", url);
+            $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                async: false
+            }).done(function (mime) {
+                if(mime) {
+                    result = mime;
+                }
+            });
+            return result;
+        }
+        Service.getMimeTypeByUrl = getMimeTypeByUrl;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));
@@ -3856,9 +3951,13 @@ var CZ;
             return coord;
         }
         Dates.getCoordinateFromYMD = getCoordinateFromYMD;
-        function getYMDFromCoordinate(coord) {
+        function getYMDFromCoordinate(coord, MarkerCorrection) {
+            if (typeof MarkerCorrection === "undefined") { MarkerCorrection = false; }
             var absCoord = Math.abs(coord), floorCoord = Math.floor(coord), sign = (coord === 0) ? 1 : coord / absCoord, day = 0, month = 0, year = (coord >= 1) ? floorCoord : floorCoord - 1, isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, daysFraction = sign * (absCoord - Math.abs(floorCoord));
             day = Math.round(daysFraction * daysInYear);
+            if(MarkerCorrection) {
+                day = Math.floor(daysFraction * daysInYear);
+            }
             day += +(day < daysInYear);
             while(day > Dates.daysInMonth[month] + (+(isLeap && month === 1))) {
                 day -= Dates.daysInMonth[month];
@@ -4286,6 +4385,13 @@ var CZ;
                 t.x = temp.x;
                 t.width = temp.width;
                 t.endDate = prop.end;
+                if(t.children.length < 3) {
+                    t.height = Math.min.apply(Math, [
+                        t.parent.height * CZ.Layout.timelineHeightRate, 
+                        t.width * CZ.Settings.timelineMinAspect, 
+                        t.height
+                    ]);
+                }
                 t.title = prop.title;
                 updateTimelineTitle(t);
                 CZ.Service.putTimeline(t).then(function (success) {
@@ -4451,11 +4557,15 @@ var CZ;
             while(contentItems[i] != null) {
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
+                var mime = CZ.Service.getMimeTypeByUrl(ci.uri);
+                console.log("mime:" + mime);
                 if(ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
-                        alert("Sorry, only JPG/PNG/GIF images are supported");
-                        isValid = false;
+                        if(mime != "image/jpg" && mime != "image/jpeg" && mime != "image/gif" && mime != "image/png") {
+                            alert("Sorry, only JPG/PNG/GIF images are supported.");
+                            isValid = false;
+                        }
                     }
                 } else if(ci.mediaType.toLowerCase() === "video") {
                     var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&]+&v=|\/user\/\S+))([^\/&#]{10,12})/;
@@ -4469,13 +4579,30 @@ var CZ;
                         ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
                     } else if(vimeoEmbed.test(ci.uri)) {
                     } else {
-                        alert("Sorry, only YouTube or Vimeo videos are supported");
+                        alert("Sorry, only YouTube or Vimeo videos are supported.");
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$|\.(pdf)\?/i;
                     if(!pdf.test(ci.uri)) {
-                        alert("Sorry, only PDF extension is supported");
+                        if(mime != "application/pdf") {
+                            alert("Sorry, only PDF extension is supported.");
+                            isValid = false;
+                        }
+                    }
+                } else if(ci.mediaType.toLowerCase() === "skydrive-document") {
+                    var skydrive = /skydrive\.live\.com\/embed/;
+                    if(!skydrive.test(ci.uri)) {
+                        alert("This is not a Skydrive embed link.");
+                        isValid = false;
+                    }
+                } else if(ci.mediaType.toLowerCase() === "skydrive-image") {
+                    var splited = ci.uri.split(' ');
+                    var skydrive = /skydrive\.live\.com\/embed/;
+                    var width = /[0-9]/;
+                    var height = /[0-9]/;
+                    if(!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
+                        alert("This is not a Skydrive embed link.");
                         isValid = false;
                     }
                 }
@@ -5126,6 +5253,7 @@ var CZ;
                         };
                     }
                     var bookmark = self.bookmarks[self.currentPlace.bookmark];
+                    showBookmark(Tours.tour, bookmark);
                     var isInTransitionToFirstBookmark = (self.currentPlace.bookmark == 0 && self.currentPlace.type == 'goto');
                     if(self.currentPlace.type == 'bookmark' || self.currentPlace.bookmark != 0) {
                         self.RaiseBookmarkStarted(bookmark);
@@ -5314,8 +5442,9 @@ var CZ;
             $("#bookmarks").hide();
             Tours.isBookmarksWindowVisible = false;
             var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
+            if(curURL.hash.params["tour"]) {
+                delete curURL.hash.params["tour"];
+            }
             CZ.UrlNav.setURL(curURL);
         }
         Tours.tourAbort = tourAbort;
@@ -6174,6 +6303,9 @@ var CZ;
             }
             this.u = function (s) {
                 var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
+                if(this.uS < this.pathLen) {
+                    val = val * this.uSRatio;
+                }
                 return Math.min(val, this.pathLen);
             };
             this.scale = function (t) {
@@ -6260,6 +6392,8 @@ var CZ;
             }
             this.coshR0 = cosh(this.r0);
             this.sinhR0 = sinh(this.r0);
+            this.uS = this.u(this.S);
+            this.uSRatio = this.pathLen / this.uS;
         }
         ViewportAnimation.EllipticalZoom = EllipticalZoom;
         function animationEase(t) {
@@ -6276,6 +6410,7 @@ var CZ;
         Layout.animatingElements = {
             length: 0
         };
+        Layout.timelineHeightRate = 0.4;
         function Timeline(title, left, right, childTimelines, exhibits) {
             this.Title = title;
             this.left = left;
@@ -6312,7 +6447,7 @@ var CZ;
             if(timeline.Height) {
                 timeline.Height /= 100;
             } else if(!timeline.AspectRatio && !timeline.Height) {
-                timeline.Height = 0.4;
+                timeline.Height = CZ.Layout.timelineHeightRate;
             }
         }
         function GenerateAspect(timeline) {
@@ -8093,6 +8228,15 @@ var CZ;
             this.getRegime(range.min, range.max);
             var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
             labelText = (Math.abs(time / this.level)).toFixed(Math.abs(numOfDigits));
+            var localPresent = CZ.Dates.getPresent();
+            var presentDate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+            if(time == presentDate) {
+                if(this.regime !== "ka") {
+                    labelText = 0;
+                } else {
+                    labelText = 2;
+                }
+            }
             labelText += " " + (time < 0 ? this.regime : String(this.regime).charAt(0));
             return labelText;
         };
@@ -8508,7 +8652,7 @@ var CZ;
         };
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var date = CZ.Dates.getYMDFromCoordinate(time);
+            var date = CZ.Dates.getYMDFromCoordinate(time, true);
             var labelText = date.year + "." + (date.month + 1) + "." + date.day;
             return labelText;
         };
@@ -9275,7 +9419,7 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring.showMessageWindow("Please click and drag with mouse or finger in the canvas to create the TimeLine.", "Create Timeline");
+                CZ.Authoring.showMessageWindow("Click and drag to set the approximate length of the timeline.", "Create Timeline");
                 var prevIsActive = CZ.Authoring.isActive;
                 var prevMode = CZ.Authoring.mode;
                 var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
@@ -9299,7 +9443,7 @@ var CZ;
                 if(CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
-                CZ.Authoring.showMessageWindow("Please click inside a timeline to create the Exhibit.", "Create Exhibit");
+                CZ.Authoring.showMessageWindow("Click inside a timeline to set the approximate date of the exhibit.", "Create Exhibit");
                 var prevIsActive = CZ.Authoring.isActive;
                 var prevMode = CZ.Authoring.mode;
                 var messageForm = CZ.HomePageViewModel.getFormById("#message-window");
@@ -10793,6 +10937,8 @@ var CZ;
             SkyDriveMediaPicker.filePickerIframe;
             SkyDriveMediaPicker.logoutButton;
             SkyDriveMediaPicker.isEnabled;
+            SkyDriveMediaPicker.helperText;
+            var mediaType;
             function setup(context) {
                 contentItem = context;
                 editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
@@ -10800,6 +10946,10 @@ var CZ;
                     text: "Logout",
                     class: "cz-skydrive-logout-button",
                     click: onLogout
+                });
+                SkyDriveMediaPicker.helperText = $("<label></label>", {
+                    text: "Selected items will be automatically shared",
+                    class: "cz-skydrive-help-text"
                 });
                 SkyDriveMediaPicker.filePicker = showFilePicker().then(onFilePick, onError);
             }
@@ -10816,6 +10966,14 @@ var CZ;
                 getEmbed(response).then(onContentReceive, onError);
             }
             function getEmbed(response) {
+                switch(response.data.files[0].type) {
+                    case "photo":
+                        mediaType = "skydrive-image";
+                        break;
+                    default:
+                        mediaType = "skydrive-document";
+                        break;
+                }
                 return WL.api({
                     path: response.data.files[0].id + "/embed",
                     method: "GET"
@@ -10823,9 +10981,15 @@ var CZ;
             }
             function onContentReceive(response) {
                 var src = response.embed_html.match(/src=\"(.*?)\"/i)[1];
+                var uri = src;
+                if(mediaType === "skydrive-image") {
+                    var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    uri += ' ' + width + ' ' + height;
+                }
                 var mediaInfo = {
-                    uri: src,
-                    mediaType: "skydrive",
+                    uri: uri,
+                    mediaType: mediaType,
                     mediaSource: src,
                     attribution: src
                 };
@@ -10841,18 +11005,12 @@ var CZ;
                 }
             }
             function onLogout() {
-                var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-                SkyDriveMediaPicker.logoutButton.hide();
-                SkyDriveMediaPicker.filePicker.cancel();
-                WL.logout();
-                if(isFirefox) {
-                    setTimeout(setup, 500, contentItem);
-                } else {
-                    var start = +new Date();
-                    while(+new Date() - start < 500) {
-                        ;
-                    }
-                    setup(contentItem);
+                if(window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
+                    SkyDriveMediaPicker.logoutButton.hide();
+                    SkyDriveMediaPicker.helperText.hide();
+                    SkyDriveMediaPicker.filePicker.cancel();
+                    WL.logout();
+                    window.location.assign("https://login.live.com/oauth20_logout.srf?client_id=" + CZ.Settings.WLAPIClientID + "&redirect_uri=" + window.location.toString());
                 }
             }
             function watchFilePicker(callback) {
@@ -10865,6 +11023,7 @@ var CZ;
             }
             function onFilePickerLoad() {
                 SkyDriveMediaPicker.logoutButton.appendTo("body");
+                SkyDriveMediaPicker.helperText.appendTo("body");
                 $(window).on("resize", onWindowResize);
                 SkyDriveMediaPicker.filePickerIframe.load(function () {
                     onWindowResize();
@@ -10874,10 +11033,14 @@ var CZ;
                     SkyDriveMediaPicker.logoutButton.animate({
                         opacity: 1
                     });
+                    SkyDriveMediaPicker.helperText.animate({
+                        opacity: 1
+                    });
                 });
             }
             function onFilePickerClose() {
                 SkyDriveMediaPicker.logoutButton.remove();
+                SkyDriveMediaPicker.helperText.remove();
                 $(window).off("resize", onWindowResize);
             }
             function onWindowResize() {
@@ -10889,6 +11052,10 @@ var CZ;
                 SkyDriveMediaPicker.logoutButton.offset({
                     top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin,
                     left: iframeOffset.left + buttonLeftMargin
+                });
+                SkyDriveMediaPicker.helperText.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin + 1,
+                    left: iframeOffset.left + buttonLeftMargin + 90
                 });
             }
         })(Media.SkyDriveMediaPicker || (Media.SkyDriveMediaPicker = {}));
@@ -10918,10 +11085,10 @@ var CZ;
         function initialize() {
             registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
             if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
-                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x50.png", CZ.Media.SkyDriveMediaPicker).done(function () {
+                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x150.png", CZ.Media.SkyDriveMediaPicker).done(function () {
                     WL.init({
-                        client_id: "0000000040101FFA",
-                        redirect_uri: "http://test.chronozoom.com/",
+                        client_id: CZ.Settings.WLAPIClientID,
+                        redirect_uri: CZ.Settings.WLAPIRedirectUrl,
                         response_type: "token",
                         scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
                     });
@@ -11531,6 +11698,7 @@ var CZ;
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
+                var that = this;
                 this.saveButton.prop('disabled', false);
                 this.titleInput.change(function () {
                     _this.isModified = true;
@@ -11550,10 +11718,26 @@ var CZ;
                 this.descriptionInput.change(function () {
                     _this.isModified = true;
                 });
-                if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                this.descriptionInput.on('keyup', function (e) {
+                    if(e.which == 13) {
+                        that.saveButton.click(function () {
+                            return that.onSave();
+                        });
+                    }
+                });
+                this.descriptionInput.on('keydown', function (e) {
+                    if(e.which == 13) {
+                        that.saveButton.off();
+                    }
+                });
+                if(CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
                     $("<option></option>", {
-                        value: "skydrive",
-                        text: " Skydrive "
+                        value: "skydrive-image",
+                        text: " Skydrive Image "
+                    }).appendTo(this.mediaTypeInput);
+                    $("<option></option>", {
+                        value: "skydrive-document",
+                        text: " Skydrive Document "
                     }).appendTo(this.mediaTypeInput);
                 }
                 this.titleInput.val(this.contentItem.title || "");
@@ -13088,7 +13272,7 @@ var CZ;
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');
-                if(form) {
+                if(form && form.isFormVisible === true) {
                     form.close();
                 }
             });

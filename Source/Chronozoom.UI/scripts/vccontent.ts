@@ -203,19 +203,34 @@ module CZ {
             return addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
         };
 
-        /* Adds a embeded skydrive document as a child of the given virtual canvas element.
+        /* Adds a embed skydrive document as a child of the given virtual canvas element.
         @param element   (CanvasElement) Parent element, whose children is to be new element.
         @param layerid   (any type) id of the layer for this element
         @param id   (any type) id of an element
-        @param embededSource (string) embeded document URI
+        @param embedSource (string) embed document code
         @param vx   (number) x of left top corner in virtual space
         @param vy   (number) y of left top corner in virtual space
         @param vw   (number) width of a bounding box in virtual space
         @param vh   (number) height of a bounding box in virtual space
         @param z (number) z-index
         */
-        export var addSkydrive = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
-            return addChild(element, new CanvasSkydriveItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+        export var addSkydriveDocument = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return addChild(element, new CanvasSkydriveDocumentItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+        };
+
+        /* Adds a embed skydrive image as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param embedSource (string) embed image code. pattern: {url} {width} {height}
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param z (number) z-index
+        */
+        export var addSkydriveImage = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
+            return addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
 
 
@@ -938,10 +953,11 @@ module CZ {
                     this.editButton.reactsOnMouse = true;
 
                     this.editButton.onmouseclick = function () {
-                        CZ.Authoring.isActive = true;
-                        CZ.Authoring.mode = "editTimeline";
-                        CZ.Authoring.selectedTimeline = this.parent;
-
+                        if (CZ.Common.vc.virtualCanvas("getHoveredInfodot").x == undefined) {
+                            CZ.Authoring.isActive = true;
+                            CZ.Authoring.mode = "editTimeline";
+                            CZ.Authoring.selectedTimeline = this.parent;
+                        }
                         return true;
                     }
 
@@ -1160,7 +1176,6 @@ module CZ {
                             var mlines = this.text.split('\n');
                             var textHeight = 0;
                             var lines = [];
-
                             for (var il = 0; il < mlines.length; il++) {
                                 var words = mlines[il].split(' ');
                                 var lineWidth = 0;
@@ -1182,11 +1197,20 @@ module CZ {
                                         else currentLine += ' ' + words[iw];
                                         lineWidth = newWidth;
                                     }
+                                    var NewWordWidth;
+                                    if ((words.length == 1) && (wsize.width > size_p.x)) {
+                                        var NewWordWidth = wsize.width;
+                                        while (NewWordWidth > size_p.x) {
+                                                fontSize /= 1.5;
+                                                NewWordWidth /= 1.5;
+                                            }
+                                    }
                                 }
                                 lines.push(currentLine);
                                 textHeight += fontSize * k;
                             }
 
+                            
                             if (textHeight > size_p.y) { // we're out of vertical limit
                                 fontSize /= 1.5;
                             } else {
@@ -1695,15 +1719,15 @@ module CZ {
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
-        /*Represents skydrive embeded document
-        @param embededSrc   embeded document source
+        /*Represents skydrive embed document
+        @param embedSrc     embed document source code
         @param vx           x of left top corner in virtual space
         @param vy           y of left top corner in virtual space
         @param vw           width of in virtual space
         @param vh           height of in virtual space
         @param z            z-index
         */
-        function CanvasSkydriveItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+        function CanvasSkydriveDocumentItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
             
@@ -1712,6 +1736,65 @@ module CZ {
             elem.setAttribute("src", embededSrc);
             this.initializeContent(elem);
             
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+
+        /*Represents skydrive embed image        
+        Image is scaled to fit entire container.
+        @param embedSrc     embed image source code. pattern: {url} {width} {height}
+        @param vx           x of left top corner in virtual space
+        @param vy           y of left top corner in virtual space
+        @param vw           width of in virtual space
+        @param vh           height of in virtual space
+        @param z            z-index
+        */
+        function CanvasSkydriveImageItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+
+            // parse src params
+            var srcData = embededSrc.split(" ");
+
+            var elem = document.createElement('iframe');
+            elem.setAttribute("id", id);
+            elem.setAttribute("src", srcData[0]);
+            elem.setAttribute("scrolling", "no");
+            elem.setAttribute("frameborder", "0");
+            this.initializeContent(elem);
+
+            this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                if (!this.content) return;
+
+                var p = viewport2d.pointVirtualToScreen(this.x, this.y);
+                // p.x = p.x + 8; p.y = p.y + 8; // todo: properly position relative to VC and remove this offset
+
+                // parse base size of iframe
+                var width = parseFloat(srcData[1]);
+                var height = parseFloat(srcData[2]);
+
+                // calculate scale level
+                var scale = size_p.x / width;
+                if (height / width > size_p.y / size_p.x) {
+                    scale = size_p.y / height;
+                }
+
+                // position image in center of container
+                this.content.style.left = (p.x + size_p.x / 2) + 'px';
+                this.content.style.top = (p.y + size_p.y / 2) + 'px';
+                this.content.style.marginLeft = (-width / 2) + 'px';
+                this.content.style.marginTop = (-height / 2) + 'px';
+
+                this.content.style.width = width + 'px';
+                this.content.style.height = height + 'px';
+                this.content.style.opacity = opacity;
+                this.content.style.filter = 'alpha(opacity=' + (opacity * 100) + ')';
+
+                // scale iframe to fit entire container
+                this.content.style.webkitTransform = "scale(" + scale + ")";
+                this.content.style.msTransform = "scale(" + scale + ")";
+                this.content.style.MozTransform = "scale(" + scale + ")";
+            };
+
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
@@ -1946,8 +2029,11 @@ module CZ {
                     else if (this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     }
-                    else if (this.contentItem.mediaType.toLowerCase() === 'skydrive') {
-                        addSkydrive(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    else if (this.contentItem.mediaType.toLowerCase() === 'skydrive-document') {
+                        addSkydriveDocument(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
+                    }
+                    else if (this.contentItem.mediaType.toLowerCase() === 'skydrive-image') {
+                        addSkydriveImage(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     }
                     else if (CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
                         addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
@@ -2114,6 +2200,7 @@ module CZ {
             this.tooltipEnabled = true; // indicates whether tooltip is enabled for this infodot at this moment or not
             this.tooltipIsShown = false; // indicates whether tooltip is shown or not
 
+
             this.onmousehover = function (pv, e) {
                 this.vc.currentlyHoveredInfodot = this;
                 this.vc.requestInvalidate();
@@ -2156,8 +2243,7 @@ module CZ {
             };
 
             this.onmouseleave = function (e) {
-                this.isMouseIn = false
-
+                this.isMouseIn = false;
                 this.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
                 this.settings.lineWidth = CZ.Settings.infoDotBorderWidth * radv;
                 this.vc.requestInvalidate();
@@ -2261,8 +2347,13 @@ module CZ {
                         if ((exhibitDate.regime == "CE") || (exhibitDate.regime == "BCE")) {
                             var date_number = Number(infodotDescription.date);
                             var exhibitDate = CZ.Dates.convertCoordinateToYear(date_number);
+                            var exhibitYMD = CZ.Dates.getYMDFromCoordinate(date_number);
                             date_number = Math.abs(date_number);
-                            title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                            if (date_number == Math.floor(date_number)) {
+                                title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
+                            } else {
+                                title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + exhibitYMD.month + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
+                            }
                         } else {
                             // Format year title with fixed precision
                             title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
@@ -2291,8 +2382,8 @@ module CZ {
                             CZ.Authoring.isActive = true;
                             CZ.Authoring.mode = "editExhibit";
                             CZ.Authoring.selectedExhibit = infodot;
-
                             return true;
+                                
                         }
 
                         editButton.onmouseenter = function () {

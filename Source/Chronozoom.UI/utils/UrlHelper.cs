@@ -15,7 +15,7 @@ namespace Chronozoom.UI
             if (value == null)
                 return null;
 
-            return Uri.EscapeDataString(value.Replace(' ', '-').ToLowerInvariant());
+            return HttpUtility.UrlEncode(value);
         }
 
         // Decodes from URL friendly representations. For instance, converts '-' to space.
@@ -25,7 +25,7 @@ namespace Chronozoom.UI
             if (value == null)
                 return null;
 
-            return Uri.UnescapeDataString(value.Replace('-', ' '));
+            return HttpUtility.UrlDecode(value);
         }
     }
 }

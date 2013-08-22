@@ -231,5 +231,9 @@
 
         export var mediapickerVideoThumbnailMaxWidth = 190; // the max allowed width of thumbnail
         export var mediapickerVideoThumbnailMaxHeight = 130; // the max allowed height of thumbnail
+
+        // WL API constants
+        export var WLAPIClientID = "0000000040101FFA";
+        export var WLAPIRedirectUrl = "http://test.chronozoom.com/";
     }
 }

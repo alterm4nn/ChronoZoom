@@ -1,0 +1,15 @@
+﻿  [{
+        "login": "", 
+        "password": "",
+		"type" : "google"
+    },
+	{
+        "login": "", 
+        "password": "",
+		"type" : "yahoo"
+    },
+	{
+        "login": "", 
+        "password": "",
+		"type" : "microsoft"
+    }]
