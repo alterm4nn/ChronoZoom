@@ -6,6 +6,7 @@ namespace Tests
     public class UserProfileFormTests : TestBase
     {
         #region Initialize and Cleanup
+        public TestContext TestContext { get; set; }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
@@ -33,6 +34,7 @@ namespace Tests
         [TestCleanup]
         public void TestCleanup()
         {
+            CreateScreenshotsIfTestFail(TestContext);
             AuthorizationHelper.LogoutByUrl();
         }
 

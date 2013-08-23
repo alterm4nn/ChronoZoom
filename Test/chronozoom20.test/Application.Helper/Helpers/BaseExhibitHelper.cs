@@ -8,12 +8,16 @@ namespace Application.Helper.Helpers
     {
         protected void SetDescription(string description)
         {
+            Logger.Log("<- description: " + description);
             TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-descr cz-input']"), description);
+            Logger.Log("->");
         }
 
         protected void SetTitle(string title)
         {
+            Logger.Log("<- title: " + title);
             TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-title cz-input']"), title);
+            Logger.Log("->");
         }
 
         protected void InitArtifactForm()
