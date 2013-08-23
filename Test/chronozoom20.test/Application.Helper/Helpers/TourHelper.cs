@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Application.Driver;
-using Application.Helper.Constants;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 using Tour = Application.Helper.Entities.Tour;
@@ -14,6 +13,7 @@ namespace Application.Helper.Helpers
     public class TourHelper : DependentActions
     {
         private const string MayanHistoryTourName = "Mayan History";
+        private const string PortusTourName = "Portus Tour";
 
         public void AddTour(Tour tour, out string tourId)
         {
@@ -24,7 +24,6 @@ namespace Application.Helper.Helpers
             SetTourDescription(tour.Description);
             SetTourBookmarks(tour.Bookmarks);
             CreateTour();
-            //tourId = GetTourId(tour.Name);
             tourId = "";
 
             Logger.Log("->");
@@ -90,20 +89,17 @@ namespace Application.Helper.Helpers
             }
             Logger.Log("->");
         }
-
-        private void CloseTourEditForm()
+        
+        public void CloseBookmark()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='auth-edit-tours-form']/div[1]/ul/li[3]/a"));
+            Click(By.ClassName("cz-tour-form-close-btn"));
             Logger.Log("->");
         }
 
-        private string GetTourId(string name)
+        public void StartPortusTour()
         {
-            Logger.Log("<-");
-            string tourId = GetJavaScriptExecutionResult("for(var i = 0; i < CZ.Tours.tours.length; i++){if(CZ.Tours.tours[i].title == '" + name + "'){CZ.Tours.tours[i].id}}");
-            Logger.Log("-> id: " + tourId);
-            return tourId;
+            SelectTour(PortusTourName);
         }
 
         private void EditTour(string tourName)
@@ -154,7 +150,7 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void SetTourBookmarks(Collection<Chronozoom.Entities.Bookmark> bookmarks)
+        private void SetTourBookmarks(IEnumerable<Chronozoom.Entities.Bookmark> bookmarks)
         {
             foreach (var bookmark in bookmarks)
             {
@@ -185,11 +181,6 @@ namespace Application.Helper.Helpers
             }
         }
 
-        private void GoToTimeline(string guid)
-        {
-            ExecuteJavaScript("CZ.Search.goToSearchResult('" + guid + "', 'timeline')");
-        }
-
         private void SetTourDescription(string tourDescription)
         {
             Logger.Log("<- tour description: " + tourDescription);
@@ -203,7 +194,6 @@ namespace Application.Helper.Helpers
             TypeText(By.XPath("//*[@id='auth-edit-tours-form']/div[2]/input"), tourName);
             Logger.Log("->");
         }
-
 
     }
 }

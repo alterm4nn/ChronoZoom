@@ -25,7 +25,6 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             HomePageHelper.OpenSandboxPage();
-            //HomePageHelper.DeleteAllElementsLocally();
             TourHelper.DeleteToursIfExist("webdriverTour");
 
             #region create timeline
@@ -85,9 +84,6 @@ namespace Tests
 
             ApiHelper.DeleteTimelineByApi(_newTimeline);
             ApiHelper.DeleteExhibitByApi(_newExhibit);
-            //ApiHelper.DeleteTourByApi(_newTour);
-            //TourHelper.DeleteToursIfExist("webdriverTour");
-
             #endregion
             CreateScreenshotsIfTestFail(TestContext);
         }
@@ -99,8 +95,6 @@ namespace Tests
         {
             string newtourId;
             TourHelper.AddTour(_newTour, out newtourId);
-            //_newTour.Id = new Guid(newtourId);
-
             Assert.IsTrue(TourHelper.IsTourExist(_newTour));
         }
     }
