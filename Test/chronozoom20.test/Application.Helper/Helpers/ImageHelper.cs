@@ -10,7 +10,10 @@ namespace Application.Helper.Helpers
     {
         public void ClickOnBibliographyImage()
         {
-            const string targetImagePath = Constants.ImageTemplateFilesLocations.ImageTemplatesPath + "Bibliography.png";
+            string targetImageFollder = Directory.Exists(Constants.ImageTemplateFilesLocations.ImageTemplatesPath) ? 
+                                            Constants.ImageTemplateFilesLocations.ImageTemplatesPath : 
+                                            Constants.ImageTemplateFilesLocations.ImageTemplatesPathScriptRun;
+            string targetImagePath = targetImageFollder + "Bibliography.png";
             Sleep(10);
             Screenshot screenshotString = ScreenshotManager.GetScreenshot();
             MemoryStream streamBitmap = new MemoryStream(screenshotString.AsByteArray);
