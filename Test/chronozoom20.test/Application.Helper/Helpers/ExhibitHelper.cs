@@ -314,22 +314,30 @@ namespace Application.Helper.Helpers
 
         private void SetMediaSourse(string mediaSource)
         {
+            Logger.Log("-> mediaSource: " + mediaSource);
             TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-mediasource cz-input']"), mediaSource);
+            Logger.Log("<-");
         }
 
         private void SetAttribution(string attribution)
         {
+            Logger.Log("-> attribution: " + attribution);
             TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-attribution cz-input']"), attribution);
+            Logger.Log("<-");
         }
 
         private void SelectMediaType(string mediaType)
         {
+            Logger.Log("-> mediaType: " + mediaType);
             SelectByText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-media-type cz-input']"), mediaType);
+            Logger.Log("<-");
         }
 
-        private void SetUrl(string mediaSourse)
+        private void SetUrl(string url)
         {
-            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-mediaurl cz-input']"), mediaSourse);
+            Logger.Log("-> url: " + url);
+            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-mediaurl cz-input']"), url);
+            Logger.Log("<-");
         }
 
         private void AddArtifacts(IEnumerable<Chronozoom.Entities.ContentItem> contentItems)
