@@ -425,32 +425,6 @@ namespace Chronozoom.UI
         [WebInvoke(Method = "POST", UriTemplate = "/{superCollectionName}/{collectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         TourResult PostTour(string superCollectionName, string collectionName, Tour tourRequest);
 
-        /// <summary>
-        /// Creates or updates a tour with bookmark support.
-        /// </summary>
-        /// <remarks>
-        /// All bookmarks in a tour must belong to the same collection and the user 
-        /// must have permission to modify that collection.
-        /// To modify an existing tour, specify the tour ID.
-        /// If the tour ID to be updated does not exist a "not found" status is returned. 
-        /// If an invalid tour ID or bookmark ID (for updates) is specified then the request will fail. 
-        /// </remarks>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
-        /// <param name="collectionName">The name of the collection to modify.</param>
-        /// <param name="tourRequest">The tour data in JSON format.</param>
-        /// <returns>A list of guids of tour guid followed by bookmark guids in JSON format.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: PUT
-        ///
-        /// URL:
-        /// http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour
-        ///
-        /// Request body:
-        /// {
-        ///          
-        /// }
-        /// ]]>
-        /// </example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         TourResult PutTour(string superCollectionName, string collectionName, Tour tourRequest);
@@ -462,14 +436,12 @@ namespace Chronozoom.UI
         /// All bookmarks in a tour must belong to the same collection and the user 
         /// must have permission to modify that collection.
         /// Supported operations include:
-        /// 1. Create a new tour
-        ///    Do not specify a tour id or bookmark ids for the new entities to be created.
-        /// 2. Modify an existing tour
-        ///    Specify the tour id and any of the tour fields (id, description, audio) that need to be modified.
-        ///         If tour id is specified and it does not exist, a "not found" status is returned.
-        ///         If tour id is specified and it exists, update any specified tour fields. 
-        ///     Delete all existing bookmarks and for the bookmarks json object passed in add them to the tour.
-        ///     The sequence ids of the bookmarks are automatically generated based on the order they are received.
+        /// To Create a new tour, do not specify a tour id or bookmark ids for the new entities to be created.
+        /// To modify an existing tour, specify the tour id and any of the tour fields (id, description, audio) that need to be modified.
+        /// If a tour id is specified and it does not exist, a "not found" status is returned.
+        /// If a tour id is specified and it exists, any specified fields are updated. 
+        /// Delete all existing bookmarks and add bookmarks defined in the bookmarks JSON object to the tour.
+        /// The sequence ids of the bookmarks are automatically generated based on the order they are received.
         ///     
         /// If an invalid tour Id, bookmark Id or bookmark sequence Id is specified then the request will fail. 
         /// </remarks>
