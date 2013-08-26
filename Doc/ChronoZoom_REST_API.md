@@ -291,7 +291,6 @@ A registered user.
 - [DeleteExhibit](#deleteexhibit)
 - [PutContentItem](#putcontentitem)
 - [DeleteContentItem](#deletecontentitem)
-- [PutTour](#puttour)
 - [PutTour2](#puttour2)
 - [DeleteTour](#deletetour)
 - [PutBookmarks](#putbookmarks)
@@ -870,48 +869,6 @@ Delete the specified content item from the specified collection.
  
 ----------
  
-### PutTour ###
- 
-Creates or updates a tour with bookmark support.
- 
-**Returns**
-A list of guids of tour guid followed by bookmark guids in JSON format.
- 
-**Example**
- 
-    HTTP verb: PUT
-            
-    URL:
-    http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour
-            
-    Request body:
-    {
-             
-    }
-    
-
- 
-**Parameters**
- 
-|Parameter|Value|
-|:--------|:----|
-|superCollectionName|The name of the parent collection.|
-|collectionName|The name of the collection to modify.|
-|tourRequest|The tour data in JSON format.|
- 
-**Remarks**
-All bookmarks in a tour must belong to the same collection and the user 
-    must have permission to modify that collection.
-    To modify an existing tour, specify the tour ID.
-    If the tour ID to be updated does not exist a "not found" status is returned. 
-    If an invalid tour ID or bookmark ID (for updates) is specified then the request will fail.
-
- 
- 
-[top](#chronozoom-rest-api-reference)
- 
-----------
- 
 ### PutTour2 ###
  
 Creates or updates a tour with bookmark support.
@@ -945,14 +902,12 @@ A list of guids of the tour guid followed by bookmark guids in JSON format.
 All bookmarks in a tour must belong to the same collection and the user 
     must have permission to modify that collection.
     Supported operations include:
-    1. Create a new tour
-       Do not specify a tour id or bookmark ids for the new entities to be created.
-    2. Modify an existing tour
-       Specify the tour id and any of the tour fields (id, description, audio) that need to be modified.
-            If tour id is specified and it does not exist, a "not found" status is returned.
-            If tour id is specified and it exists, update any specified tour fields. 
-        Delete all existing bookmarks and for the bookmarks json object passed in add them to the tour.
-        The sequence ids of the bookmarks are automatically generated based on the order they are received.
+    To Create a new tour, do not specify a tour id or bookmark ids for the new entities to be created.
+    To modify an existing tour, specify the tour id and any of the tour fields (id, description, audio) that need to be modified.
+    If a tour id is specified and it does not exist, a "not found" status is returned.
+    If a tour id is specified and it exists, any specified fields are updated. 
+    Delete all existing bookmarks and add bookmarks defined in the bookmarks JSON object to the tour.
+    The sequence ids of the bookmarks are automatically generated based on the order they are received.
         
     If an invalid tour Id, bookmark Id or bookmark sequence Id is specified then the request will fail.
 
@@ -971,7 +926,7 @@ Deletes the specified tour.
     HTTP verb: DELETE
             
     URL:
-    http://{URL}/api/{supercollection}/{collection}/tour
+    http://{URL}/api/{supercollection}/{collection}/tour2
             
     Request body:
     {
@@ -1036,7 +991,7 @@ Delete a list of bookmarks belonging to the same tour.
     HTTP verb: DELETE
             
     URL:
-    http://{URL}/api/{supercollection}/{collection}/{collectionName}/bookmark
+    http://{URL}/api/{supercollection}/{collection}/bookmark
             
     Request body:
     {

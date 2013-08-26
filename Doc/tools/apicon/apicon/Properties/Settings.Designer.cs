@@ -99,10 +99,20 @@ namespace apicon.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\v-wfren\\Documents\\GitHub\\ChronoZoom\\Doc\\tools\\apicon\\apicon\\output")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\v-wfren\\Documents\\GitHub\\ChronoZoom\\Doc\\tools\\apicon\\apicon\\output\\Chron" +
+            "oZoom_REST_API.md")]
         public string OutFile {
             get {
                 return ((string)(this["OutFile"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\v-wfren\\Documents\\GitHub\\ChronoZoom\\Doc\\ChronoZoom_REST_API.md")]
+        public string OutFile2 {
+            get {
+                return ((string)(this["OutFile2"]));
             }
         }
     }
