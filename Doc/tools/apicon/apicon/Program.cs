@@ -330,9 +330,16 @@ namespace apicon
             string members = getMembers(memberPath);
             sb.AppendLine(members);
 
+            // Output a copy to the project so we can look at it.
             using (StreamWriter outfile = new StreamWriter(Properties.Settings.Default.OutFile))
             {
                 outfile.Write(sb.ToString());
+            }
+
+            // Also output a copy to the doc folder for upload.
+            using (StreamWriter outfile2 = new StreamWriter(Properties.Settings.Default.OutFile2))
+            {
+                outfile2.Write(sb.ToString());
             }
 
             // Keep the console window open in debug mode.
