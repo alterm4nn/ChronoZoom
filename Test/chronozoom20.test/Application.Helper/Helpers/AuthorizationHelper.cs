@@ -281,6 +281,8 @@ namespace Application.Helper.Helpers
                 case "microsoft":
                     Click(By.XPath("//*[@name='Windows Live™ ID']"));
                     break;
+                default:
+                    throw new Exception("User type is not defined"); 
             }
             Logger.Log("->");
         }
