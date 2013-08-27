@@ -100,7 +100,7 @@ $AbsoleteTestDllPath = "Tests.UI\bin\Debug\Tests.dll"
 
 $TestsLibraryPath = Join-Path $SrcFolderpath $AbsoleteTestDllPath
 $ConfigPath = Get-ConfigPath
-#$MSTestSettingsPath = Join-Path $SrcFolderpath "local.testsettings"
+$MSTestSettingsPath = Join-Path $SrcFolderpath "chronozoom.testsettings"
 $TestResultsPath = Join-Path $SrcFolderpath "TestResults"
 $TrxToHtmlResultPath = Join-Path $SrcFolderpath "Utils\Trx2HtmlReport.exe"
 $solutionPath = join-path $SrcFolderpath "ChronoZoom.Testing.sln"
@@ -297,7 +297,7 @@ if(($isUsingGrid -eq "true"))
 						
 						$resultFilePath = join-path $tempFolderPath $resultFilename
 					
-					$MSTestArgumentList = " /testcontainer:" + '"' + $TestsLibraryPath + '"' + " /resultsfile:" + '"'+$resultFilePath+'"' + ' ' + $categoryArgs
+					$MSTestArgumentList = " /testsettings:" + '"' + $MSTestSettingsPath + '"' + " /testcontainer:" + '"' + $TestsLibraryPath + '"' + " /resultsfile:" + '"'+$resultFilePath+'"' + ' ' + $categoryArgs
 					$currentTime = Get-Date -Format "HH.mm.ss"
 					Write-Host "Environment: " $resultFilename.Replace('.trx','') "`t Time start: " $currentTime
 					StartNewProcess -processPath $MSTestPath -processArguments $MSTestArgumentList
@@ -322,7 +322,7 @@ if(($isUsingGrid -eq "false"))
 	$resultFilename = "local.trx"
 	$resultFilePath = join-path $tempFolderPath $resultFilename
 					 
-	$MSTestArgumentList = " /testcontainer:" + '"' + $TestsLibraryPath + '"' + " /resultsfile:" + '"'+$resultFilePath+'"' + ' ' + $categoryArgs
+	$MSTestArgumentList = " /testsettings:" + '"' + $MSTestSettingsPath + '"' + " /testcontainer:" + '"' + $TestsLibraryPath + '"' + " /resultsfile:" + '"'+$resultFilePath+'"' + ' ' + $categoryArgs
 	$currentTime = Get-Date -Format "HH.mm.ss"
 	Write-Host "Environment: " $resultFilename.Replace('.trx','') "`t Time start: " $currentTime
 	
