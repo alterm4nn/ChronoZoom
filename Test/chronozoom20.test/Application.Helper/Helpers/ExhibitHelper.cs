@@ -274,7 +274,9 @@ namespace Application.Helper.Helpers
         private void SaveAndClose()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='auth-edit-exhibit-form']//*[@class='cz-form-save cz-button']"));
+            By saveButton = By.XPath("//*[@id='auth-edit-exhibit-form']//*[@class='cz-form-save cz-button']");
+            WaitForElementEnabled(saveButton);
+            Click(saveButton);
             Logger.Log("->");
         }
 
