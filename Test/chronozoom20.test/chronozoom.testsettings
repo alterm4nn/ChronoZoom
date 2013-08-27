@@ -3,10 +3,11 @@
   <Description>These are default test settings for a local test run.</Description>
   <Deployment>
     <DeploymentItem filename="Tests.UI\TimeSeriesFiles\semicolon.csv" />
-    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\positive.csv" />
-    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\tab.csv" />
     <DeploymentItem filename="Tests.UI\TimeSeriesFiles\textPositive.txt" />
+    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\tab.csv" />
     <DeploymentItem filename="Tests.UI\TimeSeriesFiles\space.csv" />
+    <DeploymentItem filename="Application.Helper\ImageTemplates\Bibliography.png" />
+    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\positive.csv" />
   </Deployment>
   <Execution>
     <TestTypeSpecific>
