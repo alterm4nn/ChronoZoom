@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.UI", "Tests.UI\Tests.UI.csproj", "{482D59BA-663E-46CF-B79F-F83CB4D9067D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3A81DC60-E939-4B89-A2FE-13606C393FF4}"
+	ProjectSection(SolutionItems) = preProject
+		chronozoom.testsettings = chronozoom.testsettings
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{37B416F4-C8A8-42A3-BDC5-4AB2030BEF3C}"
 	ProjectSection(SolutionItems) = preProject

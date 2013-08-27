@@ -66,7 +66,6 @@ packages/
 *.dbmdl
 
 #Test files
-*.testsettings
 *_Chutzpah*
 *Test/chronozoom20.test/Tests.BL/Scripts/Js/*
 *Test/chronozoom20.test/Tests.BL/Scripts/Utils/*
