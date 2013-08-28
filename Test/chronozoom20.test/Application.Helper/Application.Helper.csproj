@@ -58,7 +58,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\ApiConstants.cs" />
-    <Compile Include="Constants\ImageTemplateFilesLocations.cs" />
     <Compile Include="Constants\Javascripts.cs" />
     <Compile Include="Entities\Bibliography.cs" />
     <Compile Include="Entities\Bookmark.cs" />

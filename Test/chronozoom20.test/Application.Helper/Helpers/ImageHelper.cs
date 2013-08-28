@@ -10,8 +10,7 @@ namespace Application.Helper.Helpers
     {
         public void ClickOnBibliographyImage()
         {
-            string targetImageFollder = Directory.GetCurrentDirectory() + "\\";
-            string targetImagePath = targetImageFollder + "Bibliography.png";
+            const string targetImagePath = "Bibliography.png";
             Logger.Log("image path: " + targetImagePath,LogType.MessageWithoutScreenshot);
             Sleep(10);
             Screenshot screenshotString = ScreenshotManager.GetScreenshot();
