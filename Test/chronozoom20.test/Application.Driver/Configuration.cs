@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Xml;
 using Application.Driver.Constants;
@@ -41,7 +40,7 @@ namespace Application.Driver
         #region HelperMethods
         private static XmlDocument GetConfig()
         {
-            string configFilePath = File.Exists(ConfigFileLocations.ConfigPathVsRun) ? ConfigFileLocations.ConfigPathVsRun : ConfigFileLocations.ConfigPathConsoleRun;
+            const string configFilePath = "config.xml";
             var xml = new XmlDocument();
             xml.Load(configFilePath);
             return _config ?? (_config = xml);
