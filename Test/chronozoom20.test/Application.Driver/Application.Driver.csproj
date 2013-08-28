@@ -53,10 +53,7 @@
     <Compile Include="BrowserStateManager.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Constants\BrowserNames.cs" />
-    <Compile Include="Constants\ConfigFileLocations.cs" />
     <Compile Include="Constants\ConfigProperties.cs" />
-    <Compile Include="Constants\CookieConstants.cs" />
-    <Compile Include="Constants\WebDriverDirectories.cs" />
     <Compile Include="DriverManager.cs" />
     <Compile Include="Environment.cs" />
     <Compile Include="Extensions\ExtendedRemoteWebDriver.cs" />
