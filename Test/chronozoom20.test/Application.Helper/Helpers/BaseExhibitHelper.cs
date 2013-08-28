@@ -32,7 +32,10 @@ namespace Application.Helper.Helpers
         protected void SaveArtifact()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']"));
+            By saveArtifactButton =
+                By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']");
+            WaitForElementEnabled(saveArtifactButton);
+            Click(saveArtifactButton);
             Logger.Log("->");
         }
     }
