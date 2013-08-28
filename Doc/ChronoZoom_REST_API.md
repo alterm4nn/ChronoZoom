@@ -36,6 +36,7 @@ Use JSON for the request body:
 - [Storage](#storage)
 - [StorageMigrationsConfiguration](#storagemigrationsconfiguration)
 - [SuperCollection](#supercollection)
+- [Timeline](#timeline)
 - [User](#user)
 
 ### BookmarkType ###
@@ -253,6 +254,27 @@ Represents a set of collections.
 |Title|The title of the supercollection.|
 |User|The user who owns the supercollection.|
 |Collections|A collection of collections that belong to the supercollection.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### Timeline ###
+ 
+A visual representation of a time period that contains a set of Exhibits, child Timelines, and Time Series Data, and is contained by another Timeline or a Collection. The Timeline entity is externally searchable and linkable.
+ 
+|Property|Value|
+|:-------|:----|
+|Id|The ID of the timeline (GUID).|
+|Depth|The depth of the timeline in the timeline tree.|
+|SubtreeSize|The number of content items contained in subtree under current timeline.|
+|Title|The title of the timeline.|
+|Regime|The regime in which the timeline should occur.|
+|FromYear|The year the timeline begins.|
+|ToYear|The year the timeline ends.|
+|ForkNode|???|
+|ChildTimelines|The collection of child timelines belonging to the timeline.|
+|Exhibits|The collection of exhibits belonging to the timeline.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -881,7 +903,7 @@ A list of guids of the tour guid followed by bookmark guids in JSON format.
     HTTP verb: PUT
             
     URL:
-    http://{URL}/api/{supercollection}/{collection}/{collectionName}/tour2
+    http://{URL}/api/{supercollection}/{collection}/tour2
             
     Request body:
     {
