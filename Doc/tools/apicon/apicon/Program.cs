@@ -55,7 +55,9 @@ namespace apicon
             }
             else
             {
-                Console.WriteLine("One or more XML doc files could not be found. Check the settings file to make sure all paths are valid.");
+                Console.WriteLine("One or more XML doc files could not be found. Check the settings file to make sure all paths are valid. Press any key to exit.");
+                // Keep the console window open in debug mode.
+                Console.ReadKey();
             }
         }
 
