@@ -167,6 +167,7 @@ namespace Application.Helper.Helpers
 
         private void NavigateToBookmark(Bookmark bookmark)
         {
+            Logger.Log("<- navigate to bookmark: " + bookmark.Name);
             switch (bookmark.Type)
             {
                 case "timeline":
@@ -179,6 +180,7 @@ namespace Application.Helper.Helpers
                     ExecuteJavaScript(string.Format("CZ.Search.goToSearchResult('{0}')", bookmark.Id));
                     break;
             }
+            Logger.Log("->");
         }
 
         private void SetTourDescription(string tourDescription)
