@@ -100,7 +100,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             HelperManager<NavigationHelper>.Instance.NavigateToCosmos();
-            WaitCondition(() => GetItemsCount(By.XPath("//*[@id='breadcrumbs-table']//td")) == 1, 60);
+            WaitCondition(() => GetItemsCount(By.CssSelector("#breadcrumbs-table td")) == 1, 60);
             Logger.Log("->");
         }
 
@@ -139,7 +139,7 @@ namespace Application.Helper.Helpers
 
         private void ClickDelete()
         {
-            Click(By.XPath("//*[@id='auth-edit-timeline-form']//*[@class='cz-form-delete cz-button']"));
+            Click(By.CssSelector("#auth-edit-timeline-form .cz-form-delete.cz-button"));
         }
 
         private void InitEditForm()
@@ -158,13 +158,13 @@ namespace Application.Helper.Helpers
 
         private void CreateTimeline()
         {
-            Click(By.XPath("//*[@id='auth-edit-timeline-form']//*[@class='cz-form-save cz-button']"));
+            Click(By.CssSelector("#auth-edit-timeline-form .cz-form-save.cz-button"));
         }
 
         private void SetTimelineName(string timelineName)
         {
             Logger.Log("<- timeline: " + timelineName);
-            TypeText(By.XPath("//*[@id='auth-edit-timeline-form']//*[@class='cz-form-item-title cz-input']"), timelineName);
+            TypeText(By.CssSelector("#auth-edit-timeline-form .cz-form-item-title.cz-input"), timelineName);
             Logger.Log("->");
         }
 
@@ -178,14 +178,14 @@ namespace Application.Helper.Helpers
         private void InitTimelineCreationMode()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.XPath("//*[@title='Create Your Events']"));
-            MoveToElementAndClick(By.XPath("//button[text()='create timeline']"));
+            MoveToElementAndClick(By.CssSelector("[title='Create Your Events']"));
+            MoveToElementAndClick(By.CssSelector("button.cz-form-create-timeline.cz-button"));
             Logger.Log("->");
         }
 
         private void SetDayMode()
         {
-            SelectByText(By.XPath("//*[@class='cz-form-time-start cz-datepicker']//*[@class='cz-datepicker-mode cz-input']"), "Date");
+            SelectByText(By.CssSelector(".cz-form-time-start.cz-datepicker .cz-datepicker-mode.cz-input"), "Date");
         }
     }
 }

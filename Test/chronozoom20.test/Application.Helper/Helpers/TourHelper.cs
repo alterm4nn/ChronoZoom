@@ -47,7 +47,7 @@ namespace Application.Helper.Helpers
         public void PauseTour()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@title='play/pause']"));
+            Click(By.CssSelector("[title='play/pause']"));
             Logger.Log("->");
         }
 
@@ -121,7 +121,7 @@ namespace Application.Helper.Helpers
         private List<string> GetTourNames()
         {
             Logger.Log("<-");
-            ReadOnlyCollection<IWebElement> tourElements = FindElements(By.XPath("//*[@id='tours']/div[*]/li/div[2]/p[1]"));
+            ReadOnlyCollection<IWebElement> tourElements = FindElements(By.CssSelector("#tours .cz-contentitem-listitem-title"));
             List<string> tourNames = tourElements.Select(tourElement => tourElement.Text).ToList();
             Logger.Log("-> " + string.Join(",", tourNames));
             return tourNames;
@@ -138,15 +138,15 @@ namespace Application.Helper.Helpers
         private void CreateTour()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='auth-edit-tours-form']/div[2]/button[text()='create tour']"));
+            Click(By.XPath("//*[@id='auth-edit-tours-form']//button[text()='create tour']"));
             Logger.Log("->");
         }
 
         private void InitTourCreationMode()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.XPath("//*[@title='Create Your Events']"));
-            MoveToElementAndClick(By.XPath("//*[@id='header-edit-form']/div[2]/button[3]"));
+            MoveToElementAndClick(By.CssSelector("[title='Create Your Events']"));
+            MoveToElementAndClick(By.CssSelector(".cz-form-create-tour.cz-button"));
             Logger.Log("->");
         }
 
@@ -184,14 +184,14 @@ namespace Application.Helper.Helpers
         private void SetTourDescription(string tourDescription)
         {
             Logger.Log("<- tour description: " + tourDescription);
-            TypeText(By.XPath("//*[@id='auth-edit-tours-form']/div[2]/textarea"), tourDescription);
+            TypeText(By.CssSelector(".cz-form-tour-description.cz-input"), tourDescription);
             Logger.Log("->");
         }
 
         private void SetTourName(string tourName)
         {
             Logger.Log("<- tour name: " + tourName);
-            TypeText(By.XPath("//*[@id='auth-edit-tours-form']/div[2]/input"), tourName);
+            TypeText(By.CssSelector(".cz-form-tour-title.cz-input"), tourName);
             Logger.Log("->");
         }
 

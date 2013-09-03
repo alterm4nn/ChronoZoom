@@ -276,6 +276,11 @@ namespace Application.Driver.UserActions
         protected string GetAttributeValue(By by, string attributeName)
         {
             return FindElement(by).GetAttribute(attributeName);
+        } 
+        
+        protected string GetElementValue(By by)
+        {
+            return FindElement(by).GetAttribute("value");
         }
 
         protected void WaitAjaxComplete(int timeoutInSeconds)

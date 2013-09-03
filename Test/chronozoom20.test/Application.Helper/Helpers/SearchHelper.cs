@@ -9,7 +9,7 @@ namespace Application.Helper.Helpers
         public void InitSearchWindow()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@class='header-icon search-icon']"));
+            Click(By.CssSelector(".header-icon.search-icon"));
             Logger.Log("->");
         }
 
@@ -46,7 +46,7 @@ namespace Application.Helper.Helpers
         private void TypeSearchString(string searchText)
         {
             Logger.Log("<- text: " + searchText);
-            TypeText(By.XPath("//input[@type='search']"), searchText);
+            TypeText(By.CssSelector("input[type='search']"), searchText);
             Logger.Log("->");
         }
 

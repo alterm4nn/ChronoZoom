@@ -31,7 +31,7 @@ namespace Application.Helper.Helpers
                 {
                     AddSkyDriveImage(contentItem.FileName);
                 }
-                WaitCondition(()=>(FindElement(By.XPath("//*[@ class='cz-form-item-mediaurl cz-input']")).GetAttribute("value") != ""),15);
+                WaitCondition(()=>(GetElementValue(By.CssSelector(".cz-form-item-mediaurl.cz-input")) != ""),15);
                 SaveArtifact();
                 isLoginToSkyDrive = true;
             }
@@ -41,7 +41,7 @@ namespace Application.Helper.Helpers
         private void InitSkyDriveForm()
         {
             Logger.Log("->");
-            Click(By.XPath("//*[@title='skydrive']"));
+            Click(By.CssSelector("[title='skydrive']"));
             Logger.Log("<-");
         }
 
@@ -59,7 +59,7 @@ namespace Application.Helper.Helpers
         private void AddSkyDriveImage(string fileName)
         {
             Logger.Log("->");
-            SwitchToFrame(By.XPath("//*[@sutra='picker']"));
+            SwitchToSkyDriveFrame();
             OpenPicturesFolder();
             SelectFile(fileName);
             SwitchToDefaultContent();
@@ -75,10 +75,17 @@ namespace Application.Helper.Helpers
         private void AddSkyDriveDocument(string fileName)
         {
             Logger.Log("->");
-            SwitchToFrame(By.XPath("//*[@sutra='picker']"));
+            SwitchToSkyDriveFrame();
             OpenDocumentsFolder();
             SelectFile(fileName);
             SwitchToDefaultContent();
+            Logger.Log("<-");
+        }
+
+        private void SwitchToSkyDriveFrame()
+        {
+            Logger.Log("->");
+            SwitchToFrame(By.CssSelector("[sutra='picker']"));
             Logger.Log("<-");
         }
 
@@ -92,8 +99,8 @@ namespace Application.Helper.Helpers
         private void SelectFile(string fileName)
         {
             Logger.Log("->");
-            string xpath = string.Format("//*[@alt='{0}']", fileName);
-            Click(By.XPath(xpath));
+            string xpath = string.Format("[alt='{0}']", fileName);
+            Click(By.CssSelector(xpath));
             Click(By.Id("FilePickerView-0_9"));
             Logger.Log("<-");
         }
