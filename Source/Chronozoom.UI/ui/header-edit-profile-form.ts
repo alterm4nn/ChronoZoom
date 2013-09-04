@@ -1,10 +1,12 @@
 ﻿/// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+
 
 module CZ {
     export module UI {
-
+        declare var WL: any;
 
         export interface FormEditProfileInfo extends CZ.UI.IFormUpdateEntityInfo {
             logoutButton: string;
@@ -160,6 +162,7 @@ module CZ {
 
                 this.logoutButton.click(event =>
                 {
+                    WL.logout();
                     window.location.assign("/pages/logoff.aspx");
                 });
 
