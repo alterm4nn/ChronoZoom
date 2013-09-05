@@ -43,6 +43,7 @@ namespace RandomDataGenerator
                 VideoResult[] videoResults = objectsVideo.ResponseData.Results;
                 if (videoResults != null) return videoResults[Random.Next(videoResults.Length - 1)].Url;
             }
+            throw new NullReferenceException("objectsVideo");
         }
 
         private static string SendRequest(string pattern, string type)
