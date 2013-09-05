@@ -79,7 +79,7 @@ namespace Application.Helper.Helpers
         private int GetResultsCount()
         {
             Logger.Log("<-");
-            int count = GetItemsCount(By.XPath("//div[@class='cz-bing-result-container']"));
+            int count = GetItemsCount(By.CssSelector("div.cz-bing-result-container"));
             Logger.Log("-> count: " + count);
             return count;
         }
@@ -94,7 +94,7 @@ namespace Application.Helper.Helpers
         private void SelectBingSearch()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*/div[@class='cz-form-medialist cz-medialist']/div[@title='bing']"));
+            Click(By.CssSelector("div[title='bing']"));
             Logger.Log("->");
         }
 
