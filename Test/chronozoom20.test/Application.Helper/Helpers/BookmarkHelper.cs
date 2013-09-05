@@ -1,5 +1,4 @@
-﻿using System;
-using Application.Driver;
+﻿using Application.Driver;
 using Application.Helper.UserActions;
 using OpenQA.Selenium;
 
@@ -18,7 +17,7 @@ namespace Application.Helper.Helpers
         public bool IsBookmarkExpanded()
         {
             Logger.Log("<-");
-            bool result = IsElementDisplayed(By.XPath("//*[@id='tour-caption-form']//*[@class='cz-form-content']"));
+            bool result = IsElementDisplayed(By.CssSelector("#tour-caption-form>.cz-form-content"));
             Logger.Log("-> IsBookmarkExpanded: " + result);
             return result;
         }

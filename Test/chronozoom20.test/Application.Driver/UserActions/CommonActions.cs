@@ -63,7 +63,7 @@ namespace Application.Driver.UserActions
                 element.Highlight();
                 return element;
             }
-            catch (Exception ex)
+            catch (NoSuchElementException ex)
             {
                 throw new NoSuchElementException("Can not find element " + by, ex);
             }
@@ -76,7 +76,18 @@ namespace Application.Driver.UserActions
 
         protected void Click(By by)
         {
-            FindElement(by).Click();
+            try
+            {
+                FindElement(by).Click();
+            }
+            catch (ElementNotVisibleException ex)
+            {
+                throw new ElementNotVisibleException("Element is not visible " + by, ex);
+            }
+            catch (StaleElementReferenceException ex)
+            {
+                throw new StaleElementReferenceException(by.ToString(), ex);
+            }
         }
 
         protected void SelectByText(By by, String text)
@@ -163,8 +174,8 @@ namespace Application.Driver.UserActions
             IWebElement element = FindElement(by);
             element.Clear();
             element.SendKeys(text);
-        }  
-        
+        }
+
         protected void SetFilePath(By by, string text)
         {
             IWebElement element = FindElement(by);
@@ -226,7 +237,7 @@ namespace Application.Driver.UserActions
         {
             chain.Invoke().Build().Perform();
         }
-        
+
         protected void ClickElementAndType(By by, string text)
         {
             IWebElement element = FindElement(by);
@@ -266,16 +277,21 @@ namespace Application.Driver.UserActions
         {
             IWebElement element = FindElement(by);
             InvokeChain(() => Builder.MoveToElement(element, x, y));
-        }  
-        
+        }
+
         protected void ClickByCoordinates(int x, int y)
         {
-            InvokeChain(() => Builder.MoveToElement(FindElement(By.XPath("//body")),0,0).MoveByOffset(x,y).Click());
+            InvokeChain(() => Builder.MoveToElement(FindElement(By.XPath("//body")), 0, 0).MoveByOffset(x, y).Click());
         }
 
         protected string GetAttributeValue(By by, string attributeName)
         {
             return FindElement(by).GetAttribute(attributeName);
+        }
+
+        protected string GetElementValue(By by)
+        {
+            return FindElement(by).GetAttribute("value");
         }
 
         protected void WaitAjaxComplete(int timeoutInSeconds)
