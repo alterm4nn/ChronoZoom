@@ -60,6 +60,8 @@
     <Compile Include="AuthorizationTests.cs" />
     <Compile Include="BibliographyTests.cs" />
     <Compile Include="BingSearchTests.cs" />
+    <Compile Include="RandomDataTimelineTests.cs" />
+    <Compile Include="RandomDataExhibitsTests.cs" />
     <Compile Include="ExhibitsTests.cs" />
     <Compile Include="FooterTests.cs" />
     <Compile Include="PhanerozoicAgeTests.cs" />
@@ -90,6 +92,10 @@
     <ProjectReference Include="..\Application.Helper\Application.Helper.csproj">
       <Project>{5bdf5dc6-03b4-4a08-8861-51ebaf9742de}</Project>
       <Name>Application.Helper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RandomDataGenerator\RandomDataGenerator.csproj">
+      <Project>{3703ca82-5bef-42ec-ba7c-a6ff5a3e91fc}</Project>
+      <Name>RandomDataGenerator</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
