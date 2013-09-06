@@ -1,11 +1,10 @@
 ﻿using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RandomDataGenerator;
 
 namespace Tests
 {
     [TestClass]
-    public class RandomDataTimelineTests : TestBase
+    public class TimelineTests : TestBase
     {
         #region Initialize and Cleanup
         public TestContext TestContext { get; set; }
@@ -17,8 +16,8 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             HomePageHelper.OpenSandboxPage();
-
-            _timeline = new Timeline { Title = RandomString.GetRandomString(1, 200, isUsingSpecChars: true) };
+            
+            _timeline = new Timeline { Title = "WebdriverTitle" };
             HomePageHelper.DeleteAllElementsLocally();
             TimelineHelper.AddTimeline(_timeline);
             _newTimeline = TimelineHelper.GetLastTimeline();
@@ -47,19 +46,19 @@ namespace Tests
         #endregion
 
         [TestMethod]
-        public void random_new_timeline_should_have_a_title()
+        public void new_timeline_should_have_a_title()
         {
             Assert.AreEqual(_timeline.Title, _newTimeline.Title);
         }
 
         [TestMethod]
-        public void random_new_timeline_should_not_have_null_id()
+        public void new_timeline_should_not_have_null_id()
         {
             Assert.IsNotNull(_newTimeline.TimelineId);
         }
 
         [TestMethod]
-        public void random_new_timeline_should_be_deleted()
+        public void new_timeline_should_be_deleted()
         {
             TimelineHelper.DeleteTimeline(_newTimeline);
             Assert.IsFalse(TimelineHelper.IsTimelineFound(_newTimeline));
