@@ -2391,7 +2391,7 @@ var CZ;
                             if(date_number == Math.floor(date_number)) {
                                 title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
                             } else {
-                                title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + exhibitYMD.month + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
+                                title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + (exhibitYMD.month + 1) + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
                             }
                         } else {
                             title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
@@ -11413,7 +11413,6 @@ var CZ;
                     this.saveButton.text("create exhibit");
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-                    console.log("this.datePicker.");
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
