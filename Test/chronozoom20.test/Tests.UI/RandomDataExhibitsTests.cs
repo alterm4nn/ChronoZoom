@@ -1,4 +1,5 @@
-﻿using Application.Helper.Entities;
+﻿using System.Globalization;
+using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.ObjectModel;
 using RandomDataGenerator;
@@ -15,7 +16,7 @@ namespace Tests
         {
             Title = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
             Caption = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
-            MediaSource = RandomUrl.GetRandomVideoUrl(),
+            MediaSource = RandomUrl.GetRandomWebUrl(),
             MediaType = "Video",
             Attribution = RandomString.GetRandomString(1, 200),
             Uri = RandomUrl.GetRandomVideoUrl()
@@ -26,7 +27,7 @@ namespace Tests
         {
             Title = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
             Caption = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
-            MediaSource = RandomUrl.GetRandomImageUrl(),
+            MediaSource = RandomUrl.GetRandomWebUrl(),
             MediaType = "Image",
             Attribution = RandomString.GetRandomString(1,200),
             Uri = RandomUrl.GetRandomImageUrl()
@@ -36,6 +37,10 @@ namespace Tests
         static readonly Exhibit Exhibit = new Exhibit
         {
             Title = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
+            Day = RandomDate.GetRandomDate().Day.ToString(CultureInfo.InvariantCulture),
+            Year = RandomDate.GetRandomDate().Year,
+            Month = RandomDate.GetRandomDate().MonthName,
+            TimeMode = "Date",
             ContentItems = new Collection<Chronozoom.Entities.ContentItem> { ContentItemVideo, ContentItemImage }
         };
 
@@ -47,7 +52,6 @@ namespace Tests
             BrowserStateManager.RefreshState();
             HomePageHelper.OpenSandboxPage();
             HomePageHelper.DeleteAllElementsLocally();
-
             ExhibitHelper.AddExhibitWithContentItem(Exhibit);
             _newExhibit = ExhibitHelper.GetNewExhibit();
 
@@ -78,6 +82,7 @@ namespace Tests
         #endregion
 
         [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_content_should_be_correctly()
         {
             for (int i = 0; i < Exhibit.ContentItems.Count; i++)
@@ -92,9 +97,18 @@ namespace Tests
         }
 
         [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_should_have_a_title()
         {
             Assert.AreEqual(Exhibit.Title, _newExhibit.Title, "Titles are not equal");
+        }
+
+        [TestMethod]
+        [Ignore]
+        //https://github.com/alterm4nn/ChronoZoom/issues/744
+        public void random_new_exhibit_should_have_a_year()
+        {
+            Assert.AreEqual(Exhibit.Year, _newExhibit.Year, "Years are not equal");
         }
 
         [TestMethod]
@@ -109,18 +123,21 @@ namespace Tests
 
 
         [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_should_have_a_content_items()
         {
             Assert.AreEqual(Exhibit.ContentItems.Count, _newExhibit.ContentItems.Count, "Content items count are not equal");
         }
 
         [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_should_not_have_null_id()
         {
             Assert.IsNotNull(_newExhibit.Id);
         }
 
         [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_should_be_deleted()
         {
             ExhibitHelper.DeleteExhibit(_newExhibit);
