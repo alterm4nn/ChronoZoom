@@ -7,6 +7,7 @@ namespace RandomDataGenerator
     public class RandomUrl
     {
         private static readonly Random Random;
+
         static RandomUrl()
         {
             Random = new Random();
@@ -28,13 +29,19 @@ namespace RandomDataGenerator
         {
             string searchPattern = GetRandomWord();
             return GetUrl(searchPattern, ServiceType.Web);
+        }    
+        
+        public static string GetRandomPdfUrl()
+        {
+            string searchPattern = GetRandomWord();
+            return GetUrl(String.Format("{0}+filetype:pdf",searchPattern), ServiceType.Web);
         }
 
-        private static string GetUrl(string pattern, string mediaType)
+        private static string GetUrl(string pattern, string serviceType)
         {
-            var response = SendRequest(pattern, mediaType);
+            var response = SendRequest(pattern, serviceType);
             if (response == null) throw new ArgumentNullException("pattern");
-            switch (mediaType)
+            switch (serviceType)
             {
                 case ServiceType.Image:
                     ResponseImage objects = JsonConvert.DeserializeObject<ResponseImage>(response);
