@@ -97,7 +97,7 @@ namespace Application.Helper.Helpers
         public bool IsNewUserAuthenticated()
         {
             Logger.Log("<-");
-            WaitForElementIsDisplayed(By.XPath("//*[@id='profile-form']//*[@class='cz-form-content']"));
+            WaitForElementIsDisplayed(By.CssSelector("#profile-form>.cz-form-content"));
             bool result = IsUserAuthenticated();
             Logger.Log("-> result: " + result);
             return result;
@@ -261,7 +261,7 @@ namespace Application.Helper.Helpers
                 case "microsoft":
                     ClickElementAndType(By.Id("idDiv_PWD_UsernameExample"), user.Login);
                     ClickElementAndType(By.Id("idDiv_PWD_PasswordExample"), user.Password);
-                    Click(By.XPath("//*[@id='idSIButton9']"));
+                    Click(By.Id("idSIButton9"));
                     break;
             }
             Logger.Log("->", LogType.MessageWithoutScreenshot);
@@ -273,14 +273,16 @@ namespace Application.Helper.Helpers
             switch (user.Type)
             {
                 case "google":
-                    Click(By.XPath("//*[@name='Google']"));
+                    Click(By.CssSelector("[name='Google']"));
                     break;
                 case "yahoo":
-                    Click(By.XPath("//*[@name='Yahoo!']"));
+                    Click(By.CssSelector("[name='Yahoo!']"));
                     break;
                 case "microsoft":
-                    Click(By.XPath("//*[@name='Windows Live™ ID']"));
+                    Click(By.CssSelector("[name='Windows Live™ ID']"));
                     break;
+                default:
+                    throw new Exception("User type is not defined"); 
             }
             Logger.Log("->");
         }

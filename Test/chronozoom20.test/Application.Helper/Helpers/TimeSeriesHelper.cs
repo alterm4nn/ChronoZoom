@@ -53,7 +53,7 @@ namespace Application.Helper.Helpers
         public void CloseUploadFileForm()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='timeSeriesDataForm']//li[@class='cz-form-close-btn']"));
+            Click(By.CssSelector("#timeSeriesDataForm li.cz-form-close-btn"));
             Logger.Log("->");
         }
 

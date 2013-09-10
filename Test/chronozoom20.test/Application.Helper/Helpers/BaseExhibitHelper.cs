@@ -8,18 +8,22 @@ namespace Application.Helper.Helpers
     {
         protected void SetDescription(string description)
         {
-            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-descr cz-input']"), description);
+            Logger.Log("<- description: " + description);
+            TypeText(By.CssSelector("#auth-edit-contentitem-form .cz-form-item-descr.cz-input"), description);
+            Logger.Log("->");
         }
 
         protected void SetTitle(string title)
         {
-            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-title cz-input']"), title);
+            Logger.Log("<- title: " + title);
+            TypeText(By.CssSelector("#auth-edit-contentitem-form .cz-form-item-title.cz-input"), title);
+            Logger.Log("->");
         }
 
         protected void InitArtifactForm()
         {
             Logger.Log("<-");
-            By createArtifactButton = By.XPath("//*[@class='cz-form-create-artifact cz-button']");
+            By createArtifactButton = By.CssSelector(".cz-form-create-artifact.cz-button");
             WaitForElementEnabled(createArtifactButton);
             Click(createArtifactButton);
             Logger.Log("->");
@@ -28,7 +32,10 @@ namespace Application.Helper.Helpers
         protected void SaveArtifact()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-save cz-button']"));
+            By saveArtifactButton =
+                By.CssSelector("#auth-edit-contentitem-form .cz-form-save.cz-button");
+            WaitForElementEnabled(saveArtifactButton);
+            Click(saveArtifactButton);
             Logger.Log("->");
         }
     }

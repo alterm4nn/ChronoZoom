@@ -25,7 +25,6 @@ namespace Tests
         {
             BrowserStateManager.RefreshState();
             HomePageHelper.OpenSandboxPage();
-            //HomePageHelper.DeleteAllElementsLocally();
             TourHelper.DeleteToursIfExist("webdriverTour");
 
             #region create timeline
@@ -44,25 +43,23 @@ namespace Tests
             #region create exhibit
 
             var contentItems = new Collection<ContentItem>();
-            var contentItem = new ContentItem() { Title = "WebDriverApi", MediaType = "image", Uri = @"http://yandex.st/www/1.609/yaru/i/logo.png", Caption = "", Order = 0, Attribution = "", MediaSource = "" };
+            var contentItem = new ContentItem { Title = "WebDriverApi", MediaType = "image", Uri = @"http://yandex.st/www/1.609/yaru/i/logo.png", Caption = "", Order = 0, Attribution = "", MediaSource = "" };
             contentItems.Add(contentItem);
 
-            _newExhibit = new Exhibit()
-            {
-                Timeline_ID = newTimelineId,
-                Title = "WebDriverApiExhibit",
-                Year = -8596430000,
-                ContentItems = contentItems
-            };
+            _newExhibit = new Exhibit
+                {
+                    Timeline_ID = newTimelineId,
+                    Title = "WebDriverApiExhibit",
+                    Year = -8596430000,
+                    ContentItems = contentItems
+                };
             _newExhibit.Id = new Guid(ApiHelper.CreateExhibitByApi(_newExhibit).ExhibitId);
 
             #endregion
 
             #region init new tour
 
-            _newTour = new Tour();
-            _newTour.Name = "webdriverTour";
-            _newTour.Description = "webdriver description";
+            _newTour = new Tour {Name = "webdriverTour", Description = "webdriver description"};
             Bookmark exhibitBookmark = new Bookmark { Name = "WebDriverApiExhibitBookmark", Id = _newExhibit.Id, Type = "exhibit" };
             Bookmark timelineBookmark = new Bookmark { Name = "WebDriverApiTimelineBookmark", Id = _newTimeline.Id, Type = "timeline" };
             Collection<Chronozoom.Entities.Bookmark> bookmarks = new Collection<Chronozoom.Entities.Bookmark> { exhibitBookmark, timelineBookmark };
@@ -85,9 +82,6 @@ namespace Tests
 
             ApiHelper.DeleteTimelineByApi(_newTimeline);
             ApiHelper.DeleteExhibitByApi(_newExhibit);
-            //ApiHelper.DeleteTourByApi(_newTour);
-            //TourHelper.DeleteToursIfExist("webdriverTour");
-
             #endregion
             CreateScreenshotsIfTestFail(TestContext);
         }
@@ -99,8 +93,6 @@ namespace Tests
         {
             string newtourId;
             TourHelper.AddTour(_newTour, out newtourId);
-            //_newTour.Id = new Guid(newtourId);
-
             Assert.IsTrue(TourHelper.IsTourExist(_newTour));
         }
     }
