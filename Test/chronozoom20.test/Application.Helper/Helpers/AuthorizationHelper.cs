@@ -188,7 +188,7 @@ namespace Application.Helper.Helpers
         }
         private IEnumerable<User> GetUsersFromJson()
         {
-            StreamReader stream = new StreamReader(GetValidAcountsJsonPath());
+            StreamReader stream = new StreamReader("Accounts.json");
             string text = stream.ReadToEnd();
             stream.Close();
             byte[] byteArray = Encoding.UTF8.GetBytes(text);
@@ -199,26 +199,7 @@ namespace Application.Helper.Helpers
             return users;
         }
 
-        private string GetValidAcountsJsonPath()
-        {
-            var validFilePath = string.Empty;
-
-            const string accountsPathVsRun = @".\..\..\..\Application.Helper\Constants\Accounts.json";
-            const string accountsPathConsoleRun = @".\..\..\..\..\Application.Helper\Constants\Accounts.json";
-
-            if (File.Exists(accountsPathVsRun))
-                validFilePath = accountsPathVsRun;
-            if (File.Exists(accountsPathConsoleRun))
-                validFilePath = accountsPathConsoleRun;
-            if (string.IsNullOrEmpty(validFilePath))
-            {
-                throw new Exception("Cannot find Accounts.xml file");
-            }
-
-            return validFilePath;
-        }
-
-        private bool IsUserAuthenticated()
+       private bool IsUserAuthenticated()
         {
             Logger.Log("<-");
             var isLogoutPresent = IsElementDisplayed(By.Id("cz-form-logout"));

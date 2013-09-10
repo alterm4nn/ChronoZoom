@@ -54,7 +54,7 @@ namespace Tests
         public void timeline_should_be_created_in_date_mode()
         {
             _timeline = new Timeline { Title = "WebdriverTitleDayMode" };
-            TimelineHelper.AddTimelineWithDayMode(_timeline);
+            TimelineHelper.AddTimelineWithDateMode(_timeline);
             _newTimeline = TimelineHelper.GetLastTimeline();
             Assert.AreEqual(_timeline.Title, _newTimeline.Title);
         }

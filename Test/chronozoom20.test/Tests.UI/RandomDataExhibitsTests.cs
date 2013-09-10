@@ -82,6 +82,7 @@ namespace Tests
         #endregion
 
         [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_content_should_be_correctly()
         {
             for (int i = 0; i < Exhibit.ContentItems.Count; i++)
@@ -96,6 +97,7 @@ namespace Tests
         }
 
         [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_should_have_a_title()
         {
             Assert.AreEqual(Exhibit.Title, _newExhibit.Title, "Titles are not equal");
@@ -103,6 +105,7 @@ namespace Tests
 
         [TestMethod]
         [Ignore]
+        //https://github.com/alterm4nn/ChronoZoom/issues/744
         public void random_new_exhibit_should_have_a_year()
         {
             Assert.AreEqual(Exhibit.Year, _newExhibit.Year, "Years are not equal");
@@ -120,18 +123,21 @@ namespace Tests
 
 
         [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_should_have_a_content_items()
         {
             Assert.AreEqual(Exhibit.ContentItems.Count, _newExhibit.ContentItems.Count, "Content items count are not equal");
         }
 
         [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_should_not_have_null_id()
         {
             Assert.IsNotNull(_newExhibit.Id);
         }
 
         [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_should_be_deleted()
         {
             ExhibitHelper.DeleteExhibit(_newExhibit);
