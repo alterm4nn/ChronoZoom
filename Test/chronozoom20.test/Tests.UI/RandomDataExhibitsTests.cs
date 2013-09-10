@@ -127,8 +127,17 @@ namespace Tests
         {
             for (int i = 0; i < Exhibit.ContentItems.Count; i++)
             {
-                Assert.AreEqual(ExhibitHelper.GetExpectedYouTubeUri(Exhibit.ContentItems[i].Uri), _newExhibit.ContentItems[i].Uri,
-                                "Content items Urls are not equal");
+                if (Exhibit.ContentItems[i].MediaType == "Video")
+                {
+                    Assert.AreEqual(ExhibitHelper.GetExpectedYouTubeUri(Exhibit.ContentItems[i].Uri), _newExhibit.ContentItems[i].Uri,
+                               "Content items Urls are not equal");
+                }
+                else
+                {
+                    Assert.AreEqual(Exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri,
+                              "Content items Urls are not equal");
+                }
+               
             }
         }
 
