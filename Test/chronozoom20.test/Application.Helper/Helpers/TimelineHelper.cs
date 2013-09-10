@@ -20,13 +20,13 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        public void AddTimelineWithDayMode(Timeline timeline)
+        public void AddTimelineWithDateMode(Timeline timeline)
         {
             Logger.Log("<- timeline: " + timeline);
             InitTimelineCreationMode();
             DrawTimeline();
             SetTimelineName(timeline.Title);
-            SetDayMode();
+            SetDateMode();
             CreateTimeline();
             WaitAjaxComplete(60);
             Logger.Log("->");
@@ -183,7 +183,7 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void SetDayMode()
+        private void SetDateMode()
         {
             SelectByText(By.CssSelector(".cz-form-time-start.cz-datepicker .cz-datepicker-mode.cz-input"), "Date");
         }
