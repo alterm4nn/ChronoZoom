@@ -32,6 +32,17 @@ namespace Tests
             Attribution = RandomString.GetRandomString(1,200),
             Uri = RandomUrl.GetRandomImageUrl()
 
+        };    
+        
+        readonly static ContentItem ContentItemPdf = new ContentItem
+        {
+            Title = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
+            Caption = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
+            MediaSource = RandomUrl.GetRandomWebUrl(),
+            MediaType = "PDF",
+            Attribution = RandomString.GetRandomString(1,200),
+            Uri = RandomUrl.GetRandomPdfUrl()
+
         };
 
         static readonly Exhibit Exhibit = new Exhibit
@@ -41,7 +52,7 @@ namespace Tests
             Year = RandomDate.GetRandomDate().Year,
             Month = RandomDate.GetRandomDate().MonthName,
             TimeMode = "Date",
-            ContentItems = new Collection<Chronozoom.Entities.ContentItem> { ContentItemVideo, ContentItemImage }
+            ContentItems = new Collection<Chronozoom.Entities.ContentItem> { ContentItemVideo, ContentItemImage, ContentItemPdf }
         };
 
         private static Exhibit _newExhibit;
@@ -116,8 +127,17 @@ namespace Tests
         {
             for (int i = 0; i < Exhibit.ContentItems.Count; i++)
             {
-                Assert.AreEqual(ExhibitHelper.GetExpectedYouTubeUri(Exhibit.ContentItems[i].Uri), _newExhibit.ContentItems[i].Uri,
-                                "Content items Urls are not equal");
+                if (Exhibit.ContentItems[i].MediaType == "Video")
+                {
+                    Assert.AreEqual(ExhibitHelper.GetExpectedYouTubeUri(Exhibit.ContentItems[i].Uri), _newExhibit.ContentItems[i].Uri,
+                               "Content items Urls are not equal");
+                }
+                else
+                {
+                    Assert.AreEqual(Exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri,
+                              "Content items Urls are not equal");
+                }
+               
             }
         }
 
