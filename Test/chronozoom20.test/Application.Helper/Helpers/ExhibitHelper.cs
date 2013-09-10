@@ -97,7 +97,7 @@ namespace Application.Helper.Helpers
         public string GetFirstContentItemDescription()
         {
             Logger.Log("<-");
-            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            string description = GetText(By.CssSelector("#vc>.contentItemDescription>div"));
             Logger.Log("-> description: " + description);
             return description;
         }
@@ -158,7 +158,7 @@ namespace Application.Helper.Helpers
         public string GetTakeOurSurveyArtifactContentItemDescription()
         {
             Logger.Log("<-");
-            string description = GetText(By.XPath("//*[@id='vc']/*[@class='contentItemDescription']/div"));
+            string description = GetFirstContentItemDescription();
             Logger.Log("-> description: " + description);
             return description;
         }
@@ -212,7 +212,7 @@ namespace Application.Helper.Helpers
         public void ClickByAddArtifact()
         {
             Logger.Log("->");
-            By createArtifactButton = By.XPath("//*[@class='cz-form-create-artifact cz-button']");
+            By createArtifactButton = By.CssSelector(".cz-form-create-artifact.cz-button");
             WaitForElementEnabled(createArtifactButton);
             Click(createArtifactButton);
             Logger.Log("<-");
@@ -221,7 +221,7 @@ namespace Application.Helper.Helpers
         public string GetCurrentImageOrVideoUrl()
         {
             Logger.Log("->");
-            string imageUrl = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/input[@class='cz-form-item-mediaurl cz-input']")).GetAttribute("value");
+            string imageUrl = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("input.cz-form-item-mediaurl")));
             Logger.Log("<- imageUrl: " + imageUrl);
             return imageUrl;
         }
@@ -229,7 +229,7 @@ namespace Application.Helper.Helpers
         public string GetCurrentMediaSource()
         {
             Logger.Log("->");
-            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/input[@class='cz-form-item-mediasource cz-input']")).GetAttribute("value");
+            string mediaSource = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("input.cz-form-item-mediasource")));
             Logger.Log("<- mediaSource: " + mediaSource);
             return mediaSource;
         }
@@ -237,7 +237,7 @@ namespace Application.Helper.Helpers
         public string GetCurrentAttribution()
         {
             Logger.Log("->");
-            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/input[@class='cz-form-item-attribution cz-input']")).GetAttribute("value");
+            string mediaSource = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("input.cz-form-item-attribution")));
             Logger.Log("<- attribution: " + mediaSource);
             return mediaSource;
         }
@@ -245,7 +245,7 @@ namespace Application.Helper.Helpers
         public string GetCurrentMediaType()
         {
             Logger.Log("->");
-            string mediaSource = FindElement(By.XPath("//*[@id='auth-edit-contentitem-form']/div[@class='cz-form-content']/select[@class='cz-form-item-media-type cz-input']")).GetAttribute("value");
+            string mediaSource = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("select.cz-form-item-media-type.cz-input")));
             Logger.Log("<- attribution: " + mediaSource);
             return mediaSource;
         }
@@ -258,7 +258,7 @@ namespace Application.Helper.Helpers
 
         private void ClickDeleteButton()
         {
-            Click(By.XPath("//*[@id='auth-edit-exhibit-form']//*[@class='cz-form-delete cz-button']"));
+            Click(By.CssSelector("#auth-edit-exhibit-form .cz-form-delete.cz-button"));
         }
 
         private void InitEditExhibitForm()
@@ -274,22 +274,24 @@ namespace Application.Helper.Helpers
         private void SaveAndClose()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='auth-edit-exhibit-form']//*[@class='cz-form-save cz-button']"));
+            By saveButton = By.CssSelector("#auth-edit-exhibit-form .cz-form-save.cz-button");
+            WaitForElementEnabled(saveButton);
+            Click(saveButton);
             Logger.Log("->");
         }
 
         private void SetExhibitTitle(string exhibitName)
         {
             Logger.Log("<- name: " + exhibitName);
-            TypeText(By.XPath("//*[@id='auth-edit-exhibit-form']//*[@class='cz-form-item-title cz-input']"), exhibitName);
+            TypeText(By.CssSelector("#auth-edit-exhibit-form .cz-form-item-title"), exhibitName);
             Logger.Log("->");
         }
 
         private void InitExhibitCreationMode()
         {
             Logger.Log("<-");
-            MoveToElementAndClick(By.XPath("//*[@title='Create Your Events']"));
-            MoveToElementAndClick(By.XPath("//button[text()='create exhibit']"));
+            MoveToElementAndClick(By.CssSelector("[title='Create Your Events']"));
+            MoveToElementAndClick(By.CssSelector(".cz-form-create-exhibit.cz-button"));
             Logger.Log("->");
         }
 
@@ -314,22 +316,30 @@ namespace Application.Helper.Helpers
 
         private void SetMediaSourse(string mediaSource)
         {
-            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-mediasource cz-input']"), mediaSource);
+            Logger.Log("-> mediaSource: " + mediaSource);
+            TypeText(By.CssSelector(SetAuthContentItemFormElementLocator(".cz-form-item-mediasource")), mediaSource);
+            Logger.Log("<-");
         }
 
         private void SetAttribution(string attribution)
         {
-            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-attribution cz-input']"), attribution);
+            Logger.Log("-> attribution: " + attribution);
+            TypeText(By.CssSelector(SetAuthContentItemFormElementLocator(".cz-form-item-attribution")), attribution);
+            Logger.Log("<-");
         }
 
         private void SelectMediaType(string mediaType)
         {
-            SelectByText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-media-type cz-input']"), mediaType);
+            Logger.Log("-> mediaType: " + mediaType);
+            SelectByText(By.CssSelector(SetAuthContentItemFormElementLocator(".cz-form-item-media-type")), mediaType);
+            Logger.Log("<-");
         }
 
-        private void SetUrl(string mediaSourse)
+        private void SetUrl(string url)
         {
-            TypeText(By.XPath("//*[@id='auth-edit-contentitem-form']//*[@class='cz-form-item-mediaurl cz-input']"), mediaSourse);
+            Logger.Log("-> url: " + url);
+            TypeText(By.CssSelector(SetAuthContentItemFormElementLocator(".cz-form-item-mediaurl")), url);
+            Logger.Log("<-");
         }
 
         private void AddArtifacts(IEnumerable<Chronozoom.Entities.ContentItem> contentItems)
@@ -343,6 +353,11 @@ namespace Application.Helper.Helpers
                 SaveArtifact();
             }
             Logger.Log("<-");
+        }
+
+        private string SetAuthContentItemFormElementLocator(string element)
+        {
+            return String.Format("#auth-edit-contentitem-form>div.cz-form-content>{0}.cz-input", element);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Application.Driver
             foreach (var screenshot in Screenshots)
             {
                 var filePath = Path.Combine(testDeploymentDir, screenshot.Guid + ".png");
-                screenshot.Screenshot.SaveAsFile(filePath,ImageFormat.Png);
+                screenshot.Screenshot.SaveAsFile(filePath, ImageFormat.Png);
             }
         }
 
@@ -34,6 +34,16 @@ namespace Application.Driver
 
         public static void TakeScreenshot(Guid guid)
         {
+            try
+            {
+                IAlert alert = WebDriver.SwitchTo().Alert();
+                Logger.Log("Unexpected alert with text: '" + alert.Text + "' is presented", LogType.MessageWithoutScreenshot);
+                alert.Accept();
+            }
+            catch (NoAlertPresentException)
+            {
+
+            }
             Screenshot ss = ((ITakesScreenshot)WebDriver).GetScreenshot();
             AddScreenshot(guid.ToString(), ss);
         }

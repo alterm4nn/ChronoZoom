@@ -10,6 +10,7 @@ namespace Tests
         internal string Path = Directory.GetCurrentDirectory() + "\\";
 
         #region Initialize and Cleanup
+        public TestContext TestContext { get; set; }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
@@ -32,6 +33,7 @@ namespace Tests
         [TestCleanup]
         public void TestCleanup()
         {
+            CreateScreenshotsIfTestFail(TestContext);
             TimeSeriesHelper.CloseChart();
             TimeSeriesHelper.CloseUploadFileForm();
         }

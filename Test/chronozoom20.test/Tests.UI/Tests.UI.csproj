@@ -52,9 +52,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WebDriver">
-      <HintPath>..\packages\Selenium.WebDriver.2.33.0\lib\net40\WebDriver.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthoringSkyDriveTests.cs" />
@@ -63,6 +60,8 @@
     <Compile Include="AuthorizationTests.cs" />
     <Compile Include="BibliographyTests.cs" />
     <Compile Include="BingSearchTests.cs" />
+    <Compile Include="RandomDataTimelineTests.cs" />
+    <Compile Include="RandomDataExhibitsTests.cs" />
     <Compile Include="ExhibitsTests.cs" />
     <Compile Include="FooterTests.cs" />
     <Compile Include="PhanerozoicAgeTests.cs" />
@@ -94,6 +93,10 @@
       <Project>{5bdf5dc6-03b4-4a08-8861-51ebaf9742de}</Project>
       <Name>Application.Helper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RandomDataGenerator\RandomDataGenerator.csproj">
+      <Project>{3703ca82-5bef-42ec-ba7c-a6ff5a3e91fc}</Project>
+      <Name>RandomDataGenerator</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -101,8 +104,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PreBuildEvent>copy "..\..\TimeSeriesFiles\*" "$(TargetDir)" /y
-</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

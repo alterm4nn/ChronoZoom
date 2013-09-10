@@ -263,8 +263,8 @@ namespace Chronozoom.UI
 
                 Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
 
-                // If available, retrieve from cache.
-                if (CanCacheGetTimelines(storage, user, collectionId))
+                // getTimelines for origin collection may be cached
+                if (superCollection == null || CanCacheGetTimelines(storage, user, collectionId))
                 {
                     Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements, depth);
                     if (cachedTimeline != null)
@@ -302,7 +302,11 @@ namespace Chronozoom.UI
                 if (timeline == null)
                     timeline = timelines.FirstOrDefault();
 
-                CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements, depth);
+                // Cache getTimeline only for origin collection
+                if (superCollection == null)
+                {
+                    CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements, depth);
+                }
 
                 return timeline;
             });

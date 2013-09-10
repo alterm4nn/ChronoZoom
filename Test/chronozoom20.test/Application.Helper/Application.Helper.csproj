@@ -51,13 +51,13 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WebDriver">
+    <Reference Include="WebDriver, Version=2.35.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Selenium.WebDriver.2.35.0\lib\net40\WebDriver.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\ApiConstants.cs" />
-    <Compile Include="Constants\ImageTemplateFilesLocations.cs" />
     <Compile Include="Constants\Javascripts.cs" />
     <Compile Include="Entities\Bibliography.cs" />
     <Compile Include="Entities\Bookmark.cs" />

@@ -14,7 +14,7 @@ using System.Data.SqlTypes;
 namespace Chronozoom.Entities
 {
     /// <summary>
-    /// A visual representation of a time period that contains a set of Exhibits, child Timelines, and Time Series Data, and is contained by another Timeline or a Collection. The Timeline entity is externally searchable & linkable.
+    /// A visual representation of a time period that contains a set of Exhibits, child Timelines, and Time Series Data, and is contained by another Timeline or a Collection. The Timeline entity is externally searchable and linkable.
     /// </summary>
     [KnownType(typeof(TimelineRaw))]
     [KnownType(typeof(ExhibitRaw))]
@@ -29,12 +29,12 @@ namespace Chronozoom.Entities
         public Guid Id { get; set; }
 
         /// <summary>
-        /// The depth of the timeline in the timeline tree
+        /// The depth of the timeline in the timeline tree.
         /// </summary>
         public int Depth { get; set; }
 
         /// <summary>
-        /// The number of content items contained in subtree under current timeline
+        /// The number of content items contained in subtree under current timeline.
         /// </summary>
         public int SubtreeSize { get; set; }
 
