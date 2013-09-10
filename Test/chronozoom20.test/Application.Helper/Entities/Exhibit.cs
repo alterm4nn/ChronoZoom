@@ -8,6 +8,10 @@ namespace Application.Helper.Entities
     [NotMapped]
     public class Exhibit : ExhibitRaw
     {
+        public string TimeMode { get; set; }
+        public string Month { get; set; }
+        public string Day { get; set; }
+        
         public override string ToString()
         {
             var contentItemsCount = (ContentItems == null) ? "" : ",  ContentItemsCount = " + ContentItems.Count;
