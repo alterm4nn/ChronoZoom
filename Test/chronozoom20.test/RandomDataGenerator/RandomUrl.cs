@@ -28,6 +28,12 @@ namespace RandomDataGenerator
         {
             string searchPattern = GetRandomWord();
             return GetUrl(searchPattern, ServiceType.Web);
+        }    
+        
+        public static string GetRandomPdfUrl()
+        {
+            string searchPattern = GetRandomWord();
+            return GetUrl(String.Format("{0}+filetype:pdf",searchPattern), ServiceType.Web);
         }
 
         private static string GetUrl(string pattern, string mediaType)

@@ -32,6 +32,17 @@ namespace Tests
             Attribution = RandomString.GetRandomString(1,200),
             Uri = RandomUrl.GetRandomImageUrl()
 
+        };    
+        
+        readonly static ContentItem ContentItemPdf = new ContentItem
+        {
+            Title = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
+            Caption = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
+            MediaSource = RandomUrl.GetRandomWebUrl(),
+            MediaType = "PDF",
+            Attribution = RandomString.GetRandomString(1,200),
+            Uri = RandomUrl.GetRandomPdfUrl()
+
         };
 
         static readonly Exhibit Exhibit = new Exhibit
@@ -41,7 +52,7 @@ namespace Tests
             Year = RandomDate.GetRandomDate().Year,
             Month = RandomDate.GetRandomDate().MonthName,
             TimeMode = "Date",
-            ContentItems = new Collection<Chronozoom.Entities.ContentItem> { ContentItemVideo, ContentItemImage }
+            ContentItems = new Collection<Chronozoom.Entities.ContentItem> { ContentItemVideo, ContentItemImage, ContentItemPdf }
         };
 
         private static Exhibit _newExhibit;
