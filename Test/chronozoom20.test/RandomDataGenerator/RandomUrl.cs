@@ -15,35 +15,53 @@ namespace RandomDataGenerator
         public static string GetRandomImageUrl()
         {
             string searchPattern = GetRandomWord();
-            return GetUrl(searchPattern, MediaType.Image);
+            return GetUrl(searchPattern, ServiceType.Image);
         }
 
         public static string GetRandomVideoUrl()
         {
             string searchPattern = GetRandomWord();
-            return GetUrl(searchPattern, MediaType.Video);
+            return GetUrl(searchPattern, ServiceType.Video);
+        }
+
+        public static string GetRandomWebUrl()
+        {
+            string searchPattern = GetRandomWord();
+            return GetUrl(searchPattern, ServiceType.Web);
         }
 
         private static string GetUrl(string pattern, string mediaType)
         {
             var response = SendRequest(pattern, mediaType);
             if (response == null) throw new ArgumentNullException("pattern");
-            if (mediaType == MediaType.Image)
+            switch (mediaType)
             {
-                ResponseImage objects = JsonConvert.DeserializeObject<ResponseImage>(response);
-                if (objects != null && objects.ResponseData != null)
-                {
-                    ImageResult[] results = objects.ResponseData.Results;
-                    if (results != null) return results[Random.Next(results.Length - 1)].UnescapedUrl;
-                }
+                case ServiceType.Image:
+                    ResponseImage objects = JsonConvert.DeserializeObject<ResponseImage>(response);
+                    if (objects != null && objects.ResponseData != null)
+                    {
+                        ImageResult[] results = objects.ResponseData.Results;
+                        if (results != null) return results[Random.Next(results.Length - 1)].UnescapedUrl;
+                    }
+                    break;
+                case ServiceType.Video:
+                    ResponseVideo objectsVideo = JsonConvert.DeserializeObject<ResponseVideo>(response);
+                    if (objectsVideo != null && objectsVideo.ResponseData != null)
+                    {
+                        VideoResult[] videoResults = objectsVideo.ResponseData.Results;
+                        if (videoResults != null) return videoResults[Random.Next(videoResults.Length - 1)].Url;
+                    }
+                    break;
+                case ServiceType.Web:
+                    ResponseWeb objectsWeb = JsonConvert.DeserializeObject<ResponseWeb>(response);
+                    if (objectsWeb != null && objectsWeb.ResponseData != null)
+                    {
+                        WebResult[] webResults = objectsWeb.ResponseData.Results;
+                        if (webResults != null) return webResults[Random.Next(webResults.Length - 1)].UnescapedUrl;
+                    }
+                    break;
             }
-            ResponseVideo objectsVideo = JsonConvert.DeserializeObject<ResponseVideo>(response);
-            if (objectsVideo != null && objectsVideo.ResponseData != null)
-            {
-                VideoResult[] videoResults = objectsVideo.ResponseData.Results;
-                if (videoResults != null) return videoResults[Random.Next(videoResults.Length - 1)].Url;
-            }
-            throw new NullReferenceException("objectsVideo");
+            throw new NullReferenceException("response");
         }
 
         private static string SendRequest(string pattern, string type)
@@ -60,6 +78,26 @@ namespace RandomDataGenerator
             string[] words = Dictionaries.Words;
             return words[Random.Next(words.Length - 1)];
         }
+    }
+
+    internal class ResponseImage
+    {
+        public ImageResultsData ResponseData { get; set; }
+    }
+
+    internal class ResponseVideo
+    {
+        public VideoResultsData ResponseData { get; set; }
+    }
+
+    internal class ResponseWeb
+    {
+        public WebResultsData ResponseData { get; set; }
+    }
+
+    internal class WebResultsData
+    {
+        public WebResult[] Results { get; set; }
     }
 
     internal class ImageResultsData
@@ -82,19 +120,17 @@ namespace RandomDataGenerator
         public string Url { get; set; }
     }
 
-    internal class ResponseImage
+
+    internal class WebResult
     {
-        public ImageResultsData ResponseData { get; set; }
+        public string UnescapedUrl { get; set; }
     }
 
-    internal class ResponseVideo
-    {
-        public VideoResultsData ResponseData { get; set; }
-    }
 
-    internal class MediaType
+    internal class ServiceType
     {
         public const string Image = "images";
         public const string Video = "video";
+        public const string Web = "web";
     }
 }

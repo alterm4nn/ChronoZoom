@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Application.Driver;
 using Application.Helper.Constants;
 using Application.Helper.Entities;
@@ -10,23 +11,16 @@ namespace Application.Helper.Helpers
 {
     public class ExhibitHelper : BaseExhibitHelper
     {
-
-        public void AddExhibit(Exhibit exhibit)
-        {
-            Logger.Log("<- " + exhibit);
-            InitExhibitCreationMode();
-            SetExhibitPoint();
-            SetExhibitTitle(exhibit.Title);
-            SaveAndClose();
-            Logger.Log("->");
-        }
-
         public void AddExhibitWithContentItem(Exhibit exhibit)
         {
             Logger.Log("<- " + exhibit);
             InitExhibitCreationMode();
             SetExhibitPoint();
             SetExhibitTitle(exhibit.Title);
+            if (exhibit.Year != 0)
+            {
+                SetExhibitDate(exhibit);
+            }
             AddArtifacts(exhibit.ContentItems);
             SaveAndClose();
             Logger.Log("->");
@@ -50,7 +44,8 @@ namespace Application.Helper.Helpers
             var exhibit = new Exhibit
                 {
                     ContentItems = new Collection<Chronozoom.Entities.ContentItem>(),
-                    Title = GetJavaScriptExecutionResult(script + ".title")
+                    Title = GetJavaScriptExecutionResult(script + ".title"),
+                    Year = Decimal.Parse(GetJavaScriptExecutionResult(String.Format("CZ.Dates.getYMDFromCoordinate({0}.infodotDescription.date).year",script)))
                 };
             int contentItemsCount = int.Parse(GetJavaScriptExecutionResult(script + ".contentItems.length"));
             Logger.Log("- contentItemsCount: " + contentItemsCount, LogType.MessageWithoutScreenshot);
@@ -284,6 +279,45 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<- name: " + exhibitName);
             TypeText(By.CssSelector("#auth-edit-exhibit-form .cz-form-item-title"), exhibitName);
+            Logger.Log("->");
+        }
+
+
+        private void SetExhibitDate(Exhibit exhibit)
+        {
+            Logger.Log("<- name: " + exhibit.Title);
+            SetTimeMode(exhibit.TimeMode);
+            SetMonth(exhibit.Month);
+            SetDay(exhibit.Day);
+            SetYear(exhibit.Year.ToString(CultureInfo.InvariantCulture));
+            Logger.Log("->");
+        }
+
+        private void SetTimeMode(string timeMode)
+        {
+            Logger.Log("<- time mode: " + timeMode);
+            SelectByText(By.CssSelector(".cz-datepicker-mode.cz-input"), timeMode);
+            Logger.Log("->");
+        }
+
+        private void SetMonth(string month)
+        {
+            Logger.Log("<- month: " + month);
+            SelectByText(By.CssSelector(".cz-datepicker-month-selector.cz-input"), month);
+            Logger.Log("->");
+        }
+
+        private void SetDay(string day)
+        {
+            Logger.Log("<- day: " + day);
+            SelectByText(By.CssSelector(".cz-datepicker-day-selector.cz-input"), day);
+            Logger.Log("->");
+        } 
+        
+        private void SetYear(string year)
+        {
+            Logger.Log("<- year: " + year);
+            TypeText(By.CssSelector(".cz-datepicker-year-date.cz-input"), year);
             Logger.Log("->");
         }
 
