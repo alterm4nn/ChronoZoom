@@ -2,14 +2,15 @@
 <TestSettings name="chronozoom" id="4b548e85-c95b-4f69-869f-b7d73abb2460" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>These are default test settings for a local test run.</Description>
   <Deployment>
-    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\space.csv" />
     <DeploymentItem filename="Tests.UI\config.xml" />
-    <DeploymentItem filename="Application.Helper\ImageTemplates\Bibliography.png" />
-    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\positive.csv" />
+    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\space.csv" />
+    <DeploymentItem filename="Application.Helper\Constants\Accounts.json" />
     <DeploymentItem filename="ThirdParty\" />
-    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\tab.csv" />
-    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\textPositive.txt" />
     <DeploymentItem filename="Tests.UI\TimeSeriesFiles\semicolon.csv" />
+    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\positive.csv" />
+    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\tab.csv" />
+    <DeploymentItem filename="Application.Helper\ImageTemplates\Bibliography.png" />
+    <DeploymentItem filename="Tests.UI\TimeSeriesFiles\textPositive.txt" />
   </Deployment>
   <NamingScheme baseName="UI_Tests" useDefault="false" />
   <Execution>
