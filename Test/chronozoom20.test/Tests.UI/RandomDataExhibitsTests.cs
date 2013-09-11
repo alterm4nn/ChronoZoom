@@ -30,18 +30,18 @@ namespace Tests
             Caption = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
             MediaSource = RandomUrl.GetRandomWebUrl(),
             MediaType = "Image",
-            Attribution = RandomString.GetRandomString(1,200),
+            Attribution = RandomString.GetRandomString(1, 200),
             Uri = RandomUrl.GetRandomImageUrl()
 
-        };    
-        
+        };
+
         readonly static ContentItem ContentItemPdf = new ContentItem
         {
             Title = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
             Caption = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
             MediaSource = RandomUrl.GetRandomWebUrl(),
             MediaType = "PDF",
-            Attribution = RandomString.GetRandomString(1,200),
+            Attribution = RandomString.GetRandomString(1, 200),
             Uri = RandomUrl.GetRandomPdfUrl()
 
         };
@@ -125,27 +125,36 @@ namespace Tests
             }
             else
             {
-                Assert.AreEqual(Exhibit.Year-1, _newExhibit.Year, "Years are not equal");
+                Assert.AreEqual(Exhibit.Year - 1, _newExhibit.Year, "Years are not equal");
             }
-           
+
         }
 
         [TestMethod]
+        [TestCategory("Random")]
+        public void random_new_exhibit_should_have_a_day()
+        {
+            Assert.AreEqual(Exhibit.Day, _newExhibit.Day, "Days are not equal");
+        }   
+        
+        [TestMethod]
+        [TestCategory("Random")]
+        public void random_new_exhibit_should_have_a_month()
+        {
+            Assert.AreEqual(Exhibit.Month, _newExhibit.Month, "Months are not equal");
+        }
+
+        [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_should_have_a_correct_url()
         {
             for (int i = 0; i < Exhibit.ContentItems.Count; i++)
             {
-                if (Exhibit.ContentItems[i].MediaType == "Video")
-                {
-                    Assert.AreEqual(ExhibitHelper.GetExpectedYouTubeUri(Exhibit.ContentItems[i].Uri), _newExhibit.ContentItems[i].Uri,
-                               "Content items Urls are not equal");
-                }
-                else
-                {
-                    Assert.AreEqual(Exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri,
-                              "Content items Urls are not equal");
-                }
-               
+                Assert.AreEqual(
+                    Exhibit.ContentItems[i].MediaType == "Video"
+                        ? ExhibitHelper.GetExpectedYouTubeUri(Exhibit.ContentItems[i].Uri)
+                        : Exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri,
+                    "Content items Urls are not equal");
             }
         }
 
