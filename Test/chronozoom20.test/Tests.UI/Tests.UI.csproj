@@ -93,6 +93,10 @@
       <Project>{5bdf5dc6-03b4-4a08-8861-51ebaf9742de}</Project>
       <Name>Application.Helper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHubIssueWatcher\GitHubIssueWatcher.csproj">
+      <Project>{0b6ab4d8-f0f4-4bf2-9629-1f9feac0d9a1}</Project>
+      <Name>GitHubIssueWatcher</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RandomDataGenerator\RandomDataGenerator.csproj">
       <Project>{3703ca82-5bef-42ec-ba7c-a6ff5a3e91fc}</Project>
       <Name>RandomDataGenerator</Name>
