@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Application.Helper.Entities;
+using GitHubIssueWatcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.ObjectModel;
 using RandomDataGenerator;
@@ -115,11 +116,18 @@ namespace Tests
         }
 
         [TestMethod]
-        [Ignore]
         //https://github.com/alterm4nn/ChronoZoom/issues/744
         public void random_new_exhibit_should_have_a_year()
         {
-            Assert.AreEqual(Exhibit.Year, _newExhibit.Year, "Years are not equal");
+            if (IssueStatus.IsIssueResolved("744"))
+            {
+                Assert.AreEqual(Exhibit.Year, _newExhibit.Year, "Years are not equal");
+            }
+            else
+            {
+                Assert.AreEqual(Exhibit.Year-1, _newExhibit.Year, "Years are not equal");
+            }
+           
         }
 
         [TestMethod]
