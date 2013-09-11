@@ -96,7 +96,7 @@ var CZ;
             }, 
             {
                 Name: "Skydrive",
-                Activation: FeatureActivation.NotProduction
+                Activation: FeatureActivation.Enabled
             }, 
             
         ];

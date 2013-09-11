@@ -140,7 +140,7 @@ module CZ {
             },
             {
                 Name: "Skydrive",
-                Activation: FeatureActivation.NotProduction
+                Activation: FeatureActivation.Enabled
             },
         ];
 

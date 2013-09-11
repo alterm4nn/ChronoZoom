@@ -12029,6 +12029,7 @@ var CZ;
                     });
                 });
                 this.logoutButton.click(function (event) {
+                    WL.logout();
                     window.location.assign("/pages/logoff.aspx");
                 });
                 var preventEnterKeyPress = function (event) {
@@ -12684,7 +12685,7 @@ var CZ;
             }, 
             {
                 Name: "Skydrive",
-                Activation: FeatureActivation.NotProduction
+                Activation: FeatureActivation.Enabled
             }, 
             
         ];
