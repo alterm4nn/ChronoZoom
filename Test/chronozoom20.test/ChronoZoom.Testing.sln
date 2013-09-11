@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageSearchEngine", "ImageS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomDataGenerator", "RandomDataGenerator\RandomDataGenerator.csproj", "{3703CA82-5BEF-42EC-BA7C-A6FF5A3E91FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubIssueWatcher", "GitHubIssueWatcher\GitHubIssueWatcher.csproj", "{0B6AB4D8-F0F4-4BF2-9629-1F9FEAC0D9A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{3703CA82-5BEF-42EC-BA7C-A6FF5A3E91FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3703CA82-5BEF-42EC-BA7C-A6FF5A3E91FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3703CA82-5BEF-42EC-BA7C-A6FF5A3E91FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B6AB4D8-F0F4-4BF2-9629-1F9FEAC0D9A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B6AB4D8-F0F4-4BF2-9629-1F9FEAC0D9A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B6AB4D8-F0F4-4BF2-9629-1F9FEAC0D9A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B6AB4D8-F0F4-4BF2-9629-1F9FEAC0D9A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
