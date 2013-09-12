@@ -75,7 +75,6 @@ module CZ {
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-                    console.log("this.datePicker.");
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
