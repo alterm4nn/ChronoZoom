@@ -411,7 +411,21 @@ var CZ;
                             CZ.Authoring.showSessionForm();
                         }, (CZ.Settings.sessionTime - 60) * 1000);
                     }
+                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
                 }).fail(function (error) {
+                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                }).always(function () {
+                    if(!CZ.Authoring.isEnabled) {
+                        $(".edit-icon").hide();
+                    }
+                    CZ.Common.loadData().then(function (response) {
+                        if(!response) {
+                            canvasIsEmpty = true;
+                            if(CZ.Authoring.showCreateTimelineForm) {
+                                CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                            }
+                        }
+                    });
                 });
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
@@ -471,16 +485,10 @@ var CZ;
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
-                        CZ.Authoring.isEnabled = UserCanEditCollection(data);
                         InitializeToursUI(data, forms);
                     }).fail(function (error) {
                         $("#login-panel").show();
-                        CZ.Authoring.isEnabled = UserCanEditCollection(null);
                         InitializeToursUI(null, forms);
-                    }).always(function () {
-                        if(!CZ.Authoring.isEnabled) {
-                            $(".edit-icon").hide();
-                        }
                     });
                 }
                 $("#login-panel").click(function (event) {
@@ -533,14 +541,6 @@ var CZ;
             if(window.location.hash) {
                 CZ.Common.startHash = window.location.hash;
             }
-            CZ.Common.loadData().then(function (response) {
-                if(!response) {
-                    canvasIsEmpty = true;
-                    if(CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
-                }
-            });
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
