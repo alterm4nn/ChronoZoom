@@ -478,7 +478,25 @@ module CZ {
                     if (data != "") {
                         CZ.Authoring.timer = setTimeout(() => { CZ.Authoring.showSessionForm(); }, (CZ.Settings.sessionTime - 60) * 1000);
                     }
-                }).fail((error) => {  });
+
+                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
+                }).fail((error) => {
+                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                }).always(() => {
+                    if (!CZ.Authoring.isEnabled) {
+                        $(".edit-icon").hide();
+                    }
+
+                    //retrieving the data
+                    CZ.Common.loadData().then(function (response) {
+                        if (!response) {
+                            canvasIsEmpty = true;
+                            if (CZ.Authoring.showCreateTimelineForm) {
+                                CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                            }
+                        }
+                    });
+                });
 
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
@@ -549,17 +567,11 @@ module CZ {
                             $(".auth-panel-login").html(data.DisplayName);
                         }
 
-                        CZ.Authoring.isEnabled = UserCanEditCollection(data);
                         InitializeToursUI(data, forms);
                     }).fail((error) => {
                         $("#login-panel").show();
 
-                        CZ.Authoring.isEnabled = UserCanEditCollection(null);
                         InitializeToursUI(null, forms);
-                    }).always(() => {
-                        if (!CZ.Authoring.isEnabled) {
-                            $(".edit-icon").hide();
-                        }
                     });
                 }
 
@@ -623,15 +635,6 @@ module CZ {
 
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
-
-            CZ.Common.loadData().then(function (response) {
-                if (!response) {
-                    canvasIsEmpty = true;
-                    if (CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
-                }
-            }); //retrieving the data
 
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
