@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Application.Helper.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ContentItem = Chronozoom.Entities.ContentItem;
@@ -35,8 +34,7 @@ namespace Tests
                 ToYear = -5808809999,
                 Title = "WebDriverApiTitle"
             };
-            Guid newTimelineId = ApiHelper.CreateTimelineByApi(_newTimeline);
-            _newTimeline.Id = newTimelineId;
+            ApiHelper.CreateTimelineByApi(_newTimeline);
 
             #endregion
 
@@ -48,12 +46,12 @@ namespace Tests
 
             _newExhibit = new Exhibit
                 {
-                    Timeline_ID = newTimelineId,
+                    Timeline_ID = _newTimeline.Id,
                     Title = "WebDriverApiExhibit",
                     Year = -8596430000,
                     ContentItems = contentItems
                 };
-            _newExhibit.Id = new Guid(ApiHelper.CreateExhibitByApi(_newExhibit).ExhibitId);
+            ApiHelper.CreateExhibitByApi(_newExhibit);
 
             #endregion
 
@@ -91,8 +89,7 @@ namespace Tests
         [TestMethod]
         public void tour_should_be_created()
         {
-            string newtourId;
-            TourHelper.AddTour(_newTour, out newtourId);
+            TourHelper.AddTour(_newTour);
             Assert.IsTrue(TourHelper.IsTourExist(_newTour));
         }
     }

@@ -15,7 +15,7 @@ namespace Application.Helper.Helpers
         private const string MayanHistoryTourName = "Mayan History";
         private const string PortusTourName = "Portus Tour";
 
-        public void AddTour(Tour tour, out string tourId)
+        public void AddTour(Tour tour)
         {
             Logger.Log("<- " + tour);
 
@@ -24,8 +24,6 @@ namespace Application.Helper.Helpers
             SetTourDescription(tour.Description);
             SetTourBookmarks(tour.Bookmarks);
             CreateTour();
-            tourId = "";
-
             Logger.Log("->");
         }
 

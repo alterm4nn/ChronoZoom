@@ -1,4 +1,5 @@
 ﻿using Application.Helper.Entities;
+using GitHubIssueWatcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.ObjectModel;
 
@@ -94,7 +95,6 @@ namespace Tests
                                 "Content items Urls are not equal");
             }
         }
-
 
         [TestMethod]
         public void new_exhibit_should_have_a_content_items()

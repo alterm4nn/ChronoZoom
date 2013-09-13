@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net;
+using System.Runtime.Serialization;
 using System.Text;
 using Application.Driver;
 using Application.Helper.Constants;
-using Application.Helper.Entities;
 using Application.Helper.UserActions;
 using System.IO;
 using System.Runtime.Serialization.Json;
@@ -23,7 +24,7 @@ namespace Application.Helper.Helpers
         private const string ExhibitApiServiceUrl = ApiConstants.ExhibitApiServiceUrl;
         private const string TourApiServiceUrl = ApiConstants.TourApiServiceUrl;
 
-        public Guid CreateTimelineByApi(Timeline timeline)
+        public void CreateTimelineByApi(Timeline timeline)
         {
             timeline.Timeline_ID = new Guid(CosmosGuidTemplate);
 
@@ -41,8 +42,7 @@ namespace Application.Helper.Helpers
                 throw new NullReferenceException("responseStream is null");
             }
 
-            Guid timelineId = (Guid)guidSerializer.ReadObject(responseStream);
-            return timelineId;
+            timeline.Id = (Guid)guidSerializer.ReadObject(responseStream);
         }
 
         public void DeleteTimelineByApi(Timeline timeline)
@@ -56,7 +56,7 @@ namespace Application.Helper.Helpers
             request.GetResponse();
         }
 
-        public NewExhibitApiResponse CreateExhibitByApi(Exhibit exhibit)
+        public void CreateExhibitByApi(Exhibit exhibit)
         {
             DataContractJsonSerializer exhibitSerializer = new DataContractJsonSerializer(typeof(Exhibit));
             DataContractJsonSerializer guidSerializer = new DataContractJsonSerializer(typeof(NewExhibitApiResponse));
@@ -75,7 +75,7 @@ namespace Application.Helper.Helpers
             }
 
             NewExhibitApiResponse newExhibitApiResponse = (NewExhibitApiResponse)guidSerializer.ReadObject(responseStream);
-            return newExhibitApiResponse;
+            exhibit.Id = new Guid(newExhibitApiResponse.ExhibitId);
         }
 
         public void DeleteExhibitByApi(Exhibit exhibit)
@@ -148,5 +148,15 @@ namespace Application.Helper.Helpers
             request.Method = method;
             return request;
         }
+    }
+
+    [DataContract]
+    internal class NewExhibitApiResponse
+    {
+        [DataMember(Name = "ContentItemId")]
+        public Collection<string> ContentItemId { get; set; }
+        [DataMember(Name = "ExhibitId")]
+        public string ExhibitId { get; set; }
+
     }
 }
