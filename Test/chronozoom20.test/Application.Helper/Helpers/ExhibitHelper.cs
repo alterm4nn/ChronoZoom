@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Text;
 using Application.Driver;
 using Application.Helper.Constants;
 using Application.Helper.Entities;
@@ -11,6 +12,11 @@ namespace Application.Helper.Helpers
 {
     public class ExhibitHelper : BaseExhibitHelper
     {
+        const string LastCanvasElement = Javascripts.LastCanvasElement;
+
+        private readonly string _getYmdFromCoordinateScript =
+            String.Format("CZ.Dates.getYMDFromCoordinate({0}.infodotDescription.date)", LastCanvasElement);
+
         public void AddExhibitWithContentItem(Exhibit exhibit)
         {
             Logger.Log("<- " + exhibit);
@@ -40,19 +46,20 @@ namespace Application.Helper.Helpers
         public Exhibit GetNewExhibit()
         {
             Logger.Log("<-");
-            const string script = Javascripts.LastCanvasElement;
             var exhibit = new Exhibit
                 {
                     ContentItems = new Collection<Chronozoom.Entities.ContentItem>(),
-                    Title = GetJavaScriptExecutionResult(script + ".title"),
-                    Year = Decimal.Parse(GetJavaScriptExecutionResult(String.Format("CZ.Dates.getYMDFromCoordinate({0}.infodotDescription.date).year",script)))
+                    Title = GetJavaScriptExecutionResult(LastCanvasElement + ".title"),
+                    Year = GetNewExhibitYear(),
+                    Month = GetNewExhibitMonth(),
+                    Day = GetNewExhibitday()
                 };
-            int contentItemsCount = int.Parse(GetJavaScriptExecutionResult(script + ".contentItems.length"));
+            int contentItemsCount = int.Parse(GetJavaScriptExecutionResult(LastCanvasElement + ".contentItems.length"));
             Logger.Log("- contentItemsCount: " + contentItemsCount, LogType.MessageWithoutScreenshot);
             for (int i = 0; i < contentItemsCount; i++)
             {
                 var contentItem = new ContentItem();
-                string item = string.Format("{0}.contentItems[{1}].", script, i);
+                string item = string.Format("{0}.contentItems[{1}].", LastCanvasElement, i);
                 contentItem.Title = GetJavaScriptExecutionResult(item + "title");
                 Logger.Log("- contentItem.Title: " + contentItem.Title, LogType.MessageWithoutScreenshot);
                 contentItem.Caption = GetJavaScriptExecutionResult(item + "description");
@@ -67,11 +74,41 @@ namespace Application.Helper.Helpers
                 Logger.Log("- contentItem.Attribution: " + contentItem.Attribution, LogType.MessageWithoutScreenshot);
                 exhibit.ContentItems.Add(contentItem);
             }
-            WaitCondition(() => (GetJavaScriptExecutionResult(script + ".guid") != string.Empty), 15);
-            exhibit.Id = new Guid(GetJavaScriptExecutionResult(script + ".guid"));
+            WaitCondition(() => (GetJavaScriptExecutionResult(LastCanvasElement + ".guid") != string.Empty), 15);
+            exhibit.Id = new Guid(GetJavaScriptExecutionResult(LastCanvasElement + ".guid"));
             Logger.Log("- exhibit.Id: " + exhibit.Id, LogType.MessageWithoutScreenshot);
             Logger.Log("->" + exhibit);
             return exhibit;
+        }
+
+
+        public string GetNewExhibitDisplayDate()
+        {
+            return
+                GetJavaScriptExecutionResult(
+                    String.Format("{0}.children[0].content.children[{0}.children[0].content.children.length-2].text[1]", LastCanvasElement));
+
+        }
+
+        private string GetNewExhibitday()
+        {
+            Logger.Log("->", LogType.MessageWithoutScreenshot);
+            return GetJavaScriptExecutionResult(_getYmdFromCoordinateScript + ".day");
+        }
+
+        private string GetNewExhibitMonth()
+        {
+            Logger.Log("->", LogType.MessageWithoutScreenshot);
+            int monthNumber = int.Parse(
+                        GetJavaScriptExecutionResult(_getYmdFromCoordinateScript + ".month"));
+            Logger.Log("- month number" + monthNumber, LogType.MessageWithoutScreenshot);
+            return monthNumber == 0 ? "" : CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthNumber);
+        }
+
+        private decimal GetNewExhibitYear()
+        {
+            Logger.Log("->", LogType.MessageWithoutScreenshot);
+            return Decimal.Parse(GetJavaScriptExecutionResult(_getYmdFromCoordinateScript + ".year"));
         }
 
         public void DeleteExhibitByJavascript(Exhibit exhibit)
@@ -174,9 +211,8 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             OpenBibliography();
-            Bibliography bibliography = new Bibliography();
-            bibliography.Sources = new List<Source>();
-            Source bibliographySource = new Source();
+            var bibliography = new Bibliography {Sources = new List<Source>()};
+            var bibliographySource = new Source();
             ReadOnlyCollection<IWebElement> sources = FindElements(By.ClassName("source"));
             foreach (IWebElement source in sources)
             {
@@ -206,45 +242,65 @@ namespace Application.Helper.Helpers
 
         public void ClickByAddArtifact()
         {
-            Logger.Log("->");
+            Logger.Log("<-");
             By createArtifactButton = By.CssSelector(".cz-form-create-artifact.cz-button");
             WaitForElementEnabled(createArtifactButton);
             Click(createArtifactButton);
-            Logger.Log("<-");
+            Logger.Log("->");
         }
 
         public string GetCurrentImageOrVideoUrl()
         {
-            Logger.Log("->");
+            Logger.Log("<-");
             string imageUrl = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("input.cz-form-item-mediaurl")));
-            Logger.Log("<- imageUrl: " + imageUrl);
+            Logger.Log("-> imageUrl: " + imageUrl);
             return imageUrl;
         }
 
         public string GetCurrentMediaSource()
         {
-            Logger.Log("->");
+            Logger.Log("<-");
             string mediaSource = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("input.cz-form-item-mediasource")));
-            Logger.Log("<- mediaSource: " + mediaSource);
+            Logger.Log("-> mediaSource: " + mediaSource);
             return mediaSource;
         }
 
         public string GetCurrentAttribution()
         {
-            Logger.Log("->");
+            Logger.Log("<-");
             string mediaSource = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("input.cz-form-item-attribution")));
-            Logger.Log("<- attribution: " + mediaSource);
+            Logger.Log("-> attribution: " + mediaSource);
             return mediaSource;
         }
 
         public string GetCurrentMediaType()
         {
-            Logger.Log("->");
+            Logger.Log("<-");
             string mediaSource = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("select.cz-form-item-media-type.cz-input")));
-            Logger.Log("<- attribution: " + mediaSource);
+            Logger.Log("-> attribution: " + mediaSource);
             return mediaSource;
         }
 
+        public string GetExhibitDisplayDate(Exhibit exhibit)
+        {
+            Logger.Log("<-");
+            string scriptGetExhibit = String.Format("CZ.Common.vc.virtualCanvas('findElement', 'e{0}__title').text", exhibit.Id);
+            int countExhibitTitleItems = int.Parse(GetJavaScriptExecutionResult(scriptGetExhibit + ".length"));
+            var date = new StringBuilder();
+            for (int index = 1; index < countExhibitTitleItems; index++)
+            {
+                date.Append(GetJavaScriptExecutionResult(String.Format("{0}[{1}]", scriptGetExhibit, index))).Append(" ");
+            }
+            Logger.Log("-> date: " + date);
+            return date.ToString();
+        }
+
+        public decimal GetCoordinateFromYmd(decimal year, int month, int day)
+        {
+            string monthStr = (month - 1).ToString(CultureInfo.InvariantCulture);
+            return Decimal.Parse(GetJavaScriptExecutionResult(String.Format("CZ.Dates.getCoordinateFromYMD({0},{1},{2})", year, monthStr, day)));
+        }
+        
         private void ConfirmDeletion()
         {
             AcceptAlert();
@@ -312,8 +368,8 @@ namespace Application.Helper.Helpers
             Logger.Log("<- day: " + day);
             SelectByText(By.CssSelector(".cz-datepicker-day-selector.cz-input"), day);
             Logger.Log("->");
-        } 
-        
+        }
+
         private void SetYear(string year)
         {
             Logger.Log("<- year: " + year);
@@ -393,5 +449,6 @@ namespace Application.Helper.Helpers
         {
             return String.Format("#auth-edit-contentitem-form>div.cz-form-content>{0}.cz-input", element);
         }
+
     }
 }

@@ -38,7 +38,7 @@ namespace Tests
                 Year = -8596430000,
                 ContentItems = contentItems
             };
-            _newExhibit.Id = new Guid(ApiHelper.CreateExhibitByApi(_newExhibit).ExhibitId);
+            ApiHelper.CreateExhibitByApi(_newExhibit);
 
             #endregion
             HomePageHelper.OpenSandboxPage();
