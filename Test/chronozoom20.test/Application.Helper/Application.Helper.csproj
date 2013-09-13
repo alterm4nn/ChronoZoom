@@ -63,7 +63,6 @@
     <Compile Include="Entities\Bookmark.cs" />
     <Compile Include="Entities\ContentItem.cs" />
     <Compile Include="Entities\Exhibit.cs" />
-    <Compile Include="Entities\NewExhibitApiResponse.cs" />
     <Compile Include="Entities\Timeline.cs" />
     <Compile Include="Entities\Tour.cs" />
     <Compile Include="Entities\User.cs" />
@@ -79,7 +78,6 @@
     <Compile Include="Helpers\BaseExhibitHelper.cs" />
     <Compile Include="Helpers\BookmarkHelper.cs" />
     <Compile Include="Helpers\BreadcrumbsHelper.cs" />
-    <Compile Include="Helpers\DateTimeHelper.cs" />
     <Compile Include="Helpers\ExhibitHelper.cs" />
     <Compile Include="Helpers\ExhibitSkyDriveHelper.cs" />
     <Compile Include="Helpers\HomePageHelper.cs" />

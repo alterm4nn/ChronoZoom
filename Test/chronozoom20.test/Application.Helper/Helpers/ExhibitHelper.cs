@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Text;
 using Application.Driver;
 using Application.Helper.Constants;
 using Application.Helper.Entities;
@@ -85,7 +86,7 @@ namespace Application.Helper.Helpers
         {
             return
                 GetJavaScriptExecutionResult(
-                    String.Format("{0}.children[0].content.children[{0}.children[0].content.children.length-2].text[1]",LastCanvasElement));
+                    String.Format("{0}.children[0].content.children[{0}.children[0].content.children.length-2].text[1]", LastCanvasElement));
 
         }
 
@@ -210,9 +211,8 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             OpenBibliography();
-            Bibliography bibliography = new Bibliography();
-            bibliography.Sources = new List<Source>();
-            Source bibliographySource = new Source();
+            var bibliography = new Bibliography {Sources = new List<Source>()};
+            var bibliographySource = new Source();
             ReadOnlyCollection<IWebElement> sources = FindElements(By.ClassName("source"));
             foreach (IWebElement source in sources)
             {
@@ -242,45 +242,65 @@ namespace Application.Helper.Helpers
 
         public void ClickByAddArtifact()
         {
-            Logger.Log("->");
+            Logger.Log("<-");
             By createArtifactButton = By.CssSelector(".cz-form-create-artifact.cz-button");
             WaitForElementEnabled(createArtifactButton);
             Click(createArtifactButton);
-            Logger.Log("<-");
+            Logger.Log("->");
         }
 
         public string GetCurrentImageOrVideoUrl()
         {
-            Logger.Log("->");
+            Logger.Log("<-");
             string imageUrl = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("input.cz-form-item-mediaurl")));
-            Logger.Log("<- imageUrl: " + imageUrl);
+            Logger.Log("-> imageUrl: " + imageUrl);
             return imageUrl;
         }
 
         public string GetCurrentMediaSource()
         {
-            Logger.Log("->");
+            Logger.Log("<-");
             string mediaSource = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("input.cz-form-item-mediasource")));
-            Logger.Log("<- mediaSource: " + mediaSource);
+            Logger.Log("-> mediaSource: " + mediaSource);
             return mediaSource;
         }
 
         public string GetCurrentAttribution()
         {
-            Logger.Log("->");
+            Logger.Log("<-");
             string mediaSource = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("input.cz-form-item-attribution")));
-            Logger.Log("<- attribution: " + mediaSource);
+            Logger.Log("-> attribution: " + mediaSource);
             return mediaSource;
         }
 
         public string GetCurrentMediaType()
         {
-            Logger.Log("->");
+            Logger.Log("<-");
             string mediaSource = GetElementValue(By.CssSelector(SetAuthContentItemFormElementLocator("select.cz-form-item-media-type.cz-input")));
-            Logger.Log("<- attribution: " + mediaSource);
+            Logger.Log("-> attribution: " + mediaSource);
             return mediaSource;
         }
 
+        public string GetExhibitDisplayDate(Exhibit exhibit)
+        {
+            Logger.Log("<-");
+            string scriptGetExhibit = String.Format("CZ.Common.vc.virtualCanvas('findElement', 'e{0}__title').text", exhibit.Id);
+            int countExhibitTitleItems = int.Parse(GetJavaScriptExecutionResult(scriptGetExhibit + ".length"));
+            var date = new StringBuilder();
+            for (int index = 1; index < countExhibitTitleItems; index++)
+            {
+                date.Append(GetJavaScriptExecutionResult(String.Format("{0}[{1}]", scriptGetExhibit, index))).Append(" ");
+            }
+            Logger.Log("-> date: " + date);
+            return date.ToString();
+        }
+
+        public decimal GetCoordinateFromYmd(decimal year, int month, int day)
+        {
+            string monthStr = (month - 1).ToString(CultureInfo.InvariantCulture);
+            return Decimal.Parse(GetJavaScriptExecutionResult(String.Format("CZ.Dates.getCoordinateFromYMD({0},{1},{2})", year, monthStr, day)));
+        }
+        
         private void ConfirmDeletion()
         {
             AcceptAlert();

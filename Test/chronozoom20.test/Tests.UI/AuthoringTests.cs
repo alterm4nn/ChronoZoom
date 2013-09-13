@@ -4,7 +4,7 @@ using System.Globalization;
 using Application.Driver;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RandomDataGenerator;
-using ContentItem = Application.Helper.Entities.ContentItem;
+using ContentItem = Chronozoom.Entities.ContentItem;
 using Exhibit = Application.Helper.Entities.Exhibit;
 using Timeline = Application.Helper.Entities.Timeline;
 
@@ -48,6 +48,7 @@ namespace Tests
             {
                 TimelineHelper.DeleteTimelineByJavaScript(_newTimeline);
             }
+            _newExhibit = null;
             CreateScreenshotsIfTestFail(TestContext);
         }
 
@@ -84,7 +85,7 @@ namespace Tests
             var exhibit = new Exhibit
             {
                 Title = "WebdriverExhibitWithContent",
-                ContentItems = new Collection<Chronozoom.Entities.ContentItem> { contentItemImage, contentItemMusic }
+                ContentItems = new Collection<ContentItem> { contentItemImage, contentItemMusic }
             };
 
             ExhibitHelper.AddExhibitWithContentItem(exhibit);
@@ -115,7 +116,7 @@ namespace Tests
             var exhibit = new Exhibit
             {
                 Title = "WebdriverExhibitWithContent",
-                ContentItems = new Collection<Chronozoom.Entities.ContentItem> { contentItemPdf }
+                ContentItems = new Collection<ContentItem> { contentItemPdf }
             };
             ExhibitHelper.AddExhibitWithContentItem(exhibit);
             _newExhibit = ExhibitHelper.GetNewExhibit();
@@ -126,44 +127,81 @@ namespace Tests
                 Assert.AreEqual(exhibit.ContentItems[i].MediaType, _newExhibit.ContentItems[i].MediaType, true, "Content items mediaTypes are not equal");
                 Assert.AreEqual(contentItemPdf.Uri, _newExhibit.ContentItems[i].Uri, "Content items Uri are not equal");
             }
-        } 
-        
-        
+        }
+
+
         [TestMethod]
-        public void exhibit_should_display_correct_date()
+        public void exhibit_should_display_correct_date_in_ce()
         {
             var contentItemPdf = new ContentItem
             {
                 Title = RandomString.GetRandomString(1, 200),
                 Caption = RandomString.GetRandomString(1, 200),
                 MediaSource = RandomUrl.GetRandomWebUrl(),
-                MediaType = "PDF",
+                MediaType = "pdf",
                 Attribution = RandomString.GetRandomString(1, 200),
-                Uri = RandomUrl.GetRandomPdfUrl()
-
+                Uri = RandomUrl.GetRandomPdfUrl(),
+                Order = 0
             };
             CustomDate date = RandomDate.GetRandomDate(1900);
-            var exhibit = new Exhibit
+            _newExhibit = new Exhibit
             {
-                Title = RandomString.GetRandomString(1,200),
-                ContentItems = new Collection<Chronozoom.Entities.ContentItem> { contentItemPdf },
-                Year = date.Year,
+                Title = RandomString.GetRandomString(1, 200),
+                ContentItems = new Collection<ContentItem> { contentItemPdf },
+
                 Month = date.MonthName,
                 Day = date.Day.ToString(CultureInfo.InvariantCulture),
-                TimeMode = "Date"
+                Year = ExhibitHelper.GetCoordinateFromYmd(date.Year, date.MonthNumber, date.Day),
+                Timeline_ID = new Guid("bdc1ceff-76f8-4df4-ba72-96b353991314")
             };
-            ExhibitHelper.AddExhibitWithContentItem(exhibit);
-            //Need to delete exhibit after test
-            _newExhibit = ExhibitHelper.GetNewExhibit();
-            string diplayDate = ExhibitHelper.GetNewExhibitDisplayDate();
-            StringAssert.Contains(diplayDate,"CE");
-            StringAssert.Contains(diplayDate,exhibit.Year.ToString(CultureInfo.InvariantCulture));
-            StringAssert.Contains(diplayDate,exhibit.Day);
+            ApiHelper.CreateExhibitByApi(_newExhibit);
+            HomePageHelper.OpenSandboxPage();
+            ExhibitHelper.NavigateToExhibit(_newExhibit);
+            string displayDate = ExhibitHelper.GetExhibitDisplayDate(_newExhibit);
+            StringAssert.Contains(displayDate, "CE");
+            StringAssert.Contains(displayDate, date.Year.ToString(CultureInfo.InvariantCulture));
+            StringAssert.Contains(displayDate, _newExhibit.Day);
             if (GitHubIssueWatcher.IssueStatus.IsIssueResolved("1024"))
             {
-                StringAssert.Contains(diplayDate, DateTime.ParseExact(exhibit.Month, "MMMM", CultureInfo.CurrentCulture).Month.ToString(CultureInfo.InvariantCulture));    
+                StringAssert.Contains(displayDate, DateTime.ParseExact(_newExhibit.Month, "MMMM", CultureInfo.CurrentCulture).Month.ToString(CultureInfo.InvariantCulture));
             }
-            
+        }     
+        
+        [TestMethod]
+        public void exhibit_should_display_correct_date_december_in_bce()
+        {
+            var contentItemPdf = new ContentItem
+            {
+                Title = RandomString.GetRandomString(1, 200),
+                Caption = RandomString.GetRandomString(1, 200),
+                MediaSource = RandomUrl.GetRandomWebUrl(),
+                MediaType = "image",
+                Attribution = RandomString.GetRandomString(1, 200),
+                Uri = RandomUrl.GetRandomImageUrl(),
+                Order = 0
+            };
+            const decimal year = -2015;
+            _newExhibit = new Exhibit
+            {
+                Title = RandomString.GetRandomString(1, 200),
+                ContentItems = new Collection<ContentItem> { contentItemPdf },
+
+                Month = "December",
+                Day = "31",
+                Year = ExhibitHelper.GetCoordinateFromYmd(year, 12, 31),
+                Timeline_ID = new Guid("bdc1ceff-76f8-4df4-ba72-96b353991314")
+            };
+            ApiHelper.CreateExhibitByApi(_newExhibit);
+            HomePageHelper.OpenSandboxPage();
+            ExhibitHelper.NavigateToExhibit(_newExhibit);
+            string displayDate = ExhibitHelper.GetExhibitDisplayDate(_newExhibit);
+            StringAssert.Contains(displayDate, "BCE");
+            StringAssert.Contains(displayDate, year.ToString(CultureInfo.InvariantCulture));
+            StringAssert.Contains(displayDate, _newExhibit.Day);
+            if (GitHubIssueWatcher.IssueStatus.IsIssueResolved("1024"))
+            {
+                StringAssert.Contains(displayDate, DateTime.ParseExact(_newExhibit.Month, "MMMM", CultureInfo.CurrentCulture).Month.ToString(CultureInfo.InvariantCulture));
+            }
         }
     }
 }
