@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Application.Helper.Entities;
+using GitHubIssueWatcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.ObjectModel;
 using RandomDataGenerator;
@@ -29,8 +30,19 @@ namespace Tests
             Caption = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
             MediaSource = RandomUrl.GetRandomWebUrl(),
             MediaType = "Image",
-            Attribution = RandomString.GetRandomString(1,200),
+            Attribution = RandomString.GetRandomString(1, 200),
             Uri = RandomUrl.GetRandomImageUrl()
+
+        };
+
+        readonly static ContentItem ContentItemPdf = new ContentItem
+        {
+            Title = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
+            Caption = RandomString.GetRandomString(1, 200, isUsingSpecChars: true),
+            MediaSource = RandomUrl.GetRandomWebUrl(),
+            MediaType = "PDF",
+            Attribution = RandomString.GetRandomString(1, 200),
+            Uri = RandomUrl.GetRandomPdfUrl()
 
         };
 
@@ -41,7 +53,7 @@ namespace Tests
             Year = RandomDate.GetRandomDate().Year,
             Month = RandomDate.GetRandomDate().MonthName,
             TimeMode = "Date",
-            ContentItems = new Collection<Chronozoom.Entities.ContentItem> { ContentItemVideo, ContentItemImage }
+            ContentItems = new Collection<Chronozoom.Entities.ContentItem> { ContentItemVideo, ContentItemImage, ContentItemPdf }
         };
 
         private static Exhibit _newExhibit;
@@ -104,20 +116,45 @@ namespace Tests
         }
 
         [TestMethod]
-        [Ignore]
         //https://github.com/alterm4nn/ChronoZoom/issues/744
         public void random_new_exhibit_should_have_a_year()
         {
-            Assert.AreEqual(Exhibit.Year, _newExhibit.Year, "Years are not equal");
+            if (IssueStatus.IsIssueResolved("744"))
+            {
+                Assert.AreEqual(Exhibit.Year, _newExhibit.Year, "Years are not equal");
+            }
+            else
+            {
+                Assert.AreEqual(Exhibit.Year - 1, _newExhibit.Year, "Years are not equal");
+            }
+
         }
 
         [TestMethod]
+        [TestCategory("Random")]
+        public void random_new_exhibit_should_have_a_day()
+        {
+            Assert.AreEqual(Exhibit.Day, _newExhibit.Day, "Days are not equal");
+        }   
+        
+        [TestMethod]
+        [TestCategory("Random")]
+        public void random_new_exhibit_should_have_a_month()
+        {
+            Assert.AreEqual(Exhibit.Month, _newExhibit.Month, "Months are not equal");
+        }
+
+        [TestMethod]
+        [TestCategory("Random")]
         public void random_new_exhibit_should_have_a_correct_url()
         {
             for (int i = 0; i < Exhibit.ContentItems.Count; i++)
             {
-                Assert.AreEqual(ExhibitHelper.GetExpectedYouTubeUri(Exhibit.ContentItems[i].Uri), _newExhibit.ContentItems[i].Uri,
-                                "Content items Urls are not equal");
+                Assert.AreEqual(
+                    Exhibit.ContentItems[i].MediaType == "Video"
+                        ? ExhibitHelper.GetExpectedYouTubeUri(Exhibit.ContentItems[i].Uri)
+                        : Exhibit.ContentItems[i].Uri, _newExhibit.ContentItems[i].Uri,
+                    "Content items Urls are not equal");
             }
         }
 

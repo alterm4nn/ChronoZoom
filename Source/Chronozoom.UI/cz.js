@@ -2391,7 +2391,7 @@ var CZ;
                             if(date_number == Math.floor(date_number)) {
                                 title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
                             } else {
-                                title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + exhibitYMD.month + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
+                                title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + (exhibitYMD.month + 1) + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
                             }
                         } else {
                             title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
@@ -11413,7 +11413,6 @@ var CZ;
                     this.saveButton.text("create exhibit");
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-                    console.log("this.datePicker.");
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -13000,7 +12999,21 @@ var CZ;
                             CZ.Authoring.showSessionForm();
                         }, (CZ.Settings.sessionTime - 60) * 1000);
                     }
+                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
                 }).fail(function (error) {
+                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                }).always(function () {
+                    if(!CZ.Authoring.isEnabled) {
+                        $(".edit-icon").hide();
+                    }
+                    CZ.Common.loadData().then(function (response) {
+                        if(!response) {
+                            canvasIsEmpty = true;
+                            if(CZ.Authoring.showCreateTimelineForm) {
+                                CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                            }
+                        }
+                    });
                 });
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
@@ -13060,16 +13073,10 @@ var CZ;
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
-                        CZ.Authoring.isEnabled = UserCanEditCollection(data);
                         InitializeToursUI(data, forms);
                     }).fail(function (error) {
                         $("#login-panel").show();
-                        CZ.Authoring.isEnabled = UserCanEditCollection(null);
                         InitializeToursUI(null, forms);
-                    }).always(function () {
-                        if(!CZ.Authoring.isEnabled) {
-                            $(".edit-icon").hide();
-                        }
                     });
                 }
                 $("#login-panel").click(function (event) {
@@ -13122,14 +13129,6 @@ var CZ;
             if(window.location.hash) {
                 CZ.Common.startHash = window.location.hash;
             }
-            CZ.Common.loadData().then(function (response) {
-                if(!response) {
-                    canvasIsEmpty = true;
-                    if(CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
-                }
-            });
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
