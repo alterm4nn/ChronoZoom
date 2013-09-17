@@ -233,7 +233,7 @@
         export var mediapickerVideoThumbnailMaxHeight = 130; // the max allowed height of thumbnail
 
         // WL API constants
-        export var WLAPIClientID = "00000000401057E7";
-        export var WLAPIRedirectUrl = "http://chronozoom.com/";
+        export var WLAPIClientID = "00000000440FD1D7";
+        export var WLAPIRedirectUrl = "http://www.chronozoom.com/";
     }
 }
