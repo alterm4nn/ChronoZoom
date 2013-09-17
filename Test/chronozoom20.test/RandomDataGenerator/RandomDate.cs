@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace RandomDataGenerator
 {
@@ -12,7 +13,7 @@ namespace RandomDataGenerator
             DateTime d = start.AddDays(gen.Next(range));
             long year = LongRandom(minYear, DateTime.Today.Year, gen);
             int day = year > 0 ? DateTime.DaysInMonth((int) year, d.Month) : gen.Next(1, 28);
-            var month = d.ToString("MMMM");
+            var month = d.ToString("MMMM", CultureInfo.InvariantCulture);
             return new CustomDate {Day = day, Year = year, MonthName = month};
         }
 
