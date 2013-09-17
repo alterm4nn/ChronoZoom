@@ -234,6 +234,6 @@
 
         // WL API constants
         export var WLAPIClientID = "0000000040101FFA";
-        export var WLAPIRedirectUrl = "http://test.chronozoom.com/";
+        export var WLAPIRedirectUrl = "http://chronozoom.com/";
     }
 }
