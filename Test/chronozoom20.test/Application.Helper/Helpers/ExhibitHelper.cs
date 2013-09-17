@@ -102,7 +102,7 @@ namespace Application.Helper.Helpers
             int monthNumber = int.Parse(
                         GetJavaScriptExecutionResult(_getYmdFromCoordinateScript + ".month")) + 1;
             Logger.Log("- month number" + monthNumber, LogType.MessageWithoutScreenshot);
-            return monthNumber == 0 ? "" : CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthNumber);
+            return monthNumber == 0 ? "" : CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(monthNumber);
         }
 
         private decimal GetNewExhibitYear()
