@@ -100,7 +100,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("->", LogType.MessageWithoutScreenshot);
             int monthNumber = int.Parse(
-                        GetJavaScriptExecutionResult(_getYmdFromCoordinateScript + ".month"));
+                        GetJavaScriptExecutionResult(_getYmdFromCoordinateScript + ".month")) + 1;
             Logger.Log("- month number" + monthNumber, LogType.MessageWithoutScreenshot);
             return monthNumber == 0 ? "" : CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthNumber);
         }
@@ -392,7 +392,7 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void FillArtifact(ContentItem contentItem)
+        private void FillArtifact(Chronozoom.Entities.ContentItem contentItem)
         {
             Logger.Log("<- contentItem: " + contentItem);
             if (contentItem.Title != null) SetTitle(contentItem.Title);
@@ -435,7 +435,7 @@ namespace Application.Helper.Helpers
         private void AddArtifacts(IEnumerable<Chronozoom.Entities.ContentItem> contentItems)
         {
             Logger.Log("->");
-            foreach (ContentItem contentItem in contentItems)
+            foreach (Chronozoom.Entities.ContentItem contentItem in contentItems)
             {
                 Logger.Log("-- " + contentItem);
                 InitArtifactForm();
