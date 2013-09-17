@@ -56,10 +56,14 @@
     <Content Include="css\media.css">
       <DependentUpon>media.less</DependentUpon>
     </Content>
+    <Content Include="css\start-page.css">
+      <DependentUpon>start-page.less</DependentUpon>
+    </Content>
     <Content Include="dumps\extensions\rin-sample.js" />
     <Content Include="dumps\sample.csv" />
     <Content Include="dumps\extensions-get.json" />
     <Content Include="css\media.less" />
+    <Content Include="css\start-page.less" />
     <Content Include="css\_mixins.less" />
     <Content Include="css\_colors.less" />
     <Content Include="css\_vars.less" />
@@ -274,7 +278,39 @@
     <Content Include="images\credits\msu.png" />
     <Content Include="images\credits\ucb.png" />
     <Content Include="images\credits\uw.png" />
+    <Content Include="images\dummy\icon_create.png" />
+    <Content Include="images\dummy\icon_down_arrow.png" />
+    <Content Include="images\dummy\icon_help.png" />
+    <Content Include="images\dummy\icon_home.png" />
+    <Content Include="images\dummy\icon_right_arrow.png" />
+    <Content Include="images\dummy\icon_timeseries.png" />
+    <Content Include="images\dummy\icon_twitter.png" />
+    <Content Include="images\dummy\icon_user.png" />
+    <Content Include="images\dummy\list-expander2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="images\dummy\tile_akhttomb.jpg" />
+    <Content Include="images\dummy\tile_bighistory.jpg" />
+    <Content Include="images\dummy\tile_cern.jpg" />
+    <Content Include="images\dummy\tile_colosseum.jpg" />
+    <Content Include="images\dummy\tile_earthscience.jpg" />
+    <Content Include="images\dummy\tile_gradient.png" />
+    <Content Include="images\dummy\tile_justin_morrill.jpg" />
+    <Content Include="images\dummy\tile_kingtut.jpg" />
+    <Content Include="images\dummy\tile_lucy.jpg" />
+    <Content Include="images\dummy\tile_mayan.jpg" />
+    <Content Include="images\dummy\tile_napoleon.jpg" />
+    <Content Include="images\dummy\tile_plateosaurus.jpg" />
+    <Content Include="images\dummy\tile_pyramid.jpg" />
+    <Content Include="images\dummy\tile_starforming.jpg" />
+    <Content Include="images\dummy\tile_turtle.jpg" />
+    <Content Include="images\dummy\tile_twitterbg.png" />
+    <Content Include="images\dummy\tile_wanapitei.jpg" />
+    <Content Include="images\dummy\tile_ww1.jpg" />
+    <Content Include="images\dummy\twitter_profile_pic.gif" />
+    <Content Include="images\dummy\video_intro.gif" />
     <Content Include="images\edit-icon.png" />
+    <Content Include="images\home-icon.png" />
     <Content Include="images\media\bing-import-50x150.png" />
     <Content Include="images\media\bing-import-50x50.png" />
     <Content Include="images\media\SkyDrive-Import-50X150.png" />
@@ -592,6 +628,11 @@
     </Content>
     <Content Include="css\Site.css" />
     <Content Include="ui\message-window.html" />
+    <TypeScriptCompile Include="ui\start-page.ts" />
+    <Content Include="ui\start-page.html" />
+    <Content Include="ui\start-page.js">
+      <DependentUpon>start-page.ts</DependentUpon>
+    </Content>
     <Content Include="ui\timeseries-data-form.html" />
     <TypeScriptCompile Include="ui\timeseries-data-form.ts" />
     <Content Include="ui\timeseries-data-form.js">

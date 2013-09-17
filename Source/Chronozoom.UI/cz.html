@@ -111,6 +111,7 @@
                 AddScript("/ui/message-window.js");
                 AddScript("/ui/header-session-expired-form.js");
                 AddScript("/ui/mediapicker-form.js");
+                AddScript("/ui/start-page.js");
 
                 AddScript("/scripts/cz.js");
             }
@@ -170,12 +171,17 @@
                 <li class="fright">
                     <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
                 </li>
+  
                 <li class="fright">
                     <div class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
                 </li>
                 <li class="fright">
                     <div id="tours_index" class="header-icon tour-icon" title="Take a Guided Tour" data-enabled="true"></div>
                 </li>
+                <li class="fright">
+                    <div id="home_button" class="header-icon home-icon" title="View Home Screen" data-enabled="true"></div>
+                </li>
+
             </ul>
         </div>
     </header>
@@ -243,6 +249,9 @@
         <div id="message-window" class="cz-form cz-form-left cz-major-form cz-message-window unselectable"></div>
         <div id="header-session-expired-form" class="cz-form cz-form-left cz-session-expired"></div>
         <div id="mediapicker-form" class="cz-form cz-form-left unselectable"></div>
+        <!-- Start Page -->
+        <div id="start-page" class="start-page-screen"></div>
+
     </div>
 
     <script src="https://cz-nodelete-chronozoom-test.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2ftest.chronozoomproject.org%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>

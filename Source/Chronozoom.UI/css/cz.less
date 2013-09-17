@@ -4,6 +4,7 @@
 @import "timescale";
 @import "datepicker";
 @import "media";
+@import "start-page";
 
 @headerHeight: 36px; /* The height of the page header */
 @headerLogoWidth: 170px; /* The width of the logo area */
@@ -222,17 +223,26 @@ a
     line-height: @headerHeight;
     background-repeat: no-repeat;
     background-position: center;
+
+    &.active {
+        background-color: #0464a2;
+    }
+
+    &[data-enabled~="true"] {
+        &:hover {
+            background-color: #0464a2;
+        }
+    }
+
+    &[disabled="disabled"] {
+        opacity: 0.5;
+
+        &.active,
+        &:hover {
+            background-color: transparent;
+        }
+    }
 }
-
-    .header-icon[data-enabled~="true"]:hover
-    {
-        background-color: #0464a2;
-    }
-
-    .header-icon.active
-    {
-        background-color: #0464a2;
-    }
 
 .tour-icon
 {
@@ -258,6 +268,16 @@ a
 .edit-icon
 {
     background-image: url('../images/edit-icon.png');
+}
+
+.home-icon
+{
+    background-image: url('../images/home-icon.png');
+}
+
+.toggle-list-button
+{
+    background-image: url('../images/dummy/list-expander2.png');
 }
 
 .profile-icon

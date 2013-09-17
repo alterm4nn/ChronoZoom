@@ -96,7 +96,7 @@ module CZ {
         export function goToSearchResult(resultId, elementType?) {
             var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
             var navStringElement = CZ.UrlNav.vcelementToNavString(element);
-
+            CZ.StartPage.hide();
             var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
             CZ.Common.controller.moveToVisible(visible)
         }

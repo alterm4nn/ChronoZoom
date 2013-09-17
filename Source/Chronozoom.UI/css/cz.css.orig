@@ -9,6 +9,10 @@
   width: auto;
   height: auto;
   color: #dd4b39;
+<<<<<<< HEAD
+=======
+  background-color: #ffdccc;
+>>>>>>> 58ca446... Homepage base
 }
 .input-error-message {
   -webkit-box-sizing: border-box;
@@ -18,10 +22,19 @@
   width: auto;
   height: auto;
   color: #dd4b39;
+<<<<<<< HEAD
   margin-top: 10px;
   min-height: 29px;
   font-size: 1em;
   line-height: 2em;
+=======
+  background-color: #ffdccc;
+  margin-top: 10px;
+  padding: 8px 10px;
+  min-height: 29px;
+  font-size: 0.75em;
+  line-height: 1em;
+>>>>>>> 58ca446... Homepage base
 }
 input.error {
   border: 1px solid #ff4800;
@@ -34,10 +47,18 @@ input.error {
   width: auto;
   height: auto;
   color: #dd4b39;
+<<<<<<< HEAD
   margin-top: 10px;
   padding: 8px 10px;
   min-height: 29px;
   font-size: 1em;
+=======
+  background-color: #ffdccc;
+  margin-top: 10px;
+  padding: 5px 10px;
+  min-height: 29px;
+  font-size: 0.75em;
+>>>>>>> 58ca446... Homepage base
   line-height: 1em;
 }
 /* Common */
