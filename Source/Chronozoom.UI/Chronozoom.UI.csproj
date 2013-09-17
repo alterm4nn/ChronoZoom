@@ -60,6 +60,9 @@
     <Content Include="dumps\sample.csv" />
     <Content Include="dumps\extensions-get.json" />
     <Content Include="css\media.less" />
+    <Content Include="css\_mixins.less" />
+    <Content Include="css\_colors.less" />
+    <Content Include="css\_vars.less" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -327,6 +330,10 @@
       <DependentUpon>media.ts</DependentUpon>
     </Content>
     <Content Include="scripts\media.ts" />
+    <TypeScriptCompile Include="scripts\plugins\error-plugin.ts" />
+    <Content Include="scripts\plugins\error-plugin.js">
+      <DependentUpon>error-plugin.ts</DependentUpon>
+    </Content>
     <Content Include="ui\auth-edit-tour-form.html" />
     <Content Include="ui\auth-edit-tour-form.js">
       <DependentUpon>auth-edit-tour-form.ts</DependentUpon>

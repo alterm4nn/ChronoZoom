@@ -1,3 +1,6 @@
+@import "_colors";
+@import "_mixins";
+
 @import "timescale";
 @import "datepicker";
 @import "media";
@@ -12,6 +15,7 @@
 
 @footerHeight: 25px; /* The height of the page footer */
 @footerLinksWidth: 350px; /* The width of the footers links area */
+
 
 html, body
 {
@@ -1200,6 +1204,16 @@ img.fallbackBackground
     padding: 15px;
     background-color: #fff;
     text-align: justify;
+}
+
+.cz-input-wrapper {
+    input.error {
+        border: @border-error;
+    }
+
+    div.error {
+        .input-error-message;
+    }
 }
 
 .cz-input
