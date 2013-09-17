@@ -4,7 +4,7 @@
 @import "_vars";
 
 @inputHeight: 29px; /* Height of input element */
-@errorFontSize: 0.75em; /* Font-size of error message */
+@errorFontSize: 1em; /* Font-size of error message */
 
 /* Error messages */
 
@@ -15,17 +15,15 @@
     width: auto;
     height: auto;
     color: @error-light-red;
-    background-color: @error-background;
 }
 
 .input-error-message {
     .error-message;
     
     margin-top: 10px;
-    padding: 8px 10px;
     min-height: @inputHeight;
     font-size: @errorFontSize;
-    line-height: 1em;
+    line-height: 2em;
 }
 
 input.error {
@@ -36,7 +34,7 @@ input.error {
     .error-message;
 
     margin-top: 10px;
-    padding: 5px 10px;
+    padding: 8px 10px;
     min-height: @inputHeight;
     font-size: @errorFontSize;
     line-height: 1em;

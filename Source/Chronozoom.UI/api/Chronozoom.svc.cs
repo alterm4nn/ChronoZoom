@@ -77,6 +77,7 @@ namespace Chronozoom.UI
     public class PutExhibitResult
     {
         private List<Guid> _contentItemId;
+        public string errorMessage;
 
         public Guid ExhibitId { get; set; }
         public IEnumerable<Guid> ContentItemId
@@ -90,6 +91,7 @@ namespace Chronozoom.UI
         internal PutExhibitResult()
         {
             _contentItemId = new List<Guid>();
+            errorMessage = "";
         }
 
         internal void Add(Guid id)
@@ -1003,8 +1005,11 @@ namespace Chronozoom.UI
 
                 foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
                 {
-                    if (!ValidateContentItemUrl(contentItemRequest))
+                    if (!ValidateContentItemUrl(contentItemRequest, out returnValue.errorMessage))
+                    {
+                        returnValue.errorMessage += " in '" + contentItemRequest.Title + "' artifact.";
                         return returnValue;
+                    }
                 }
 
                 if (exhibitRequest.Id == Guid.Empty)
@@ -1148,9 +1153,10 @@ namespace Chronozoom.UI
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1304:SpecifyCultureInfo", MessageId = "System.String.ToLower")]
-        private static Boolean ValidateContentItemUrl(ContentItem contentitem)
+        private static Boolean ValidateContentItemUrl(ContentItem contentitem, out string error)
         {
             string contentitemURI = contentitem.Uri;
+            error = "";
 
             // Custom validation for Skydrive images
             if (contentitem.MediaType == "skydrive-image")
@@ -1162,6 +1168,8 @@ namespace Chronozoom.UI
                 if (splited.Length != 3)
                 {
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                    error = ErrorDescription.InvalidContentItemUrl;
+
                     return false;
                 }
 
@@ -1172,6 +1180,8 @@ namespace Chronozoom.UI
                 if (!Int32.TryParse(splited[1], out value) || !Int32.TryParse(splited[2], out value))
                 {
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                    error = ErrorDescription.InvalidContentItemUrl;
+
                     return false;
                 }
             }
@@ -1183,6 +1193,8 @@ namespace Chronozoom.UI
             if (contentitem.MediaSource.Length > 0 && !(Uri.TryCreate(contentitem.MediaSource, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
             {
                 SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMediaSourceUrl);
+                error = ErrorDescription.InvalidMediaSourceUrl;
+
                 return false;
             }
 
@@ -1190,6 +1202,8 @@ namespace Chronozoom.UI
             if (!(Uri.TryCreate(contentitemURI, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
             {
                 SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                error = ErrorDescription.InvalidContentItemUrl;
+
                 return false;
             }
 
@@ -1269,7 +1283,10 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Content Item");
 
-                if (!ValidateContentItemUrl(contentItemRequest))
+                // junk out variable for ValidateContentItemUrl method
+                string junk;
+
+                if (!ValidateContentItemUrl(contentItemRequest, out junk))
                     return Guid.Empty;
 
                 Guid returnValue;

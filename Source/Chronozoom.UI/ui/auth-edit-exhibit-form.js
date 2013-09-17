@@ -9,6 +9,7 @@ var CZ;
         var FormEditExhibit = (function (_super) {
             __extends(FormEditExhibit, _super);
             function FormEditExhibit(container, formInfo) {
+                var _this = this;
                         _super.call(this, container, formInfo);
                 this.titleTextblock = container.find(formInfo.titleTextblock);
                 this.titleInput = container.find(formInfo.titleInput);
@@ -18,6 +19,9 @@ var CZ;
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
+                this.titleInput.focus(function () {
+                    _this.titleInput.hideError();
+                });
                 this.contentItemsTemplate = formInfo.contentItemsTemplate;
                 this.exhibit = formInfo.context;
                 this.exhibitCopy = $.extend({
@@ -158,6 +162,12 @@ var CZ;
                     contentItems: this.exhibit.contentItems || [],
                     type: "infodot"
                 };
+                if(!CZ.Authoring.isNotEmpty(this.titleInput.val())) {
+                    this.titleInput.showError("Title can't be empty");
+                }
+                if(CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true)) {
+                    this.errorMessage.text("Exhibit intersects other elemenets");
+                }
                 if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
                     this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
@@ -167,7 +177,13 @@ var CZ;
                         _this.exhibit.id = arguments[0].id;
                         _this.exhibit.onmouseclick();
                     }, function (error) {
-                        alert("Unable to save changes. Please try again later.");
+                        var errorMessage = JSON.parse(error.responseText).errorMessage;
+                        if(errorMessage !== "") {
+                            _this.errorMessage.text(errorMessage);
+                        } else {
+                            _this.errorMessage.text("Sorry, internal server error :(");
+                        }
+                        _this.errorMessage.show().delay(7000).fadeOut();
                     }).always(function () {
                         _this.saveButton.prop('disabled', false);
                     });
@@ -178,7 +194,7 @@ var CZ;
                         return self.errorMessage.text(origMsg);
                     });
                 } else {
-                    this.errorMessage.show().delay(7000).fadeOut();
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
             };
             FormEditExhibit.prototype.onDelete = function () {
@@ -280,6 +296,7 @@ var CZ;
                     complete: function () {
                         _this.datePicker.remove();
                         _this.contentItemsListBox.clear();
+                        _this.titleInput.hideError();
                     }
                 });
                 if(this.isCancel) {

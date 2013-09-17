@@ -386,7 +386,7 @@ var CZ;
                     deferred.resolve(newExhibit);
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
-                    deferred.reject();
+                    deferred.reject(error);
                 });
             } else {
                 deferred.reject();
@@ -430,7 +430,7 @@ var CZ;
                     deferred.resolve();
                 }, function (error) {
                     console.log("Error connecting to service: update content item.\n" + error.responseText);
-                    deferred.reject();
+                    deferred.reject(error);
                 });
             } else {
                 deferred.reject();
@@ -468,7 +468,7 @@ var CZ;
         function validateExhibitData(date, title, contentItems) {
             var isValid = date !== false;
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
-            isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
+            isValid = isValid && CZ.Authoring.validateContentItems(contentItems, null);
             return isValid;
         }
         Authoring.validateExhibitData = validateExhibitData;
@@ -484,7 +484,7 @@ var CZ;
             return (parseFloat(start) + 1 / 366 <= parseFloat(end));
         }
         Authoring.isIntervalPositive = isIntervalPositive;
-        function validateContentItems(contentItems) {
+        function validateContentItems(contentItems, mediaInput) {
             var isValid = true;
             if(contentItems.length == 0) {
                 return false;
@@ -499,7 +499,9 @@ var CZ;
                     var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
                         if(mime != "image/jpg" && mime != "image/jpeg" && mime != "image/gif" && mime != "image/png") {
-                            alert("Sorry, only JPG/PNG/GIF images are supported.");
+                            if(mediaInput) {
+                                mediaInput.showError("Sorry, only JPG/PNG/GIF images are supported.");
+                            }
                             isValid = false;
                         }
                     }
@@ -515,14 +517,18 @@ var CZ;
                         ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
                     } else if(vimeoEmbed.test(ci.uri)) {
                     } else {
-                        alert("Sorry, only YouTube or Vimeo videos are supported.");
+                        if(mediaInput) {
+                            mediaInput.showError("Sorry, only YouTube or Vimeo videos are supported.");
+                        }
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$|\.(pdf)\?/i;
                     if(!pdf.test(ci.uri)) {
                         if(mime != "application/pdf") {
-                            alert("Sorry, only PDF extension is supported.");
+                            if(mediaInput) {
+                                mediaInput.showError("Sorry, only PDF extension is supported.");
+                            }
                             isValid = false;
                         }
                     }
@@ -538,7 +544,9 @@ var CZ;
                     var width = /[0-9]/;
                     var height = /[0-9]/;
                     if(!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
-                        alert("This is not a Skydrive embed link.");
+                        if(mediaInput) {
+                            mediaInput.showError("This is not a Skydrive embed link.");
+                        }
                         isValid = false;
                     }
                 }

@@ -238,6 +238,6 @@ module CZ {
         export var WLAPIClientID = "0000000040101FFA";
         export var WLAPIRedirectUrl = "http://test.chronozoom.com/";
 
-        export var errorMessageSlideDuration = 200; // slide animation duration of input error messages
+        export var errorMessageSlideDuration = 0; // slide animation duration of input error messages
     }
 }

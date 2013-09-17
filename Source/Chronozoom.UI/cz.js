@@ -231,7 +231,7 @@
         Settings.mediapickerVideoThumbnailMaxHeight = 130;
         Settings.WLAPIClientID = "0000000040101FFA";
         Settings.WLAPIRedirectUrl = "http://test.chronozoom.com/";
-        Settings.errorMessageSlideDuration = 200;
+        Settings.errorMessageSlideDuration = 0;
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
@@ -4549,7 +4549,7 @@ var CZ;
                     deferred.resolve(newExhibit);
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
-                    deferred.reject();
+                    deferred.reject(error);
                 });
             } else {
                 deferred.reject();
@@ -4593,7 +4593,7 @@ var CZ;
                     deferred.resolve();
                 }, function (error) {
                     console.log("Error connecting to service: update content item.\n" + error.responseText);
-                    deferred.reject();
+                    deferred.reject(error);
                 });
             } else {
                 deferred.reject();
@@ -4631,7 +4631,7 @@ var CZ;
         function validateExhibitData(date, title, contentItems) {
             var isValid = date !== false;
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
-            isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
+            isValid = isValid && CZ.Authoring.validateContentItems(contentItems, null);
             return isValid;
         }
         Authoring.validateExhibitData = validateExhibitData;
@@ -4647,7 +4647,7 @@ var CZ;
             return (parseFloat(start) + 1 / 366 <= parseFloat(end));
         }
         Authoring.isIntervalPositive = isIntervalPositive;
-        function validateContentItems(contentItems) {
+        function validateContentItems(contentItems, mediaInput) {
             var isValid = true;
             if(contentItems.length == 0) {
                 return false;
@@ -4662,7 +4662,9 @@ var CZ;
                     var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
                         if(mime != "image/jpg" && mime != "image/jpeg" && mime != "image/gif" && mime != "image/png") {
-                            alert("Sorry, only JPG/PNG/GIF images are supported.");
+                            if(mediaInput) {
+                                mediaInput.showError("Sorry, only JPG/PNG/GIF images are supported.");
+                            }
                             isValid = false;
                         }
                     }
@@ -4678,14 +4680,18 @@ var CZ;
                         ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
                     } else if(vimeoEmbed.test(ci.uri)) {
                     } else {
-                        alert("Sorry, only YouTube or Vimeo videos are supported.");
+                        if(mediaInput) {
+                            mediaInput.showError("Sorry, only YouTube or Vimeo videos are supported.");
+                        }
                         isValid = false;
                     }
                 } else if(ci.mediaType.toLowerCase() === "pdf") {
                     var pdf = /\.(pdf)$|\.(pdf)\?/i;
                     if(!pdf.test(ci.uri)) {
                         if(mime != "application/pdf") {
-                            alert("Sorry, only PDF extension is supported.");
+                            if(mediaInput) {
+                                mediaInput.showError("Sorry, only PDF extension is supported.");
+                            }
                             isValid = false;
                         }
                     }
@@ -4701,7 +4707,9 @@ var CZ;
                     var width = /[0-9]/;
                     var height = /[0-9]/;
                     if(!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
-                        alert("This is not a Skydrive embed link.");
+                        if(mediaInput) {
+                            mediaInput.showError("This is not a Skydrive embed link.");
+                        }
                         isValid = false;
                     }
                 }
@@ -11272,6 +11280,7 @@ var CZ;
         var FormEditTimeline = (function (_super) {
             __extends(FormEditTimeline, _super);
             function FormEditTimeline(container, formInfo) {
+                var _this = this;
                         _super.call(this, container, formInfo);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
@@ -11282,6 +11291,9 @@ var CZ;
                 this.timeline = formInfo.context;
                 this.saveButton.off();
                 this.deleteButton.off();
+                this.titleInput.focus(function () {
+                    _this.titleInput.hideError();
+                });
                 this.initialize();
             }
             FormEditTimeline.prototype.initialize = function () {
@@ -11314,14 +11326,13 @@ var CZ;
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
                 this.saveButton.click(function (event) {
-                    _this.startDate.setDate("d");
-                    var result = _this.startDate.getDate();
                     _this.errorMessage.empty();
                     var isDataValid = false;
                     isDataValid = CZ.Authoring.validateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
                     if(!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
-                        _this.errorMessage.text('Title is empty');
-                    } else if(!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
+                        _this.titleInput.showError("Title can't be empty");
+                    }
+                    if(!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
                         _this.errorMessage.text('Time interval should no less than one day');
                     }
                     if(!isDataValid) {
@@ -11340,9 +11351,9 @@ var CZ;
                             self.timeline.onmouseclick();
                         }, function (error) {
                             if(error !== undefined && error !== null) {
-                                self.errorMessage.text(error);
+                                self.errorMessage.text(error).show().delay(7000).fadeOut();
                             } else {
-                                alert("Unable to save changes. Please try again later.");
+                                self.errorMessage.text("Sorry, internal server error :(").show().delay(7000).fadeOut();
                             }
                             console.log(error);
                         }).always(function () {
@@ -11376,6 +11387,7 @@ var CZ;
                     complete: function () {
                         _this.endDate.remove();
                         _this.startDate.remove();
+                        _this.titleInput.hideError();
                     }
                 });
                 if(this.isCancel && CZ.Authoring.mode === "createTimeline") {
@@ -11480,6 +11492,7 @@ var CZ;
         var FormEditExhibit = (function (_super) {
             __extends(FormEditExhibit, _super);
             function FormEditExhibit(container, formInfo) {
+                var _this = this;
                         _super.call(this, container, formInfo);
                 this.titleTextblock = container.find(formInfo.titleTextblock);
                 this.titleInput = container.find(formInfo.titleInput);
@@ -11489,6 +11502,9 @@ var CZ;
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
+                this.titleInput.focus(function () {
+                    _this.titleInput.hideError();
+                });
                 this.contentItemsTemplate = formInfo.contentItemsTemplate;
                 this.exhibit = formInfo.context;
                 this.exhibitCopy = $.extend({
@@ -11629,6 +11645,12 @@ var CZ;
                     contentItems: this.exhibit.contentItems || [],
                     type: "infodot"
                 };
+                if(!CZ.Authoring.isNotEmpty(this.titleInput.val())) {
+                    this.titleInput.showError("Title can't be empty");
+                }
+                if(CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true)) {
+                    this.errorMessage.text("Exhibit intersects other elemenets");
+                }
                 if(CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
                     this.saveButton.prop('disabled', true);
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
@@ -11638,7 +11660,13 @@ var CZ;
                         _this.exhibit.id = arguments[0].id;
                         _this.exhibit.onmouseclick();
                     }, function (error) {
-                        alert("Unable to save changes. Please try again later.");
+                        var errorMessage = JSON.parse(error.responseText).errorMessage;
+                        if(errorMessage !== "") {
+                            _this.errorMessage.text(errorMessage);
+                        } else {
+                            _this.errorMessage.text("Sorry, internal server error :(");
+                        }
+                        _this.errorMessage.show().delay(7000).fadeOut();
                     }).always(function () {
                         _this.saveButton.prop('disabled', false);
                     });
@@ -11649,7 +11677,7 @@ var CZ;
                         return self.errorMessage.text(origMsg);
                     });
                 } else {
-                    this.errorMessage.show().delay(7000).fadeOut();
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
             };
             FormEditExhibit.prototype.onDelete = function () {
@@ -11751,6 +11779,7 @@ var CZ;
                     complete: function () {
                         _this.datePicker.remove();
                         _this.contentItemsListBox.clear();
+                        _this.titleInput.hideError();
                     }
                 });
                 if(this.isCancel) {
@@ -11779,6 +11808,7 @@ var CZ;
         var FormEditCI = (function (_super) {
             __extends(FormEditCI, _super);
             function FormEditCI(container, formInfo) {
+                var _this = this;
                         _super.call(this, container, formInfo);
                 this.titleTextblock = container.find(formInfo.titleTextblock);
                 this.titleInput = container.find(formInfo.titleInput);
@@ -11790,6 +11820,15 @@ var CZ;
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
+                this.titleInput.focus(function () {
+                    _this.titleInput.hideError();
+                });
+                this.mediaInput.focus(function () {
+                    _this.mediaInput.hideError();
+                });
+                this.mediaSourceInput.focus(function () {
+                    _this.mediaSourceInput.hideError();
+                });
                 this.prevForm = formInfo.prevForm;
                 this.exhibit = formInfo.context.exhibit;
                 this.contentItem = formInfo.context.contentItem;
@@ -11882,9 +11921,15 @@ var CZ;
                     description: this.descriptionInput.val() || "",
                     order: this.contentItem.order
                 };
+                if(!CZ.Authoring.isNotEmpty(newContentItem.title)) {
+                    this.titleInput.showError("Title can't be empty");
+                }
+                if(!CZ.Authoring.isNotEmpty(newContentItem.uri)) {
+                    this.mediaInput.showError("URL can't be empty");
+                }
                 if(CZ.Authoring.validateContentItems([
                     newContentItem
-                ])) {
+                ], this.mediaInput)) {
                     if(CZ.Authoring.contentItemMode === "createContentItem") {
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
@@ -11915,14 +11960,21 @@ var CZ;
                                 _this.isModified = false;
                                 _this.close();
                             }, function (error) {
-                                alert("Unable to save changes. Please try again later.");
+                                var errorMessage = error.statusText;
+                                if(errorMessage.match(/Media Source/)) {
+                                    _this.errorMessage.text("One or more fields filled wrong");
+                                    _this.mediaSourceInput.showError("Media Source URL is not a valid URL");
+                                } else {
+                                    _this.errorMessage.text("Sorry, internal server error :(");
+                                }
+                                _this.errorMessage.show().delay(7000).fadeOut();
                             }).always(function () {
                                 _this.saveButton.prop('disabled', false);
                             });
                         }
                     }
                 } else {
-                    this.errorMessage.show().delay(7000).fadeOut();
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
             };
             FormEditCI.prototype.updateMediaInfo = function () {
@@ -11958,6 +12010,9 @@ var CZ;
                     duration: 500,
                     complete: function () {
                         _this.mediaList.remove();
+                        _this.mediaInput.hideError();
+                        _this.titleInput.hideError();
+                        _this.mediaSourceInput.hideError();
                     }
                 });
                 if(this.isCancel) {
@@ -13565,3 +13620,73 @@ var CZ;
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));
+(function ($) {
+    $.fn.showError = function (msg, className, props) {
+        className = className || "error";
+        props = props || {
+        };
+        $.extend(true, props, {
+            class: className,
+            text: msg
+        });
+        var $errorTemplate = $("<div></div>", props).attr("error", true);
+        var $allErrors = $();
+        var $errorElems = $();
+        var result = this.each(function () {
+            var $this = $(this);
+            var isDiv;
+            var $div;
+            var $error;
+            if(!$this.data("error")) {
+                isDiv = $this.is("div");
+                $div = isDiv ? $this : $this.closest("div");
+                $error = $errorTemplate.clone();
+                $allErrors = $allErrors.add($error);
+                $errorElems = $errorElems.add($this);
+                $errorElems = $errorElems.add($div);
+                $errorElems = $errorElems.add($div.children());
+                $this.data("error", $error);
+                if(isDiv) {
+                    $div.append($error);
+                } else {
+                    $this.after($error);
+                }
+            }
+        });
+        if($allErrors.length > 0) {
+            $errorElems.addClass(className);
+            $allErrors.slideDown(CZ.Settings.errorMessageSlideDuration);
+        }
+        return result;
+    };
+    $.fn.hideError = function () {
+        var $allErrors = $();
+        var $errorElems = $();
+        var classes = "";
+        var result = this.each(function () {
+            var $this = $(this);
+            var $error = $this.data("error");
+            var $div;
+            var className;
+            if($error) {
+                $div = $this.is("div") ? $this : $this.closest("div");
+                className = $error.attr("class");
+                if(classes.split(" ").indexOf(className) === -1) {
+                    classes += " " + className;
+                }
+                $allErrors = $allErrors.add($error);
+                $errorElems = $errorElems.add($this);
+                $errorElems = $errorElems.add($div);
+                $errorElems = $errorElems.add($div.children());
+            }
+        });
+        if($allErrors.length > 0) {
+            $allErrors.slideUp(CZ.Settings.errorMessageSlideDuration).promise().done(function () {
+                $allErrors.remove();
+                $errorElems.removeData("error");
+                $errorElems.removeClass(classes);
+            });
+        }
+        return result;
+    };
+})(jQuery);
