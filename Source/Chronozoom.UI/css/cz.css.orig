@@ -913,9 +913,12 @@ a:visited {
 .home-icon {
   background-image: url('../images/home-icon.png');
 }
+<<<<<<< HEAD
 .toggle-list-button {
   background-image: url('../images/dummy/list-expander2.png');
 }
+=======
+>>>>>>> 4bbb34d... Add home page button.
 .profile-icon {
   background-image: url('../images/profile-icon.png');
   background-position-x: 3px;

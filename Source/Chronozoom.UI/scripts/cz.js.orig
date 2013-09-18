@@ -188,12 +188,8 @@ var CZ;
             })();
 <<<<<<< HEAD
 =======
-            CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1);
-            CZ.StartPage.cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list", 1);
-            CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
-            CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
-            CZ.StartPage.InitializeStartVideo();
->>>>>>> d61748f... design 3
+            CZ.StartPage.initialize();
+>>>>>>> 4bbb34d... Add home page button.
             $('.bubbleInfo').hide();
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;

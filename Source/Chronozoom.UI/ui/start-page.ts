@@ -356,5 +356,53 @@ module CZ {
                 show();
             }
         }
+
+        export function show() {
+            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
+            $(".home-icon").addClass("active");
+
+            // Disable buttons: save click handlers and remove them.
+            $disabledButtons.attr("disabled", "disabled")
+                .each(function (i, el) {
+                    var events = $(el).data("events");
+                    $(el).data("onclick", events && events.click && events.click[0]);
+                })
+                .off();
+
+            // Hide regimes.
+            $(".header-regimes").fadeOut();
+
+            // Show home page.
+            $("#start-page").fadeIn();
+        }
+
+        export function hide() {
+            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
+            $(".home-icon").removeClass("active");
+
+            // Enable buttons: add saved handlers.
+            $disabledButtons.removeAttr("disabled")
+                .each(function (i, el) {
+                    $(el).click($(el).data("onclick"));
+                });
+
+            // Show regimes.
+            $(".header-regimes").fadeIn();
+
+            // Hide home page.
+            $("#start-page").fadeOut();
+        }
+
+        export function initialize() {
+            $(".home-icon").toggle(show, hide);
+
+            cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
+            cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list",1); /* featured Timelines */
+
+            cloneTweetTemplate("#template-tweet .tweet-box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
+            TwitterLayout(CZ.StartPage.tileLayout, 2); 
+
+            InitializeStartVideo();
+        }
     }
 }

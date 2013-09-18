@@ -236,18 +236,10 @@ module CZ {
            
 =======
 
+            // Initialize home page.
+            CZ.StartPage.initialize();
 
-
-            CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
-            //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
-            CZ.StartPage.cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list",1); /* featured Timelines */
-
-            CZ.StartPage.cloneTweetTemplate( "#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
-            CZ.StartPage.TwitterLayout( CZ.StartPage.tileLayout, 2); 
-
-            CZ.StartPage.InitializeStartVideo();
-
->>>>>>> d61748f... design 3
+>>>>>>> 4bbb34d... Add home page button.
             $('.bubbleInfo').hide();
 
             var url = CZ.UrlNav.getURL();
