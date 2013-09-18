@@ -22,6 +22,7 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Web;
 using Chronozoom.Entities;
+using System.Data.Entity;
 
 using Chronozoom.UI.Utils;
 using System.ServiceModel.Description;
@@ -154,7 +155,7 @@ namespace Chronozoom.UI
             return new Uri(ConfigurationManager.AppSettings["ThumbnailsPath"]);
         });
 
-                // The login URL to sign in with Microsoft account
+        // The login URL to sign in with Microsoft account
         private static Lazy<Uri> _signinUrlMicrosoft = new Lazy<Uri>(() =>
         {
             if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["SignInUrlMicrosoft"]))
@@ -532,7 +533,7 @@ namespace Chronozoom.UI
             return GetUser("");
         }
 
-        
+
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
@@ -543,16 +544,16 @@ namespace Chronozoom.UI
             {
                 if (String.IsNullOrEmpty(name))
                 {
-                
-                        Trace.TraceInformation("Get User");
-                        if (user == null)
-                        {
-                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.RequestBodyEmpty);
-                            return new User();
-                        }
-                        var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
-                        if (u != null) return u;
-                        return user;
+
+                    Trace.TraceInformation("Get User");
+                    if (user == null)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.RequestBodyEmpty);
+                        return new User();
+                    }
+                    var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+                    if (u != null) return u;
+                    return user;
                 }
                 else
                 {
@@ -636,7 +637,7 @@ namespace Chronozoom.UI
                 superCollection.Collections.Add(personalCollection);
 
                 // Add root timeline Cosmos to the personal collection
-                Timeline rootTimeline = new Timeline { Id = Guid.NewGuid(), Title = "Cosmos" , Regime = "Cosmos" };
+                Timeline rootTimeline = new Timeline { Id = Guid.NewGuid(), Title = "Cosmos", Regime = "Cosmos" };
                 rootTimeline.FromYear = -13700000000;
                 rootTimeline.ToYear = 9999;
                 rootTimeline.Collection = personalCollection;
@@ -803,7 +804,7 @@ namespace Chronozoom.UI
                 Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
 
                 collection.Theme = collectionRequest.Theme;
-                
+
                 storage.SaveChanges();
                 return collection.Id;
             });
@@ -900,7 +901,7 @@ namespace Chronozoom.UI
                         newTimeline.SubtreeSize = 1;
                     }
                     storage.Timelines.Add(newTimeline);
-                        
+
                     returnValue = newTimelineGuid;
                 }
                 else
@@ -1035,7 +1036,7 @@ namespace Chronozoom.UI
                         parentTimeline.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
                     }
                     parentTimeline.Exhibits.Add(newExhibit);
-                        
+
                     storage.Exhibits.Add(newExhibit);
                     UpdateSubtreeSize(storage, parentTimeline, 1 + (newExhibit.ContentItems != null ? newExhibit.ContentItems.Count() : 0));
 
@@ -1252,7 +1253,7 @@ namespace Chronozoom.UI
                 Timeline parentTimeline = storage.GetExhibitParentTimeline(deleteExhibit.Id);
 
                 storage.Entry(deleteExhibit).Collection(_ => _.ContentItems).Load();
-                UpdateSubtreeSize(storage, parentTimeline, (deleteExhibit.ContentItems != null ? - deleteExhibit.ContentItems.Count() : 0) - 1);
+                UpdateSubtreeSize(storage, parentTimeline, (deleteExhibit.ContentItems != null ? -deleteExhibit.ContentItems.Count() : 0) - 1);
 
                 storage.DeleteExhibit(exhibitRequest.Id);
                 storage.SaveChanges();
@@ -1300,7 +1301,7 @@ namespace Chronozoom.UI
                     contentItemRequest.Id = UpdateContentItem(storage, collection.Id, contentItemRequest);
                     returnValue = contentItemRequest.Id;
                 }
-                
+
                 storage.SaveChanges();
                 _thumbnailGenerator.Value.CreateThumbnails(contentItemRequest);
 
@@ -1531,9 +1532,9 @@ namespace Chronozoom.UI
                 returnValue.Add(newBookmarkGuid);
                 sequenceId++;
             }
-            
+
         }
-        
+
         private static Guid UpdateBookmark(Storage storage, Tour updateTour, Bookmark bookmarkRequest)
         {
             Bookmark updateBookmark = storage.Bookmarks.Find(bookmarkRequest.Id);
@@ -1799,7 +1800,7 @@ namespace Chronozoom.UI
                 return value;
             });
         }
-        
+
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
@@ -2025,7 +2026,7 @@ namespace Chronozoom.UI
         private static Collection RetrieveCollection(Storage storage, Guid collectionId)
         {
             Collection collection = storage.Collections.Find(collectionId);
-            if (collection != null)   
+            if (collection != null)
                 storage.Entry(collection).Reference("User").Load();
             return collection;
         }
@@ -2069,5 +2070,129 @@ namespace Chronozoom.UI
                 return contentType;
             }
         }
+
+        #region FavoriteTimelines
+
+        public Collection<TimelineShortcut> GetUserFavorites()
+        {
+            return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
+            {
+                if (user == null)
+                {
+                    return null;
+                }
+                var triple = storage.GetTriplet(String.Format("czusr:{0}", user.Id), "czpred:favorite").FirstOrDefault();
+                if (triple == null)
+                    return null;
+
+                var elements = new Collection<TimelineShortcut>();
+                foreach (var t in triple.Objects)
+                {
+                    if (storage.GetPrefix(t.Object) == "cztimeline")
+                    {
+                        var g = new Guid(storage.GetValue(t.Object));
+                        var timeline = storage.Timelines.Where(x => x.Id == g).Include(f => f.Collection).Include(u => u.Collection.User).FirstOrDefault();
+
+                        //ToDo: get image url
+                        if (timeline != null)
+                            elements.Add(new TimelineShortcut()
+                            {
+                                Title = timeline.Title,
+                                ImageUrl = "/images/chronozoom.png",
+                                TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, storage.GetContentPath(timeline.Collection.Id, timeline.Id, null)),
+                                Author = timeline.Collection.User.DisplayName
+                            });
+                    }
+                }
+                return elements;
+            });
+        }
+
+        public bool PutUserFavorite(string favoriteGUID)
+        {
+            return ApiOperation<bool>(delegate(User user, Storage storage)
+            {
+                if (user == null)
+                {
+                    return false;
+                }
+                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
+            });
+        }
+
+        public bool DeleteUserFavorite(string favoriteGUID)
+        {
+            return ApiOperation<bool>(delegate(User user, Storage storage)
+            {
+                if (user == null)
+                {
+                    return false;
+                }
+                return storage.DeleteTriplet(String.Format("czusr:{0}", user.Id), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
+            });
+        }
+
+        #endregion
+
+        #region FeaturedTimeline
+        public Collection<TimelineShortcut> GetUserFeatured(string guid)
+        {
+            return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
+            {
+                if (String.IsNullOrEmpty(guid))
+                {
+                    return null;
+                }
+                var triple = storage.GetTriplet(String.Format("czusr:{0}", new Guid(guid)), "czpred:featured").FirstOrDefault();
+                if (triple == null)
+                    return null;
+
+                var elements = new Collection<TimelineShortcut>();
+                foreach (var t in triple.Objects)
+                {
+                    if (storage.GetPrefix(t.Object) == "cztimeline")
+                    {
+                        var g = new Guid(storage.GetValue(t.Object));
+                        var timeline = storage.Timelines.Where(x => x.Id == g).Include(f => f.Collection).Include(u => u.Collection.User).FirstOrDefault();
+
+                        //ToDo: get image url
+                        if (timeline != null)
+                            elements.Add(new TimelineShortcut()
+                            {
+                                Title = timeline.Title,
+                                ImageUrl = "/images/chronozoom.png",
+                                TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, storage.GetContentPath(timeline.Collection.Id, timeline.Id, null)),
+                                Author = timeline.Collection.User.DisplayName
+                            });
+                    }
+                }
+                return elements;
+            });
+        }
+
+        public bool PutUserFeatured(string favoriteGUID)
+        {
+            return ApiOperation<bool>(delegate(User user, Storage storage)
+            {
+                if (user == null)
+                {
+                    return false;
+                }
+                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", favoriteGUID));
+            });
+        }
+
+        public bool DeleteUserFeatured(string favoriteGUID)
+        {
+            return ApiOperation<bool>(delegate(User user, Storage storage)
+            {
+                if (user == null)
+                {
+                    return false;
+                }
+                return storage.DeleteTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", favoriteGUID));
+            });
+        }
+        #endregion
     }
 }

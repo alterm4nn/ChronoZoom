@@ -35,7 +35,7 @@ namespace Chronozoom.Entities
     /// <summary>
     /// Storage implementation for ChronoZoom based on Entity Framework.
     /// </summary>
-    public class Storage : DbContext
+    public partial class Storage : DbContext
     {
         private static Lazy<int> _storageTimeout = new Lazy<int>(() =>
         {
@@ -85,6 +85,12 @@ namespace Chronozoom.Entities
         public DbSet<Entities.Collection> Collections { get; set; }
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
+
+        public DbSet<Triple> Triples { get; set; }
+
+        public DbSet<TripleObject> TripleObjects { get; set; }
+
+        public DbSet<TriplePrefix> TriplePrefixes { get; set; }
 
         public Collection<Timeline> TimelinesQuery(Guid collectionId, decimal startTime, decimal endTime, decimal span, Guid? commonAncestor, int maxElements, int depth)
         {

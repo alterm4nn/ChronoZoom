@@ -3906,6 +3906,101 @@ var CZ;
             return result;
         }
         Service.getMimeTypeByUrl = getMimeTypeByUrl;
+        function getUserFavorites() {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("getuserfavorites");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getUserFavorites = getUserFavorites;
+        function deleteUserFavorite(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("deleteuserfavorite");
+            if(guid == "") {
+                return null;
+            }
+            request.addParameter("guid", guid);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.deleteUserFavorite = deleteUserFavorite;
+        function putUserFavorite(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("putuserfavorite");
+            if(guid == "") {
+                return null;
+            }
+            request.addParameter("guid", guid);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.putUserFavorite = putUserFavorite;
+        function getUserFeatured(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("getuserfeatured");
+            request.addParameter("guid", guid);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getUserFeatured = getUserFeatured;
+        function deleteUserFeatured(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("deleteuserfeatured");
+            if(guid == "") {
+                return null;
+            }
+            request.addParameter("guid", guid);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.deleteUserFeatured = deleteUserFeatured;
+        function putUserFeatured(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("putuserfeatured");
+            if(guid == "") {
+                return null;
+            }
+            request.addParameter("guid", guid);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.putUserFeatured = putUserFeatured;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));
