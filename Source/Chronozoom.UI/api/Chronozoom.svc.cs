@@ -2072,6 +2072,7 @@ namespace Chronozoom.UI
         }
 
         #region FavoriteTimelines
+        private static Regex guidReg = new Regex(@"[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public Collection<TimelineShortcut> GetUserFavorites()
         {
@@ -2110,6 +2111,9 @@ namespace Chronozoom.UI
 
         public bool PutUserFavorite(string favoriteGUID)
         {
+            if (!guidReg.IsMatch(favoriteGUID))
+                return false;
+
             return ApiOperation<bool>(delegate(User user, Storage storage)
             {
                 if (user == null)
@@ -2122,6 +2126,9 @@ namespace Chronozoom.UI
 
         public bool DeleteUserFavorite(string favoriteGUID)
         {
+            if (!guidReg.IsMatch(favoriteGUID))
+                return false;
+
             return ApiOperation<bool>(delegate(User user, Storage storage)
             {
                 if (user == null)
@@ -2170,20 +2177,26 @@ namespace Chronozoom.UI
             });
         }
 
-        public bool PutUserFeatured(string favoriteGUID)
+        public bool PutUserFeatured(string faturedGUID)
         {
+            if (!guidReg.IsMatch(faturedGUID))
+                return false;
+
             return ApiOperation<bool>(delegate(User user, Storage storage)
             {
                 if (user == null)
                 {
                     return false;
                 }
-                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", favoriteGUID));
+                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", faturedGUID));
             });
         }
 
         public bool DeleteUserFeatured(string favoriteGUID)
         {
+            if (!guidReg.IsMatch(favoriteGUID))
+                return false;
+
             return ApiOperation<bool>(delegate(User user, Storage storage)
             {
                 if (user == null)

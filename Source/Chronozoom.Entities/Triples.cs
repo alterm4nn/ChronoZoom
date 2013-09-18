@@ -204,7 +204,7 @@ namespace Chronozoom.Entities
                 }
                 else
                 {
-                    return false;
+                    return true;
                 }
                 SaveChanges();
                 return true;
