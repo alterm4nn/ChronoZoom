@@ -163,7 +163,7 @@ namespace Tests
             StringAssert.Contains(displayDate, _newExhibit.Day);
             if (GitHubIssueWatcher.IssueStatus.IsIssueResolved("1024"))
             {
-                StringAssert.Contains(displayDate, DateTime.ParseExact(_newExhibit.Month, "MMMM", CultureInfo.CurrentCulture).Month.ToString(CultureInfo.InvariantCulture));
+                StringAssert.Contains(displayDate, DateTime.ParseExact(_newExhibit.Month, "MMMM", CultureInfo.InvariantCulture).Month.ToString(CultureInfo.InvariantCulture));
             }
         }     
         
@@ -200,7 +200,7 @@ namespace Tests
             StringAssert.Contains(displayDate, _newExhibit.Day);
             if (GitHubIssueWatcher.IssueStatus.IsIssueResolved("1024"))
             {
-                StringAssert.Contains(displayDate, DateTime.ParseExact(_newExhibit.Month, "MMMM", CultureInfo.CurrentCulture).Month.ToString(CultureInfo.InvariantCulture));
+                StringAssert.Contains(displayDate, DateTime.ParseExact(_newExhibit.Month, "MMMM", CultureInfo.InvariantCulture).Month.ToString(CultureInfo.InvariantCulture));
             }
         }
     }

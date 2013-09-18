@@ -2391,7 +2391,7 @@ var CZ;
                             if(date_number == Math.floor(date_number)) {
                                 title = infodotDescription.title + '\n(' + parseFloat((date_number).toFixed(2)) + ' ' + exhibitDate.regime + ')';
                             } else {
-                                title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + exhibitYMD.month + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
+                                title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + (exhibitYMD.month + 1) + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
                             }
                         } else {
                             title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
@@ -4101,6 +4101,7 @@ var CZ;
         Authoring.mode = null;
         Authoring.contentItemMode = null;
         Authoring.showCreateTimelineForm = null;
+        Authoring.showCreateRootTimelineForm = null;
         Authoring.showEditTimelineForm = null;
         Authoring.showCreateExhibitForm = null;
         Authoring.showEditExhibitForm = null;
@@ -4355,6 +4356,8 @@ var CZ;
                 }
             });
             Authoring.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {
+            };
+            Authoring.showCreateRootTimelineForm = formHandlers && formHandlers.showCreateRootTimelineForm || function () {
             };
             Authoring.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {
             };
@@ -11196,6 +11199,11 @@ var CZ;
                     this.deleteButton.show();
                     this.titleTextblock.text("Edit Timeline");
                     this.saveButton.text("update timeline");
+                } else if(CZ.Authoring.mode === "createRootTimeline") {
+                    this.deleteButton.hide();
+                    this.closeButton.hide();
+                    this.titleTextblock.text("Create Root Timeline");
+                    this.saveButton.text("create timeline");
                 } else {
                     console.log("Unexpected authoring mode in timeline form.");
                     this.close();
@@ -11413,7 +11421,6 @@ var CZ;
                     this.saveButton.text("create exhibit");
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-                    console.log("this.datePicker.");
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -12770,7 +12777,6 @@ var CZ;
                 return c;
             })();
             $('.bubbleInfo').hide();
-            var canvasIsEmpty;
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
@@ -12904,6 +12910,23 @@ var CZ;
                         });
                         form.show();
                     },
+                    showCreateRootTimelineForm: function (timeline) {
+                        CZ.Authoring.mode = "createRootTimeline";
+                        var form = new CZ.UI.FormEditTimeline(forms[1], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            startDate: ".cz-form-time-start",
+                            endDate: ".cz-form-time-end",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
+                            context: timeline
+                        });
+                        form.show();
+                    },
                     showEditTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
@@ -12981,9 +13004,6 @@ var CZ;
                         form.show(noAnimation);
                     }
                 });
-                if(canvasIsEmpty) {
-                    CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                }
                 HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
                     activationSource: $("#header-session-expired-form"),
                     navButton: ".cz-form-nav",
@@ -13000,7 +13020,24 @@ var CZ;
                             CZ.Authoring.showSessionForm();
                         }, (CZ.Settings.sessionTime - 60) * 1000);
                     }
+                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
                 }).fail(function (error) {
+                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                }).always(function () {
+                    if(!CZ.Authoring.isEnabled) {
+                        $(".edit-icon").hide();
+                    }
+                    CZ.Common.loadData().then(function (response) {
+                        if(!response) {
+                            if(CZ.Authoring.isEnabled) {
+                                if(CZ.Authoring.showCreateRootTimelineForm) {
+                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
+                                }
+                            } else {
+                                CZ.Authoring.showMessageWindow("Looks like this collection is empty. Come back later when author will fill it with content.", "Collection is empty :(");
+                            }
+                        }
+                    });
                 });
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
@@ -13060,16 +13097,10 @@ var CZ;
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
-                        CZ.Authoring.isEnabled = UserCanEditCollection(data);
                         InitializeToursUI(data, forms);
                     }).fail(function (error) {
                         $("#login-panel").show();
-                        CZ.Authoring.isEnabled = UserCanEditCollection(null);
                         InitializeToursUI(null, forms);
-                    }).always(function () {
-                        if(!CZ.Authoring.isEnabled) {
-                            $(".edit-icon").hide();
-                        }
                     });
                 }
                 $("#login-panel").click(function (event) {
@@ -13122,14 +13153,6 @@ var CZ;
             if(window.location.hash) {
                 CZ.Common.startHash = window.location.hash;
             }
-            CZ.Common.loadData().then(function (response) {
-                if(!response) {
-                    canvasIsEmpty = true;
-                    if(CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
-                }
-            });
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);

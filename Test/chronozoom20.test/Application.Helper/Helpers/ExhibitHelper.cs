@@ -100,9 +100,9 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("->", LogType.MessageWithoutScreenshot);
             int monthNumber = int.Parse(
-                        GetJavaScriptExecutionResult(_getYmdFromCoordinateScript + ".month"));
+                        GetJavaScriptExecutionResult(_getYmdFromCoordinateScript + ".month")) + 1;
             Logger.Log("- month number" + monthNumber, LogType.MessageWithoutScreenshot);
-            return monthNumber == 0 ? "" : CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthNumber);
+            return monthNumber == 0 ? "" : CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(monthNumber);
         }
 
         private decimal GetNewExhibitYear()
@@ -240,12 +240,10 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        public void ClickByAddArtifact()
+        public void ClickOnAddArtifact()
         {
             Logger.Log("<-");
-            By createArtifactButton = By.CssSelector(".cz-form-create-artifact.cz-button");
-            WaitForElementEnabled(createArtifactButton);
-            Click(createArtifactButton);
+            InitArtifactForm();
             Logger.Log("->");
         }
 
@@ -334,7 +332,9 @@ namespace Application.Helper.Helpers
         private void SetExhibitTitle(string exhibitName)
         {
             Logger.Log("<- name: " + exhibitName);
-            TypeText(By.CssSelector("#auth-edit-exhibit-form .cz-form-item-title"), exhibitName);
+            By title = By.CssSelector("#auth-edit-exhibit-form .cz-form-item-title");
+            WaitForElementEnabled(title);
+            TypeText(title, exhibitName);
             Logger.Log("->");
         }
 
@@ -392,7 +392,7 @@ namespace Application.Helper.Helpers
             Logger.Log("->");
         }
 
-        private void FillArtifact(ContentItem contentItem)
+        private void FillArtifact(Chronozoom.Entities.ContentItem contentItem)
         {
             Logger.Log("<- contentItem: " + contentItem);
             if (contentItem.Title != null) SetTitle(contentItem.Title);
@@ -435,7 +435,7 @@ namespace Application.Helper.Helpers
         private void AddArtifacts(IEnumerable<Chronozoom.Entities.ContentItem> contentItems)
         {
             Logger.Log("->");
-            foreach (ContentItem contentItem in contentItems)
+            foreach (Chronozoom.Entities.ContentItem contentItem in contentItems)
             {
                 Logger.Log("-- " + contentItem);
                 InitArtifactForm();

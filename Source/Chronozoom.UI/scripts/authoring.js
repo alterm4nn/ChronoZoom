@@ -34,6 +34,7 @@ var CZ;
         Authoring.mode = null;
         Authoring.contentItemMode = null;
         Authoring.showCreateTimelineForm = null;
+        Authoring.showCreateRootTimelineForm = null;
         Authoring.showEditTimelineForm = null;
         Authoring.showCreateExhibitForm = null;
         Authoring.showEditExhibitForm = null;
@@ -288,6 +289,8 @@ var CZ;
                 }
             });
             Authoring.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {
+            };
+            Authoring.showCreateRootTimelineForm = formHandlers && formHandlers.showCreateRootTimelineForm || function () {
             };
             Authoring.showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () {
             };

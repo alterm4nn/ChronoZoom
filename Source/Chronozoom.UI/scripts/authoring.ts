@@ -46,6 +46,7 @@ module CZ {
 
         // Forms' handlers.
         export var showCreateTimelineForm: (...args: any[]) => any = null;
+        export var showCreateRootTimelineForm: (...args: any[]) => any = null;
         export var showEditTimelineForm: (...args: any[]) => any = null;
         export var showCreateExhibitForm: (...args: any[]) => any = null;
         export var showEditExhibitForm: (...args: any[]) => any = null;
@@ -481,6 +482,7 @@ module CZ {
 
             // Assign forms' handlers.
             showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () { };
+            showCreateRootTimelineForm = formHandlers && formHandlers.showCreateRootTimelineForm || function () { };
             showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () { };
             showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () { };
             showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () { };

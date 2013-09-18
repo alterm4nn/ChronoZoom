@@ -284,7 +284,9 @@ namespace Application.Helper.Helpers
 
         public void LogoutByUrl()
         {
+            Logger.Log("<-");
             OpenUrl(Configuration.BaseUrl + "/pages/logoff.aspx");
+            Logger.Log("->");
         }
 
         private void LoginToAcsProvider(string email)

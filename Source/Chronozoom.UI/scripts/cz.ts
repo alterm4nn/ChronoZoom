@@ -228,7 +228,6 @@ module CZ {
 
 
             $('.bubbleInfo').hide();
-            var canvasIsEmpty;
 
             var url = CZ.UrlNav.getURL();
             rootCollection = url.superCollectionName === undefined;
@@ -380,6 +379,23 @@ module CZ {
                         });
                         form.show();
                     },
+                    showCreateRootTimelineForm: function (timeline) {
+                        CZ.Authoring.mode = "createRootTimeline";
+                        var form = new CZ.UI.FormEditTimeline(forms[1], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            startDate: ".cz-form-time-start",
+                            endDate: ".cz-form-time-end",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
+                            context: timeline
+                        });
+                        form.show();
+                    },
                     showEditTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
@@ -458,10 +474,6 @@ module CZ {
                     }
                 });
 
-                if (canvasIsEmpty) {
-                    CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                }
-
                 sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
                     activationSource: $("#header-session-expired-form"),
                     navButton: ".cz-form-nav",
@@ -478,7 +490,36 @@ module CZ {
                     if (data != "") {
                         CZ.Authoring.timer = setTimeout(() => { CZ.Authoring.showSessionForm(); }, (CZ.Settings.sessionTime - 60) * 1000);
                     }
-                }).fail((error) => {  });
+
+                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
+                }).fail((error) => {
+                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                }).always(() => {
+                    if (!CZ.Authoring.isEnabled) {
+                        $(".edit-icon").hide();
+                    }
+
+                    //retrieving the data
+                    CZ.Common.loadData().then(function (response) {
+                        // collection is empty
+                        if (!response) {
+                            // author should create a root timeline
+                            // TODO: store 'user' variable in CZ that is the response of getProfile()
+                            if (CZ.Authoring.isEnabled) {
+                                if (CZ.Authoring.showCreateRootTimelineForm) {
+                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
+                                }
+                            }
+                            // show message for other users that collection is empty
+                            else {
+                                CZ.Authoring.showMessageWindow(
+                                    "Looks like this collection is empty. Come back later when author will fill it with content.",
+                                    "Collection is empty :("
+                                );
+                            }
+                        }
+                    });
+                });
 
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
@@ -549,17 +590,11 @@ module CZ {
                             $(".auth-panel-login").html(data.DisplayName);
                         }
 
-                        CZ.Authoring.isEnabled = UserCanEditCollection(data);
                         InitializeToursUI(data, forms);
                     }).fail((error) => {
                         $("#login-panel").show();
 
-                        CZ.Authoring.isEnabled = UserCanEditCollection(null);
                         InitializeToursUI(null, forms);
-                    }).always(() => {
-                        if (!CZ.Authoring.isEnabled) {
-                            $(".edit-icon").hide();
-                        }
                     });
                 }
 
@@ -623,15 +658,6 @@ module CZ {
 
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
-
-            CZ.Common.loadData().then(function (response) {
-                if (!response) {
-                    canvasIsEmpty = true;
-                    if (CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
-                }
-            }); //retrieving the data
 
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
