@@ -133,6 +133,7 @@ var CZ;
         }
         StartPage.cloneTweetTemplate = cloneTweetTemplate;
         function PlayIntroTour() {
+<<<<<<< HEAD
             var intoTour = CZ.Tours.tours[0];
             if(typeof intoTour === "undefined") {
                 return false;
@@ -152,6 +153,10 @@ var CZ;
             });
             CZ.Tours.tourCaptionForm.show();
             CZ.Tours.activateTour(intoTour, undefined);
+=======
+            var toursListForm = CZ.HomePageViewModel.getFormById("#toursList");
+            toursListForm.toursListBox.TakeTour(CZ.Tours.tours[0]);
+>>>>>>> 1b4cfc1... what can I do with tours
         }
         StartPage.PlayIntroTour = PlayIntroTour;
         function TwitterLayout(target, idx) {
@@ -163,6 +168,7 @@ var CZ;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
+                    console.log(response);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-text").text(text);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-author").text(author);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-time").text(convertedDate);
@@ -287,39 +293,6 @@ var CZ;
                 show();
             }
         }
-<<<<<<< HEAD
-=======
-        StartPage.InitializeStartVideo = InitializeStartVideo;
-        function show() {
-            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
-            $(".home-icon").addClass("active");
-            $disabledButtons.attr("disabled", "disabled").each(function (i, el) {
-                var events = $(el).data("events");
-                $(el).data("onclick", events && events.click && events.click[0]);
-            }).off();
-            $(".header-regimes").fadeOut();
-            $("#start-page").fadeIn();
-        }
-        StartPage.show = show;
-        function hide() {
-            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
-            $(".home-icon").removeClass("active");
-            $disabledButtons.removeAttr("disabled").each(function (i, el) {
-                $(el).click($(el).data("onclick"));
-            });
-            $(".header-regimes").fadeIn();
-            $("#start-page").fadeOut();
-        }
-        StartPage.hide = hide;
-        function initialize() {
-            $(".home-icon").toggle(show, hide);
-            cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1);
-            cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list", 1);
-            cloneTweetTemplate("#template-tweet .tweet-box", CZ.StartPage.tileLayout, 2);
-            TwitterLayout(CZ.StartPage.tileLayout, 2);
-            InitializeStartVideo();
-        }
->>>>>>> 4bbb34d... Add home page button.
         StartPage.initialize = initialize;
     })(CZ.StartPage || (CZ.StartPage = {}));
     var StartPage = CZ.StartPage;

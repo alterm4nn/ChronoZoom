@@ -186,10 +186,6 @@ var CZ;
                 };
                 return c;
             })();
-<<<<<<< HEAD
-=======
-            CZ.StartPage.initialize();
->>>>>>> 4bbb34d... Add home page button.
             $('.bubbleInfo').hide();
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;
@@ -526,9 +522,14 @@ var CZ;
                         loginForm.close();
                     }
                 });
+<<<<<<< HEAD
                 if(IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
                 }
+=======
+                CZ.StartPage.show();
+                CZ.StartPage.initialize();
+>>>>>>> 1b4cfc1... what can I do with tours
             });
             CZ.Service.getServiceInformation().then(function (response) {
                 CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;

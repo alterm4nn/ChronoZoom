@@ -12922,6 +12922,8 @@ var CZ;
             });
             CZ.Tours.tourCaptionForm.show();
             CZ.Tours.activateTour(intoTour, undefined);
+            var toursListForm = CZ.HomePageViewModel.getFormById("#toursList");
+            toursListForm.toursListBox.TakeTour(CZ.Tours.tours[0]);
         }
         StartPage.PlayIntroTour = PlayIntroTour;
         function TwitterLayout(target, idx) {
@@ -12933,6 +12935,7 @@ var CZ;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
+                    console.log(response);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-text").text(text);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-author").text(author);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-time").text(convertedDate);
@@ -13050,6 +13053,9 @@ var CZ;
                 fillFeaturedTimelines(response);
                 fillFeaturedTimelinesList(response);
             });
+            $(".home-icon").toggle(show, hide);
+            CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1);
+            CZ.StartPage.cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list", 1);
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
             var hash = CZ.UrlNav.getURL().hash.path;

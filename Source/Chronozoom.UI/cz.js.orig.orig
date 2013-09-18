@@ -12919,6 +12919,7 @@ var CZ;
         }
         StartPage.cloneTweetTemplate = cloneTweetTemplate;
         function PlayIntroTour() {
+<<<<<<< HEAD
             var intoTour = CZ.Tours.tours[0];
             if(typeof intoTour === "undefined") {
                 return false;
@@ -12938,6 +12939,10 @@ var CZ;
             });
             CZ.Tours.tourCaptionForm.show();
             CZ.Tours.activateTour(intoTour, undefined);
+=======
+            var toursListForm = CZ.HomePageViewModel.getFormById("#toursList");
+            toursListForm.toursListBox.TakeTour(CZ.Tours.tours[0]);
+>>>>>>> 1b4cfc1... what can I do with tours
         }
         StartPage.PlayIntroTour = PlayIntroTour;
         function TwitterLayout(target, idx) {
@@ -12949,6 +12954,7 @@ var CZ;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
+                    console.log(response);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-text").text(text);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-author").text(author);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-time").text(convertedDate);
@@ -13066,38 +13072,15 @@ var CZ;
                 fillFeaturedTimelines(response);
                 fillFeaturedTimelinesList(response);
             });
+            $(".home-icon").toggle(show, hide);
+            CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1);
+            CZ.StartPage.cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list", 1);
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
             var hash = CZ.UrlNav.getURL().hash.path;
             if(!hash || hash === "/t" + CZ.Settings.guidEmpty) {
                 show();
             }
-        }
-<<<<<<< HEAD
-=======
-        StartPage.InitializeStartVideo = InitializeStartVideo;
-        function show() {
-            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
-            $(".home-icon").addClass("active");
-            $disabledButtons.attr("disabled", "disabled").each(function (i, el) {
-                var events = $(el).data("events");
-                $(el).data("onclick", events && events.click && events.click[0]);
-            }).off();
-            $(".header-regimes").fadeOut();
-            $("#start-page").fadeIn();
-        }
-        StartPage.show = show;
-        function hide() {
-            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
-            $(".home-icon").removeClass("active");
-            $disabledButtons.removeAttr("disabled").each(function (i, el) {
-                $(el).click($(el).data("onclick"));
-            });
-            $(".header-regimes").fadeIn();
-            $("#start-page").fadeOut();
-        }
-        StartPage.hide = hide;
-        function initialize() {
             $(".home-icon").toggle(show, hide);
             cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1);
             cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list", 1);
@@ -13105,7 +13088,6 @@ var CZ;
             TwitterLayout(CZ.StartPage.tileLayout, 2);
             InitializeStartVideo();
         }
->>>>>>> 4bbb34d... Add home page button.
         StartPage.initialize = initialize;
     })(CZ.StartPage || (CZ.StartPage = {}));
     var StartPage = CZ.StartPage;
@@ -13299,12 +13281,20 @@ var CZ;
                 return c;
             })();
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+            CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1);
+            CZ.StartPage.cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list", 1);
+            CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
+            CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
+            CZ.StartPage.InitializeStartVideo();
+>>>>>>> d61748f... design 3
 <<<<<<< HEAD
 =======
             CZ.StartPage.initialize();
 >>>>>>> 4bbb34d... Add home page button.
->>>>>>> 2d5ccce... Add home page button.
+=======
+>>>>>>> e12ca75... Merge and refactoring
             $('.bubbleInfo').hide();
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;
@@ -13642,9 +13632,14 @@ var CZ;
                         loginForm.close();
                     }
                 });
+<<<<<<< HEAD
                 if(IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
                 }
+=======
+                CZ.StartPage.show();
+                CZ.StartPage.initialize();
+>>>>>>> 1b4cfc1... what can I do with tours
             });
             CZ.Service.getServiceInformation().then(function (response) {
                 CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;

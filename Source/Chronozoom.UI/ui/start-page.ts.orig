@@ -150,6 +150,7 @@ module CZ {
         }
 
         export function PlayIntroTour() {
+<<<<<<< HEAD
             // "Introduction to ChronoZoom tour"
             // TODO: implement search of tour by title
             var intoTour = CZ.Tours.tours[0];
@@ -175,6 +176,10 @@ module CZ {
 
             CZ.Tours.tourCaptionForm.show();
             CZ.Tours.activateTour(intoTour, undefined);
+=======
+        var toursListForm = CZ.HomePageViewModel.getFormById("#toursList");
+        toursListForm.toursListBox.TakeTour(CZ.Tours.tours[0]);
+>>>>>>> 1b4cfc1... what can I do with tours
         }
 
         export function TwitterLayout( target, idx) {

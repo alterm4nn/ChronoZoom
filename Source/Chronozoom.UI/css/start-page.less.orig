@@ -8,18 +8,31 @@
     bottom: 20px;
     left: 0%;
     right: 0%;
-<<<<<<< HEAD
     cursor: default;        
-=======
-    min-width: 300px;
-  //  border-radius: 8px;
-    background-color: rgba(0,0,0,1);
-    cursor: default;
->>>>>>> d61748f... design 3
     overflow: hidden;
     z-index: 1000;
+<<<<<<< HEAD
     background-image: url(/images/background.jpg);
     background-size: 100%;
+=======
+    background-image: url(http://localhost:4949/images/background.jpg);
+    background-size: 100% ;
+}
+
+
+.start-page-section-column {
+    float: left;
+    margin: 5px;
+    padding: 5px;
+    width: calc(33.333333% - 2px);
+    height: calc(100%);
+    border: dotted 2px #1e1e1e;
+    background-color: transparent;
+    vertical-align: top;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+>>>>>>> 1b4cfc1... what can I do with tours
 }
 
 .FTTiles {
@@ -136,21 +149,10 @@
     border-top: 3px #666 solid;
  }
 
-<<<<<<< HEAD
 .toggle-list-button {
     float: right; 
     margin: 18px 10px 0 0;
  }
-=======
-.boxInner {
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    top: 10px;
- //   bottom: 10px;
-    overflow: visible;
-}
->>>>>>> d61748f... design 3
 
 .template-invisible {
     display: none;
@@ -335,6 +337,8 @@
     }
 
     .welcome-box-1 {
+       // padding: 5px 5px 10px 5px;
+       overflow:hidden;
         overflow: visible;
         vertical-align: top;
         font-size: 15px;

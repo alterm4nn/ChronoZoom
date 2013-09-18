@@ -380,8 +380,26 @@ iframe[sutra=picker] + div {
   cursor: default;
   overflow: hidden;
   z-index: 1000;
+<<<<<<< HEAD
   background-image: url(/images/background.jpg);
   background-size: 100%;
+=======
+  background-image: url(http://localhost:4949/images/background.jpg);
+  background-size: 100% ;
+}
+.start-page-section-column {
+  float: left;
+  margin: 5px;
+  padding: 5px;
+  width: calc(31.333333000000003%);
+  height: calc(100%);
+  border: dotted 2px #1e1e1e;
+  background-color: transparent;
+  vertical-align: top;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+>>>>>>> 1b4cfc1... what can I do with tours
 }
 .FTTiles {
   width: calc(100%);
@@ -646,6 +664,7 @@ iframe[sutra=picker] + div {
     box-sizing: border-box;
   }
   .welcome-box-1 {
+    overflow: hidden;
     overflow: visible;
     vertical-align: top;
     font-size: 15px;
@@ -913,12 +932,9 @@ a:visited {
 .home-icon {
   background-image: url('../images/home-icon.png');
 }
-<<<<<<< HEAD
 .toggle-list-button {
   background-image: url('../images/dummy/list-expander2.png');
 }
-=======
->>>>>>> 4bbb34d... Add home page button.
 .profile-icon {
   background-image: url('../images/profile-icon.png');
   background-position-x: 3px;

@@ -69,10 +69,14 @@
     <Content Include="dumps\sample.csv" />
     <Content Include="dumps\extensions-get.json" />
     <Content Include="css\media.less" />
+<<<<<<< HEAD
+<<<<<<< HEAD
 =======
     <Content Include="css\start-page.less" />
-=======
 >>>>>>> 58ca446... Homepage base
+=======
+    <Content Include="css\start-page.less" />
+>>>>>>> e12ca75... Merge and refactoring
     <Content Include="css\_mixins.less" />
     <Content Include="css\_colors.less" />
     <Content Include="css\_vars.less" />

@@ -5,16 +5,29 @@
   bottom: 20px;
   left: 0%;
   right: 0%;
-<<<<<<< HEAD
-=======
-  min-width: 300px;
-  background-color: #000000;
->>>>>>> d61748f... design 3
   cursor: default;
   overflow: hidden;
   z-index: 1000;
+<<<<<<< HEAD
   background-image: url(/images/background.jpg);
   background-size: 100%;
+=======
+  background-image: url(http://localhost:4949/images/background.jpg);
+  background-size: 100% ;
+}
+.start-page-section-column {
+  float: left;
+  margin: 5px;
+  padding: 5px;
+  width: calc(31.333333000000003%);
+  height: calc(100%);
+  border: dotted 2px #1e1e1e;
+  background-color: transparent;
+  vertical-align: top;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+>>>>>>> 1b4cfc1... what can I do with tours
 }
 .FTTiles {
   width: calc(100%);
@@ -96,7 +109,6 @@
   font-size: 12px;
   display: block;
 }
-<<<<<<< HEAD
 .WelcomeBlock {
   color: white;
   overflow: hidden;
@@ -104,21 +116,6 @@
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-=======
-/*.WelcomeVideo {
-    position: absolute;
-    top: 5%;
-    bottom: 5%;
-    left: 5%;
-    right: 5%;
-}*/
-.boxInner {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  top: 10px;
-  overflow: visible;
->>>>>>> d61748f... design 3
 }
 .welcome-link {
   color: green;
@@ -295,6 +292,7 @@
     box-sizing: border-box;
   }
   .welcome-box-1 {
+    overflow: hidden;
     overflow: visible;
     vertical-align: top;
     font-size: 15px;

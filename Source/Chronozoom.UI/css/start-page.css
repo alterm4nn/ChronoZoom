@@ -274,6 +274,7 @@
     box-sizing: border-box;
   }
   .welcome-box-1 {
+    overflow: hidden;
     overflow: visible;
     vertical-align: top;
     font-size: 15px;
