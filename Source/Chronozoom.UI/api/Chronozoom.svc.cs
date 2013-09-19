@@ -1950,7 +1950,10 @@ namespace Chronozoom.UI
                 User user = new User();
                 user.NameIdentifier = nameIdentifierClaim.Value;
                 user.IdentityProvider = identityProviderClaim.Value;
-
+                var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+                if (u != null)
+                    user.Id = u.Id;
+    
                 return operation(user, storage);
             }
         }
@@ -2166,10 +2169,10 @@ namespace Chronozoom.UI
             });
         }
 
-        public bool PutUserFeatured(string faturedGUID)
+        public bool PutUserFeatured(string featuredGUID)
         {
             Guid g;
-            if (!Guid.TryParse(faturedGUID, out g))
+            if (!Guid.TryParse(featuredGUID, out g))
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2178,7 +2181,7 @@ namespace Chronozoom.UI
                 {
                     return false;
                 }
-                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", faturedGUID));
+                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", featuredGUID));
             });
         }
 
