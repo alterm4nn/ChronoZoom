@@ -11,34 +11,22 @@
     cursor: default;        
     overflow: hidden;
     z-index: 1000;
-<<<<<<< HEAD
     background-image: url(/images/background.jpg);
     background-size: 100%;
-=======
-    background-image: url(http://localhost:4949/images/background.jpg);
-    background-size: 100% ;
-}
-
-
-.start-page-section-column {
-    float: left;
-    margin: 5px;
-    padding: 5px;
-    width: calc(33.333333% - 2px);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
-    background-color: transparent;
-    vertical-align: top;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
->>>>>>> 1b4cfc1... what can I do with tours
 }
 
 .FTTiles {
     width: calc(100%);
     height: calc(100%);
     overflow: hidden;
+}
+    height: calc(100%);
+    overflow: hidden;
+}
+
+.FTList {
+    display: none;
+     color: white;
 }
 
 .FTList {
@@ -148,14 +136,36 @@
     color: white;
     border-top: 3px #666 solid;
  }
+<<<<<<< HEAD
+//////////////////////////////
+=======
+>>>>>>> 91f56ef... refactoring
 
 .toggle-list-button {
     float: right; 
     margin: 18px 10px 0 0;
  }
 
+<<<<<<< HEAD
+.boxInner {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 10px;
+ //   bottom: 10px;
+    overflow: visible;
 .template-invisible {
     display: none;
+.boxInner {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    overflow: visible;
+=======
+.template-invisible {
+    display: none;
+>>>>>>> 91f56ef... refactoring
 }
 
 @media only screen and (max-width : 650px), screen and (orientation: landscape) and (max-device-width : 480px) {
@@ -339,6 +349,11 @@
     .welcome-box-1 {
        // padding: 5px 5px 10px 5px;
        overflow:hidden;
+        white-space: nowrap;
+       // padding: 5px 5px 10px 5px;
+       overflow:hidden;
+        overflow: hidden;
+        white-space: nowrap;
         overflow: visible;
         vertical-align: top;
         font-size: 15px;
@@ -423,4 +438,9 @@
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
     }
+}
+
+
+
+}
 }

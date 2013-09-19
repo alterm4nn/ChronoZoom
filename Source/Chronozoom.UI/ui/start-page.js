@@ -279,6 +279,7 @@ var CZ;
             });
             CZ.Service.getUserFeatured("63c4373e-6712-44a6-9bb4-b99a2783f53a").done(function (response) {
                 fillFeaturedTimelines(response);
+            });
                 fillFeaturedTimelinesList(response);
             });
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);

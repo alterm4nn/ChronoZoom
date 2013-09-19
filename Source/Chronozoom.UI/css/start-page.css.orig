@@ -8,36 +8,21 @@
   cursor: default;
   overflow: hidden;
   z-index: 1000;
-<<<<<<< HEAD
   background-image: url(/images/background.jpg);
   background-size: 100%;
-=======
-  background-image: url(http://localhost:4949/images/background.jpg);
-  background-size: 100% ;
-}
-.start-page-section-column {
-  float: left;
-  margin: 5px;
-  padding: 5px;
-  width: calc(31.333333000000003%);
-  height: calc(100%);
-  border: dotted 2px #1e1e1e;
-  background-color: transparent;
-  vertical-align: top;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
->>>>>>> 1b4cfc1... what can I do with tours
 }
 .FTTiles {
   width: calc(100%);
   height: calc(100%);
   overflow: hidden;
 }
+<<<<<<< HEAD
 .FTList {
   display: none;
   color: white;
 }
+=======
+>>>>>>> a19aed8... latest changes
 .cleardiv {
   clear: both;
   width: 100%;
@@ -109,6 +94,7 @@
   font-size: 12px;
   display: block;
 }
+<<<<<<< HEAD
 .WelcomeBlock {
   color: white;
   overflow: hidden;
@@ -131,6 +117,8 @@
 .template-invisible {
   display: none;
 }
+=======
+>>>>>>> a19aed8... latest changes
 @media only screen and (max-width: 650px), screen and (orientation: landscape) and (max-device-width: 480px) {
   /* Small Tablet view: 3 rows, 2 columns */
   .ex3,
@@ -262,6 +250,10 @@
     width: calc(31.333333000000003%);
     height: calc(100%);
     border: dotted 2px #1e1e1e;
+<<<<<<< HEAD
+=======
+    box-sizing: border-box;
+>>>>>>> a19aed8... latest changes
   }
   .FeaturedTimelinesBlock {
     float: left;
@@ -292,7 +284,10 @@
     box-sizing: border-box;
   }
   .welcome-box-1 {
+<<<<<<< HEAD
     overflow: hidden;
+=======
+>>>>>>> a19aed8... latest changes
     overflow: visible;
     vertical-align: top;
     font-size: 15px;

@@ -1969,10 +1969,14 @@ namespace Chronozoom.UI
                 User user = new User();
                 user.NameIdentifier = nameIdentifierClaim.Value;
                 user.IdentityProvider = identityProviderClaim.Value;
+<<<<<<< HEAD
                 var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
                 if (u != null)
                     user.Id = u.Id;
     
+=======
+
+>>>>>>> f17887d... Integrate featured timelines to start page.
                 return operation(user, storage);
             }
         }
@@ -2095,9 +2099,13 @@ namespace Chronozoom.UI
 
         #region FavoriteTimelines
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         private static Regex guidReg = new Regex(@"[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 >>>>>>> 58ca446... Homepage base
+=======
+        private static Regex guidReg = new Regex(@"[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+>>>>>>> f17887d... Integrate featured timelines to start page.
 
         public Collection<TimelineShortcut> GetUserFavorites()
         {
@@ -2122,8 +2130,11 @@ namespace Chronozoom.UI
                         //ToDo: get image url
                         if (timeline != null)
 <<<<<<< HEAD
+<<<<<<< HEAD
                             elements.Add(storage.GetTimelineShortcut(timeline));
 =======
+=======
+>>>>>>> f17887d... Integrate featured timelines to start page.
                             elements.Add(new TimelineShortcut()
                             {
                                 Title = timeline.Title,
@@ -2131,7 +2142,10 @@ namespace Chronozoom.UI
                                 TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, storage.GetContentPath(timeline.Collection.Id, timeline.Id, null)),
                                 Author = timeline.Collection.User.DisplayName
                             });
+<<<<<<< HEAD
 >>>>>>> 58ca446... Homepage base
+=======
+>>>>>>> f17887d... Integrate featured timelines to start page.
                     }
                 }
                 return elements;
@@ -2141,11 +2155,15 @@ namespace Chronozoom.UI
         public bool PutUserFavorite(string favoriteGUID)
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
             Guid g;
             if (!Guid.TryParse(favoriteGUID, out g))
 =======
             if (!guidReg.IsMatch(favoriteGUID))
 >>>>>>> 58ca446... Homepage base
+=======
+            if (!guidReg.IsMatch(favoriteGUID))
+>>>>>>> f17887d... Integrate featured timelines to start page.
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2161,11 +2179,15 @@ namespace Chronozoom.UI
         public bool DeleteUserFavorite(string favoriteGUID)
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
             Guid g;
             if (!Guid.TryParse(favoriteGUID, out g))
 =======
             if (!guidReg.IsMatch(favoriteGUID))
 >>>>>>> 58ca446... Homepage base
+=======
+            if (!guidReg.IsMatch(favoriteGUID))
+>>>>>>> f17887d... Integrate featured timelines to start page.
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2186,18 +2208,24 @@ namespace Chronozoom.UI
             return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 Guid userGuid;
                 if (!Guid.TryParse(guid, out userGuid))
                     return null;
 
                 var triple = storage.GetTriplet(String.Format("czusr:{0}", userGuid), "czpred:featured").FirstOrDefault();
 =======
+=======
+>>>>>>> f17887d... Integrate featured timelines to start page.
                 if (String.IsNullOrEmpty(guid))
                 {
                     return null;
                 }
                 var triple = storage.GetTriplet(String.Format("czusr:{0}", new Guid(guid)), "czpred:featured").FirstOrDefault();
+<<<<<<< HEAD
 >>>>>>> 58ca446... Homepage base
+=======
+>>>>>>> f17887d... Integrate featured timelines to start page.
                 if (triple == null)
                     return null;
 
@@ -2207,6 +2235,7 @@ namespace Chronozoom.UI
                     if (storage.GetPrefix(t.Object) == "cztimeline")
                     {
 <<<<<<< HEAD
+<<<<<<< HEAD
                         var g = new Guid(storage.GetValue(t.Object));
                         var timeline = storage.Timelines.Where(x => x.Id == g).Include(f => f.Collection).Include(u => u.Collection.User).FirstOrDefault();
 
@@ -2214,6 +2243,8 @@ namespace Chronozoom.UI
                         if (timeline != null)
                             elements.Add(storage.GetTimelineShortcut(timeline));
 =======
+=======
+>>>>>>> f17887d... Integrate featured timelines to start page.
                         string imageUrl = String.Empty;
                         var g = new Guid(storage.GetValue(t.Object));
                         var timeline = storage.Timelines.Where(x => x.Id == g)
@@ -2233,13 +2264,17 @@ namespace Chronozoom.UI
                                 TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, storage.GetContentPath(timeline.Collection.Id, timeline.Id, null)),
                                 Author = timeline.Collection.User.DisplayName
                             });
+<<<<<<< HEAD
 >>>>>>> 58ca446... Homepage base
+=======
+>>>>>>> f17887d... Integrate featured timelines to start page.
                     }
                 }
                 return elements;
             });
         }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         public bool PutUserFeatured(string featuredGUID)
         {
@@ -2250,10 +2285,16 @@ namespace Chronozoom.UI
         {
             if (!guidReg.IsMatch(faturedGUID))
 >>>>>>> 58ca446... Homepage base
+=======
+        public bool PutUserFeatured(string faturedGUID)
+        {
+            if (!guidReg.IsMatch(faturedGUID))
+>>>>>>> f17887d... Integrate featured timelines to start page.
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
             {
+<<<<<<< HEAD
 <<<<<<< HEAD
                 if (user == null)
                 {
@@ -2268,292 +2309,7 @@ namespace Chronozoom.UI
                 }
                 return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", faturedGUID));
 >>>>>>> 58ca446... Homepage base
-            });
-        }
-
-        public bool DeleteUserFeatured(string favoriteGUID)
-        {
-<<<<<<< HEAD
-            Guid g;
-            if (!Guid.TryParse(favoriteGUID, out g))
 =======
-            if (!guidReg.IsMatch(favoriteGUID))
->>>>>>> 58ca446... Homepage base
-                return false;
-
-            return ApiOperation<bool>(delegate(User user, Storage storage)
-            {
-                if (user == null)
-                {
-                    return false;
-                }
-                return storage.DeleteTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", favoriteGUID));
-            });
-        }
-        #endregion
-
-<<<<<<< HEAD
-
-=======
-        private static string getTimelineImageUrl(Timeline timeline)
-        {
-            foreach (var exhibit in timeline.Exhibits)
-            {
-                foreach (var contentItem in exhibit.ContentItems)
-                {
-                    if (contentItem.MediaType.ToLower().Equals("picture"))
-                    {
-                        return contentItem.Uri;
-                    }
-                }
-            }
-
-            return String.Empty;
-        }
->>>>>>> 58ca446... Homepage base
-    }
-}
-
-                return operation(user, storage);
-            }
-        }
-
-        // Helper to ApiOperation to handle void.
-        private static void ApiOperation(Action<User, Storage> operation)
-        {
-            ApiOperation<bool>(delegate(User user, Storage storage)
-            {
-                operation(user, storage);
-                return true;
-            });
-        }
-
-        // Can a given GetTimelines request be cached?
-        private static bool CanCacheGetTimelines(Storage storage, User user, Guid collectionId)
-        {
-            string cacheKey = string.Format(CultureInfo.InvariantCulture, "Collection-To-Owner {0}", collectionId);
-            if (!Cache.Contains(cacheKey))
-            {
-                Collection collection = RetrieveCollection(storage, collectionId);
-
-                string ownerNameIdentifier = collection == null || collection.User == null || collection.User.NameIdentifier == null ? "" : collection.User.NameIdentifier;
-                Cache.Add(cacheKey, ownerNameIdentifier);
-            }
-
-            string userNameIdentifier = user == null || user.NameIdentifier == null ? "" : user.NameIdentifier;
-
-            // Can cache as long as the user does not own the collection.
-            return (string)Cache[cacheKey] != userNameIdentifier;
-        }
-
-        private static string GetTimelinesCacheKey(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
-        {
-            return string.Format(CultureInfo.InvariantCulture, "GetTimelines {0}|{1}|{2}|{3}|{4}|{5}|{6}", collectionId, start, end, minspan, lca, maxElements, depth);
-        }
-
-        // Retrieves the cached timeline.
-        // Null if not cached.
-        private static Timeline GetCachedGetTimelines(Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
-        {
-            string cacheKey = GetTimelinesCacheKey(collectionId, start, end, minspan, lca, maxElements, depth);
-            if (Cache.Contains(cacheKey))
-            {
-                return (Timeline)Cache[cacheKey];
-            }
-
-            return null;
-        }
-
-        // Caches the given timeline for the given GetTimelines request.
-        private static void CacheGetTimelines(Timeline timeline, Guid collectionId, string start, string end, string minspan, string lca, string maxElements, string depth)
-        {
-            string cacheKey = GetTimelinesCacheKey(collectionId, start, end, minspan, lca, maxElements, depth);
-            if (!Cache.Contains(cacheKey) && timeline != null)
-            {
-                Cache.Add(cacheKey, timeline);
-            }
-        }
-
-        private static bool UserCanModifyCollection(User user, Collection collection)
-        {
-            if (user == null)
-            {
-                return collection.User == null || collection.User.NameIdentifier == null;
-            }
-            else
-            {
-                return collection.User.NameIdentifier == user.NameIdentifier;
-            }
-        }
-
-        private static Collection RetrieveCollection(Storage storage, Guid collectionId)
-        {
-            Collection collection = storage.Collections.Find(collectionId);
-            if (collection != null)
-                storage.Entry(collection).Reference("User").Load();
-            return collection;
-        }
-
-        private static SuperCollection RetrieveSuperCollection(Storage storage, Guid superCollectionId)
-        {
-            SuperCollection superCollection = storage.SuperCollections.Find(superCollectionId);
-            storage.Entry(superCollection).Reference("User").Load();
-            return superCollection;
-        }
-
-        static bool ValidateTimelineInCollection(Storage storage, Guid? timelineId, Guid collectionId)
-        {
-            // Validate that the collection of the parent timeline in the request object corresponds to the collection specified in the uri.
-            Guid timelineCollectionId = storage.GetCollectionFromTimeline(timelineId);
-            if (timelineCollectionId != collectionId)
-            {
-                SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.ParentTimelineCollectionMismatch);
-                return false;
-            }
-            return true;
-        }
-
-        public string GetMemiTypeByUrl(string url)
-        {
-            string contentType = "";
-            try
-            {
-                var request = HttpWebRequest.Create(url) as HttpWebRequest;
-                request.Method = "head";
-                if (request != null)
-                {
-                    var response = request.GetResponse() as HttpWebResponse;
-                    if (response != null)
-                        contentType = response.ContentType;
-                }
-                return contentType;
-            }
-            catch
-            {
-                return contentType;
-            }
-        }
-
-        #region FavoriteTimelines
-        private static Regex guidReg = new Regex(@"[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-        public Collection<TimelineShortcut> GetUserFavorites()
-        {
-            return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
-            {
-                if (user == null)
-                {
-                    return null;
-                }
-                var triple = storage.GetTriplet(String.Format("czusr:{0}", user.Id), "czpred:favorite").FirstOrDefault();
-                if (triple == null)
-                    return null;
-
-                var elements = new Collection<TimelineShortcut>();
-                foreach (var t in triple.Objects)
-                {
-                    if (storage.GetPrefix(t.Object) == "cztimeline")
-                    {
-                        var g = new Guid(storage.GetValue(t.Object));
-                        var timeline = storage.Timelines.Where(x => x.Id == g).Include(f => f.Collection).Include(u => u.Collection.User).FirstOrDefault();
-
-                        //ToDo: get image url
-                        if (timeline != null)
-                            elements.Add(new TimelineShortcut()
-                            {
-                                Title = timeline.Title,
-                                ImageUrl = "/images/chronozoom.png",
-                                TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, storage.GetContentPath(timeline.Collection.Id, timeline.Id, null)),
-                                Author = timeline.Collection.User.DisplayName
-                            });
-                    }
-                }
-                return elements;
-            });
-        }
-
-        public bool PutUserFavorite(string favoriteGUID)
-        {
-            if (!guidReg.IsMatch(favoriteGUID))
-                return false;
-
-            return ApiOperation<bool>(delegate(User user, Storage storage)
-            {
-                if (user == null)
-                {
-                    return false;
-                }
-                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
-            });
-        }
-
-        public bool DeleteUserFavorite(string favoriteGUID)
-        {
-            if (!guidReg.IsMatch(favoriteGUID))
-                return false;
-
-            return ApiOperation<bool>(delegate(User user, Storage storage)
-            {
-                if (user == null)
-                {
-                    return false;
-                }
-                return storage.DeleteTriplet(String.Format("czusr:{0}", user.Id), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
-            });
-        }
-
-        #endregion
-
-        #region FeaturedTimeline
-        public Collection<TimelineShortcut> GetUserFeatured(string guid)
-        {
-            return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
-            {
-                if (String.IsNullOrEmpty(guid))
-                {
-                    return null;
-                }
-                var triple = storage.GetTriplet(String.Format("czusr:{0}", new Guid(guid)), "czpred:featured").FirstOrDefault();
-                if (triple == null)
-                    return null;
-
-                var elements = new Collection<TimelineShortcut>();
-                foreach (var t in triple.Objects)
-                {
-                    if (storage.GetPrefix(t.Object) == "cztimeline")
-                    {
-                        string imageUrl = String.Empty;
-                        var g = new Guid(storage.GetValue(t.Object));
-                        var timeline = storage.Timelines.Where(x => x.Id == g)
-                            .Include("Collection")
-                            .Include("Collection.User")
-                            .Include("Exhibits")
-                            .Include("Exhibits.ContentItems")
-                            .FirstOrDefault();
-
-                        //ToDo: get image url
-                        if (timeline != null)
-                            imageUrl = getTimelineImageUrl(timeline);
-                            elements.Add(new TimelineShortcut()
-                            {
-                                Title = timeline.Title,
-                                ImageUrl = !string.IsNullOrEmpty(imageUrl) ? imageUrl : "/images/chronozoom.png",
-                                TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, storage.GetContentPath(timeline.Collection.Id, timeline.Id, null)),
-                                Author = timeline.Collection.User.DisplayName
-                            });
-                    }
-                }
-                return elements;
-            });
-        }
-
-        public bool PutUserFeatured(string faturedGUID)
-        {
-            if (!guidReg.IsMatch(faturedGUID))
-                return false;
-
-            return ApiOperation<bool>(delegate(User user, Storage storage)
-            {
                 if (user == null) {
                     // NOTE: Use this for test with anonymous user.
 <<<<<<< HEAD
@@ -2565,12 +2321,22 @@ namespace Chronozoom.UI
 >>>>>>> 576f06d... Integrate featured timelines to start page.
                 }
                 return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", faturedGUID));
+>>>>>>> f17887d... Integrate featured timelines to start page.
             });
         }
 
         public bool DeleteUserFeatured(string favoriteGUID)
         {
+<<<<<<< HEAD
+<<<<<<< HEAD
+            Guid g;
+            if (!Guid.TryParse(favoriteGUID, out g))
+=======
             if (!guidReg.IsMatch(favoriteGUID))
+>>>>>>> 58ca446... Homepage base
+=======
+            if (!guidReg.IsMatch(favoriteGUID))
+>>>>>>> f17887d... Integrate featured timelines to start page.
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2584,6 +2350,12 @@ namespace Chronozoom.UI
         }
         #endregion
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+=======
+=======
+>>>>>>> f17887d... Integrate featured timelines to start page.
         private static string getTimelineImageUrl(Timeline timeline)
         {
             foreach (var exhibit in timeline.Exhibits)
@@ -2599,5 +2371,9 @@ namespace Chronozoom.UI
 
             return String.Empty;
         }
+<<<<<<< HEAD
+>>>>>>> 58ca446... Homepage base
+=======
+>>>>>>> f17887d... Integrate featured timelines to start page.
     }
 }

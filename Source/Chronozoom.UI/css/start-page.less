@@ -20,6 +20,9 @@
     height: calc(100%);
     overflow: hidden;
 }
+    height: calc(100%);
+    overflow: hidden;
+}
 
 .FTList {
     display: none;
@@ -128,14 +131,28 @@
     color: white;
     border-top: 3px #666 solid;
  }
+//////////////////////////////
 
 .toggle-list-button {
     float: right; 
     margin: 18px 10px 0 0;
  }
 
+.boxInner {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 10px;
+ //   bottom: 10px;
+    overflow: visible;
 .template-invisible {
     display: none;
+.boxInner {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    overflow: visible;
 }
 
 @media only screen and (max-width : 650px), screen and (orientation: landscape) and (max-device-width : 480px) {
@@ -319,6 +336,11 @@
     .welcome-box-1 {
        // padding: 5px 5px 10px 5px;
        overflow:hidden;
+        white-space: nowrap;
+       // padding: 5px 5px 10px 5px;
+       overflow:hidden;
+        overflow: hidden;
+        white-space: nowrap;
         overflow: visible;
         vertical-align: top;
         font-size: 15px;
@@ -403,4 +425,9 @@
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
     }
+}
+
+
+
+}
 }

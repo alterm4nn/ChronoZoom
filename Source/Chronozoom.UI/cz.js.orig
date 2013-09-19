@@ -12919,7 +12919,6 @@ var CZ;
         }
         StartPage.cloneTweetTemplate = cloneTweetTemplate;
         function PlayIntroTour() {
-<<<<<<< HEAD
             var intoTour = CZ.Tours.tours[0];
             if(typeof intoTour === "undefined") {
                 return false;
@@ -12939,10 +12938,8 @@ var CZ;
             });
             CZ.Tours.tourCaptionForm.show();
             CZ.Tours.activateTour(intoTour, undefined);
-=======
             var toursListForm = CZ.HomePageViewModel.getFormById("#toursList");
             toursListForm.toursListBox.TakeTour(CZ.Tours.tours[0]);
->>>>>>> 1b4cfc1... what can I do with tours
         }
         StartPage.PlayIntroTour = PlayIntroTour;
         function TwitterLayout(target, idx) {
@@ -12972,6 +12969,11 @@ var CZ;
             }
         }
         StartPage.listFlip = listFlip;
+<<<<<<< HEAD
+        }
+        StartPage.InitializeStartVideo = InitializeStartVideo;
+=======
+>>>>>>> 91f56ef... refactoring
         function fillFeaturedTimelines(timelines) {
             var $template = $("#template-tile .box");
             var layout = CZ.StartPage.tileLayout[1];
@@ -13072,8 +13074,6 @@ var CZ;
                 fillFeaturedTimelines(response);
                 fillFeaturedTimelinesList(response);
             });
-            $(".home-icon").toggle(show, hide);
-            CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1);
             CZ.StartPage.cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list", 1);
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
@@ -13633,14 +13633,9 @@ var CZ;
                         loginForm.close();
                     }
                 });
-<<<<<<< HEAD
                 if(IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
                 }
-=======
-                CZ.StartPage.show();
-                CZ.StartPage.initialize();
->>>>>>> 1b4cfc1... what can I do with tours
             });
             CZ.Service.getServiceInformation().then(function (response) {
                 CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;

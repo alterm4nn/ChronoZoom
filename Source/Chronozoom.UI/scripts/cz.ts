@@ -844,8 +844,6 @@ module CZ {
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
-           /* CZ.StartPage.show();
-            CZ.StartPage.initialize();*/
         });
 
         export function IsFeatureEnabled(featureMap: FeatureInfo[], featureName: string) {

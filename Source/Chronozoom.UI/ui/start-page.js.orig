@@ -133,7 +133,6 @@ var CZ;
         }
         StartPage.cloneTweetTemplate = cloneTweetTemplate;
         function PlayIntroTour() {
-<<<<<<< HEAD
             var intoTour = CZ.Tours.tours[0];
             if(typeof intoTour === "undefined") {
                 return false;
@@ -153,10 +152,6 @@ var CZ;
             });
             CZ.Tours.tourCaptionForm.show();
             CZ.Tours.activateTour(intoTour, undefined);
-=======
-            var toursListForm = CZ.HomePageViewModel.getFormById("#toursList");
-            toursListForm.toursListBox.TakeTour(CZ.Tours.tours[0]);
->>>>>>> 1b4cfc1... what can I do with tours
         }
         StartPage.PlayIntroTour = PlayIntroTour;
         function TwitterLayout(target, idx) {
@@ -186,6 +181,11 @@ var CZ;
             }
         }
         StartPage.listFlip = listFlip;
+<<<<<<< HEAD
+        }
+        StartPage.InitializeStartVideo = InitializeStartVideo;
+=======
+>>>>>>> 91f56ef... refactoring
         function fillFeaturedTimelines(timelines) {
             var $template = $("#template-tile .box");
             var layout = CZ.StartPage.tileLayout[1];
@@ -284,6 +284,7 @@ var CZ;
             });
             CZ.Service.getUserFeatured("63c4373e-6712-44a6-9bb4-b99a2783f53a").done(function (response) {
                 fillFeaturedTimelines(response);
+            });
                 fillFeaturedTimelinesList(response);
             });
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);

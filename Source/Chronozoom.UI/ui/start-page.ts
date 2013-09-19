@@ -351,10 +351,78 @@ module CZ {
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
-
             var hash = CZ.UrlNav.getURL().hash.path;
             if (!hash || hash === "/t" + CZ.Settings.guidEmpty) {
                 show();
+            }
+        }
+
+        export function fillFeaturedTimelines(timelines) {
+            var $template = $("#template-tile .box");
+            var layout = CZ.StartPage.tileLayout[1];
+
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+                var $startPage = $("#start-page");
+                var $tile = $template.clone(true, true);
+                var $tileImage = $tile.find(".boxInner .tile-photo img");
+                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
+                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
+
+                // Set appearance and click handler.
+                $tile.appendTo(layout.Name)
+                    .addClass(layout.Visibility[i])
+                    .attr("id", "featured" + i)
+                    .click(function () {
+                        window.location.href = timelineUrl;
+                    });
+
+                // Resize and crop image on load.
+                // TODO: Why size of tile so strange? Only gradient has real size.
+                //       ($this.parent().next() is a gradient element)
+                $tileImage.load(function (event) {
+                    var $this = $(this);
+
+                    // TODO: Simplify this code.
+                    // Show start page if it's not visible to get size of the tile.
+                    var width = $this.parent().next().width();
+                    var height = $this.parent().next().height();
+                    if (!$startPage.is(":visible")) {
+                        $startPage.show();
+                        width = $this.parent().next().width();
+                        height = $this.parent().next().height();
+                        $startPage.hide();
+                    }
+                    
+                    var naturalHeight = (<any>event.srcElement).naturalHeight;
+                    var naturalWidth = (<any>event.srcElement).naturalWidth;
+                    var ratio = naturalWidth / naturalHeight;
+                    var marginTop = 0;
+                    var marginLeft = 0;
+
+                    if (naturalWidth > naturalHeight) {
+                        $this.height(height);
+                        $this.width(height * ratio);
+                        marginLeft = ($this.width() - $this.height()) / 2;
+                    } else {
+                        $this.width(width);
+                        $this.height(width / ratio);
+                        marginTop = ($this.height() - $this.width()) / 2;
+                    }
+
+                    $this.css({
+                        "margin-top": -marginTop + "px",
+                        "margin-left": -marginLeft + "px"
+                    });
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+
+                // Set title and author.
+                $tileTitle.text(timeline.Title);
+                $tileAuthor.text(timeline.Author);
             }
         }
 
@@ -395,15 +463,30 @@ module CZ {
         }
 
         export function initialize() {
-            $(".home-icon").toggle(show, hide);
+            $(".home-icon").click(function () {
+                if ($("#start-page").is(":visible")) {
+                    hide();
+                } else {
+                    show();
+                }
+            });
             
-             CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
+            // TODO: Replace with current user.
+            CZ.Service.getUserFeatured("63c4373e-6712-44a6-9bb4-b99a2783f53a").done(function (response) {
+                fillFeaturedTimelines(response);
+            });
+
+            // CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
             //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
-            CZ.StartPage.cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list",1); /* featured Timelines */
+            CZ.StartPage.cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list", 1); /* featured Timelines */
 
-            CZ.StartPage.cloneTweetTemplate( "#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
-            CZ.StartPage.TwitterLayout( CZ.StartPage.tileLayout, 2); 
+            CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
+            CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
 
+            var hash = CZ.UrlNav.getURL().hash.path;
+            if (!hash || hash === "/t" + CZ.Settings.guidEmpty) {
+                show();
+            }
         }
     }
 }
