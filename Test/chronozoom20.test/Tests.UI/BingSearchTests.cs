@@ -24,7 +24,7 @@ namespace Tests
             HomePageHelper.DeleteAllElementsLocally();
             var exhibit = new Exhibit { Title = "WebdriverExhibitWithContent" };
             ExhibitHelper.AddExhibitWithoutFormClosing(exhibit);
-            ExhibitHelper.ClickByAddArtifact();
+            ExhibitHelper.ClickOnAddArtifact();
         }
 
         [ClassCleanup]

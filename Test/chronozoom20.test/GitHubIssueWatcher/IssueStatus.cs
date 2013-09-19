@@ -18,7 +18,7 @@ namespace GitHubIssueWatcher
                 ResultsData objects = JsonConvert.DeserializeObject<ResultsData>(response);
                 return objects.Labels.Any(label => label.Name == "resolved");
             }
-            return true;
+            return false;
         }
 
         private static string SendRequest(string repository, string project, string issue)

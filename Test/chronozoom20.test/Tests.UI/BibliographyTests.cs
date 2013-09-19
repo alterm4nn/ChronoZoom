@@ -8,6 +8,7 @@ using Exhibit = Application.Helper.Entities.Exhibit;
 namespace Tests
 {
     [TestClass]
+    [Ignore]
     public class BibliographyTests : TestBase
     {
         private Exhibit _newExhibit;
@@ -60,6 +61,7 @@ namespace Tests
         #endregion
 
         [TestMethod]
+        [Ignore]
         public void Test_Open_Bibliography()
         {
             ExhibitHelper.NavigateToExhibit(_newExhibit);
