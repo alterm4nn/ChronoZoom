@@ -2072,7 +2072,7 @@ namespace Chronozoom.UI
         }
 
         #region FavoriteTimelines
-        private static Regex guidReg = new Regex(@"[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static Regex guidReg = new Regex(@"^[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public Collection<TimelineShortcut> GetUserFavorites()
         {
@@ -2146,10 +2146,9 @@ namespace Chronozoom.UI
         {
             return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
             {
-                if (String.IsNullOrEmpty(guid))
-                {
+                if (!guidReg.IsMatch(guid))
                     return null;
-                }
+
                 var triple = storage.GetTriplet(String.Format("czusr:{0}", new Guid(guid)), "czpred:featured").FirstOrDefault();
                 if (triple == null)
                     return null;
