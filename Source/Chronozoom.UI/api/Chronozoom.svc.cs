@@ -2100,7 +2100,7 @@ namespace Chronozoom.UI
                             {
                                 Title = timeline.Title,
                                 ImageUrl = "/images/chronozoom.png",
-                                TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, storage.GetContentPath(timeline.Collection.Id, timeline.Id, null)),
+                                TimelineUrl = storage.GetTimelineUrl(timeline),
                                 Author = timeline.Collection.User.DisplayName
                             });
                     }
@@ -2167,7 +2167,7 @@ namespace Chronozoom.UI
                             {
                                 Title = timeline.Title,
                                 ImageUrl = "/images/chronozoom.png",
-                                TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, storage.GetContentPath(timeline.Collection.Id, timeline.Id, null)),
+                                TimelineUrl = storage.GetTimelineUrl(timeline),
                                 Author = timeline.Collection.User.DisplayName
                             });
                     }
@@ -2206,5 +2206,7 @@ namespace Chronozoom.UI
             });
         }
         #endregion
+
+
     }
 }

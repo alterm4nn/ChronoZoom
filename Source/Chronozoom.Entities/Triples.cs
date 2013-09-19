@@ -314,5 +314,23 @@ namespace Chronozoom.Entities
                 return false;
             }
         }
+
+
+        /// <summary>
+        /// Get full timeline URL.
+        /// </summary>
+        /// <param name="timeline">Timeline object</param>
+        /// <returns>Returns Timeline URL</returns>
+        public string GetTimelineUrl(Timeline timeline)
+        {
+            if (timeline.Collection.Title == "Beta Content")
+            {
+                return String.Format("/#{0}", GetContentPath(timeline.Collection.Id, timeline.Id, null));
+            }
+            else
+            {
+                return String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, GetContentPath(timeline.Collection.Id, timeline.Id, null));
+            }
+        }
     }
 }
