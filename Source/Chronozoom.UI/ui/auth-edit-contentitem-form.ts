@@ -56,6 +56,18 @@ module CZ {
                 this.saveButton = container.find(formInfo.saveButton);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
 
+                this.titleInput.focus(() => {
+                    this.titleInput.hideError();
+                });
+
+                this.mediaInput.focus(() => {
+                    this.mediaInput.hideError();
+                });
+
+                this.mediaSourceInput.focus(() => {
+                    this.mediaSourceInput.hideError();
+                });
+
                 this.prevForm = formInfo.prevForm;
 
                 this.exhibit = formInfo.context.exhibit;
@@ -134,7 +146,16 @@ module CZ {
                     description: this.descriptionInput.val() || "",
                     order: this.contentItem.order
                 };
-                if (CZ.Authoring.validateContentItems([newContentItem])) {
+
+                if (!CZ.Authoring.isNotEmpty(newContentItem.title)) {
+                    this.titleInput.showError("Title can't be empty");
+                }
+
+                if (!CZ.Authoring.isNotEmpty(newContentItem.uri)) {
+                    this.mediaInput.showError("URL can't be empty");
+                }
+
+                if (CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
                         if (this.prevForm && this.prevForm instanceof FormEditExhibit) {
                             this.isCancel = false;
@@ -167,7 +188,17 @@ module CZ {
                                     this.close();
                                 },
                                 error => {
-                                    alert("Unable to save changes. Please try again later.");
+                                    var errorMessage = error.statusText;
+
+                                    if (errorMessage.match(/Media Source/)) {
+                                        this.errorMessage.text("One or more fields filled wrong");
+                                        this.mediaSourceInput.showError("Media Source URL is not a valid URL");
+                                    }
+                                    else {
+                                        this.errorMessage.text("Sorry, internal server error :(");
+                                    }
+
+                                    this.errorMessage.show().delay(7000).fadeOut();
                                 }
                             ).always(() => {
                                 this.saveButton.prop('disabled', false);
@@ -175,7 +206,7 @@ module CZ {
                         }
                     }
                 } else {
-                    this.errorMessage.show().delay(7000).fadeOut();
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
             }
 
@@ -213,6 +244,9 @@ module CZ {
                     duration: 500,
                     complete: () => {
                         this.mediaList.remove();
+                        this.mediaInput.hideError();
+                        this.titleInput.hideError();
+                        this.mediaSourceInput.hideError();
                     }
                 });
                 if (this.isCancel) {

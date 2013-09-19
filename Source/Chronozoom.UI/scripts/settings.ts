@@ -1,4 +1,6 @@
-﻿module CZ {
+﻿/// <reference path='typings/jquery/jquery.d.ts'/>
+
+module CZ {
     export module Settings {
         export var czDataSource = 'db'; // possible values: db, relay, dump
         // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
@@ -235,5 +237,7 @@
         // WL API constants
         export var WLAPIClientID = "0000000040101FFA";
         export var WLAPIRedirectUrl = "http://test.chronozoom.com/";
+
+        export var errorMessageSlideDuration = 0; // slide animation duration of input error messages
     }
 }
