@@ -420,6 +420,7 @@ var CZ;
                 });
                 CZ.Service.getProfile().done(function (data) {
                     if(data != "") {
+                        CZ.Settings.isAuthorized = true;
                         CZ.Authoring.timer = setTimeout(function () {
                             CZ.Authoring.showSessionForm();
                         }, (CZ.Settings.sessionTime - 60) * 1000);

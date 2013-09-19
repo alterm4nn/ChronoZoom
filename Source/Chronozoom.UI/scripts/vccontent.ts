@@ -803,7 +803,7 @@ module CZ {
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
             var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : CZ.Settings.timelineHeaderSize * timelineinfo.height;
-            var headerWidth = timelineinfo.titleRect && CZ.Authoring.isEnabled ? timelineinfo.titleRect.width : 0;
+            var headerWidth = timelineinfo.titleRect && (CZ.Authoring.isEnabled || CZ.Settings.isAuthorized) ? timelineinfo.titleRect.width : 0;
             var marginLeft = timelineinfo.titleRect ? timelineinfo.titleRect.marginLeft : CZ.Settings.timelineHeaderMargin * timelineinfo.height; // size of left and top margins (e.g. if timeline is for 100 years, relative margin timelineHeaderMargin=0.05, then absolute margin is 5 years).
             var marginTop = timelineinfo.titleRect ? timelineinfo.titleRect.marginTop : (1 - CZ.Settings.timelineHeaderMargin) * timelineinfo.height - headerSize;
             var baseline = timelineinfo.top + marginTop + headerSize / 2.0;
@@ -946,7 +946,43 @@ module CZ {
                 //rendering itself
                 this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
 
-                //initialize edit button if it isn't root collection and titleObject was already initialized
+                // initialize add favorite button if user is authorized
+                if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0) {
+                    var btnX = CZ.Authoring.isEnabled ? this.x + this.width - 1.8 * this.titleObject.height : this.x + this.width - 1.0 * this.titleObject.height;
+                    var btnY = this.titleObject.y + 0.15 * this.titleObject.height;
+
+                    this.favoriteBtn = addImage(this,
+                        layerid,
+                        id + "__favorite",
+                        btnX,
+                        btnY,
+                        0.7 * this.titleObject.height,
+                        0.7 * this.titleObject.height,
+                        "/images/star.svg");
+                    this.favoriteBtn.reactsOnMouse = true;
+
+                    this.favoriteBtn.onmouseclick = function () {
+                        CZ.Service.putUserFavorite(id);
+                        return true;
+                    }
+
+                    this.favoriteBtn.onmousehover = function () {
+                        this.parent.settings.strokeStyle = "yellow";
+                    }
+
+                    this.favoriteBtn.onmouseunhover = function () {
+                        this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+                    }
+
+                    // remove event handlers to prevent their stacking
+                    this.favoriteBtn.onRemove = function () {
+                        this.onmousehover = undefined;
+                        this.onmouseunhover = undefined;
+                        this.onmouseclick = undefined;
+                    }
+                }
+
+                // initialize edit button if it isn't root collection and titleObject was already initialized
                 if (CZ.Authoring.isEnabled && typeof this.editButton === "undefined" && this.titleObject.width !== 0) {
                     this.editButton = addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y,
                         this.titleObject.height, this.titleObject.height, "/images/edit.svg");
