@@ -2072,7 +2072,6 @@ namespace Chronozoom.UI
         }
 
         #region FavoriteTimelines
-        private static Regex guidReg = new Regex(@"^[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public Collection<TimelineShortcut> GetUserFavorites()
         {
@@ -2096,13 +2095,7 @@ namespace Chronozoom.UI
 
                         //ToDo: get image url
                         if (timeline != null)
-                            elements.Add(new TimelineShortcut()
-                            {
-                                Title = timeline.Title,
-                                ImageUrl = "/images/chronozoom.png",
-                                TimelineUrl = storage.GetTimelineUrl(timeline),
-                                Author = timeline.Collection.User.DisplayName
-                            });
+                            elements.Add(storage.GetTimelineShortcut(timeline));
                     }
                 }
                 return elements;
@@ -2111,7 +2104,8 @@ namespace Chronozoom.UI
 
         public bool PutUserFavorite(string favoriteGUID)
         {
-            if (!guidReg.IsMatch(favoriteGUID))
+            Guid g;
+            if (!Guid.TryParse(favoriteGUID, out g))
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2126,7 +2120,8 @@ namespace Chronozoom.UI
 
         public bool DeleteUserFavorite(string favoriteGUID)
         {
-            if (!guidReg.IsMatch(favoriteGUID))
+            Guid g;
+            if (!Guid.TryParse(favoriteGUID, out g))
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2146,10 +2141,11 @@ namespace Chronozoom.UI
         {
             return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
             {
-                if (!guidReg.IsMatch(guid))
+                Guid userGuid;
+                if (!Guid.TryParse(guid, out userGuid))
                     return null;
 
-                var triple = storage.GetTriplet(String.Format("czusr:{0}", new Guid(guid)), "czpred:featured").FirstOrDefault();
+                var triple = storage.GetTriplet(String.Format("czusr:{0}", userGuid), "czpred:featured").FirstOrDefault();
                 if (triple == null)
                     return null;
 
@@ -2163,13 +2159,7 @@ namespace Chronozoom.UI
 
                         //ToDo: get image url
                         if (timeline != null)
-                            elements.Add(new TimelineShortcut()
-                            {
-                                Title = timeline.Title,
-                                ImageUrl = "/images/chronozoom.png",
-                                TimelineUrl = storage.GetTimelineUrl(timeline),
-                                Author = timeline.Collection.User.DisplayName
-                            });
+                            elements.Add(storage.GetTimelineShortcut(timeline));
                     }
                 }
                 return elements;
@@ -2178,7 +2168,8 @@ namespace Chronozoom.UI
 
         public bool PutUserFeatured(string faturedGUID)
         {
-            if (!guidReg.IsMatch(faturedGUID))
+            Guid g;
+            if (!Guid.TryParse(faturedGUID, out g))
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2193,7 +2184,8 @@ namespace Chronozoom.UI
 
         public bool DeleteUserFeatured(string favoriteGUID)
         {
-            if (!guidReg.IsMatch(favoriteGUID))
+            Guid g;
+            if (!Guid.TryParse(favoriteGUID, out g))
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)

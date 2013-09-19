@@ -317,20 +317,29 @@ namespace Chronozoom.Entities
 
 
         /// <summary>
-        /// Get full timeline URL.
+        /// Get TimelineShortctu from Timeline
         /// </summary>
         /// <param name="timeline">Timeline object</param>
-        /// <returns>Returns Timeline URL</returns>
-        public string GetTimelineUrl(Timeline timeline)
+        /// <returns>TimelineShortcut</returns>
+        public TimelineShortcut GetTimelineShortcut(Timeline timeline)
         {
+            var ts = new TimelineShortcut()
+            {
+                Title = timeline.Title
+            };
+
             if (timeline.Collection.Title == "Beta Content")
             {
-                return String.Format("/#{0}", GetContentPath(timeline.Collection.Id, timeline.Id, null));
+                ts.TimelineUrl = String.Format("/#{0}", GetContentPath(timeline.Collection.Id, timeline.Id, null));
+                ts.Author = "Chronozoom";
             }
             else
             {
-                return String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, GetContentPath(timeline.Collection.Id, timeline.Id, null));
+                ts.TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, GetContentPath(timeline.Collection.Id, timeline.Id, null));
+                ts.Author = timeline.Collection.User.DisplayName;
             }
+            ts.ImageUrl = "/images/chronozoom.png";
+            return ts;
         }
     }
 }
