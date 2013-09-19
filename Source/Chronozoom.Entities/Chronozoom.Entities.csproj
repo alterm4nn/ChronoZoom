@@ -70,6 +70,7 @@
     <Compile Include="Collection.cs" />
     <Compile Include="ContentItem.cs" />
     <Compile Include="Exhibit.cs" />
+    <Compile Include="TimelineShortcut.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Migrations\201305102053361_RemoveBetaFields.cs" />
     <Compile Include="Migrations\201305102053361_RemoveBetaFields.Designer.cs">
@@ -125,6 +126,10 @@
     <Compile Include="Timeline.cs" />
     <Compile Include="TimelineExtensions.cs" />
     <Compile Include="Tour.cs" />
+    <Compile Include="Triple.cs" />
+    <Compile Include="TripleObject.cs" />
+    <Compile Include="TriplePrefix.cs" />
+    <Compile Include="Triples.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>

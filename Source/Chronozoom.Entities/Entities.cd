@@ -25,7 +25,7 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAACAgCABAAAQGAIAAAAAAAAAAABAAAgAAAAAAAAAIA=</HashCode>
+      <HashCode>AAACAgCABAAAQGAIAAAAAAAAAAABAACgAAAAAAAAAIA=</HashCode>
       <FileName>Timeline.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -37,7 +37,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Chronozoom.Entities.ContentItem">
-    <Position X="7.25" Y="6" Width="1.5" />
+    <Position X="8.25" Y="5.5" Width="1.5" />
     <Members>
       <Property Name="MediaSource" Hidden="true" />
       <Property Name="MediaType" Hidden="true" />
@@ -50,7 +50,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Chronozoom.Entities.Tour">
-    <Position X="7.5" Y="2.5" Width="1.5" />
+    <Position X="10" Y="4.5" Width="1.5" />
     <Members>
       <Property Name="Bookmarks" Hidden="true" />
       <Property Name="Category" Hidden="true" />
@@ -58,14 +58,14 @@
       <Property Name="UniqueId" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>BAACAAAAAABAQAAAAAAAAAQAAAAAAAAAAAAAAAEASAA=</HashCode>
+      <HashCode>BAACAAAAAABgQAAAAAAAAAQAAAAAAAAAAAAAAAEASAA=</HashCode>
       <FileName>Tour.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Chronozoom.Entities.Collection">
     <Position X="0.5" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAADAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAADAAAAAAAAAEAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Collection.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -78,6 +78,30 @@
     <ShowAsCollectionAssociation>
       <Property Name="Collections" />
     </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Chronozoom.Entities.Triple">
+    <Position X="5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAIAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>Triple.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Objects" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Chronozoom.Entities.TripleObject">
+    <Position X="7.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TripleObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chronozoom.Entities.TriplePrefix">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TriplePrefix.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
