@@ -15,12 +15,10 @@ namespace Chronozoom.Entities
                 return;
 
             operation(timeline);
-            if (timeline.ChildTimelines != null)
+            if (timeline.ChildTimelines == null) return;
+            foreach (Timeline childTimeline in timeline.ChildTimelines)
             {
-                foreach (Timeline childTimeline in timeline.ChildTimelines)
-                {
-                    Traverse(childTimeline, operation);
-                }
+                Traverse(childTimeline, operation);
             }
         }
     }
