@@ -599,17 +599,17 @@ namespace Chronozoom.UI
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/getuserfavorites", ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "GET", UriTemplate = "/userfavorites", ResponseFormat = WebMessageFormat.Json)]
         Collection<TimelineShortcut> GetUserFavorites();
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/putuserfavorite?guid={favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "PUT", UriTemplate = "/userfavorite?guid={favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
         bool PutUserFavorite(string favoriteGUID);
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/deleteuserfavorite?guid={favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/userfavorite?guid={favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
         bool DeleteUserFavorite(string favoriteGUID);
 
         #endregion
@@ -618,17 +618,17 @@ namespace Chronozoom.UI
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/getuserfeatured?guid={featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "GET", UriTemplate = "/userfeatured?guid={featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
         Collection<TimelineShortcut> GetUserFeatured(string featuredGUID);
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/putuserfeatured?guid={featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "PUT", UriTemplate = "/userfeatured?guid={featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
         bool PutUserFeatured(string featuredGUID);
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/deleteuserfeatured?guid={featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/userfeatured?guid={featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
         bool DeleteUserFeatured(string featuredGUID);
 
         #endregion

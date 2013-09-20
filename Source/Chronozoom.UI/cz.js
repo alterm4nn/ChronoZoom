@@ -3929,7 +3929,7 @@ var CZ;
             }
             request.addParameter("guid", guid);
             return $.ajax({
-                type: "GET",
+                type: "DELETE",
                 cache: false,
                 contentType: "application/json",
                 url: request.url
@@ -3946,7 +3946,7 @@ var CZ;
             }
             request.addParameter("guid", guid);
             return $.ajax({
-                type: "GET",
+                type: "PUT",
                 cache: false,
                 contentType: "application/json",
                 url: request.url
@@ -3977,7 +3977,7 @@ var CZ;
             }
             request.addParameter("guid", guid);
             return $.ajax({
-                type: "GET",
+                type: "DELETE",
                 cache: false,
                 contentType: "application/json",
                 url: request.url
@@ -3994,7 +3994,7 @@ var CZ;
             }
             request.addParameter("guid", guid);
             return $.ajax({
-                type: "GET",
+                type: "PUT",
                 cache: false,
                 contentType: "application/json",
                 url: request.url

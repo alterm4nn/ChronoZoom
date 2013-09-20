@@ -584,7 +584,7 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("getuserfavorites");
+            request.addToPath("userfavorites");
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -597,13 +597,13 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("deleteuserfavorite");
+            request.addToPath("userfavorite");
             if(guid == "") {
                 return null;
             }
             request.addParameter("guid", guid);
             return $.ajax({
-                type: "GET",
+                type: "DELETE",
                 cache: false,
                 contentType: "application/json",
                 url: request.url
@@ -614,13 +614,13 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("putuserfavorite");
+            request.addToPath("userfavorite");
             if(guid == "") {
                 return null;
             }
             request.addParameter("guid", guid);
             return $.ajax({
-                type: "GET",
+                type: "PUT",
                 cache: false,
                 contentType: "application/json",
                 url: request.url
@@ -631,7 +631,7 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("getuserfeatured");
+            request.addToPath("userfeatured");
             request.addParameter("guid", guid);
             return $.ajax({
                 type: "GET",
@@ -645,13 +645,13 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("deleteuserfeatured");
+            request.addToPath("userfeatured");
             if(guid == "") {
                 return null;
             }
             request.addParameter("guid", guid);
             return $.ajax({
-                type: "GET",
+                type: "DELETE",
                 cache: false,
                 contentType: "application/json",
                 url: request.url
@@ -662,13 +662,13 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("putuserfeatured");
+            request.addToPath("userfeatured");
             if(guid == "") {
                 return null;
             }
             request.addParameter("guid", guid);
             return $.ajax({
-                type: "GET",
+                type: "PUT",
                 cache: false,
                 contentType: "application/json",
                 url: request.url
