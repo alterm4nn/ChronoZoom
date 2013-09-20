@@ -615,12 +615,13 @@ module CZ {
                     }
                 });
 <<<<<<< HEAD
+=======
+
+                // Show home page.
+>>>>>>> 6ee76cb... Feature activation of start page.
                 if (IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
                 }
-=======
-                CZ.StartPage.initialize();
->>>>>>> e033fc3... start page in separate html
             });
 
             CZ.Service.getServiceInformation().then(
