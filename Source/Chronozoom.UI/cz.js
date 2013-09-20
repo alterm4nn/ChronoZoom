@@ -13056,12 +13056,6 @@ var CZ;
             if(!hash || hash === "/t" + CZ.Settings.guidEmpty) {
                 show();
             }
-            $(".home-icon").toggle(show, hide);
-            cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1);
-            cloneListTemplate("#template-list .list-item", "#FeaturedTimelinesBlock-list", 1);
-            cloneTweetTemplate("#template-tweet .tweet-box", CZ.StartPage.tileLayout, 2);
-            TwitterLayout(CZ.StartPage.tileLayout, 2);
-            InitializeStartVideo();
         }
         StartPage.initialize = initialize;
     })(CZ.StartPage || (CZ.StartPage = {}));
