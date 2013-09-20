@@ -1,3 +1,6 @@
+@import "_colors";
+@import "_mixins";
+
 @import "timescale";
 @import "datepicker";
 @import "media";
@@ -12,6 +15,7 @@
 
 @footerHeight: 25px; /* The height of the page footer */
 @footerLinksWidth: 350px; /* The width of the footers links area */
+
 
 html, body
 {
@@ -1202,6 +1206,16 @@ img.fallbackBackground
     text-align: justify;
 }
 
+.cz-input-wrapper {
+    input.error {
+        border: @border-error;
+    }
+
+    div.error {
+        .input-error-message;
+    }
+}
+
 .cz-input
 {
     color: #232323;
@@ -1272,7 +1286,8 @@ img.fallbackBackground
 
 .cz-form-errormsg
 {
-    color: #dd4b39;
+    .form-error-message;
+
     display: block;
 }
 

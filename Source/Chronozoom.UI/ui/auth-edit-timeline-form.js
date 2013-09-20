@@ -9,6 +9,7 @@ var CZ;
         var FormEditTimeline = (function (_super) {
             __extends(FormEditTimeline, _super);
             function FormEditTimeline(container, formInfo) {
+                var _this = this;
                         _super.call(this, container, formInfo);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
@@ -19,6 +20,9 @@ var CZ;
                 this.timeline = formInfo.context;
                 this.saveButton.off();
                 this.deleteButton.off();
+                this.titleInput.focus(function () {
+                    _this.titleInput.hideError();
+                });
                 this.initialize();
             }
             FormEditTimeline.prototype.initialize = function () {
@@ -51,14 +55,13 @@ var CZ;
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
                 this.saveButton.click(function (event) {
-                    _this.startDate.setDate("d");
-                    var result = _this.startDate.getDate();
                     _this.errorMessage.empty();
                     var isDataValid = false;
                     isDataValid = CZ.Authoring.validateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
                     if(!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
-                        _this.errorMessage.text('Title is empty');
-                    } else if(!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
+                        _this.titleInput.showError("Title can't be empty");
+                    }
+                    if(!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
                         _this.errorMessage.text('Time interval should no less than one day');
                     }
                     if(!isDataValid) {
@@ -77,9 +80,9 @@ var CZ;
                             self.timeline.onmouseclick();
                         }, function (error) {
                             if(error !== undefined && error !== null) {
-                                self.errorMessage.text(error);
+                                self.errorMessage.text(error).show().delay(7000).fadeOut();
                             } else {
-                                alert("Unable to save changes. Please try again later.");
+                                self.errorMessage.text("Sorry, internal server error :(").show().delay(7000).fadeOut();
                             }
                             console.log(error);
                         }).always(function () {
@@ -113,6 +116,7 @@ var CZ;
                     complete: function () {
                         _this.endDate.remove();
                         _this.startDate.remove();
+                        _this.titleInput.hideError();
                     }
                 });
                 if(this.isCancel && CZ.Authoring.mode === "createTimeline") {

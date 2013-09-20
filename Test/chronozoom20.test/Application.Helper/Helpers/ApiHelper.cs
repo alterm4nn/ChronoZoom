@@ -58,6 +58,7 @@ namespace Application.Helper.Helpers
 
         public void CreateExhibitByApi(Exhibit exhibit)
         {
+            Logger.Log("<- exhibit: " + exhibit,LogType.MessageWithoutScreenshot);
             DataContractJsonSerializer exhibitSerializer = new DataContractJsonSerializer(typeof(Exhibit));
             DataContractJsonSerializer guidSerializer = new DataContractJsonSerializer(typeof(NewExhibitApiResponse));
 
@@ -76,6 +77,7 @@ namespace Application.Helper.Helpers
 
             NewExhibitApiResponse newExhibitApiResponse = (NewExhibitApiResponse)guidSerializer.ReadObject(responseStream);
             exhibit.Id = new Guid(newExhibitApiResponse.ExhibitId);
+            Logger.Log("->");
         }
 
         public void DeleteExhibitByApi(Exhibit exhibit)

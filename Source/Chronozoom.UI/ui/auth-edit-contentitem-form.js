@@ -9,6 +9,7 @@ var CZ;
         var FormEditCI = (function (_super) {
             __extends(FormEditCI, _super);
             function FormEditCI(container, formInfo) {
+                var _this = this;
                         _super.call(this, container, formInfo);
                 this.titleTextblock = container.find(formInfo.titleTextblock);
                 this.titleInput = container.find(formInfo.titleInput);
@@ -20,6 +21,15 @@ var CZ;
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
+                this.titleInput.focus(function () {
+                    _this.titleInput.hideError();
+                });
+                this.mediaInput.focus(function () {
+                    _this.mediaInput.hideError();
+                });
+                this.mediaSourceInput.focus(function () {
+                    _this.mediaSourceInput.hideError();
+                });
                 this.prevForm = formInfo.prevForm;
                 this.exhibit = formInfo.context.exhibit;
                 this.contentItem = formInfo.context.contentItem;
@@ -112,9 +122,15 @@ var CZ;
                     description: this.descriptionInput.val() || "",
                     order: this.contentItem.order
                 };
+                if(!CZ.Authoring.isNotEmpty(newContentItem.title)) {
+                    this.titleInput.showError("Title can't be empty");
+                }
+                if(!CZ.Authoring.isNotEmpty(newContentItem.uri)) {
+                    this.mediaInput.showError("URL can't be empty");
+                }
                 if(CZ.Authoring.validateContentItems([
                     newContentItem
-                ])) {
+                ], this.mediaInput)) {
                     if(CZ.Authoring.contentItemMode === "createContentItem") {
                         if(this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
@@ -145,14 +161,21 @@ var CZ;
                                 _this.isModified = false;
                                 _this.close();
                             }, function (error) {
-                                alert("Unable to save changes. Please try again later.");
+                                var errorMessage = error.statusText;
+                                if(errorMessage.match(/Media Source/)) {
+                                    _this.errorMessage.text("One or more fields filled wrong");
+                                    _this.mediaSourceInput.showError("Media Source URL is not a valid URL");
+                                } else {
+                                    _this.errorMessage.text("Sorry, internal server error :(");
+                                }
+                                _this.errorMessage.show().delay(7000).fadeOut();
                             }).always(function () {
                                 _this.saveButton.prop('disabled', false);
                             });
                         }
                     }
                 } else {
-                    this.errorMessage.show().delay(7000).fadeOut();
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
             };
             FormEditCI.prototype.updateMediaInfo = function () {
@@ -188,6 +211,9 @@ var CZ;
                     duration: 500,
                     complete: function () {
                         _this.mediaList.remove();
+                        _this.mediaInput.hideError();
+                        _this.titleInput.hideError();
+                        _this.mediaSourceInput.hideError();
                     }
                 });
                 if(this.isCancel) {

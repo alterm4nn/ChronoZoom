@@ -50,6 +50,10 @@ module CZ {
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
 
+                this.titleInput.focus(() => {
+                    this.titleInput.hideError();
+                });
+
                 this.contentItemsTemplate = formInfo.contentItemsTemplate;
 
                 this.exhibit = formInfo.context;
@@ -150,8 +154,7 @@ module CZ {
                 }
             }
 
-            private onSave() {
-                
+            private onSave() {                
                 var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
                 var exhibit_y = this.exhibit.y;
 
@@ -180,6 +183,14 @@ module CZ {
                     type: "infodot"
                 };
 
+                if (!CZ.Authoring.isNotEmpty(this.titleInput.val())) {
+                    this.titleInput.showError("Title can't be empty");
+                }
+
+                if (CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true)) {
+                    this.errorMessage.text("Exhibit intersects other elemenets");
+                }
+
                 if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) &&
                     CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) &&
                     this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
@@ -197,7 +208,16 @@ module CZ {
 
                         },
                         error => {
-                            alert("Unable to save changes. Please try again later.");
+                            var errorMessage = JSON.parse(error.responseText).errorMessage;
+
+                            if (errorMessage !== "") {
+                                this.errorMessage.text(errorMessage);
+                            }
+                            else {
+                                this.errorMessage.text("Sorry, internal server error :(")
+                            }
+
+                            this.errorMessage.show().delay(7000).fadeOut();
                         }
                     ).always(() => {
                         this.saveButton.prop('disabled', false);
@@ -211,7 +231,7 @@ module CZ {
                         .delay(7000)
                         .fadeOut(() => self.errorMessage.text(origMsg));
                 } else {
-                    this.errorMessage.show().delay(7000).fadeOut();
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
             }
 
@@ -303,8 +323,7 @@ module CZ {
                     }
                     else {
                         return;
-                    }
-                    
+                    }                   
                 }
 
                 super.close(noAnimation ? undefined : {
@@ -314,6 +333,7 @@ module CZ {
                     complete: () => {
                         this.datePicker.remove();
                         this.contentItemsListBox.clear();
+                        this.titleInput.hideError();
                     }
                 });
                 if (this.isCancel) {

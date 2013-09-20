@@ -32,7 +32,7 @@ namespace Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            AuthorizationHelper.DeleteAuthenticatedCookies();
+            AuthorizationHelper.LogoutByUrl();
             CreateScreenshotsIfTestFail(TestContext);
         }
 

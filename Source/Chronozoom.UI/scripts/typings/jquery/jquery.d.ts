@@ -801,6 +801,13 @@ interface JQuery {
     queue(queueName?: string): any[];
     queue(queueName: string, newQueueOrCallback: any): JQuery;
     queue(newQueueOrCallback: any): JQuery;
+
+    /******
+     CUSTOM
+    *******/
+
+    showError(...arguments: any[]): JQuery;
+    hideError(): JQuery;
 }
 
 interface EventTarget {
