@@ -16,7 +16,7 @@ namespace RandomDataGenerator
         public static string GetRandomImageUrl()
         {
             string searchPattern = GetRandomWord();
-            return GetUrl(searchPattern, ServiceType.Image);
+            return GetUrl(String.Format("{0}+filetype:jpg%20OR%20filetype:jpeg%20OR%20filetype:png%20OR%20filetype:gif", searchPattern), ServiceType.Image);
         }
 
         public static string GetRandomVideoUrl()
