@@ -163,7 +163,6 @@ var CZ;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
-                    console.log(response);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-text").text(text);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-author").text(author);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-time").text(convertedDate);
@@ -181,11 +180,6 @@ var CZ;
             }
         }
         StartPage.listFlip = listFlip;
-<<<<<<< HEAD
-        }
-        StartPage.InitializeStartVideo = InitializeStartVideo;
-=======
->>>>>>> 91f56ef... refactoring
         function fillFeaturedTimelines(timelines) {
             var $template = $("#template-tile .box");
             var layout = CZ.StartPage.tileLayout[1];
@@ -284,9 +278,13 @@ var CZ;
             });
             CZ.Service.getUserFeatured("63c4373e-6712-44a6-9bb4-b99a2783f53a").done(function (response) {
                 fillFeaturedTimelines(response);
-            });
                 fillFeaturedTimelinesList(response);
             });
+<<<<<<< HEAD
+                fillFeaturedTimelinesList(response);
+            });
+=======
+>>>>>>> 213fa2b... list of FT
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
             var hash = CZ.UrlNav.getURL().hash.path;

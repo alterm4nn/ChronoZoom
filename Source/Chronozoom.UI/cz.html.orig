@@ -294,7 +294,7 @@
                 <div class="list-item">
                     <div class="li-title"><a href="#">REPLACE</a></div>
                     <div class="li-author"></div>
-                    <div class="li-icon"></div>
+                  <!--  <div class="li-icon"></div>-->
                     <div class="cleardiv"></div>
                 </div>
             </div>
@@ -335,7 +335,7 @@
             </div>
 
         </div>
->>>>>>> a6a47ff... additional refactored
+>>>>>>> 213fa2b... list of FT
 
     </div>
 
