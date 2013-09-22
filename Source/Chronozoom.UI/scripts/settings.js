@@ -1,6 +1,7 @@
 var CZ;
 (function (CZ) {
     (function (Settings) {
+        Settings.isAuthorized = false;
         Settings.czDataSource = 'db';
         Settings.czVersion = "main";
         Settings.ellipticalZoomZoomoutFactor = 0.5;

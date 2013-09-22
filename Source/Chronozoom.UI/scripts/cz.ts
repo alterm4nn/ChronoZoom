@@ -488,6 +488,7 @@ module CZ {
                 CZ.Service.getProfile().done(data => {
                     //Authorized
                     if (data != "") {
+                        CZ.Settings.isAuthorized = true;
                         CZ.Authoring.timer = setTimeout(() => { CZ.Authoring.showSessionForm(); }, (CZ.Settings.sessionTime - 60) * 1000);
                     }
 
