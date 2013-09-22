@@ -1,6 +1,7 @@
 ﻿var CZ;
 (function (CZ) {
     (function (Settings) {
+        Settings.isAuthorized = false;
         Settings.czDataSource = 'db';
         Settings.czVersion = "main";
         Settings.ellipticalZoomZoomoutFactor = 0.5;
@@ -1265,7 +1266,7 @@ var CZ;
             this.endDate = timelineinfo.endDate;
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
             var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : CZ.Settings.timelineHeaderSize * timelineinfo.height;
-            var headerWidth = timelineinfo.titleRect && CZ.Authoring.isEnabled ? timelineinfo.titleRect.width : 0;
+            var headerWidth = timelineinfo.titleRect && (CZ.Authoring.isEnabled || CZ.Settings.isAuthorized) ? timelineinfo.titleRect.width : 0;
             var marginLeft = timelineinfo.titleRect ? timelineinfo.titleRect.marginLeft : CZ.Settings.timelineHeaderMargin * timelineinfo.height;
             var marginTop = timelineinfo.titleRect ? timelineinfo.titleRect.marginTop : (1 - CZ.Settings.timelineHeaderMargin) * timelineinfo.height - headerSize;
             var baseline = timelineinfo.top + marginTop + headerSize / 2.0;
@@ -1369,6 +1370,27 @@ var CZ;
                     this.settings.gradientOpacity = Math.min(1, Math.max(0, this.settings.gradientOpacity + this.settings.hoverAnimationDelta));
                 }
                 this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
+                if(CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0) {
+                    var btnX = CZ.Authoring.isEnabled ? this.x + this.width - 1.8 * this.titleObject.height : this.x + this.width - 1.0 * this.titleObject.height;
+                    var btnY = this.titleObject.y + 0.15 * this.titleObject.height;
+                    this.favoriteBtn = VCContent.addImage(this, layerid, id + "__favorite", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/star.svg");
+                    this.favoriteBtn.reactsOnMouse = true;
+                    this.favoriteBtn.onmouseclick = function () {
+                        CZ.Service.putUserFavorite(id);
+                        return true;
+                    };
+                    this.favoriteBtn.onmousehover = function () {
+                        this.parent.settings.strokeStyle = "yellow";
+                    };
+                    this.favoriteBtn.onmouseunhover = function () {
+                        this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+                    };
+                    this.favoriteBtn.onRemove = function () {
+                        this.onmousehover = undefined;
+                        this.onmouseunhover = undefined;
+                        this.onmouseclick = undefined;
+                    };
+                }
                 if(CZ.Authoring.isEnabled && typeof this.editButton === "undefined" && this.titleObject.width !== 0) {
                     this.editButton = VCContent.addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y, this.titleObject.height, this.titleObject.height, "/images/edit.svg");
                     this.editButton.reactsOnMouse = true;
@@ -6850,11 +6872,11 @@ var CZ;
                 height = width * 100.0 / size.width;
             }
             return {
-                width: width - 1.25 * height,
+                width: width - 2.1 * height,
                 height: height,
                 marginTop: tlHeight - height - margin,
                 marginLeft: margin,
-                bboxWidth: width + 2 * margin - 1.25 * height,
+                bboxWidth: width + 2 * margin - 2.1 * height,
                 bboxHeight: height + 2 * margin
             };
         }
@@ -13167,6 +13189,7 @@ var CZ;
                 });
                 CZ.Service.getProfile().done(function (data) {
                     if(data != "") {
+                        CZ.Settings.isAuthorized = true;
                         CZ.Authoring.timer = setTimeout(function () {
                             CZ.Authoring.showSessionForm();
                         }, (CZ.Settings.sessionTime - 60) * 1000);

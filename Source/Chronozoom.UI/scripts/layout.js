@@ -338,11 +338,11 @@ var CZ;
                 height = width * 100.0 / size.width;
             }
             return {
-                width: width - 1.25 * height,
+                width: width - 2.1 * height,
                 height: height,
                 marginTop: tlHeight - height - margin,
                 marginLeft: margin,
-                bboxWidth: width + 2 * margin - 1.25 * height,
+                bboxWidth: width + 2 * margin - 2.1 * height,
                 bboxHeight: height + 2 * margin
             };
         }
