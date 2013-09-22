@@ -1967,7 +1967,10 @@ namespace Chronozoom.UI
                 User user = new User();
                 user.NameIdentifier = nameIdentifierClaim.Value;
                 user.IdentityProvider = identityProviderClaim.Value;
-
+                var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+                if (u != null)
+                    user.Id = u.Id;
+    
                 return operation(user, storage);
             }
         }
@@ -2089,7 +2092,6 @@ namespace Chronozoom.UI
         }
 
         #region FavoriteTimelines
-        private static Regex guidReg = new Regex(@"[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public Collection<TimelineShortcut> GetUserFavorites()
         {
@@ -2113,13 +2115,7 @@ namespace Chronozoom.UI
 
                         //ToDo: get image url
                         if (timeline != null)
-                            elements.Add(new TimelineShortcut()
-                            {
-                                Title = timeline.Title,
-                                ImageUrl = "/images/chronozoom.png",
-                                TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, storage.GetContentPath(timeline.Collection.Id, timeline.Id, null)),
-                                Author = timeline.Collection.User.DisplayName
-                            });
+                            elements.Add(storage.GetTimelineShortcut(timeline));
                     }
                 }
                 return elements;
@@ -2128,7 +2124,8 @@ namespace Chronozoom.UI
 
         public bool PutUserFavorite(string favoriteGUID)
         {
-            if (!guidReg.IsMatch(favoriteGUID))
+            Guid g;
+            if (!Guid.TryParse(favoriteGUID, out g))
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2143,7 +2140,8 @@ namespace Chronozoom.UI
 
         public bool DeleteUserFavorite(string favoriteGUID)
         {
-            if (!guidReg.IsMatch(favoriteGUID))
+            Guid g;
+            if (!Guid.TryParse(favoriteGUID, out g))
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2163,11 +2161,11 @@ namespace Chronozoom.UI
         {
             return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
             {
-                if (String.IsNullOrEmpty(guid))
-                {
+                Guid userGuid;
+                if (!Guid.TryParse(guid, out userGuid))
                     return null;
-                }
-                var triple = storage.GetTriplet(String.Format("czusr:{0}", new Guid(guid)), "czpred:featured").FirstOrDefault();
+
+                var triple = storage.GetTriplet(String.Format("czusr:{0}", userGuid), "czpred:featured").FirstOrDefault();
                 if (triple == null)
                     return null;
 
@@ -2181,22 +2179,17 @@ namespace Chronozoom.UI
 
                         //ToDo: get image url
                         if (timeline != null)
-                            elements.Add(new TimelineShortcut()
-                            {
-                                Title = timeline.Title,
-                                ImageUrl = "/images/chronozoom.png",
-                                TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, storage.GetContentPath(timeline.Collection.Id, timeline.Id, null)),
-                                Author = timeline.Collection.User.DisplayName
-                            });
+                            elements.Add(storage.GetTimelineShortcut(timeline));
                     }
                 }
                 return elements;
             });
         }
 
-        public bool PutUserFeatured(string faturedGUID)
+        public bool PutUserFeatured(string featuredGUID)
         {
-            if (!guidReg.IsMatch(faturedGUID))
+            Guid g;
+            if (!Guid.TryParse(featuredGUID, out g))
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2205,13 +2198,14 @@ namespace Chronozoom.UI
                 {
                     return false;
                 }
-                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", faturedGUID));
+                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", featuredGUID));
             });
         }
 
         public bool DeleteUserFeatured(string favoriteGUID)
         {
-            if (!guidReg.IsMatch(favoriteGUID))
+            Guid g;
+            if (!Guid.TryParse(favoriteGUID, out g))
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -2224,5 +2218,7 @@ namespace Chronozoom.UI
             });
         }
         #endregion
+
+
     }
 }
