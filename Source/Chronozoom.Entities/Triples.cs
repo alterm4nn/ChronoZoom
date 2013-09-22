@@ -314,5 +314,32 @@ namespace Chronozoom.Entities
                 return false;
             }
         }
+
+
+        /// <summary>
+        /// Get TimelineShortctu from Timeline
+        /// </summary>
+        /// <param name="timeline">Timeline object</param>
+        /// <returns>TimelineShortcut</returns>
+        public TimelineShortcut GetTimelineShortcut(Timeline timeline)
+        {
+            var ts = new TimelineShortcut()
+            {
+                Title = timeline.Title
+            };
+
+            if (timeline.Collection.Title == "Beta Content")
+            {
+                ts.TimelineUrl = String.Format("/#{0}", GetContentPath(timeline.Collection.Id, timeline.Id, null));
+                ts.Author = "Chronozoom";
+            }
+            else
+            {
+                ts.TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, GetContentPath(timeline.Collection.Id, timeline.Id, null));
+                ts.Author = timeline.Collection.User.DisplayName;
+            }
+            ts.ImageUrl = "/images/chronozoom.png";
+            return ts;
+        }
     }
 }
