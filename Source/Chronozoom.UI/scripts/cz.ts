@@ -28,6 +28,7 @@
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
 /// <reference path='../ui/media/skydrive-mediapicker.ts'/>
+/// <reference path='../ui/start-page.ts'/>
 
 var constants: any;
 
@@ -57,7 +58,8 @@ module CZ {
             "#header-search-form": "/ui/header-search-form.html", // 14
             "#header-session-expired-form": "/ui/header-session-expired-form.html", // 15
             "#tour-caption-form": "/ui/tour-caption-form.html", // 16
-            "#mediapicker-form": "/ui/mediapicker-form.html" // 17
+            "#mediapicker-form": "/ui/mediapicker-form.html", // 17
+            "#start-page":"/ui/start-page.html"
         };
 
         export enum FeatureActivation {
@@ -142,6 +144,11 @@ module CZ {
                 Name: "Skydrive",
                 Activation: FeatureActivation.Enabled
             },
+            {
+                Name: "StartPage",
+                Activation: FeatureActivation.NotProduction,
+                JQueryReference: ".header-icon.home-icon"
+            },
         ];
 
         export var rootCollection: bool;
@@ -225,8 +232,7 @@ module CZ {
                     c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () { };
                 return c;
             })();
-
-
+           
             $('.bubbleInfo').hide();
 
             var url = CZ.UrlNav.getURL();
@@ -609,6 +615,9 @@ module CZ {
                         loginForm.close();
                     }
                 });
+                if (IsFeatureEnabled(_featureMap, "StartPage")) {
+                    CZ.StartPage.initialize();
+                }
             });
 
             CZ.Service.getServiceInformation().then(
