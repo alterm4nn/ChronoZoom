@@ -1,24 +1,20 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Chronozoom.Entities.Test
+namespace Chronozoom.Entities.UnitTests
 {
     public class StorageTestBase
     {
-        protected Storage _storage = new Storage();
-        protected Collection _betaCollection = null;
+        protected Storage Storage = new Storage();
+        protected Collection BetaCollection = null;
 
         [TestInitialize]
-        public void Initialize()
+        public void StorageTestBaseInitialize()
         {
-            _storage.Database.Delete();
+            Storage.Database.Delete();
 
-            _betaCollection = _storage.Collections.Where(candidate => candidate.Title == "Beta Content").FirstOrDefault();
-            Assert.IsNotNull(_betaCollection);
+            BetaCollection = Storage.Collections.FirstOrDefault(candidate => candidate.Title == "Beta Content");
+            Assert.IsNotNull(BetaCollection);
         }
     }
 }
