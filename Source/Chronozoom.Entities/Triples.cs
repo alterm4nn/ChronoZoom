@@ -9,10 +9,10 @@ namespace Chronozoom.Entities
 {
     public partial class Storage
     {
-        private Regex prefixReg = new Regex(@"^([a-z0-9]+):([a-z0-9\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private Regex namespaceReg = new Regex(@"^http://(?:www.)*chronozoom.com/([a-z0-9]+)#([a-z0-9\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private Dictionary<String, String> prefixesAndNamespaces = new Dictionary<string, string>() 
-        { 
+        private readonly Regex _prefixReg = new Regex(@"^([a-z0-9]+):([a-z0-9\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex _namespaceReg = new Regex(@"^http://(?:www.)*chronozoom.com/([a-z0-9]+)#([a-z0-9\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Dictionary<String, String> _prefixesAndNamespaces = new Dictionary<string, string>
+            { 
             {"czusr","http://www.chronozoom.com/users#"},
             {"czpred","http://www.chronozoom.com/preds#"},
             {"cztimeline", "http://chrnozoom.com/timeline#"}
@@ -25,8 +25,8 @@ namespace Chronozoom.Entities
         /// <returns>Returns value;</returns>
         public string GetValue(string str)
         {
-            var mp = prefixReg.Match(str);
-            var mn = namespaceReg.Match(str);
+            var mp = _prefixReg.Match(str);
+            var mn = _namespaceReg.Match(str);
             if (mp.Success)
                 return mp.Groups[2].Value;
             if (mn.Success)
@@ -43,8 +43,8 @@ namespace Chronozoom.Entities
         /// <returns>Returns prefix.</returns>
         public string GetPrefix(string fullStr)
         {
-            var mp = prefixReg.Match(fullStr);
-            var mn = namespaceReg.Match(fullStr);
+            var mp = _prefixReg.Match(fullStr);
+            var mn = _namespaceReg.Match(fullStr);
             if (mp.Success)
                 return mp.Groups[1].Value;
             if (mn.Success)
@@ -60,25 +60,13 @@ namespace Chronozoom.Entities
         /// <returns>Returns namespace.</returns>
         public string GetNamespace(string prefixStr)
         {
-            if (prefixesAndNamespaces.ContainsKey(prefixStr))
+            if (_prefixesAndNamespaces.ContainsKey(prefixStr))
             {
                 //Search among standard namespaces
-                return prefixesAndNamespaces[prefixStr];
+                return _prefixesAndNamespaces[prefixStr];
             }
-            else
-            {
-                var tr = TriplePrefixes.FirstOrDefault(x => x.Prefix == prefixStr);
-                if (tr != null)
-                {
-                    //Prefix found in DB
-                    return tr.Namespace;
-                }
-                else
-                {
-                    //Error: Not found in database
-                    return null;
-                }
-            }
+            var tr = TriplePrefixes.FirstOrDefault(x => x.Prefix == prefixStr);
+            return tr != null ? tr.Namespace : null;
         }
 
         /// <summary>
@@ -88,20 +76,13 @@ namespace Chronozoom.Entities
         /// <returns>Returns namespace string.</returns>
         private string ToNamespaceStr(string str)
         {
-            var mp = prefixReg.Match(str);
+            var mp = _prefixReg.Match(str);
             if (mp.Success)
             {
                 return string.Format("{0}:{1}", GetNamespace(mp.Groups[1].Value), mp.Groups[2].Value);
             }
-            else
-            {
-                var mn = namespaceReg.Match(str);
-                if (mn.Success)
-                {
-                    return str;
-                }
-                return null;
-            }
+            var mn = _namespaceReg.Match(str);
+            return mn.Success ? str : null;
         }
 
         /// <summary>
@@ -111,20 +92,13 @@ namespace Chronozoom.Entities
         /// <returns>Returns prefix string.</returns>
         private string ToPrefixString(string str)
         {
-            var ms = namespaceReg.Match(str);
+            var ms = _namespaceReg.Match(str);
             if (ms.Success)
             {
                 return string.Format("{0}:{1}", GetPrefix(ms.Groups[1].Value), ms.Groups[2].Value);
             }
-            else
-            {
-                var mp = prefixReg.Match(str);
-                if (mp.Success)
-                {
-                    return str;
-                }
-                return null;
-            }
+            var mp = _prefixReg.Match(str);
+            return mp.Success ? str : null;
         }
 
         /// <summary>
@@ -139,16 +113,16 @@ namespace Chronozoom.Entities
         {
             //GetTriplet( “czusr:76087518-4f8e-4d3a-9bfb-2fd2332376eb”, “czpred:favorite”, null, null)
 
-            if ((prefixReg.Match(subjectStr).Success || namespaceReg.Match(subjectStr).Success) &&
-                (prefixReg.Match(predicateStr).Success || namespaceReg.Match(predicateStr).Success) &&
-                ((objectStr != null && (prefixReg.Match(objectStr).Success || namespaceReg.Match(objectStr).Success)) || (objectStr == null)) == false)
+            if ((_prefixReg.Match(subjectStr).Success || _namespaceReg.Match(subjectStr).Success) &&
+                (_prefixReg.Match(predicateStr).Success || _namespaceReg.Match(predicateStr).Success) &&
+                ((objectStr != null && (_prefixReg.Match(objectStr).Success || _namespaceReg.Match(objectStr).Success)) || (objectStr == null)) == false)
                 return null;
 
 
             IQueryable<Triple> triples;
             if (objectStr == null)
             {
-                triples = Triples.Where(t => t.Subject == subjectStr && t.Predicate == predicateStr).Include(o => o.Objects); ;
+                triples = Triples.Where(t => t.Subject == subjectStr && t.Predicate == predicateStr).Include(o => o.Objects);
             }
             else
             {
@@ -180,9 +154,9 @@ namespace Chronozoom.Entities
         {
             //PutTriplet( “czusr:76087518-4f8e-4d3a-9bfb-2fd2332376eb”, “czpred:favorite”, "cztimeline:3a87bb5c-85f7-4305-8b2f-f2002580cd25")
 
-            if ((prefixReg.Match(subjectStr).Success || namespaceReg.Match(subjectStr).Success) &&
-                (prefixReg.Match(predicateStr).Success || namespaceReg.Match(predicateStr).Success) &&
-                (prefixReg.Match(objectStr).Success || namespaceReg.Match(objectStr).Success) == false)
+            if ((_prefixReg.Match(subjectStr).Success || _namespaceReg.Match(subjectStr).Success) &&
+                (_prefixReg.Match(predicateStr).Success || _namespaceReg.Match(predicateStr).Success) &&
+                (_prefixReg.Match(objectStr).Success || _namespaceReg.Match(objectStr).Success) == false)
                 return false;
 
             var shortSubjectStr = ToPrefixString(subjectStr);
@@ -195,11 +169,11 @@ namespace Chronozoom.Entities
                 if (tr.Objects.FirstOrDefault(x => x.Object == shortObjectStr) == null)
                 {
                     tr.Objects.Add(
-                        new TripleObject()
-                        {
-                            Object = shortObjectStr,
-                            TripleObject_Id = Guid.NewGuid()
-                        }
+                        new TripleObject
+                            {
+                                Object = shortObjectStr,
+                                TripleObject_Id = Guid.NewGuid()
+                            }
                     );
                 }
                 else
@@ -209,26 +183,23 @@ namespace Chronozoom.Entities
                 SaveChanges();
                 return true;
             }
-            else
-            {
-                var triple = new Triple()
+            var triple = new Triple
                 {
                     Subject = shortSubjectStr,
                     Predicate = shortPredicateStr,
                     Id = Guid.NewGuid(),
-                    Objects = new Collection<TripleObject>() 
+                    Objects = new Collection<TripleObject>
                         { 
-                            new TripleObject() 
-                            { 
-                                Object = shortObjectStr,
-                                TripleObject_Id = Guid.NewGuid()
-                            } 
+                            new TripleObject
+                                { 
+                                    Object = shortObjectStr,
+                                    TripleObject_Id = Guid.NewGuid()
+                                } 
                         }
                 };
-                Triples.Add(triple);
-                SaveChanges();
-                return true;
-            }
+            Triples.Add(triple);
+            SaveChanges();
+            return true;
         }
 
         /// <summary>
@@ -240,9 +211,9 @@ namespace Chronozoom.Entities
         /// <returns>Returns 'True' if operation completed succeful, 'False' otherwise.</returns>
         public bool DeleteTriplet(string subjectStr, string predicateStr, string objectStr)
         {
-            if ((prefixReg.Match(subjectStr).Success || namespaceReg.Match(subjectStr).Success) &&
-                (prefixReg.Match(predicateStr).Success || namespaceReg.Match(predicateStr).Success) &&
-                (prefixReg.Match(objectStr).Success || namespaceReg.Match(objectStr).Success) == false)
+            if ((_prefixReg.Match(subjectStr).Success || _namespaceReg.Match(subjectStr).Success) &&
+                (_prefixReg.Match(predicateStr).Success || _namespaceReg.Match(predicateStr).Success) &&
+                (_prefixReg.Match(objectStr).Success || _namespaceReg.Match(objectStr).Success) == false)
                 return false;
 
 
@@ -258,7 +229,7 @@ namespace Chronozoom.Entities
                 {
                     TripleObjects.Remove(TripleObjects.Find(obj.TripleObject_Id));
 
-                    if (tr.Objects.Count() == 0)
+                    if (!tr.Objects.Any())
                         Triples.Remove(tr);
 
                     SaveChanges();
@@ -279,19 +250,16 @@ namespace Chronozoom.Entities
             var val = TriplePrefixes.FirstOrDefault(x => x.Prefix == prefixStr || x.Namespace == fullStr);
             if (val == null)
             {
-                var t = new TriplePrefix()
-                {
-                    Namespace = fullStr,
-                    Prefix = prefixStr
-                };
+                var t = new TriplePrefix
+                    {
+                        Namespace = fullStr,
+                        Prefix = prefixStr
+                    };
                 TriplePrefixes.Add(t);
                 SaveChanges();
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         /// <summary>
@@ -309,10 +277,7 @@ namespace Chronozoom.Entities
                 SaveChanges();
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
 
