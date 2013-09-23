@@ -27,6 +27,8 @@ using System.Data.Entity;
 using Chronozoom.UI.Utils;
 using System.ServiceModel.Description;
 using System.Text.RegularExpressions;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace Chronozoom.UI
 {

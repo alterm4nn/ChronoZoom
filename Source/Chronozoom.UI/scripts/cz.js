@@ -23,7 +23,8 @@ var CZ;
             "#header-search-form": "/ui/header-search-form.html",
             "#header-session-expired-form": "/ui/header-session-expired-form.html",
             "#tour-caption-form": "/ui/tour-caption-form.html",
-            "#mediapicker-form": "/ui/mediapicker-form.html"
+            "#mediapicker-form": "/ui/mediapicker-form.html",
+            "#start-page": "/ui/start-page.html"
         };
         (function (FeatureActivation) {
             FeatureActivation._map = [];
@@ -97,6 +98,11 @@ var CZ;
             {
                 Name: "Skydrive",
                 Activation: FeatureActivation.Enabled
+            }, 
+            {
+                Name: "StartPage",
+                Activation: FeatureActivation.NotProduction,
+                JQueryReference: ".header-icon.home-icon"
             }, 
             
         ];
@@ -517,6 +523,9 @@ var CZ;
                         loginForm.close();
                     }
                 });
+                if(IsFeatureEnabled(_featureMap, "StartPage")) {
+                    CZ.StartPage.initialize();
+                }
             });
             CZ.Service.getServiceInformation().then(function (response) {
                 CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;
