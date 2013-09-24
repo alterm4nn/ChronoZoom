@@ -447,7 +447,7 @@ namespace Application.Helper.Helpers
 
         private string SetAuthContentItemFormElementLocator(string element)
         {
-            return String.Format("#auth-edit-contentitem-form>div.cz-form-content>{0}.cz-input", element);
+            return String.Format("#auth-edit-contentitem-form div.cz-form-content {0}.cz-input", element);
         }
 
     }

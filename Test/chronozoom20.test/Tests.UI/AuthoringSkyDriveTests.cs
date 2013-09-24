@@ -23,6 +23,7 @@ namespace Tests
             HomePageHelper.OpenPage();
             AuthorizationHelper.OpenLoginPage();
             AuthorizationHelper.AuthenticateAsExistedGoogleUser();
+            HomePageHelper.CloseStartPage();
             HomePageHelper.DeleteAllElementsLocally();
         }
 
