@@ -4,8 +4,8 @@
 .start-page-screen {
     display: none;
     position: absolute;
-    top: 33px;
-    bottom: 20px;
+    top: 35px;
+    bottom: 25px;
     left: 0%;
     right: 0%;
     cursor: default;        
@@ -15,12 +15,16 @@
     background-size: 100%;
 }
 
-.FTTiles {
-    width: calc(100%);
-    height: calc(100%);
-    overflow: hidden;
+.FakeFooter {
+    position: absolute;
+    top: 30px;
+    height:5px;
+    color: #AAA;
 }
-    height: calc(100%);
+
+.FTTiles {
+    width: 100%;
+    height:100%;
     overflow: hidden;
 }
 
@@ -51,6 +55,7 @@
 }
 
 .boxInner {
+    border-top: 3px #666 solid;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -61,7 +66,6 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    border: 3px #666 solid;
     overflow: hidden;
 }
 
@@ -117,7 +121,6 @@
 .WelcomeBlock {
     color: white;
     overflow: hidden;
-    border: dotted 2px #1e1e1e;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -131,28 +134,18 @@
     color: white;
     border-top: 3px #666 solid;
  }
-//////////////////////////////
 
 .toggle-list-button {
     float: right; 
     margin: 18px 10px 0 0;
  }
 
-.boxInner {
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    top: 10px;
- //   bottom: 10px;
-    overflow: visible;
 .template-invisible {
     display: none;
-.boxInner {
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    top: 10px;
-    overflow: visible;
+}
+
+.header-text {
+    display: inline-block;
 }
 
 @media only screen and (max-width : 650px), screen and (orientation: landscape) and (max-device-width : 480px) {
@@ -164,27 +157,29 @@
     .box {
         float: left;
         position: relative;
-        width: 30%;
+        margin:5px;
+        width: 25%;
         height: 30%;
-        padding-bottom: 30%;
+        padding-bottom: 20%;
         overflow: hidden;
     }
 
     .WelcomeBlock {
-        width: calc(100%);
-        height: calc(20%);
+        width: 100%;
+        height: 20%;
+        //Webkit
     }
 
     .welcome-box-1 {
         padding: 0px;
         font-size: 10px;
         overflow: visible;
-        height: calc(40%);
+        height: 40%;
     }
 
     .welcome-box-2 {
         float:left;
-        height: calc(60%);
+        height: -webkit-calc(60%);
         font-size: 11px;
         overflow: auto;
     }
@@ -200,7 +195,8 @@
     .box {
         float: left;
         position: relative;
-        width: 50%;
+        margin:5px;
+        width: 45%;
         height: 15%;
         padding-bottom: 20%;
     }
@@ -217,8 +213,8 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(100%);
-        height: calc(30%);
+        width: 100%;
+        height: 30%;
         background-color: transparent;
         vertical-align: top;
     }
@@ -227,9 +223,8 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(50% - 5px);
-        height: calc(60%);
-        border: dotted 2px #1e1e1e;
+        width: 45%;
+        height: 60%;
         background-color: transparent;
         vertical-align: top;
         -moz-box-sizing: border-box;
@@ -241,9 +236,8 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(50%- 5px);
-        height: calc(60%);
-        border: dotted 2px #1e1e1e;
+        width: 45%;
+        height: 60%;
         background-color: transparent;
         vertical-align: top;
         -moz-box-sizing: border-box;
@@ -255,9 +249,8 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(50%- 5px);
-        height: calc(60%);
-        border: dotted 2px #1e1e1e;
+        width: 45%;
+        height: 60%;
         background-color: transparent;
         vertical-align: top;
         box-sizing: border-box;
@@ -267,11 +260,13 @@
         font-size: 15px;
         white-space: nowrap;
         overflow: visible;
+        height: -webkit-calc(60% - 10px);
         height: calc(60% - 10px);
     }
 
     .welcome-box-2 {
         float:left;
+        height: -webkit-calc(40% - 10px);
         height: calc(40% - 10px);
         font-size: 14px;
         overflow: auto;
@@ -288,7 +283,8 @@
     .box {
         float: left;
         position: relative;
-        width: 50%;
+        margin:5px;
+        width: 45%;
         height: 15%;
         padding-bottom: 20%;
     }
@@ -297,18 +293,16 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(33.333333% - 2px);
-        height: calc(100%);
-        border: dotted 2px #1e1e1e;
+        width: 31%;
+        height: 100%;
     }
 
     .FeaturedTimelinesBlock {
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(33.333333% - 2px);
-        height: calc(100%);
-        border: dotted 2px #1e1e1e;
+        width: 31%;
+        height: 100%;
         background-color: transparent;
         box-sizing:border-box;
     }
@@ -317,9 +311,8 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(33.333333% - 2px);
-        height: calc(100%);
-        border: dotted 2px #1e1e1e;
+        width: 31%;
+        height: 100%;
         box-sizing:border-box;
     }
 
@@ -327,20 +320,12 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(33.333333% - 2px);
-        height: calc(100%);
-        border: dotted 2px #1e1e1e;
+        width: 31%;
+        height: 100%;
         box-sizing:border-box;
     }
 
     .welcome-box-1 {
-       // padding: 5px 5px 10px 5px;
-       overflow:hidden;
-        white-space: nowrap;
-       // padding: 5px 5px 10px 5px;
-       overflow:hidden;
-        overflow: hidden;
-        white-space: nowrap;
         overflow: visible;
         vertical-align: top;
         font-size: 15px;
@@ -350,6 +335,7 @@
         float:left;
         overflow: visible;
         height: calc(40% - 10px);
+        height: -webkit-calc(40% - 10px);
     }
 
     .welcome-box-3 {
@@ -365,7 +351,8 @@
     .box {
         float: left;
         position: relative;
-        width: 50%;
+        margin:5px;
+        width: 45%;
         height: 15%;
         padding-bottom: 20%;
     }
@@ -374,9 +361,8 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(33.333333% - 2px);
-        height: calc(100%);
-        border: dotted 2px #1e1e1e;
+        width: 31%;
+        height: 100%;
         background-color: transparent;
         vertical-align: top;
         -moz-box-sizing: border-box;
@@ -388,9 +374,8 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(33.333333% - 2px);
-        height: calc(100%);
-        border: dotted 2px #1e1e1e;
+        width: 31%;
+        height: 100%;
         background-color: transparent;
         vertical-align: top;
         -moz-box-sizing: border-box;
@@ -402,9 +387,8 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(33.333333% - 2px);
-        height: calc(100%);
-        border: dotted 2px #1e1e1e;
+        width: 31;
+        height: 100%;
         background-color: transparent;
         vertical-align: top;
         -moz-box-sizing: border-box;
@@ -416,18 +400,12 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: calc(33.333333% - 2px);
-        height: calc(100%);
-        border: dotted 2px #1e1e1e;
+        width: 31%;
+        height: 100%;
         background-color: transparent;
         vertical-align: top;
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
     }
-}
-
-
-
-}
 }

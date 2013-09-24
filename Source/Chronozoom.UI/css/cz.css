@@ -1,4 +1,4 @@
-﻿/* Height of input element */
+/* Height of input element */
 /* Font-size of error message */
 /* Error messages */
 .error-message {
@@ -352,8 +352,8 @@ iframe[sutra=picker] + div {
 .start-page-screen {
   display: none;
   position: absolute;
-  top: 33px;
-  bottom: 20px;
+  top: 35px;
+  bottom: 25px;
   left: 0%;
   right: 0%;
   cursor: default;
@@ -362,9 +362,15 @@ iframe[sutra=picker] + div {
   background-image: url(/images/background.jpg);
   background-size: 100%;
 }
+.FakeFooter {
+  position: absolute;
+  top: 30px;
+  height: 5px;
+  color: #AAA;
+}
 .FTTiles {
-  width: calc(100%);
-  height: calc(100%);
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 .FTList {
@@ -389,6 +395,7 @@ iframe[sutra=picker] + div {
   width: 33.3333%;
 }
 .boxInner {
+  border-top: 3px #666 solid;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -398,7 +405,6 @@ iframe[sutra=picker] + div {
   position: absolute;
   width: 100%;
   height: 100%;
-  border: 3px #666 solid;
   overflow: hidden;
 }
 .tile-photo img {
@@ -445,7 +451,6 @@ iframe[sutra=picker] + div {
 .WelcomeBlock {
   color: white;
   overflow: hidden;
-  border: dotted 2px #1e1e1e;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -464,6 +469,9 @@ iframe[sutra=picker] + div {
 .template-invisible {
   display: none;
 }
+.header-text {
+  display: inline-block;
+}
 @media only screen and (max-width: 650px), screen and (orientation: landscape) and (max-device-width: 480px) {
   /* Small Tablet view: 3 rows, 2 columns */
   .ex3,
@@ -474,24 +482,25 @@ iframe[sutra=picker] + div {
   .box {
     float: left;
     position: relative;
-    width: 30%;
+    margin: 5px;
+    width: 25%;
     height: 30%;
-    padding-bottom: 30%;
+    padding-bottom: 20%;
     overflow: hidden;
   }
   .WelcomeBlock {
-    width: calc(100%);
-    height: calc(20%);
+    width: 100%;
+    height: 20%;
   }
   .welcome-box-1 {
     padding: 0px;
     font-size: 10px;
     overflow: visible;
-    height: calc(40%);
+    height: 40%;
   }
   .welcome-box-2 {
     float: left;
-    height: calc(60%);
+    height: -webkit-calc(60%);
     font-size: 11px;
     overflow: auto;
   }
@@ -505,7 +514,8 @@ iframe[sutra=picker] + div {
   .box {
     float: left;
     position: relative;
-    width: 50%;
+    margin: 5px;
+    width: 45%;
     height: 15%;
     padding-bottom: 20%;
   }
@@ -520,8 +530,8 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(100%);
-    height: calc(30%);
+    width: 100%;
+    height: 30%;
     background-color: transparent;
     vertical-align: top;
   }
@@ -529,9 +539,8 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(45%);
-    height: calc(60%);
-    border: dotted 2px #1e1e1e;
+    width: 45%;
+    height: 60%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -542,9 +551,8 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(45%);
-    height: calc(60%);
-    border: dotted 2px #1e1e1e;
+    width: 45%;
+    height: 60%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -555,9 +563,8 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(45%);
-    height: calc(60%);
-    border: dotted 2px #1e1e1e;
+    width: 45%;
+    height: 60%;
     background-color: transparent;
     vertical-align: top;
     box-sizing: border-box;
@@ -566,10 +573,12 @@ iframe[sutra=picker] + div {
     font-size: 15px;
     white-space: nowrap;
     overflow: visible;
+    height: -webkit-calc(50%);
     height: calc(50%);
   }
   .welcome-box-2 {
     float: left;
+    height: -webkit-calc(30%);
     height: calc(30%);
     font-size: 14px;
     overflow: auto;
@@ -584,7 +593,8 @@ iframe[sutra=picker] + div {
   .box {
     float: left;
     position: relative;
-    width: 50%;
+    margin: 5px;
+    width: 45%;
     height: 15%;
     padding-bottom: 20%;
   }
@@ -592,17 +602,15 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
   }
   .FeaturedTimelinesBlock {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     background-color: transparent;
     box-sizing: border-box;
   }
@@ -610,22 +618,19 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     box-sizing: border-box;
   }
   .TwitterBlock {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     box-sizing: border-box;
   }
   .welcome-box-1 {
-    overflow: hidden;
     overflow: visible;
     vertical-align: top;
     font-size: 15px;
@@ -634,6 +639,7 @@ iframe[sutra=picker] + div {
     float: left;
     overflow: visible;
     height: calc(30%);
+    height: -webkit-calc(30%);
   }
   .welcome-box-3 {
     float: left;
@@ -647,7 +653,8 @@ iframe[sutra=picker] + div {
   .box {
     float: left;
     position: relative;
-    width: 50%;
+    margin: 5px;
+    width: 45%;
     height: 15%;
     padding-bottom: 20%;
   }
@@ -655,9 +662,8 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -668,9 +674,8 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -681,9 +686,8 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31;
+    height: 100%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -694,9 +698,8 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
