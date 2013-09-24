@@ -187,8 +187,8 @@ module CZ {
                 var myDate = new Date(time.match(/\d+/)[0] * 1);
                 var convertedDate = myDate.toLocaleTimeString() +"; "+  myDate.getDate();
                 convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
-                $("#m"+idx+"i"+i+" .boxInner .tile-meta .tile-meta-text").text(text);
-                $("#m"+idx+"i"+i+" .boxInner .tile-meta .tile-meta-author").text(author);
+                $("#m"+idx+"i"+i+" .boxInner .tile-meta .tweet-meta-text").text(text);
+                $("#m"+idx+"i"+i+" .boxInner .tile-meta .tweet-meta-author").text(author);
                  $("#m"+idx+"i"+i+" .boxInner .tile-meta .tile-meta-time").text(convertedDate);
                  }
             });
@@ -293,7 +293,7 @@ module CZ {
             }
         }
 
-        export function show() {
+        export function show() {      
             var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
             $(".home-icon").addClass("active");
 
@@ -307,7 +307,7 @@ module CZ {
 
             // Hide regimes.
             $(".header-regimes").fadeOut();
-
+            $("#timeSeriesDataForm").hide();
             // Show home page.
             $("#start-page").fadeIn();
         }

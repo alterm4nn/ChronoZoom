@@ -163,8 +163,8 @@ var CZ;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
-                    $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-text").text(text);
-                    $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-author").text(author);
+                    $("#m" + idx + "i" + i + " .boxInner .tile-meta .tweet-meta-text").text(text);
+                    $("#m" + idx + "i" + i + " .boxInner .tile-meta .tweet-meta-author").text(author);
                     $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-time").text(convertedDate);
                 }
             });
@@ -255,6 +255,7 @@ var CZ;
                 $(el).data("onclick", events && events.click && events.click[0]);
             }).off();
             $(".header-regimes").fadeOut();
+            $("#timeSeriesDataForm").hide();
             $("#start-page").fadeIn();
         }
         StartPage.show = show;

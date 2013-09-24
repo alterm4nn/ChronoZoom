@@ -307,7 +307,9 @@
     <Content Include="images\dummy\tile_twitterbg.png" />
     <Content Include="images\dummy\tile_wanapitei.jpg" />
     <Content Include="images\dummy\tile_ww1.jpg" />
-    <Content Include="images\dummy\twitter_profile_pic.gif" />
+    <Content Include="images\dummy\twitter_profile_pic.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="images\dummy\video_intro.gif" />
     <Content Include="images\edit-icon.png" />
     <Content Include="images\home-icon.png" />
