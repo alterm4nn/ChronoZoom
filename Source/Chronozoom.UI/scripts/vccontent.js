@@ -607,7 +607,7 @@ var CZ;
                     this.favoriteBtn = VCContent.addImage(this, layerid, id + "__favorite", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/star.svg");
                     this.favoriteBtn.reactsOnMouse = true;
                     this.favoriteBtn.onmouseclick = function () {
-                        CZ.Service.putUserFavorite(id);
+                        CZ.Service.putUserFavorite(timelineinfo.guid);
                         return true;
                     };
                     this.favoriteBtn.onmousehover = function () {
