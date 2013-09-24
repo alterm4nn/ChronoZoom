@@ -30,18 +30,18 @@ namespace Chronozoom.Entities
     /// </summary>
     public partial class Storage : DbContext
     {
-        private static Lazy<int> _storageTimeout = new Lazy<int>(() =>
+        private static readonly Lazy<int> StorageTimeout = new Lazy<int>(() =>
         {
             string storageTimeout = ConfigurationManager.AppSettings["StorageTimeout"];
             return string.IsNullOrEmpty(storageTimeout) ? 30 : int.Parse(storageTimeout, CultureInfo.InvariantCulture);
         });
 
         // Enables RI-Tree queries.
-        private static Lazy<bool> _useRiTreeQuery = new Lazy<bool>(() =>
+        private static readonly Lazy<bool> UseRiTreeQuery = new Lazy<bool>(() =>
         {
             string useRiTreeQuery = ConfigurationManager.AppSettings["UseRiTreeQuery"];
 
-            return string.IsNullOrEmpty(useRiTreeQuery) ? false : bool.Parse(useRiTreeQuery);
+            return !string.IsNullOrEmpty(useRiTreeQuery) && bool.Parse(useRiTreeQuery);
         });
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
@@ -52,10 +52,10 @@ namespace Chronozoom.Entities
 
         public Storage()
         {
-            base.Configuration.ProxyCreationEnabled = false;
+            Configuration.ProxyCreationEnabled = false;
             if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.​SqlClient"))
             {
-                ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = _storageTimeout.Value;
+                ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = StorageTimeout.Value;
             }
         }
 
@@ -75,7 +75,7 @@ namespace Chronozoom.Entities
 
         public DbSet<User> Users { get; set; }
 
-        public DbSet<Entities.Collection> Collections { get; set; }
+        public DbSet<Collection> Collections { get; set; }
 
         public DbSet<SuperCollection> SuperCollections { get; set; }
 
@@ -89,8 +89,8 @@ namespace Chronozoom.Entities
         {
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
 
-            List<Timeline> timelines = null;
-            if (_useRiTreeQuery.Value)
+            List<Timeline> timelines;
+            if (UseRiTreeQuery.Value)
             {
                 Trace.TraceInformation("Using RI-Tree Query");
                 timelines = FillTimelinesRiTreeQuery(collectionId, timelinesMap, startTime, endTime, span, commonAncestor, ref maxElements);
@@ -138,7 +138,7 @@ namespace Chronozoom.Entities
         {
             int maxAllElements = 0;
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
-            IEnumerable<TimelineRaw> allTimelines = null;
+            IEnumerable<TimelineRaw> allTimelines;
 
             if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.SqlClient"))
             {
@@ -188,7 +188,7 @@ namespace Chronozoom.Entities
             foreach (ExhibitRaw exhibitRaw in exhibitsRaw)
             {
                 if (exhibitRaw.ContentItems == null)
-                    exhibitRaw.ContentItems = new System.Collections.ObjectModel.Collection<ContentItem>();
+                    exhibitRaw.ContentItems = new Collection<ContentItem>();
 
                 if (timelinesMap.Keys.Contains(exhibitRaw.Timeline_ID))
                 {
@@ -276,7 +276,7 @@ namespace Chronozoom.Entities
         {
             /* There are 4 cases of a given timeline intersecting the current canvas: [<]>, <[>], [<>], and <[]> (<> denotes the timeline, and [] denotes the canvas) */
 
-            string timelinesQuery = @"SELECT TOP({0}) * FROM (
+            const string timelinesQuery = @"SELECT TOP({0}) * FROM (
                 SELECT DISTINCT [Timelines].*, [Timelines].[FromYear] as [Start], [Timelines].[ToYear] as [End], [Timelines].[ToYear] - [Timelines].[FromYear] AS [TimeSpan] FROM [Timelines] JOIN
                 (
                     SELECT ([b1] & CAST(({1} + 13700000001) AS BIGINT)) AS [node] FROM [Bitmasks] WHERE (CAST(({1} + 13700000001) AS BIGINT) & [b2]) <> 0
@@ -308,7 +308,7 @@ namespace Chronozoom.Entities
             foreach (TimelineRaw timelineRaw in timelinesRaw)
             {
                 if (timelineRaw.Exhibits == null)
-                    timelineRaw.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
+                    timelineRaw.Exhibits = new Collection<Exhibit>();
 
                 timelinesParents[timelineRaw.Id] = timelineRaw.Timeline_ID;
                 timelinesMap[timelineRaw.Id] = timelineRaw;
@@ -330,7 +330,7 @@ namespace Chronozoom.Entities
                 {
                     Timeline parentTimeline = timelinesMap[(Guid)parentId];
                     if (parentTimeline.ChildTimelines == null)
-                        parentTimeline.ChildTimelines = new System.Collections.ObjectModel.Collection<Timeline>();
+                        parentTimeline.ChildTimelines = new Collection<Timeline>();
 
                     parentTimeline.ChildTimelines.Add(timeline);
                 }
@@ -359,8 +359,8 @@ namespace Chronozoom.Entities
                 exhibitIDs.RemoveAt(0);
             }
 
-            Timeline removeTimeline = this.Timelines.Find(id);
-            this.Timelines.Remove(removeTimeline);
+            Timeline removeTimeline = Timelines.Find(id);
+            Timelines.Remove(removeTimeline);
         }
 
         // Deletes every content item and reference from exhibit with given guid.
@@ -371,13 +371,13 @@ namespace Chronozoom.Entities
             // delete content items
             while (exhibitsIDs.Count != 0)
             {
-                var e = this.ContentItems.Find(exhibitsIDs.First());
-                this.ContentItems.Remove(e);
+                var e = ContentItems.Find(exhibitsIDs.First());
+                ContentItems.Remove(e);
                 exhibitsIDs.RemoveAt(0);
             }
 
-            Exhibit deleteExhibit = this.Exhibits.Find(id);
-            this.Exhibits.Remove(deleteExhibit);
+            Exhibit deleteExhibit = Exhibits.Find(id);
+            Exhibits.Remove(deleteExhibit);
         }
 
         /// <summary>
@@ -395,6 +395,7 @@ namespace Chronozoom.Entities
             }
 
             ExhibitRaw exhibit = Database.SqlQuery<ExhibitRaw>("SELECT * FROM Exhibits WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+
             if (exhibit != null)
             {
                 contentPath = "/e" + exhibit.Id + contentPath;
@@ -409,7 +410,7 @@ namespace Chronozoom.Entities
                 timeline = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id = {0}", timeline.Timeline_ID).FirstOrDefault();
             } 
 
-            return contentPath.ToString();
+            return contentPath.ToString(CultureInfo.InvariantCulture);
         }
 
         // Returns list of ids of chilt timelines of timeline with given id.
