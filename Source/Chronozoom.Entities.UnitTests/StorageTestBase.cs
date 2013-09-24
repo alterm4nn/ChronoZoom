@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace Chronozoom.Entities.UnitTests
 {
+    [TestClass]
     public class StorageTestBase
     {
         protected Storage Storage = new Storage();
