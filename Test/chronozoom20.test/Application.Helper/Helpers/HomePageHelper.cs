@@ -10,14 +10,27 @@ namespace Application.Helper.Helpers
     {
         public void OpenPage()
         {
+            Logger.Log("<-");
             HelperManager<NavigationHelper>.Instance.OpenHomePage();
             WaitWhileHomePageIsLoaded();
+            CloseStartPage();
+            Logger.Log("->");
+        }
+
+        public void CloseStartPage()
+        {
+            Logger.Log("<-");
+            Click(By.CssSelector(".welcome-box-2>.welcome-link"));
+            Logger.Log("->");
         }
 
         public void OpenSandboxPage()
         {
+            Logger.Log("<-");
             HelperManager<NavigationHelper>.Instance.OpenSandboxPage();
             WaitWhileHomePageIsLoaded();
+            CloseStartPage();
+            Logger.Log("->");
         }
 
         public void MoveMouseToCenter()
