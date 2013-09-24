@@ -303,8 +303,24 @@ namespace Chronozoom.Entities
                 ts.TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, GetContentPath(timeline.Collection.Id, timeline.Id, null));
                 ts.Author = timeline.Collection.User.DisplayName;
             }
-            ts.ImageUrl = "/images/chronozoom.png";
+            ts.ImageUrl = GetTimelineImageUrl(timeline);
             return ts;
+        }
+
+        private static string GetTimelineImageUrl(Timeline timeline)
+        {
+            foreach (var exhibit in timeline.Exhibits)
+            {
+                foreach (var contentItem in exhibit.ContentItems)
+                {
+                    if (contentItem.MediaType.ToLower().Equals("picture"))
+                    {
+                        return contentItem.Uri;
+                    }
+                }
+            }
+
+            return "/images/dummy/tile_earthscience.jpg";
         }
     }
 }

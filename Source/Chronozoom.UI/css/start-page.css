@@ -11,11 +11,9 @@
   background-image: url(/images/background.jpg);
   background-size: 100%;
 }
-.FakeFooter {
-  position: absolute;
-  top: 30px;
-  height: 5px;
-  color: #AAA;
+.ContentContainer {
+  position: relative;
+  margin: 0 auto;
 }
 .FTTiles {
   width: 100%;
