@@ -434,6 +434,7 @@ var CZ;
                     CZ.Authoring.isEnabled = UserCanEditCollection(data);
                 }).fail(function (error) {
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(function () {
                     if(!CZ.Authoring.isEnabled) {
                         $(".edit-icon").hide();
