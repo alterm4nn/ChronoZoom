@@ -29,6 +29,7 @@
 /// <reference path='extensions/extensions.ts'/>
 /// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 /// <reference path='../ui/start-page.ts'/>
+/// <reference path='plugins/error-plugin.ts'/>
 
 var constants: any;
 

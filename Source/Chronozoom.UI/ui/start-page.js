@@ -174,9 +174,11 @@ var CZ;
             if('block' != document.getElementById(name + '-list').style.display) {
                 document.getElementById(name + '-list').style.display = 'block';
                 document.getElementById(name + '-tiles').style.display = 'none';
+                $("#" + name).find(".list-view-icon").addClass("active");
             } else {
                 document.getElementById(name + '-list').style.display = 'none';
                 document.getElementById(name + '-tiles').style.display = 'block';
+                $("#" + name).find(".list-view-icon").removeClass("active");
             }
         }
         StartPage.listFlip = listFlip;
