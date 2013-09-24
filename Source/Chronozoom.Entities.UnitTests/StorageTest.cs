@@ -22,7 +22,7 @@ namespace Chronozoom.Entities.UnitTests
             int timelineCount = 0;
             foreach (Timeline timeline in timelines)
             {
-                timeline.Traverse(childTimeline => 
+                timeline.Traverse(childTimeline =>
                 {
                     timelineCount++;
                     timelineCount += childTimeline.Exhibits.Count();
@@ -43,8 +43,8 @@ namespace Chronozoom.Entities.UnitTests
 
             var timelineDeleted = Storage.Timelines.FirstOrDefault(candidate => candidate.Id == timelineDeleteId);
             Assert.IsNull(timelineDeleted, "Timeline was not deleted");
-        } 
-        
+        }
+
         [TestMethod]
         public void TestEntities_DeleteTimeline_DeletesTimelineWithChildrens()
         {
@@ -89,7 +89,6 @@ namespace Chronozoom.Entities.UnitTests
             Storage.DeleteExhibit(exhibit.Id);
             Storage.SaveChanges();
             Exhibit exhibitAfterDeletion = Storage.Exhibits.FirstOrDefault(exh => exh.Title == "Fighting Stigma");
-            
             Assert.IsNull(exhibitAfterDeletion);
 
         }
@@ -108,6 +107,49 @@ namespace Chronozoom.Entities.UnitTests
             {
                 Assert.IsNull(timeline.ChildTimelines, "No children expected while retrieving one level");
             }
+        }
+
+        [TestMethod]
+        public void ContentItemPathShouldBeCorrectly()
+        {
+            Guid collectionId = new Guid("2b6cd8e0-5833-ceaf-117e-cf74db7fed1f");
+            Guid elementId = new Guid("428b173f-4e31-410d-9d88-f4fe94698289");
+            const string contentItemName = "Salman Kahn Explains the Birth of Stars";
+
+            string contentPath = Storage.GetContentPath(collectionId, elementId,contentItemName);
+
+            string timelinesQuery = string.Format(
+               CultureInfo.InvariantCulture,
+               "SELECT * FROM ContentItems WHERE Title = '{0}' AND Collection_Id = '{1}'", contentItemName,collectionId);
+
+            IEnumerable<ContentItemRaw> contentItems = Storage.Database.SqlQuery<ContentItemRaw>(timelinesQuery);
+            
+            Guid exhibitId = contentItems.First().Exhibit_ID;
+            string expectedPath = String.Format("/t00000000-0000-0000-0000-000000000000/e{0}/{1}", exhibitId,
+                                                elementId);
+            Assert.AreEqual(expectedPath,contentPath);
+        } 
+        
+        
+        [TestMethod]
+        public void ContentItemPathShouldBeCorrectlyIfTitleNull()
+        {
+            Guid collectionId = new Guid("2b6cd8e0-5833-ceaf-117e-cf74db7fed1f");
+            Guid elementId = new Guid("428b173f-4e31-410d-9d88-f4fe94698289");
+            const string contentItemName = null;
+
+            string contentPath = Storage.GetContentPath(collectionId, elementId,contentItemName);
+
+            string timelinesQuery = string.Format(
+               CultureInfo.InvariantCulture,
+               "SELECT * FROM ContentItems WHERE Id = '{0}' AND Collection_Id = '{1}'", elementId, collectionId);
+
+            IEnumerable<ContentItemRaw> contentItems = Storage.Database.SqlQuery<ContentItemRaw>(timelinesQuery);
+            
+            Guid exhibitId = contentItems.First().Exhibit_ID;
+            string expectedPath = String.Format("/t00000000-0000-0000-0000-000000000000/e{0}/{1}", exhibitId,
+                                                elementId);
+            Assert.AreEqual(expectedPath,contentPath);
         }
     }
 }
