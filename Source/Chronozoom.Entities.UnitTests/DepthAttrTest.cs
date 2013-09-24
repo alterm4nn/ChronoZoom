@@ -1,5 +1,4 @@
 ﻿using System;
-using Chronozoom.Entities.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chronozoom.Entities.UnitTests
@@ -11,7 +10,7 @@ namespace Chronozoom.Entities.UnitTests
         [TestMethod]
         public void TestEntities_DepthField_GeneratedCorrectly()
         {
-            var timelineRandomSamples = _storage.Timelines.SqlQuery(String.Format("SELECT TOP {0} * FROM Timelines ORDER BY NEWID()", NumTest));
+            var timelineRandomSamples = Storage.Timelines.SqlQuery(String.Format("SELECT TOP {0} * FROM Timelines ORDER BY NEWID()", NumTest));
             foreach (Timeline t in timelineRandomSamples)
             {
                 if (t.ChildTimelines != null)
