@@ -273,7 +273,7 @@
     box-sizing: border-box;
   }
   .TwitterBlock {
-    float: left;
+    float: right;
     margin: 5px;
     padding: 5px;
     width: 45%;
