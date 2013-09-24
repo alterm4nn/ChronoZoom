@@ -54,6 +54,7 @@
 }
 
 .boxInner {
+    background-color: #313131;
     border-top: 3px #666 solid;
     position: absolute;
     width: 100%;
@@ -94,6 +95,8 @@
 }
 
 .tweet-meta {
+    height: 100%;
+    overflow: visible;
     padding: 5%;
     position: absolute;
     top: 0;
@@ -135,7 +138,7 @@
     font-weight: normal;
     font-size: 12px;
     color:#10A5C6;
-    float:left;
+    display:block;
 }
 
 .tile-meta-time {
@@ -178,7 +181,7 @@
 }
 
 .welcome-link {
-    color:green;
+    color:#03A1BF;
 }
 
 .block-header {
@@ -425,6 +428,10 @@
 
 @media only screen and (min-width : 1401px) {
     /* Large desktop: 6 columns, 3 rows, extra margin tiles */
+
+    .twitter-time-container {
+        bottom:25px;
+    }
     .box {
         float: left;
         position: relative;
@@ -464,7 +471,7 @@
         float: left;
         margin: 5px;
         padding: 5px;
-        width: 31;
+        width: 31%;
         height: 100%;
         background-color: transparent;
         vertical-align: top;
