@@ -14,26 +14,19 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
-using System.Data;
-using System.Diagnostics;
-
-using Chronozoom.Entities;
 
 namespace Chronozoom.Entities.Migration
 {
     internal class Migrator
     {
-        private Storage _storage;
-        private static MD5 _md5Hasher = MD5.Create();
-        private const string _defaultUserName = "anonymous";
+        private readonly Storage _storage;
+        private static readonly MD5 Md5Hasher = MD5.Create();
+        private const string DefaultUserName = "anonymous";
 
         // The user that is able to modify the base collections (e.g. Beta Content, AIDS Quilt)
-        private static Lazy<string> _baseContentAdmin = new Lazy<string>(() =>
-        {
-            return ConfigurationManager.AppSettings["BaseCollectionsAdministrator"];
-        });
+        private static readonly Lazy<string> BaseContentAdmin = new Lazy<string>(() => ConfigurationManager.AppSettings["BaseCollectionsAdministrator"]);
 
-        private static Lazy<string> _baseDirectory = new Lazy<string>(() =>
+        private static readonly Lazy<string> BaseDirectory = new Lazy<string>(() =>
         {
             if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["BaseDataMigrationDirectory"]))
                 return ConfigurationManager.AppSettings["BaseDataMigrationDirectory"];
@@ -41,7 +34,7 @@ namespace Chronozoom.Entities.Migration
             return AppDomain.CurrentDomain.BaseDirectory;
         });
 
-        private static Lazy<int> _maxTimelinesToImport = new Lazy<int>(() =>
+        private static readonly Lazy<int> MaxTimelinesToImport = new Lazy<int>(() =>
         {
             if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["MaxTimelinesToImport"]))
                 return int.Parse(ConfigurationManager.AppSettings["MaxTimelinesToImport"], CultureInfo.InvariantCulture);
@@ -57,33 +50,28 @@ namespace Chronozoom.Entities.Migration
         public void Migrate()
         {
             MigrateRiTree();
-            LoadDataFromDump("Beta Content", "Beta Content", "beta-get.json", "beta-gettours.json", false, _baseContentAdmin.Value);
+            LoadDataFromDump("Beta Content", "Beta Content", "beta-get.json", "beta-gettours.json", false, BaseContentAdmin.Value);
             LoadDataFromDump("Sandbox", "Sandbox", "beta-get.json", null, true, null);
             LoadDataFromDump("Sandbox", "Extensions", "extensions-get.json", null, true, null);
-            LoadDataFromDump("AIDS Timeline", "AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", false, _baseContentAdmin.Value);
+            LoadDataFromDump("AIDS Timeline", "AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", false, BaseContentAdmin.Value);
        }
 
         private void MigrateRiTree()
         {
-            if (!_storage.Bitmasks.Any())
+            if (_storage.Bitmasks.Any()) return;
+            long v = 1;
+            foreach (var b in _storage.Bitmasks)
             {
-                long v = 1;
-                foreach (var b in _storage.Bitmasks)
-                {
-                    _storage.Bitmasks.Remove(b);
-                }
-                _storage.SaveChanges();
-                for (int r = 0; r < 63; ++r)
-                {
-                    Bitmask b = new Bitmask();
-                    b.B1 = -(v << 1);
-                    b.B2 = v;
-                    b.B3 = v << 1;
-                    _storage.Bitmasks.Add(b);
-                    v <<= 1;
-                }
-                _storage.SaveChanges();
+                _storage.Bitmasks.Remove(b);
             }
+            _storage.SaveChanges();
+            for (int r = 0; r < 63; ++r)
+            {
+                var b = new Bitmask {B1 = -(v << 1), B2 = v, B3 = v << 1};
+                _storage.Bitmasks.Add(b);
+                v <<= 1;
+            }
+            _storage.SaveChanges();
         }
 
         private void LoadDataFromDump(string superCollectionName, string collectionName, string getFileName, string getToursFileName, bool replaceGuids, string contentAdminId)
@@ -94,15 +82,15 @@ namespace Chronozoom.Entities.Migration
             if (superCollection != null)
             {
                 _storage.Entry(superCollection).Collection(_ => _.Collections).Load();
-                createCollection = !superCollection.Collections.Any(candidate => candidate.Title == collectionName);
+                createCollection = superCollection.Collections.All(candidate => candidate.Title != collectionName);
             }
 
             if (superCollection == null || createCollection)
             {
                 // Load the Beta Content collection
                 Collection collection = LoadCollections(superCollectionName, collectionName, contentAdminId);
-                using (Stream getData = File.OpenRead(_baseDirectory.Value + @"Dumps\" + getFileName))
-                using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(_baseDirectory.Value + @"Dumps\" + getToursFileName))
+                using (Stream getData = File.OpenRead(BaseDirectory.Value + @"Dumps\" + getFileName))
+                using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(BaseDirectory.Value + @"Dumps\" + getToursFileName))
                 {
                     LoadData(getData, getToursData, collection, replaceGuids);
                 }
@@ -114,38 +102,30 @@ namespace Chronozoom.Entities.Migration
 
         private Collection LoadCollections(string superCollectionName, string collectionName, string userId)
         {
-            User user;
-            if (userId == null)
-            {
-                // Anonymous user - Sandbox collection etc.
-                user = _storage.Users.Where(candidate => candidate.NameIdentifier == null).FirstOrDefault();
-            }
-            else
-            {
-                // Beta content
-                user = _storage.Users.Where(candidate => candidate.NameIdentifier == userId).FirstOrDefault();
-            }
+            User user = (userId == null 
+                             ? _storage.Users.FirstOrDefault(candidate => candidate.NameIdentifier == null) 
+                             : _storage.Users.FirstOrDefault(candidate => candidate.NameIdentifier == userId)) ??
+                        new User {Id = Guid.NewGuid(), NameIdentifier = userId, DisplayName = userId ?? DefaultUserName};
 
-            if (user == null)
-            {
-                user = new User { Id = Guid.NewGuid(), NameIdentifier = userId };
-                user.DisplayName = (userId == null) ? _defaultUserName : userId;
-            }
             // Load Collection
-            Collection collection = new Collection();
-            collection.Title = collectionName;
-            collection.Id = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-            collection.User = user;
+            var collection = new Collection
+                {
+                    Title = collectionName,
+                    Id = CollectionIdFromSuperCollection(superCollectionName, collectionName),
+                    User = user
+                };
 
             // Load SuperCollection
             SuperCollection superCollection = _storage.SuperCollections.FirstOrDefault(candidate => candidate.Title == superCollectionName);
 
             if (superCollection == null)
             {
-                superCollection = new SuperCollection();
-                superCollection.Title = superCollectionName;
-                superCollection.Id = CollectionIdFromText(superCollectionName);
-                superCollection.User = user;
+                superCollection = new SuperCollection
+                    {
+                        Title = superCollectionName,
+                        Id = CollectionIdFromText(superCollectionName),
+                        User = user
+                    };
                 _storage.SuperCollections.Add(superCollection);
             }
 
@@ -163,7 +143,7 @@ namespace Chronozoom.Entities.Migration
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Incremental change, will refactor later if the import process is kept")]
         private void LoadData(Stream dataTimelines, Stream dataTours, Collection collection, bool replaceGuids)
         {
-            var timelines = new DataContractJsonSerializer(typeof(IEnumerable<Timeline>)).ReadObject(dataTimelines) as IEnumerable<Timeline>;
+            var timelines = new DataContractJsonSerializer(typeof(IList<Timeline>)).ReadObject(dataTimelines) as IList<Timeline>;
 
             _storage.Collections.Add(collection);
 
@@ -172,7 +152,7 @@ namespace Chronozoom.Entities.Migration
             // Associate each timeline with the root collection
             TraverseTimelines(timelines, timeline =>
             {
-                if (++importedTimelinesCount < _maxTimelinesToImport.Value)
+                if (++importedTimelinesCount < MaxTimelinesToImport.Value)
                 {
                     timeline.Collection = collection;
 
@@ -221,29 +201,32 @@ namespace Chronozoom.Entities.Migration
                 );
             }
 
-            foreach (var timeline in timelines)
+            if (timelines != null)
             {
-                if (replaceGuids) timeline.Id = Guid.NewGuid();
-                timeline.Collection = collection;
-                timeline.Depth = -1;  // this denotes no migration has been applied to current timeline
-                timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
-            }
-
-            foreach (var timeline in timelines)  // note: timeline objects in "timelines" are ordered by depth already since they are parsed from a nested-JSON file 
-            {
-                if (timeline.Depth == -1)
+                foreach (var timeline in timelines)
                 {
-                    timeline.Depth = 0;
-                    MigrateInPlace(timeline);
+                    if (replaceGuids) timeline.Id = Guid.NewGuid();
+                    timeline.Collection = collection;
+                    timeline.Depth = -1;  // this denotes no migration has been applied to current timeline
+                    timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
                 }
-                _storage.Timelines.Add(timeline);
+
+                foreach (var timeline in timelines)  // note: timeline objects in "timelines" are ordered by depth already since they are parsed from a nested-JSON file 
+                {
+                    if (timeline.Depth == -1)
+                    {
+                        timeline.Depth = 0;
+                        MigrateInPlace(timeline);
+                    }
+                    _storage.Timelines.Add(timeline);
+                }
             }
             _storage.SaveChanges();
 
-            if (dataTours != null)
-            {
-                var bjrTours = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Tour>>)).ReadObject(dataTours) as BaseJsonResult<IEnumerable<Tour>>;
+            if (dataTours == null) return;
+            var bjrTours = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Tour>>)).ReadObject(dataTours) as BaseJsonResult<IEnumerable<Tour>>;
 
+            if (bjrTours != null)
                 foreach (var tour in bjrTours.d)
                 {
                     if (replaceGuids) tour.Id = Guid.NewGuid();
@@ -258,8 +241,7 @@ namespace Chronozoom.Entities.Migration
                     }
                     _storage.Tours.Add(tour);
                 }
-                _storage.SaveChanges();
-            }
+            _storage.SaveChanges();
         }
 
         public static void MigrateInPlace(Timeline timeline)
@@ -325,7 +307,7 @@ namespace Chronozoom.Entities.Migration
             // Replace with URL friendly representations
             value = value.Replace(' ', '-');
 
-            byte[] data = _md5Hasher.ComputeHash(Encoding.Default.GetBytes(value.ToLowerInvariant()));
+            byte[] data = Md5Hasher.ComputeHash(Encoding.Default.GetBytes(value.ToLowerInvariant()));
             return new Guid(data);
         }
     }
