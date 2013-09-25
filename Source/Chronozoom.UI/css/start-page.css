@@ -289,6 +289,9 @@ input.error {
 .TwitterBlock {
   text-align: center;
 }
+.box {
+  visibility: visible important!;
+}
 @media only screen and (max-width: 650px), screen and (orientation: landscape) and (max-device-width: 480px) {
   /* Small Tablet view: 3 rows, 2 columns */
   .tweet-meta-title {

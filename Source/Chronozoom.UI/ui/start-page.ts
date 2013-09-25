@@ -259,7 +259,6 @@ module CZ {
                 var $tileImage = $tile.find(".boxInner .tile-photo img");
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
-
                 // Set appearance and click handler.
                 // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name)
@@ -299,6 +298,7 @@ module CZ {
                 // Set title and author.
                 $tileTitle.text(timeline.Title);
                 $tileAuthor.text(timeline.Author);
+                $tile.attr("style", "visibility : visible;");
             }
         }
 

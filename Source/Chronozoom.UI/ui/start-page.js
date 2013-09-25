@@ -249,6 +249,7 @@ var CZ;
                 });
                 $tileTitle.text(timeline.Title);
                 $tileAuthor.text(timeline.Author);
+                $tile.attr("style", "visibility : visible;");
             }
         }
         StartPage.fillFeaturedTimelines = fillFeaturedTimelines;
