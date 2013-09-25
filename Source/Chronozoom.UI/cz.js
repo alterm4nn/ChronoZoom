@@ -12873,6 +12873,38 @@ var CZ;
             }, 
             
         ];
+        function resizeCrop($image, imageProps) {
+            var $startPage = $("#start-page");
+            var width = $image.parent().width();
+            var height = $image.parent().height();
+            if(!$startPage.is(":visible")) {
+                $startPage.show();
+                width = $image.width();
+                height = $image.height();
+                $startPage.hide();
+            }
+            var naturalHeight = imageProps.naturalHeight;
+            var naturalWidth = imageProps.naturalWidth;
+            var ratio = naturalWidth / naturalHeight;
+            var marginTop = 0;
+            var marginLeft = 0;
+            if(naturalWidth > naturalHeight) {
+                $image.height(height);
+                $image.width(height * ratio);
+                marginLeft = ($image.width() - width) / 2;
+            } else if(naturalWidth < naturalHeight) {
+                $image.width(width);
+                $image.height(width / ratio);
+                marginTop = ($image.height() - height) / 2;
+            } else {
+                $image.width(width);
+                $image.height(height);
+            }
+            $image.css({
+                "margin-top": -marginTop + "px",
+                "margin-left": -marginLeft + "px"
+            });
+        }
         function cloneTileTemplate(template, target, idx) {
             for(var i = 0; i < target[idx].Visibility.length; i++) {
                 var o = $(template).clone(true, true).appendTo(target[idx].Name);
@@ -12970,31 +13002,13 @@ var CZ;
                 }).invisible();
                 $tileImage.load($tile, function (event) {
                     var $this = $(this);
-                    var width = $this.parent().next().width();
-                    var height = $this.parent().next().height();
-                    if(!$startPage.is(":visible")) {
-                        $startPage.show();
-                        width = $this.parent().next().width();
-                        height = $this.parent().next().height();
-                        $startPage.hide();
-                    }
-                    var naturalHeight = (event.srcElement).naturalHeight;
-                    var naturalWidth = (event.srcElement).naturalWidth;
-                    var ratio = naturalWidth / naturalHeight;
-                    var marginTop = 0;
-                    var marginLeft = 0;
-                    if(naturalWidth > naturalHeight) {
-                        $this.height(height);
-                        $this.width(height * ratio);
-                        marginLeft = ($this.width() - $this.height()) / 2;
-                    } else {
-                        $this.width(width);
-                        $this.height(width / ratio);
-                        marginTop = ($this.height() - $this.width()) / 2;
-                    }
-                    $this.css({
-                        "margin-top": -marginTop + "px",
-                        "margin-left": -marginLeft + "px"
+                    var imageProps = event.srcElement;
+                    resizeCrop($this, imageProps);
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
                     });
                     setTimeout(function () {
                         event.data.visible();
