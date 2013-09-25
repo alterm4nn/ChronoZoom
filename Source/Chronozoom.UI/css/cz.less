@@ -17,6 +17,13 @@
 @footerHeight: 25px; /* The height of the page footer */
 @footerLinksWidth: 350px; /* The width of the footers links area */
 
+@font-face {
+    font-family: "Segoe UI Light";
+    src: url("/fonts/segoeuil.eot");
+    src: url("/fonts/segoeuil.eot?#iefix") format("embedded-opentype"),
+         url("/fonts/segoeuil.woff") format("woff"),
+         url("/fonts/segoeuil.ttf") format("truetype");
+}
 
 html, body
 {
@@ -180,6 +187,7 @@ a
 }
 
 .header-regimes {
+    .transition(opacity @fade-duration ease-in-out, visibility @fade-duration ease-in-out);
     height: @headerHeight;
     width: @headerRegimesWidth;
     display: none;
@@ -196,6 +204,7 @@ a
 
 .header-breadcrumbs
 {
+    .transition(opacity @fade-duration ease-in-out, visibility @fade-duration ease-in-out);
     height: @headerBreadcrumbsHeight;
     width: 100%;
     display: none;
@@ -273,11 +282,6 @@ a
 .home-icon
 {
     background-image: url('../images/home-icon.png');
-}
-
-.toggle-list-button
-{
-    background-image: url('../images/dummy/list-expander2.png');
 }
 
 .profile-icon
@@ -1127,6 +1131,10 @@ img.fallbackBackground
     -ms-user-select: text;
     -o-user-select: text;
     user-select: text;
+}
+
+.no-transition {
+    .transition(none);
 }
 
 /***********************************************************

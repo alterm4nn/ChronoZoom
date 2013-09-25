@@ -1,0 +1,48 @@
+/* Height of input element */
+/* Font-size of error message */
+/* Error messages */
+.error-message {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: none;
+  width: auto;
+  height: auto;
+  color: #dd4b39;
+}
+.input-error-message {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: none;
+  width: auto;
+  height: auto;
+  color: #dd4b39;
+  margin-top: 10px;
+  min-height: 29px;
+  font-size: 1em;
+  line-height: 2em;
+}
+input.error {
+  border: 1px solid #ff4800;
+}
+.form-error-message {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: none;
+  width: auto;
+  height: auto;
+  color: #dd4b39;
+  margin-top: 10px;
+  padding: 8px 10px;
+  min-height: 29px;
+  font-size: 1em;
+  line-height: 1em;
+}
+/* Common */
+.box-sizing {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}

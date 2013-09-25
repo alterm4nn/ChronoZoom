@@ -1,20 +1,82 @@
+/* Height of input element */
+/* Font-size of error message */
+/* Error messages */
+.error-message {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: none;
+  width: auto;
+  height: auto;
+  color: #dd4b39;
+}
+.input-error-message {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: none;
+  width: auto;
+  height: auto;
+  color: #dd4b39;
+  margin-top: 10px;
+  min-height: 29px;
+  font-size: 1em;
+  line-height: 2em;
+}
+input.error {
+  border: 1px solid #ff4800;
+}
+.form-error-message {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  display: none;
+  width: auto;
+  height: auto;
+  color: #dd4b39;
+  margin-top: 10px;
+  padding: 8px 10px;
+  min-height: 29px;
+  font-size: 1em;
+  line-height: 1em;
+}
+/* Common */
+.box-sizing {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
 .start-page-screen {
   display: none;
   position: absolute;
-  top: 33px;
-  bottom: 20px;
-  left: 0%;
-  right: 0%;
+  top: 35px;
+  bottom: 25px;
+  left: 0;
+  right: 0;
   cursor: default;
   overflow: hidden;
   z-index: 1000;
-  background-image: url(/images/background.jpg);
-  background-size: 100%;
+  background: url(/images/background.jpg) no-repeat;
+  background-size: cover;
+  font-family: "Segoe UI Light";
+  font-weight: lighter;
+}
+.start-page-screen h1,
+.start-page-screen h2,
+.start-page-screen h3 {
+  margin: 0;
+  font-weight: lighter;
+}
+.ContentContainer {
+  position: relative;
+  margin: 0 auto;
+  height: 100%;
 }
 .FTTiles {
-  width: calc(100%);
-  height: calc(100%);
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+  text-align: center;
 }
 .FTList {
   display: none;
@@ -38,17 +100,23 @@
   width: 33.3333%;
 }
 .boxInner {
+  background-color: #313131;
+  border-top: 3px #666 solid;
   position: absolute;
   width: 100%;
   height: 100%;
 }
 .tile-photo {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
   position: absolute;
   width: 100%;
   height: 100%;
-  border: 3px #666 solid;
   overflow: hidden;
+}
+.tile-photo:hover {
+  cursor: pointer;
 }
 .tile-photo img {
   position: absolute;
@@ -71,7 +139,22 @@
   top: 0;
   left: 0;
 }
+.tweet-meta {
+  height: 100%;
+  overflow: visible;
+  padding: 5%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 .tile-meta-title {
+  font-weight: bold;
+  color: #FFF;
+  font-size: 14px;
+  display: block;
+}
+.tweet-meta-title {
+  float: left;
   font-weight: bold;
   color: #FFF;
   font-size: 14px;
@@ -82,65 +165,167 @@
   color: #999;
   font-size: 12px;
 }
-.tile-meta-time {
+.tweet-avatar-icon {
+  float: left;
+}
+.tweet-icon {
+  float: right;
+  margin: 3px;
+}
+.tweet-meta-author {
+  font-weight: normal;
   font-size: 12px;
+  color: #10A5C6;
+  display: block;
+}
+.tile-meta-time {
+  display: inline-block;
+  font-size: 12px;
+  color: #B0B0B0;
+  float: right;
+}
+.twitter-time-container {
+  position: absolute;
+  margin: 5px;
+  bottom: 15px;
+  left: 5px;
+  right: 5px;
+  border-top: 1px #666 solid;
 }
 .tile-meta-text {
   font-weight: normal;
-  color: #999;
+  color: #B0B0B0;
   font-size: 12px;
   display: block;
 }
+.tweet-meta-text {
+  font-weight: normal;
+  color: #B0B0B0;
+  font-size: 12px;
+  display: block;
+  overflow: hidden;
+}
 .WelcomeBlock {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
   color: white;
   overflow: hidden;
-  border: dotted 2px #1e1e1e;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+}
+.WelcomeBlock .welcome-box-1 {
+  margin-top: 3px;
+  text-align: bottom;
+}
+.WelcomeBlock .welcome-box-1 h1 {
+  font-size: 34px;
+  margin: 10px 0 35px;
+}
+.WelcomeBlock .welcome-box-2 {
+  font-size: 18px;
+}
+.WelcomeBlock .welcome-box-2 .welcome-link {
+  color: #00bce0;
+  padding: 0 30px;
+  height: 65px;
+  border: 1px solid transparent;
+  line-height: 65px;
+  margin: 25px 0;
+  font-size: 22px;
+}
+.WelcomeBlock .welcome-box-2 .welcome-link:hover {
+  border: 1px solid #00bce0;
+  background: url(/images/arrow-right-hover.png) no-repeat 95% center rgba(80, 80, 104, 0.7);
+  cursor: pointer;
 }
 .welcome-link {
-  color: green;
+  color: #03A1BF;
 }
 .block-header {
   color: white;
   border-top: 3px #666 solid;
+  text-align: left;
 }
-.toggle-list-button {
+.block-header .header-text {
+  font-size: 26px;
+  line-height: 74px;
+}
+.list-view-icon {
   float: right;
-  margin: 18px 10px 0 0;
+  width: 36px;
+  height: 36px;
+  background-image: url(/images/arrow-right.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 19px 0;
+  cursor: pointer;
+}
+.list-view-icon:hover {
+  background-image: url(/images/arrow-right-hover.png);
+  cursor: pointer;
+}
+.list-view-icon.active {
+  background-image: url(/images/arrow-left.png);
+  cursor: pointer;
+}
+.list-view-icon.active:hover {
+  background-image: url(/images/arrow-left-hover.png);
+  cursor: pointer;
 }
 .template-invisible {
   display: none;
 }
+.header-text {
+  display: inline-block;
+}
+.box {
+  -webkit-transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  -moz-transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  position: relative;
+  margin: 5px;
+  display: inline-block;
+  text-align: left;
+}
+.TwitterBlock {
+  text-align: center;
+}
+.box {
+  visibility: visible important!;
+}
 @media only screen and (max-width: 650px), screen and (orientation: landscape) and (max-device-width: 480px) {
   /* Small Tablet view: 3 rows, 2 columns */
+  .tweet-meta-title {
+    display: none;
+  }
+  .tweet-meta-text {
+    font-size: 10px;
+  }
+  .tweet-avatar-icon {
+    display: none;
+  }
   .ex3,
   .ex4,
   .ex6 {
     display: none;
   }
   .box {
-    float: left;
-    position: relative;
-    width: 30%;
+    width: 25%;
     height: 30%;
-    padding-bottom: 30%;
+    padding-bottom: 20%;
     overflow: hidden;
   }
   .WelcomeBlock {
-    width: calc(100%);
-    height: calc(20%);
+    width: 100%;
+    height: 20%;
   }
   .welcome-box-1 {
     padding: 0px;
-    font-size: 10px;
     overflow: visible;
-    height: calc(40%);
+    height: 40%;
   }
   .welcome-box-2 {
     float: left;
-    height: calc(60%);
+    height: -webkit-calc(60%);
     font-size: 11px;
     overflow: auto;
   }
@@ -151,16 +336,23 @@
 }
 @media only screen and (max-width: 1050px) and (min-width: 651px) {
   /* Tablet view: 1 row 4 columns and 2 x 2 columns below */
+  .tweet-avatar-icon {
+    display: none;
+  }
+  .tweet-meta-title {
+    font-size: 10px;
+  }
+  .tweet-meta-author {
+    font-size: 10px;
+  }
   .box {
-    float: left;
-    position: relative;
-    width: 50%;
+    width: 45%;
     height: 15%;
     padding-bottom: 20%;
   }
   .ex3,
   .ex4 {
-    display: block;
+    display: inline-block;
   }
   .ex6 {
     display: none;
@@ -169,8 +361,8 @@
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(100%);
-    height: calc(30%);
+    width: 100%;
+    height: 30%;
     background-color: transparent;
     vertical-align: top;
   }
@@ -178,9 +370,8 @@
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(45%);
-    height: calc(60%);
-    border: dotted 2px #1e1e1e;
+    width: 45%;
+    height: 60%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -191,9 +382,8 @@
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(45%);
-    height: calc(60%);
-    border: dotted 2px #1e1e1e;
+    width: 45%;
+    height: 60%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -201,12 +391,11 @@
     box-sizing: border-box;
   }
   .TwitterBlock {
-    float: left;
+    float: right;
     margin: 5px;
     padding: 5px;
-    width: calc(45%);
-    height: calc(60%);
-    border: dotted 2px #1e1e1e;
+    width: 45%;
+    height: 60%;
     background-color: transparent;
     vertical-align: top;
     box-sizing: border-box;
@@ -215,10 +404,12 @@
     font-size: 15px;
     white-space: nowrap;
     overflow: visible;
+    height: -webkit-calc(50%);
     height: calc(50%);
   }
   .welcome-box-2 {
     float: left;
+    height: -webkit-calc(30%);
     height: calc(30%);
     font-size: 14px;
     overflow: auto;
@@ -231,9 +422,7 @@
 }
 @media only screen and (max-width: 1400px) and (min-width: 1051px) {
   .box {
-    float: left;
-    position: relative;
-    width: 50%;
+    width: 45%;
     height: 15%;
     padding-bottom: 20%;
   }
@@ -241,17 +430,15 @@
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
   }
   .FeaturedTimelinesBlock {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     background-color: transparent;
     box-sizing: border-box;
   }
@@ -259,22 +446,19 @@
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     box-sizing: border-box;
   }
   .TwitterBlock {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     box-sizing: border-box;
   }
   .welcome-box-1 {
-    overflow: hidden;
     overflow: visible;
     vertical-align: top;
     font-size: 15px;
@@ -283,6 +467,7 @@
     float: left;
     overflow: visible;
     height: calc(30%);
+    height: -webkit-calc(30%);
   }
   .welcome-box-3 {
     float: left;
@@ -293,10 +478,11 @@
 }
 @media only screen and (min-width: 1401px) {
   /* Large desktop: 6 columns, 3 rows, extra margin tiles */
+  .twitter-time-container {
+    bottom: 25px;
+  }
   .box {
-    float: left;
-    position: relative;
-    width: 50%;
+    width: 45%;
     height: 15%;
     padding-bottom: 20%;
   }
@@ -304,9 +490,8 @@
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -317,9 +502,8 @@
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -330,9 +514,8 @@
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -343,9 +526,8 @@
     float: left;
     margin: 5px;
     padding: 5px;
-    width: calc(31.333333000000003%);
-    height: calc(100%);
-    border: dotted 2px #1e1e1e;
+    width: 31%;
+    height: 100%;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
