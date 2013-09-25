@@ -808,6 +808,8 @@ interface JQuery {
 
     showError(...arguments: any[]): JQuery;
     hideError(): JQuery;
+    visible(noTransition?: bool): JQuery;
+    invisible(noTransition?: bool): JQuery;
 }
 
 interface EventTarget {

@@ -47,3 +47,10 @@ input.error {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+.transition(...) {
+    @props: ~`"@{arguments}".replace(/[\[\]]/g, '')`;
+    -webkit-transition: @props;
+    -moz-transition: @props;
+    transition: @props;
+}

@@ -2216,7 +2216,12 @@ namespace Chronozoom.UI
                     if (storage.GetPrefix(t.Object) == "cztimeline")
                     {
                         var g = new Guid(storage.GetValue(t.Object));
-                        var timeline = storage.Timelines.Where(x => x.Id == g).Include(f => f.Collection).Include(u => u.Collection.User).FirstOrDefault();
+                        var timeline = storage.Timelines.Where(x => x.Id == g)
+                            .Include("Collection")
+                            .Include("Collection.User")
+                            .Include("Exhibits")
+                            .Include("Exhibits.ContentItems")
+                            .FirstOrDefault();
 
                         //ToDo: get image url
                         if (timeline != null)
@@ -2276,7 +2281,5 @@ namespace Chronozoom.UI
             });
         }
         #endregion
-
-
     }
 }
