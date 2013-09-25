@@ -12771,6 +12771,7 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (StartPage) {
+        var _isRegimesVisible;
         StartPage.tileData = [
             {
                 "Idx": 0,
@@ -12963,10 +12964,11 @@ var CZ;
                 var $tileImage = $tile.find(".boxInner .tile-photo img");
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
-                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(function () {
-                    window.location.href = timelineUrl;
-                });
-                $tileImage.load(function (event) {
+                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                }).invisible();
+                $tileImage.load($tile, function (event) {
                     var $this = $(this);
                     var width = $this.parent().next().width();
                     var height = $this.parent().next().height();
@@ -12994,6 +12996,9 @@ var CZ;
                         "margin-top": -marginTop + "px",
                         "margin-left": -marginLeft + "px"
                     });
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
                 }).attr({
                     src: timeline.ImageUrl,
                     alt: timeline.Title
@@ -13026,8 +13031,9 @@ var CZ;
                 var events = $(el).data("events");
                 $(el).data("onclick", events && events.click && events.click[0]);
             }).off();
-            $(".header-regimes").fadeOut();
-            $("#timeSeriesDataForm").hide();
+            $(".header-regimes").invisible();
+            $(".header-breadcrumbs").invisible();
+            CZ.HomePageViewModel.closeAllForms();
             $("#start-page").fadeIn();
         }
         StartPage.show = show;
@@ -13037,11 +13043,15 @@ var CZ;
             $disabledButtons.removeAttr("disabled").each(function (i, el) {
                 $(el).click($(el).data("onclick"));
             });
-            $(".header-regimes").fadeIn();
+            if(_isRegimesVisible) {
+                $(".header-regimes").visible();
+            }
+            $(".header-breadcrumbs").visible();
             $("#start-page").fadeOut();
         }
         StartPage.hide = hide;
         function initialize() {
+            _isRegimesVisible = $(".header-regimes").is(":visible");
             $(".home-icon").click(function () {
                 if($("#start-page").is(":visible")) {
                     hide();
@@ -13055,8 +13065,8 @@ var CZ;
             });
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
-            var hash = CZ.UrlNav.getURL().hash.path;
-            if(!hash || hash === "/t" + CZ.Settings.guidEmpty) {
+            var hash = CZ.UrlNav.getURL().hash;
+            if(!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
                 show();
             }
         }
@@ -13132,6 +13142,36 @@ var CZ;
             });
         }
         return result;
+    };
+})(jQuery);
+(function ($) {
+    $.fn.visible = function (noTransition) {
+        return this.each(function () {
+            var $this = $(this);
+            if(noTransition) {
+                $this.addClass("no-transition");
+            } else {
+                $this.removeClass("no-transition");
+            }
+            $this.css({
+                opacity: 1,
+                visibility: "visible"
+            });
+        });
+    };
+    $.fn.invisible = function (noTransition) {
+        return this.each(function () {
+            var $this = $(this);
+            if(noTransition) {
+                $this.addClass("no-transition");
+            } else {
+                $this.removeClass("no-transition");
+            }
+            $this.css({
+                opacity: 0,
+                visibility: "hidden"
+            });
+        });
     };
 })(jQuery);
 var constants;

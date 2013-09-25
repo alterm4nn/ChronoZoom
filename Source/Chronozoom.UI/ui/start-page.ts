@@ -3,6 +3,8 @@
 
 module CZ {
     export module StartPage {
+        var _isRegimesVisible;
+
         /* Dummy data in an approximate format that might be returned from a service ... */
         export var tileData = [
             {
@@ -221,17 +223,20 @@ module CZ {
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
 
                 // Set appearance and click handler.
+                // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name)
                     .addClass(layout.Visibility[i])
                     .attr("id", "featured" + i)
-                    .click(function () {
-                        window.location.href = timelineUrl;
-                    });
+                    .click(timelineUrl, function (event) {
+                        window.location.href = event.data;
+                        hide();
+                    })
+                    .invisible();
 
                 // Resize and crop image on load.
                 // TODO: Why size of tile so strange? Only gradient has real size.
                 //       ($this.parent().next() is a gradient element)
-                $tileImage.load(function (event) {
+                $tileImage.load($tile, function (event) {
                     var $this = $(this);
 
                     // TODO: Simplify this code.
@@ -251,6 +256,7 @@ module CZ {
                     var marginTop = 0;
                     var marginLeft = 0;
 
+                    // Keep aspect ratio.
                     if (naturalWidth > naturalHeight) {
                         $this.height(height);
                         $this.width(height * ratio);
@@ -265,6 +271,12 @@ module CZ {
                         "margin-top": -marginTop + "px",
                         "margin-left": -marginLeft + "px"
                     });
+
+                    // Show the tile with transition.
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
+                        
                 }).attr({
                     src: timeline.ImageUrl,
                     alt: timeline.Title
@@ -308,8 +320,14 @@ module CZ {
                 .off();
 
             // Hide regimes.
-            $(".header-regimes").fadeOut();
-            $("#timeSeriesDataForm").hide();
+            $(".header-regimes").invisible();
+
+            // Hide breadcrumbs.
+            $(".header-breadcrumbs").invisible();
+
+            // Hide all forms.
+            CZ.HomePageViewModel.closeAllForms();
+
             // Show home page.
             $("#start-page").fadeIn();
         }
@@ -324,14 +342,23 @@ module CZ {
                     $(el).click($(el).data("onclick"));
                 });
 
-            // Show regimes.
-            $(".header-regimes").fadeIn();
+            // Show regimes if necessary.
+            if (_isRegimesVisible) {
+                $(".header-regimes").visible();
+            }
+
+            // Show breadcrumbs.
+            $(".header-breadcrumbs").visible();
 
             // Hide home page.
             $("#start-page").fadeOut();
         }
 
         export function initialize() {
+            // Is regimes visible initially?
+            _isRegimesVisible = $(".header-regimes").is(":visible");
+
+            // Toggle for home button.
             $(".home-icon").click(function () {
                 if ($("#start-page").is(":visible")) {
                     hide();
@@ -352,8 +379,10 @@ module CZ {
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
-            var hash = CZ.UrlNav.getURL().hash.path;
-            if (!hash || hash === "/t" + CZ.Settings.guidEmpty) {
+
+            // Show home page if this is a root URL of ChronoZoom.
+            var hash = CZ.UrlNav.getURL().hash;
+            if (!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
                 show();
             }
         }

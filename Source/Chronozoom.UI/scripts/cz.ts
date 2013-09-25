@@ -30,6 +30,7 @@
 /// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 /// <reference path='../ui/start-page.ts'/>
 /// <reference path='plugins/error-plugin.ts'/>
+/// <reference path='plugins/utility-plugins.ts'/>
 
 var constants: any;
 

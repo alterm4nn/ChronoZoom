@@ -187,6 +187,7 @@ a
 }
 
 .header-regimes {
+    .transition(opacity @fade-duration ease-in-out, visibility @fade-duration ease-in-out);
     height: @headerHeight;
     width: @headerRegimesWidth;
     display: none;
@@ -203,6 +204,7 @@ a
 
 .header-breadcrumbs
 {
+    .transition(opacity @fade-duration ease-in-out, visibility @fade-duration ease-in-out);
     height: @headerBreadcrumbsHeight;
     width: 100%;
     display: none;
@@ -1129,6 +1131,10 @@ img.fallbackBackground
     -ms-user-select: text;
     -o-user-select: text;
     user-select: text;
+}
+
+.no-transition {
+    .transition(none);
 }
 
 /***********************************************************
