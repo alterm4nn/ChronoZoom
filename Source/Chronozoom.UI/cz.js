@@ -12771,6 +12771,7 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (StartPage) {
+        var _isRegimesVisible;
         StartPage.tileData = [
             {
                 "Idx": 0,
@@ -12872,6 +12873,38 @@ var CZ;
             }, 
             
         ];
+        function resizeCrop($image, imageProps) {
+            var $startPage = $("#start-page");
+            var width = $image.parent().width();
+            var height = $image.parent().height();
+            if(!$startPage.is(":visible")) {
+                $startPage.show();
+                width = $image.width();
+                height = $image.height();
+                $startPage.hide();
+            }
+            var naturalHeight = imageProps.naturalHeight;
+            var naturalWidth = imageProps.naturalWidth;
+            var ratio = naturalWidth / naturalHeight;
+            var marginTop = 0;
+            var marginLeft = 0;
+            if(naturalWidth > naturalHeight) {
+                $image.height(height);
+                $image.width(height * ratio);
+                marginLeft = ($image.width() - width) / 2;
+            } else if(naturalWidth < naturalHeight) {
+                $image.width(width);
+                $image.height(width / ratio);
+                marginTop = ($image.height() - height) / 2;
+            } else {
+                $image.width(width);
+                $image.height(height);
+            }
+            $image.css({
+                "margin-top": -marginTop + "px",
+                "margin-left": -marginLeft + "px"
+            });
+        }
         function cloneTileTemplate(template, target, idx) {
             for(var i = 0; i < target[idx].Visibility.length; i++) {
                 var o = $(template).clone(true, true).appendTo(target[idx].Name);
@@ -12944,9 +12977,11 @@ var CZ;
             if('block' != document.getElementById(name + '-list').style.display) {
                 document.getElementById(name + '-list').style.display = 'block';
                 document.getElementById(name + '-tiles').style.display = 'none';
+                $("#" + name).find(".list-view-icon").addClass("active");
             } else {
                 document.getElementById(name + '-list').style.display = 'none';
                 document.getElementById(name + '-tiles').style.display = 'block';
+                $("#" + name).find(".list-view-icon").removeClass("active");
             }
         }
         StartPage.listFlip = listFlip;
@@ -12961,37 +12996,23 @@ var CZ;
                 var $tileImage = $tile.find(".boxInner .tile-photo img");
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
-                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(function () {
-                    window.location.href = timelineUrl;
-                });
-                $tileImage.load(function (event) {
+                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                }).invisible();
+                $tileImage.load($tile, function (event) {
                     var $this = $(this);
-                    var width = $this.parent().next().width();
-                    var height = $this.parent().next().height();
-                    if(!$startPage.is(":visible")) {
-                        $startPage.show();
-                        width = $this.parent().next().width();
-                        height = $this.parent().next().height();
-                        $startPage.hide();
-                    }
-                    var naturalHeight = (event.srcElement).naturalHeight;
-                    var naturalWidth = (event.srcElement).naturalWidth;
-                    var ratio = naturalWidth / naturalHeight;
-                    var marginTop = 0;
-                    var marginLeft = 0;
-                    if(naturalWidth > naturalHeight) {
-                        $this.height(height);
-                        $this.width(height * ratio);
-                        marginLeft = ($this.width() - $this.height()) / 2;
-                    } else {
-                        $this.width(width);
-                        $this.height(width / ratio);
-                        marginTop = ($this.height() - $this.width()) / 2;
-                    }
-                    $this.css({
-                        "margin-top": -marginTop + "px",
-                        "margin-left": -marginLeft + "px"
+                    var imageProps = event.srcElement;
+                    resizeCrop($this, imageProps);
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
                     });
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
                 }).attr({
                     src: timeline.ImageUrl,
                     alt: timeline.Title
@@ -13024,8 +13045,9 @@ var CZ;
                 var events = $(el).data("events");
                 $(el).data("onclick", events && events.click && events.click[0]);
             }).off();
-            $(".header-regimes").fadeOut();
-            $("#timeSeriesDataForm").hide();
+            $(".header-regimes").invisible();
+            $(".header-breadcrumbs").invisible();
+            CZ.HomePageViewModel.closeAllForms();
             $("#start-page").fadeIn();
         }
         StartPage.show = show;
@@ -13035,11 +13057,15 @@ var CZ;
             $disabledButtons.removeAttr("disabled").each(function (i, el) {
                 $(el).click($(el).data("onclick"));
             });
-            $(".header-regimes").fadeIn();
+            if(_isRegimesVisible) {
+                $(".header-regimes").visible();
+            }
+            $(".header-breadcrumbs").visible();
             $("#start-page").fadeOut();
         }
         StartPage.hide = hide;
         function initialize() {
+            _isRegimesVisible = $(".header-regimes").is(":visible");
             $(".home-icon").click(function () {
                 if($("#start-page").is(":visible")) {
                     hide();
@@ -13053,8 +13079,8 @@ var CZ;
             });
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
-            var hash = CZ.UrlNav.getURL().hash.path;
-            if(!hash || hash === "/t" + CZ.Settings.guidEmpty) {
+            var hash = CZ.UrlNav.getURL().hash;
+            if(!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
                 show();
             }
         }
@@ -13062,6 +13088,106 @@ var CZ;
     })(CZ.StartPage || (CZ.StartPage = {}));
     var StartPage = CZ.StartPage;
 })(CZ || (CZ = {}));
+(function ($) {
+    $.fn.showError = function (msg, className, props) {
+        className = className || "error";
+        props = props || {
+        };
+        $.extend(true, props, {
+            class: className,
+            text: msg
+        });
+        var $errorTemplate = $("<div></div>", props).attr("error", true);
+        var $allErrors = $();
+        var $errorElems = $();
+        var result = this.each(function () {
+            var $this = $(this);
+            var isDiv;
+            var $div;
+            var $error;
+            if(!$this.data("error")) {
+                isDiv = $this.is("div");
+                $div = isDiv ? $this : $this.closest("div");
+                $error = $errorTemplate.clone();
+                $allErrors = $allErrors.add($error);
+                $errorElems = $errorElems.add($this);
+                $errorElems = $errorElems.add($div);
+                $errorElems = $errorElems.add($div.children());
+                $this.data("error", $error);
+                if(isDiv) {
+                    $div.append($error);
+                } else {
+                    $this.after($error);
+                }
+            }
+        });
+        if($allErrors.length > 0) {
+            $errorElems.addClass(className);
+            $allErrors.slideDown(CZ.Settings.errorMessageSlideDuration);
+        }
+        return result;
+    };
+    $.fn.hideError = function () {
+        var $allErrors = $();
+        var $errorElems = $();
+        var classes = "";
+        var result = this.each(function () {
+            var $this = $(this);
+            var $error = $this.data("error");
+            var $div;
+            var className;
+            if($error) {
+                $div = $this.is("div") ? $this : $this.closest("div");
+                className = $error.attr("class");
+                if(classes.split(" ").indexOf(className) === -1) {
+                    classes += " " + className;
+                }
+                $allErrors = $allErrors.add($error);
+                $errorElems = $errorElems.add($this);
+                $errorElems = $errorElems.add($div);
+                $errorElems = $errorElems.add($div.children());
+            }
+        });
+        if($allErrors.length > 0) {
+            $allErrors.slideUp(CZ.Settings.errorMessageSlideDuration).promise().done(function () {
+                $allErrors.remove();
+                $errorElems.removeData("error");
+                $errorElems.removeClass(classes);
+            });
+        }
+        return result;
+    };
+})(jQuery);
+(function ($) {
+    $.fn.visible = function (noTransition) {
+        return this.each(function () {
+            var $this = $(this);
+            if(noTransition) {
+                $this.addClass("no-transition");
+            } else {
+                $this.removeClass("no-transition");
+            }
+            $this.css({
+                opacity: 1,
+                visibility: "visible"
+            });
+        });
+    };
+    $.fn.invisible = function (noTransition) {
+        return this.each(function () {
+            var $this = $(this);
+            if(noTransition) {
+                $this.addClass("no-transition");
+            } else {
+                $this.removeClass("no-transition");
+            }
+            $this.css({
+                opacity: 0,
+                visibility: "hidden"
+            });
+        });
+    };
+})(jQuery);
 var constants;
 var CZ;
 (function (CZ) {
@@ -13947,73 +14073,3 @@ var CZ;
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));
-(function ($) {
-    $.fn.showError = function (msg, className, props) {
-        className = className || "error";
-        props = props || {
-        };
-        $.extend(true, props, {
-            class: className,
-            text: msg
-        });
-        var $errorTemplate = $("<div></div>", props).attr("error", true);
-        var $allErrors = $();
-        var $errorElems = $();
-        var result = this.each(function () {
-            var $this = $(this);
-            var isDiv;
-            var $div;
-            var $error;
-            if(!$this.data("error")) {
-                isDiv = $this.is("div");
-                $div = isDiv ? $this : $this.closest("div");
-                $error = $errorTemplate.clone();
-                $allErrors = $allErrors.add($error);
-                $errorElems = $errorElems.add($this);
-                $errorElems = $errorElems.add($div);
-                $errorElems = $errorElems.add($div.children());
-                $this.data("error", $error);
-                if(isDiv) {
-                    $div.append($error);
-                } else {
-                    $this.after($error);
-                }
-            }
-        });
-        if($allErrors.length > 0) {
-            $errorElems.addClass(className);
-            $allErrors.slideDown(CZ.Settings.errorMessageSlideDuration);
-        }
-        return result;
-    };
-    $.fn.hideError = function () {
-        var $allErrors = $();
-        var $errorElems = $();
-        var classes = "";
-        var result = this.each(function () {
-            var $this = $(this);
-            var $error = $this.data("error");
-            var $div;
-            var className;
-            if($error) {
-                $div = $this.is("div") ? $this : $this.closest("div");
-                className = $error.attr("class");
-                if(classes.split(" ").indexOf(className) === -1) {
-                    classes += " " + className;
-                }
-                $allErrors = $allErrors.add($error);
-                $errorElems = $errorElems.add($this);
-                $errorElems = $errorElems.add($div);
-                $errorElems = $errorElems.add($div.children());
-            }
-        });
-        if($allErrors.length > 0) {
-            $allErrors.slideUp(CZ.Settings.errorMessageSlideDuration).promise().done(function () {
-                $allErrors.remove();
-                $errorElems.removeData("error");
-                $errorElems.removeClass(classes);
-            });
-        }
-        return result;
-    };
-})(jQuery);

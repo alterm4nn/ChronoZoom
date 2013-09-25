@@ -1,85 +1,82 @@
-﻿       <!-- Start Page -->
-     
-            <div id="ContentContainer" class="ContentContainer">
+﻿<!-- Start Page -->
+<div id="ContentContainer" class="ContentContainer">
 
-            <div id="WelcomeBlock" class="WelcomeBlock">
-                <div class="welcome-box-1">
-                    <h2>Welcome to ChronoZoom!</h2>
+    <div id="WelcomeBlock" class="WelcomeBlock">
+        <div class="welcome-box-1">
+            <h1>Welcome to ChronoZoom!</h1>
+        </div>
+        <div class="welcome-box-2">
+            ChronoZoom is an educational tool for teachers and students who want to put historical events in perspective.
+            A great many resources have been created already in ChronoZoom for your enjoyment and enlightenment.
+            <div class="welcome-link" onclick="CZ.StartPage.hide();">>&nbsp;Start Using ChronoZoom</div>
+            <div class="welcome-box-3">
+                Use ChronoZoom to get a perspective of the extensive scale of time and historical events relative to what happened around the world.
+                Become and author yourself, simply log on with your social networking credentials to record your unique perspective or tell a story that needs to be told.
+                <div class="welcome-link" onclick="CZ.StartPage.hide(); CZ.StartPage.PlayIntroTour();">>&nbsp;Take an Intro Tour</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="FeaturedTimelinesBlock" class="FeaturedTimelinesBlock">
+        <div class="block-header">              
+            <h2 class="header-text">Featured Timelines</h2>
+            <div class="list-view-icon" data-enabled="true" onclick="CZ.StartPage.listFlip('FeaturedTimelinesBlock');">
+            </div>
+        </div>
+        <div id="FeaturedTimelinesBlock-tiles" class="FTTiles"></div>
+        <div id="FeaturedTimelinesBlock-list" class="FTList"></div>
+    </div>
+
+    <div id="TwitterBlock" class="TwitterBlock">
+        <div class="block-header">              
+            <h2 class="header-text">Twitter</h2>
+        </div>
+    </div>
+
+    <div id="template-list" class="template-invisible" style="display: none;">
+        <div class="list-item">
+            <div class="li-title"><a href="#">REPLACE</a></div>
+            <div class="li-author"></div>
+          <!--  <div class="li-icon"></div>-->
+            <div class="cleardiv"></div>
+        </div>
+    </div>
+
+    <div id="template-tile" class="template-invisible">
+        <div class="box">
+            <div class="boxInner">
+                <div class="tile-photo">
+                    <img src="images/dummy/tile_bighistory.jpg" alt="REPLACE"/>
+                </div>  
+                <div class="tile-gradient">
+                    <img src="images/dummy/tile_gradient.png" alt=""/>
                 </div>
-                <div class="welcome-box-2">
-                    ChronoZoom is an educational tool for teachers and students who want to put historical events in perspective.
-                    A great many resources have been created already in ChronoZoom for your enjoyment and enlightenment.
-                    <a class = "welcome-link"  onclick="CZ.StartPage.hide();">Enter Here.</a>
-                    <div class="welcome-box-3">
-                        Use ChronoZoom to get a perspective of the extensive scale of time and historical events relative to what happened around the world.
-                        Become and author yourself, simply log on with your social networking credentials to record your unique perspective or tell a story that needs to be told.
-                        <a class = "welcome-link" onclick="CZ.StartPage.hide(); CZ.StartPage.PlayIntroTour();">Take Intro Tour.</a>
+                <div class="tile-meta">
+                    <span class="tile-meta-title">REPLACE</span>
+                    <span class="tile-meta-author">REPLACE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="template-tweet" class="template-invisible">
+        <div class="box">
+            <div class="boxInner">
+                <div class="tweet-meta">
+                <img class="tweet-avatar-icon" src="images/dummy/twitter_profile_pic.gif" />
+                <div style="display: inline-block">
+                    <span class="tweet-meta-title">ChronoZoom</span>
+                    <div class="tweet-meta-author">@ChronoZoomTS</div>
+                </div>
+                     <div class="cleardiv"></div>
+                    <div class="tweet-meta-text">Big History is my favorite course ever</div>
+                    <div class="twitter-time-container"> 
+                        <img src="images/dummy/icon_twitter.png" class="tweet-icon"/>
+                        <div class="tile-meta-time">1h</div>
                     </div>
                 </div>
-            </div>
+              </div>
+        </div>
+    </div>
 
-            <div id="FeaturedTimelinesBlock" class="FeaturedTimelinesBlock">
-                <div class="block-header">              
-                    <h3 class = "header-text">Featured Timelines</h3>
-                    <div class="header-icon toggle-list-button" data-enabled="true" onclick="CZ.StartPage.listFlip('FeaturedTimelinesBlock');">
-                    </div>
-                    <div class="cleardiv"></div>
-                </div>
-                <div id="FeaturedTimelinesBlock-tiles" class="FTTiles"></div>
-                <div id="FeaturedTimelinesBlock-list" class = "FTList"></div>
-            </div>
-
-            <div id="TwitterBlock" class="TwitterBlock">
-                <div class = "block-header">              
-                    <div><h3>Twitter</h3></div>
-                    <div class="cleardiv"></div>
-                </div>
-            </div>
-
-            <div id="template-list" class = "template-invisible" style="display:none;">
-                <div class="list-item">
-                    <div class="li-title"><a href="#">REPLACE</a></div>
-                    <div class="li-author"></div>
-                  <!--  <div class="li-icon"></div>-->
-                    <div class="cleardiv"></div>
-                </div>
-            </div>
-
-            <div id="template-tile" class = "template-invisible">
-                <div class="box">
-                    <div class="boxInner">
-                        <div class="tile-photo">
-                            <img src="images/dummy/tile_bighistory.jpg" alt="REPLACE"/>
-                        </div>  
-                        <div class="tile-gradient">
-                            <img src="images/dummy/tile_gradient.png" alt=""/>
-                        </div>
-                        <div class="tile-meta">
-                            <span class="tile-meta-title">REPLACE</span>
-                            <span class="tile-meta-author">REPLACE</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="template-tweet" class = "template-invisible">
-                <div class="box">
-                    <div class="boxInner">
-                        <div class="tweet-meta">
-                        <img class = "tweet-avatar-icon" src="images/dummy/twitter_profile_pic.gif" />
-                        <div style = "display:inline-block">
-                            <span class="tweet-meta-title" >ChronoZoom</span>
-                            <div class="tweet-meta-author">@ChronoZoomTS</div>
-                        </div>
-                             <div class="cleardiv"></div>
-                            <div class="tweet-meta-text">Big History is my favorite course ever</div>
-                            <div class="twitter-time-container"> 
-                                <img src="images/dummy/icon_twitter.png" class = "tweet-icon"/>
-                                <div class="tile-meta-time">1h</div>
-                            </div>
-                        </div>
-                      </div>
-                </div>
-            </div>
-
-            </div>
+</div>

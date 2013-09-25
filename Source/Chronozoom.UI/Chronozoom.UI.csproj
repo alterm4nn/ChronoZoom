@@ -67,6 +67,9 @@
     <Content Include="css\_mixins.less" />
     <Content Include="css\_colors.less" />
     <Content Include="css\_vars.less" />
+    <Content Include="fonts\segoeuil.eot" />
+    <Content Include="fonts\segoeuil.ttf" />
+    <Content Include="fonts\segoeuil.woff" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -272,6 +275,10 @@
     <Content Include="cz.js" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
+    <Content Include="images\arrow-left-hover.png" />
+    <Content Include="images\arrow-left.png" />
+    <Content Include="images\arrow-right-hover.png" />
+    <Content Include="images\arrow-right.png" />
     <Content Include="images\chronozoom.png" />
     <Content Include="images\credits\github.png" />
     <Content Include="images\credits\msr.png" />
@@ -373,6 +380,10 @@
     <Content Include="scripts\plugins\error-plugin.js">
       <DependentUpon>error-plugin.ts</DependentUpon>
     </Content>
+    <Content Include="scripts\plugins\utility-plugins.js">
+      <DependentUpon>utility-plugins.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\plugins\utility-plugins.ts" />
     <Content Include="ui\auth-edit-tour-form.html" />
     <Content Include="ui\auth-edit-tour-form.js">
       <DependentUpon>auth-edit-tour-form.ts</DependentUpon>

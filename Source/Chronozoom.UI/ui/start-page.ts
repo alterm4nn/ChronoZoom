@@ -3,6 +3,8 @@
 
 module CZ {
     export module StartPage {
+        var _isRegimesVisible;
+
         /* Dummy data in an approximate format that might be returned from a service ... */
         export var tileData = [
             {
@@ -117,6 +119,46 @@ module CZ {
             },
         ];
 
+        function resizeCrop($image: JQuery, imageProps: any): void {
+            var $startPage = $("#start-page");
+
+            // Get size of the tile.
+            var width = $image.parent().width();
+            var height = $image.parent().height();
+
+            // Show start page if it's not visible to get size of the tile.
+            if (!$startPage.is(":visible")) {
+                $startPage.show();
+                width = $image.width();
+                height = $image.height();
+                $startPage.hide();
+            }
+            
+            var naturalHeight = imageProps.naturalHeight;
+            var naturalWidth = imageProps.naturalWidth;
+            var ratio = naturalWidth / naturalHeight;
+            var marginTop = 0;
+            var marginLeft = 0;
+
+            // Keep aspect ratio.
+            if (naturalWidth > naturalHeight) {
+                $image.height(height);
+                $image.width(height * ratio);
+                marginLeft = ($image.width() - width) / 2;
+            } else if (naturalWidth < naturalHeight) {
+                $image.width(width);
+                $image.height(width / ratio);
+                marginTop = ($image.height() - height) / 2;
+            } else {
+                $image.width(width);
+                $image.height(height);
+            }
+
+            $image.css({
+                "margin-top": -marginTop + "px",
+                "margin-left": -marginLeft + "px"
+            });
+        }
 
         export function cloneTileTemplate(template, target, idx) {
             for (var i = 0; i < target[idx].Visibility.length; i++) {
@@ -178,31 +220,31 @@ module CZ {
         }
 
         export function TwitterLayout( target, idx) {
-
-              CZ.Service.getRecentTweets().done(response => {
-                 for (var i = 0, len = response.d.length; i < len; ++i) {
-                var  text =  response.d[i].Text;
-                var  author = response.d[i].User.Name;
-                var  time = response.d[i].CreatedDate;
-                var myDate = new Date(time.match(/\d+/)[0] * 1);
-                var convertedDate = myDate.toLocaleTimeString() +"; "+  myDate.getDate();
-                convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
-                $("#m"+idx+"i"+i+" .boxInner .tile-meta .tweet-meta-text").text(text);
-                $("#m"+idx+"i"+i+" .boxInner .tile-meta .tweet-meta-author").text(author);
-                 $("#m"+idx+"i"+i+" .boxInner .tile-meta .tile-meta-time").text(convertedDate);
-                 }
+            CZ.Service.getRecentTweets().done(response => {
+                for (var i = 0, len = response.d.length; i < len; ++i) {
+                    var  text =  response.d[i].Text;
+                    var  author = response.d[i].User.Name;
+                    var  time = response.d[i].CreatedDate;
+                    var myDate = new Date(time.match(/\d+/)[0] * 1);
+                    var convertedDate = myDate.toLocaleTimeString() +"; "+  myDate.getDate();
+                    convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
+                    $("#m"+idx+"i"+i+" .boxInner .tile-meta .tweet-meta-text").text(text);
+                    $("#m"+idx+"i"+i+" .boxInner .tile-meta .tweet-meta-author").text(author);
+                    $("#m"+idx+"i"+i+" .boxInner .tile-meta .tile-meta-time").text(convertedDate);
+                }
             });
         }
 
-       export function listFlip(name){
-                if( 'block' != document.getElementById(name+'-list').style.display){
-                    document.getElementById(name+'-list').style.display = 'block';
-                    document.getElementById(name+'-tiles').style.display = 'none';
-                }
-                else{
-                    document.getElementById(name+'-list').style.display = 'none';
-                    document.getElementById(name+'-tiles').style.display = 'block';
-                }
+        export function listFlip(name){
+            if( 'block' != document.getElementById(name+'-list').style.display){
+                document.getElementById(name+'-list').style.display = 'block';
+                document.getElementById(name+'-tiles').style.display = 'none';
+                $("#" + name).find(".list-view-icon").addClass("active");
+            } else {
+                document.getElementById(name+'-list').style.display = 'none';
+                document.getElementById(name+'-tiles').style.display = 'block';
+                $("#" + name).find(".list-view-icon").removeClass("active");
+            }
         }
 
         export function fillFeaturedTimelines(timelines) {
@@ -219,50 +261,36 @@ module CZ {
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
 
                 // Set appearance and click handler.
+                // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name)
                     .addClass(layout.Visibility[i])
                     .attr("id", "featured" + i)
-                    .click(function () {
-                        window.location.href = timelineUrl;
-                    });
+                    .click(timelineUrl, function (event) {
+                        window.location.href = event.data;
+                        hide();
+                    })
+                    .invisible();
 
                 // Resize and crop image on load.
-                // TODO: Why size of tile so strange? Only gradient has real size.
-                //       ($this.parent().next() is a gradient element)
-                $tileImage.load(function (event) {
+                $tileImage.load($tile, function (event) {
                     var $this = $(this);
+                    var imageProps = event.srcElement;
 
-                    // TODO: Simplify this code.
-                    // Show start page if it's not visible to get size of the tile.
-                    var width = $this.parent().next().width();
-                    var height = $this.parent().next().height();
-                    if (!$startPage.is(":visible")) {
-                        $startPage.show();
-                        width = $this.parent().next().width();
-                        height = $this.parent().next().height();
-                        $startPage.hide();
-                    }
-                    
-                    var naturalHeight = (<any>event.srcElement).naturalHeight;
-                    var naturalWidth = (<any>event.srcElement).naturalWidth;
-                    var ratio = naturalWidth / naturalHeight;
-                    var marginTop = 0;
-                    var marginLeft = 0;
+                    // Resize and crop the image.
+                    resizeCrop($this, imageProps);
 
-                    if (naturalWidth > naturalHeight) {
-                        $this.height(height);
-                        $this.width(height * ratio);
-                        marginLeft = ($this.width() - $this.height()) / 2;
-                    } else {
-                        $this.width(width);
-                        $this.height(width / ratio);
-                        marginTop = ($this.height() - $this.width()) / 2;
-                    }
-
-                    $this.css({
-                        "margin-top": -marginTop + "px",
-                        "margin-left": -marginLeft + "px"
+                    // Resize and crop the image on window resize.
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
                     });
+
+                    // Show the tile with transition.
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
                 }).attr({
                     src: timeline.ImageUrl,
                     alt: timeline.Title
@@ -306,8 +334,14 @@ module CZ {
                 .off();
 
             // Hide regimes.
-            $(".header-regimes").fadeOut();
-            $("#timeSeriesDataForm").hide();
+            $(".header-regimes").invisible();
+
+            // Hide breadcrumbs.
+            $(".header-breadcrumbs").invisible();
+
+            // Hide all forms.
+            CZ.HomePageViewModel.closeAllForms();
+
             // Show home page.
             $("#start-page").fadeIn();
         }
@@ -322,14 +356,23 @@ module CZ {
                     $(el).click($(el).data("onclick"));
                 });
 
-            // Show regimes.
-            $(".header-regimes").fadeIn();
+            // Show regimes if necessary.
+            if (_isRegimesVisible) {
+                $(".header-regimes").visible();
+            }
+
+            // Show breadcrumbs.
+            $(".header-breadcrumbs").visible();
 
             // Hide home page.
             $("#start-page").fadeOut();
         }
 
         export function initialize() {
+            // Is regimes visible initially?
+            _isRegimesVisible = $(".header-regimes").is(":visible");
+
+            // Toggle for home button.
             $(".home-icon").click(function () {
                 if ($("#start-page").is(":visible")) {
                     hide();
@@ -350,8 +393,10 @@ module CZ {
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
-            var hash = CZ.UrlNav.getURL().hash.path;
-            if (!hash || hash === "/t" + CZ.Settings.guidEmpty) {
+
+            // Show home page if this is a root URL of ChronoZoom.
+            var hash = CZ.UrlNav.getURL().hash;
+            if (!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
                 show();
             }
         }
