@@ -712,4 +712,32 @@ namespace Chronozoom.UI
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         BaseJsonResult<IEnumerable<TweetSharp.TwitterStatus>> GetRecentTweets();
     }
+
+    [ServiceContract(Namespace = "")]
+    public interface ITriplesAPI
+    {
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/{subject}/{predicate}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<Triple> GetTriplet(string subject, string predicate);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/{subject}/{predicate}/{object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<Triple> GetTriplet2(string subject, string predicate, string @object);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{subject}/{predicate}/{object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        bool DeleteTriplet(string subject, string predicate, string @object);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{subject}/{predicate}/{object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        bool PutTriplet(string subject, string predicate, string @object);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/prefix/{prefix}/{namespace}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        bool SetPrefix(string prefix, string @namespace);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/prefix/{prefix}/{namespace}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        bool DeletePrefix(string prefix, string @namespace);
+    }
 }

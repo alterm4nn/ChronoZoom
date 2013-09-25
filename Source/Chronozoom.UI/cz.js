@@ -4024,6 +4024,69 @@ var CZ;
             });
         }
         Service.putUserFeatured = putUserFeatured;
+        function putTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            request.addToPath(object);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.putTriplet = putTriplet;
+        function getTriplet(subject, predicate, object) {
+            if (typeof object === "undefined") { object = null; }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            if(object != null) {
+                request.addToPath(object);
+            }
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getTriplet = getTriplet;
+        function deleteTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            request.addToPath(object);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.deleteTriplet = deleteTriplet;
+        function setTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            request.addToPath(object);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.setTriplet = setTriplet;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));

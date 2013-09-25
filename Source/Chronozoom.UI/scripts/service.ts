@@ -770,5 +770,68 @@ module CZ {
                 url: request.url
             });
         }
+
+        //Triples
+
+        export function putTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            request.addToPath(object);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+
+        export function getTriplet(subject, predicate, object = null) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            if(object != null)
+                request.addToPath(object);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+
+        export function deleteTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            request.addToPath(object);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+
+        export function setTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            request.addToPath(object);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
     }
 }
