@@ -561,7 +561,7 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("getmimetypebyurl");
+            request.addToPath("mimetypebyurl");
             if(url == "") {
                 return result;
             }
