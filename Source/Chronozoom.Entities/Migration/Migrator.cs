@@ -20,13 +20,13 @@ namespace Chronozoom.Entities.Migration
     internal class Migrator
     {
         private readonly Storage _storage;
-        private static readonly MD5 Md5Hasher = MD5.Create();
-        private const string DefaultUserName = "anonymous";
+        private static readonly MD5 _md5Hasher = MD5.Create();
+        private const string _defaultUserName = "anonymous";
 
         // The user that is able to modify the base collections (e.g. Beta Content, AIDS Quilt)
-        private static readonly Lazy<string> BaseContentAdmin = new Lazy<string>(() => ConfigurationManager.AppSettings["BaseCollectionsAdministrator"]);
+        private static readonly Lazy<string> _baseContentAdmin = new Lazy<string>(() => ConfigurationManager.AppSettings["BaseCollectionsAdministrator"]);
 
-        private static readonly Lazy<string> BaseDirectory = new Lazy<string>(() =>
+        private static readonly Lazy<string> _baseDirectory = new Lazy<string>(() =>
         {
             if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["BaseDataMigrationDirectory"]))
                 return ConfigurationManager.AppSettings["BaseDataMigrationDirectory"];
@@ -34,7 +34,7 @@ namespace Chronozoom.Entities.Migration
             return AppDomain.CurrentDomain.BaseDirectory;
         });
 
-        private static readonly Lazy<int> MaxTimelinesToImport = new Lazy<int>(() =>
+        private static readonly Lazy<int> _maxTimelinesToImport = new Lazy<int>(() =>
         {
             if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["MaxTimelinesToImport"]))
                 return int.Parse(ConfigurationManager.AppSettings["MaxTimelinesToImport"], CultureInfo.InvariantCulture);
@@ -50,10 +50,10 @@ namespace Chronozoom.Entities.Migration
         public void Migrate()
         {
             MigrateRiTree();
-            LoadDataFromDump("Beta Content", "Beta Content", "beta-get.json", "beta-gettours.json", false, BaseContentAdmin.Value);
+            LoadDataFromDump("Beta Content", "Beta Content", "beta-get.json", "beta-gettours.json", false, _baseContentAdmin.Value);
             LoadDataFromDump("Sandbox", "Sandbox", "beta-get.json", null, true, null);
             LoadDataFromDump("Sandbox", "Extensions", "extensions-get.json", null, true, null);
-            LoadDataFromDump("AIDS Timeline", "AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", false, BaseContentAdmin.Value);
+            LoadDataFromDump("AIDS Timeline", "AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", false, _baseContentAdmin.Value);
        }
 
         private void MigrateRiTree()
@@ -89,8 +89,8 @@ namespace Chronozoom.Entities.Migration
             {
                 // Load the Beta Content collection
                 Collection collection = LoadCollections(superCollectionName, collectionName, contentAdminId);
-                using (Stream getData = File.OpenRead(BaseDirectory.Value + @"Dumps\" + getFileName))
-                using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(BaseDirectory.Value + @"Dumps\" + getToursFileName))
+                using (Stream getData = File.OpenRead(_baseDirectory.Value + @"Dumps\" + getFileName))
+                using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(_baseDirectory.Value + @"Dumps\" + getToursFileName))
                 {
                     LoadData(getData, getToursData, collection, replaceGuids);
                 }
@@ -105,7 +105,7 @@ namespace Chronozoom.Entities.Migration
             User user = (userId == null 
                              ? _storage.Users.FirstOrDefault(candidate => candidate.NameIdentifier == null) 
                              : _storage.Users.FirstOrDefault(candidate => candidate.NameIdentifier == userId)) ??
-                        new User {Id = Guid.NewGuid(), NameIdentifier = userId, DisplayName = userId ?? DefaultUserName};
+                        new User {Id = Guid.NewGuid(), NameIdentifier = userId, DisplayName = userId ?? _defaultUserName};
 
             // Load Collection
             var collection = new Collection
@@ -152,7 +152,7 @@ namespace Chronozoom.Entities.Migration
             // Associate each timeline with the root collection
             TraverseTimelines(timelines, timeline =>
             {
-                if (++importedTimelinesCount < MaxTimelinesToImport.Value)
+                if (++importedTimelinesCount < _maxTimelinesToImport.Value)
                 {
                     timeline.Collection = collection;
 
@@ -223,25 +223,29 @@ namespace Chronozoom.Entities.Migration
             }
             _storage.SaveChanges();
 
-            if (dataTours == null) return;
-            var bjrTours = new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Tour>>)).ReadObject(dataTours) as BaseJsonResult<IEnumerable<Tour>>;
+            if (dataTours != null)
+            {
+                var bjrTours =
+                    new DataContractJsonSerializer(typeof (BaseJsonResult<IEnumerable<Tour>>)).ReadObject(dataTours) as
+                    BaseJsonResult<IEnumerable<Tour>>;
 
-            if (bjrTours != null)
-                foreach (var tour in bjrTours.d)
-                {
-                    if (replaceGuids) tour.Id = Guid.NewGuid();
-                    tour.Collection = collection;
-
-                    if (tour.Bookmarks != null && replaceGuids)
+                if (bjrTours != null)
+                    foreach (var tour in bjrTours.d)
                     {
-                        foreach (var bookmark in tour.Bookmarks)
+                        if (replaceGuids) tour.Id = Guid.NewGuid();
+                        tour.Collection = collection;
+
+                        if (tour.Bookmarks != null && replaceGuids)
                         {
-                            bookmark.Id = Guid.NewGuid();
+                            foreach (var bookmark in tour.Bookmarks)
+                            {
+                                bookmark.Id = Guid.NewGuid();
+                            }
                         }
+                        _storage.Tours.Add(tour);
                     }
-                    _storage.Tours.Add(tour);
-                }
-            _storage.SaveChanges();
+                _storage.SaveChanges();
+            }
         }
 
         public static void MigrateInPlace(Timeline timeline)
@@ -307,7 +311,7 @@ namespace Chronozoom.Entities.Migration
             // Replace with URL friendly representations
             value = value.Replace(' ', '-');
 
-            byte[] data = Md5Hasher.ComputeHash(Encoding.Default.GetBytes(value.ToLowerInvariant()));
+            byte[] data = _md5Hasher.ComputeHash(Encoding.Default.GetBytes(value.ToLowerInvariant()));
             return new Guid(data);
         }
     }
