@@ -8,6 +8,7 @@ using Chronozoom.Entities.Test;
 
 namespace Chronozoom.Entities.Test
 {
+    [TestClass]
     public class RITreeTest : StorageTestBase
     {
         private readonly int num_timelines = 50000;   /* difference in query time was negligible for n == 10000 or n == 100000 on commodity hardware */
