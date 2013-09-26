@@ -291,15 +291,15 @@ namespace Chronozoom.UI
                     timelines = storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed == Guid.Empty ? (Guid?)null : lcaParsed, maxElementsParsed, depthParsed);
                 else
                 {
-                    if (ShouldRetrieveAllTimelines(storage, commonAncestor, collectionId, maxElementsParsed))
-                    {
+                    //if (ShouldRetrieveAllTimelines(storage, commonAncestor, collectionId, maxElementsParsed))
+                    //{
                         timelines = storage.RetrieveAllTimelines(collectionId);
-                    }
-                    else
-                    {
-                        Trace.TraceInformation("Get Timelines - Using Progressive Load");
-                        timelines = storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed);
-                    }
+                    //}
+                    //else
+                    //{
+                    //    Trace.TraceInformation("Get Timelines - Using Progressive Load");
+                    //    timelines = storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed);
+                    //}
                 }
 
                 Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
@@ -317,21 +317,21 @@ namespace Chronozoom.UI
             });
         }
 
-        private static bool ShouldRetrieveAllTimelines(Storage storage, string commonAncestor, Guid collectionId, int maxElements)
-        {
-            if (!string.IsNullOrEmpty(commonAncestor))
-                return false;
+        //private static bool ShouldRetrieveAllTimelines(Storage storage, string commonAncestor, Guid collectionId, int maxElements)
+        //{
+        //    if (!string.IsNullOrEmpty(commonAncestor))
+        //        return false;
 
-            Timeline rootTimeline = storage.GetRootTimelines(collectionId);
+        //    Timeline rootTimeline = storage.GetRootTimelines(collectionId);
 
-            if (rootTimeline == null)
-                return true;
+        //    if (rootTimeline == null)
+        //        return true;
 
-            if (rootTimeline.SubtreeSize < maxElements)
-                return true;
+        //    if (rootTimeline.SubtreeSize < maxElements)
+        //        return true;
 
-            return false;
-        }
+        //    return false;
+        //}
 
         /// <summary>
         /// Documentation under IChronozoomSVC
