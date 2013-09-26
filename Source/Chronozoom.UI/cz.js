@@ -3910,7 +3910,7 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("getmimetypebyurl");
+            request.addToPath("mimetypebyurl");
             if(url == "") {
                 return result;
             }
@@ -4678,8 +4678,10 @@ var CZ;
             while(contentItems[i] != null) {
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
-                var mime = CZ.Service.getMimeTypeByUrl(ci.uri);
-                console.log("mime:" + mime);
+                var mime;
+                if(ci.mediaType.toLowerCase() !== "video") {
+                    mime = CZ.Service.getMimeTypeByUrl(ci.uri);
+                }
                 if(ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
