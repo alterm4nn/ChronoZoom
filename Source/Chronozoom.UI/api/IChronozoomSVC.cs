@@ -587,13 +587,13 @@ namespace Chronozoom.UI
         /// HTTP verb: GET
         ///
         /// URL:
-        /// http://{URL}/api/getmimetypebyurl
+        /// http://{URL}/api/mimetypebyurl
         /// ]]>
         /// </example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/getmimetypebyurl?url={url}", ResponseFormat = WebMessageFormat.Json)]
-        string GetMemiTypeByUrl(string url);
+        [WebInvoke(Method = "GET", UriTemplate = "/mimetypebyurl?url={url}", ResponseFormat = WebMessageFormat.Json)]
+        string GetMimeTypeByUrl(string url);
 
 
         #region FavoriteTimelines
