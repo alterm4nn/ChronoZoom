@@ -244,6 +244,10 @@ namespace Chronozoom.UI
             public const string InvalidContentItemUrl = "Artifact URL is invalid";
             public const string InvalidMediaSourceUrl = "Media Source URL is invalid";
             public const string CollectionRootTimelineExists = "Root timeline for the collection already exists";
+            public const string InvalidContentItemPdfUrl = "Artifact URL is not a PDF";
+            public const string InvalidContentItemImageUrl = "Artifact URL is not a JPG/GIF/PNG";
+            public const string InvalidContentItemVideoUrl = "Artifact URL is not a Vimeo or Youtube";
+            public const string ResourceAccessFailed = "Failed to access given resource";
         }
 
         private static Lazy<ChronozoomSVC> _sharedService = new Lazy<ChronozoomSVC>(() =>
@@ -1188,7 +1192,6 @@ namespace Chronozoom.UI
                 }
             }
 
-
             Uri uriResult;
 
             // If Media Source is present, validate it
@@ -1207,6 +1210,65 @@ namespace Chronozoom.UI
                 error = ErrorDescription.InvalidContentItemUrl;
 
                 return false;
+            }
+
+            // Get MIME type of Url.
+            var mimeType = "";
+            try
+            {
+                mimeType = MimeTypeOfUrl(contentitem.Uri);
+            }
+            catch (Exception)
+            {
+                if (contentitem.MediaType == "image" || contentitem.MediaType == "pdf")
+                {
+                    SetStatusCode(HttpStatusCode.InternalServerError, ErrorDescription.ResourceAccessFailed);
+                    error = ErrorDescription.InvalidContentItemUrl;
+
+                    return false;
+                }
+            }
+
+            // Check if MIME type match mediaType (regex test for 'video')
+            switch (contentitem.MediaType) {
+                case "image":
+                    if (mimeType != "image/jpg"
+                        && mimeType != "image/jpeg"
+                        && mimeType != "image/gif"
+                        && mimeType != "image/png")
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemImageUrl);
+                        error = ErrorDescription.InvalidContentItemImageUrl;
+
+                        return false;
+                    }
+                    break;
+
+                case "video":
+                    // Youtube
+                    var youtube = new Regex("(?:youtu\\.be\\/|youtube\\.com(?:\\/embed\\/|\\/v\\/|\\/watch\\?v=|[\\S\\?\\&]+&v=|\\/user\\/\\S+))([^\\/&#]{10,12})");
+                    // Vimeo
+                    var vimeo = new Regex("vimeo\\.com\\/([0-9]+)", RegexOptions.IgnoreCase);
+                    var vimeoEmbed = new Regex("player.vimeo.com\\/video\\/([0-9]+)", RegexOptions.IgnoreCase);
+
+                    if (!youtube.IsMatch(contentitem.Uri) && !vimeo.IsMatch(contentitem.Uri) && !vimeoEmbed.IsMatch(contentitem.Uri))
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemVideoUrl);
+                        error = ErrorDescription.InvalidContentItemVideoUrl;
+
+                        return false;
+                    }
+                    break;
+
+                case "pdf":
+                    if (mimeType != "application/pdf")
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemPdfUrl);
+                        error = ErrorDescription.InvalidContentItemPdfUrl;
+
+                        return false;
+                    }
+                    break;
             }
 
             return true;
@@ -2072,25 +2134,53 @@ namespace Chronozoom.UI
             return true;
         }
 
-        public string GetMemiTypeByUrl(string url)
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public string GetMimeTypeByUrl(string url)
         {
-            string contentType = "";
+            // Check if valid url.
+            Uri uriResult;
+            if (!(Uri.TryCreate(url, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
+            {
+                throw new WebFaultException<string>(ErrorDescription.InvalidContentItemUrl, HttpStatusCode.BadRequest);
+            }
+
+            var mimeType = "";
             try
             {
-                var request = HttpWebRequest.Create(url) as HttpWebRequest;
-                request.Method = "head";
-                if (request != null)
-                {
-                    var response = request.GetResponse() as HttpWebResponse;
-                    if (response != null)
-                        contentType = response.ContentType;
-                }
-                return contentType;
+                mimeType = MimeTypeOfUrl(url);
             }
-            catch
+            catch (Exception)
             {
-                return contentType;
+                throw new WebFaultException<string>(ErrorDescription.ResourceAccessFailed, HttpStatusCode.InternalServerError);
             }
+
+            return mimeType;
+        }
+
+        /// <summary>
+        /// Returns a MIME type of internet resource accessible via given Url. 
+        /// Throws an exception if failed to access internet resource via given Url.
+        /// </summary>
+        /// <param name="url">Url to get MIME type of.</param>
+        /// <returns>MIME type of internet resource accessible via given Url.</returns>
+        private static string MimeTypeOfUrl(string url)
+        {
+            string contentType = "";
+
+            var request = HttpWebRequest.Create(url) as HttpWebRequest;
+            request.Method = "head";
+            if (request != null)
+            {
+                var response = request.GetResponse() as HttpWebResponse;
+                if (response != null)
+                {
+                    contentType = response.ContentType;
+                }
+            }
+
+            return contentType;
         }
 
         #region FavoriteTimelines
