@@ -525,7 +525,7 @@ var CZ;
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
             if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
-                document.addEventListener('touchmove', function (e) {
+                document.addEventListener('touchmove', function (e) { 
                     e.preventDefault();
                 });
             }
@@ -533,7 +533,6 @@ var CZ;
                 var body = document.getElementsByTagName('body')[0];
                 (body).style.overflow = "hidden";
             }
-            Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
             CZ.Common.maxPermitedVerticalRange = {
                 top: 0,
                 bottom: 10000000
