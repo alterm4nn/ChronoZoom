@@ -323,6 +323,7 @@
     <Content Include="scripts\external\jquery-1.7.2.min.js" />
     <Content Include="scripts\external\jquery-ui.js" />
     <Content Include="scripts\external\jquery.mousewheel.js" />
+    <Content Include="scripts\external\modernizr.custom.55478.js" />
     <Content Include="scripts\media.js">
       <DependentUpon>media.ts</DependentUpon>
     </Content>
