@@ -11,7 +11,7 @@ namespace Chronozoom.Entities
     {
         private readonly Regex _prefixReg = new Regex(@"^([a-z0-9]+):([a-z0-9\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly Regex _namespaceReg = new Regex(@"^http://(?:www.)*chronozoom.com/([a-z0-9]+)#([a-z0-9\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private readonly Dictionary<String, String> _prefixesAndNamespaces = new Dictionary<string, string>
+        public readonly Dictionary<String, String> PrefixesAndNamespaces = new Dictionary<string, string>
             { 
             {"czusr","http://www.chronozoom.com/users#"},
             {"czpred","http://www.chronozoom.com/preds#"},
@@ -60,10 +60,10 @@ namespace Chronozoom.Entities
         /// <returns>Returns namespace.</returns>
         public string GetNamespace(string prefixStr)
         {
-            if (_prefixesAndNamespaces.ContainsKey(prefixStr))
+            if (PrefixesAndNamespaces.ContainsKey(prefixStr))
             {
                 //Search among standard namespaces
-                return _prefixesAndNamespaces[prefixStr];
+                return PrefixesAndNamespaces[prefixStr];
             }
             var tr = TriplePrefixes.FirstOrDefault(x => x.Prefix == prefixStr);
             return tr != null ? tr.Namespace : null;

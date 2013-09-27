@@ -86,5 +86,21 @@ namespace Chronozoom.UI
             //Prefixes aren't user associated, need to think about security policy
             return false;
         }
+
+        public Dictionary<string,string> GetPrefixes()
+        {
+            return ApiOperation<Dictionary<string, string>>(delegate(User user, Storage storage)
+            {
+                var d = new Dictionary<string,string>();
+
+                foreach (var p in storage.TriplePrefixes)
+                    d.Add(p.Prefix, p.Namespace);
+
+                foreach (var p in storage.PrefixesAndNamespaces)
+                    d.Add(p.Key, p.Value);
+                return d;
+            });
+
+        }
     }
 }
