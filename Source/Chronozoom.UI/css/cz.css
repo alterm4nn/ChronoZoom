@@ -375,12 +375,6 @@ iframe[sutra=picker] + div {
   margin: 0 auto;
   height: 100%;
 }
-.FTTiles {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  text-align: center;
-}
 .FTList {
   display: none;
   color: white;
@@ -595,8 +589,14 @@ iframe[sutra=picker] + div {
 .box {
   visibility: visible important!;
 }
-@media only screen and (max-width: 650px), screen and (orientation: landscape) and (max-device-width: 480px) {
+@media only screen and (max-width: 780px), screen and (orientation: landscape) and (max-device-width: 480px) {
   /* Small Tablet view: 3 rows, 2 columns */
+  .FTTiles {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    text-align: center;
+  }
   .tweet-meta-title {
     display: none;
   }
@@ -612,9 +612,8 @@ iframe[sutra=picker] + div {
     display: none;
   }
   .box {
-    width: 25%;
-    height: 30%;
-    padding-bottom: 20%;
+    height: 150px;
+    width: 150px;
     overflow: hidden;
   }
   .WelcomeBlock {
@@ -637,8 +636,14 @@ iframe[sutra=picker] + div {
     display: none;
   }
 }
-@media only screen and (max-width: 1050px) and (min-width: 651px) {
+@media only screen and (max-width: 1100px) and (min-width: 781px) {
   /* Tablet view: 1 row 4 columns and 2 x 2 columns below */
+  .FTTiles {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    text-align: center;
+  }
   .tweet-avatar-icon {
     display: none;
   }
@@ -649,9 +654,8 @@ iframe[sutra=picker] + div {
     font-size: 10px;
   }
   .box {
-    width: 45%;
-    height: 15%;
-    padding-bottom: 20%;
+    height: 150px;
+    width: 150px;
   }
   .ex3,
   .ex4 {
@@ -668,6 +672,7 @@ iframe[sutra=picker] + div {
     height: 30%;
     background-color: transparent;
     vertical-align: top;
+    overflow: auto;
   }
   .FeaturedTimelinesBlock {
     float: left;
@@ -680,18 +685,7 @@ iframe[sutra=picker] + div {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-  }
-  .PopularTimelinesBlock {
-    float: left;
-    margin: 5px;
-    padding: 5px;
-    width: 45%;
-    height: 60%;
-    background-color: transparent;
-    vertical-align: top;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
+    overflow: auto;
   }
   .TwitterBlock {
     float: right;
@@ -702,6 +696,7 @@ iframe[sutra=picker] + div {
     background-color: transparent;
     vertical-align: top;
     box-sizing: border-box;
+    overflow: auto;
   }
   .welcome-box-1 {
     font-size: 15px;
@@ -723,43 +718,37 @@ iframe[sutra=picker] + div {
     display: none;
   }
 }
-@media only screen and (max-width: 1400px) and (min-width: 1051px) {
+@media only screen and (max-width: 1400px) and (min-width: 1101px) {
   .box {
-    width: 45%;
-    height: 15%;
-    padding-bottom: 20%;
+    height: 150px;
+    width: 150px;
   }
   .WelcomeBlock {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: 31%;
+    width: 32%;
     height: 100%;
+    overflow: auto;
   }
   .FeaturedTimelinesBlock {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: 31%;
+    width: 32%;
     height: 100%;
     background-color: transparent;
     box-sizing: border-box;
-  }
-  .PopularTimelinesBlock {
-    float: left;
-    margin: 5px;
-    padding: 5px;
-    width: 31%;
-    height: 100%;
-    box-sizing: border-box;
+    overflow: auto;
   }
   .TwitterBlock {
-    float: left;
+    float: right;
     margin: 5px;
     padding: 5px;
-    width: 31%;
+    width: 32%;
     height: 100%;
     box-sizing: border-box;
+    overflow: auto;
   }
   .welcome-box-1 {
     overflow: visible;
@@ -785,16 +774,16 @@ iframe[sutra=picker] + div {
     bottom: 25px;
   }
   .box {
-    width: 45%;
-    height: 15%;
-    padding-bottom: 20%;
+    height: 160px;
+    width: 160px;
   }
   .WelcomeBlock {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: 31%;
+    width: 32%;
     height: 100%;
+    min-height: 600px;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -805,37 +794,29 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: 31%;
+    width: 32%;
     height: 100%;
+    min-height: 500px;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-  }
-  .PopularTimelinesBlock {
-    float: left;
-    margin: 5px;
-    padding: 5px;
-    width: 31%;
-    height: 100%;
-    background-color: transparent;
-    vertical-align: top;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
+    overflow: auto;
   }
   .TwitterBlock {
-    float: left;
+    float: right;
     margin: 5px;
     padding: 5px;
-    width: 31%;
+    width: 32%;
     height: 100%;
+    min-height: 600px;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
+    overflow: auto;
   }
 }
 /* The height of the page header */

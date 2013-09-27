@@ -12960,15 +12960,16 @@ var CZ;
         function TwitterLayout(target, idx) {
             CZ.Service.getRecentTweets().done(function (response) {
                 for(var i = 0, len = response.d.length; i < len; ++i) {
+                    console.log(response);
                     var text = response.d[i].Text;
                     var author = response.d[i].User.Name;
                     var time = response.d[i].CreatedDate;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
-                    $("#m" + idx + "i" + i + " .boxInner .tile-meta .tweet-meta-text").text(text);
-                    $("#m" + idx + "i" + i + " .boxInner .tile-meta .tweet-meta-author").text(author);
-                    $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-time").text(convertedDate);
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").text(text);
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-author").text(author);
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tile-meta-time").text(convertedDate);
                 }
             });
         }

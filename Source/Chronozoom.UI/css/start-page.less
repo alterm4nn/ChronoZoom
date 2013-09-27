@@ -50,13 +50,6 @@
     height: 100%;
 }
 
-.FTTiles {
-    width: 100%;
-    height:100%;
-    overflow: hidden;
-    text-align: center;
-}
-
 .FTList {
     display: none;
     color: white;
@@ -299,7 +292,6 @@
     display: inline-block;
     text-align: left;
 }
-
 .TwitterBlock {
     text-align: center;
 }
@@ -309,9 +301,15 @@ visibility: visible important!;
     }
 
 
-@media only screen and (max-width : 650px), screen and (orientation: landscape) and (max-device-width : 480px) {
+@media only screen and (max-width : 780px), screen and (orientation: landscape) and (max-device-width : 480px) {
     /* Small Tablet view: 3 rows, 2 columns */
-    .tweet-meta-title {
+        .FTTiles {
+        width: 100%;
+        height:100%;
+        overflow: hidden;
+        text-align: center;
+    }
+        .tweet-meta-title {
         display: none;
     }
 
@@ -329,9 +327,11 @@ visibility: visible important!;
     }
 
     .box {
-        width: 25%;
-        height: 30%;
-        padding-bottom: 20%;
+        height:150px;
+        width:  150px;
+//        width: 25%;
+//        height: 30%;
+//        padding-bottom: 20%;
         overflow: hidden;
     }
 
@@ -359,9 +359,14 @@ visibility: visible important!;
     }
 }
 
-@media only screen and (max-width : 1050px) and (min-width : 651px) {
+@media only screen and (max-width : 1100px) and (min-width : 781px) {
     /* Tablet view: 1 row 4 columns and 2 x 2 columns below */
-
+    .FTTiles {
+        width: 100%;
+        height:100%;
+        overflow: hidden;
+        text-align: center;
+    }
     .tweet-avatar-icon {
         display: none;
     }
@@ -375,9 +380,11 @@ visibility: visible important!;
     }
 
     .box {
-        width: 45%;
-        height: 15%;
-        padding-bottom: 20%;
+        height:150px;
+        width:  150px;
+//        width: 45%;
+//        height: 15%;
+//        padding-bottom: 20%;
     }
 
     .ex3, .ex4 {
@@ -396,6 +403,7 @@ visibility: visible important!;
         height: 30%;
         background-color: transparent;
         vertical-align: top;
+        overflow:auto;
     }
 
     .FeaturedTimelinesBlock {
@@ -409,19 +417,7 @@ visibility: visible important!;
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
-    }
-
-    .PopularTimelinesBlock {
-        float: left;
-        margin: 5px;
-        padding: 5px;
-        width: 45%;
-        height: 60%;
-        background-color: transparent;
-        vertical-align: top;
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
+        overflow:auto;
     }
 
     .TwitterBlock {
@@ -433,6 +429,7 @@ visibility: visible important!;
         background-color: transparent;
         vertical-align: top;
         box-sizing: border-box;
+        overflow:auto;
     }
 
     .welcome-box-1 {
@@ -458,47 +455,43 @@ visibility: visible important!;
     }
 }
 
-@media only screen and (max-width : 1400px) and (min-width : 1051px) {
+@media only screen and (max-width : 1400px) and (min-width : 1101px) {
     .box {
-        width: 45%;
-        height: 15%;
-        padding-bottom: 20%;
+//        width: 45%;
+//        height: 15%;
+        height:150px;
+        width:  150px;
+//        padding-bottom: 20%;
     }
 
     .WelcomeBlock {
         float: left;
         margin: 5px;
         padding: 5px;
-        width: 31%;
+        width: 32%;
         height: 100%;
+        overflow:auto;
     }
 
     .FeaturedTimelinesBlock {
         float: left;
         margin: 5px;
         padding: 5px;
-        width: 31%;
+        width: 32%;
         height: 100%;
         background-color: transparent;
         box-sizing:border-box;
-    }
-
-    .PopularTimelinesBlock {
-        float: left;
-        margin: 5px;
-        padding: 5px;
-        width: 31%;
-        height: 100%;
-        box-sizing:border-box;
+        overflow:auto;        
     }
 
     .TwitterBlock {
-        float: left;
+        float: right;
         margin: 5px;
         padding: 5px;
-        width: 31%;
+        width: 32%;
         height: 100%;
         box-sizing:border-box;
+        overflow:auto;
     }
 
     .welcome-box-1 {
@@ -530,17 +523,17 @@ visibility: visible important!;
     }
 
     .box {
-        width: 45%;
-        height: 15%;
-        padding-bottom: 20%;
+        height:160px;
+        width:160px;
     }
 
     .WelcomeBlock {
         float: left;
         margin: 5px;
         padding: 5px;
-        width: 31%;
+        width: 32%;
         height: 100%;
+        min-height: 600px;
         background-color: transparent;
         vertical-align: top;
         -moz-box-sizing: border-box;
@@ -552,38 +545,29 @@ visibility: visible important!;
         float: left;
         margin: 5px;
         padding: 5px;
-        width: 31%;
+        width: 32%;
         height: 100%;
+        min-height: 500px;
         background-color: transparent;
         vertical-align: top;
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
-    }
-
-    .PopularTimelinesBlock {
-        float: left;
-        margin: 5px;
-        padding: 5px;
-        width: 31%;
-        height: 100%;
-        background-color: transparent;
-        vertical-align: top;
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
+        overflow:auto;
     }
 
     .TwitterBlock {
-        float: left;
+        float: right;
         margin: 5px;
         padding: 5px;
-        width: 31%;
+        width: 32%;
         height: 100%;
+        min-height: 600px;
         background-color: transparent;
         vertical-align: top;
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
+        overflow:auto;
     }
 }
