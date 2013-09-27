@@ -83,7 +83,7 @@ input.error {
 }
 .li-title {
   float: left;
-  width: 33.3333%;
+  width: 66.3333%;
 }
 .li-author {
   float: left;
@@ -289,8 +289,6 @@ input.error {
 @media only screen and (max-width: 780px), screen and (orientation: landscape) and (max-device-width: 480px) {
   /* Small Tablet view: 3 rows, 2 columns */
   .FTTiles {
-    width: 100%;
-    height: 100%;
     overflow: hidden;
     text-align: center;
   }
@@ -316,15 +314,21 @@ input.error {
   .WelcomeBlock {
     width: 100%;
     height: 20%;
+    min-height: 250px;
   }
+  /*    .FeaturedTimelinesBlock {
+          width: 305px;
+      }
+  
+      .TwitterBlock {
+          width: 305px;
+      }*/
   .welcome-box-1 {
     padding: 0px;
     overflow: visible;
-    height: 40%;
   }
   .welcome-box-2 {
     float: left;
-    height: -webkit-calc(60%);
     font-size: 11px;
     overflow: auto;
   }
@@ -333,11 +337,9 @@ input.error {
     display: none;
   }
 }
-@media only screen and (max-width: 1100px) and (min-width: 781px) {
+@media only screen and (max-width: 1200px) and (min-width: 781px) {
   /* Tablet view: 1 row 4 columns and 2 x 2 columns below */
   .FTTiles {
-    width: 100%;
-    height: 100%;
     overflow: hidden;
     text-align: center;
   }
@@ -369,13 +371,14 @@ input.error {
     height: 30%;
     background-color: transparent;
     vertical-align: top;
-    overflow: auto;
+    overflow: visible;
+    min-height: 250px;
   }
   .FeaturedTimelinesBlock {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: 45%;
+    width: 380px;
     height: 60%;
     background-color: transparent;
     vertical-align: top;
@@ -388,7 +391,7 @@ input.error {
     float: right;
     margin: 5px;
     padding: 5px;
-    width: 45%;
+    width: 410px;
     height: 60%;
     background-color: transparent;
     vertical-align: top;
@@ -399,13 +402,9 @@ input.error {
     font-size: 15px;
     white-space: nowrap;
     overflow: visible;
-    height: -webkit-calc(50%);
-    height: calc(50%);
   }
   .welcome-box-2 {
     float: left;
-    height: -webkit-calc(30%);
-    height: calc(30%);
     font-size: 14px;
     overflow: auto;
   }
@@ -415,10 +414,13 @@ input.error {
     display: none;
   }
 }
-@media only screen and (max-width: 1400px) and (min-width: 1101px) {
+@media only screen and (max-width: 1400px) and (min-width: 1201px) {
   .box {
     height: 150px;
     width: 150px;
+  }
+  .FTTiles {
+    overflow: hidden;
   }
   .WelcomeBlock {
     float: left;
@@ -426,7 +428,8 @@ input.error {
     padding: 5px;
     width: 32%;
     height: 100%;
-    overflow: auto;
+    min-height: 500px;
+    overflow: hidden;
   }
   .FeaturedTimelinesBlock {
     float: left;
@@ -434,6 +437,7 @@ input.error {
     padding: 5px;
     width: 32%;
     height: 100%;
+    min-height: 300px;
     background-color: transparent;
     box-sizing: border-box;
     overflow: auto;
@@ -444,6 +448,7 @@ input.error {
     padding: 5px;
     width: 32%;
     height: 100%;
+    min-height: 300px;
     box-sizing: border-box;
     overflow: auto;
   }
@@ -467,6 +472,9 @@ input.error {
 }
 @media only screen and (min-width: 1401px) {
   /* Large desktop: 6 columns, 3 rows, extra margin tiles */
+  .FTTiles {
+    overflow: hidden;
+  }
   .twitter-time-container {
     bottom: 25px;
   }
@@ -493,7 +501,7 @@ input.error {
     padding: 5px;
     width: 32%;
     height: 100%;
-    min-height: 500px;
+    min-height: 300px;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
@@ -507,7 +515,7 @@ input.error {
     padding: 5px;
     width: 32%;
     height: 100%;
-    min-height: 600px;
+    min-height: 300px;
     background-color: transparent;
     vertical-align: top;
     -moz-box-sizing: border-box;
