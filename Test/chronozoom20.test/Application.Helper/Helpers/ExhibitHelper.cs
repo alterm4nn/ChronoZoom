@@ -75,7 +75,9 @@ namespace Application.Helper.Helpers
                 exhibit.ContentItems.Add(contentItem);
             }
             WaitCondition(() => (GetJavaScriptExecutionResult(LastCanvasElement + ".guid") != string.Empty), 15);
-            exhibit.Id = new Guid(GetJavaScriptExecutionResult(LastCanvasElement + ".guid"));
+            string parseGuid = GetJavaScriptExecutionResult(LastCanvasElement + ".guid");
+            Logger.Log("- parse guid: " + parseGuid, LogType.MessageWithoutScreenshot);
+            exhibit.Id = new Guid(parseGuid);
             Logger.Log("- exhibit.Id: " + exhibit.Id, LogType.MessageWithoutScreenshot);
             Logger.Log("->" + exhibit);
             return exhibit;
@@ -447,7 +449,7 @@ namespace Application.Helper.Helpers
 
         private string SetAuthContentItemFormElementLocator(string element)
         {
-            return String.Format("#auth-edit-contentitem-form>div.cz-form-content>{0}.cz-input", element);
+            return String.Format("#auth-edit-contentitem-form div.cz-form-content {0}.cz-input", element);
         }
 
     }

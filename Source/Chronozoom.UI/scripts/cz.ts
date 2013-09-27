@@ -503,6 +503,7 @@ module CZ {
                     CZ.Authoring.isEnabled = UserCanEditCollection(data);
                 }).fail((error) => {
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(() => {
                     if (!CZ.Authoring.isEnabled) {
                         $(".edit-icon").hide();

@@ -962,7 +962,7 @@ module CZ {
                     this.favoriteBtn.reactsOnMouse = true;
 
                     this.favoriteBtn.onmouseclick = function () {
-                        CZ.Service.putUserFavorite(id);
+                        CZ.Service.putUserFavorite(timelineinfo.guid);
                         return true;
                     }
 

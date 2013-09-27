@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Chronozoom.Entities.UnitTests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Chronozoom.Entities;
 using Chronozoom.Entities.Test;
@@ -7,6 +8,7 @@ using Chronozoom.Entities.Test;
 
 namespace Chronozoom.Entities.Test
 {
+    [TestClass]
     public class RITreeTest : StorageTestBase
     {
         private readonly int num_timelines = 50000;   /* difference in query time was negligible for n == 10000 or n == 100000 on commodity hardware */
@@ -16,7 +18,7 @@ namespace Chronozoom.Entities.Test
         [TestInitialize]
         public void Initialize()
         {
-            base.Initialize();
+            base.StorageTestBaseInitialize();
             Random rand = new Random();
             Console.WriteLine("adding " + num_timelines + " random timelines");
             for (int i = 0; i < num_timelines; ++i)
@@ -30,7 +32,7 @@ namespace Chronozoom.Entities.Test
                 t.ForkNode = Storage.ForkNode((Int64)t.FromYear, (Int64)t.ToYear);
                 t.Regime = "RITreeTestTimeline";
             }
-            _storage.SaveChanges();
+            Storage.SaveChanges();
         }
 
         // Failing/Disable: [TestMethod]
@@ -43,7 +45,7 @@ namespace Chronozoom.Entities.Test
             Assert.AreEqual(Storage.ForkNode(offset + 13700005424, offset + 13700005585), 13700005504);
             Assert.AreEqual(Storage.ForkNode(offset + 3970765138, offset + 6840749504), 4294967296);
             /* check (via random sampling) that the correct ForkNode computation is actually applied to records in DB */
-            var r = _storage.Database.SqlQuery<Timeline>("SELECT TOP 10 * FROM Timelines ORDER BY NEWID()");
+            var r = Storage.Database.SqlQuery<Timeline>("SELECT TOP 10 * FROM Timelines ORDER BY NEWID()");
             foreach (Timeline t in r)
             {
                 Console.WriteLine((t.FromYear - offset) + "," + (t.ToYear - offset) + "," + t.ForkNode);
@@ -52,7 +54,7 @@ namespace Chronozoom.Entities.Test
             /* test SQL range query */
             Console.WriteLine("testing SQL range query:");
             long t1 = DateTime.Now.Ticks;
-            var r1 = _storage.Database.SqlQuery<Timeline>("SELECT * FROM Timelines WHERE (FromYear >= {0} AND FromYear <= {1}) OR (ToYear >= {0} AND ToYear <= {1}) OR (FromYear >= {0} AND ToYear <= {1}) OR (FromYear <= {0} AND ToYear >= {1})", test_start_time, test_end_time);
+            var r1 = Storage.Database.SqlQuery<Timeline>("SELECT * FROM Timelines WHERE (FromYear >= {0} AND FromYear <= {1}) OR (ToYear >= {0} AND ToYear <= {1}) OR (FromYear >= {0} AND ToYear <= {1}) OR (FromYear <= {0} AND ToYear >= {1})", test_start_time, test_end_time);
             long t2 = DateTime.Now.Ticks;
             count1 = 0;
             foreach (var r1_t in r1)
@@ -65,7 +67,7 @@ namespace Chronozoom.Entities.Test
             /* test RI tree query */
             Console.WriteLine("testing RI-tree query:");
             long t3 = DateTime.Now.Ticks;
-            var r2 = _storage.Database.SqlQuery<Timeline>("SELECT DISTINCT [Timelines].* FROM [Timelines] JOIN (SELECT (CAST({2} AS BIGINT) & [B1]) AS [node] FROM [Bitmasks] WHERE (CAST({2} AS BIGINT) & [B2]) <> 0) AS [left_nodes] ON [Timelines].[ForkNode] = [left_nodes].[node] AND [Timelines].[ToYear] >= {0} UNION ALL SELECT DISTINCT [Timelines].* FROM [Timelines] JOIN (SELECT ((CAST({3} AS BIGINT) & [B1]) | [B3]) AS [node] FROM [bitmasks] WHERE (CAST({3} AS BIGINT) & [B3]) = 0) AS [right_nodes] ON [Timelines].[ForkNode] = [right_nodes].[node] AND [Timelines].[FromYear] <= {1} UNION ALL SELECT DISTINCT [Timelines].* FROM [Timelines] WHERE [Timelines].[ForkNode] BETWEEN {2} AND {3}", test_start_time, test_end_time, start, end);
+            var r2 = Storage.Database.SqlQuery<Timeline>("SELECT DISTINCT [Timelines].* FROM [Timelines] JOIN (SELECT (CAST({2} AS BIGINT) & [B1]) AS [node] FROM [Bitmasks] WHERE (CAST({2} AS BIGINT) & [B2]) <> 0) AS [left_nodes] ON [Timelines].[ForkNode] = [left_nodes].[node] AND [Timelines].[ToYear] >= {0} UNION ALL SELECT DISTINCT [Timelines].* FROM [Timelines] JOIN (SELECT ((CAST({3} AS BIGINT) & [B1]) | [B3]) AS [node] FROM [bitmasks] WHERE (CAST({3} AS BIGINT) & [B3]) = 0) AS [right_nodes] ON [Timelines].[ForkNode] = [right_nodes].[node] AND [Timelines].[FromYear] <= {1} UNION ALL SELECT DISTINCT [Timelines].* FROM [Timelines] WHERE [Timelines].[ForkNode] BETWEEN {2} AND {3}", test_start_time, test_end_time, start, end);
             long t4 = DateTime.Now.Ticks;
             count2 = 0;
             foreach (var r2_t in r2)

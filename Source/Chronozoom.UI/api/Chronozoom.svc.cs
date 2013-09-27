@@ -291,15 +291,15 @@ namespace Chronozoom.UI
                     timelines = storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed == Guid.Empty ? (Guid?)null : lcaParsed, maxElementsParsed, depthParsed);
                 else
                 {
-                    if (ShouldRetrieveAllTimelines(storage, commonAncestor, collectionId, maxElementsParsed))
-                    {
+                    //if (ShouldRetrieveAllTimelines(storage, commonAncestor, collectionId, maxElementsParsed))
+                    //{
                         timelines = storage.RetrieveAllTimelines(collectionId);
-                    }
-                    else
-                    {
-                        Trace.TraceInformation("Get Timelines - Using Progressive Load");
-                        timelines = storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed);
-                    }
+                    //}
+                    //else
+                    //{
+                    //    Trace.TraceInformation("Get Timelines - Using Progressive Load");
+                    //    timelines = storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed);
+                    //}
                 }
 
                 Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
@@ -317,21 +317,21 @@ namespace Chronozoom.UI
             });
         }
 
-        private static bool ShouldRetrieveAllTimelines(Storage storage, string commonAncestor, Guid collectionId, int maxElements)
-        {
-            if (!string.IsNullOrEmpty(commonAncestor))
-                return false;
+        //private static bool ShouldRetrieveAllTimelines(Storage storage, string commonAncestor, Guid collectionId, int maxElements)
+        //{
+        //    if (!string.IsNullOrEmpty(commonAncestor))
+        //        return false;
 
-            Timeline rootTimeline = storage.GetRootTimelines(collectionId);
+        //    Timeline rootTimeline = storage.GetRootTimelines(collectionId);
 
-            if (rootTimeline == null)
-                return true;
+        //    if (rootTimeline == null)
+        //        return true;
 
-            if (rootTimeline.SubtreeSize < maxElements)
-                return true;
+        //    if (rootTimeline.SubtreeSize < maxElements)
+        //        return true;
 
-            return false;
-        }
+        //    return false;
+        //}
 
         /// <summary>
         /// Documentation under IChronozoomSVC
@@ -2099,11 +2099,21 @@ namespace Chronozoom.UI
         {
             return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
             {
+#if RELEASE
                 if (user == null)
                 {
                     return null;
                 }
-                var triple = storage.GetTriplet(String.Format("czusr:{0}", user.Id), "czpred:favorite").FirstOrDefault();
+#endif
+
+                Guid userId = user == null || user.Id == null ? Guid.Empty : user.Id;
+                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFavorites - {0}", userId);
+                if (Cache.Contains(cacheKey))
+                {
+                    return (Collection<TimelineShortcut>)Cache.Get(cacheKey);
+                }
+
+                var triple = storage.GetTriplet(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty), "czpred:favorite").FirstOrDefault();
                 if (triple == null)
                     return null;
 
@@ -2120,6 +2130,9 @@ namespace Chronozoom.UI
                             elements.Add(storage.GetTimelineShortcut(timeline));
                     }
                 }
+
+                Cache.Add(cacheKey, elements);
+
                 return elements;
             });
         }
@@ -2132,11 +2145,21 @@ namespace Chronozoom.UI
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
             {
+#if RELEASE
                 if (user == null)
                 {
                     return false;
                 }
-                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
+#endif
+
+                Guid userId = user == null || user.Id == null ? Guid.Empty : user.Id;
+                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFavorites - {0}", userId);
+                if (Cache.Contains(cacheKey))
+                {
+                    Cache.Remove(cacheKey);
+                }
+
+                return storage.PutTriplet(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
             });
         }
 
@@ -2148,11 +2171,21 @@ namespace Chronozoom.UI
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
             {
+#if RELEASE
                 if (user == null)
                 {
                     return false;
                 }
-                return storage.DeleteTriplet(String.Format("czusr:{0}", user.Id), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
+#endif
+
+                Guid userId = user == null || user.Id == null ? Guid.Empty : user.Id;
+                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFavorites - {0}", userId);
+                if (Cache.Contains(cacheKey))
+                {
+                    Cache.Remove(cacheKey);
+                }
+
+                return storage.DeleteTriplet(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
             });
         }
 
@@ -2166,6 +2199,12 @@ namespace Chronozoom.UI
                 Guid userGuid;
                 if (!Guid.TryParse(guid, out userGuid))
                     return null;
+
+                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFeatured - {0}", guid);
+                if (Cache.Contains(cacheKey))
+                {
+                    return (Collection<TimelineShortcut>)Cache.Get(cacheKey);
+                }
 
                 var triple = storage.GetTriplet(String.Format("czusr:{0}", userGuid), "czpred:featured").FirstOrDefault();
                 if (triple == null)
@@ -2189,6 +2228,9 @@ namespace Chronozoom.UI
                             elements.Add(storage.GetTimelineShortcut(timeline));
                     }
                 }
+
+                Cache.Add(cacheKey, elements);
+
                 return elements;
             });
         }
@@ -2205,6 +2247,13 @@ namespace Chronozoom.UI
                 {
                     return false;
                 }
+
+                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFeatured - {0}", user.Id);
+                if (Cache.Contains(cacheKey))
+                {
+                    Cache.Remove(cacheKey);
+                }
+
                 return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", featuredGUID));
             });
         }
@@ -2221,6 +2270,13 @@ namespace Chronozoom.UI
                 {
                     return false;
                 }
+
+                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFeatured - {0}", user.Id);
+                if (Cache.Contains(cacheKey))
+                {
+                    Cache.Remove(cacheKey);
+                }
+
                 return storage.DeleteTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", favoriteGUID));
             });
         }
