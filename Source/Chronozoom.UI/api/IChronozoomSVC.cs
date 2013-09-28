@@ -590,49 +590,24 @@ namespace Chronozoom.UI
         /// http://{URL}/api/mimetypebyurl
         /// ]]>
         /// </example>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/mimetypebyurl?url={url}", ResponseFormat = WebMessageFormat.Json)]
         string GetMimeTypeByUrl(string url);
 
-
-        #region FavoriteTimelines
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        #region Favorites
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/userfavorites", ResponseFormat = WebMessageFormat.Json)]
         Collection<TimelineShortcut> GetUserFavorites();
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebInvoke(Method = "PUT", UriTemplate = "/userfavorite?guid={favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "PUT", UriTemplate = "/userfavorites/{favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
         bool PutUserFavorite(string favoriteGUID);
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
-        [WebInvoke(Method = "DELETE", UriTemplate = "/userfavorite?guid={favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/userfavorites/{favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
         bool DeleteUserFavorite(string favoriteGUID);
-
         #endregion
 
-        #region FeaturedTimelines
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/userfeatured?guid={featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
-        Collection<TimelineShortcut> GetUserFeatured(string featuredGUID);
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        [OperationContract]
-        [WebInvoke(Method = "PUT", UriTemplate = "/userfeatured?guid={featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
-        bool PutUserFeatured(string featuredGUID);
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        [OperationContract]
-        [WebInvoke(Method = "DELETE", UriTemplate = "/userfeatured?guid={featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
-        bool DeleteUserFeatured(string featuredGUID);
-
-        #endregion
     }
 
     [ServiceContract(Namespace = "")]
@@ -711,5 +686,53 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         BaseJsonResult<IEnumerable<TweetSharp.TwitterStatus>> GetRecentTweets();
+    }
+
+    [ServiceContract(Namespace = "")]
+    public interface IFeaturedAPI
+    {
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/{featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
+        Collection<TimelineShortcut> GetUserFeatured(string featuredGUID);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
+        bool PutUserFeatured(string featuredGUID);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
+        bool DeleteUserFeatured(string featuredGUID);
+    }
+    
+    [ServiceContract(Namespace = "")]
+    public interface ITriplesAPI
+    {
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/{subject}/{predicate}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<Triple> GetTriplet(string subject, string predicate);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/{subject}/{predicate}/{object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<Triple> GetTriplet2(string subject, string predicate, string @object);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{subject}/{predicate}/{object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        bool DeleteTriplet(string subject, string predicate, string @object);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{subject}/{predicate}/{object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        bool PutTriplet(string subject, string predicate, string @object);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/prefix/{prefix}/{namespace}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        bool SetPrefix(string prefix, string @namespace);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/prefix/{prefix}/{namespace}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        bool DeletePrefix(string prefix, string @namespace);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/prefixes", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Dictionary<string,string> GetPrefixes();
     }
 }
