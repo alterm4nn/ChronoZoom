@@ -218,10 +218,10 @@ module CZ {
         export function PlayIntroTour() {
             // "Introduction to ChronoZoom tour"
             // TODO: implement search of tour by title
-            var intoTour = CZ.Tours.tours[0];
+            var introTour = CZ.Tours.tours[0];
 
             // check if tours failed to load
-            if (typeof intoTour === "undefined") {
+            if (typeof introTour === "undefined") {
                 return false;
             }
 
@@ -236,11 +236,11 @@ module CZ {
                 tourPlayerContainer: ".cz-form-tour-player",
                 bookmarksCount: ".cz-form-tour-bookmarks-count",
                 narrationToggle: ".cz-toggle-narration",
-                context: intoTour
+                context: introTour
             });
 
             CZ.Tours.tourCaptionForm.show();
-            CZ.Tours.activateTour(intoTour, undefined);
+            CZ.Tours.activateTour(introTour, undefined);
         }
 
         export function listFlip(name){
@@ -252,6 +252,7 @@ module CZ {
                 document.getElementById(name+'-list').style.display = 'none';
                 document.getElementById(name+'-tiles').style.display = 'block';
                 $("#" + name).find(".list-view-icon").removeClass("active");
+                $(window).resize();
             }
         }
 
@@ -267,6 +268,7 @@ module CZ {
                 var $tileImage = $tile.find(".boxInner .tile-photo img");
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
+
                 // Set appearance and click handler.
                 // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name)
@@ -281,7 +283,7 @@ module CZ {
                 // Resize and crop image on load.
                 $tileImage.load($tile, function (event) {
                     var $this = $(this);
-                    var imageProps = event.srcElement;
+                    var imageProps = event.target || event.srcElement;
 
                     // Resize and crop the image.
                     resizeCrop($this, imageProps);
@@ -306,7 +308,6 @@ module CZ {
                 // Set title and author.
                 $tileTitle.text(timeline.Title);
                 $tileAuthor.text(timeline.Author);
-                $tile.attr("style", "visibility : visible;");
             }
         }
 

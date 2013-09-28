@@ -5139,6 +5139,7 @@ var CZ;
                     duration: 500,
                     complete: function () {
                         _this.tourPlayer.exit();
+                        CZ.Common.hashHandle = true;
                     }
                 });
                 this.activationSource.removeClass("active");
@@ -13035,8 +13036,8 @@ var CZ;
         }
         StartPage.cloneTweetTemplate = cloneTweetTemplate;
         function PlayIntroTour() {
-            var intoTour = CZ.Tours.tours[0];
-            if(typeof intoTour === "undefined") {
+            var introTour = CZ.Tours.tours[0];
+            if(typeof introTour === "undefined") {
                 return false;
             }
             CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
@@ -13050,10 +13051,10 @@ var CZ;
                 tourPlayerContainer: ".cz-form-tour-player",
                 bookmarksCount: ".cz-form-tour-bookmarks-count",
                 narrationToggle: ".cz-toggle-narration",
-                context: intoTour
+                context: introTour
             });
             CZ.Tours.tourCaptionForm.show();
-            CZ.Tours.activateTour(intoTour, undefined);
+            CZ.Tours.activateTour(introTour, undefined);
         }
         StartPage.PlayIntroTour = PlayIntroTour;
         function listFlip(name) {
@@ -13065,6 +13066,7 @@ var CZ;
                 document.getElementById(name + '-list').style.display = 'none';
                 document.getElementById(name + '-tiles').style.display = 'block';
                 $("#" + name).find(".list-view-icon").removeClass("active");
+                $(window).resize();
             }
         }
         StartPage.listFlip = listFlip;
@@ -13085,7 +13087,7 @@ var CZ;
                 }).invisible();
                 $tileImage.load($tile, function (event) {
                     var $this = $(this);
-                    var imageProps = event.srcElement;
+                    var imageProps = event.target || event.srcElement;
                     resizeCrop($this, imageProps);
                     $(window).resize({
                         $image: $this,
@@ -13102,7 +13104,6 @@ var CZ;
                 });
                 $tileTitle.text(timeline.Title);
                 $tileAuthor.text(timeline.Author);
-                $tile.attr("style", "visibility : visible;");
             }
         }
         StartPage.fillFeaturedTimelines = fillFeaturedTimelines;
