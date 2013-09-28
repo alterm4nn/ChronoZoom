@@ -727,7 +727,7 @@ module CZ {
             });
         }
 
-        export function getUserFeatured(guid) {
+        export function getUserFeatured(guid?) {
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);

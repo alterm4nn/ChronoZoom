@@ -1,6 +1,7 @@
 ﻿using Chronozoom.Entities;
 using System;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
@@ -15,10 +16,18 @@ namespace Chronozoom.UI
             return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
             {
                 Guid userGuid;
-                if (!Guid.TryParse(guid, out userGuid))
-                    return null;
 
-                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFeatured - {0}", guid);
+                // If GUID is not given then get supervisor's GUID. Otherwise parse the given GUID.
+                if (string.IsNullOrEmpty(guid))
+                {
+                    userGuid = Guid.Parse(ConfigurationManager.AppSettings["FeaturedTimelinesSupervisorGuid"]);
+                }
+                else if (!Guid.TryParse(guid, out userGuid))
+                {
+                    return null;
+                }
+
+                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFeatured - {0}", userGuid);
                 if (Cache.Contains(cacheKey))
                 {
                     return (Collection<TimelineShortcut>)Cache.Get(cacheKey);

@@ -309,18 +309,21 @@ namespace Chronozoom.Entities
 
         private static string GetTimelineImageUrl(Timeline timeline)
         {
-            foreach (var exhibit in timeline.Exhibits)
+            if (timeline.Exhibits != null)
             {
-                foreach (var contentItem in exhibit.ContentItems)
+                foreach (var exhibit in timeline.Exhibits)
                 {
-                    if (contentItem.MediaType.ToLower().Equals("picture"))
+                    foreach (var contentItem in exhibit.ContentItems)
                     {
-                        return contentItem.Uri;
+                        if (contentItem.MediaType.ToLower().Equals("picture"))
+                        {
+                            return contentItem.Uri;
+                        }
                     }
                 }
             }
 
-            return "/images/dummy/tile_earthscience.jpg";
+            return "/images/default-tile.png";
         }
     }
 }
