@@ -315,7 +315,8 @@ namespace Chronozoom.Entities
                 {
                     foreach (var contentItem in exhibit.ContentItems)
                     {
-                        if (contentItem.MediaType.ToLower().Equals("picture"))
+                        var mediaType = contentItem.MediaType.ToLower();
+                        if (mediaType.Equals("picture") || mediaType.Equals("image"))
                         {
                             return contentItem.Uri;
                         }
