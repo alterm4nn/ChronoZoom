@@ -148,6 +148,7 @@ var CZ;
                     duration: 500,
                     complete: function () {
                         _this.tourPlayer.exit();
+                        CZ.Common.hashHandle = true;
                     }
                 });
                 this.activationSource.removeClass("active");
