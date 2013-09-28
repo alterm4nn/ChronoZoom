@@ -421,9 +421,11 @@ module CZ {
             });
             
             // TODO: Replace with current user.
-            CZ.Service.getUserFeatured("63c4373e-6712-44a6-9bb4-b99a2783f53a").done(function (response) {
-                fillFeaturedTimelines(response);
-                fillFeaturedTimelinesList(response);
+            CZ.Service.getUserFeatured().done(function (response) {
+                // Show the newest featured timelines first.
+                var timelines = response ? response.reverse() : [];
+                fillFeaturedTimelines(timelines);
+                fillFeaturedTimelinesList(timelines);
             });
 
             // CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */

@@ -336,9 +336,10 @@ var CZ;
                     show();
                 }
             });
-            CZ.Service.getUserFeatured("63c4373e-6712-44a6-9bb4-b99a2783f53a").done(function (response) {
-                fillFeaturedTimelines(response);
-                fillFeaturedTimelinesList(response);
+            CZ.Service.getUserFeatured().done(function (response) {
+                var timelines = response ? response.reverse() : [];
+                fillFeaturedTimelines(timelines);
+                fillFeaturedTimelinesList(timelines);
             });
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
