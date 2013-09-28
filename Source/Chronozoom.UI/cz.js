@@ -3977,6 +3977,7 @@ var CZ;
         }
         Service.putUserFavorite = putUserFavorite;
         function getUserFeatured(guid) {
+            if (typeof guid === "undefined") { guid = "default"; }
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
