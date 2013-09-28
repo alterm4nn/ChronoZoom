@@ -244,6 +244,10 @@ namespace Chronozoom.UI
             public const string InvalidContentItemUrl = "Artifact URL is invalid";
             public const string InvalidMediaSourceUrl = "Media Source URL is invalid";
             public const string CollectionRootTimelineExists = "Root timeline for the collection already exists";
+            public const string InvalidContentItemPdfUrl = "Artifact URL is not a PDF";
+            public const string InvalidContentItemImageUrl = "Artifact URL is not a JPG/GIF/PNG";
+            public const string InvalidContentItemVideoUrl = "Artifact URL is not a Vimeo or Youtube";
+            public const string ResourceAccessFailed = "Failed to access given resource";
         }
 
         private static Lazy<ChronozoomSVC> _sharedService = new Lazy<ChronozoomSVC>(() =>
@@ -1188,7 +1192,6 @@ namespace Chronozoom.UI
                 }
             }
 
-
             Uri uriResult;
 
             // If Media Source is present, validate it
@@ -1207,6 +1210,65 @@ namespace Chronozoom.UI
                 error = ErrorDescription.InvalidContentItemUrl;
 
                 return false;
+            }
+
+            // Get MIME type of Url.
+            var mimeType = "";
+            try
+            {
+                mimeType = MimeTypeOfUrl(contentitem.Uri);
+            }
+            catch (Exception)
+            {
+                if (contentitem.MediaType == "image" || contentitem.MediaType == "pdf")
+                {
+                    SetStatusCode(HttpStatusCode.InternalServerError, ErrorDescription.ResourceAccessFailed);
+                    error = ErrorDescription.InvalidContentItemUrl;
+
+                    return false;
+                }
+            }
+
+            // Check if MIME type match mediaType (regex test for 'video')
+            switch (contentitem.MediaType) {
+                case "image":
+                    if (mimeType != "image/jpg"
+                        && mimeType != "image/jpeg"
+                        && mimeType != "image/gif"
+                        && mimeType != "image/png")
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemImageUrl);
+                        error = ErrorDescription.InvalidContentItemImageUrl;
+
+                        return false;
+                    }
+                    break;
+
+                case "video":
+                    // Youtube
+                    var youtube = new Regex("(?:youtu\\.be\\/|youtube\\.com(?:\\/embed\\/|\\/v\\/|\\/watch\\?v=|[\\S\\?\\&]+&v=|\\/user\\/\\S+))([^\\/&#]{10,12})");
+                    // Vimeo
+                    var vimeo = new Regex("vimeo\\.com\\/([0-9]+)", RegexOptions.IgnoreCase);
+                    var vimeoEmbed = new Regex("player.vimeo.com\\/video\\/([0-9]+)", RegexOptions.IgnoreCase);
+
+                    if (!youtube.IsMatch(contentitem.Uri) && !vimeo.IsMatch(contentitem.Uri) && !vimeoEmbed.IsMatch(contentitem.Uri))
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemVideoUrl);
+                        error = ErrorDescription.InvalidContentItemVideoUrl;
+
+                        return false;
+                    }
+                    break;
+
+                case "pdf":
+                    if (mimeType != "application/pdf")
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemPdfUrl);
+                        error = ErrorDescription.InvalidContentItemPdfUrl;
+
+                        return false;
+                    }
+                    break;
             }
 
             return true;
@@ -2072,214 +2134,53 @@ namespace Chronozoom.UI
             return true;
         }
 
-        public string GetMemiTypeByUrl(string url)
-        {
-            string contentType = "";
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public string GetMimeTypeByUrl(string url)
+            {
+            // Check if valid url.
+            Uri uriResult;
+            if (!(Uri.TryCreate(url, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
+            {
+                throw new WebFaultException<string>(ErrorDescription.InvalidContentItemUrl, HttpStatusCode.BadRequest);
+            }
+
+            var mimeType = "";
             try
             {
-                var request = HttpWebRequest.Create(url) as HttpWebRequest;
-                request.Method = "head";
-                if (request != null)
-                {
-                    var response = request.GetResponse() as HttpWebResponse;
-                    if (response != null)
-                        contentType = response.ContentType;
-                }
-                return contentType;
+                mimeType = MimeTypeOfUrl(url);
             }
-            catch
+            catch (Exception)
             {
-                return contentType;
+                throw new WebFaultException<string>(ErrorDescription.ResourceAccessFailed, HttpStatusCode.InternalServerError);
             }
+
+            return mimeType;
         }
 
-        #region FavoriteTimelines
-
-        public Collection<TimelineShortcut> GetUserFavorites()
+        /// <summary>
+        /// Returns a MIME type of internet resource accessible via given Url. 
+        /// Throws an exception if failed to access internet resource via given Url.
+        /// </summary>
+        /// <param name="url">Url to get MIME type of.</param>
+        /// <returns>MIME type of internet resource accessible via given Url.</returns>
+        private static string MimeTypeOfUrl(string url)
         {
-            return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
+            string contentType = "";
+
+            var request = HttpWebRequest.Create(url) as HttpWebRequest;
+            request.Method = "head";
+            if (request != null)
             {
-#if RELEASE
-                if (user == null)
+                var response = request.GetResponse() as HttpWebResponse;
+                if (response != null)
                 {
-                    return null;
+                    contentType = response.ContentType;
                 }
-#endif
+            }
 
-                Guid userId = user == null || user.Id == null ? Guid.Empty : user.Id;
-                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFavorites - {0}", userId);
-                if (Cache.Contains(cacheKey))
-                {
-                    return (Collection<TimelineShortcut>)Cache.Get(cacheKey);
-                }
-
-                var triple = storage.GetTriplet(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty), "czpred:favorite").FirstOrDefault();
-                if (triple == null)
-                    return null;
-
-                var elements = new Collection<TimelineShortcut>();
-                foreach (var t in triple.Objects)
-                {
-                    if (storage.GetPrefix(t.Object) == "cztimeline")
-                    {
-                        var g = new Guid(storage.GetValue(t.Object));
-                        var timeline = storage.Timelines.Where(x => x.Id == g).Include(f => f.Collection).Include(u => u.Collection.User).FirstOrDefault();
-
-                        //ToDo: get image url
-                        if (timeline != null)
-                            elements.Add(storage.GetTimelineShortcut(timeline));
-                    }
-                }
-
-                Cache.Add(cacheKey, elements);
-
-                return elements;
-            });
+            return contentType;
         }
-
-        public bool PutUserFavorite(string favoriteGUID)
-        {
-            Guid g;
-            if (!Guid.TryParse(favoriteGUID, out g))
-                return false;
-
-            return ApiOperation<bool>(delegate(User user, Storage storage)
-            {
-#if RELEASE
-                if (user == null)
-                {
-                    return false;
-                }
-#endif
-
-                Guid userId = user == null || user.Id == null ? Guid.Empty : user.Id;
-                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFavorites - {0}", userId);
-                if (Cache.Contains(cacheKey))
-                {
-                    Cache.Remove(cacheKey);
-                }
-
-                return storage.PutTriplet(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
-            });
-        }
-
-        public bool DeleteUserFavorite(string favoriteGUID)
-        {
-            Guid g;
-            if (!Guid.TryParse(favoriteGUID, out g))
-                return false;
-
-            return ApiOperation<bool>(delegate(User user, Storage storage)
-            {
-#if RELEASE
-                if (user == null)
-                {
-                    return false;
-                }
-#endif
-
-                Guid userId = user == null || user.Id == null ? Guid.Empty : user.Id;
-                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFavorites - {0}", userId);
-                if (Cache.Contains(cacheKey))
-                {
-                    Cache.Remove(cacheKey);
-                }
-
-                return storage.DeleteTriplet(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
-            });
-        }
-
-        #endregion
-
-        #region FeaturedTimeline
-        public Collection<TimelineShortcut> GetUserFeatured(string guid)
-        {
-            return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
-            {
-                Guid userGuid;
-                if (!Guid.TryParse(guid, out userGuid))
-                    return null;
-
-                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFeatured - {0}", guid);
-                if (Cache.Contains(cacheKey))
-                {
-                    return (Collection<TimelineShortcut>)Cache.Get(cacheKey);
-                }
-
-                var triple = storage.GetTriplet(String.Format("czusr:{0}", userGuid), "czpred:featured").FirstOrDefault();
-                if (triple == null)
-                    return null;
-
-                var elements = new Collection<TimelineShortcut>();
-                foreach (var t in triple.Objects)
-                {
-                    if (storage.GetPrefix(t.Object) == "cztimeline")
-                    {
-                        var g = new Guid(storage.GetValue(t.Object));
-                        var timeline = storage.Timelines.Where(x => x.Id == g)
-                            .Include("Collection")
-                            .Include("Collection.User")
-                            .Include("Exhibits")
-                            .Include("Exhibits.ContentItems")
-                            .FirstOrDefault();
-
-                        //ToDo: get image url
-                        if (timeline != null)
-                            elements.Add(storage.GetTimelineShortcut(timeline));
-                    }
-                }
-
-                Cache.Add(cacheKey, elements);
-
-                return elements;
-            });
-        }
-
-        public bool PutUserFeatured(string featuredGUID)
-        {
-            Guid g;
-            if (!Guid.TryParse(featuredGUID, out g))
-                return false;
-
-            return ApiOperation<bool>(delegate(User user, Storage storage)
-            {
-                if (user == null)
-                {
-                    return false;
-                }
-
-                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFeatured - {0}", user.Id);
-                if (Cache.Contains(cacheKey))
-                {
-                    Cache.Remove(cacheKey);
-                }
-
-                return storage.PutTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", featuredGUID));
-            });
-        }
-
-        public bool DeleteUserFeatured(string favoriteGUID)
-        {
-            Guid g;
-            if (!Guid.TryParse(favoriteGUID, out g))
-                return false;
-
-            return ApiOperation<bool>(delegate(User user, Storage storage)
-            {
-                if (user == null)
-                {
-                    return false;
-                }
-
-                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFeatured - {0}", user.Id);
-                if (Cache.Contains(cacheKey))
-                {
-                    Cache.Remove(cacheKey);
-                }
-
-                return storage.DeleteTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", favoriteGUID));
-            });
-        }
-        #endregion
     }
 }

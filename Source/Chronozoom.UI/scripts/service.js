@@ -561,7 +561,7 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("getmimetypebyurl");
+            request.addToPath("mimetypebyurl");
             if(url == "") {
                 return result;
             }
@@ -597,11 +597,11 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfavorite");
+            request.addToPath("userfavorites");
             if(guid == "") {
                 return null;
             }
-            request.addParameter("guid", guid);
+            request.addToPath(guid);
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -614,11 +614,11 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfavorite");
+            request.addToPath("userfavorites");
             if(guid == "") {
                 return null;
             }
-            request.addParameter("guid", guid);
+            request.addToPath(guid);
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -632,7 +632,7 @@ var CZ;
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("userfeatured");
-            request.addParameter("guid", guid);
+            request.addToPath(guid);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -649,7 +649,7 @@ var CZ;
             if(guid == "") {
                 return null;
             }
-            request.addParameter("guid", guid);
+            request.addToPath(guid);
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -666,7 +666,7 @@ var CZ;
             if(guid == "") {
                 return null;
             }
-            request.addParameter("guid", guid);
+            request.addToPath(guid);
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -675,6 +675,82 @@ var CZ;
             });
         }
         Service.putUserFeatured = putUserFeatured;
+        function putTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            request.addToPath(object);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.putTriplet = putTriplet;
+        function getTriplet(subject, predicate, object) {
+            if (typeof object === "undefined") { object = null; }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            if(object != null) {
+                request.addToPath(object);
+            }
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getTriplet = getTriplet;
+        function deleteTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            request.addToPath(object);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.deleteTriplet = deleteTriplet;
+        function setTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath(subject);
+            request.addToPath(predicate);
+            request.addToPath(object);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.setTriplet = setTriplet;
+        function getPrefixes() {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath("prefixes");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getPrefixes = getPrefixes;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));
