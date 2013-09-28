@@ -805,7 +805,7 @@ interface JQuery {
     /******
      CUSTOM
     *******/
-
+    dotdotdot(...arguments: any[]): JQuery;
     showError(...arguments: any[]): JQuery;
     hideError(): JQuery;
     visible(noTransition?: bool): JQuery;
