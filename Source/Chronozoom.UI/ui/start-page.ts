@@ -1,6 +1,7 @@
 /// <reference path='../scripts/cz.ts'/> 
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 
+
 module CZ {
     export module StartPage {
         var _isRegimesVisible;
@@ -187,6 +188,30 @@ module CZ {
                 var o=$(template).clone( true, true).appendTo(target[idx].Name);
                 o.attr("class",target[idx].Visibility[i]);
                 o.attr("id","m"+idx+"i"+i);
+
+                $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
+                        /*  The HTML to add as ellipsis. */
+                        ellipsis    : '... ',
+                        /*  How to cut off the text/html: 'word'/'letter'/'children' */
+                        wrap        : 'word',
+                        /*  Wrap-option fallback to 'letter' for long words */
+                        fallbackToLetter: true,
+                        /*  jQuery-selector for the element to keep and put after the ellipsis. */
+                        after       : null,
+                        /*  Whether to update the ellipsis: true/'window' */
+                        watch       : false,
+                        /*  Optionally set a max-height, if null, the height will be measured. */
+                        height      : null,
+                        /*  Deviation for the height-option. */
+                        tolerance   : 0,
+                        lastCharacter   : {
+                            /*  Remove these characters from the end of the truncated text. */
+                            remove      : [ ' ', ',', ';', '.', '!', '?' ],
+                            /*  Don't add an ellipsis if this array contains 
+                                the last character of the truncated text. */
+                            noEllipsis  : []
+                        }
+                    });
             }
         }
 
@@ -302,13 +327,14 @@ module CZ {
                         window.location.href = event.data;
                         hide();
                     })
-            //    $("#l" + idx + "i" + i + " .li-title a").attr("href",timelineUrl);
                 $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title);
                 $("#l" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }
 
         export function TwitterLayout( target, idx) {
+            var ListTemplate = "#template-list .list-item";
+            var ListElem = "#TwitterBlock-list";
 
             CZ.Service.getRecentTweets().done(response => {
                 for (var i = 0, len = response.d.length; i < len; ++i) {
@@ -317,16 +343,19 @@ module CZ {
                     var  time = response.d[i].CreatedDate;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() +"; "+  myDate.getDate();
+                    var tweetLink = "https://twitter.com/" + response.d[i].User.ScreenName;
+
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
                     $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-text").text(text);
                     $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-author").text(author);
+                    $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-author").attr("href",tweetLink);
                     $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tile-meta-time").text(convertedDate);
-
-
+              
                     var ListTemplateClone=$(ListTemplate).clone( true, true).appendTo(ListElem);
                     ListTemplateClone.attr("id","l"+idx+"i"+i);
                     $("#l" + idx + "i" + i + " .li-title a").text(text);
                     $("#l" + idx + "i" + i + " .li-author").text(author);
+                    $("#l" + idx + "i" + i + " .li-author").attr("href",tweetLink);
                 }
             });
         }
@@ -399,7 +428,7 @@ module CZ {
 
             // CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
             //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
-            CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
+            //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
