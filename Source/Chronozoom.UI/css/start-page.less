@@ -61,13 +61,19 @@
     height: 5px;
 }
 
+.list-item {
+    border: 1px #666 solid;   
+}
+
 .li-title {
     float: left;
+    text-align: left;
     width: 66.3333%;
 }
 
 .li-author {
     float: left;
+    text-align: right;
     width: 33.3333%;
 }
 
@@ -128,6 +134,7 @@
     position: absolute;
     top: 0;
     left: 0;
+    right: 0;
 }
 
 .tile-meta-title {
@@ -196,7 +203,8 @@
     color: #B0B0B0;
     font-size: 12px;
     display: block;
-    overflow: hidden
+    overflow: hidden;
+    height:65px;
 }
 
 .WelcomeBlock {
@@ -223,7 +231,6 @@
             height: @sp-welcome-link-height;
             border: @border-transparent-thin;
             line-height: @sp-welcome-link-height;
-            margin: 25px 0;
             font-size: @sp-welcome-link-font-size;
 
             &:hover {
@@ -301,7 +308,7 @@ visibility: visible important!;
     }
 
 
-@media only screen and (max-width : 780px), screen and (orientation: landscape) and (max-device-width : 480px) {
+@media only screen and (max-width : 880px), screen and (orientation: landscape) and (max-device-width : 480px) {
     /* Small Tablet view: 3 rows, 2 columns */
         .FTTiles {
         overflow: hidden;
@@ -363,7 +370,7 @@ visibility: visible important!;
     }
 }
 
-@media only screen and (max-width : 1200px) and (min-width : 781px) {
+@media only screen and (max-width : 1200px) and (min-width : 881px) {
     /* Tablet view: 1 row 4 columns and 2 x 2 columns below */
 
     .FTTiles {
@@ -458,6 +465,7 @@ visibility: visible important!;
     .box {
         height:150px;
         width:  150px;
+        float: left;
     }
 
     .FTTiles {
@@ -532,6 +540,7 @@ visibility: visible important!;
     .box {
         height:160px;
         width:160px;
+        float: left;
     }
 
     .WelcomeBlock {

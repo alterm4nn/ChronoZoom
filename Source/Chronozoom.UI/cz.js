@@ -13010,6 +13010,26 @@ var CZ;
                 var o = $(template).clone(true, true).appendTo(target[idx].Name);
                 o.attr("class", target[idx].Visibility[i]);
                 o.attr("id", "m" + idx + "i" + i);
+                $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
+                    ellipsis: '... ',
+                    wrap: 'word',
+                    fallbackToLetter: true,
+                    after: null,
+                    watch: false,
+                    height: null,
+                    tolerance: 0,
+                    lastCharacter: {
+                        remove: [
+                            ' ', 
+                            ',', 
+                            ';', 
+                            '.', 
+                            '!', 
+                            '?'
+                        ],
+                        noEllipsis: []
+                    }
+                });
             }
         }
         StartPage.cloneTweetTemplate = cloneTweetTemplate;
@@ -13105,6 +13125,8 @@ var CZ;
         }
         StartPage.fillFeaturedTimelinesList = fillFeaturedTimelinesList;
         function TwitterLayout(target, idx) {
+            var ListTemplate = "#template-list .list-item";
+            var ListElem = "#TwitterBlock-list";
             CZ.Service.getRecentTweets().done(function (response) {
                 for(var i = 0, len = response.d.length; i < len; ++i) {
                     var text = response.d[i].Text;
@@ -13112,14 +13134,17 @@ var CZ;
                     var time = response.d[i].CreatedDate;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
+                    var tweetLink = "https://twitter.com/" + response.d[i].User.ScreenName;
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
                     $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").text(text);
                     $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-author").text(author);
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-author").attr("href", tweetLink);
                     $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tile-meta-time").text(convertedDate);
                     var ListTemplateClone = $(ListTemplate).clone(true, true).appendTo(ListElem);
                     ListTemplateClone.attr("id", "l" + idx + "i" + i);
                     $("#l" + idx + "i" + i + " .li-title a").text(text);
                     $("#l" + idx + "i" + i + " .li-author").text(author);
+                    $("#l" + idx + "i" + i + " .li-author").attr("href", tweetLink);
                 }
             });
         }
@@ -13163,7 +13188,6 @@ var CZ;
                 fillFeaturedTimelines(response);
                 fillFeaturedTimelinesList(response);
             });
-            CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2);
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
             var hash = CZ.UrlNav.getURL().hash;

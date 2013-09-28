@@ -81,12 +81,17 @@ input.error {
   width: 100%;
   height: 5px;
 }
+.list-item {
+  border: 1px #666 solid;
+}
 .li-title {
   float: left;
+  text-align: left;
   width: 66.3333%;
 }
 .li-author {
   float: left;
+  text-align: right;
   width: 33.3333%;
 }
 .li-icon {
@@ -140,6 +145,7 @@ input.error {
   position: absolute;
   top: 0;
   left: 0;
+  right: 0;
 }
 .tile-meta-title {
   font-weight: bold;
@@ -198,6 +204,7 @@ input.error {
   font-size: 12px;
   display: block;
   overflow: hidden;
+  height: 65px;
 }
 .WelcomeBlock {
   -webkit-box-sizing: border-box;
@@ -223,7 +230,6 @@ input.error {
   height: 65px;
   border: 1px solid transparent;
   line-height: 65px;
-  margin: 25px 0;
   font-size: 22px;
 }
 .WelcomeBlock .welcome-box-2 .welcome-link:hover {
@@ -286,7 +292,7 @@ input.error {
 .box {
   visibility: visible important!;
 }
-@media only screen and (max-width: 780px), screen and (orientation: landscape) and (max-device-width: 480px) {
+@media only screen and (max-width: 880px), screen and (orientation: landscape) and (max-device-width: 480px) {
   /* Small Tablet view: 3 rows, 2 columns */
   .FTTiles {
     overflow: hidden;
@@ -337,7 +343,7 @@ input.error {
     display: none;
   }
 }
-@media only screen and (max-width: 1200px) and (min-width: 781px) {
+@media only screen and (max-width: 1200px) and (min-width: 881px) {
   /* Tablet view: 1 row 4 columns and 2 x 2 columns below */
   .FTTiles {
     overflow: hidden;
@@ -418,6 +424,7 @@ input.error {
   .box {
     height: 150px;
     width: 150px;
+    float: left;
   }
   .FTTiles {
     overflow: hidden;
@@ -481,6 +488,7 @@ input.error {
   .box {
     height: 160px;
     width: 160px;
+    float: left;
   }
   .WelcomeBlock {
     float: left;

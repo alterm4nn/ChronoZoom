@@ -384,6 +384,7 @@
     <Content Include="scripts\external\csvToArray.v2.1.js" />
     <Content Include="scripts\external\jquery-1.7.2.min.js" />
     <Content Include="scripts\external\jquery-ui.js" />
+    <Content Include="scripts\external\jquery.dotdotdot.js" />
     <Content Include="scripts\external\jquery.mousewheel.js" />
     <Content Include="scripts\media.js">
       <DependentUpon>media.ts</DependentUpon>
