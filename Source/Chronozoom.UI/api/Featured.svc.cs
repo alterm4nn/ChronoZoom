@@ -18,7 +18,7 @@ namespace Chronozoom.UI
                 Guid userGuid;
 
                 // If GUID is not given then get supervisor's GUID. Otherwise parse the given GUID.
-                if (string.IsNullOrEmpty(guid))
+                if (guid.Equals("default"))
                 {
                     userGuid = Guid.Parse(ConfigurationManager.AppSettings["FeaturedTimelinesSupervisorGuid"]);
                 }
@@ -43,9 +43,13 @@ namespace Chronozoom.UI
                     if (storage.GetPrefix(t.Object) == "cztimeline")
                     {
                         var g = new Guid(storage.GetValue(t.Object));
-                        var timeline = storage.Timelines.Where(x => x.Id == g).Include(f => f.Collection).Include(u => u.Collection.User).FirstOrDefault();
+                        var timeline = storage.Timelines.Where(x => x.Id == g)
+                            .Include("Collection")
+                            .Include("Collection.User")
+                            .Include("Exhibits")
+                            .Include("Exhibits.ContentItems")
+                            .FirstOrDefault();
 
-                        //ToDo: get image url
                         if (timeline != null)
                             elements.Add(storage.GetTimelineShortcut(timeline));
                     }
@@ -80,10 +84,10 @@ namespace Chronozoom.UI
             });
         }
 
-        public bool DeleteUserFeatured(string favoriteGUID)
+        public bool DeleteUserFeatured(string featuredGUID)
         {
             Guid g;
-            if (!Guid.TryParse(favoriteGUID, out g))
+            if (!Guid.TryParse(featuredGUID, out g))
                 return false;
 
             return ApiOperation<bool>(delegate(User user, Storage storage)
@@ -99,7 +103,7 @@ namespace Chronozoom.UI
                     Cache.Remove(cacheKey);
                 }
 
-                return storage.DeleteTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", favoriteGUID));
+                return storage.DeleteTriplet(String.Format("czusr:{0}", user.Id), "czpred:featured", String.Format("cztimeline:{0}", featuredGUID));
             });
         }
     }
