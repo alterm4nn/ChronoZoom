@@ -207,6 +207,18 @@
     height:65px;
 }
 
+.welcome-block-toggle {
+    .toggle-block {
+        &[data-toggle~="show"] {
+            display: block;
+        }
+
+        &[data-toggle~="hide"] {
+            display: none;
+        }
+    }
+}
+
 .WelcomeBlock {
     .box-sizing;
     color: white;
@@ -284,6 +296,10 @@
     }
 }
 
+.FavoriteTimelinesBlock {
+    color: #fff;
+}
+
 .template-invisible {
     display: none;
 }
@@ -337,7 +353,7 @@ visibility: visible important!;
         overflow: hidden;
     }
 
-    .WelcomeBlock {
+    .welcome-block-toggle {
         width: 100%;
         height: 20%;
         min-height: 250px;
@@ -402,7 +418,7 @@ visibility: visible important!;
         display: none;
     }
 
-    .WelcomeBlock {
+    .welcome-block-toggle {
         float: left;
         margin: 5px;
         padding: 5px;
@@ -472,7 +488,7 @@ visibility: visible important!;
         overflow:hidden;
     }
 
-    .WelcomeBlock {
+    .welcome-block-toggle {
         float: left;
         margin: 5px;
         padding: 5px;
@@ -543,7 +559,7 @@ visibility: visible important!;
         float: left;
     }
 
-    .WelcomeBlock {
+    .welcome-block-toggle {
         float: left;
         margin: 5px;
         padding: 5px;

@@ -1,4 +1,4 @@
-/* Height of input element */
+﻿/* Height of input element */
 /* Font-size of error message */
 /* Error messages */
 .error-message {
@@ -509,6 +509,12 @@ iframe[sutra=picker] + div {
   overflow: hidden;
   height: 65px;
 }
+.welcome-block-toggle .toggle-block[data-toggle~="show"] {
+  display: block;
+}
+.welcome-block-toggle .toggle-block[data-toggle~="hide"] {
+  display: none;
+}
 .WelcomeBlock {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -574,6 +580,9 @@ iframe[sutra=picker] + div {
   background-image: url(/images/arrow-left-hover.png);
   cursor: pointer;
 }
+.FavoriteTimelinesBlock {
+  color: #fff;
+}
 .template-invisible {
   display: none;
 }
@@ -620,7 +629,7 @@ iframe[sutra=picker] + div {
     width: 150px;
     overflow: hidden;
   }
-  .WelcomeBlock {
+  .welcome-block-toggle {
     width: 100%;
     height: 20%;
     min-height: 250px;
@@ -672,7 +681,7 @@ iframe[sutra=picker] + div {
   .ex6 {
     display: none;
   }
-  .WelcomeBlock {
+  .welcome-block-toggle {
     float: left;
     margin: 5px;
     padding: 5px;
@@ -732,7 +741,7 @@ iframe[sutra=picker] + div {
   .FTTiles {
     overflow: hidden;
   }
-  .WelcomeBlock {
+  .welcome-block-toggle {
     float: left;
     margin: 5px;
     padding: 5px;
@@ -793,7 +802,7 @@ iframe[sutra=picker] + div {
     width: 160px;
     float: left;
   }
-  .WelcomeBlock {
+  .welcome-block-toggle {
     float: left;
     margin: 5px;
     padding: 5px;

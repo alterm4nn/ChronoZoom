@@ -507,6 +507,10 @@ module CZ {
                 }).always(() => {
                     if (!CZ.Authoring.isEnabled) {
                         $(".edit-icon").hide();
+                        $("#WelcomeBlock").attr("data-toggle", "show");
+                    }
+                    else {
+                        $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
                     }
 
                     //retrieving the data
