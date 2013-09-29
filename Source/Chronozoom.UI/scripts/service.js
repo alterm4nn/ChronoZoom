@@ -680,26 +680,31 @@ var CZ;
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("triples");
-            request.addToPath(subject);
-            request.addToPath(predicate);
-            request.addToPath(object);
             return $.ajax({
                 type: "PUT",
                 cache: false,
                 contentType: "application/json",
-                url: request.url
+                url: request.url,
+                data: JSON.stringify({
+                    Subject: subject,
+                    Predicate: predicate,
+                    Object: object
+                })
             });
         }
         Service.putTriplet = putTriplet;
-        function getTriplet(subject, predicate, object) {
+        function getTriplets(subject, predicate, object) {
+            if (typeof predicate === "undefined") { predicate = null; }
             if (typeof object === "undefined") { object = null; }
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("triples");
-            request.addToPath(subject);
-            request.addToPath(predicate);
+            request.addParameter("subject", encodeURIComponent(subject));
+            if(predicate != null) {
+                request.addParameter("predicate", encodeURIComponent(predicate));
+            }
             if(object != null) {
-                request.addToPath(object);
+                request.addParameter("object", encodeURIComponent(object));
             }
             return $.ajax({
                 type: "GET",
@@ -708,37 +713,24 @@ var CZ;
                 url: request.url
             });
         }
-        Service.getTriplet = getTriplet;
+        Service.getTriplets = getTriplets;
         function deleteTriplet(subject, predicate, object) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("triples");
-            request.addToPath(subject);
-            request.addToPath(predicate);
-            request.addToPath(object);
             return $.ajax({
                 type: "DELETE",
                 cache: false,
                 contentType: "application/json",
-                url: request.url
+                url: request.url,
+                data: JSON.stringify({
+                    Subject: subject,
+                    Predicate: predicate,
+                    Object: object
+                })
             });
         }
         Service.deleteTriplet = deleteTriplet;
-        function setTriplet(subject, predicate, object) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("triples");
-            request.addToPath(subject);
-            request.addToPath(predicate);
-            request.addToPath(object);
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.setTriplet = setTriplet;
         function getPrefixes() {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
