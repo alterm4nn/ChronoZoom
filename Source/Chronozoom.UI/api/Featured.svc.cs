@@ -20,7 +20,8 @@ namespace Chronozoom.UI
                 // If GUID is not given then get supervisor's GUID. Otherwise parse the given GUID.
                 if (guid.Equals("default"))
                 {
-                    userGuid = Guid.Parse(ConfigurationManager.AppSettings["FeaturedTimelinesSupervisorGuid"]);
+                    string aps = ConfigurationManager.AppSettings["FeaturedTimelinesSupervisorGuid"];
+                    userGuid = String.IsNullOrEmpty(aps) ? Guid.Empty : Guid.Parse(aps);
                 }
                 else if (!Guid.TryParse(guid, out userGuid))
                 {
@@ -40,9 +41,10 @@ namespace Chronozoom.UI
                 var elements = new Collection<TimelineShortcut>();
                 foreach (var t in triple.Objects)
                 {
-                    if (storage.GetPrefix(t.Object) == "cztimeline")
+                    var objName = TripleName.Parse(t.Object);
+                    if (objName.Prefix == "cztimeline")
                     {
-                        var g = new Guid(storage.GetValue(t.Object));
+                        var g = new Guid(objName.Name);
                         var timeline = storage.Timelines.Where(x => x.Id == g)
                             .Include("Collection")
                             .Include("Collection.User")

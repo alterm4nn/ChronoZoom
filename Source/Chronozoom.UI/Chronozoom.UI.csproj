@@ -232,10 +232,10 @@
     <Compile Include="api\Bing.svc.cs">
       <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
-    <Compile Include="api\Favorites.svc.cs" >
+    <Compile Include="api\Favorites.svc.cs">
       <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
-    <Compile Include="api\Featured.svc.cs" >
+    <Compile Include="api\Featured.svc.cs">
       <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
     <Compile Include="api\Triples.svc.cs">
