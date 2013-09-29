@@ -2,105 +2,144 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 
 namespace Chronozoom.UI
 {
-    public partial class ChronozoomSVC : ITriplesAPI
+    public partial class ChronozoomSVC
     {
-        public IEnumerable<Entities.Triple> GetTriplet(string subject, string predicate)
+        private string GetSubjectOwner(Storage storage, string subject)
         {
-            return ApiOperation<IEnumerable<Entities.Triple>>(delegate(User user, Storage storage) 
-            {
-                if (user == null) return null;
-                if (user.Id.ToString() == storage.GetValue(subject))
-                {
-                    return storage.GetTriplet(subject, predicate);
-                }
-                else
-                {
+            var name = storage.EnsurePrefix(TripleName.Parse(subject)); 
+            switch(name.Prefix) {
+                case TripleName.UserPrefix:
+                    return name.Name; 
+                case TripleName.TimelinePrefix:
+                    var collection = RetrieveCollection(storage, storage.GetCollectionFromTimeline(Guid.Parse(name.Name)));
+                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;
+                case TripleName.ExhibitPrefix:
+                    collection = RetrieveCollection(storage, storage.GetCollectionFromExhibitGuid(Guid.Parse(name.Name)));
+                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;
+                case TripleName.ArtifactPrefix:
+                    collection = RetrieveCollection(storage, storage.GetCollectionFromContentItemGuid(Guid.Parse(name.Name)));
+                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;                    
+                default:
                     return null;
-                }
-            });
+            }
         }
 
-        public IEnumerable<Entities.Triple> GetTriplet2(string subject, string predicate, string @object)
+        public IEnumerable<Entities.Triple> GetTriplets(string subject, string predicate, string @object)
         {
-            return ApiOperation<IEnumerable<Entities.Triple>>(delegate(User user, Storage storage)
+            try
             {
-                if (user == null) return null;
-                if (user.Id.ToString() == storage.GetValue(subject))
+                using (var storage = new Storage())
+                    return storage.GetTriplet(
+                        HttpUtility.UrlDecode(subject), 
+                        predicate == null ? null : HttpUtility.UrlDecode(predicate), 
+                        @object == null ? null : HttpUtility.UrlDecode(@object));
+            }
+            catch (ArgumentException exc)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, exc.Message);
+                return null;
+            }
+        }
+
+        public void DeleteTriplet(SingleTriple triple)
+        {
+#if RELEASE // Authenticate only in RELEASE mode 
+            ApiOperation(delegate(User user, Storage storage)
+            {
+                if (user == null)
                 {
-                    return storage.GetTriplet(subject, predicate, @object);
+                    SetStatusCode(HttpStatusCode.Unauthorized, "Anonymous users cannot delete triple");
+                } 
+                else 
+                {
+                    if(GetSubjectOwner(storage, triple.Subject) == user.Id.ToString())
+                    {
+#else
+                    using(var storage = new Storage()) 
+#endif
+                        try
+                        {
+                            SetStatusCode(storage.DeleteTriplet(triple.Subject, triple.Predicate, triple.Object) ? HttpStatusCode.OK : HttpStatusCode.NotModified, "");
+                        }
+                        catch (ArgumentException exc)
+                        {
+                            SetStatusCode(HttpStatusCode.BadRequest, exc.Message);
+                        }
+#if RELEASE
+                    }
+                    else
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, "Only subject owners can delete triple");
+                    }
+                }
+            });
+#endif
+        }
+
+        public void PutTriplet(SingleTriple triple)
+        {
+#if RELEASE
+            ApiOperation(delegate(User user, Storage storage)
+            {
+                if (user == null)
+                {
+                    SetStatusCode(HttpStatusCode.Unauthorized, "Anonymous users cannot modify triple");
                 }
                 else
                 {
-                    return null;
+                    if (GetSubjectOwner(storage, triple.Subject) == user.Id.ToString())
+                    {
+#else
+                    using(var storage = new Storage()) 
+#endif
+                        try
+                        {
+                            SetStatusCode(storage.PutTriplet(triple.Subject, triple.Predicate, triple.Object) ? HttpStatusCode.OK : HttpStatusCode.NotModified, "");
+                        }
+                        catch (ArgumentException exc)
+                        {
+                            SetStatusCode(HttpStatusCode.BadRequest, exc.Message);
+                        }
+#if RELEASE
+                    }
+                    else
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, "Only subject owners can modify triple");
+                    }
                 }
             });
-        }
-
-        public bool DeleteTriplet(string subject, string predicate, string @object)
-        {
-            return ApiOperation<bool>(delegate(User user, Storage storage)
-            {
-                if (user == null) return false;
-                if (user.Id.ToString() == storage.GetValue(subject))
-                {
-                    return storage.DeleteTriplet(subject, predicate, @object);
-                }
-                else
-                {
-                    return false;
-                }
-            });
-        }
-
-        public bool PutTriplet(string subject, string predicate, string @object)
-        {
-            return ApiOperation<bool>(delegate(User user, Storage storage)
-            {
-                if (user == null) return false;
-                if (user.Id.ToString() == storage.GetValue(subject))
-                {
-                    return storage.PutTriplet(subject, predicate, @object);
-                }
-                else
-                {
-                    return false;
-                }
-            });
+#endif
         }
 
 
-        public bool SetPrefix(string prefix, string @namespace)
+        public void SetPrefix(string prefix, string @namespace)
         {
-            //Not implemented
-            //Prefixes aren't user associated, need to think about security policy
-            return false;
+            SetStatusCode(HttpStatusCode.Unauthorized, "Cannot modify prefix collection"); 
         }
 
-        public bool DeletePrefix(string prefix, string @namespace)
+        public void DeletePrefix(string prefix, string @namespace)
         {
-            //Not implemented
-            //Prefixes aren't user associated, need to think about security policy
-            return false;
+            SetStatusCode(HttpStatusCode.Unauthorized, "Cannot modify prefix collection");
         }
 
         public Dictionary<string,string> GetPrefixes()
         {
-            return ApiOperation<Dictionary<string, string>>(delegate(User user, Storage storage)
+            using(var storage = new Storage())
             {
                 var d = new Dictionary<string,string>();
 
                 foreach (var p in storage.TriplePrefixes)
                     d.Add(p.Prefix, p.Namespace);
 
-                foreach (var p in storage.PrefixesAndNamespaces)
+                foreach (var p in TripleName.PrefixesAndNamespaces)
                     d.Add(p.Key, p.Value);
                 return d;
-            });
-
+            }
         }
     }
 }
