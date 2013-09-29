@@ -127,6 +127,7 @@
     <Compile Include="TimelineExtensions.cs" />
     <Compile Include="Tour.cs" />
     <Compile Include="Triple.cs" />
+    <Compile Include="TripleName.cs" />
     <Compile Include="TripleObject.cs" />
     <Compile Include="TriplePrefix.cs" />
     <Compile Include="Triples.cs" />

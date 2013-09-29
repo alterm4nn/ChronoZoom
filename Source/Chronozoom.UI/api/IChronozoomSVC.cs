@@ -608,6 +608,42 @@ namespace Chronozoom.UI
         bool DeleteUserFavorite(string favoriteGUID);
         #endregion
 
+        #region Triples
+
+        //[OperationContract]
+        //[WebInvoke(Method = "GET", UriTemplate = "/triples?subject={subject}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        //IEnumerable<Triple> GetTripletsForSubject(string subject);
+
+        //[OperationContract]
+        //[WebInvoke(Method = "GET", UriTemplate = "/triples?subject={subject}&predicate={predicate}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        //IEnumerable<Triple> GetTripletsForPredicate(string subject, string predicate);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/triples?subject={subject}&predicate={predicate}&object={object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<Triple> GetTriplets(string subject, string predicate, string @object);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/triples", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void DeleteTriplet(SingleTriple triple);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/triples", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void PutTriplet(SingleTriple triple);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/triples/prefixes/{prefix}/{namespace}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void SetPrefix(string prefix, string @namespace);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/triples/prefixes/{prefix}/{namespace}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void DeletePrefix(string prefix, string @namespace);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/triples/prefixes", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Dictionary<string, string> GetPrefixes();
+
+        #endregion
+
     }
 
     [ServiceContract(Namespace = "")]
@@ -702,37 +738,5 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
         bool DeleteUserFeatured(string featuredGUID);
-    }
-    
-    [ServiceContract(Namespace = "")]
-    public interface ITriplesAPI
-    {
-        [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/{subject}/{predicate}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        IEnumerable<Triple> GetTriplet(string subject, string predicate);
-
-        [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/{subject}/{predicate}/{object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        IEnumerable<Triple> GetTriplet2(string subject, string predicate, string @object);
-
-        [OperationContract]
-        [WebInvoke(Method = "DELETE", UriTemplate = "/{subject}/{predicate}/{object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        bool DeleteTriplet(string subject, string predicate, string @object);
-
-        [OperationContract]
-        [WebInvoke(Method = "PUT", UriTemplate = "/{subject}/{predicate}/{object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        bool PutTriplet(string subject, string predicate, string @object);
-
-        [OperationContract]
-        [WebInvoke(Method = "PUT", UriTemplate = "/prefix/{prefix}/{namespace}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        bool SetPrefix(string prefix, string @namespace);
-
-        [OperationContract]
-        [WebInvoke(Method = "DELETE", UriTemplate = "/prefix/{prefix}/{namespace}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        bool DeletePrefix(string prefix, string @namespace);
-
-        [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/prefixes", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        Dictionary<string,string> GetPrefixes();
-    }
+    }   
 }

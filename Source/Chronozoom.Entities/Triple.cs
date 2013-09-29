@@ -21,4 +21,17 @@ namespace Chronozoom.Entities
         [DataMember]
         public Collection<TripleObject> Objects { get; set; }
     }
+
+    [DataContract]
+    public class SingleTriple
+    {
+        [DataMember]
+        public string Subject { get; set; }
+
+        [DataMember]
+        public string Predicate { get; set; }
+
+        [DataMember]
+        public string Object { get; set; }
+    }
 }
