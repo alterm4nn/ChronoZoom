@@ -686,7 +686,8 @@ iframe[sutra=picker] + div {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: 40%;
+    width: 45%;
+    min-width: 400px;
     height: 60%;
     background-color: transparent;
     vertical-align: top;
@@ -699,7 +700,8 @@ iframe[sutra=picker] + div {
     float: right;
     margin: 5px;
     padding: 5px;
-    width: 40%;
+    width: 45%;
+    min-width: 400px;
     height: 60%;
     background-color: transparent;
     vertical-align: top;
