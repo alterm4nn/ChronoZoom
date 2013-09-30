@@ -24,3 +24,4 @@ BLTs are implemented using JavaScript and the Jasmine framework, and are used to
     `[Path to extracted chutzpah]\chutzpah.console.exe  [solution dir]\Test\chronozoom20.test\Tests.BL\Scripts\Specs\ /openInBrowser`
 	
 [Reference: All chutzpah Command Line Options](http://chutzpah.codeplex.com/wikipage?title=Command%20Line%20Options&referringTitle=Documentation)
+[Reference: Video Manuals](https://www.dropbox.com/home/Dev%20Docs/TestTeam/Video%20manuals)
