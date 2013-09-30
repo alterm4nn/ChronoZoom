@@ -118,6 +118,17 @@ module CZ {
                     "box ex3 ex4 ex6"
                 ],
             },
+            {
+                "Name": "#FavoriteTimelinesBlock-tiles",
+                "Visibility": [
+                    "box",
+                    "box",
+                    "box ex3",
+                    "box ex3 ex4",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6"
+                ],
+            },
         ];
 
         function resizeCrop($image: JQuery, imageProps: any): void {
@@ -333,6 +344,81 @@ module CZ {
             }
         }
 
+        export function fillFavoriteTimelines(timelines) {
+            var $template = $("#template-tile .box");
+            var layout = CZ.StartPage.tileLayout[3];
+
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+                var $startPage = $("#start-page");
+                var $tile = $template.clone(true, true);
+                var $tileImage = $tile.find(".boxInner .tile-photo img");
+                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
+                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
+
+                // Set appearance and click handler.
+                // Initially the tile is hidden. Show it on image load.
+                $tile.appendTo(layout.Name)
+                    .addClass(layout.Visibility[i])
+                    .attr("id", "favorite" + i)
+                    .click(timelineUrl, function (event) {
+                        window.location.href = event.data;
+                        hide();
+                    })
+                    .invisible();
+
+                // Resize and crop image on load.
+                $tileImage.load($tile, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    // Resize and crop the image.
+                    resizeCrop($this, imageProps);
+
+                    // Resize and crop the image on window resize.
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
+                    });
+
+                    // Show the tile with transition.
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+
+                // Set title and author.
+                $tileTitle.text(timeline.Title);
+            }
+        }
+
+        export function fillFavoriteTimelinesList(timelines) {
+            var template = "#template-list .list-item";
+            var target = "#FavoriteTimelinesBlock-list";
+
+            for (var i = 0; i < Math.min(tileData.length, timelines.length) ; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+
+                var TemplateClone = $(template).clone(true, true).appendTo(target);
+
+                var Name = "favorite-list-elem" + i;
+                var idx = 1;
+                TemplateClone.attr("id", "l" + idx + "i" + i);
+                TemplateClone.click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                })
+                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title);
+            }
+        }
+
         export function TwitterLayout( target, idx) {
             var ListTemplate = "#template-list .list-item";
             var ListElem = "#TwitterBlock-list";
@@ -427,6 +513,23 @@ module CZ {
                 var timelines = response ? response.reverse() : [];
                 fillFeaturedTimelines(timelines);
                 fillFeaturedTimelinesList(timelines);
+            });
+
+            CZ.Service.getUserFavorites().then(response => {
+                var timelines = response ? response.reverse() : [];
+
+                if (timelines.length === 0) {
+                    $("#FavoriteTimelinesBlock .list-view-icon").hide();
+                    $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." +
+                         "Click star icon of the timeline you like to save it as favorite.");
+                }
+                else {
+                    fillFavoriteTimelines(timelines);
+                    fillFavoriteTimelinesList(timelines);
+                }
+            },
+            error => {
+                console.log("[ERROR] getUserFavorites");
             });
 
             // CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
