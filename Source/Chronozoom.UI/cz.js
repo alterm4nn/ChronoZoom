@@ -1386,7 +1386,11 @@ var CZ;
                     this.favoriteBtn = VCContent.addImage(this, layerid, id + "__favorite", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/star.svg");
                     this.favoriteBtn.reactsOnMouse = true;
                     this.favoriteBtn.onmouseclick = function () {
-                        CZ.Service.putUserFavorite(timelineinfo.guid);
+                        if(CZ.Settings.favoriteTimelines.indexOf(timelineinfo.guid) !== -1) {
+                            CZ.Service.deleteUserFavorite(timelineinfo.guid);
+                        } else {
+                            CZ.Service.putUserFavorite(timelineinfo.guid);
+                        }
                         return true;
                     };
                     this.favoriteBtn.onmousehover = function () {
@@ -4453,6 +4457,12 @@ var CZ;
                 t.editButton.y = t.titleObject.y;
                 t.editButton.width = t.titleObject.height;
                 t.editButton.height = t.titleObject.height;
+            }
+            if(typeof t.favoriteBtn !== "undefined") {
+                t.favoriteBtn.x = t.x + t.width - 1.8 * t.titleObject.height;
+                t.favoriteBtn.y = t.titleObject.y + 0.15 * t.titleObject.height;
+                t.favoriteBtn.width = 0.7 * t.titleObject.height;
+                t.favoriteBtn.height = 0.7 * t.titleObject.height;
             }
         }
         Authoring.modeMouseHandlers = {
@@ -13115,7 +13125,7 @@ var CZ;
                     src: timeline.ImageUrl,
                     alt: timeline.Title
                 });
-                $tileTitle.text(timeline.Title);
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
         }
@@ -13134,7 +13144,7 @@ var CZ;
                     window.location.href = event.data;
                     hide();
                 });
-                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
                 $("#l" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }
@@ -13171,7 +13181,7 @@ var CZ;
                     src: timeline.ImageUrl,
                     alt: timeline.Title
                 });
-                $tileTitle.text(timeline.Title);
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
         }
@@ -13190,7 +13200,7 @@ var CZ;
                     window.location.href = event.data;
                     hide();
                 });
-                $("#lfav" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                $("#lfav" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
                 $("#lfav" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }

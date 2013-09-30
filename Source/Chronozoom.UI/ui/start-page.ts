@@ -317,7 +317,7 @@ module CZ {
                 });
 
                 // Set title and author.
-                $tileTitle.text(timeline.Title);
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
         }
@@ -339,7 +339,7 @@ module CZ {
                         window.location.href = event.data;
                         hide();
                     })
-                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
                 $("#l" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }
@@ -394,7 +394,7 @@ module CZ {
                 });
 
                 // Set title and author.
-                $tileTitle.text(timeline.Title);
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
         }
@@ -416,7 +416,7 @@ module CZ {
                     window.location.href = event.data;
                     hide();
                 })
-                $("#lfav" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                $("#lfav" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
                 $("#lfav" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }
