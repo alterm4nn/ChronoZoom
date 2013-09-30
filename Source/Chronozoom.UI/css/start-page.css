@@ -47,17 +47,6 @@ input.error {
   box-sizing: border-box;
 }
 /*Start Page*/
-.start-page-text-link {
-  text-decoration: none;
-}
-.start-page-text-link:link,
-.start-page-text-link:active,
-.start-page-text-link:visited {
-  color: #00bce0;
-}
-.start-page-text-link:hover {
-  color: #ffffff;
-}
 .start-page-screen {
   display: none;
   position: absolute;
@@ -254,12 +243,21 @@ input.error {
   display: block;
 }
 .tweet-meta-text {
+  text-decoration: none;
   font-weight: normal;
   color: #B0B0B0;
   font-size: 12px;
   display: block;
   overflow: hidden;
   height: 65px;
+}
+.tweet-meta-text:link,
+.tweet-meta-text:active,
+.tweet-meta-text:visited {
+  color: #b0b0b0;
+}
+.tweet-meta-text:hover {
+  color: #ffffff;
 }
 .welcome-block-toggle .toggle-block[data-toggle~="show"] {
   display: block;

@@ -434,7 +434,18 @@ module CZ {
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
 
                     // Replace all @authors with links.
-                    text = text.replace(/(@(\S+))/gi, "<a class='tweet-message-link' href='https://twitter.com/$2'>$1</a>");
+                    text = text.replace(
+                        /(@([A-Za-z0-9_]+))/gi,
+                        "<a class='tweet-message-link' target='_blank' \
+                        href='https://twitter.com/$2'>$1</a>"
+                    );
+
+                    // Replace all #tags with links.
+                    text = text.replace(
+                        /(#([A-Za-z0-9_]+))/gi,
+                        "<a class='tweet-message-link' target='_blank' \
+                        href='https://twitter.com/search?q=$2&f=realtime'>$1</a>"
+                    );
 
                     $tileMessage.html(text).attr("href", tweetLink);
                     $tileAuthor.text("@" + author).attr("href", tweetAuthorLink);

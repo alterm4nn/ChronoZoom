@@ -354,7 +354,10 @@ var CZ;
                     var $tileAuthor = $tweetTile.find(".boxInner .tweet-meta .tweet-meta-author");
                     var $tileDate = $tweetTile.find(".boxInner .tweet-meta .tile-meta-time");
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
-                    text = text.replace(/(@(\S+))/gi, "<a class='tweet-message-link' href='https://twitter.com/$2'>$1</a>");
+                    text = text.replace(/(@([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='_blank' \
+                        href='https://twitter.com/$2'>$1</a>");
+                    text = text.replace(/(#([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='_blank' \
+                        href='https://twitter.com/search?q=$2&f=realtime'>$1</a>");
                     $tileMessage.html(text).attr("href", tweetLink);
                     $tileAuthor.text("@" + author).attr("href", tweetAuthorLink);
                     $tileDate.text(convertedDate);

@@ -10,6 +10,7 @@
 @border-transparent-thin: 1px solid transparent;
 @text-blue: #00BCE0;
 @text-white: #FFFFFF;
+@text-gray: #B0B0B0;
 
 @img-arrow-left-icon: url(/images/arrow-left.png);
 @img-arrow-left-icon-hover: url(/images/arrow-left-hover.png);
@@ -25,17 +26,17 @@
 @sp-block-header-font-size: 26px;
 
 // Mixin for start page text link.
-.start-page-text-link {
+.start-page-text-link(@default, @hover) {
     text-decoration: none;
 
     &:link,
     &:active,
     &:visited {
-        color: @text-blue;
+        color: @default;
     }
 
     &:hover {
-        color: @text-white;
+        color: @hover;
     }
 }
 
@@ -196,7 +197,7 @@
 }
 
 .tweet-meta-author {
-    .start-page-text-link;
+    .start-page-text-link(@text-blue, @text-white);
 
     font-weight: normal;
     font-size: 12px;
@@ -228,6 +229,8 @@
 }
 
 .tweet-meta-text {
+    .start-page-text-link(@text-gray, @text-white);
+
     font-weight: normal;
     color: #B0B0B0;
     font-size: 12px;
@@ -354,7 +357,7 @@
 }
 
 .tweet-message-link {
-    .start-page-text-link
+    .start-page-text-link(@text-blue, @text-white);
 }
 
 @media only screen and (max-width : 880px), screen and (orientation: landscape) and (max-device-width : 480px) {
