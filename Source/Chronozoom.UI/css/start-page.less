@@ -9,6 +9,7 @@
 @border-blue-thin: 1px solid #00BCE0;
 @border-transparent-thin: 1px solid transparent;
 @text-blue: #00BCE0;
+@text-white: #FFFFFF;
 
 @img-arrow-left-icon: url(/images/arrow-left.png);
 @img-arrow-left-icon-hover: url(/images/arrow-left-hover.png);
@@ -22,6 +23,21 @@
 @sp-welcome-text-font-size: 18px;
 @sp-welcome-link-font-size: 22px;
 @sp-block-header-font-size: 26px;
+
+// Mixin for start page text link.
+.start-page-text-link {
+    text-decoration: none;
+
+    &:link,
+    &:active,
+    &:visited {
+        color: @text-blue;
+    }
+
+    &:hover {
+        color: @text-white;
+    }
+}
 
 .start-page-screen {
     display: none;
@@ -180,10 +196,12 @@
 }
 
 .tweet-meta-author {
+    .start-page-text-link;
+
     font-weight: normal;
     font-size: 12px;
-    color:#10A5C6;
-    display:block;
+    color: #10A5C6;
+    display: block;
 }
 
 .tile-meta-time {
@@ -326,14 +344,18 @@
     display: inline-block;
     text-align: left;
 }
+
 .TwitterBlock {
     text-align: center;
 }
 
- .box {
-visibility: visible important!;
-    }
+.box {
+    visibility: visible important!;
+}
 
+.tweet-message-link {
+    .start-page-text-link
+}
 
 @media only screen and (max-width : 880px), screen and (orientation: landscape) and (max-device-width : 480px) {
     /* Small Tablet view: 3 rows, 2 columns */

@@ -13056,24 +13056,7 @@ var CZ;
                 o.attr("class", target[idx].Visibility[i]);
                 o.attr("id", "m" + idx + "i" + i);
                 $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
-                    ellipsis: '... ',
-                    wrap: 'word',
-                    fallbackToLetter: true,
-                    after: null,
-                    watch: false,
-                    height: null,
-                    tolerance: 0,
-                    lastCharacter: {
-                        remove: [
-                            ' ', 
-                            ',', 
-                            ';', 
-                            '.', 
-                            '!', 
-                            '?'
-                        ],
-                        noEllipsis: []
-                    }
+                    watch: "window"
                 });
             }
         }
@@ -13230,19 +13213,24 @@ var CZ;
             var ListElem = "#TwitterBlock-list";
             CZ.Service.getRecentTweets().done(function (response) {
                 for(var i = 0, len = response.d.length; i < len; ++i) {
-                    var text = response.d[i].Text;
-                    var author = response.d[i].User.Name;
-                    var time = response.d[i].CreatedDate;
+                    var tweet = response.d[i];
+                    var text = tweet.Text;
+                    var author = tweet.User.Name;
+                    var photo = tweet.User.ProfileImageUrl;
+                    var time = tweet.CreatedDate;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
-                    var tweetAuthorLink = "https://twitter.com/" + response.d[i].User.ScreenName;
-                    var tweetLink = "https://twitter.com/" + response.d[i].User.ScreenName + "/statuses/" + response.d[i].IdStr;
+                    var tweetAuthorLink = "https://twitter.com/" + tweet.User.ScreenName;
+                    var tweetLink = "https://twitter.com/" + tweet.User.ScreenName + "/statuses/" + tweet.IdStr;
+                    var $tweetTile = $("#m" + idx + "i" + i);
+                    var $tileMessage = $tweetTile.find(".boxInner .tweet-meta .tweet-meta-text");
+                    var $tileAuthor = $tweetTile.find(".boxInner .tweet-meta .tweet-meta-author");
+                    var $tileDate = $tweetTile.find(".boxInner .tweet-meta .tile-meta-time");
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
-                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").text(text);
-                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").attr("href", tweetLink);
-                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-author").text(author);
-                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-author").attr("href", tweetAuthorLink);
-                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tile-meta-time").text(convertedDate);
+                    text = text.replace(/(@(\S+))/gi, "<a class='tweet-message-link' href='https://twitter.com/$2'>$1</a>");
+                    $tileMessage.html(text).attr("href", tweetLink);
+                    $tileAuthor.text("@" + author).attr("href", tweetAuthorLink);
+                    $tileDate.text(convertedDate);
                     var ListTemplateClone = $(ListTemplate).clone(true, true).appendTo(ListElem);
                     ListTemplateClone.attr("id", "l" + idx + "i" + i);
                     $("#l" + idx + "i" + i + " .li-title a").text(text);
