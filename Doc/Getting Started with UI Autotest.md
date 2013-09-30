@@ -50,3 +50,6 @@ This document shows you how to use [Selenium WebDriver](http://docs.seleniumhq.o
     3. Test will do something.
     4. Browser will be closed.
     5. Test results will be shown.
+
+[Video manuals](https://www.dropbox.com/home/Dev%20Docs/TestTeam/Video%20manuals)
+   
