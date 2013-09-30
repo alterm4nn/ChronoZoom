@@ -344,19 +344,23 @@ module CZ {
                     var  time = response.d[i].CreatedDate;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() +"; "+  myDate.getDate();
-                    var tweetLink = "https://twitter.com/" + response.d[i].User.ScreenName;
+                    var tweetAuthorLink = "https://twitter.com/" + response.d[i].User.ScreenName;
+                    var tweetLink = "https://twitter.com/" + response.d[i].User.ScreenName + "/statuses/" + response.d[i].IdStr;
 
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
                     $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-text").text(text);
+                    $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-text").attr("href",tweetLink);
+
                     $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-author").text(author);
-                    $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-author").attr("href",tweetLink);
+                    $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-author").attr("href",tweetAuthorLink);
                     $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tile-meta-time").text(convertedDate);
               
                     var ListTemplateClone=$(ListTemplate).clone( true, true).appendTo(ListElem);
                     ListTemplateClone.attr("id","l"+idx+"i"+i);
                     $("#l" + idx + "i" + i + " .li-title a").text(text);
+                    $("#l" + idx + "i" + i + " .li-title a").attr("href",tweetLink);
                     $("#l" + idx + "i" + i + " .li-author").text(author);
-                    $("#l" + idx + "i" + i + " .li-author").attr("href",tweetLink);
+                    $("#l" + idx + "i" + i + " .li-author").attr("href",tweetAuthorLink);
                 }
             });
         }

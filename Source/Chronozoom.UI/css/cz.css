@@ -386,18 +386,26 @@ iframe[sutra=picker] + div {
   width: 100%;
   height: 5px;
 }
-.list-item {
-  border: 1px #666 solid;
+.bigcleardiv {
+  clear: both;
+  width: 100%;
+  height: 25px;
 }
 .li-title {
   float: left;
   text-align: left;
   width: 66.3333%;
 }
+.li-title a:hover {
+  color: #00BADE;
+}
 .li-author {
   float: left;
   text-align: right;
   width: 33.3333%;
+}
+.li-author:hover {
+  color: #00BADE;
 }
 .li-icon {
   float: left;
@@ -429,27 +437,27 @@ iframe[sutra=picker] + div {
     height: 100%;
  }*/
 .tile-gradient {
-  background-color: #232323;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#232323), to(#ebebeb));
+  background-color: #313131;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#313131), to(#cbcbcb));
   /* Saf4+, Chrome */
 
-  background-image: -webkit-linear-gradient(top, #232323, #ebebeb);
+  background-image: -webkit-linear-gradient(top, #313131, #cbcbcb);
   /* Chrome 10+, Saf5.1+, iOS 5+ */
 
-  background-image: -moz-linear-gradient(top, #232323, #ebebeb);
+  background-image: -moz-linear-gradient(top, #313131, #cbcbcb);
   /* FF3.6+ */
 
-  background-image: -ms-linear-gradient(top, #232323, #ebebeb);
+  background-image: -ms-linear-gradient(top, #313131, #cbcbcb);
   /* IE10 */
 
-  background-image: -o-linear-gradient(top, #232323, #ebebeb);
+  background-image: -o-linear-gradient(top, #313131, #cbcbcb);
   /* Opera 11.10+ */
 
-  background-image: linear-gradient(to bottom, #232323, #ebebeb);
-  -ms-filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(#232323), endColorstr=quote(#ebebeb));
+  background-image: linear-gradient(to bottom, #313131, #cbcbcb);
+  -ms-filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(#313131), endColorstr=quote(#cbcbcb));
   /* IE8 */
 
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(#232323), endColorstr=quote(#ebebeb));
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(#313131), endColorstr=quote(#cbcbcb));
   /* IE6 & IE7 */
 
   position: absolute;
