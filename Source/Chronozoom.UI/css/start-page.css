@@ -60,6 +60,7 @@ input.error {
   background-size: cover;
   font-family: "Segoe UI Light";
   font-weight: lighter;
+  min-width: 700px;
 }
 .start-page-screen h1,
 .start-page-screen h2,
@@ -307,8 +308,6 @@ input.error {
   .tweet-avatar-icon {
     display: none;
   }
-  .ex3,
-  .ex4,
   .ex6 {
     display: none;
   }
@@ -384,7 +383,8 @@ input.error {
     float: left;
     margin: 5px;
     padding: 5px;
-    width: 380px;
+    width: 45%;
+    min-width: 400px;
     height: 60%;
     background-color: transparent;
     vertical-align: top;
@@ -397,7 +397,8 @@ input.error {
     float: right;
     margin: 5px;
     padding: 5px;
-    width: 410px;
+    width: 45%;
+    min-width: 400px;
     height: 60%;
     background-color: transparent;
     vertical-align: top;
