@@ -3,6 +3,7 @@
 module CZ {
     export module Settings {
         export var isAuthorized = false; // user is authorized flag
+        export var favoriteTimelines = []; // guids of favorite timelines of current user
 
         export var czDataSource = 'db'; // possible values: db, relay, dump
         // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
