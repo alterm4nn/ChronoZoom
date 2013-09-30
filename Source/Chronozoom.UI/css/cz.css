@@ -520,6 +520,9 @@ input.error {
   left: 0;
 }
 .tweet-meta {
+  -webkit-transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  -moz-transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
   height: 100%;
   overflow: visible;
   padding: 5%;
@@ -527,6 +530,8 @@ input.error {
   top: 0;
   left: 0;
   right: 0;
+  opacity: 0;
+  visibility: hidden;
 }
 .tile-meta-title {
   font-weight: bold;
@@ -547,7 +552,6 @@ input.error {
   font-size: 12px;
 }
 .tweet-avatar-icon {
-  background-image: url('../images/twitter_profile_pic.gif');
   float: left;
   height: 35px;
   width: 35px;

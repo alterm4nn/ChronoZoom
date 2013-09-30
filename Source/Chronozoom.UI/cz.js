@@ -13215,31 +13215,41 @@ var CZ;
                 for(var i = 0, len = response.d.length; i < len; ++i) {
                     var tweet = response.d[i];
                     var text = tweet.Text;
-                    var author = tweet.User.Name;
+                    var fullname = tweet.User.Name;
+                    var username = tweet.User.ScreenName;
                     var photo = tweet.User.ProfileImageUrl;
                     var time = tweet.CreatedDate;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
                     var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
-                    var tweetAuthorLink = "https://twitter.com/" + tweet.User.ScreenName;
-                    var tweetLink = "https://twitter.com/" + tweet.User.ScreenName + "/statuses/" + tweet.IdStr;
+                    var tweetUsernameLink = "https://twitter.com/" + username;
+                    var tweetLink = "https://twitter.com/" + username + "/statuses/" + tweet.IdStr;
                     var $tweetTile = $("#m" + idx + "i" + i);
-                    var $tileMessage = $tweetTile.find(".boxInner .tweet-meta .tweet-meta-text");
-                    var $tileAuthor = $tweetTile.find(".boxInner .tweet-meta .tweet-meta-author");
-                    var $tileDate = $tweetTile.find(".boxInner .tweet-meta .tile-meta-time");
+                    var $tweetTileMeta = $tweetTile.find(".boxInner .tweet-meta");
+                    var $tileMessage = $tweetTileMeta.find(".tweet-meta-text");
+                    var $tileFullname = $tweetTileMeta.find(".tweet-meta-title");
+                    var $tileUsername = $tweetTileMeta.find(".tweet-meta-author");
+                    var $tileAvatar = $tweetTileMeta.find(".tweet-avatar-icon");
+                    var $tileDate = $tweetTileMeta.find(".tile-meta-time");
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
-                    text = text.replace(/(@([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='_blank' \
+                    $tweetTileMeta.invisible(true);
+                    $tileAvatar.load($tweetTileMeta, function (event) {
+                        event.data.visible();
+                    });
+                    text = text.replace(/(@([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
                         href='https://twitter.com/$2'>$1</a>");
-                    text = text.replace(/(#([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='_blank' \
+                    text = text.replace(/(#([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
                         href='https://twitter.com/search?q=$2&f=realtime'>$1</a>");
                     $tileMessage.html(text).attr("href", tweetLink);
-                    $tileAuthor.text("@" + author).attr("href", tweetAuthorLink);
+                    $tileUsername.text("@" + username).attr("href", tweetUsernameLink);
+                    $tileFullname.text(fullname);
                     $tileDate.text(convertedDate);
+                    $tileAvatar.attr("src", photo);
                     var ListTemplateClone = $(ListTemplate).clone(true, true).appendTo(ListElem);
                     ListTemplateClone.attr("id", "l" + idx + "i" + i);
-                    $("#l" + idx + "i" + i + " .li-title a").text(text);
-                    $("#l" + idx + "i" + i + " .li-title a").attr("href", tweetLink);
-                    $("#l" + idx + "i" + i + " .li-author").text(author);
-                    $("#l" + idx + "i" + i + " .li-author").attr("href", tweetAuthorLink);
+                    $tweetTile.find(".li-title a").text(text);
+                    $tweetTile.find(".li-title a").attr("href", tweetLink);
+                    $tweetTile.find(".li-author").text(username);
+                    $tweetTile.find(".li-author").attr("href", tweetUsernameLink);
                 }
             });
         }

@@ -151,6 +151,7 @@
 }
 
 .tweet-meta {
+    .transition(opacity @fade-duration ease-in-out, visibility @fade-duration ease-in-out);
     height: 100%;
     overflow: visible;
     padding: 5%;
@@ -158,6 +159,8 @@
     top: 0;
     left: 0;
     right: 0;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .tile-meta-title {
@@ -182,10 +185,9 @@
 }
 
 .tweet-avatar-icon {
-    background-image: url('../images/twitter_profile_pic.gif');
     float: left;
-    height:35px;
-    width:35px;
+    height: 35px;
+    width: 35px;
 }
 
 .tweet-icon {
