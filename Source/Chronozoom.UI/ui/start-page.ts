@@ -326,7 +326,7 @@ module CZ {
                 });
 
                 // Set title and author.
-                $tileTitle.text(timeline.Title);
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
         }
@@ -348,7 +348,7 @@ module CZ {
                         window.location.href = event.data;
                         hide();
                     })
-                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
                 $("#l" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }
@@ -403,7 +403,8 @@ module CZ {
                 });
 
                 // Set title and author.
-                $tileTitle.text(timeline.Title);
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
+                $tileAuthor.text(timeline.Author);
             }
         }
 
@@ -419,12 +420,13 @@ module CZ {
 
                 var Name = "favorite-list-elem" + i;
                 var idx = 1;
-                TemplateClone.attr("id", "l" + idx + "i" + i);
+                TemplateClone.attr("id", "lfav" + idx + "i" + i);
                 TemplateClone.click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 })
-                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                $("#lfav" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
+                $("#lfav" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }
 
@@ -530,6 +532,13 @@ module CZ {
 
             CZ.Service.getUserFavorites().then(response => {
                 var timelines = response ? response.reverse() : [];
+                
+                // saving guids of favorite timelines
+                timelines.forEach(function (timeline) {
+                    // timelineUrl pattern is /{collection}/{supercollection}#{/t{guid}}+/t{favorite timeline guid}
+                    // favorite timeline guid is the latest guid in url
+                    CZ.Settings.favoriteTimelines.push(timeline.TimelineUrl.split("/").pop().slice(1));
+                });
 
                 if (timelines.length === 0) {
                     $("#FavoriteTimelinesBlock .list-view-icon").hide();
