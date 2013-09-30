@@ -66,9 +66,7 @@ Test approach automation testing
 -	UI (Acceptance layer)
 -	Integration testing (API layer)
 -	Unit testing (by developers)
- 
- 
- 
+
 ## Test execution priority ##
  
 |Priority|Test that checks|The order of the test|
@@ -95,9 +93,10 @@ Workflow
 
 
 Short:
- 
+![short bug flow](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/doc_images/bug_flow_short.png?raw=true)
 
 Full:
+![full bug flow](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/doc_images/bug_flow_full.png?raw=true)
  
 ## Bug Severity ##
 -	**Blocker:** The defect affects critical functionality or critical data. It does not have a workaround.
