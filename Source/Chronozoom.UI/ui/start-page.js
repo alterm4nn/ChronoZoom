@@ -123,10 +123,14 @@ var CZ;
             }, 
             
         ];
-        function resizeCrop($image, imageProps) {
+        function resizeCrop($image, imageProps, isListView) {
             var $startPage = $("#start-page");
             var width = $image.parent().width();
             var height = $image.parent().height();
+            if(isListView) {
+                width = $image.width();
+                height = $image.height();
+            }
             if(!$startPage.is(":visible")) {
                 $startPage.show();
                 width = $image.width();
@@ -261,21 +265,30 @@ var CZ;
         }
         StartPage.fillFeaturedTimelines = fillFeaturedTimelines;
         function fillFeaturedTimelinesList(timelines) {
-            var template = "#template-list .list-item";
+            var template = "#template-timeline-list .timeline-list-item";
             var target = "#FeaturedTimelinesBlock-list";
             for(var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
                 var timeline = timelines[i];
                 var timelineUrl = timeline.TimelineUrl;
-                var TemplateClone = $(template).clone(true, true).appendTo(target);
+                var $timelineListItem = $(template).clone(true, true).appendTo(target);
+                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
                 var Name = "featured-list-elem" + i;
                 var idx = 1;
-                TemplateClone.attr("id", "l" + idx + "i" + i);
-                TemplateClone.click(timelineUrl, function (event) {
+                $timelineListItem.attr("id", "l" + idx + "i" + i);
+                $timelineListItem.click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 });
-                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
-                $("#l" + idx + "i" + i + " .li-author").text(timeline.Author);
+                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
+                $timelineListItem.attr("data-author", timeline.Author);
+                $timelineListItemImage.load($timelineListItemImage, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+                    resizeCrop($this, imageProps, true);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
             }
         }
         StartPage.fillFeaturedTimelinesList = fillFeaturedTimelinesList;
@@ -317,21 +330,30 @@ var CZ;
         }
         StartPage.fillFavoriteTimelines = fillFavoriteTimelines;
         function fillFavoriteTimelinesList(timelines) {
-            var template = "#template-list .list-item";
+            var template = "#template-timeline-list .timeline-list-item";
             var target = "#FavoriteTimelinesBlock-list";
             for(var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
                 var timeline = timelines[i];
                 var timelineUrl = timeline.TimelineUrl;
-                var TemplateClone = $(template).clone(true, true).appendTo(target);
+                var $timelineListItem = $(template).clone(true, true).appendTo(target);
+                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
                 var Name = "favorite-list-elem" + i;
                 var idx = 1;
-                TemplateClone.attr("id", "lfav" + idx + "i" + i);
-                TemplateClone.click(timelineUrl, function (event) {
+                $timelineListItem.attr("id", "lfav" + idx + "i" + i);
+                $timelineListItem.click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 });
-                $("#lfav" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
-                $("#lfav" + idx + "i" + i + " .li-author").text(timeline.Author);
+                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
+                $timelineListItem.attr("data-author", timeline.Author);
+                $timelineListItemImage.load($timelineListItemImage, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+                    resizeCrop($this, imageProps, true);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
             }
         }
         StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
