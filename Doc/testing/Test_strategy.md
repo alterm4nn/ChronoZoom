@@ -42,7 +42,7 @@ Testing start:
  -	Smoke tests (all tasks from status Deployed)
 -	Every night or weekend
  -	Regression test
--	By request
+-	[By request](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Test_Process.md)
  
 
 ## End of testing criteria	##
