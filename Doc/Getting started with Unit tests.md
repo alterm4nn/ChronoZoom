@@ -10,15 +10,15 @@ This document shows you how to use Unit tests (UTs).
 1. Download Chutzpah from [site] (http://chutzpah.codeplex.com/)
 2. Extract archive to any folder
 3. Get the source code from github (fork https://github.com/alterm4nn/ChronoZoom).
-4. Run Chutzpah  for **Test\chronozoom20.test\Tests.Unit\Scripts\Specs\** from command line (cmd.exe)
+4. Run Chutzpah  for **[solution dir]\Source\Chronozoom.UI.UnitTests\Scripts\Specs\** from command line (cmd.exe)
 	
 	*Example:*
-	[Path to unpackaged chutzpah]\chutzpah.console.exe  [Chronozoom solution dir]\Test\chronozoom20.test\Tests.Unit\Scripts\Specs\
+	[Path to unpackaged chutzpah]\chutzpah.console.exe  [solution dir]\Source\Chronozoom.UI.UnitTests\Scripts\Specs\
 	
 	If you want open results in browser you could use key "/openInBrowser"
 	
 	*Example:*
-	[Path to extracted chutzpah]\chutzpah.console.exe  [solution dir]\Test\chronozoom20.test\Tests.Unit\Scripts\Specs\ /openInBrowser
+	[Path to extracted chutzpah]\chutzpah.console.exe  [solution dir]\Source\Chronozoom.UI.UnitTests\Scripts\Specs\ /openInBrowser
 	
 	All chutzpah Command Line Options - [there](http://chutzpah.codeplex.com/wikipage?title=Command%20Line%20Options&referringTitle=Documentation)
 
@@ -29,3 +29,5 @@ If you want to run tests from Visual Studio 2012's Unit Text Explorer you should
 	Select Extesions and Updates
 	Find Chutzpah Test Adapter for Visual Studio
 	Install it
+
+You can get video tutorial from [link](https://www.dropbox.com/home/Dev%20Docs/TestTeam/Video%20manuals)
