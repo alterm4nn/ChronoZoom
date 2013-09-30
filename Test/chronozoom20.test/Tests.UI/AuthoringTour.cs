@@ -90,7 +90,7 @@ namespace Tests
         public void tour_should_be_created()
         {
             TourHelper.AddTour(_newTour);
-            Assert.IsTrue(TourHelper.IsTourExist(_newTour));
+            Assert.IsTrue(TourHelper.IsTourExist(_newTour), "Tour is not existed");
         }
     }
 }
