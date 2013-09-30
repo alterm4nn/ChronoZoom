@@ -20,7 +20,7 @@ namespace Application.Helper.Helpers
         public void CloseStartPage()
         {
             Logger.Log("<-");
-            Click(By.CssSelector(".welcome-box-2>.welcome-link"));
+            Click(By.Id("home_button"));
             Logger.Log("->");
         }
 
