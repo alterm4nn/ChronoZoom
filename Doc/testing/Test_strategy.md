@@ -42,7 +42,7 @@ Testing start:
  -	Smoke tests (all tasks from status Deployed)
 -	Every night or weekend
  -	Regression test
--	By request
+-	[By request](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Test_Process.md)
  
 
 ## End of testing criteria	##
@@ -64,9 +64,16 @@ Test approach for manual testing:
  
  
 Test approach automation testing  
--	UI (Acceptance layer)
+-	UI (Acceptance layer) 
 -	Integration testing (API layer)
 -	Unit testing (by developers)
+
+Related links	
+- [Getting Started with UI Autotest](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Getting%20Started%20with%20UI%20Autotest.md)
+- [Getting started with BL tests](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Getting%20started%20with%20BL%20tests.md)
+- [Getting started with Unit tests](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Getting%20started%20with%20Unit%20tests.md)
+
+
 
 ## Test execution priority ##
  
