@@ -481,29 +481,14 @@ input.error {
   cursor: pointer;
 }
 .tile-gradient {
-  background-color: #313131;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#313131), to(#cbcbcb));
-  /* Saf4+, Chrome */
-
-  background-image: -webkit-linear-gradient(top, #313131, #cbcbcb);
-  /* Chrome 10+, Saf5.1+, iOS 5+ */
-
-  background-image: -moz-linear-gradient(top, #313131, #cbcbcb);
-  /* FF3.6+ */
-
-  background-image: -ms-linear-gradient(top, #313131, #cbcbcb);
-  /* IE10 */
-
-  background-image: -o-linear-gradient(top, #313131, #cbcbcb);
-  /* Opera 11.10+ */
-
-  background-image: linear-gradient(to bottom, #313131, #cbcbcb);
-  -ms-filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(#313131), endColorstr=quote(#cbcbcb));
-  /* IE8 */
-
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(#313131), endColorstr=quote(#cbcbcb));
-  /* IE6 & IE7 */
-
+  background: -moz-linear-gradient(top, #313131 0%, #313131 45%, rgba(203, 203, 203, 0) 100%);
+  background: -moz-linear-gradient(top, #313131 0%, 45%, rgba(203, 203, 203, 0) 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #313131), color-stop(45%, #313131), color-stop(100%, #cbcbcb));
+  background: -webkit-linear-gradient(top, #313131 0%, #313131 45%, rgba(203, 203, 203, 0) 100%);
+  background: -o-linear-gradient(top, #313131 0%, #313131 45%, rgba(203, 203, 203, 0) 100%);
+  background: -ms-linear-gradient(top, #313131 0%, #313131 45%, rgba(203, 203, 203, 0) 100%);
+  background: linear-gradient(to bottom, #313131 0%, #313131 45%, rgba(203, 203, 203, 0) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='rgba(49,49,49,1)', endColorstr='rgba(203,203,203,0)', GradientType=0);
   position: absolute;
   width: 100%;
   height: 100%;
