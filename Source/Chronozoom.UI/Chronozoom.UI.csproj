@@ -367,6 +367,10 @@
     <Content Include="scripts\extensions\extensions.js">
       <DependentUpon>extensions.ts</DependentUpon>
     </Content>
+    <Content Include="scripts\extensions\rin-scripts\raphael.js" />
+    <Content Include="scripts\extensions\rin-scripts\rin-core-1.0.js" />
+    <Content Include="scripts\extensions\rin-scripts\rin-experiences-1.0.js" />
+    <Content Include="scripts\extensions\rin-scripts\tagInk.js" />
     <Content Include="scripts\extensions\rinplayer.js">
       <DependentUpon>rinplayer.ts</DependentUpon>
     </Content>

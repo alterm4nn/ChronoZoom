@@ -3,7 +3,7 @@ var CZ;
     (function (Extensions) {
         (function (RIN) {
             function getScript() {
-                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js";
+                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/lib/rin-core-1.0.js";
             }
             RIN.getScript = getScript;
             function getExtension(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload) {
@@ -16,11 +16,13 @@ var CZ;
                     rinDiv.addEventListener("mousedown", CZ.Common.preventbubble, false);
                     rinDiv.addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
                     rinDiv.addEventListener("mousewheel", CZ.Common.preventbubble, false);
-                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/').then(function () {
+                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/').then(function () {
                         var playerElement = document.getElementById(id);
                         var playerControl = rin.getPlayerControl(rinDiv);
-                        var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
-                        playerControl.load(contentSource);
+                        if(playerControl) {
+                            var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
+                            playerControl.load(contentSource);
+                        }
                     });
                 } else {
                     rinDiv.isAdded = false;

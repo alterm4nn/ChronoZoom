@@ -668,7 +668,7 @@ var CZ;
     (function (Extensions) {
         (function (RIN) {
             function getScript() {
-                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js";
+                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/lib/rin-core-1.0.js";
             }
             RIN.getScript = getScript;
             function getExtension(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload) {
@@ -681,11 +681,13 @@ var CZ;
                     rinDiv.addEventListener("mousedown", CZ.Common.preventbubble, false);
                     rinDiv.addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
                     rinDiv.addEventListener("mousewheel", CZ.Common.preventbubble, false);
-                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/').then(function () {
+                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/').then(function () {
                         var playerElement = document.getElementById(id);
                         var playerControl = rin.getPlayerControl(rinDiv);
-                        var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
-                        playerControl.load(contentSource);
+                        if(playerControl) {
+                            var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
+                            playerControl.load(contentSource);
+                        }
                     });
                 } else {
                     rinDiv.isAdded = false;
@@ -724,13 +726,17 @@ var CZ;
         }
         Extensions.mediaTypeIsExtension = mediaTypeIsExtension;
         function registerExtensions() {
-            registerExtension("RIN", CZ.Extensions.RIN.getExtension, "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js");
+            registerExtension("RIN", CZ.Extensions.RIN.getExtension, [
+                "/scripts/extensions/rin-scripts/tagInk.js", 
+                "/scripts/extensions/rin-scripts/raphael.js", 
+                "/scripts/extensions/rin-scripts/rin-core-1.0.js"
+            ]);
         }
         Extensions.registerExtensions = registerExtensions;
-        function registerExtension(name, initializer, script) {
+        function registerExtension(name, initializer, scripts) {
             extensions[name.toLowerCase()] = {
                 "initializer": initializer,
-                "script": script
+                "scripts": scripts
             };
         }
         function activateExtension(mediaType) {
@@ -738,7 +744,10 @@ var CZ;
                 return;
             }
             var extensionName = extensionNameFromMediaType(mediaType);
-            addScript(extensionName, getScriptFromExtensionName(extensionName));
+            var scripts = getScriptsFromExtensionName(extensionName);
+            scripts.forEach(function (script, index) {
+                addScript(extensionName, script, index);
+            });
         }
         Extensions.activateExtension = activateExtension;
         function getInitializer(mediaType) {
@@ -750,8 +759,8 @@ var CZ;
             var extensionIndex = 'extension-'.length;
             return mediaType.substring(extensionIndex, mediaType.length);
         }
-        function addScript(extensionName, scriptPath) {
-            var scriptId = "extension-" + extensionName;
+        function addScript(extensionName, scriptPath, index) {
+            var scriptId = "extension-" + extensionName + index;
             if(document.getElementById(scriptId)) {
                 return;
             }
@@ -761,8 +770,8 @@ var CZ;
             script.id = scriptId;
             document.getElementsByTagName("head")[0].appendChild(script);
         }
-        function getScriptFromExtensionName(name) {
-            return extensions[name.toLowerCase()].script;
+        function getScriptsFromExtensionName(name) {
+            return extensions[name.toLowerCase()].scripts;
         }
     })(CZ.Extensions || (CZ.Extensions = {}));
     var Extensions = CZ.Extensions;
