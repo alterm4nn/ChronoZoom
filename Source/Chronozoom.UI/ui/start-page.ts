@@ -426,14 +426,14 @@ module CZ {
             });
             
             // TODO: Replace with current user.
-           /* CZ.Service.getUserFeatured().done(function (response) {
+            CZ.Service.getUserFeatured().done(function (response) {
                 // Show the newest featured timelines first.
                 var timelines = response ? response.reverse() : [];
                 fillFeaturedTimelines(timelines);
                 fillFeaturedTimelinesList(timelines);
-            });*/
+            });
 
-             CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
+           //  CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
             //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
             //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
 
