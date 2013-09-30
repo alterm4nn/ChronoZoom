@@ -69,9 +69,9 @@ Test approach automation testing
 -	Unit testing (by developers)
 
 Related links	
-[Getting Started with UI Autotest](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Getting%20Started%20with%20UI%20Autotest.md)
-[Getting started with BL tests](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Getting%20started%20with%20BL%20tests.md)
-[Getting started with Unit tests](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Getting%20started%20with%20Unit%20tests.md)
+- [Getting Started with UI Autotest](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Getting%20Started%20with%20UI%20Autotest.md)
+- [Getting started with BL tests](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Getting%20started%20with%20BL%20tests.md)
+- [Getting started with Unit tests](https://github.com/a-chumagin/ChronoZoom/blob/master/Doc/testing/Getting%20started%20with%20Unit%20tests.md)
 
 
 
