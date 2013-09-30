@@ -112,7 +112,7 @@ namespace Application.Helper.Helpers
         public void WaitWhileHomePageIsLoaded()
         {
             Logger.Log("<-");
-            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
+            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), Configuration.ImplicitWait);
             Sleep(2);
             WaitAjaxComplete(10);
             Logger.Log("->");
