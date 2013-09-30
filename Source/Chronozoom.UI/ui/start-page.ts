@@ -204,34 +204,14 @@ module CZ {
         }
         
         export function cloneTweetTemplate(template, target, idx){
-            for( var i=0;i<target[idx].Visibility.length;i++){
-                var o=$(template).clone( true, true).appendTo(target[idx].Name);
-                o.attr("class",target[idx].Visibility[i]);
-                o.attr("id","m"+idx+"i"+i);
+            for (var i = 0; i < target[idx].Visibility.length; i++) {
+                var o = $(template).clone(true, true).appendTo(target[idx].Name);
+                o.attr("class", target[idx].Visibility[i]);
+                o.attr("id", "m" + idx + "i" + i);
 
-                $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
-                        /*  The HTML to add as ellipsis. */
-                        ellipsis    : '... ',
-                        /*  How to cut off the text/html: 'word'/'letter'/'children' */
-                        wrap        : 'word',
-                        /*  Wrap-option fallback to 'letter' for long words */
-                        fallbackToLetter: true,
-                        /*  jQuery-selector for the element to keep and put after the ellipsis. */
-                        after       : null,
-                        /*  Whether to update the ellipsis: true/'window' */
-                        watch       : false,
-                        /*  Optionally set a max-height, if null, the height will be measured. */
-                        height      : null,
-                        /*  Deviation for the height-option. */
-                        tolerance   : 0,
-                        lastCharacter   : {
-                            /*  Remove these characters from the end of the truncated text. */
-                            remove      : [ ' ', ',', ';', '.', '!', '?' ],
-                            /*  Don't add an ellipsis if this array contains 
-                                the last character of the truncated text. */
-                            noEllipsis  : []
-                        }
-                    });
+                $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
+                    watch: "window",
+                });
             }
         }
 
@@ -430,34 +410,69 @@ module CZ {
             }
         }
 
-        export function TwitterLayout( target, idx) {
+        export function TwitterLayout(target, idx) {
             var ListTemplate = "#template-list .list-item";
             var ListElem = "#TwitterBlock-list";
 
             CZ.Service.getRecentTweets().done(response => {
                 for (var i = 0, len = response.d.length; i < len; ++i) {
-                    var  text =  response.d[i].Text;
-                    var  author = response.d[i].User.Name;
-                    var  time = response.d[i].CreatedDate;
+                    var tweet = response.d[i];
+                    var text = tweet.Text;
+                    var fullname = tweet.User.Name;
+                    var username = tweet.User.ScreenName;
+                    var photo = tweet.User.ProfileImageUrl;
+                    var time = tweet.CreatedDate;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
-                    var convertedDate = myDate.toLocaleTimeString() +"; "+  myDate.getDate();
-                    var tweetAuthorLink = "https://twitter.com/" + response.d[i].User.ScreenName;
-                    var tweetLink = "https://twitter.com/" + response.d[i].User.ScreenName + "/statuses/" + response.d[i].IdStr;
+                    var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
+                    var tweetUsernameLink = "https://twitter.com/" + username;
+                    var tweetLink = "https://twitter.com/" + username + "/statuses/" + tweet.IdStr;
+
+                    var $tweetTile = $("#m" + idx + "i" + i);
+                    var $tweetTileMeta = $tweetTile.find(".boxInner .tweet-meta");
+                    var $tileMessage = $tweetTileMeta.find(".tweet-meta-text");
+                    var $tileFullname = $tweetTileMeta.find(".tweet-meta-title");
+                    var $tileUsername = $tweetTileMeta.find(".tweet-meta-author");
+                    var $tileAvatar = $tweetTileMeta.find(".tweet-avatar-icon");
+                    var $tileDate = $tweetTileMeta.find(".tile-meta-time");
 
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
-                    $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-text").text(text);
-                    $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-text").attr("href",tweetLink);
 
-                    $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-author").text(author);
-                    $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tweet-meta-author").attr("href",tweetAuthorLink);
-                    $("#m"+idx+"i"+i+" .boxInner .tweet-meta .tile-meta-time").text(convertedDate);
+                    // Show content of Tweet tile on avatar load.
+                    $tweetTileMeta.invisible(true);
+                    $tileAvatar.load($tweetTileMeta, function (event) {
+                        event.data.visible();
+                    });
+
+                    // Replace all @authors with links.
+                    text = text.replace(
+                        /(@([A-Za-z0-9_]+))/gi,
+                        "<a class='tweet-message-link' target='blank' \
+                        href='https://twitter.com/$2'>$1</a>"
+                    );
+
+                    // Replace all #tags with links.
+                    text = text.replace(
+                        /(#([A-Za-z0-9_]+))/gi,
+                        "<a class='tweet-message-link' target='blank' \
+                        href='https://twitter.com/search?q=$2&f=realtime'>$1</a>"
+                    );
+
+                    // Set tweet's properties to corresponding elements.
+                    $tileMessage.html(text).attr("href", tweetLink);
+                    $tileUsername.text("@" + username).attr("href", tweetUsernameLink);
+                    $tileFullname.text(fullname);
+                    $tileDate.text(convertedDate);
+
+                    // Set avatar.
+                    $tileAvatar.attr("src", photo);
               
-                    var ListTemplateClone=$(ListTemplate).clone( true, true).appendTo(ListElem);
-                    ListTemplateClone.attr("id","l"+idx+"i"+i);
-                    $("#l" + idx + "i" + i + " .li-title a").text(text);
-                    $("#l" + idx + "i" + i + " .li-title a").attr("href",tweetLink);
-                    $("#l" + idx + "i" + i + " .li-author").text(author);
-                    $("#l" + idx + "i" + i + " .li-author").attr("href",tweetAuthorLink);
+                    // List View.
+                    var ListTemplateClone = $(ListTemplate).clone(true, true).appendTo(ListElem);
+                    ListTemplateClone.attr("id", "l" + idx + "i" + i);
+                    $tweetTile.find(".li-title a").text(text);
+                    $tweetTile.find(".li-title a").attr("href", tweetLink);
+                    $tweetTile.find(".li-author").text(username);
+                    $tweetTile.find(".li-author").attr("href", tweetUsernameLink);
                 }
             });
         }

@@ -9,6 +9,8 @@
 @border-blue-thin: 1px solid #00BCE0;
 @border-transparent-thin: 1px solid transparent;
 @text-blue: #00BCE0;
+@text-white: #FFFFFF;
+@text-gray: #B0B0B0;
 
 @img-arrow-left-icon: url(/images/arrow-left.png);
 @img-arrow-left-icon-hover: url(/images/arrow-left-hover.png);
@@ -22,6 +24,21 @@
 @sp-welcome-text-font-size: 18px;
 @sp-welcome-link-font-size: 22px;
 @sp-block-header-font-size: 26px;
+
+// Mixin for start page text link.
+.start-page-text-link(@default, @hover) {
+    text-decoration: none;
+
+    &:link,
+    &:active,
+    &:visited {
+        color: @default;
+    }
+
+    &:hover {
+        color: @hover;
+    }
+}
 
 .start-page-screen {
     display: none;
@@ -134,6 +151,7 @@
 }
 
 .tweet-meta {
+    .transition(opacity @fade-duration ease-in-out, visibility @fade-duration ease-in-out);
     height: 100%;
     overflow: visible;
     padding: 5%;
@@ -141,6 +159,8 @@
     top: 0;
     left: 0;
     right: 0;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .tile-meta-title {
@@ -165,10 +185,9 @@
 }
 
 .tweet-avatar-icon {
-    background-image: url('../images/twitter_profile_pic.gif');
     float: left;
-    height:35px;
-    width:35px;
+    height: 35px;
+    width: 35px;
 }
 
 .tweet-icon {
@@ -180,10 +199,12 @@
 }
 
 .tweet-meta-author {
+    .start-page-text-link(@text-blue, @text-white);
+
     font-weight: normal;
     font-size: 12px;
-    color:#10A5C6;
-    display:block;
+    color: #10A5C6;
+    display: block;
 }
 
 .tile-meta-time {
@@ -210,6 +231,8 @@
 }
 
 .tweet-meta-text {
+    .start-page-text-link(@text-gray, @text-white);
+
     font-weight: normal;
     color: #B0B0B0;
     font-size: 12px;
@@ -326,14 +349,18 @@
     display: inline-block;
     text-align: left;
 }
+
 .TwitterBlock {
     text-align: center;
 }
 
- .box {
-visibility: visible important!;
-    }
+.box {
+    visibility: visible important!;
+}
 
+.tweet-message-link {
+    .start-page-text-link(@text-blue, @text-white);
+}
 
 @media only screen and (max-width : 880px), screen and (orientation: landscape) and (max-device-width : 480px) {
     /* Small Tablet view: 3 rows, 2 columns */

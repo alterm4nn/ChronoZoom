@@ -1,4 +1,4 @@
-﻿/* Height of input element */
+/* Height of input element */
 /* Font-size of error message */
 /* Error messages */
 .error-message {
@@ -168,6 +168,9 @@ input.error {
   left: 0;
 }
 .tweet-meta {
+  -webkit-transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  -moz-transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
   height: 100%;
   overflow: visible;
   padding: 5%;
@@ -175,6 +178,8 @@ input.error {
   top: 0;
   left: 0;
   right: 0;
+  opacity: 0;
+  visibility: hidden;
 }
 .tile-meta-title {
   font-weight: bold;
@@ -195,7 +200,6 @@ input.error {
   font-size: 12px;
 }
 .tweet-avatar-icon {
-  background-image: url('../images/twitter_profile_pic.gif');
   float: left;
   height: 35px;
   width: 35px;
@@ -208,10 +212,19 @@ input.error {
   width: 17px;
 }
 .tweet-meta-author {
+  text-decoration: none;
   font-weight: normal;
   font-size: 12px;
   color: #10A5C6;
   display: block;
+}
+.tweet-meta-author:link,
+.tweet-meta-author:active,
+.tweet-meta-author:visited {
+  color: #00bce0;
+}
+.tweet-meta-author:hover {
+  color: #ffffff;
 }
 .tile-meta-time {
   display: inline-block;
@@ -234,12 +247,21 @@ input.error {
   display: block;
 }
 .tweet-meta-text {
+  text-decoration: none;
   font-weight: normal;
   color: #B0B0B0;
   font-size: 12px;
   display: block;
   overflow: hidden;
   height: 65px;
+}
+.tweet-meta-text:link,
+.tweet-meta-text:active,
+.tweet-meta-text:visited {
+  color: #b0b0b0;
+}
+.tweet-meta-text:hover {
+  color: #ffffff;
 }
 .welcome-block-toggle .toggle-block[data-toggle~="show"] {
   display: block;
@@ -335,6 +357,17 @@ input.error {
 }
 .box {
   visibility: visible important!;
+}
+.tweet-message-link {
+  text-decoration: none;
+}
+.tweet-message-link:link,
+.tweet-message-link:active,
+.tweet-message-link:visited {
+  color: #00bce0;
+}
+.tweet-message-link:hover {
+  color: #ffffff;
 }
 @media only screen and (max-width: 880px), screen and (orientation: landscape) and (max-device-width: 480px) {
   /* Small Tablet view: 3 rows, 2 columns */
