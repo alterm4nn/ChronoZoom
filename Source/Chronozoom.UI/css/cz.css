@@ -743,6 +743,51 @@ iframe[sutra=picker] + div {
   color: #b0b0b0;
   float: right;
 }
+.timeline-list-item {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  position: relative;
+  border: 1px solid transparent;
+  margin: 20px 0;
+  padding: 10px;
+}
+.timeline-list-item:nth-of-type(1) {
+  margin-top: 0;
+}
+.timeline-list-item:hover {
+  border: 1px solid #00bce0;
+  background-color: rgba(80, 80, 104, 0.7);
+  cursor: pointer;
+}
+.timeline-list-item .timeline-li-image {
+  width: 64px;
+  height: 64px;
+  display: block;
+  overflow: hidden;
+  background-color: #313131;
+}
+.timeline-list-item .timeline-li-image img {
+  width: 64px;
+  height: 64px;
+  display: block;
+}
+.timeline-list-item:before {
+  position: absolute;
+  content: attr(data-title);
+  left: 84px;
+  top: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+.timeline-list-item:after {
+  position: absolute;
+  content: attr(data-author);
+  left: 84px;
+  top: 50%;
+  color: #b0b0b0;
+  text-align: center;
+}
 @media only screen and (max-width: 880px), screen and (orientation: landscape) and (max-device-width: 480px) {
   /* Small Tablet view: 3 rows, 2 columns */
   .FTTiles {

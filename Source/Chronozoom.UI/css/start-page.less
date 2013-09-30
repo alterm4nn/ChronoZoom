@@ -426,6 +426,57 @@
     }
 }
 
+// Timelines List View
+.timeline-list-item {
+    .box-sizing;
+    position: relative;
+    border: @border-transparent-thin;
+    margin: 20px 0;
+    padding: 10px;
+
+    &:nth-of-type(1) {
+        margin-top: 0;
+    }
+
+    &:hover {
+        border: @border-blue-thin;
+        background-color: fade(@bg-purple, 70%);
+        cursor: pointer;
+    }
+
+    .timeline-li-image {
+        width: 64px;
+        height: 64px;
+        display: block;
+        overflow: hidden;
+        background-color: #313131;
+
+        img {
+            width: 64px;
+            height: 64px;
+            display: block;
+        }
+    }
+
+    &:before {
+        position: absolute;
+        content: attr(data-title);
+        left: 84px;
+        top: 10px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    &:after {
+        position: absolute;
+        content: attr(data-author);
+        left: 84px;
+        top: 50%;
+        color: @text-gray;
+        text-align: center;
+    }
+}
+
 @media only screen and (max-width : 880px), screen and (orientation: landscape) and (max-device-width : 480px) {
     /* Small Tablet view: 3 rows, 2 columns */
         .FTTiles {
