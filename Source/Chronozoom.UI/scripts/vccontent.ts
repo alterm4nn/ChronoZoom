@@ -962,11 +962,28 @@ module CZ {
                     this.favoriteBtn.reactsOnMouse = true;
 
                     this.favoriteBtn.onmouseclick = function () {
-                        if (CZ.Settings.favoriteTimelines.indexOf(timelineinfo.guid) !== -1) {
-                            CZ.Service.deleteUserFavorite(timelineinfo.guid);
+                        if (CZ.Settings.favoriteTimelines.indexOf(this.parent.guid) !== -1) {
+                            CZ.Service.deleteUserFavorite(this.parent.guid).then(success => {
+                                CZ.Authoring.showMessageWindow(
+                                    "Timeline '" + this.parent.title + "' was removed from your favorite timelines.",
+                                    "Timeline removed from favorites"
+                                );
+                            },
+                            error => {
+                                console.log("[ERROR] /deleteUserFavorite with guid " + this.parent.guid + " failed.");
+                            });
+                            CZ.Settings.favoriteTimelines.splice(CZ.Settings.favoriteTimelines.indexOf(this.parent.guid), 1);                            
                         }
                         else {
-                            CZ.Service.putUserFavorite(timelineinfo.guid);
+                            CZ.Service.putUserFavorite(this.parent.guid).then(success => {
+                                CZ.Settings.favoriteTimelines.push(this.parent.guid); CZ.Authoring.showMessageWindow(
+                                        "Timeline '" + this.parent.title + "' was added to your favorite timelines.",
+                                        "Favorite timeline added"
+                                    );
+                            },
+                            error => {
+                                console.log("[ERROR] /putUserFavorite with guid + " + this.parent.guid + " failed.");
+                            });
                         }
                         return true;
                     }
