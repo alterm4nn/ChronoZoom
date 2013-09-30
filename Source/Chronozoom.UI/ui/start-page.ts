@@ -140,12 +140,17 @@ module CZ {
             },
         ];
 
-        function resizeCrop($image: JQuery, imageProps: any): void {
+        function resizeCrop($image: JQuery, imageProps: any, isListView?: bool): void {
             var $startPage = $("#start-page");
 
             // Get size of the tile.
             var width = $image.parent().width();
             var height = $image.parent().height();
+
+            if (isListView) {
+                width = $image.width();
+                height = $image.height();
+            }
 
             // Show start page if it's not visible to get size of the tile.
             if (!$startPage.is(":visible")) {
@@ -312,24 +317,38 @@ module CZ {
         }
 
         export function fillFeaturedTimelinesList(timelines) {
-            var template = "#template-list .list-item";
+            var template = "#template-timeline-list .timeline-list-item";
             var target = "#FeaturedTimelinesBlock-list";
 
-            for( var i = 0; i <Math.min(tileData.length, timelines.length) ; i++){
+            for (var i = 0; i < Math.min(tileData.length, timelines.length); i++){
                 var timeline = timelines[i];
                 var timelineUrl = timeline.TimelineUrl;
 
-                var TemplateClone=$(template).clone( true, true).appendTo(target);
+                var $timelineListItem = $(template).clone(true, true).appendTo(target);
+                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
 
                 var Name = "featured-list-elem" + i;
                 var idx = 1;
-                TemplateClone.attr("id","l"+idx+"i"+i);
-                TemplateClone.click(timelineUrl, function (event) {
-                        window.location.href = event.data;
-                        hide();
-                    })
-                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
-                $("#l" + idx + "i" + i + " .li-author").text(timeline.Author);
+
+                $timelineListItem.attr("id", "l" + idx + "i" + i);
+                $timelineListItem.click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                });
+
+                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
+                $timelineListItem.attr("data-author", timeline.Author);
+
+                $timelineListItemImage.load($timelineListItemImage, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    // Resize and crop the image.
+                    resizeCrop($this, imageProps, true);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
             }
         }
 
@@ -389,24 +408,38 @@ module CZ {
         }
 
         export function fillFavoriteTimelinesList(timelines) {
-            var template = "#template-list .list-item";
+            var template = "#template-timeline-list .timeline-list-item";
             var target = "#FavoriteTimelinesBlock-list";
 
             for (var i = 0; i < Math.min(tileData.length, timelines.length) ; i++) {
                 var timeline = timelines[i];
                 var timelineUrl = timeline.TimelineUrl;
 
-                var TemplateClone = $(template).clone(true, true).appendTo(target);
+                var $timelineListItem = $(template).clone(true, true).appendTo(target);
+                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
 
                 var Name = "favorite-list-elem" + i;
                 var idx = 1;
-                TemplateClone.attr("id", "lfav" + idx + "i" + i);
-                TemplateClone.click(timelineUrl, function (event) {
+
+                $timelineListItem.attr("id", "lfav" + idx + "i" + i);
+                $timelineListItem.click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
-                })
-                $("#lfav" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
-                $("#lfav" + idx + "i" + i + " .li-author").text(timeline.Author);
+                });
+
+                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
+                $timelineListItem.attr("data-author", timeline.Author);
+
+                $timelineListItemImage.load($timelineListItemImage, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    // Resize and crop the image.
+                    resizeCrop($this, imageProps, true);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
             }
         }
 
