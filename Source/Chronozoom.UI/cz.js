@@ -2,6 +2,7 @@
 (function (CZ) {
     (function (Settings) {
         Settings.isAuthorized = false;
+        Settings.favoriteTimelines = [];
         Settings.czDataSource = 'db';
         Settings.czVersion = "main";
         Settings.ellipticalZoomZoomoutFactor = 0.5;
@@ -13171,6 +13172,7 @@ var CZ;
                     alt: timeline.Title
                 });
                 $tileTitle.text(timeline.Title);
+                $tileAuthor.text(timeline.Author);
             }
         }
         StartPage.fillFavoriteTimelines = fillFavoriteTimelines;
@@ -13183,12 +13185,13 @@ var CZ;
                 var TemplateClone = $(template).clone(true, true).appendTo(target);
                 var Name = "favorite-list-elem" + i;
                 var idx = 1;
-                TemplateClone.attr("id", "l" + idx + "i" + i);
+                TemplateClone.attr("id", "lfav" + idx + "i" + i);
                 TemplateClone.click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 });
-                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                $("#lfav" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                $("#lfav" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }
         StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
@@ -13259,6 +13262,9 @@ var CZ;
             });
             CZ.Service.getUserFavorites().then(function (response) {
                 var timelines = response ? response.reverse() : [];
+                timelines.forEach(function (timeline) {
+                    CZ.Settings.favoriteTimelines.push(timeline.TimelineUrl.split("/").pop().slice(1));
+                });
                 if(timelines.length === 0) {
                     $("#FavoriteTimelinesBlock .list-view-icon").hide();
                     $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." + "Click star icon of the timeline you like to save it as favorite.");
@@ -13818,7 +13824,7 @@ var CZ;
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
                     CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(function () {
-                    if(!CZ.Authoring.isEnabled) {
+                    if(!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
                     } else {
