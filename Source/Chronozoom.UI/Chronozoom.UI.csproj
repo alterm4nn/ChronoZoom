@@ -59,6 +59,8 @@
     <Content Include="css\start-page.css">
       <DependentUpon>start-page.less</DependentUpon>
     </Content>
+    <Content Include="dumps\extensions\GaribaldiTourJSON.js" />
+    <Content Include="dumps\extensions\narrative.js" />
     <Content Include="dumps\extensions\rin-sample.js" />
     <Content Include="dumps\sample.csv" />
     <Content Include="dumps\extensions-get.json" />
@@ -70,6 +72,7 @@
     <Content Include="fonts\segoeuil.eot" />
     <Content Include="fonts\segoeuil.ttf" />
     <Content Include="fonts\segoeuil.woff" />
+    <Content Include="dumps\rin-dump.json" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
