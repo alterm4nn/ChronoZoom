@@ -47,6 +47,16 @@ input.error {
   box-sizing: border-box;
 }
 /*Start Page*/
+.text-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -icab-text-overflow: ellipsis;
+  -khtml-text-overflow: ellipsis;
+  -moz-text-overflow: ellipsis;
+  -webkit-text-overflow: ellipsis;
+}
 .start-page-screen {
   display: none;
   position: absolute;
@@ -353,6 +363,72 @@ input.error {
 }
 .tweet-message-link:hover {
   color: #ffffff;
+}
+.tweet-list-item {
+  text-align: left;
+  margin: 20px 0;
+}
+.tweet-list-item:nth-of-type(1) {
+  margin-top: 0;
+}
+.tweet-list-item .tweet-li-header {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -icab-text-overflow: ellipsis;
+  -khtml-text-overflow: ellipsis;
+  -moz-text-overflow: ellipsis;
+  -webkit-text-overflow: ellipsis;
+  height: 48px;
+  display: table;
+}
+.tweet-list-item .tweet-li-header .tweet-li-avatar {
+  width: 48px;
+  height: 48px;
+  margin-right: 10px;
+}
+.tweet-list-item .tweet-li-header .tweet-li-fullname,
+.tweet-list-item .tweet-li-header .tweet-li-username {
+  font-size: 20px;
+  line-height: 48px;
+  display: table-cell;
+  vertical-align: middle;
+}
+.tweet-list-item .tweet-li-header .tweet-li-username {
+  text-decoration: none;
+}
+.tweet-list-item .tweet-li-header .tweet-li-username:link,
+.tweet-list-item .tweet-li-header .tweet-li-username:active,
+.tweet-list-item .tweet-li-header .tweet-li-username:visited {
+  color: #00bce0;
+}
+.tweet-list-item .tweet-li-header .tweet-li-username:hover {
+  color: #ffffff;
+}
+.tweet-list-item .tweet-li-message {
+  text-decoration: none;
+  font-size: 16px;
+}
+.tweet-list-item .tweet-li-message:link,
+.tweet-list-item .tweet-li-message:active,
+.tweet-list-item .tweet-li-message:visited {
+  color: #ffffff;
+}
+.tweet-list-item .tweet-li-message:hover {
+  color: #ffffff;
+}
+.tweet-list-item .tweet-li-footer {
+  height: 14px;
+  margin-top: 10px;
+}
+.tweet-list-item .tweet-li-footer .tweet-icon {
+  margin-left: 10px;
+}
+.tweet-list-item .tweet-li-footer .tweet-li-date {
+  font-size: 14px;
+  color: #b0b0b0;
+  float: right;
 }
 @media only screen and (max-width: 880px), screen and (orientation: landscape) and (max-device-width: 480px) {
   /* Small Tablet view: 3 rows, 2 columns */

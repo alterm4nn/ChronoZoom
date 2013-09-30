@@ -411,7 +411,7 @@ module CZ {
         }
 
         export function TwitterLayout(target, idx) {
-            var ListTemplate = "#template-list .list-item";
+            var ListTemplate = "#template-tweet-list .tweet-list-item";
             var ListElem = "#TwitterBlock-list";
 
             CZ.Service.getRecentTweets().done(response => {
@@ -467,12 +467,19 @@ module CZ {
                     $tileAvatar.attr("src", photo);
               
                     // List View.
-                    var ListTemplateClone = $(ListTemplate).clone(true, true).appendTo(ListElem);
-                    ListTemplateClone.attr("id", "l" + idx + "i" + i);
-                    $tweetTile.find(".li-title a").text(text);
-                    $tweetTile.find(".li-title a").attr("href", tweetLink);
-                    $tweetTile.find(".li-author").text(username);
-                    $tweetTile.find(".li-author").attr("href", tweetUsernameLink);
+                    var $tweetListItem = $(ListTemplate).clone(true, true).appendTo(ListElem);
+                    var $listItemMessage = $tweetListItem.find(".tweet-li-message");
+                    var $listItemUsername = $tweetListItem.find(".tweet-li-header .tweet-li-username");
+                    var $listItemFullname = $tweetListItem.find(".tweet-li-header .tweet-li-fullname");
+                    var $listItemAvatar = $tweetListItem.find(".tweet-li-header .tweet-li-avatar");
+                    var $listItemDate = $tweetListItem.find(".tweet-li-footer .tweet-li-date");
+                    
+                    $tweetListItem.attr("id", "l" + idx + "i" + i);
+                    $listItemMessage.html(text).attr("href", tweetLink);
+                    $listItemUsername.text("@" + username).attr("href", tweetUsernameLink);
+                    $listItemFullname.text(fullname);
+                    $listItemDate.text(convertedDate);
+                    $listItemAvatar.attr("src", photo);
                 }
             });
         }

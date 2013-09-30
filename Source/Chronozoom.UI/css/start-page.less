@@ -201,10 +201,10 @@
 
 .tweet-icon {
     float: right;
-    margin:3px;
+    margin: 3px;
     background-image: url('../images/icon_twitter.png');
-    height:14px;
-    width:17px;
+    height: 14px;
+    width: 17px;
 }
 
 .tweet-meta-author {
@@ -369,6 +369,60 @@
 
 .tweet-message-link {
     .start-page-text-link(@text-blue, @text-white);
+}
+
+// Twitter List View.
+.tweet-list-item {
+    text-align: left;
+    margin: 20px 0;
+
+    &:nth-of-type(1) {
+        margin-top: 0;
+    }
+
+    .tweet-li-header {
+        .text-ellipsis;
+        height: 48px;
+        display: table;
+
+        .tweet-li-avatar {
+            width: 48px;
+            height: 48px;
+            margin-right: 10px;
+        }
+
+        .tweet-li-fullname,
+        .tweet-li-username {
+            font-size: 20px;
+            line-height: 48px;
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .tweet-li-username {
+            .start-page-text-link(@text-blue, @text-white);
+        }
+    }
+
+    .tweet-li-message {
+        .start-page-text-link(@text-white, @text-white);
+        font-size: 16px;
+    }
+
+    .tweet-li-footer {
+        height: 14px;
+        margin-top: 10px;
+
+        .tweet-icon {
+            margin-left: 10px;
+        }
+
+        .tweet-li-date {
+            font-size: 14px;
+            color: @text-gray;
+            float: right;
+        }
+    }
 }
 
 @media only screen and (max-width : 880px), screen and (orientation: landscape) and (max-device-width : 480px) {
