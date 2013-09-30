@@ -1,4 +1,4 @@
-/* Height of input element */
+﻿/* Height of input element */
 /* Font-size of error message */
 /* Error messages */
 .error-message {
@@ -207,6 +207,12 @@ input.error {
   overflow: hidden;
   height: 65px;
 }
+.welcome-block-toggle .toggle-block[data-toggle~="show"] {
+  display: block;
+}
+.welcome-block-toggle .toggle-block[data-toggle~="hide"] {
+  display: none;
+}
 .WelcomeBlock {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -272,6 +278,9 @@ input.error {
   background-image: url(/images/arrow-left-hover.png);
   cursor: pointer;
 }
+.FavoriteTimelinesBlock {
+  color: #fff;
+}
 .template-invisible {
   display: none;
 }
@@ -316,7 +325,7 @@ input.error {
     width: 150px;
     overflow: hidden;
   }
-  .WelcomeBlock {
+  .welcome-block-toggle {
     width: 100%;
     height: 20%;
     min-height: 250px;
@@ -368,7 +377,7 @@ input.error {
   .ex6 {
     display: none;
   }
-  .WelcomeBlock {
+  .welcome-block-toggle {
     float: left;
     margin: 5px;
     padding: 5px;
@@ -430,7 +439,7 @@ input.error {
   .FTTiles {
     overflow: hidden;
   }
-  .WelcomeBlock {
+  .welcome-block-toggle {
     float: left;
     margin: 5px;
     padding: 5px;
@@ -491,7 +500,7 @@ input.error {
     width: 160px;
     float: left;
   }
-  .WelcomeBlock {
+  .welcome-block-toggle {
     float: left;
     margin: 5px;
     padding: 5px;
