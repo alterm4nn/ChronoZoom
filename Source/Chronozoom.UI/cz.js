@@ -2,6 +2,7 @@
 (function (CZ) {
     (function (Settings) {
         Settings.isAuthorized = false;
+        Settings.favoriteTimelines = [];
         Settings.czDataSource = 'db';
         Settings.czVersion = "main";
         Settings.ellipticalZoomZoomoutFactor = 0.5;
@@ -1385,7 +1386,11 @@ var CZ;
                     this.favoriteBtn = VCContent.addImage(this, layerid, id + "__favorite", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/star.svg");
                     this.favoriteBtn.reactsOnMouse = true;
                     this.favoriteBtn.onmouseclick = function () {
-                        CZ.Service.putUserFavorite(timelineinfo.guid);
+                        if(CZ.Settings.favoriteTimelines.indexOf(timelineinfo.guid) !== -1) {
+                            CZ.Service.deleteUserFavorite(timelineinfo.guid);
+                        } else {
+                            CZ.Service.putUserFavorite(timelineinfo.guid);
+                        }
                         return true;
                     };
                     this.favoriteBtn.onmousehover = function () {
@@ -4452,6 +4457,12 @@ var CZ;
                 t.editButton.y = t.titleObject.y;
                 t.editButton.width = t.titleObject.height;
                 t.editButton.height = t.titleObject.height;
+            }
+            if(typeof t.favoriteBtn !== "undefined") {
+                t.favoriteBtn.x = t.x + t.width - 1.8 * t.titleObject.height;
+                t.favoriteBtn.y = t.titleObject.y + 0.15 * t.titleObject.height;
+                t.favoriteBtn.width = 0.7 * t.titleObject.height;
+                t.favoriteBtn.height = 0.7 * t.titleObject.height;
             }
         }
         Authoring.modeMouseHandlers = {
@@ -13123,7 +13134,7 @@ var CZ;
                     src: timeline.ImageUrl,
                     alt: timeline.Title
                 });
-                $tileTitle.text(timeline.Title);
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
         }
@@ -13142,7 +13153,7 @@ var CZ;
                     window.location.href = event.data;
                     hide();
                 });
-                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
                 $("#l" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }
@@ -13179,7 +13190,8 @@ var CZ;
                     src: timeline.ImageUrl,
                     alt: timeline.Title
                 });
-                $tileTitle.text(timeline.Title);
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
+                $tileAuthor.text(timeline.Author);
             }
         }
         StartPage.fillFavoriteTimelines = fillFavoriteTimelines;
@@ -13192,12 +13204,13 @@ var CZ;
                 var TemplateClone = $(template).clone(true, true).appendTo(target);
                 var Name = "favorite-list-elem" + i;
                 var idx = 1;
-                TemplateClone.attr("id", "l" + idx + "i" + i);
+                TemplateClone.attr("id", "lfav" + idx + "i" + i);
                 TemplateClone.click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 });
-                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                $("#lfav" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
+                $("#lfav" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }
         StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
@@ -13271,6 +13284,9 @@ var CZ;
             });
             CZ.Service.getUserFavorites().then(function (response) {
                 var timelines = response ? response.reverse() : [];
+                timelines.forEach(function (timeline) {
+                    CZ.Settings.favoriteTimelines.push(timeline.TimelineUrl.split("/").pop().slice(1));
+                });
                 if(timelines.length === 0) {
                     $("#FavoriteTimelinesBlock .list-view-icon").hide();
                     $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." + "Click star icon of the timeline you like to save it as favorite.");
@@ -13830,7 +13846,7 @@ var CZ;
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
                     CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(function () {
-                    if(!CZ.Authoring.isEnabled) {
+                    if(!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
                     } else {

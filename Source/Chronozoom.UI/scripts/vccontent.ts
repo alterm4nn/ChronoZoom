@@ -962,7 +962,12 @@ module CZ {
                     this.favoriteBtn.reactsOnMouse = true;
 
                     this.favoriteBtn.onmouseclick = function () {
-                        CZ.Service.putUserFavorite(timelineinfo.guid);
+                        if (CZ.Settings.favoriteTimelines.indexOf(timelineinfo.guid) !== -1) {
+                            CZ.Service.deleteUserFavorite(timelineinfo.guid);
+                        }
+                        else {
+                            CZ.Service.putUserFavorite(timelineinfo.guid);
+                        }
                         return true;
                     }
 
