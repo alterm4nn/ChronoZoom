@@ -97,19 +97,21 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    
+    background-image: url('../images/default-tile.png');
+
     &:hover {
         cursor: pointer;
     }
 }
 
-.tile-photo img {
+/*.tile-photo img {
     position: absolute;
     width: 100%;
     height: 100%;
- }
+ }*/
 
 .tile-gradient {
+    .gradient(#232323,#EBEBEB);
     position: absolute;
     width: 100%;
     height: 100%;   
@@ -160,13 +162,18 @@
 }
 
 .tweet-avatar-icon {
-   // position:absolute;
+    background-image: url('../images/twitter_profile_pic.gif');
     float: left;
+    height:35px;
+    width:35px;
 }
 
 .tweet-icon {
     float: right;
     margin:3px;
+    background-image: url('../images/icon_twitter.png');
+    height:14px;
+    width:17px;
 }
 
 .tweet-meta-author {

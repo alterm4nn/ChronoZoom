@@ -299,41 +299,11 @@
     <Content Include="images\credits\ucb.png" />
     <Content Include="images\credits\uw.png" />
     <Content Include="images\default-tile.png" />
-    <Content Include="images\dummy\icon_create.png" />
-    <Content Include="images\dummy\icon_down_arrow.png" />
-    <Content Include="images\dummy\icon_help.png" />
-    <Content Include="images\dummy\icon_home.png" />
-    <Content Include="images\dummy\icon_right_arrow.png" />
-    <Content Include="images\dummy\icon_timeseries.png" />
-    <Content Include="images\dummy\icon_twitter.png" />
-    <Content Include="images\dummy\icon_user.png" />
-    <Content Include="images\dummy\list-expander2.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\dummy\tile_akhttomb.jpg" />
-    <Content Include="images\dummy\tile_bighistory.jpg" />
-    <Content Include="images\dummy\tile_cern.jpg" />
-    <Content Include="images\dummy\tile_colosseum.jpg" />
-    <Content Include="images\dummy\tile_earthscience.jpg" />
-    <Content Include="images\dummy\tile_gradient.png" />
-    <Content Include="images\dummy\tile_justin_morrill.jpg" />
-    <Content Include="images\dummy\tile_kingtut.jpg" />
-    <Content Include="images\dummy\tile_lucy.jpg" />
-    <Content Include="images\dummy\tile_mayan.jpg" />
-    <Content Include="images\dummy\tile_napoleon.jpg" />
-    <Content Include="images\dummy\tile_plateosaurus.jpg" />
-    <Content Include="images\dummy\tile_pyramid.jpg" />
-    <Content Include="images\dummy\tile_starforming.jpg" />
-    <Content Include="images\dummy\tile_turtle.jpg" />
-    <Content Include="images\dummy\tile_twitterbg.png" />
-    <Content Include="images\dummy\tile_wanapitei.jpg" />
-    <Content Include="images\dummy\tile_ww1.jpg" />
-    <Content Include="images\dummy\twitter_profile_pic.gif">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="images\dummy\video_intro.gif" />
     <Content Include="images\edit-icon.png" />
     <Content Include="images\home-icon.png" />
+    <Content Include="images\icon_home.png" />
+    <Content Include="images\icon_right_arrow.png" />
+    <Content Include="images\icon_twitter.png" />
     <Content Include="images\media\bing-import-50x150.png" />
     <Content Include="images\media\bing-import-50x50.png" />
     <Content Include="images\media\SkyDrive-Import-50X150.png" />
@@ -344,12 +314,15 @@
     <Content Include="images\search-icon.png" />
     <Content Include="images\star.svg" />
     <Content Include="images\Temp-Thumbnail-Aqua.png" />
+    <Content Include="images\tile_bighistory.jpg" />
+    <Content Include="images\tile_gradient.png" />
     <Content Include="images\timeseries-icon.png" />
     <Content Include="images\tour-icon.png" />
     <Content Include="images\tour-next.png" />
     <Content Include="images\tour-pause.png" />
     <Content Include="images\tour-play.png" />
     <Content Include="images\tour-prev.png" />
+    <Content Include="images\twitter_profile_pic.gif" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
     <Content Include="pages\crawler.aspx" />

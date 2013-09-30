@@ -336,11 +336,7 @@ var CZ;
                     show();
                 }
             });
-            CZ.Service.getUserFeatured().done(function (response) {
-                var timelines = response ? response.reverse() : [];
-                fillFeaturedTimelines(timelines);
-                fillFeaturedTimelinesList(timelines);
-            });
+            CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1);
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
             var hash = CZ.UrlNav.getURL().hash;

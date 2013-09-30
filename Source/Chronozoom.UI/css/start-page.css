@@ -46,6 +46,7 @@ input.error {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+/*Start Page*/
 .start-page-screen {
   display: none;
   position: absolute;
@@ -114,16 +115,40 @@ input.error {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background-image: url('../images/default-tile.png');
 }
 .tile-photo:hover {
   cursor: pointer;
 }
-.tile-photo img {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
+/*.tile-photo img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+ }*/
 .tile-gradient {
+  background-color: #232323;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#232323), to(#ebebeb));
+  /* Saf4+, Chrome */
+
+  background-image: -webkit-linear-gradient(top, #232323, #ebebeb);
+  /* Chrome 10+, Saf5.1+, iOS 5+ */
+
+  background-image: -moz-linear-gradient(top, #232323, #ebebeb);
+  /* FF3.6+ */
+
+  background-image: -ms-linear-gradient(top, #232323, #ebebeb);
+  /* IE10 */
+
+  background-image: -o-linear-gradient(top, #232323, #ebebeb);
+  /* Opera 11.10+ */
+
+  background-image: linear-gradient(to bottom, #232323, #ebebeb);
+  -ms-filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(#232323), endColorstr=quote(#ebebeb));
+  /* IE8 */
+
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(#232323), endColorstr=quote(#ebebeb));
+  /* IE6 & IE7 */
+
   position: absolute;
   width: 100%;
   height: 100%;
@@ -167,11 +192,17 @@ input.error {
   font-size: 12px;
 }
 .tweet-avatar-icon {
+  background-image: url('../images/twitter_profile_pic.gif');
   float: left;
+  height: 35px;
+  width: 35px;
 }
 .tweet-icon {
   float: right;
   margin: 3px;
+  background-image: url('../images/icon_twitter.png');
+  height: 14px;
+  width: 17px;
 }
 .tweet-meta-author {
   font-weight: normal;
