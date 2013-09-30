@@ -6,6 +6,7 @@
 - Project at Trello: https://trello.com/chronozoom
 - Requirements(User Stories): https://trello.com/chronozoom
 - Documents: https://www.dropbox.com/sh/ai0ln6eg7h16xv6/Yc2ZRUugYu
+- CI: http://tfs.cs.msu.ru:8080/
  
 ## Resources: ##
  
