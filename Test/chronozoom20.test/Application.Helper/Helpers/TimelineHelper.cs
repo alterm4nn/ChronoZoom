@@ -100,7 +100,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             HelperManager<NavigationHelper>.Instance.NavigateToCosmos();
-            WaitCondition(() => GetItemsCount(By.CssSelector("#breadcrumbs-table td")) == 1, 60);
+            WaitCondition(() => GetItemsCount(By.CssSelector("#breadcrumbs-table td")) == 1, Configuration.ImplicitWait);
             Logger.Log("->");
         }
 

@@ -31,7 +31,7 @@ namespace Application.Helper.Helpers
                 {
                     AddSkyDriveImage(contentItem.FileName);
                 }
-                WaitCondition(()=>(GetElementValue(By.CssSelector(".cz-form-item-mediaurl.cz-input")) != ""),15);
+                WaitCondition(() => (GetElementValue(By.CssSelector(".cz-form-item-mediaurl.cz-input")) != ""), Configuration.ImplicitWait);
                 SaveArtifact();
                 isLoginToSkyDrive = true;
             }
