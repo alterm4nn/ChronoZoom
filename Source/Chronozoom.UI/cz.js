@@ -12918,7 +12918,10 @@ var CZ;
                     "box ex3", 
                     "box ex3 ex4", 
                     "box ex3 ex4 ex6", 
-                    "box ex3 ex4 ex6"
+                    "box ex3 ex4 ex6", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9"
                 ]
             }, 
             {
@@ -12929,7 +12932,10 @@ var CZ;
                     "box ex3", 
                     "box ex3 ex4", 
                     "box ex3 ex4 ex6", 
-                    "box ex3 ex4 ex6"
+                    "box ex3 ex4 ex6", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9"
                 ]
             }, 
             {
@@ -12940,7 +12946,10 @@ var CZ;
                     "box ex3", 
                     "box ex3 ex4", 
                     "box ex3 ex4 ex6", 
-                    "box ex3 ex4 ex6"
+                    "box ex3 ex4 ex6", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9"
                 ]
             }, 
             
@@ -13181,7 +13190,11 @@ var CZ;
                     show();
                 }
             });
-            CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1);
+            CZ.Service.getUserFeatured().done(function (response) {
+                var timelines = response ? response.reverse() : [];
+                fillFeaturedTimelines(timelines);
+                fillFeaturedTimelinesList(timelines);
+            });
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
             var hash = CZ.UrlNav.getURL().hash;

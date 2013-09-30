@@ -342,7 +342,8 @@ input.error {
   .tweet-avatar-icon {
     display: none;
   }
-  .ex6 {
+  .ex6,
+  .ex9 {
     display: none;
   }
   .box {
@@ -355,13 +356,6 @@ input.error {
     height: 20%;
     min-height: 250px;
   }
-  /*    .FeaturedTimelinesBlock {
-          width: 305px;
-      }
-  
-      .TwitterBlock {
-          width: 305px;
-      }*/
   .welcome-box-1 {
     padding: 0px;
     overflow: visible;
@@ -399,7 +393,8 @@ input.error {
   .ex4 {
     display: inline-block;
   }
-  .ex6 {
+  .ex6,
+  .ex9 {
     display: none;
   }
   .WelcomeBlock {
@@ -458,11 +453,14 @@ input.error {
     display: none;
   }
 }
-@media only screen and (max-width: 1400px) and (min-width: 1201px) {
+@media only screen and (max-width: 1700px) and (min-width: 1201px) {
   .box {
     height: 150px;
     width: 150px;
     float: left;
+  }
+  .ex9 {
+    display: none;
   }
   .FTTiles {
     overflow: hidden;
@@ -515,7 +513,7 @@ input.error {
   }
   /* Medium desktop: 6 columns, 3 rows */
 }
-@media only screen and (min-width: 1401px) {
+@media only screen and (min-width: 1701px) {
   /* Large desktop: 6 columns, 3 rows, extra margin tiles */
   .FTTiles {
     overflow: hidden;

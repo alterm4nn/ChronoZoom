@@ -93,7 +93,10 @@ module CZ {
                     "box ex3",
                     "box ex3 ex4",
                     "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6"
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
                 ],
             },
             {
@@ -104,7 +107,10 @@ module CZ {
                     "box ex3",
                     "box ex3 ex4",
                     "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6"
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
                 ],
             },
             {
@@ -115,7 +121,10 @@ module CZ {
                     "box ex3",
                     "box ex3 ex4",
                     "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6"
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
                 ],
             },
         ];
