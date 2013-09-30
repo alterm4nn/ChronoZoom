@@ -607,10 +607,21 @@ var CZ;
                     this.favoriteBtn = VCContent.addImage(this, layerid, id + "__favorite", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/star.svg");
                     this.favoriteBtn.reactsOnMouse = true;
                     this.favoriteBtn.onmouseclick = function () {
-                        if(CZ.Settings.favoriteTimelines.indexOf(timelineinfo.guid) !== -1) {
-                            CZ.Service.deleteUserFavorite(timelineinfo.guid);
+                        var _this = this;
+                        if(CZ.Settings.favoriteTimelines.indexOf(this.parent.guid) !== -1) {
+                            CZ.Service.deleteUserFavorite(this.parent.guid).then(function (success) {
+                                CZ.Authoring.showMessageWindow("Timeline '" + _this.parent.title + "' was removed from your favorite timelines.", "Timeline removed from favorites");
+                            }, function (error) {
+                                console.log("[ERROR] /deleteUserFavorite with guid " + _this.parent.guid + " failed.");
+                            });
+                            CZ.Settings.favoriteTimelines.splice(CZ.Settings.favoriteTimelines.indexOf(this.parent.guid), 1);
                         } else {
-                            CZ.Service.putUserFavorite(timelineinfo.guid);
+                            CZ.Service.putUserFavorite(this.parent.guid).then(function (success) {
+                                CZ.Settings.favoriteTimelines.push(_this.parent.guid);
+                                CZ.Authoring.showMessageWindow("Timeline '" + _this.parent.title + "' was added to your favorite timelines.", "Favorite timeline added");
+                            }, function (error) {
+                                console.log("[ERROR] /putUserFavorite with guid + " + _this.parent.guid + " failed.");
+                            });
                         }
                         return true;
                     };
