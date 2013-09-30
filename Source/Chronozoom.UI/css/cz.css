@@ -46,6 +46,7 @@ input.error {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+/*Start Page*/
 .cz-timescale {
   padding-bottom: 0px;
   font-size: large;
@@ -385,18 +386,26 @@ iframe[sutra=picker] + div {
   width: 100%;
   height: 5px;
 }
-.list-item {
-  border: 1px #666 solid;
+.bigcleardiv {
+  clear: both;
+  width: 100%;
+  height: 25px;
 }
 .li-title {
   float: left;
   text-align: left;
   width: 66.3333%;
 }
+.li-title a:hover {
+  color: #00BADE;
+}
 .li-author {
   float: left;
   text-align: right;
   width: 33.3333%;
+}
+.li-author:hover {
+  color: #00BADE;
 }
 .li-icon {
   float: left;
@@ -417,16 +426,35 @@ iframe[sutra=picker] + div {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background-image: url('../images/default-tile.png');
 }
 .tile-photo:hover {
   cursor: pointer;
 }
-.tile-photo img {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
 .tile-gradient {
+  background-color: #313131;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#313131), to(#cbcbcb));
+  /* Saf4+, Chrome */
+
+  background-image: -webkit-linear-gradient(top, #313131, #cbcbcb);
+  /* Chrome 10+, Saf5.1+, iOS 5+ */
+
+  background-image: -moz-linear-gradient(top, #313131, #cbcbcb);
+  /* FF3.6+ */
+
+  background-image: -ms-linear-gradient(top, #313131, #cbcbcb);
+  /* IE10 */
+
+  background-image: -o-linear-gradient(top, #313131, #cbcbcb);
+  /* Opera 11.10+ */
+
+  background-image: linear-gradient(to bottom, #313131, #cbcbcb);
+  -ms-filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(#313131), endColorstr=quote(#cbcbcb));
+  /* IE8 */
+
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(#313131), endColorstr=quote(#cbcbcb));
+  /* IE6 & IE7 */
+
   position: absolute;
   width: 100%;
   height: 100%;
@@ -470,11 +498,17 @@ iframe[sutra=picker] + div {
   font-size: 12px;
 }
 .tweet-avatar-icon {
+  background-image: url('../images/twitter_profile_pic.gif');
   float: left;
+  height: 35px;
+  width: 35px;
 }
 .tweet-icon {
   float: right;
   margin: 3px;
+  background-image: url('../images/icon_twitter.png');
+  height: 14px;
+  width: 17px;
 }
 .tweet-meta-author {
   font-weight: normal;
@@ -620,7 +654,8 @@ iframe[sutra=picker] + div {
   .tweet-avatar-icon {
     display: none;
   }
-  .ex6 {
+  .ex6,
+  .ex9 {
     display: none;
   }
   .box {
@@ -633,13 +668,6 @@ iframe[sutra=picker] + div {
     height: 20%;
     min-height: 250px;
   }
-  /*    .FeaturedTimelinesBlock {
-          width: 305px;
-      }
-  
-      .TwitterBlock {
-          width: 305px;
-      }*/
   .welcome-box-1 {
     padding: 0px;
     overflow: visible;
@@ -677,7 +705,8 @@ iframe[sutra=picker] + div {
   .ex4 {
     display: inline-block;
   }
-  .ex6 {
+  .ex6,
+  .ex9 {
     display: none;
   }
   .welcome-block-toggle {
@@ -727,17 +756,23 @@ iframe[sutra=picker] + div {
     font-size: 14px;
     overflow: auto;
   }
+  .welcome-box-2 .welcome-link {
+    width: 40%;
+  }
   .welcome-box-3 {
     float: left;
     overflow: auto;
     display: none;
   }
 }
-@media only screen and (max-width: 1400px) and (min-width: 1201px) {
+@media only screen and (max-width: 1700px) and (min-width: 1201px) {
   .box {
     height: 150px;
     width: 150px;
     float: left;
+  }
+  .ex9 {
+    display: none;
   }
   .FTTiles {
     overflow: hidden;
@@ -790,7 +825,7 @@ iframe[sutra=picker] + div {
   }
   /* Medium desktop: 6 columns, 3 rows */
 }
-@media only screen and (min-width: 1401px) {
+@media only screen and (min-width: 1701px) {
   /* Large desktop: 6 columns, 3 rows, extra margin tiles */
   .FTTiles {
     overflow: hidden;

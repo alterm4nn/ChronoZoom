@@ -62,20 +62,28 @@
     height: 5px;
 }
 
-.list-item {
-    border: 1px #666 solid;   
+.bigcleardiv {
+    clear: both;
+    width: 100%;
+    height: 25px;
 }
 
 .li-title {
     float: left;
     text-align: left;
     width: 66.3333%;
+    a:hover {
+      color:#00BADE;  
+    }
 }
 
 .li-author {
     float: left;
     text-align: right;
     width: 33.3333%;
+    &:hover {
+      color:#00BADE;  
+    }
 }
 
 .li-icon {
@@ -97,19 +105,16 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    
+    background-image: url('../images/default-tile.png');
+
     &:hover {
         cursor: pointer;
     }
 }
 
-.tile-photo img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
- }
 
 .tile-gradient {
+    .gradient(#313131,#CBCBCB);
     position: absolute;
     width: 100%;
     height: 100%;   
@@ -160,13 +165,18 @@
 }
 
 .tweet-avatar-icon {
-   // position:absolute;
+    background-image: url('../images/twitter_profile_pic.gif');
     float: left;
+    height:35px;
+    width:35px;
 }
 
 .tweet-icon {
     float: right;
     margin:3px;
+    background-image: url('../images/icon_twitter.png');
+    height:14px;
+    width:17px;
 }
 
 .tweet-meta-author {
@@ -344,7 +354,7 @@ visibility: visible important!;
     }
 
 
-    .ex6 {
+    .ex6, .ex9 {
         display: none;
     }
 
@@ -359,15 +369,6 @@ visibility: visible important!;
         height: 20%;
         min-height: 250px;
     }
-
-
-/*    .FeaturedTimelinesBlock {
-        width: 305px;
-    }
-
-    .TwitterBlock {
-        width: 305px;
-    }*/
 
     .welcome-box-1 {
         padding: 0px;
@@ -415,7 +416,7 @@ visibility: visible important!;
         display: inline-block;
     }
 
-    .ex6 {
+    .ex6, .ex9 {
         display: none;
     }
 
@@ -469,6 +470,9 @@ visibility: visible important!;
         float: left;
         font-size: 14px;
         overflow: auto;
+        .welcome-link {
+            width:40%;
+        }
     }
 
     .welcome-box-3 {
@@ -478,12 +482,16 @@ visibility: visible important!;
     }
 }
 
-@media only screen and (max-width : 1400px) and (min-width : 1201px) {
+@media only screen and (max-width : 1700px) and (min-width : 1201px) {
     .box {
         height:150px;
         width:  150px;
         float: left;
     }
+
+    .ex9 {
+        display: none;
+    };
 
     .FTTiles {
         overflow:hidden;
@@ -543,7 +551,7 @@ visibility: visible important!;
     /* Medium desktop: 6 columns, 3 rows */
 }
 
-@media only screen and (min-width : 1401px) {
+@media only screen and (min-width : 1701px) {
     /* Large desktop: 6 columns, 3 rows, extra margin tiles */
 
     .FTTiles {
