@@ -61,6 +61,8 @@ namespace Application.Driver.UserActions
             {
                 IWebElement element = WebDriver.FindElement(by);
                 element.Highlight();
+                //Update element state
+                element = WebDriver.FindElement(by);
                 return element;
             }
             catch (NoSuchElementException ex)
@@ -110,6 +112,11 @@ namespace Application.Driver.UserActions
         protected string GetPageTitle()
         {
             return WebDriver.Title;
+        }
+
+        protected string GetPageSource()
+        {
+            return WebDriver.PageSource;
         }
 
         protected ReadOnlyCollection<Cookie> GetAllCookies()
