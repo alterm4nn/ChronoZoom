@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
@@ -9,134 +9,75 @@ namespace Chronozoom.Entities
 {
     public partial class Storage
     {
-        private readonly Regex _prefixReg = new Regex(@"^([a-z0-9]+):([a-z0-9\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private readonly Regex _namespaceReg = new Regex(@"^http://(?:www.)*chronozoom.com/([a-z0-9]+)#([a-z0-9\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private readonly Dictionary<String, String> _prefixesAndNamespaces = new Dictionary<string, string>
-            { 
-            {"czusr","http://www.chronozoom.com/users#"},
-            {"czpred","http://www.chronozoom.com/preds#"},
-            {"cztimeline", "http://chrnozoom.com/timeline#"}
-        };
-
-        /// <summary>
-        /// Get object value without prefix and namespace.
-        /// </summary>
-        /// <param name="str">Object</param>
-        /// <returns>Returns value;</returns>
-        public string GetValue(string str)
+        public TripleName EnsurePrefix(TripleName name) 
         {
-            var mp = _prefixReg.Match(str);
-            var mn = _namespaceReg.Match(str);
-            if (mp.Success)
-                return mp.Groups[2].Value;
-            if (mn.Success)
-                return mn.Groups[2].Value;
-
-            return String.Empty;
+            if(name.Prefix == null) {
+                var found = TripleName.PrefixesAndNamespaces.FirstOrDefault(p => p.Value == name.Namespace );
+                if (found.Key != null)
+                    return new TripleName(name.Namespace, found.Key, name.Name);
+                var tr = TriplePrefixes.FirstOrDefault(t => t.Namespace == name.Namespace);
+                if(tr != null)
+                    return new TripleName(name.Namespace, tr.Prefix, name.Name);
+                else
+                    throw new ArgumentException(String.Format("There is no known prefix for namespace {0}", name.Namespace));
+            } else
+                return name;
         }
 
-
-        /// <summary>
-        /// Get prefix by namespace.
-        /// </summary>
-        /// <param name="fullStr">Namespace string</param>
-        /// <returns>Returns prefix.</returns>
-        public string GetPrefix(string fullStr)
+        public TripleName TryEnsureNamespace(TripleName name)
         {
-            var mp = _prefixReg.Match(fullStr);
-            var mn = _namespaceReg.Match(fullStr);
-            if (mp.Success)
-                return mp.Groups[1].Value;
-            if (mn.Success)
-                return mn.Groups[1].Value;
-
-            return String.Empty;
-        }
-
-        /// <summary>
-        /// Get namespace by prefix.
-        /// </summary>
-        /// <param name="prefixStr">Prefix string</param>
-        /// <returns>Returns namespace.</returns>
-        public string GetNamespace(string prefixStr)
-        {
-            if (_prefixesAndNamespaces.ContainsKey(prefixStr))
+            if(name.Namespace == null) 
             {
-                //Search among standard namespaces
-                return _prefixesAndNamespaces[prefixStr];
-            }
-            var tr = TriplePrefixes.FirstOrDefault(x => x.Prefix == prefixStr);
-            return tr != null ? tr.Namespace : null;
-        }
-
-        /// <summary>
-        /// Convert to namespace string.
-        /// </summary>
-        /// <param name="str">prefix string</param>
-        /// <returns>Returns namespace string.</returns>
-        private string ToNamespaceStr(string str)
-        {
-            var mp = _prefixReg.Match(str);
-            if (mp.Success)
-            {
-                return string.Format("{0}:{1}", GetNamespace(mp.Groups[1].Value), mp.Groups[2].Value);
-            }
-            var mn = _namespaceReg.Match(str);
-            return mn.Success ? str : null;
-        }
-
-        /// <summary>
-        /// Convert to prefix string.
-        /// </summary>
-        /// <param name="str">namespace string</param>
-        /// <returns>Returns prefix string.</returns>
-        private string ToPrefixString(string str)
-        {
-            var ms = _namespaceReg.Match(str);
-            if (ms.Success)
-            {
-                return string.Format("{0}:{1}", GetPrefix(ms.Groups[1].Value), ms.Groups[2].Value);
-            }
-            var mp = _prefixReg.Match(str);
-            return mp.Success ? str : null;
+                if (TripleName.PrefixesAndNamespaces.ContainsKey(name.Prefix))
+                    return new TripleName(TripleName.PrefixesAndNamespaces[name.Prefix], name.Prefix, name.Name);
+                var tr = TriplePrefixes.FirstOrDefault(x => x.Prefix == name.Prefix);
+                return tr != null ? new TripleName(tr.Namespace, name.Prefix, name.Name) : name;
+            } else
+                return name;
         }
 
         /// <summary>
         /// Get triple by specified parameters.
         /// </summary>
-        /// <param name="subjectStr">Subject</param>
-        /// <param name="predicateStr">Predicate</param>
-        /// <param name="objectStr">Object</param>
+        /// <param name="subject">Subject name with prefix</param>
+        /// <param name="predicate">Predicate name with prefix or null</param>
+        /// <param name="obj">Object name with prefix or null</param>
         /// <param name="expandPrefixes">If 'True' returns namespaces, else - prefixes.</param>
         /// <returns>Returns list of triplets.</returns>
-        public List<Triple> GetTriplet(string subjectStr, string predicateStr, string objectStr = null, bool expandPrefixes = false)
+        /// <example>GetTriplet( “czusr:76087518-4f8e-4d3a-9bfb-2fd2332376eb”, “czpred:favorite”, null, false)</example>
+        public List<Triple> GetTriplet(string subject, string predicate = null, string obj = null, bool expandPrefixes = false)
         {
-            //GetTriplet( “czusr:76087518-4f8e-4d3a-9bfb-2fd2332376eb”, “czpred:favorite”, null, null)
-
-            if ((_prefixReg.Match(subjectStr).Success || _namespaceReg.Match(subjectStr).Success) &&
-                (_prefixReg.Match(predicateStr).Success || _namespaceReg.Match(predicateStr).Success) &&
-                ((objectStr != null && (_prefixReg.Match(objectStr).Success || _namespaceReg.Match(objectStr).Success)) || (objectStr == null)) == false)
-                return null;
-
-
+            if(subject == null)
+                throw new ArgumentNullException("subject");
+            var subjectName = EnsurePrefix(TripleName.Parse(subject));
+            string subjectStr = subjectName.ToString();
+            
             IQueryable<Triple> triples;
-            if (objectStr == null)
+            if(predicate != null) 
             {
-                triples = Triples.Where(t => t.Subject == subjectStr && t.Predicate == predicateStr).Include(o => o.Objects);
-            }
-            else
-            {
-                triples = Triples.Where(t => t.Subject == subjectStr && t.Predicate == predicateStr).Include(o => o.Objects).Where(t => t.Objects.FirstOrDefault(x => x.Object == objectStr) != null);
-            }
+                var predicateName = EnsurePrefix(TripleName.Parse(predicate));
+                var predicateStr = predicateName.ToString();
+                if (obj != null)
+                {
+                    var objectName = EnsurePrefix(TripleName.Parse(obj));
+                    var objectStr = objectName.ToString();
+                    triples = Triples.Where(t => t.Subject == subjectStr && t.Predicate == predicateStr).Include(o => o.Objects).Where(t => t.Objects.FirstOrDefault(x => x.Object == objectStr) != null);
+                } 
+                else
+                    triples = Triples.Where(t => t.Subject == subjectStr && t.Predicate == predicateStr).Include(o => o.Objects);
+            } 
+            else 
+                triples = Triples.Where(t => t.Subject == subjectStr).Include(o => o.Objects);
 
             if (expandPrefixes)
             {
                 //ToDo:Use Join
                 triples.ToList().ForEach(x =>
                 {
-                    x.Subject = ToNamespaceStr(x.Subject);
-                    x.Predicate = ToNamespaceStr(x.Predicate);
-                    foreach (var o in x.Objects) o.Object = ToNamespaceStr(o.Object);
+                    x.Subject = TryEnsureNamespace(TripleName.Parse(x.Subject)).ToExpandedString();
+                    x.Predicate = TryEnsureNamespace(TripleName.Parse(x.Predicate)).ToExpandedString();
+                    foreach (var o in x.Objects) 
+                        o.Object = TryEnsureNamespace(TripleName.Parse(o.Object)).ToExpandedString();
                 });
             }
 
@@ -149,19 +90,13 @@ namespace Chronozoom.Entities
         /// <param name="subjectStr">Subject</param>
         /// <param name="predicateStr">Predicate</param>
         /// <param name="objectStr">Object</param>
-        /// <returns>>Returns 'True' if operation completed succeful, 'False' otherwise.</returns>
+        /// <returns>Returns 'True' if operation completed succeful, 'False' otherwise.</returns>
+        /// <example>PutTriplet( “czusr:76087518-4f8e-4d3a-9bfb-2fd2332376eb”, “czpred:favorite”, "cztimeline:3a87bb5c-85f7-4305-8b2f-f2002580cd25")</example>
         public bool PutTriplet(string subjectStr, string predicateStr, string objectStr)
         {
-            //PutTriplet( “czusr:76087518-4f8e-4d3a-9bfb-2fd2332376eb”, “czpred:favorite”, "cztimeline:3a87bb5c-85f7-4305-8b2f-f2002580cd25")
-
-            if ((_prefixReg.Match(subjectStr).Success || _namespaceReg.Match(subjectStr).Success) &&
-                (_prefixReg.Match(predicateStr).Success || _namespaceReg.Match(predicateStr).Success) &&
-                (_prefixReg.Match(objectStr).Success || _namespaceReg.Match(objectStr).Success) == false)
-                return false;
-
-            var shortSubjectStr = ToPrefixString(subjectStr);
-            var shortPredicateStr = ToPrefixString(predicateStr);
-            var shortObjectStr = ToPrefixString(objectStr);
+            var shortSubjectStr = EnsurePrefix(TripleName.Parse(subjectStr)).ToString();
+            var shortPredicateStr = EnsurePrefix(TripleName.Parse(predicateStr)).ToString();
+            var shortObjectStr = EnsurePrefix(TripleName.Parse(objectStr)).ToString();
 
             var tr = Triples.Where(t => t.Subject == shortSubjectStr && t.Predicate == shortPredicateStr).Include(o => o.Objects).FirstOrDefault();
             if (tr != null)
@@ -211,15 +146,9 @@ namespace Chronozoom.Entities
         /// <returns>Returns 'True' if operation completed succeful, 'False' otherwise.</returns>
         public bool DeleteTriplet(string subjectStr, string predicateStr, string objectStr)
         {
-            if ((_prefixReg.Match(subjectStr).Success || _namespaceReg.Match(subjectStr).Success) &&
-                (_prefixReg.Match(predicateStr).Success || _namespaceReg.Match(predicateStr).Success) &&
-                (_prefixReg.Match(objectStr).Success || _namespaceReg.Match(objectStr).Success) == false)
-                return false;
-
-
-            var shortSubjectStr = ToPrefixString(subjectStr);
-            var shortPredicateStr = ToPrefixString(predicateStr);
-            var shortObjectStr = ToPrefixString(objectStr);
+            var shortSubjectStr = EnsurePrefix(TripleName.Parse(subjectStr)).ToString();
+            var shortPredicateStr = EnsurePrefix(TripleName.Parse(predicateStr)).ToString();
+            var shortObjectStr = EnsurePrefix(TripleName.Parse(objectStr)).ToString();
 
             var tr = Triples.Where(t => t.Subject == shortSubjectStr && t.Predicate == shortPredicateStr).Include(o => o.Objects).FirstOrDefault();
             if (tr != null)
@@ -303,8 +232,28 @@ namespace Chronozoom.Entities
                 ts.TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, GetContentPath(timeline.Collection.Id, timeline.Id, null));
                 ts.Author = timeline.Collection.User.DisplayName;
             }
-            ts.ImageUrl = "/images/chronozoom.png";
+            ts.ImageUrl = GetTimelineImageUrl(timeline);
             return ts;
+        }
+
+        private static string GetTimelineImageUrl(Timeline timeline)
+        {
+            if (timeline.Exhibits != null)
+            {
+                foreach (var exhibit in timeline.Exhibits)
+                {
+                    foreach (var contentItem in exhibit.ContentItems)
+                    {
+                        var mediaType = contentItem.MediaType.ToLower();
+                        if (mediaType.Equals("picture") || mediaType.Equals("image"))
+                        {
+                            return contentItem.Uri;
+                        }
+                    }
+                }
+            }
+
+            return "/images/default-tile.png";
         }
     }
 }

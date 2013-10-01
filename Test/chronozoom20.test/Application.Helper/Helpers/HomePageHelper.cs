@@ -10,7 +10,7 @@ namespace Application.Helper.Helpers
     {
         public void OpenPage()
         {
-            Logger.Log("<-");
+            Logger.Log("<-", LogType.MessageWithoutScreenshot);
             HelperManager<NavigationHelper>.Instance.OpenHomePage();
             WaitWhileHomePageIsLoaded();
             CloseStartPage();
@@ -20,13 +20,13 @@ namespace Application.Helper.Helpers
         public void CloseStartPage()
         {
             Logger.Log("<-");
-            Click(By.CssSelector(".welcome-box-2>.welcome-link"));
+            Click(By.Id("home_button"));
             Logger.Log("->");
         }
 
         public void OpenSandboxPage()
         {
-            Logger.Log("<-");
+            Logger.Log("<-", LogType.MessageWithoutScreenshot);
             HelperManager<NavigationHelper>.Instance.OpenSandboxPage();
             WaitWhileHomePageIsLoaded();
             CloseStartPage();
@@ -111,14 +111,31 @@ namespace Application.Helper.Helpers
 
         public void WaitWhileHomePageIsLoaded()
         {
-            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), 60);
+            Logger.Log("<-");
+            WaitCondition(() => Convert.ToBoolean(GetJavaScriptExecutionResult("CZ.Common.cosmosVisible != undefined")), Configuration.ImplicitWait);
             Sleep(2);
             WaitAjaxComplete(10);
+            Logger.Log("->");
+        }
+
+        public string GetNewTabTitle(string name)
+        {
+            Logger.Log("<- tab title: " + name);
+            SwitchToWindow(name);
+            string title = GetTitle();
+            Logger.Log("-> new tab title: " + title);
+            return title;
         }
 
         private void ClickOnRightFooter(string name)
         {
             Click(By.XPath(String.Format("//a[@class='footer-link' and text()='{0}']", name)));
+        }
+
+        public void CloseAllTabsButThis(string title)
+        {
+            CloseAllWindowsButThis(title);
+            SwitchToWindow(title);
         }
     }
 }

@@ -2,6 +2,7 @@ var CZ;
 (function (CZ) {
     (function (Settings) {
         Settings.isAuthorized = false;
+        Settings.favoriteTimelines = [];
         Settings.czDataSource = 'db';
         Settings.czVersion = "main";
         Settings.ellipticalZoomZoomoutFactor = 0.5;

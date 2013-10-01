@@ -74,8 +74,10 @@ namespace Application.Helper.Helpers
                 Logger.Log("- contentItem.Attribution: " + contentItem.Attribution, LogType.MessageWithoutScreenshot);
                 exhibit.ContentItems.Add(contentItem);
             }
-            WaitCondition(() => (GetJavaScriptExecutionResult(LastCanvasElement + ".guid") != string.Empty), 15);
-            exhibit.Id = new Guid(GetJavaScriptExecutionResult(LastCanvasElement + ".guid"));
+            WaitCondition(() => (GetJavaScriptExecutionResult(LastCanvasElement + ".guid") != string.Empty), Configuration.ImplicitWait);
+            string parseGuid = GetJavaScriptExecutionResult(LastCanvasElement + ".guid");
+            Logger.Log("- parse guid: " + parseGuid, LogType.MessageWithoutScreenshot);
+            exhibit.Id = new Guid(parseGuid);
             Logger.Log("- exhibit.Id: " + exhibit.Id, LogType.MessageWithoutScreenshot);
             Logger.Log("->" + exhibit);
             return exhibit;

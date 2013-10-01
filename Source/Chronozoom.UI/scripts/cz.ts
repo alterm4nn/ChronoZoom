@@ -29,6 +29,8 @@
 /// <reference path='extensions/extensions.ts'/>
 /// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 /// <reference path='../ui/start-page.ts'/>
+/// <reference path='plugins/error-plugin.ts'/>
+/// <reference path='plugins/utility-plugins.ts'/>
 
 var constants: any;
 
@@ -501,9 +503,14 @@ module CZ {
                     CZ.Authoring.isEnabled = UserCanEditCollection(data);
                 }).fail((error) => {
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(() => {
-                    if (!CZ.Authoring.isEnabled) {
+                    if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
+                        $("#WelcomeBlock").attr("data-toggle", "show");
+                    }
+                    else {
+                        $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
                     }
 
                     //retrieving the data

@@ -206,6 +206,8 @@ module CZ {
                     duration: 500,
                     complete: () => {
                         this.tourPlayer.exit();
+                        // Enable hashchange event.
+                        CZ.Common.hashHandle = true;
                     }
                 });
 

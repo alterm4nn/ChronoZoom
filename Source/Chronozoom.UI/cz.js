@@ -2,6 +2,7 @@
 (function (CZ) {
     (function (Settings) {
         Settings.isAuthorized = false;
+        Settings.favoriteTimelines = [];
         Settings.czDataSource = 'db';
         Settings.czVersion = "main";
         Settings.ellipticalZoomZoomoutFactor = 0.5;
@@ -668,7 +669,7 @@ var CZ;
     (function (Extensions) {
         (function (RIN) {
             function getScript() {
-                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js";
+                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/lib/rin-core-1.0.js";
             }
             RIN.getScript = getScript;
             function getExtension(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload) {
@@ -681,11 +682,13 @@ var CZ;
                     rinDiv.addEventListener("mousedown", CZ.Common.preventbubble, false);
                     rinDiv.addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
                     rinDiv.addEventListener("mousewheel", CZ.Common.preventbubble, false);
-                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/').then(function () {
+                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/').then(function () {
                         var playerElement = document.getElementById(id);
                         var playerControl = rin.getPlayerControl(rinDiv);
-                        var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
-                        playerControl.load(contentSource);
+                        if(playerControl) {
+                            var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
+                            playerControl.load(contentSource);
+                        }
                     });
                 } else {
                     rinDiv.isAdded = false;
@@ -724,13 +727,17 @@ var CZ;
         }
         Extensions.mediaTypeIsExtension = mediaTypeIsExtension;
         function registerExtensions() {
-            registerExtension("RIN", CZ.Extensions.RIN.getExtension, "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js");
+            registerExtension("RIN", CZ.Extensions.RIN.getExtension, [
+                "/scripts/extensions/rin-scripts/tagInk.js", 
+                "/scripts/extensions/rin-scripts/raphael.js", 
+                "/scripts/extensions/rin-scripts/rin-core-1.0.js"
+            ]);
         }
         Extensions.registerExtensions = registerExtensions;
-        function registerExtension(name, initializer, script) {
+        function registerExtension(name, initializer, scripts) {
             extensions[name.toLowerCase()] = {
                 "initializer": initializer,
-                "script": script
+                "scripts": scripts
             };
         }
         function activateExtension(mediaType) {
@@ -738,7 +745,10 @@ var CZ;
                 return;
             }
             var extensionName = extensionNameFromMediaType(mediaType);
-            addScript(extensionName, getScriptFromExtensionName(extensionName));
+            var scripts = getScriptsFromExtensionName(extensionName);
+            scripts.forEach(function (script, index) {
+                addScript(extensionName, script, index);
+            });
         }
         Extensions.activateExtension = activateExtension;
         function getInitializer(mediaType) {
@@ -750,8 +760,8 @@ var CZ;
             var extensionIndex = 'extension-'.length;
             return mediaType.substring(extensionIndex, mediaType.length);
         }
-        function addScript(extensionName, scriptPath) {
-            var scriptId = "extension-" + extensionName;
+        function addScript(extensionName, scriptPath, index) {
+            var scriptId = "extension-" + extensionName + index;
             if(document.getElementById(scriptId)) {
                 return;
             }
@@ -761,8 +771,8 @@ var CZ;
             script.id = scriptId;
             document.getElementsByTagName("head")[0].appendChild(script);
         }
-        function getScriptFromExtensionName(name) {
-            return extensions[name.toLowerCase()].script;
+        function getScriptsFromExtensionName(name) {
+            return extensions[name.toLowerCase()].scripts;
         }
     })(CZ.Extensions || (CZ.Extensions = {}));
     var Extensions = CZ.Extensions;
@@ -1376,7 +1386,11 @@ var CZ;
                     this.favoriteBtn = VCContent.addImage(this, layerid, id + "__favorite", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/star.svg");
                     this.favoriteBtn.reactsOnMouse = true;
                     this.favoriteBtn.onmouseclick = function () {
-                        CZ.Service.putUserFavorite(id);
+                        if(CZ.Settings.favoriteTimelines.indexOf(timelineinfo.guid) !== -1) {
+                            CZ.Service.deleteUserFavorite(timelineinfo.guid);
+                        } else {
+                            CZ.Service.putUserFavorite(timelineinfo.guid);
+                        }
                         return true;
                     };
                     this.favoriteBtn.onmousehover = function () {
@@ -3910,7 +3924,7 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("getmimetypebyurl");
+            request.addToPath("mimetypebyurl");
             if(url == "") {
                 return result;
             }
@@ -3946,11 +3960,11 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfavorite");
+            request.addToPath("userfavorites");
             if(guid == "") {
                 return null;
             }
-            request.addParameter("guid", guid);
+            request.addToPath(guid);
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -3963,11 +3977,11 @@ var CZ;
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfavorite");
+            request.addToPath("userfavorites");
             if(guid == "") {
                 return null;
             }
-            request.addParameter("guid", guid);
+            request.addToPath(guid);
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -3977,11 +3991,12 @@ var CZ;
         }
         Service.putUserFavorite = putUserFavorite;
         function getUserFeatured(guid) {
+            if (typeof guid === "undefined") { guid = "default"; }
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("userfeatured");
-            request.addParameter("guid", guid);
+            request.addToPath(guid);
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -3998,7 +4013,7 @@ var CZ;
             if(guid == "") {
                 return null;
             }
-            request.addParameter("guid", guid);
+            request.addToPath(guid);
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -4015,7 +4030,7 @@ var CZ;
             if(guid == "") {
                 return null;
             }
-            request.addParameter("guid", guid);
+            request.addToPath(guid);
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -4024,6 +4039,74 @@ var CZ;
             });
         }
         Service.putUserFeatured = putUserFeatured;
+        function putTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify({
+                    Subject: subject,
+                    Predicate: predicate,
+                    Object: object
+                })
+            });
+        }
+        Service.putTriplet = putTriplet;
+        function getTriplets(subject, predicate, object) {
+            if (typeof predicate === "undefined") { predicate = null; }
+            if (typeof object === "undefined") { object = null; }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addParameter("subject", encodeURIComponent(subject));
+            if(predicate != null) {
+                request.addParameter("predicate", encodeURIComponent(predicate));
+            }
+            if(object != null) {
+                request.addParameter("object", encodeURIComponent(object));
+            }
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getTriplets = getTriplets;
+        function deleteTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify({
+                    Subject: subject,
+                    Predicate: predicate,
+                    Object: object
+                })
+            });
+        }
+        Service.deleteTriplet = deleteTriplet;
+        function getPrefixes() {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath("prefixes");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getPrefixes = getPrefixes;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));
@@ -4375,6 +4458,12 @@ var CZ;
                 t.editButton.width = t.titleObject.height;
                 t.editButton.height = t.titleObject.height;
             }
+            if(typeof t.favoriteBtn !== "undefined") {
+                t.favoriteBtn.x = t.x + t.width - 1.8 * t.titleObject.height;
+                t.favoriteBtn.y = t.titleObject.y + 0.15 * t.titleObject.height;
+                t.favoriteBtn.width = 0.7 * t.titleObject.height;
+                t.favoriteBtn.height = 0.7 * t.titleObject.height;
+            }
         }
         Authoring.modeMouseHandlers = {
             createTimeline: {
@@ -4678,8 +4767,10 @@ var CZ;
             while(contentItems[i] != null) {
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
-                var mime = CZ.Service.getMimeTypeByUrl(ci.uri);
-                console.log("mime:" + mime);
+                var mime;
+                if(ci.mediaType.toLowerCase() !== "video") {
+                    mime = CZ.Service.getMimeTypeByUrl(ci.uri);
+                }
                 if(ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if(!imageReg.test(ci.uri)) {
@@ -5060,6 +5151,7 @@ var CZ;
                     duration: 500,
                     complete: function () {
                         _this.tourPlayer.exit();
+                        CZ.Common.hashHandle = true;
                     }
                 });
                 this.activationSource.removeClass("active");
@@ -12771,66 +12863,67 @@ var CZ;
 var CZ;
 (function (CZ) {
     (function (StartPage) {
+        var _isRegimesVisible;
         StartPage.tileData = [
             {
                 "Idx": 0,
-                "Title": "Big History",
+                "Title": "Big History is my favorite course ever",
                 "Thumbnail": "../images/dummy/tile_bighistory.jpg",
                 "Author": "Some Author",
                 "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999998954347&y=-0.46459331778482354&w=3.841695822797034e-12&h=3.7430627449314544e-12"
             }, 
             {
                 "Idx": 1,
-                "Title": "CERN",
+                "Title": "CERN is my favorite course ever",
                 "Thumbnail": "../images/dummy/tile_cern.jpg",
                 "Author": "Some Author",
                 "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999192440875&y=-0.4645933209201501&w=3.729306137185042e-11&h=3.633558592459924e-11"
             }, 
             {
                 "Idx": 2,
-                "Title": "Earth Science",
+                "Title": "Earth Science is my favorite course ever",
                 "Thumbnail": "../images/dummy/tile_earthscience.jpg",
                 "Author": "Some Author",
                 "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999988061194&y=-0.46459331795948755&w=4.546120315559252e-12&h=4.4294015903520115e-12"
             }, 
             {
                 "Idx": 3,
-                "Title": "King Tut",
+                "Title": "King Tut is my favorite course ever",
                 "Thumbnail": "../images/dummy/tile_kingtut.jpg",
                 "Author": "Some Author",
                 "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999967062717304&y=-0.4645931999741229&w=3.5221148563086766e-10&h=3.4316868149181225e-10"
             }, 
             {
                 "Idx": 4,
-                "Title": "Napoleon",
+                "Title": "Napoleon is my favorite course ever",
                 "Thumbnail": "../images/dummy/tile_napoleon.jpg",
                 "Author": "Some Author",
                 "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999840411981&y=-0.46459346560505227&w=5.935054278147061e-10&h=5.782675563705605e-10"
             }, 
             {
                 "Idx": 5,
-                "Title": "World War I",
+                "Title": "World War I is my favorite course ever",
                 "Thumbnail": "../images/dummy/tile_ww1.jpg",
                 "Author": "Some Author",
                 "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999485392826&y=-0.4645933221621095&w=3.314938789411939e-12&h=3.229829860746773e-12"
             }, 
             {
                 "Idx": 6,
-                "Title": "Coluseum",
+                "Title": "Coluseum is my favorite course ever",
                 "Thumbnail": "../images/dummy/tile_colosseum.jpg",
                 "Author": "Some Author",
                 "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999988732590944&y=-0.4645934478931077&w=1.0069124184819225e-9&h=9.810605875309654e-10"
             }, 
             {
                 "Idx": 7,
-                "Title": "Justin Morrill",
+                "Title": "Justin Morrill is my favorite course ever",
                 "Thumbnail": "../images/dummy/tile_justin_morrill.jpg",
                 "Author": "Some Author",
                 "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999897945675&y=-0.46459338150077905&w=1.9362194151655837e-10&h=1.8865082227261387e-10"
             }, 
             {
                 "Idx": 8,
-                "Title": "Big History 2",
+                "Title": "Big History 2 is my favorite course ever",
                 "Thumbnail": "../images/dummy/tile_bighistory.jpg",
                 "Author": "Some Author",
                 "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4996898109169686&y=-0.46442779133805834&w=0.0007080832576286593&h=0.0006899036738441856"
@@ -12845,7 +12938,10 @@ var CZ;
                     "box ex3", 
                     "box ex3 ex4", 
                     "box ex3 ex4 ex6", 
-                    "box ex3 ex4 ex6"
+                    "box ex3 ex4 ex6", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9"
                 ]
             }, 
             {
@@ -12856,11 +12952,28 @@ var CZ;
                     "box ex3", 
                     "box ex3 ex4", 
                     "box ex3 ex4 ex6", 
-                    "box ex3 ex4 ex6"
+                    "box ex3 ex4 ex6", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9"
                 ]
             }, 
             {
-                "Name": "#TwitterBlock",
+                "Name": "#TwitterBlock-tiles",
+                "Visibility": [
+                    "box", 
+                    "box", 
+                    "box ex3", 
+                    "box ex3 ex4", 
+                    "box ex3 ex4 ex6", 
+                    "box ex3 ex4 ex6", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9", 
+                    "box ex3 ex4 ex6 ex9"
+                ]
+            }, 
+            {
+                "Name": "#FavoriteTimelinesBlock-tiles",
                 "Visibility": [
                     "box", 
                     "box", 
@@ -12872,6 +12985,38 @@ var CZ;
             }, 
             
         ];
+        function resizeCrop($image, imageProps) {
+            var $startPage = $("#start-page");
+            var width = $image.parent().width();
+            var height = $image.parent().height();
+            if(!$startPage.is(":visible")) {
+                $startPage.show();
+                width = $image.width();
+                height = $image.height();
+                $startPage.hide();
+            }
+            var naturalHeight = imageProps.naturalHeight;
+            var naturalWidth = imageProps.naturalWidth;
+            var ratio = naturalWidth / naturalHeight;
+            var marginTop = 0;
+            var marginLeft = 0;
+            if(naturalWidth > naturalHeight) {
+                $image.height(height);
+                $image.width(height * ratio);
+                marginLeft = ($image.width() - width) / 2;
+            } else if(naturalWidth < naturalHeight) {
+                $image.width(width);
+                $image.height(width / ratio);
+                marginTop = ($image.height() - height) / 2;
+            } else {
+                $image.width(width);
+                $image.height(height);
+            }
+            $image.css({
+                "margin-top": -marginTop + "px",
+                "margin-left": -marginLeft + "px"
+            });
+        }
         function cloneTileTemplate(template, target, idx) {
             for(var i = 0; i < target[idx].Visibility.length; i++) {
                 var o = $(template).clone(true, true).appendTo(target[idx].Name);
@@ -12899,12 +13044,32 @@ var CZ;
                 var o = $(template).clone(true, true).appendTo(target[idx].Name);
                 o.attr("class", target[idx].Visibility[i]);
                 o.attr("id", "m" + idx + "i" + i);
+                $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
+                    ellipsis: '... ',
+                    wrap: 'word',
+                    fallbackToLetter: true,
+                    after: null,
+                    watch: false,
+                    height: null,
+                    tolerance: 0,
+                    lastCharacter: {
+                        remove: [
+                            ' ', 
+                            ',', 
+                            ';', 
+                            '.', 
+                            '!', 
+                            '?'
+                        ],
+                        noEllipsis: []
+                    }
+                });
             }
         }
         StartPage.cloneTweetTemplate = cloneTweetTemplate;
         function PlayIntroTour() {
-            var intoTour = CZ.Tours.tours[0];
-            if(typeof intoTour === "undefined") {
+            var introTour = CZ.Tours.tours[0];
+            if(typeof introTour === "undefined") {
                 return false;
             }
             CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
@@ -12918,35 +13083,22 @@ var CZ;
                 tourPlayerContainer: ".cz-form-tour-player",
                 bookmarksCount: ".cz-form-tour-bookmarks-count",
                 narrationToggle: ".cz-toggle-narration",
-                context: intoTour
+                context: introTour
             });
             CZ.Tours.tourCaptionForm.show();
-            CZ.Tours.activateTour(intoTour, undefined);
+            CZ.Tours.activateTour(introTour, undefined);
         }
         StartPage.PlayIntroTour = PlayIntroTour;
-        function TwitterLayout(target, idx) {
-            CZ.Service.getRecentTweets().done(function (response) {
-                for(var i = 0, len = response.d.length; i < len; ++i) {
-                    var text = response.d[i].Text;
-                    var author = response.d[i].User.Name;
-                    var time = response.d[i].CreatedDate;
-                    var myDate = new Date(time.match(/\d+/)[0] * 1);
-                    var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
-                    convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
-                    $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-text").text(text);
-                    $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-author").text(author);
-                    $("#m" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-time").text(convertedDate);
-                }
-            });
-        }
-        StartPage.TwitterLayout = TwitterLayout;
         function listFlip(name) {
             if('block' != document.getElementById(name + '-list').style.display) {
                 document.getElementById(name + '-list').style.display = 'block';
                 document.getElementById(name + '-tiles').style.display = 'none';
+                $("#" + name).find(".list-view-icon").addClass("active");
             } else {
                 document.getElementById(name + '-list').style.display = 'none';
                 document.getElementById(name + '-tiles').style.display = 'block';
+                $("#" + name).find(".list-view-icon").removeClass("active");
+                $(window).resize();
             }
         }
         StartPage.listFlip = listFlip;
@@ -12961,42 +13113,28 @@ var CZ;
                 var $tileImage = $tile.find(".boxInner .tile-photo img");
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
-                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(function () {
-                    window.location.href = timelineUrl;
-                });
-                $tileImage.load(function (event) {
+                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                }).invisible();
+                $tileImage.load($tile, function (event) {
                     var $this = $(this);
-                    var width = $this.parent().next().width();
-                    var height = $this.parent().next().height();
-                    if(!$startPage.is(":visible")) {
-                        $startPage.show();
-                        width = $this.parent().next().width();
-                        height = $this.parent().next().height();
-                        $startPage.hide();
-                    }
-                    var naturalHeight = (event.srcElement).naturalHeight;
-                    var naturalWidth = (event.srcElement).naturalWidth;
-                    var ratio = naturalWidth / naturalHeight;
-                    var marginTop = 0;
-                    var marginLeft = 0;
-                    if(naturalWidth > naturalHeight) {
-                        $this.height(height);
-                        $this.width(height * ratio);
-                        marginLeft = ($this.width() - $this.height()) / 2;
-                    } else {
-                        $this.width(width);
-                        $this.height(width / ratio);
-                        marginTop = ($this.height() - $this.width()) / 2;
-                    }
-                    $this.css({
-                        "margin-top": -marginTop + "px",
-                        "margin-left": -marginLeft + "px"
+                    var imageProps = event.target || event.srcElement;
+                    resizeCrop($this, imageProps);
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
                     });
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
                 }).attr({
                     src: timeline.ImageUrl,
                     alt: timeline.Title
                 });
-                $tileTitle.text(timeline.Title);
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
         }
@@ -13011,12 +13149,99 @@ var CZ;
                 var Name = "featured-list-elem" + i;
                 var idx = 1;
                 TemplateClone.attr("id", "l" + idx + "i" + i);
-                $("#l" + idx + "i" + i + " .li-title a").attr("href", timelineUrl);
-                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title);
+                TemplateClone.click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                });
+                $("#l" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
                 $("#l" + idx + "i" + i + " .li-author").text(timeline.Author);
             }
         }
         StartPage.fillFeaturedTimelinesList = fillFeaturedTimelinesList;
+        function fillFavoriteTimelines(timelines) {
+            var $template = $("#template-tile .box");
+            var layout = CZ.StartPage.tileLayout[3];
+            for(var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+                var $startPage = $("#start-page");
+                var $tile = $template.clone(true, true);
+                var $tileImage = $tile.find(".boxInner .tile-photo img");
+                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
+                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
+                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "favorite" + i).click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                }).invisible();
+                $tileImage.load($tile, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+                    resizeCrop($this, imageProps);
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
+                    });
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
+                $tileAuthor.text(timeline.Author);
+            }
+        }
+        StartPage.fillFavoriteTimelines = fillFavoriteTimelines;
+        function fillFavoriteTimelinesList(timelines) {
+            var template = "#template-list .list-item";
+            var target = "#FavoriteTimelinesBlock-list";
+            for(var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+                var TemplateClone = $(template).clone(true, true).appendTo(target);
+                var Name = "favorite-list-elem" + i;
+                var idx = 1;
+                TemplateClone.attr("id", "lfav" + idx + "i" + i);
+                TemplateClone.click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                });
+                $("#lfav" + idx + "i" + i + " .li-title a").text(timeline.Title.trim() || "No title :(");
+                $("#lfav" + idx + "i" + i + " .li-author").text(timeline.Author);
+            }
+        }
+        StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
+        function TwitterLayout(target, idx) {
+            var ListTemplate = "#template-list .list-item";
+            var ListElem = "#TwitterBlock-list";
+            CZ.Service.getRecentTweets().done(function (response) {
+                for(var i = 0, len = response.d.length; i < len; ++i) {
+                    var text = response.d[i].Text;
+                    var author = response.d[i].User.Name;
+                    var time = response.d[i].CreatedDate;
+                    var myDate = new Date(time.match(/\d+/)[0] * 1);
+                    var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
+                    var tweetAuthorLink = "https://twitter.com/" + response.d[i].User.ScreenName;
+                    var tweetLink = "https://twitter.com/" + response.d[i].User.ScreenName + "/statuses/" + response.d[i].IdStr;
+                    convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").text(text);
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").attr("href", tweetLink);
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-author").text(author);
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-author").attr("href", tweetAuthorLink);
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tile-meta-time").text(convertedDate);
+                    var ListTemplateClone = $(ListTemplate).clone(true, true).appendTo(ListElem);
+                    ListTemplateClone.attr("id", "l" + idx + "i" + i);
+                    $("#l" + idx + "i" + i + " .li-title a").text(text);
+                    $("#l" + idx + "i" + i + " .li-title a").attr("href", tweetLink);
+                    $("#l" + idx + "i" + i + " .li-author").text(author);
+                    $("#l" + idx + "i" + i + " .li-author").attr("href", tweetAuthorLink);
+                }
+            });
+        }
+        StartPage.TwitterLayout = TwitterLayout;
         function show() {
             var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
             $(".home-icon").addClass("active");
@@ -13024,7 +13249,9 @@ var CZ;
                 var events = $(el).data("events");
                 $(el).data("onclick", events && events.click && events.click[0]);
             }).off();
-            $(".header-regimes").fadeOut();
+            $(".header-regimes").invisible();
+            $(".header-breadcrumbs").invisible();
+            CZ.HomePageViewModel.closeAllForms();
             $("#start-page").fadeIn();
         }
         StartPage.show = show;
@@ -13034,11 +13261,15 @@ var CZ;
             $disabledButtons.removeAttr("disabled").each(function (i, el) {
                 $(el).click($(el).data("onclick"));
             });
-            $(".header-regimes").fadeIn();
+            if(_isRegimesVisible) {
+                $(".header-regimes").visible();
+            }
+            $(".header-breadcrumbs").visible();
             $("#start-page").fadeOut();
         }
         StartPage.hide = hide;
         function initialize() {
+            _isRegimesVisible = $(".header-regimes").is(":visible");
             $(".home-icon").click(function () {
                 if($("#start-page").is(":visible")) {
                     hide();
@@ -13046,14 +13277,30 @@ var CZ;
                     show();
                 }
             });
-            CZ.Service.getUserFeatured("63c4373e-6712-44a6-9bb4-b99a2783f53a").done(function (response) {
-                fillFeaturedTimelines(response);
-                fillFeaturedTimelinesList(response);
+            CZ.Service.getUserFeatured().done(function (response) {
+                var timelines = response ? response.reverse() : [];
+                fillFeaturedTimelines(timelines);
+                fillFeaturedTimelinesList(timelines);
+            });
+            CZ.Service.getUserFavorites().then(function (response) {
+                var timelines = response ? response.reverse() : [];
+                timelines.forEach(function (timeline) {
+                    CZ.Settings.favoriteTimelines.push(timeline.TimelineUrl.split("/").pop().slice(1));
+                });
+                if(timelines.length === 0) {
+                    $("#FavoriteTimelinesBlock .list-view-icon").hide();
+                    $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." + "Click star icon of the timeline you like to save it as favorite.");
+                } else {
+                    fillFavoriteTimelines(timelines);
+                    fillFavoriteTimelinesList(timelines);
+                }
+            }, function (error) {
+                console.log("[ERROR] getUserFavorites");
             });
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
-            var hash = CZ.UrlNav.getURL().hash.path;
-            if(!hash || hash === "/t" + CZ.Settings.guidEmpty) {
+            var hash = CZ.UrlNav.getURL().hash;
+            if(!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
                 show();
             }
         }
@@ -13061,6 +13308,106 @@ var CZ;
     })(CZ.StartPage || (CZ.StartPage = {}));
     var StartPage = CZ.StartPage;
 })(CZ || (CZ = {}));
+(function ($) {
+    $.fn.showError = function (msg, className, props) {
+        className = className || "error";
+        props = props || {
+        };
+        $.extend(true, props, {
+            class: className,
+            text: msg
+        });
+        var $errorTemplate = $("<div></div>", props).attr("error", true);
+        var $allErrors = $();
+        var $errorElems = $();
+        var result = this.each(function () {
+            var $this = $(this);
+            var isDiv;
+            var $div;
+            var $error;
+            if(!$this.data("error")) {
+                isDiv = $this.is("div");
+                $div = isDiv ? $this : $this.closest("div");
+                $error = $errorTemplate.clone();
+                $allErrors = $allErrors.add($error);
+                $errorElems = $errorElems.add($this);
+                $errorElems = $errorElems.add($div);
+                $errorElems = $errorElems.add($div.children());
+                $this.data("error", $error);
+                if(isDiv) {
+                    $div.append($error);
+                } else {
+                    $this.after($error);
+                }
+            }
+        });
+        if($allErrors.length > 0) {
+            $errorElems.addClass(className);
+            $allErrors.slideDown(CZ.Settings.errorMessageSlideDuration);
+        }
+        return result;
+    };
+    $.fn.hideError = function () {
+        var $allErrors = $();
+        var $errorElems = $();
+        var classes = "";
+        var result = this.each(function () {
+            var $this = $(this);
+            var $error = $this.data("error");
+            var $div;
+            var className;
+            if($error) {
+                $div = $this.is("div") ? $this : $this.closest("div");
+                className = $error.attr("class");
+                if(classes.split(" ").indexOf(className) === -1) {
+                    classes += " " + className;
+                }
+                $allErrors = $allErrors.add($error);
+                $errorElems = $errorElems.add($this);
+                $errorElems = $errorElems.add($div);
+                $errorElems = $errorElems.add($div.children());
+            }
+        });
+        if($allErrors.length > 0) {
+            $allErrors.slideUp(CZ.Settings.errorMessageSlideDuration).promise().done(function () {
+                $allErrors.remove();
+                $errorElems.removeData("error");
+                $errorElems.removeClass(classes);
+            });
+        }
+        return result;
+    };
+})(jQuery);
+(function ($) {
+    $.fn.visible = function (noTransition) {
+        return this.each(function () {
+            var $this = $(this);
+            if(noTransition) {
+                $this.addClass("no-transition");
+            } else {
+                $this.removeClass("no-transition");
+            }
+            $this.css({
+                opacity: 1,
+                visibility: "visible"
+            });
+        });
+    };
+    $.fn.invisible = function (noTransition) {
+        return this.each(function () {
+            var $this = $(this);
+            if(noTransition) {
+                $this.addClass("no-transition");
+            } else {
+                $this.removeClass("no-transition");
+            }
+            $this.css({
+                opacity: 0,
+                visibility: "hidden"
+            });
+        });
+    };
+})(jQuery);
 var constants;
 var CZ;
 (function (CZ) {
@@ -13497,9 +13844,13 @@ var CZ;
                     CZ.Authoring.isEnabled = UserCanEditCollection(data);
                 }).fail(function (error) {
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(function () {
-                    if(!CZ.Authoring.isEnabled) {
+                    if(!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
+                        $("#WelcomeBlock").attr("data-toggle", "show");
+                    } else {
+                        $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
                     }
                     CZ.Common.loadData().then(function (response) {
                         if(!response) {
@@ -13946,73 +14297,3 @@ var CZ;
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));
-(function ($) {
-    $.fn.showError = function (msg, className, props) {
-        className = className || "error";
-        props = props || {
-        };
-        $.extend(true, props, {
-            class: className,
-            text: msg
-        });
-        var $errorTemplate = $("<div></div>", props).attr("error", true);
-        var $allErrors = $();
-        var $errorElems = $();
-        var result = this.each(function () {
-            var $this = $(this);
-            var isDiv;
-            var $div;
-            var $error;
-            if(!$this.data("error")) {
-                isDiv = $this.is("div");
-                $div = isDiv ? $this : $this.closest("div");
-                $error = $errorTemplate.clone();
-                $allErrors = $allErrors.add($error);
-                $errorElems = $errorElems.add($this);
-                $errorElems = $errorElems.add($div);
-                $errorElems = $errorElems.add($div.children());
-                $this.data("error", $error);
-                if(isDiv) {
-                    $div.append($error);
-                } else {
-                    $this.after($error);
-                }
-            }
-        });
-        if($allErrors.length > 0) {
-            $errorElems.addClass(className);
-            $allErrors.slideDown(CZ.Settings.errorMessageSlideDuration);
-        }
-        return result;
-    };
-    $.fn.hideError = function () {
-        var $allErrors = $();
-        var $errorElems = $();
-        var classes = "";
-        var result = this.each(function () {
-            var $this = $(this);
-            var $error = $this.data("error");
-            var $div;
-            var className;
-            if($error) {
-                $div = $this.is("div") ? $this : $this.closest("div");
-                className = $error.attr("class");
-                if(classes.split(" ").indexOf(className) === -1) {
-                    classes += " " + className;
-                }
-                $allErrors = $allErrors.add($error);
-                $errorElems = $errorElems.add($this);
-                $errorElems = $errorElems.add($div);
-                $errorElems = $errorElems.add($div.children());
-            }
-        });
-        if($allErrors.length > 0) {
-            $allErrors.slideUp(CZ.Settings.errorMessageSlideDuration).promise().done(function () {
-                $allErrors.remove();
-                $errorElems.removeData("error");
-                $errorElems.removeClass(classes);
-            });
-        }
-        return result;
-    };
-})(jQuery);

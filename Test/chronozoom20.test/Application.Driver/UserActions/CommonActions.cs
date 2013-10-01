@@ -176,9 +176,9 @@ namespace Application.Driver.UserActions
 
         protected void TypeText(By by, string text)
         {
-            IWebElement element = FindElement(by);
-            element.Clear();
-            element.SendKeys(text);
+           // IWebElement element = FindElement(by);
+            FindElement(by).Clear();
+            FindElement(by).SendKeys(text);
         }
 
         protected void SetFilePath(By by, string text)
@@ -264,10 +264,22 @@ namespace Application.Driver.UserActions
         {
             foreach (string item in WebDriver.WindowHandles)
             {
-                if (WebDriver.SwitchTo().Window(item).Title.Contains(name))
+                string currentTitle = WebDriver.SwitchTo().Window(item).Title;
+                if (currentTitle == name || currentTitle.Contains(name))
                 {
                     WebDriver.SwitchTo().Window(item);
                     break;
+                }
+            }
+        }
+
+        protected void CloseAllWindowsButThis(string name)
+        {
+            foreach (string item in WebDriver.WindowHandles)
+            {
+                if (WebDriver.SwitchTo().Window(item).Title != name)
+                {
+                    WebDriver.SwitchTo().Window(item).Close();
                 }
             }
         }

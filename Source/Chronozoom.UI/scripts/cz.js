@@ -434,9 +434,13 @@ var CZ;
                     CZ.Authoring.isEnabled = UserCanEditCollection(data);
                 }).fail(function (error) {
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(function () {
-                    if(!CZ.Authoring.isEnabled) {
+                    if(!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
+                        $("#WelcomeBlock").attr("data-toggle", "show");
+                    } else {
+                        $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
                     }
                     CZ.Common.loadData().then(function (response) {
                         if(!response) {

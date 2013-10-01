@@ -47,3 +47,23 @@ input.error {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+.transition(...) {
+    @props: ~`"@{arguments}".replace(/[\[\]]/g, '')`;
+    -webkit-transition: @props;
+    -moz-transition: @props;
+    transition: @props;
+}
+
+/*Start Page*/
+.gradient(@from, @to) {
+    background-color: @from;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(@from), to(@to)); /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(top, @from, @to); /* Chrome 10+, Saf5.1+, iOS 5+ */
+    background-image:    -moz-linear-gradient(top, @from, @to); /* FF3.6+ */
+    background-image:     -ms-linear-gradient(top, @from, @to); /* IE10 */
+    background-image:      -o-linear-gradient(top, @from, @to); /* Opera 11.10+ */
+    background-image:         linear-gradient(to bottom, @from, @to);
+    -ms-filter:       progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(@from), endColorstr=quote(@to)); /* IE8 */
+    filter:           progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(@from), endColorstr=quote(@to)); /* IE6 & IE7 */
+}
