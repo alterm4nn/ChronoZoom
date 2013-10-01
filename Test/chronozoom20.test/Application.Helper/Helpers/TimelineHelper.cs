@@ -133,20 +133,26 @@ namespace Application.Helper.Helpers
 
         private void ConfirmDeletion()
         {
+            Logger.Log("<-");
             AcceptAlert();
             MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
+            Logger.Log("->");
         }
 
         private void ClickDelete()
         {
+            Logger.Log("<-");
             Click(By.CssSelector("#auth-edit-timeline-form .cz-form-delete.cz-button"));
+            Logger.Log("->");
         }
 
         private void InitEditForm()
         {
+            Logger.Log("<-");
             ExecuteJavaScript("CZ.Authoring.isActive = true");
             ExecuteJavaScript("CZ.Authoring.mode = 'editTimeline'");
             ExecuteJavaScript("CZ.Authoring.showEditTimelineForm(CZ.Authoring.selectedTimeline)");
+            Logger.Log("->");
         }
 
         private void NavigateToTimeLine(Timeline timeline)
@@ -158,7 +164,9 @@ namespace Application.Helper.Helpers
 
         private void CreateTimeline()
         {
+            Logger.Log("<-");
             Click(By.CssSelector("#auth-edit-timeline-form .cz-form-save.cz-button"));
+            Logger.Log("->");
         }
 
         private void SetTimelineName(string timelineName)
@@ -185,7 +193,9 @@ namespace Application.Helper.Helpers
 
         private void SetDateMode()
         {
+            Logger.Log("<-");
             SelectByText(By.CssSelector(".cz-form-time-start.cz-datepicker .cz-datepicker-mode.cz-input"), "Date");
+            Logger.Log("->");
         }
     }
 }
