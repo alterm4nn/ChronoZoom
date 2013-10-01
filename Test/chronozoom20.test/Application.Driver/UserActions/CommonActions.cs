@@ -171,9 +171,9 @@ namespace Application.Driver.UserActions
 
         protected void TypeText(By by, string text)
         {
-            IWebElement element = FindElement(by);
-            element.Clear();
-            element.SendKeys(text);
+           // IWebElement element = FindElement(by);
+            FindElement(by).Clear();
+            FindElement(by).SendKeys(text);
         }
 
         protected void SetFilePath(By by, string text)
