@@ -60,7 +60,9 @@ namespace Application.Driver.UserActions
             try
             {
                 IWebElement element = WebDriver.FindElement(by);
-               // element.Highlight();
+                element.Highlight();
+                //Update element state
+                element = WebDriver.FindElement(by);
                 return element;
             }
             catch (NoSuchElementException ex)
@@ -176,9 +178,9 @@ namespace Application.Driver.UserActions
 
         protected void TypeText(By by, string text)
         {
-           // IWebElement element = FindElement(by);
-            FindElement(by).Clear();
-            FindElement(by).SendKeys(text);
+            IWebElement element = FindElement(by);
+            element.Clear();
+            element.SendKeys(text);
         }
 
         protected void SetFilePath(By by, string text)
