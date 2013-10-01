@@ -133,7 +133,7 @@ namespace Application.Helper.Helpers
 
         private void ConfirmDeletion()
         {
-            Logger.Log("<-");
+            Logger.Log("<-", LogType.MessageWithoutScreenshot);
             AcceptAlert();
             MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
             Logger.Log("->");
@@ -143,7 +143,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             Click(By.CssSelector("#auth-edit-timeline-form .cz-form-delete.cz-button"));
-            Logger.Log("->");
+            Logger.Log("->", LogType.MessageWithoutScreenshot);
         }
 
         private void InitEditForm()
