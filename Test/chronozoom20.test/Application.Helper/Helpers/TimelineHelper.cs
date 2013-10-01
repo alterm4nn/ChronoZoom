@@ -172,7 +172,11 @@ namespace Application.Helper.Helpers
         private void SetTimelineName(string timelineName)
         {
             Logger.Log("<- timeline: " + timelineName);
-            TypeText(By.CssSelector("#auth-edit-timeline-form .cz-form-item-title.cz-input"), timelineName);
+            WaitForElementIsDisplayed(By.Id("auth-edit-timeline-form"));
+            By title = By.CssSelector("#auth-edit-timeline-form .cz-form-item-title.cz-input");
+            WaitForElementIsDisplayed(title);
+            WaitForElementEnabled(title);
+            TypeText(title, timelineName);
             Logger.Log("->");
         }
 
