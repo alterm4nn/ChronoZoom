@@ -191,7 +191,10 @@ namespace Application.Helper.Helpers
         private void SetTourName(string tourName)
         {
             Logger.Log("<- tour name: " + tourName);
-            TypeText(By.CssSelector(".cz-form-tour-title.cz-input"), tourName);
+            By title = By.CssSelector(".cz-form-tour-title.cz-input");
+            WaitForElementEnabled(title);
+            WaitForElementIsDisplayed(title);
+            TypeText(title, tourName);
             Logger.Log("->");
         }
 
