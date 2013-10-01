@@ -112,6 +112,11 @@ namespace Application.Driver.UserActions
             return WebDriver.Title;
         }
 
+        protected string GetPageSource()
+        {
+            return WebDriver.PageSource;
+        }
+
         protected ReadOnlyCollection<Cookie> GetAllCookies()
         {
             return WebDriver.Manage().Cookies.AllCookies;
