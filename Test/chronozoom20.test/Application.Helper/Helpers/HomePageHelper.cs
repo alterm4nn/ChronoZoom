@@ -10,7 +10,7 @@ namespace Application.Helper.Helpers
     {
         public void OpenPage()
         {
-            Logger.Log("<-");
+            Logger.Log("<-", LogType.MessageWithoutScreenshot);
             HelperManager<NavigationHelper>.Instance.OpenHomePage();
             WaitWhileHomePageIsLoaded();
             CloseStartPage();
@@ -26,7 +26,7 @@ namespace Application.Helper.Helpers
 
         public void OpenSandboxPage()
         {
-            Logger.Log("<-");
+            Logger.Log("<-", LogType.MessageWithoutScreenshot);
             HelperManager<NavigationHelper>.Instance.OpenSandboxPage();
             WaitWhileHomePageIsLoaded();
             CloseStartPage();
@@ -122,7 +122,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<- tab title: " + name);
             SwitchToWindow(name);
-            string title = GetTitle(); 
+            string title = GetTitle();
             Logger.Log("-> new tab title: " + title);
             return title;
         }
