@@ -335,11 +335,19 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<- name: " + exhibitName);
             By title = By.CssSelector("#auth-edit-exhibit-form .cz-form-item-title");
+            WaitForExhibitEditFormIsDisplayed();
             WaitForElementEnabled(title);
+            WaitForElementIsDisplayed(title);
             TypeText(title, exhibitName);
             Logger.Log("->");
         }
 
+        private void WaitForExhibitEditFormIsDisplayed()
+        {
+            Logger.Log("<-");
+            WaitForElementIsDisplayed(By.Id("auth-edit-exhibit-form"));
+            Logger.Log("->");
+        }
 
         private void SetExhibitDate(Exhibit exhibit)
         {

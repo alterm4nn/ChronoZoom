@@ -47,21 +47,18 @@ namespace Tests
         #endregion
 
         [TestMethod]
-        [TestCategory("Random")]
         public void new_timeline_should_have_a_title()
         {
             Assert.AreEqual(_timeline.Title, _newTimeline.Title);
         }
 
         [TestMethod]
-        [TestCategory("Random")]
         public void new_timeline_should_not_have_null_id()
         {
             Assert.IsNotNull(_newTimeline.TimelineId);
         }
 
         [TestMethod]
-        [TestCategory("Random")]
         public void new_timeline_should_be_deleted()
         {
             TimelineHelper.DeleteTimeline(_newTimeline);
