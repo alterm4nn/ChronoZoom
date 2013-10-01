@@ -60,7 +60,7 @@ namespace Application.Driver.UserActions
             try
             {
                 IWebElement element = WebDriver.FindElement(by);
-                element.Highlight();
+               // element.Highlight();
                 return element;
             }
             catch (NoSuchElementException ex)
