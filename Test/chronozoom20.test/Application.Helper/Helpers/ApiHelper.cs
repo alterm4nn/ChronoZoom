@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net;
+using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Web.Script.Serialization;
 using Application.Driver;
 using Application.Helper.Constants;
 using Application.Helper.UserActions;
 using System.IO;
 using System.Runtime.Serialization.Json;
+using Chronozoom.Entities;
 using Exhibit = Application.Helper.Entities.Exhibit;
 using Timeline = Application.Helper.Entities.Timeline;
 using Tour = Application.Helper.Entities.Tour;
@@ -23,6 +28,7 @@ namespace Application.Helper.Helpers
         private const string TimelineApiServiceUrl = ApiConstants.TimelineApiServiceUrl;
         private const string ExhibitApiServiceUrl = ApiConstants.ExhibitApiServiceUrl;
         private const string TourApiServiceUrl = ApiConstants.TourApiServiceUrl;
+        Random _random = new Random();
 
         public void CreateTimelineByApi(Timeline timeline)
         {
@@ -58,7 +64,7 @@ namespace Application.Helper.Helpers
 
         public void CreateExhibitByApi(Exhibit exhibit)
         {
-            Logger.Log("<- exhibit: " + exhibit,LogType.MessageWithoutScreenshot);
+            Logger.Log("<- exhibit: " + exhibit, LogType.MessageWithoutScreenshot);
             DataContractJsonSerializer exhibitSerializer = new DataContractJsonSerializer(typeof(Exhibit));
             DataContractJsonSerializer guidSerializer = new DataContractJsonSerializer(typeof(NewExhibitApiResponse));
 
@@ -99,29 +105,93 @@ namespace Application.Helper.Helpers
             request.GetResponse();
         }
 
-        public IEnumerable<Tour> GetToursByApi()
+        public Guid[] SelectAllTimelinesAsFavorites(Collection<Chronozoom.Entities.Timeline> timelines)
         {
+            Logger.Log("<-");
+            List<Guid> list = new List<Guid>();
+            foreach (Chronozoom.Entities.Timeline timeline in timelines)
+            {
+                ExecuteJavaScript("CZ.Service.putUserFavorite('" + timeline.Id + "');");
+                Sleep(1);
+                list.Add(timeline.Id);
+            }
+            Logger.Log("-> Selected as favorite timelines: " + string.Join(",", list));
+            return list.ToArray();
+        }
 
-            HttpWebRequest request = MakeGetRequest(TourApiServiceUrl);
-            WebResponse response = request.GetResponse();
+        public Guid[] GetFavoriteTimelines()
+        {
+            Logger.Log("<-");
+            List<Guid> favoriteTimelinesGuids = new List<Guid>();
+            OpenUrl(Configuration.BaseUrl + "/api/userfavorites");
+            string userFavoritesJson = StripHtmlText(GetPageSource());
+            var javaScriptSerializer = new JavaScriptSerializer();
+            var desirealizedFavoriteItems = javaScriptSerializer.Deserialize<List<FavoriteItem>>(userFavoritesJson);
+            if (desirealizedFavoriteItems.Count != 0)
+            {
+                foreach (FavoriteItem favoriteItem in desirealizedFavoriteItems)
+                {
+                    string favoriteItemGuid = favoriteItem.TimelineUrl.Split('/').Last();
+                    favoriteTimelinesGuids.Add(Guid.Parse(favoriteItemGuid.Substring(1, favoriteItemGuid.Length - 1)));
+                }
+            }
+            Logger.Log("-> Favorite timelines guids: " + string.Join(",", favoriteTimelinesGuids));
+            return favoriteTimelinesGuids.ToArray();
+        }
 
+        public Collection<Chronozoom.Entities.Timeline> GetUserTimelines(string username)
+        {
+            Logger.Log("<- Username: " + username);
+            string requestUrl = Path.Combine(Configuration.BaseUrl, string.Format("api/gettimelines?supercollection={0}&collection={0}", username));
+            OpenUrl(requestUrl);
+            var userTimelinesJson = StripHtmlText(GetPageSource());
+            Collection<Chronozoom.Entities.Timeline> userTimelines;
 
-            var serializer = new DataContractJsonSerializer(typeof(Tour[]), "d");
-            var bar = "\"d\":[{\"audio\":\"\",\"bookmarks\":[{\"description\":\"descr\",\"id\":\"0a4b0ab6-38bb-4cd5-896d-2a7ecd768651\",\"lapseTime\":0,\"name\":\"MyTimeline\",\"referencId\":\"00000000-0000-0000-0000-000000000000\",\"referenceType\":0,\"url\":\"url.jog\"}],\"category\":null,\"description\":\"test1\",\"id\":\"00000000-0000-0000-0000-000000000000\",\"name\":\"test1\",\"sequence\":null},{\"audio\":\"\",\"bookmarks\":[{\"description\":\"descr\",\"id\":\"0a4b0ab6-38bb-4cd5-896d-2a7ecd768651\",\"lapseTime\":0,\"name\":\"MyTimeline\",\"referencId\":\"00000000-0000-0000-0000-000000000000\",\"referenceType\":0,\"url\":\"url.jog\"}],\"category\":null,\"description\":\"test1\",\"id\":\"00000000-0000-0000-0000-000000000000\",\"name\":\"test1\",\"sequence\":null},{\"audio\":\"\",\"bookmarks\":[{\"description\":\"descr\",\"id\":\"0a4b0ab6-38bb-4cd5-896d-2a7ecd768651\",\"lapseTime\":0,\"name\":\"MyTimeline\",\"referencId\":\"00000000-0000-0000-0000-000000000000\",\"referenceType\":0,\"url\":\"url.jog\"}],\"category\":null,\"description\":\"test1\",\"id\":\"00000000-0000-0000-0000-000000000000\",\"name\":\"test1\",\"sequence\":null}]";
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(bar));
-            var foo = serializer.ReadObject(stream);
-            stream.Close();
+            using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(userTimelinesJson)))
+            {
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(TimelineRaw));
+                TimelineRaw results = (TimelineRaw)serializer.ReadObject(ms);
+                userTimelines = results.ChildTimelines;
+            }
+            Logger.Log("-> User timelines count: " + userTimelines.Count);
+            return userTimelines;
+        }
 
+        public void SetUserTimelinesAsNotFavorite(Collection<Chronozoom.Entities.Timeline> timelines)
+        {
+            Logger.Log("<- imput timelines count: " + timelines.Count);
+            foreach (var timeline in timelines)
+            {
+                ExecuteJavaScript("CZ.Service.deleteUserFavorite('" + timeline.Id + "');");
+            }
+            Logger.Log("->");
+        }
 
-            DataContractJsonSerializer tourSerializer = new DataContractJsonSerializer(typeof(Tour[]));
-            Stream responseStream = response.GetResponseStream();
-            //MemoryStream ms = new MemoryStream();
-            //responseStream.CopyTo(ms);
-            //var test = Encoding.Default.GetString(ms.ToArray());
+        public Collection<Chronozoom.Entities.Timeline> GetCurrentUserTimelines()
+        {
+            Logger.Log("<-");
+            string currentUserName = GetCurrentUsername();
+            Logger.Log("->");
+            return GetUserTimelines(currentUserName);
+        }
 
-            Tour[] toursCollection = (Tour[])tourSerializer.ReadObject(responseStream);
+        internal string StripHtmlText(string text)
+        {
+            return Regex.Replace(text, @"<(.|\n)*?>", string.Empty);
+        }
 
-            return null;
+        internal string GetCurrentUsername()
+        {
+            Logger.Log("<-");
+            string userInfoApiUrl = Configuration.BaseUrl + "/api/user";
+            OpenUrl(userInfoApiUrl);
+
+            string strippedAccountInfoJson = StripHtmlText(GetPageSource());
+            var javaScriptSerializer = new JavaScriptSerializer();
+            Dictionary<string, string> data = javaScriptSerializer.Deserialize<Dictionary<string, string>>(strippedAccountInfoJson);
+            string currentUserName = data["DisplayName"];
+            Logger.Log("-> Current user name: " + currentUserName);
+            return currentUserName;
         }
 
         private HttpWebRequest MakePutRequest(string serviceUrl)
@@ -160,5 +230,13 @@ namespace Application.Helper.Helpers
         [DataMember(Name = "ExhibitId")]
         public string ExhibitId { get; set; }
 
+    }
+
+    internal class FavoriteItem
+    {
+        public string Author { get; set; }
+        public string ImageUrl { get; set; }
+        public string TimelineUrl { get; set; }
+        public string Title { get; set; }
     }
 }
