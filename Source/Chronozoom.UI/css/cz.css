@@ -360,16 +360,6 @@ iframe[sutra=picker] + div {
   background-color: #212121;
   color: #fff;
 }
-.text-ellipsis {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  -o-text-overflow: ellipsis;
-  -icab-text-overflow: ellipsis;
-  -khtml-text-overflow: ellipsis;
-  -moz-text-overflow: ellipsis;
-  -webkit-text-overflow: ellipsis;
-}
 .start-page-screen {
   display: none;
   position: absolute;
@@ -1038,11 +1028,6 @@ iframe[sutra=picker] + div {
 /* The breadcrumbs scroller area */
 /* The height of the page footer */
 /* The width of the footers links area */
-@font-face {
-  font-family: "Segoe UI Light";
-  src: url("/fonts/segoeuil.eot");
-  src: url("/fonts/segoeuil.eot?#iefix") format("embedded-opentype"), url("/fonts/segoeuil.woff") format("woff"), url("/fonts/segoeuil.ttf") format("truetype");
-}
 html,
 body {
   margin: 0;

@@ -69,9 +69,6 @@
     <Content Include="css\_mixins.less" />
     <Content Include="css\_colors.less" />
     <Content Include="css\_vars.less" />
-    <Content Include="fonts\segoeuil.eot" />
-    <Content Include="fonts\segoeuil.ttf" />
-    <Content Include="fonts\segoeuil.woff" />
     <Content Include="dumps\rin-dump.json" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
@@ -695,6 +692,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="fonts\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
