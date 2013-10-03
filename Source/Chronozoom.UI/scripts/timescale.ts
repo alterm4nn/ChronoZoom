@@ -697,7 +697,7 @@ module CZ {
                     return divPool[i];
                 }
                 else {
-                    var div = $("<div>" + inner + "</div>");
+                    var div: any = $("<div>" + inner + "</div>");
                     isUsedPool[len] = true;
                     divPool[len] = div;
                     inners[len] = inner;
@@ -1105,17 +1105,27 @@ module CZ {
         };
 
         this.getMarkerLabel = function (range, time) {
+            var labelText: string = "";
+
             this.getRegime(range.min, range.max);
-            var labelText = parseFloat(new Number(time - this.firstYear).toFixed(2));
-            labelText += (labelText > 0 ? -0.5 : -1.5);
-            labelText = Math.round(labelText);
-            if (labelText < 0) labelText = -labelText;
-            else if (labelText == 0) labelText = 1;
+            var currentDate: number = parseFloat(new Number(time - this.firstYear).toFixed(2));
+            currentDate += currentDate > 0 ? -0.5 : -1.5;
+            currentDate = Math.round(currentDate);
+            if (currentDate < 0) {
+                currentDate = -currentDate;
+            }
+            else if (currentDate == 0) {
+                currentDate = 1;
+            }
+
+            labelText = currentDate.toString();
+
             if (time < this.firstYear + 1) {
                 labelText += " " + "BCE";
             } else {
                 labelText += " " + "CE";
             }
+
             return labelText;
         };
 

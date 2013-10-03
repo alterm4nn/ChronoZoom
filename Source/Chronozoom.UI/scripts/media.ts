@@ -23,8 +23,8 @@ module CZ {
         var _mediaPickers: any = {};
         var _mediaPickersViews: any = {};
 
-        declare export var mediaPickers: any;
-        declare export var mediaPickersViews: any;
+        export declare var mediaPickers: any;
+        export declare var mediaPickersViews: any;
         Object.defineProperties(CZ.Media, {
             mediaPickers: {
                 get: () => {
@@ -63,7 +63,7 @@ module CZ {
             }
         }
 
-        export function registerMediaPicker(title: string, iconUrl: string, type: any, viewUrl?: string, selector?: string): JQueryPromise {
+        export function registerMediaPicker(title: string, iconUrl: string, type: any, viewUrl?: string, selector?: string): any {
             var order = Object.keys(_mediaPickers).length;
             var setup = type.setup;
             selector = selector || "$('<div></div>')";

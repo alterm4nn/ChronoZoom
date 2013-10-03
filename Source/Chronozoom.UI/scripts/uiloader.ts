@@ -5,7 +5,7 @@ module CZ {
         
         export function loadHtml(selector, filepath) {
             var container = $(selector);
-            var promise = new $.Deferred();
+            var promise = $.Deferred();
 
             // NOTE: Allow undefined filepath. The method will return initial container.
             if (!filepath) {

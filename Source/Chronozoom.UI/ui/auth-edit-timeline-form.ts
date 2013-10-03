@@ -14,7 +14,7 @@ module CZ {
         }
 
         export class FormEditTimeline extends CZ.UI.FormUpdateEntity {
-            private saveButton: JQuery;
+            public saveButton: JQuery;
             private deleteButton: JQuery;
             private startDate: CZ.UI.DatePicker;
             private endDate: CZ.UI.DatePicker;
@@ -22,7 +22,7 @@ module CZ {
             private errorMessage: JQuery;
 
             private timeline: any;
-            private isCancel: bool;
+            private isCancel: boolean;
 
             // We only need to add additional initialization in constructor.
             constructor(container: JQuery, formInfo: IFormEditTimelineInfo) {

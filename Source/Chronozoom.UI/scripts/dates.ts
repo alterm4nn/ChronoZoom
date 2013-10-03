@@ -41,10 +41,10 @@ module CZ {
                 coord = (year > -1) ? year : year + 1;
 
             // Get the number of day in the year.
-            var sumDaysOfMonths = function (s, d, i) {
-                return s + (i < month) * d;
+            var sumDaysOfMonths = function (s: any, d: any, i: any): number {
+                return s + parseInt((i < month).toString()) * d;
             }
-            var days = daysInMonth.reduce(sumDaysOfMonths, +(isLeap && month > 1)) + day;
+            var days = daysInMonth.reduce(sumDaysOfMonths, parseInt((isLeap && month > 1).toString())) + day;
 
             coord += (days - 1) / daysInYear;
 

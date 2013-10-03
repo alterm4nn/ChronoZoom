@@ -23,7 +23,6 @@ interface JQueryAjaxSettings {
     async?: boolean;
     beforeSend? (jqXHR: JQueryXHR, settings: JQueryAjaxSettings): any;
     cache?: boolean;
-    complete? (jqXHR: JQueryXHR, textStatus: string): any;
     contents?: { [key: string]: any; };
     //According to jQuery.ajax source code, ajax's option actually allows contentType to set to "false"
     // https://github.com/borisyankov/DefinitelyTyped/issues/742

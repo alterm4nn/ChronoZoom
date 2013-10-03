@@ -125,7 +125,7 @@ module CZ {
                 this.activationSource.removeClass("active");
             }
 
-            public checkFileLoadCompatibility(): bool {
+            public checkFileLoadCompatibility(): boolean {
                 return window['File'] && window['FileReader'] && window['FileList'] && window['Blob'];
             }
 

@@ -410,7 +410,7 @@ module CZ {
             }
 
 
-            public hide(noAnimation?: bool = false) {
+            public hide(noAnimation?: boolean) {
                 super.close(noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
