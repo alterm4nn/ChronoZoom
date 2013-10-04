@@ -140,7 +140,7 @@ module CZ {
             },
         ];
 
-        function resizeCrop($image: JQuery, imageProps: any, isListView?: bool): void {
+        function resizeCrop($image: JQuery, imageProps: any, isListView?: boolean): void {
             var $startPage = $("#start-page");
 
             // Get size of the tile.

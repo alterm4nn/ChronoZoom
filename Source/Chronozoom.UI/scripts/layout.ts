@@ -494,7 +494,7 @@ module CZ {
             }
         }
 
-        export var FindChildTimeline = function (timeline, id, recursive) {
+        export var FindChildTimeline = function (timeline, id, recursive?: boolean) {
             var result = undefined;
 
             if (timeline && timeline.timelines instanceof Array) {

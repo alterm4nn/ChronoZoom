@@ -130,7 +130,7 @@ module CZ {
             private bookmarksCount: JQuery;
             private tourPlayer: CZ.UI.TourPlayer;
             private tour: CZ.Tours.Tour;
-            private isMinimized: bool;
+            private isMinimized: boolean;
 
             constructor(container: JQuery, formInfo: IFormTourCaptionInfo) {
                 super(container, formInfo);

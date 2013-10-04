@@ -18,13 +18,13 @@ module CZ {
         }
 
         export class FormEditExhibit extends FormUpdateEntity {
-            private titleTextblock: JQuery;
+            public titleTextblock: JQuery;
             private titleInput: JQuery;
             private datePicker: DatePicker;
             private createArtifactButton: JQuery;
             public contentItemsListBox: ContentItemListBox;
             private errorMessage: JQuery;
-            private saveButton: JQuery;
+            public saveButton: JQuery;
             private deleteButton: JQuery;
 
             private contentItemsTemplate: JQuery;
@@ -33,8 +33,8 @@ module CZ {
             private exhibitCopy: any;
 
             private mode; // create | edit
-            private isCancel: bool; // is form closed without saving changes
-            public isModified: bool;
+            private isCancel: boolean; // is form closed without saving changes
+            public isModified: boolean;
 
             public clickedListItem: ContentItemListItem; // the contentitem on which the user dbl clicked
 
@@ -296,7 +296,7 @@ module CZ {
                 CZ.Common.vc.virtualCanvas("requestInvalidate");
             }
 
-            public show(noAnimation?: bool = false) {
+            public show(noAnimation: boolean = false) {
                 CZ.Authoring.isActive = true;
                 this.activationSource.addClass("active");
                 this.errorMessage.hide();
@@ -307,7 +307,7 @@ module CZ {
                 });
             }
 
-            public hide(noAnimation?: bool = false) {
+            public hide(noAnimation: boolean = false) {
                 super.close(noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
@@ -316,7 +316,7 @@ module CZ {
                 this.activationSource.removeClass("active");
             }
 
-            public close(noAnimation?: bool = false) {
+            public close(noAnimation: boolean = false) {
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;

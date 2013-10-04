@@ -75,9 +75,9 @@ module CZ {
         export interface FeatureInfo {
             Name: string;
             Activation: FeatureActivation;
-            JQueryReference: string;
-            IsEnabled: bool;
-            HasBeenActivated: bool;
+            JQueryReference?: string;
+            IsEnabled?: boolean;
+            HasBeenActivated?: boolean;
         }
 
         export var sessionForm: CZ.UI.FormHeaderSessionExpired;
@@ -153,7 +153,7 @@ module CZ {
             },
         ];
 
-        export var rootCollection: bool;
+        export var rootCollection: boolean;
 
         function UserCanEditCollection(profile) {
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
@@ -1011,7 +1011,7 @@ module CZ {
                 var feature = _featureMap[idxFeature];
 
                 if (feature.IsEnabled === undefined) {
-                    var enabled: bool = true;
+                    var enabled: boolean = true;
                     if (feature.Activation === FeatureActivation.Disabled) {
                         enabled = false;
                     }

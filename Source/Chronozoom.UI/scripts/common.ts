@@ -296,7 +296,7 @@ module CZ {
                     setVisible(visible);
                 });
 
-                var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID);
+                var lifeTimeline = CZ.Layout.FindChildTimeline(earthTimeline, CZ.Settings.lifeTimelineID, false);
                 if (typeof lifeTimeline !== "undefined") {
                     lifeVisible = f(lifeTimeline);
                     $("#regime-link-life").click(function () {
@@ -304,7 +304,7 @@ module CZ {
                         setVisible(visible);
                     });
 
-                    var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID);
+                    var prehistoryTimeline = CZ.Layout.FindChildTimeline(lifeTimeline, CZ.Settings.prehistoryTimelineID, false);
                     if (typeof prehistoryTimeline !== "undefined") {
                         prehistoryVisible = f(prehistoryTimeline);
                         $("#regime-link-prehistory").click(function () {

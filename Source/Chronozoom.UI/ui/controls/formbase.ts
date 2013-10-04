@@ -13,7 +13,7 @@ module CZ {
         }
 
         export class FormBase {
-            public isFormVisible: bool;
+            public isFormVisible: boolean;
             public activationSource: JQuery;
             public navButton: JQuery;
             public closeButton: JQuery;

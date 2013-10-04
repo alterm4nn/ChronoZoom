@@ -582,8 +582,8 @@ module CZ {
                 }
                 if (this.prevContent) {
                     var renderTime = new Date();
-                    var renderTimeDiff = renderTime - self.lastRenderTime;
-                    self.lastRenderTime = renderTime;
+                    var renderTimeDiff = renderTime.getTime() - self.lastRenderTime;
+                    self.lastRenderTime = renderTime.getTime();
 
                     // Override the default contentAppearanceAnimationStep,
                     // instead of being a constant it now depends on the time,

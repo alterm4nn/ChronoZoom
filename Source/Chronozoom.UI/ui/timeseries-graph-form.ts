@@ -265,7 +265,7 @@ module CZ {
                 var c = y < ymin ? 1 : 0;
                 var d = y > ymax ? 1 : 0;
                 return a << 3 | b << 2 | c << 1 | d;
-            };
+            }
 
             public generateAxisParameters(tickOrigin: number, secondScreenBorder: number, ymin: number, ymax: number, appearence: any): any {
                 var that = this;
@@ -403,7 +403,7 @@ module CZ {
                 cont.height(24).appendTo(legend);
             }
 
-            public checkLegendVisibility(screenWidth: number): bool {
+            public checkLegendVisibility(screenWidth: number): boolean {
                 var baseIndicatorSize = 24;
                 var horOffset = 30;
                 var topOffset = 10;

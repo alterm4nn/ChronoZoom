@@ -5,7 +5,7 @@
      * Make the element fully visible using opacity and visibility CSS rules.
      * @param  {bool} noTransition If true then CSS transition won't be used.
      */
-    $.fn.visible = function (noTransition?: bool) {
+    $.fn.visible = function (noTransition?: boolean) {
         return this.each(function () {
             var $this = $(this);
             if (noTransition) {
@@ -24,7 +24,7 @@
      * Make the element fully invisible using opacity and visibility CSS rules.
      * @param  {bool} noTransition If true then CSS transition won't be used.
      */
-    $.fn.invisible = function (noTransition?: bool) {
+    $.fn.invisible = function (noTransition?: boolean) {
         return this.each(function () {
             var $this = $(this);
             if (noTransition) {

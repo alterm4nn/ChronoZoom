@@ -1,9 +1,11 @@
 var constants;
+
 var CZ;
 (function (CZ) {
     CZ.timeSeriesChart;
     CZ.leftDataSet;
     CZ.rightDataSet;
+
     (function (HomePageViewModel) {
         var _uiMap = {
             "#header-edit-form": "/ui/header-edit-form.html",
@@ -26,99 +28,101 @@ var CZ;
             "#mediapicker-form": "/ui/mediapicker-form.html",
             "#start-page": "/ui/start-page.html"
         };
+
         (function (FeatureActivation) {
-            FeatureActivation._map = [];
-            FeatureActivation._map[0] = "Enabled";
-            FeatureActivation.Enabled = 0;
-            FeatureActivation._map[1] = "Disabled";
-            FeatureActivation.Disabled = 1;
-            FeatureActivation._map[2] = "RootCollection";
-            FeatureActivation.RootCollection = 2;
-            FeatureActivation._map[3] = "NotRootCollection";
-            FeatureActivation.NotRootCollection = 3;
-            FeatureActivation._map[4] = "NotProduction";
-            FeatureActivation.NotProduction = 4;
+            FeatureActivation[FeatureActivation["Enabled"] = 0] = "Enabled";
+            FeatureActivation[FeatureActivation["Disabled"] = 1] = "Disabled";
+            FeatureActivation[FeatureActivation["RootCollection"] = 2] = "RootCollection";
+            FeatureActivation[FeatureActivation["NotRootCollection"] = 3] = "NotRootCollection";
+            FeatureActivation[FeatureActivation["NotProduction"] = 4] = "NotProduction";
         })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
         var FeatureActivation = HomePageViewModel.FeatureActivation;
+
         HomePageViewModel.sessionForm;
+
         var _featureMap = [
             {
                 Name: "Login",
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: "#login-panel"
-            }, 
+            },
             {
                 Name: "Search",
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: "#search-button"
-            }, 
+            },
             {
                 Name: "Tours",
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: "#tours-index"
-            }, 
+            },
             {
                 Name: "Authoring",
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-icon.edit-icon"
-            }, 
+            },
             {
                 Name: "TourAuthoring",
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: ".cz-form-create-tour"
-            }, 
+            },
             {
                 Name: "WelcomeScreen",
                 Activation: FeatureActivation.RootCollection,
                 JQueryReference: "#welcomeScreenBack"
-            }, 
+            },
             {
                 Name: "Regimes",
                 Activation: FeatureActivation.RootCollection,
                 JQueryReference: ".header-regimes"
-            }, 
+            },
             {
                 Name: "TimeSeries",
                 Activation: FeatureActivation.Enabled
-            }, 
+            },
             {
                 Name: "ManageCollections",
                 Activation: FeatureActivation.Disabled,
                 JQueryReference: "#collections_button"
-            }, 
+            },
             {
                 Name: "BreadCrumbs",
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-breadcrumbs"
-            }, 
+            },
             {
                 Name: "Themes",
                 Activation: FeatureActivation.NotProduction
-            }, 
+            },
             {
                 Name: "Skydrive",
                 Activation: FeatureActivation.Enabled
-            }, 
+            },
             {
                 Name: "StartPage",
                 Activation: FeatureActivation.NotProduction,
                 JQueryReference: ".header-icon.home-icon"
-            }, 
-            
+            }
         ];
+
         HomePageViewModel.rootCollection;
+
         function UserCanEditCollection(profile) {
-            if(CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
+            if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
                 return true;
             }
-            if(!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
+
+            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
                 return false;
             }
+
             return true;
         }
+
         function InitializeToursUI(profile, forms) {
             CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+
             var onTakeTour = function (tour) {
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
@@ -135,13 +139,16 @@ var CZ;
                     context: tour
                 });
                 CZ.Tours.tourCaptionForm.show();
+
                 CZ.Tours.removeActiveTour();
                 CZ.Tours.activateTour(tour, undefined);
             };
+
             var onToursInitialized = function () {
                 $("#tours_index").click(function () {
                     var toursListForm = getFormById("#toursList");
-                    if(toursListForm.isFormVisible) {
+
+                    if (toursListForm.isFormVisible) {
                         toursListForm.close();
                     } else {
                         closeAllForms();
@@ -154,56 +161,56 @@ var CZ;
                             tours: CZ.Tours.tours,
                             takeTour: onTakeTour,
                             editTour: allowEditing ? function (tour) {
-                                if(CZ.Authoring.showEditTourForm) {
+                                if (CZ.Authoring.showEditTourForm)
                                     CZ.Authoring.showEditTourForm(tour);
-                                }
                             } : null
                         });
                         form.show();
                     }
                 });
             };
-            if(CZ.Tours.tours) {
+            if (CZ.Tours.tours)
                 onToursInitialized();
-            } else {
+else
                 $("body").bind("toursInitialized", onToursInitialized);
-            }
         }
-        var defaultRootTimeline = {
-            title: "My Timeline",
-            x: 1950,
-            endDate: 9999,
-            children: [],
-            parent: {
-                guid: null
-            }
-        };
+
+        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
+
         $(document).ready(function () {
             window.console = window.console || (function () {
-                var c = {
-                };
+                var c = {};
                 c.log = c.warn = c.debug = c.info = c.log = c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () {
                 };
                 return c;
             })();
+
             $('.bubbleInfo').hide();
+
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
+
             ApplyFeatureActivation();
+
             CZ.Extensions.registerExtensions();
+
             CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
+
             CZ.Common.initialize();
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
+
                 CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
+
                 $('#timeSeries_button').click(function () {
                     var tsForm = getFormById('#timeSeriesDataForm');
-                    if(tsForm === false) {
+                    if (tsForm === false) {
                         closeAllForms();
+
                         var timSeriesDataFormDiv = forms[12];
                         var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
                             activationSource: $("#timeSeries_button"),
@@ -211,7 +218,7 @@ var CZ;
                         });
                         timSeriesDataForm.show();
                     } else {
-                        if(tsForm.isFormVisible) {
+                        if (tsForm.isFormVisible) {
                             tsForm.close();
                         } else {
                             closeAllForms();
@@ -219,9 +226,10 @@ var CZ;
                         }
                     }
                 });
+
                 $(".header-icon.edit-icon").click(function () {
                     var editForm = getFormById("#header-edit-form");
-                    if(editForm === false) {
+                    if (editForm === false) {
                         closeAllForms();
                         var form = new CZ.UI.FormHeaderEdit(forms[0], {
                             activationSource: $(this),
@@ -235,7 +243,7 @@ var CZ;
                         form.show();
                         ApplyFeatureActivation();
                     } else {
-                        if(editForm.isFormVisible) {
+                        if (editForm.isFormVisible) {
                             editForm.close();
                         } else {
                             closeAllForms();
@@ -243,9 +251,10 @@ var CZ;
                         }
                     }
                 });
+
                 $(".header-icon.search-icon").click(function () {
                     var searchForm = getFormById("#header-search-form");
-                    if(searchForm === false) {
+                    if (searchForm === false) {
                         closeAllForms();
                         var form = new CZ.UI.FormHeaderSearch(forms[14], {
                             activationSource: $(this),
@@ -260,7 +269,7 @@ var CZ;
                         });
                         form.show();
                     } else {
-                        if(searchForm.isFormVisible) {
+                        if (searchForm.isFormVisible) {
                             searchForm.close();
                         } else {
                             closeAllForms();
@@ -268,22 +277,21 @@ var CZ;
                         }
                     }
                 });
+
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showMessageWindow: function (message, title, onClose) {
                         var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
-                        if(onClose) {
+                        if (onClose)
                             wnd.container.bind("close", function () {
                                 wnd.container.unbind("close", onClose);
                                 onClose();
                             });
-                        }
                         wnd.show();
                     },
                     hideMessageWindow: function () {
                         var wnd = forms[13].data("form");
-                        if(wnd) {
+                        if (wnd)
                             wnd.close();
-                        }
                     },
                     showEditTourForm: function (tour) {
                         CZ.Tours.removeActiveTour();
@@ -414,6 +422,7 @@ var CZ;
                         form.show(noAnimation);
                     }
                 });
+
                 HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
                     activationSource: $("#header-session-expired-form"),
                     navButton: ".cz-form-nav",
@@ -424,28 +433,31 @@ var CZ;
                     sessionTimeSpan: "#session-time",
                     sessionButton: "#session-button"
                 });
+
                 CZ.Service.getProfile().done(function (data) {
-                    if(data != "") {
+                    if (data != "") {
                         CZ.Settings.isAuthorized = true;
                         CZ.Authoring.timer = setTimeout(function () {
                             CZ.Authoring.showSessionForm();
                         }, (CZ.Settings.sessionTime - 60) * 1000);
                     }
+
                     CZ.Authoring.isEnabled = UserCanEditCollection(data);
                 }).fail(function (error) {
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
                     CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(function () {
-                    if(!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
+                    if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
                     } else {
                         $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
                     }
+
                     CZ.Common.loadData().then(function (response) {
-                        if(!response) {
-                            if(CZ.Authoring.isEnabled) {
-                                if(CZ.Authoring.showCreateRootTimelineForm) {
+                        if (!response) {
+                            if (CZ.Authoring.isEnabled) {
+                                if (CZ.Authoring.showCreateRootTimelineForm) {
                                     CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
                                 }
                             } else {
@@ -454,6 +466,7 @@ var CZ;
                         }
                     });
                 });
+
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
@@ -474,6 +487,7 @@ var CZ;
                     collectionThemeInput: "#collection-theme",
                     collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
                 });
+
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
                     activationSource: $("#login-panel"),
                     navButton: ".cz-form-nav",
@@ -482,9 +496,10 @@ var CZ;
                     titleInput: ".cz-form-item-title",
                     context: ""
                 });
+
                 $("#profile-panel").click(function (event) {
                     event.preventDefault();
-                    if(!profileForm.isFormVisible) {
+                    if (!profileForm.isFormVisible) {
                         closeAllForms();
                         profileForm.setTheme(CZ.Settings.theme);
                         profileForm.show();
@@ -492,15 +507,17 @@ var CZ;
                         profileForm.close();
                     }
                 });
-                if(IsFeatureEnabled(_featureMap, "Login")) {
+
+                if (IsFeatureEnabled(_featureMap, "Login")) {
                     CZ.Service.getProfile().done(function (data) {
-                        if(data == "") {
+                        if (data == "") {
                             $("#login-panel").show();
-                        } else if(data != "" && data.DisplayName == null) {
+                        } else if (data != "" && data.DisplayName == null) {
                             $("#login-panel").hide();
                             $("#profile-panel").show();
                             $("#profile-panel input#username").focus();
-                            if(!profileForm.isFormVisible) {
+
+                            if (!profileForm.isFormVisible) {
                                 closeAllForms();
                                 profileForm.setTheme(CZ.Settings.theme);
                                 profileForm.show();
@@ -512,181 +529,213 @@ var CZ;
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
+
                         InitializeToursUI(data, forms);
                     }).fail(function (error) {
                         $("#login-panel").show();
+
                         InitializeToursUI(null, forms);
                     });
                 }
+
                 $("#login-panel").click(function (event) {
                     event.preventDefault();
-                    if(!loginForm.isFormVisible) {
+                    if (!loginForm.isFormVisible) {
                         closeAllForms();
                         loginForm.show();
                     } else {
                         loginForm.close();
                     }
                 });
-                if(IsFeatureEnabled(_featureMap, "StartPage")) {
+                if (IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
                 }
             });
+
             CZ.Service.getServiceInformation().then(function (response) {
                 CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;
                 CZ.Settings.signinUrlMicrosoft = response.signinUrlMicrosoft;
                 CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
+
             CZ.Settings.applyTheme(null);
-            if(CZ.Service.superCollectionName) {
+
+            if (CZ.Service.superCollectionName) {
                 CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
                     $(response).each(function (index) {
-                        if(response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                        if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
                             CZ.Settings.applyTheme(response[index].theme);
                         }
                     });
                 });
             }
+
             $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
             $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
+
             $('#biblCloseButton').mouseout(function () {
                 CZ.Common.toggleOffImage('biblCloseButton', 'png');
             }).mouseover(function () {
                 CZ.Common.toggleOnImage('biblCloseButton', 'png');
             });
-            if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
+
+            if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();
                 });
             }
-            if(navigator.userAgent.indexOf('Mac') != -1) {
+
+            if (navigator.userAgent.indexOf('Mac') != -1) {
                 var body = document.getElementsByTagName('body')[0];
                 (body).style.overflow = "hidden";
             }
+
             Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
-            CZ.Common.maxPermitedVerticalRange = {
-                top: 0,
-                bottom: 10000000
-            };
-            if(window.location.hash) {
+
+            CZ.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 };
+
+            if (window.location.hash)
                 CZ.Common.startHash = window.location.hash;
-            }
+
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
+
             var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
             var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
             var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
             var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
+
             CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 var markerPos = CZ.Common.axis.markerPosition;
                 var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
+
                 CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
                 CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
                 vp = CZ.Common.vc.virtualCanvas("getViewport");
-                if(CZ.Tours.pauseTourAtAnyAnimation) {
+                if (CZ.Tours.pauseTourAtAnyAnimation) {
                     CZ.Tours.tourPause();
                     CZ.Tours.pauseTourAtAnyAnimation = false;
                 }
+
                 var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
                 var actAni = CZ.Common.controller.activeAnimation != undefined;
-                if(actAni) {
+
+                if (actAni) {
                     var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
                     CZ.Common.updateMarker();
                 }
+
                 updateTimeSeriesChart(vp);
             }, function () {
                 return CZ.Common.vc.virtualCanvas("getViewport");
             }, jointGesturesStream);
+
             var hashChangeFromOutside = true;
+
             CZ.Common.controller.onAnimationComplete.push(function (id) {
                 hashChangeFromOutside = false;
-                if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) {
+                if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) {
                     CZ.UrlNav.navigationAnchor = CZ.UrlNav.navStringTovcElement(CZ.Common.setNavigationStringTo.bookmark, CZ.Common.vc.virtualCanvas("getLayerContent"));
                     window.location.hash = CZ.Common.setNavigationStringTo.bookmark;
                 } else {
-                    if(CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id) {
+                    if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id)
                         CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
-                    }
+
                     var vp = CZ.Common.vc.virtualCanvas("getViewport");
                     window.location.hash = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, vp);
                 }
                 CZ.Common.setNavigationStringTo = null;
             });
+
             window.addEventListener("hashchange", function () {
-                if(window.location.hash && hashChangeFromOutside && CZ.Common.hashHandle) {
+                if (window.location.hash && hashChangeFromOutside && CZ.Common.hashHandle) {
                     var hash = window.location.hash;
                     var visReg = CZ.UrlNav.navStringToVisible(window.location.hash.substring(1), CZ.Common.vc);
-                    if(visReg) {
+                    if (visReg) {
                         CZ.Common.isAxisFreezed = true;
                         CZ.Common.controller.moveToVisible(visReg, true);
-                        if(window.location.hash != hash) {
+
+                        if (window.location.hash != hash) {
                             hashChangeFromOutside = false;
                             window.location.hash = hash;
                         }
                     }
                     CZ.Common.hashHandle = true;
-                } else {
+                } else
                     hashChangeFromOutside = true;
-                }
             });
+
             CZ.Common.controller.onAnimationComplete.push(function () {
             });
+
             CZ.Common.controller.onAnimationStarted.push(function () {
             });
+
             CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
-                if(oldId != undefined && newId == undefined) {
+                if (oldId != undefined && newId == undefined) {
                     setTimeout(function () {
                     }, 500);
                 }
             });
+
             CZ.Common.controller.onAnimationComplete.push(function (id) {
-                if(CZ.Tours.tourBookmarkTransitionCompleted != undefined) {
+                if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
                     CZ.Tours.tourBookmarkTransitionCompleted(id);
-                }
-                if(CZ.Tours.tour != undefined && CZ.Tours.tour.state != "finished") {
+                if (CZ.Tours.tour != undefined && CZ.Tours.tour.state != "finished")
                     CZ.Tours.pauseTourAtAnyAnimation = true;
-                }
             });
+
             CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
-                if(CZ.Tours.tour != undefined) {
-                    if(CZ.Tours.tourBookmarkTransitionInterrupted != undefined) {
+                if (CZ.Tours.tour != undefined) {
+                    if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) {
                         var prevState = CZ.Tours.tour.state;
                         CZ.Tours.tourBookmarkTransitionInterrupted(oldId);
                         var alteredState = CZ.Tours.tour.state;
-                        if(prevState == "play" && alteredState == "pause") {
+
+                        if (prevState == "play" && alteredState == "pause")
                             CZ.Tours.tourPause();
-                        }
+
                         CZ.Common.setNavigationStringTo = null;
                     }
                 }
             });
+
             CZ.Common.updateLayout();
+
             CZ.Common.vc.bind("elementclick", function (e) {
                 CZ.Search.navigateToElement(e);
             });
+
             CZ.Common.vc.bind('cursorPositionChanged', function (cursorPositionChangedEvent) {
                 CZ.Common.updateMarker();
             });
+
             CZ.Common.ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
                 var bookmark = CZ.UrlNav.navStringToVisible(thresholdBookmark.Bookmark, CZ.Common.vc);
-                if(bookmark != undefined) {
+                if (bookmark != undefined) {
                     CZ.Common.controller.moveToVisible(bookmark, false);
                 }
             });
+
             CZ.Common.vc.bind("innerZoomConstraintChanged", function (constraint) {
                 CZ.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue;
                 CZ.Common.axis.allowMarkerMovesOnHover = !constraint.zoomValue;
             });
+
             CZ.Common.vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) {
                 CZ.BreadCrumbs.updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);
             });
+
             $(window).bind('resize', function () {
                 CZ.timeSeriesChart.updateCanvasHeight();
                 CZ.Common.updateLayout();
+
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 updateTimeSeriesChart(vp);
             });
+
             var vp = CZ.Common.vc.virtualCanvas("getViewport");
             CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({
                 x: -13700000000,
@@ -695,8 +744,9 @@ var CZ;
                 height: 5535444444.444445
             }, 1.0, vp, false), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
+
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
-            if(bid) {
+            if (bid) {
                 $("#bibliography .sources").empty();
                 $("#bibliography .title").append($("<span></span>", {
                     text: "Loading..."
@@ -704,6 +754,7 @@ var CZ;
                 $("#bibliographyBack").css("display", "block");
             }
         });
+
         function IsFeatureEnabled(featureMap, featureName) {
             var feature = $.grep(featureMap, function (e) {
                 return e.Name === featureName;
@@ -711,24 +762,26 @@ var CZ;
             return feature[0].IsEnabled;
         }
         HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
+
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');
-                if(form && form.isFormVisible === true) {
+                if (form && form.isFormVisible === true) {
                     form.close();
                 }
             });
         }
         HomePageViewModel.closeAllForms = closeAllForms;
+
         function getFormById(name) {
             var form = $(name).data("form");
-            if(form) {
+            if (form)
                 return form;
-            } else {
+else
                 return false;
-            }
         }
         HomePageViewModel.getFormById = getFormById;
+
         function showTimeSeriesChart() {
             $('#timeSeriesContainer').height('30%');
             $('#timeSeriesContainer').show();
@@ -737,6 +790,7 @@ var CZ;
             CZ.Common.updateLayout();
         }
         HomePageViewModel.showTimeSeriesChart = showTimeSeriesChart;
+
         function hideTimeSeriesChart() {
             CZ.leftDataSet = undefined;
             CZ.rightDataSet = undefined;
@@ -746,138 +800,150 @@ var CZ;
             CZ.Common.updateLayout();
         }
         HomePageViewModel.hideTimeSeriesChart = hideTimeSeriesChart;
+
         function updateTimeSeriesChart(vp) {
             var left = vp.pointScreenToVirtual(0, 0).x;
-            if(left < CZ.Settings.maxPermitedTimeRange.left) {
+            if (left < CZ.Settings.maxPermitedTimeRange.left)
                 left = CZ.Settings.maxPermitedTimeRange.left;
-            }
             var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
-            if(right > CZ.Settings.maxPermitedTimeRange.right) {
+            if (right > CZ.Settings.maxPermitedTimeRange.right)
                 right = CZ.Settings.maxPermitedTimeRange.right;
-            }
-            if(CZ.timeSeriesChart !== undefined) {
+
+            if (CZ.timeSeriesChart !== undefined) {
                 var leftCSS = vp.pointVirtualToScreen(left, 0).x;
                 var rightCSS = vp.pointVirtualToScreen(right, 0).x;
                 var leftPlot = CZ.Dates.getYMDFromCoordinate(left).year;
                 var rightPlot = CZ.Dates.getYMDFromCoordinate(right).year;
+
                 CZ.timeSeriesChart.clear(leftCSS, rightCSS);
                 CZ.timeSeriesChart.clearLegend("left");
                 CZ.timeSeriesChart.clearLegend("right");
+
                 var chartHeader = "TimeSeries Chart";
-                if(CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
+
+                if (CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
                     CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
                 }
+
                 var screenWidthForLegend = rightCSS - leftCSS;
-                if(CZ.rightDataSet !== undefined && CZ.leftDataSet !== undefined) {
+                if (CZ.rightDataSet !== undefined && CZ.leftDataSet !== undefined) {
                     screenWidthForLegend /= 2;
                 }
                 var isLegendVisible = CZ.timeSeriesChart.checkLegendVisibility(screenWidthForLegend);
-                if(CZ.leftDataSet !== undefined) {
+
+                if (CZ.leftDataSet !== undefined) {
                     var padding = CZ.leftDataSet.getVerticalPadding() + 10;
+
                     var plotBottom = Number.MAX_VALUE;
                     var plotTop = Number.MIN_VALUE;
+
                     CZ.leftDataSet.series.forEach(function (seria) {
-                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
                             plotBottom = seria.appearanceSettings.yMin;
                         }
-                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
                             plotTop = seria.appearanceSettings.yMax;
                         }
                     });
-                    if((plotTop - plotBottom) === 0) {
+
+                    if ((plotTop - plotBottom) === 0) {
                         var absY = Math.max(0.1, Math.abs(plotBottom));
                         var offsetConstant = 0.01;
                         plotTop += absY * offsetConstant;
                         plotBottom -= absY * offsetConstant;
                     }
-                    var axisAppearence = {
-                        labelCount: 4,
-                        tickLength: 10,
-                        majorTickThickness: 1,
-                        stroke: 'black',
-                        axisLocation: 'left',
-                        font: '16px Calibri',
-                        verticalPadding: padding
-                    };
+
+                    var axisAppearence = { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri', verticalPadding: padding };
                     var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(leftCSS, rightCSS, plotBottom, plotTop, axisAppearence);
                     CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
                     CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
                     CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
-                    if(isLegendVisible) {
-                        for(var i = 0; i < CZ.leftDataSet.series.length; i++) {
+
+                    if (isLegendVisible) {
+                        for (var i = 0; i < CZ.leftDataSet.series.length; i++) {
                             CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
                         }
                     }
+
                     chartHeader += " (" + CZ.leftDataSet.name;
                 }
-                if(CZ.rightDataSet !== undefined) {
+
+                if (CZ.rightDataSet !== undefined) {
                     var padding = CZ.rightDataSet.getVerticalPadding() + 10;
+
                     var plotBottom = Number.MAX_VALUE;
                     var plotTop = Number.MIN_VALUE;
+
                     CZ.rightDataSet.series.forEach(function (seria) {
-                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
                             plotBottom = seria.appearanceSettings.yMin;
                         }
-                        if(seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
                             plotTop = seria.appearanceSettings.yMax;
                         }
                     });
-                    if((plotTop - plotBottom) === 0) {
+
+                    if ((plotTop - plotBottom) === 0) {
                         var absY = Math.max(0.1, Math.abs(plotBottom));
                         var offsetConstant = 0.01;
                         plotTop += absY * offsetConstant;
                         plotBottom -= absY * offsetConstant;
                     }
-                    var axisAppearence = {
-                        labelCount: 4,
-                        tickLength: 10,
-                        majorTickThickness: 1,
-                        stroke: 'black',
-                        axisLocation: 'right',
-                        font: '16px Calibri',
-                        verticalPadding: padding
-                    };
+
+                    var axisAppearence = { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'right', font: '16px Calibri', verticalPadding: padding };
                     var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(rightCSS, leftCSS, plotBottom, plotTop, axisAppearence);
                     CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
                     CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
                     CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
-                    if(isLegendVisible) {
-                        for(var i = 0; i < CZ.rightDataSet.series.length; i++) {
+
+                    if (isLegendVisible) {
+                        for (var i = 0; i < CZ.rightDataSet.series.length; i++) {
                             CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
                         }
                     }
+
                     var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
                     chartHeader += str + CZ.rightDataSet.name + ")";
                 } else {
                     chartHeader += ")";
                 }
+
                 $("#timeSeriesChartHeader").text(chartHeader);
             }
         }
         HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
+
         function ApplyFeatureActivation() {
-            for(var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
+            for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
                 var feature = _featureMap[idxFeature];
-                if(feature.IsEnabled === undefined) {
+
+                if (feature.IsEnabled === undefined) {
                     var enabled = true;
-                    if(feature.Activation === FeatureActivation.Disabled) {
+                    if (feature.Activation === FeatureActivation.Disabled) {
                         enabled = false;
                     }
-                    if(feature.Activation === FeatureActivation.NotRootCollection && HomePageViewModel.rootCollection) {
+
+                    if (feature.Activation === FeatureActivation.NotRootCollection && HomePageViewModel.rootCollection) {
                         enabled = false;
                     }
-                    if(feature.Activation === FeatureActivation.RootCollection && !HomePageViewModel.rootCollection) {
+
+                    if (feature.Activation === FeatureActivation.RootCollection && !HomePageViewModel.rootCollection) {
                         enabled = false;
                     }
-                    if(feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {
+
+                    if (feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {
                         enabled = false;
                     }
+
                     _featureMap[idxFeature].IsEnabled = enabled;
                 }
-                if(feature.JQueryReference) {
-                    if(!_featureMap[idxFeature].IsEnabled) {
+
+                if (feature.JQueryReference) {
+                    if (!_featureMap[idxFeature].IsEnabled) {
                         $(feature.JQueryReference).css("display", "none");
-                    } else if(!_featureMap[idxFeature].HasBeenActivated) {
+                    } else if (!_featureMap[idxFeature].HasBeenActivated) {
                         _featureMap[idxFeature].HasBeenActivated = true;
                         $(feature.JQueryReference).css("display", "block");
                     }

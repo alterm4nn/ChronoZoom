@@ -21,7 +21,7 @@ module CZ {
         }
 
         export class FormEditCI extends CZ.UI.FormUpdateEntity {
-            private titleTextblock: JQuery;
+            public titleTextblock: JQuery;
             private titleInput: JQuery;
             private mediaInput: JQuery;
             private mediaSourceInput: JQuery;
@@ -29,18 +29,18 @@ module CZ {
             private attributionInput: JQuery;
             private descriptionInput: JQuery;
             private errorMessage: JQuery;
-            private saveButton: JQuery;
+            public saveButton: JQuery;
             private mediaListContainer: JQuery;
 
-            private prevForm: FormBase;
+            public prevForm: FormBase;
             private mediaList: CZ.UI.MediaList;
 
             private exhibit: any; // CanvasInfodot
             private contentItem: any; // ContentItem Metadata
 
             private mode; // create | edit
-            private isCancel: bool; // is form closed without saving changes
-            private isModified: bool;
+            private isCancel: boolean; // is form closed without saving changes
+            private isModified: boolean;
 
             constructor(container: JQuery, formInfo: IFormEditCIInfo) {
                 super(container, formInfo);
@@ -217,7 +217,7 @@ module CZ {
                 this.attributionInput.val(this.contentItem.attribution || "");
             }
 
-            public show(noAnimation?: bool = false) {
+            public show(noAnimation?) {
                 CZ.Authoring.isActive = true;
                 this.activationSource.addClass("active");
                 this.errorMessage.hide();
@@ -228,7 +228,7 @@ module CZ {
                 });
             }
 
-            public close(noAnimation?: bool = false) {
+            public close(noAnimation: boolean = false) {
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;

@@ -3,27 +3,34 @@ var CZ;
     (function (UILoader) {
         function loadHtml(selector, filepath) {
             var container = $(selector);
-            var promise = new $.Deferred();
-            if(!filepath) {
+            var promise = $.Deferred();
+
+            if (!filepath) {
                 promise.resolve(container);
                 return promise;
             }
-            if(!selector || !container.length) {
+
+            if (!selector || !container.length) {
                 throw "Unable to load " + filepath + " " + selector;
             }
+
             container.load(filepath, function () {
                 promise.resolve(container);
             });
+
             return promise;
         }
         UILoader.loadHtml = loadHtml;
+
         function loadAll(uiMap) {
             var promises = [];
-            for(var selector in uiMap) {
-                if(uiMap.hasOwnProperty(selector)) {
+
+            for (var selector in uiMap) {
+                if (uiMap.hasOwnProperty(selector)) {
                     promises.push(loadHtml(selector, uiMap[selector]));
                 }
             }
+
             return $.when.apply($, promises);
         }
         UILoader.loadAll = loadAll;
