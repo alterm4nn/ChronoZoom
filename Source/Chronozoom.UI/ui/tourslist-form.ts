@@ -16,7 +16,7 @@ module CZ {
         export class FormToursList extends CZ.UI.FormBase {
 
             private toursListBox: TourListBox;
-            private isCancel: bool;
+            private isCancel: boolean;
             private takeTour: (tour: any) => void;
             private editTour: (tour: any) => void;
 

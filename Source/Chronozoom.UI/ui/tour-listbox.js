@@ -1,4 +1,5 @@
 var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
@@ -11,10 +12,12 @@ var CZ;
             function TourListBox(container, listItemContainer, contentItems, takeTour, editTour) {
                 this.takeTour = takeTour;
                 this.editTour = editTour;
+
                 var listBoxInfo = {
                     context: contentItems,
                     sortableSettings: null
                 };
+
                 var listItemsInfo = {
                     default: {
                         container: listItemContainer,
@@ -26,8 +29,9 @@ var CZ;
                         }
                     }
                 };
+
                 listItemsInfo.default.ctor = TourListItem;
-                        _super.call(this, container, listBoxInfo, listItemsInfo);
+                _super.call(this, container, listBoxInfo, listItemsInfo);
             }
             Object.defineProperty(TourListBox.prototype, "TakeTour", {
                 get: function () {
@@ -36,6 +40,7 @@ var CZ;
                 enumerable: true,
                 configurable: true
             });
+
             Object.defineProperty(TourListBox.prototype, "EditTour", {
                 get: function () {
                     return this.editTour;
@@ -45,17 +50,19 @@ var CZ;
             });
             return TourListBox;
         })(UI.ListBoxBase);
-        UI.TourListBox = TourListBox;        
+        UI.TourListBox = TourListBox;
+
         var TourListItem = (function (_super) {
             __extends(TourListItem, _super);
             function TourListItem(parent, container, uiMap, context) {
-                if(!context) {
+                if (!context)
                     throw "Tour list item's context is undefined";
-                }
-                        _super.call(this, parent, container, uiMap, context);
+                _super.call(this, parent, container, uiMap, context);
+
                 this.iconImg = this.container.find(uiMap.iconImg);
                 this.titleTextblock = this.container.find(uiMap.titleTextblock);
                 this.descrTextblock = this.container.find(".cz-contentitem-listitem-descr");
+
                 var self = this;
                 var thumbUrl = this.data.thumbnailUrl;
                 this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
@@ -64,22 +71,23 @@ var CZ;
                     self.iconImg.replaceWith(img);
                 };
                 img.onerror = function () {
-                    if(console && console.warn) {
+                    if (console && console.warn)
                         console.warn("Could not load a thumbnail image " + thumbUrl);
-                    }
                 };
                 img.src = thumbUrl;
+
                 this.titleTextblock.text(this.data.title);
-                if(this.data.description) {
+                if (this.data.description)
                     this.descrTextblock.text(this.data.description);
-                } else {
+else
                     this.descrTextblock.hide();
-                }
+
                 this.container.find("#takeTour").click(function (e) {
                     parent.TakeTour(context);
                 });
+
                 container.find(".cz-tourslist-editing").css("display", parent.EditTour ? "inline" : "none");
-                if(parent.EditTour) {
+                if (parent.EditTour) {
                     this.container.find("#editTour").click(function (e) {
                         parent.EditTour(context);
                     });
@@ -87,7 +95,7 @@ var CZ;
             }
             return TourListItem;
         })(UI.ListItemBase);
-        UI.TourListItem = TourListItem;        
+        UI.TourListItem = TourListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));

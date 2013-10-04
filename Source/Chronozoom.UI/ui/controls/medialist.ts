@@ -21,7 +21,7 @@ module CZ {
             private fillListOfLinks(): void {
                 // Sort mediaPickers keys by 'order' property.
                 var sortedMediaPickersKeys = Object.keys(this.mediaPickers).sort((key1, key2) => {
-                    return (this.mediaPickers[key1].order - this.mediaPickers[key2].order) > 0;
+                    return this.mediaPickers[key1].order - this.mediaPickers[key2].order;
                 });
 
                 // Construct list of links dynamically.

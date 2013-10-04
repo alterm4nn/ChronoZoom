@@ -576,7 +576,7 @@ module CZ {
         * Auxiliary Methods.
         */
 
-        export function putExhibitContent(e, oldContentItems): JQueryPromise {
+        export function putExhibitContent(e: any, oldContentItems: any): any {
             CZ.Authoring.resetSessionTimer();
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;

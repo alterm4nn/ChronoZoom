@@ -43,7 +43,7 @@ module CZ {
                 moveToRightEdge();
 
                 // length of new breadcrumbs path is higher than length of current path
-                for (var i = breadCrumbs.length; i < newBreadCrumbs.length; i++)
+                for (var i: number = breadCrumbs.length; i < newBreadCrumbs.length; i++)
                     addBreadCrumb(newBreadCrumbs[i].vcElement);
 
                 moveToRightEdge();

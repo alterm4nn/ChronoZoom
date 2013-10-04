@@ -1,10 +1,9 @@
 var CZ;
 (function (CZ) {
     (function (Media) {
-        var _mediaPickers = {
-        };
-        var _mediaPickersViews = {
-        };
+        var _mediaPickers = {};
+        var _mediaPickersViews = {};
+
         Object.defineProperties(CZ.Media, {
             mediaPickers: {
                 get: function () {
@@ -17,9 +16,11 @@ var CZ;
                 }
             }
         });
+
         function initialize() {
             registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
-            if(CZ.Media.SkyDriveMediaPicker.isEnabled) {
+
+            if (CZ.Media.SkyDriveMediaPicker.isEnabled) {
                 registerMediaPicker("skydrive", "/images/media/skydrive-import-50x150.png", CZ.Media.SkyDriveMediaPicker).done(function () {
                     WL.init({
                         client_id: CZ.Settings.WLAPIClientID,
@@ -31,12 +32,13 @@ var CZ;
             }
         }
         Media.initialize = initialize;
+
         function registerMediaPicker(title, iconUrl, type, viewUrl, selector) {
             var order = Object.keys(_mediaPickers).length;
             var setup = type.setup;
             selector = selector || "$('<div></div>')";
-            _mediaPickers[title] = {
-            };
+            _mediaPickers[title] = {};
+
             return CZ.UILoader.loadHtml(selector, viewUrl).always(function (view) {
                 _mediaPickersViews[title] = view;
                 _mediaPickers[title] = {

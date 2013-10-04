@@ -1,4 +1,5 @@
 var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
@@ -9,10 +10,11 @@ var CZ;
         var FormHeaderSessionExpired = (function (_super) {
             __extends(FormHeaderSessionExpired, _super);
             function FormHeaderSessionExpired(container, formInfo) {
-                        _super.call(this, container, formInfo);
+                _super.call(this, container, formInfo);
                 this.time = 60;
                 this.sessionTimeSpan = container.find(formInfo.sessionTimeSpan);
                 this.sessionButton = container.find(formInfo.sessionButton);
+
                 this.initialize();
             }
             FormHeaderSessionExpired.prototype.initialize = function () {
@@ -27,9 +29,10 @@ var CZ;
                     return false;
                 });
             };
+
             FormHeaderSessionExpired.prototype.onTimer = function () {
                 var _this = this;
-                if(this.time > 0) {
+                if (this.time > 0) {
                     this.time--;
                     this.sessionTimeSpan.html(this.time.toString());
                     clearTimeout(this.timer);
@@ -38,6 +41,7 @@ var CZ;
                     }, 1000);
                 } else {
                     clearTimeout(this.timer);
+
                     this.close();
                     document.location.href = "/account/logout";
                 }
@@ -51,11 +55,13 @@ var CZ;
                     complete: function () {
                     }
                 });
+
                 this.timer = setTimeout(function () {
                     _this.onTimer();
                 }, 1000);
                 this.activationSource.addClass("active");
             };
+
             FormHeaderSessionExpired.prototype.close = function () {
                 _super.prototype.close.call(this, {
                     effect: "slide",
@@ -66,7 +72,7 @@ var CZ;
             };
             return FormHeaderSessionExpired;
         })(CZ.UI.FormBase);
-        UI.FormHeaderSessionExpired = FormHeaderSessionExpired;        
+        UI.FormHeaderSessionExpired = FormHeaderSessionExpired;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));

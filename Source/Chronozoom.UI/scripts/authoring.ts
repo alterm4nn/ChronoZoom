@@ -36,9 +36,9 @@ module CZ {
 
 
         // Authoring Tool state.
-        export var isActive: bool = false;
-        export var isEnabled: bool = false;
-        export var isDragging: bool = false;
+        export var isActive: boolean = false;
+        export var isEnabled: boolean = false;
+        export var isDragging: boolean = false;
 
         //TODO: use enum for authoring modes when new authoring forms will be completly integrated
         export var mode: any = null;
@@ -508,7 +508,7 @@ module CZ {
          * @param  {Widget} form A dialog form for editing timeline.
          */
         export function updateTimeline(t, prop) {
-            var deffered = new jQuery.Deferred();
+            var deffered = jQuery.Deferred();
 
             var temp = {
                 x: Number(prop.start),

@@ -8,9 +8,9 @@ module CZ {
     export module Tours {
 
         export var isTourWindowVisible = false;
-        private isBookmarksWindowVisible = false;
-        private isBookmarksWindowExpanded = true;
-        private isBookmarksTextShown = true;
+        var isBookmarksWindowVisible = false;
+        var isBookmarksWindowExpanded = true;
+        var isBookmarksTextShown = true;
         export var isNarrationOn = true;
 
         export var tours; // list of loaded tours
@@ -20,7 +20,7 @@ module CZ {
 
         export var pauseTourAtAnyAnimation = false;
 
-        private bookmarkAnimation; // current animation of bookmark' description text sliding
+        var bookmarkAnimation; // current animation of bookmark' description text sliding
 
         var isToursDebugEnabled = false; // enables rebug output
 
@@ -60,7 +60,7 @@ module CZ {
             animationId: number;
         }
 
-        export function hasActiveTour(): bool {
+        export function hasActiveTour(): boolean {
             return tour != undefined;
         }
 

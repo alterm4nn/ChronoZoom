@@ -2,7 +2,7 @@
     $.fn.visible = function (noTransition) {
         return this.each(function () {
             var $this = $(this);
-            if(noTransition) {
+            if (noTransition) {
                 $this.addClass("no-transition");
             } else {
                 $this.removeClass("no-transition");
@@ -13,10 +13,11 @@
             });
         });
     };
+
     $.fn.invisible = function (noTransition) {
         return this.each(function () {
             var $this = $(this);
-            if(noTransition) {
+            if (noTransition) {
                 $this.addClass("no-transition");
             } else {
                 $this.removeClass("no-transition");
