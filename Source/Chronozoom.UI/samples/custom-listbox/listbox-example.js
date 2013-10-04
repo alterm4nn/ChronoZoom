@@ -1,4 +1,5 @@
 var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
@@ -9,19 +10,22 @@ var RedGreenListBox = (function (_super) {
         listItemsInfo.red.ctor = RedListItem;
         listItemsInfo.green.ctor = GreenListItem;
         _super.call(this, container, listBoxInfo, listItemsInfo, function (item) {
-    var type = item.text.match(/red|green/i);
-    return type ? type[0].toLowerCase() : "default";
-});
+            var type = item.text.match(/red|green/i);
+            return type ? type[0].toLowerCase() : "default";
+        });
     }
     return RedGreenListBox;
 })(CZ.UI.ListBoxBase);
+
 var RedListItem = (function (_super) {
     __extends(RedListItem, _super);
     function RedListItem(parent, container, uiMap, context) {
         var _this = this;
         _super.call(this, parent, container, uiMap, context);
+
         this.textblock = this.container.find(uiMap.textblock);
         this.textblock.text(context.text);
+
         this.container.click(function (event) {
             var oldtext = _this.textblock.text();
             _this.textblock.text("Clicked Red!");
@@ -32,13 +36,16 @@ var RedListItem = (function (_super) {
     }
     return RedListItem;
 })(CZ.UI.ListItemBase);
+
 var GreenListItem = (function (_super) {
     __extends(GreenListItem, _super);
     function GreenListItem(parent, container, uiMap, context) {
         var _this = this;
         _super.call(this, parent, container, uiMap, context);
+
         this.textblock = this.container.find(uiMap.textblock);
         this.textblock.text(context.text);
+
         this.container.click(function (event) {
             var oldtext = _this.textblock.text();
             _this.textblock.text("Clicked Green!");

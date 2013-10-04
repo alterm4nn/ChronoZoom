@@ -228,7 +228,7 @@ module CZ {
                 });
             }
 
-            public close(noAnimation?) {
+            public close(noAnimation: boolean = false) {
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;

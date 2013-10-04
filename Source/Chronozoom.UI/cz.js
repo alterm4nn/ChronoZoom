@@ -4324,6 +4324,7 @@ else if (_this.tourStopsListBox.items.length == 0)
             };
 
             FormEditTour.prototype.hide = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
@@ -5322,9 +5323,9 @@ var CZ;
 
             // Get the number of day in the year.
             var sumDaysOfMonths = function (s, d, i) {
-                return s + parseInt((i < month).toString()) * d;
+                return s + +(i < month) * d;
             };
-            var days = Dates.daysInMonth.reduce(sumDaysOfMonths, parseInt((isLeap && month > 1).toString())) + day;
+            var days = Dates.daysInMonth.reduce(sumDaysOfMonths, +(isLeap && month > 1)) + day;
 
             coord += (days - 1) / daysInYear;
 
@@ -15111,6 +15112,7 @@ var CZ;
             };
 
             FormEditExhibit.prototype.show = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 CZ.Authoring.isActive = true;
                 this.activationSource.addClass("active");
                 this.errorMessage.hide();
@@ -15122,6 +15124,7 @@ var CZ;
             };
 
             FormEditExhibit.prototype.hide = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
@@ -15131,6 +15134,7 @@ var CZ;
             };
 
             FormEditExhibit.prototype.close = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
@@ -15387,6 +15391,7 @@ else
             };
 
             FormEditCI.prototype.close = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {

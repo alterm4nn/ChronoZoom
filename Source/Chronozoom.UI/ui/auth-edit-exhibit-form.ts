@@ -296,7 +296,7 @@ module CZ {
                 CZ.Common.vc.virtualCanvas("requestInvalidate");
             }
 
-            public show(noAnimation?: boolean) {
+            public show(noAnimation: boolean = false) {
                 CZ.Authoring.isActive = true;
                 this.activationSource.addClass("active");
                 this.errorMessage.hide();
@@ -307,7 +307,7 @@ module CZ {
                 });
             }
 
-            public hide(noAnimation?: boolean) {
+            public hide(noAnimation: boolean = false) {
                 super.close(noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
@@ -316,7 +316,7 @@ module CZ {
                 this.activationSource.removeClass("active");
             }
 
-            public close(noAnimation?: boolean) {
+            public close(noAnimation: boolean = false) {
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
