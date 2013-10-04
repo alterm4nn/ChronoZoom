@@ -116,21 +116,21 @@ namespace Chronozoom.Entities.UnitTests
             Guid elementId = new Guid("428b173f-4e31-410d-9d88-f4fe94698289");
             const string contentItemName = "Salman Kahn Explains the Birth of Stars";
 
-            string contentPath = Storage.GetContentPath(collectionId, elementId,contentItemName);
+            string contentPath = Storage.GetContentPath(collectionId, elementId, contentItemName);
 
             string timelinesQuery = string.Format(
                CultureInfo.InvariantCulture,
-               "SELECT * FROM ContentItems WHERE Title = '{0}' AND Collection_Id = '{1}'", contentItemName,collectionId);
+               "SELECT * FROM ContentItems WHERE Title = '{0}' AND Collection_Id = '{1}'", contentItemName, collectionId);
 
             IEnumerable<ContentItemRaw> contentItems = Storage.Database.SqlQuery<ContentItemRaw>(timelinesQuery);
-            
+
             Guid exhibitId = contentItems.First().Exhibit_ID;
             string expectedPath = String.Format("/t00000000-0000-0000-0000-000000000000/e{0}/{1}", exhibitId,
                                                 elementId);
-            Assert.AreEqual(expectedPath,contentPath);
-        } 
-        
-        
+            Assert.AreEqual(expectedPath, contentPath);
+        }
+
+
         [TestMethod]
         public void ContentItemPathShouldBeCorrectlyIfTitleNull()
         {
@@ -138,18 +138,105 @@ namespace Chronozoom.Entities.UnitTests
             Guid elementId = new Guid("428b173f-4e31-410d-9d88-f4fe94698289");
             const string contentItemName = null;
 
-            string contentPath = Storage.GetContentPath(collectionId, elementId,contentItemName);
+            string contentPath = Storage.GetContentPath(collectionId, elementId, contentItemName);
 
             string timelinesQuery = string.Format(
                CultureInfo.InvariantCulture,
                "SELECT * FROM ContentItems WHERE Id = '{0}' AND Collection_Id = '{1}'", elementId, collectionId);
 
             IEnumerable<ContentItemRaw> contentItems = Storage.Database.SqlQuery<ContentItemRaw>(timelinesQuery);
-            
+
             Guid exhibitId = contentItems.First().Exhibit_ID;
             string expectedPath = String.Format("/t00000000-0000-0000-0000-000000000000/e{0}/{1}", exhibitId,
                                                 elementId);
-            Assert.AreEqual(expectedPath,contentPath);
+            Assert.AreEqual(expectedPath, contentPath);
         }
+
+        [TestMethod]
+        public void TripletShouldBeCreatedIfDataPositive()
+        {
+            var timelineId = new Guid("2b6cd8e0-5833-ceaf-117e-cf74db7fed1f");
+            const string userId = "ff5214e1-1bf4-4af5-8835-96cff2ce2cfd";
+            string subjectStr = String.Format("czusr:{0}", userId);
+            string objectStr = String.Format("cztimeline:{0}", timelineId);
+            const string predicateStr = "czpred:favorite";
+
+            bool result = Storage.PutTriplet(subjectStr, predicateStr, objectStr);
+            Assert.IsTrue(result, "Triplet has not created");
+
+            List<Triple> triples = Storage.GetTriplet(subjectStr, predicateStr);
+
+            bool tr = false;
+            foreach (Triple triple in triples)
+            {
+                tr = triple.Objects.Any(t => t.Object == objectStr);
+            }
+            Assert.IsTrue(tr);
+        }
+
+        [TestMethod]
+        public void TripletShouldBeAddedTwoObject()
+        {
+            var timelineId = Guid.NewGuid();
+            var secondTimelineId = Guid.NewGuid();
+            const string userId = "ff5214e1-1bf4-4af5-8835-96cff2ce2cfd";
+            string subjectStr = String.Format("czusr:{0}", userId);
+            string objectStr = String.Format("cztimeline:{0}", timelineId);
+            string objectStr2 = String.Format("cztimeline:{0}", secondTimelineId);
+            const string predicateStr = "czpred:favorite";
+
+            bool result = Storage.PutTriplet(subjectStr, predicateStr, objectStr);
+            Assert.IsTrue(result, "Triplet has not created");
+
+            List<Triple> triples = Storage.GetTriplet(subjectStr, predicateStr);
+
+            bool tr = false;
+            foreach (Triple triple in triples)
+            {
+                tr = triple.Objects.Any(t => t.Object == objectStr);
+            }
+            Assert.IsTrue(tr);
+
+            bool result2 = Storage.PutTriplet(subjectStr, predicateStr, objectStr2);
+            Assert.IsTrue(result2, "Triplet has not created");
+
+            List<Triple> triples2 = Storage.GetTriplet(subjectStr, predicateStr);
+
+            bool tr2 = false;
+            foreach (Triple triple in triples2)
+            {
+                tr2 = triple.Objects.Any(t => t.Object == objectStr);
+            }
+            Assert.IsTrue(tr2);
+        }
+
+        [TestMethod]
+        public void TripletShouldNotBeCreatedIfUserIdIsNotGuid()
+        {
+            //This test is failed
+            const string userId = "not guid";
+            const string predicateStr = "czpred:favorite";
+            string timelineId = Guid.NewGuid().ToString();
+            string subjectStr = String.Format("czusr:{0}", userId);
+            string objectStr = String.Format("cztimeline:{0}", timelineId);
+
+            bool result = Storage.PutTriplet(subjectStr, predicateStr, objectStr);
+            Assert.IsFalse(result, "Triplet has created");
+        }
+
+        [TestMethod]
+        public void TripletShouldNotBeCreatedIfTimelineIdIsNotGuid()
+        {
+            const string timelineId = "not guid";
+            const string predicateStr = "czpred:favorite";
+
+            string userId = Guid.NewGuid().ToString();
+            string subjectStr = String.Format("czusr:{0}", userId);
+            string objectStr = String.Format("cztimeline:{0}", timelineId);
+            
+            bool result = Storage.PutTriplet(subjectStr, predicateStr, objectStr);
+            Assert.IsFalse(result, "Triplet has created");
+        }
+
     }
 }
