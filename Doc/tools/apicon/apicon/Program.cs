@@ -29,15 +29,16 @@ namespace apicon
     {
         /* Prefixes, regexes and paths defined in Properties/Settings.settings.
          * The prefixes are configurable since they could change.
-         * The regexes are also configurable and should match their corresponding 
-         * member prefix string. */
+         * The regexes are automatically generated. */
+
         static string memberClass = Properties.Settings.Default.MemberClass;
-        static Regex memberRgx = new Regex(Properties.Settings.Default.MemberRgx);
+        static Regex memberRgx = makeRegex(Properties.Settings.Default.MemberClass);
 
         static string entityTypeClass = Properties.Settings.Default.EntityTypeClass;
-        static Regex entityTypeRgx = new Regex(Properties.Settings.Default.EntityTypeRgx);
+        static Regex entityTypeRgx = makeRegex(Properties.Settings.Default.EntityTypeClass);
 
         static string entityPropClass = Properties.Settings.Default.EntityPropClass;
+        // These regexes are generated differently. See the definition for entityPropRgx below.
 
         // These are the paths to the VS doc XML files we are going to process.
         static string memberPath = Properties.Settings.Default.MemberPath;
@@ -84,7 +85,9 @@ namespace apicon
                 if (rgx.IsMatch(member.Value))
                 {
                     string n = cleanString(member.Value, repl);
-                    nameStack.Push(n);
+                    // Make sure the name is not in the exclude list.
+                    if (!Properties.Settings.Default.ExcludeList.Contains(n))
+                        nameStack.Push(n);
                 }
             }
 
@@ -107,7 +110,9 @@ namespace apicon
             // Get all of the members.
             var qMembers =
                 from member in doc.Descendants("member")
-                where (memberRgx.IsMatch(member.Attribute("name").Value))
+                //where (memberRgx.IsMatch(member.Attribute("name").Value))
+                // Make sure the member is not in the exclude list.
+                where (memberRgx.IsMatch(member.Attribute("name").Value)) && (!Properties.Settings.Default.ExcludeList.Contains(cleanString(member.Attribute("name").Value, memberClass)))
                 select
                     member;
 
@@ -190,7 +195,8 @@ namespace apicon
             // Get all of the entities.
             var qEntityTypes =
                 from member in doc.Descendants("member")
-                where (entityTypeRgx.IsMatch(member.Attribute("name").Value))
+                // Match to regex and ensure that the name is not in the exclude list.
+                where (entityTypeRgx.IsMatch(member.Attribute("name").Value)) && (!Properties.Settings.Default.ExcludeList.Contains(cleanString(member.Attribute("name").Value, entityTypeClass)))
                 select
                     member;
 
@@ -277,12 +283,26 @@ namespace apicon
             {
                 aLine = sr.ReadLine();
                 if (aLine != null)
-                    fullExample += aLine.Replace("             ", "    ") + "\n";
+                {
+                    /* The following hack is here because if any blank /// line 
+                     * within any CDATA region contains EXACTLY one space
+                     * the resulting doc XML will be improperly indented,
+                     * and the Example block will render improperly.
+                     * For some reason selectively replacing on 12 or 13 spaces
+                     * seems to do the trick. 
+                     */
+                    // replace 13 spaces with 4
+                    if (aLine.Contains("             "))
+                        fullExample += aLine.Replace("             ", "    ") + "\n";
+                    // replace 12 spaces with 4
+                    else if (aLine.Contains("            "))
+                        fullExample += aLine.Replace("            ", "    ") + "\n";
+                }
                 else
                     return fullExample;
             }
 
-            return fullExample;
+            //return fullExample;
         }
 
         // Output a table of contents.
@@ -298,6 +318,16 @@ namespace apicon
             }
 
             return sb.ToString();
+        }
+
+        // Generate a regular expression for each path.
+        static Regex makeRegex(string path)
+        {
+            string regStr = path.Replace(".", "\\.");
+            regStr = regStr.Insert(regStr.Length, @"\w*");
+            Regex reg = new Regex(regStr);
+
+            return reg;
         }
 
         // Create the entire document (this is the starting point).
