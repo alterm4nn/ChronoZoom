@@ -11,14 +11,15 @@ Everything begins with the paths, strings and regular expressions that are defin
 |MemberPath|Path to the XML documentation file for Chronozoom.UI.XML.|
 |EntityPath|Path to the XML documentation file for Chronozoom.Entities.XML.|
 |MemberClass|Prefix string for Chronozoom.UI members.|
-|MemberRgx|Regex for matching Chronozoom.UI members.|
 |EntityTypeClass|Prefix for Chronozoom.Entities types.|
-|EntityTypeRgx|Regex for matching Chronozoom.Entities members.|
 |EntityPropClass|Prefix string for Chronozoom.Entities properties.|
 |TopMatter|Path to the predefined top matter section.|
 |OutFile|Path to which the output file should be saved.|
 
 When APICON is run, the `makeDoc()` function is called first. This function groups together all of the other functions, and is responsible for generating the output file. APICON is built specifically to generate REST API documentation for the Chronozoom.UI and Chronozoom.Entities. Because of this, the two main functions (`getMembers()`, `getEntities()`) are specific to the APIs they convert (more about extensibility below).
+
+### A note about XML documentation file ###
+Code examples are presented within a CDATA block, which presents issues for Visual Studio as it parses the XML documentation file. Specifically, if there is a blank line in the triple-slash block (perfectly acceptable), there can NOT be any spaces. For some reason this interferes with the way Visual Studio indents the XML file. 
 
 ## Using APICON ##
 
