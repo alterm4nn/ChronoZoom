@@ -26,10 +26,6 @@ Use JSON for the request body:
 - [Collection](#collection)
 - [ContentItem](#contentitem)
 - [Exhibit](#exhibit)
-- [RemoveBetaFields](#removebetafields)
-- [RemoveRITree](#removeritree)
-- [AddRITreeWithIndex](#addritreewithindex)
-- [Properties.Resources](#properties.resources)
 - [ObjectType](#objecttype)
 - [SearchResult](#searchresult)
 - [StorageCorruptedException](#storagecorruptedexception)
@@ -120,70 +116,6 @@ Contains a set of content items, and is contained by a timeline or a collection.
 |Title|The title of the exhibit.|
 |ContentItems|Specifies the collection of content items that is associated with the exhibit.|
 |Collection|Specifies the collection that is associated with the exhibit.|
- 
-[top](#chronozoom-rest-api-reference)
- 
-----------
- 
-### RemoveBetaFields ###
- 
-Migration to remove beta fields.
- 
- 
-[top](#chronozoom-rest-api-reference)
- 
-----------
- 
-### RemoveRITree ###
- 
-Migration to remove the RI-Tree.
- 
- 
-[top](#chronozoom-rest-api-reference)
- 
-----------
- 
-### AddRITreeWithIndex ###
- 
-Migration to add RI-Tree with index field.
- 
- 
-[top](#chronozoom-rest-api-reference)
- 
-----------
- 
-### Properties.Resources ###
- 
-A strongly-typed resource class, for looking up localized strings, etc.
- 
-|Property|Value|
-|:-------|:----|
-|ResourceManager|Returns the cached ResourceManager instance used by this class.|
-|Culture|Overrides the current thread's CurrentUICulture property for all
-              resource lookups using this strongly typed resource class.|
-|TimelineSubtreeQuery|Looks up a localized string similar to CREATE PROCEDURE TimelineSubtreeQuery
-            	@Collection_Id UNIQUEIDENTIFIER,
-            	@LCA UNIQUEIDENTIFIER,
-            	@min_span DECIMAL,
-            	@startTime DECIMAL,
-            	@endTime DECIMAL,
-            	@max_elem INT
-            AS
-            BEGIN
-            	DECLARE @return_entire_subtree BIT
-            	DECLARE @subtree_size INT
-            	DECLARE @current_level_cnt INT
-            	DECLARE @cnt INT
-            	DECLARE @num_ge_min_span INT
-            	DECLARE @current_id UNIQUEIDENTIFIER
-            	DECLARE @current_level TABLE (
-            		Id UNIQUEIDENTIFIER
-            	)
-            	DECLARE @next_level TABLE (
-            		Id UNIQUEIDENTIFIER
-            	)
-            	DECLARE @results TABLE (
-            		Id UNIQUEIDE [rest of string was truncated]";.|
  
 [top](#chronozoom-rest-api-reference)
  
@@ -320,7 +252,7 @@ A registered user.
 - [GetContentPath](#getcontentpath)
 - [GetSuperCollections](#getsupercollections)
 - [GetCollections](#getcollections)
-- [GetMemiTypeByUrl](#getmemitypebyurl)
+- [GetMimeTypeByUrl](#getmimetypebyurl)
 
 ### GetTimelines ###
  
@@ -330,9 +262,7 @@ Returns timeline data within a specified range of years from a collection or a s
 Timeline data in JSON format.
  
 **Example**
- 
     HTTP verb: GET
-            
     URL:
     http://{URL}/api/gettimelines?supercollection={supercollection}&collection={collection}&start={year}&end={year}
     
@@ -364,9 +294,7 @@ Performs a search for a specific term within a collection or a superCollection.
 Search results in JSON format.
  
 **Example**
- 
     HTTP verb: GET
-            
     URL:
     http://{URL}/api/search?searchTerm={term}&supercollection={supercollection}&collection={collection}
     
@@ -381,7 +309,6 @@ Search results in JSON format.
 |searchTerm|The term to search for.|
  
 **Remarks**
-The syntax for search is different from other requests. The values for supercollection and collection are specified as request parameters rather than as part of the URL.
 
  
  
@@ -397,9 +324,7 @@ Returns a list of tours for the default collection and default superCollection.
 A list of tours in JSON format.
  
 **Example**
- 
     HTTP verb: GET
-            
     URL: 
     http://{URL}/api/tours
     
@@ -421,9 +346,7 @@ Returns a list of tours for a given collection or superCollection.
 A list of tours in JSON format.
  
 **Example**
- 
     HTTP verb: GET
-            
     URL: 
     http://{URL}/api/{supercollection}/{collection}/tours
     
@@ -449,17 +372,15 @@ Creates a new user, or updates an existing user's information and associated per
 The URL for the new user collection.
  
 **Example**
- 
     HTTP verb: PUT
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}/user
     
-    Request body (JSON):
+    Request body:
     {
-        id: "0123456789",
-        displayName: "Joe",
-        email: "email@email.com"
+       id: "0123456789",
+       displayName: "Joe",
+       email: "email@email.com"
     }
     
 
@@ -471,13 +392,11 @@ The URL for the new user collection.
 |userRequest|JSON containing the request details.|
  
 **Remarks**
-If the user ID is omitted then a new user is created.
     If there is no ACS the user is treated as anonymous and granted access to the sandbox collection.
     If the anonymous user does not exist in the database then it is created.
     A new superCollection with the user's display name is added.
     A new default collection with the user's display name is added to this superCollection.
     A new user with the specified attributes is created.
-            
     If the specified user display name does not exist it is considered an error.
     If the user display name is specified and it exists then the user's attributes are updated.
 
@@ -510,17 +429,15 @@ Deletes the user with the specified user ID.
 HTTP response code.
  
 **Example**
- 
-            HTTP verb: DELETE
-            
-            URL:
-            http://{URL}/api/{supercollection}/{collection}/user
-            
-            Request body (JSON):
-            {
-       displayName: "Neil"
-            }
-            
+    HTTP verb: DELETE
+    URL:
+    http://{URL}/api/{supercollection}/{collection}/user
+    
+    Request body:
+    {
+        displayName: "Neil"
+    }
+    
 
  
 **Parameters**
@@ -542,12 +459,10 @@ Returns the user by name, if name parameter is empty returns current user.
 JSON containing data for the current user.
  
 **Example**
-
-            HTTP verb: GET
-            
-            URL:
-            http://{URL}/api/user
-            
+    HTTP verb: GET
+    URL:
+    http://{URL}/api/user
+    
 
  
 **Parameters**
@@ -569,13 +484,11 @@ Creates a new collection using the specified name.
 
  
 **Example**
- 
-    HTTP verb: PUT
-            
+    HTTP verb: POST
     URL:
     http://{URL}/api/{supercollection}/{collection}
-            
-    Request body (JSON):
+    
+    Request body:
     {
          id: "{id}",
          title: "{title}"
@@ -592,7 +505,6 @@ Creates a new collection using the specified name.
 |collectionRequest|[Collection](#collection) data in JSON format.|
  
 **Remarks**
-If a collection of the specified name does not exist then a new collection is created. 
     The title field can't be modified because it is part of the URL (the URL can be indexed).
 
  
@@ -609,13 +521,11 @@ Modifies an existing collection.
 
  
 **Example**
- 
     HTTP verb: PUT
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}
-            
-    Request body (JSON):
+    
+    Request body:
     {
          id: "{id}",
          title: "{title}"
@@ -632,7 +542,6 @@ Modifies an existing collection.
 |collectionRequest|[Collection](#collection) data in JSON format.|
  
 **Remarks**
-If the collection exists and the authenticated user is the author then the collection is modified. 
     If no author is registered then the authenticated user is set as the author. 
     The title field can't be modified because it is part of the URL (the URL can be indexed).
 
@@ -650,9 +559,7 @@ Deletes the specified collection.
 HTTP response code.
  
 **Example**
- 
     HTTP verb: DELETE
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}
     
@@ -678,13 +585,11 @@ Creates or updates the timeline in a given collection.
 HTTP status code.
  
 **Example**
- 
     HTTP verb: PUT
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}/timeline
-            
-    Request body (JSON):
+    
+    Request body:
     {
          ParentTimelineId: "ff5214e1-1bf4-4af5-8835-96cff2ce2cfd",
          Regime: null - optional,
@@ -704,7 +609,6 @@ HTTP status code.
 |timelineRequest|[Timeline](#timeline) data in JSON format.|
  
 **Remarks**
-If an ID is specified but the collection does not exist, the request will fail ("not found" status).
     If an ID is not specified, a new timeline will be added to the collection. 
     For a new timeline, if the parent is not defined the root timeline will be set as the parent.
     If the timeline with the specified identifier exists, then the existing timeline is updated.
@@ -720,13 +624,11 @@ If an ID is specified but the collection does not exist, the request will fail (
 Deletes the timeline with the specified ID.
  
 **Example**
- 
     HTTP verb: DELETE
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}/timeline
-            
-    Request body (JSON):
+    
+    Request body:
     {
          id: "0123456789"
     }
@@ -754,13 +656,11 @@ Creates or updates the exhibit and its content items in a given collection. If t
 [Exhibit](#exhibit) data in JSON format.
  
 **Example**
- 
     HTTP verb: PUT
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}/exhibit
-            
-    Request body (JSON):
+    
+    Request body:
     {
         ParentTimelineId: "123456"
         id: "0123456789",
@@ -780,7 +680,6 @@ Creates or updates the exhibit and its content items in a given collection. If t
 |exhibitRequest|[Exhibit](#exhibit) data in JSON format.|
  
 **Remarks**
-If an exhibit id is not specified, a new exhibit is added to the collection. 
     If the ID for an existing exhibit is specified then the exhibit will be updated. 
     If the exhibit ID to be updated does not exist a "not found" status is returned. 
     If the parent timeline is not specified the exhibit is added to the root timeline. 
@@ -798,12 +697,10 @@ If an exhibit id is not specified, a new exhibit is added to the collection.
 Deletes the specified exhibit from the specified collection.
  
 **Example**
- 
     HTTP verb: DELETE
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}/exhibit
-            
+    
     Request body:
     {
          id: "0123456789"
@@ -832,17 +729,15 @@ Creates or updates the content item in a given collection. If the collection doe
 
  
 **Example**
- 
     HTTP verb: PUT
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}/contentitem
-            
+                
     Request body:
     {
-        id: "0123456789",
-        title: "The Outer Planets",
-        uri: "http://www.example.com/images/planets.png"
+       id: "0123456789",
+       title: "The Outer Planets",
+       uri: "http://www.example.com/images/planets.png"
     }
     
 
@@ -865,12 +760,10 @@ Creates or updates the content item in a given collection. If the collection doe
 Delete the specified content item from the specified collection.
  
 **Example**
- 
     HTTP verb: DELETE
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}/contentitem
-            
+    
     Request body:
     {
          id: "0123456789"
@@ -899,12 +792,10 @@ Creates or updates a tour with bookmark support.
 A list of guids of the tour guid followed by bookmark guids in JSON format.
  
 **Example**
- 
     HTTP verb: PUT
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}/tour2
-            
+    
     Request body:
     {
              
@@ -921,7 +812,6 @@ A list of guids of the tour guid followed by bookmark guids in JSON format.
 |tourRequest|The tour data in JSON format.|
  
 **Remarks**
-All bookmarks in a tour must belong to the same collection and the user 
     must have permission to modify that collection.
     Supported operations include:
     To Create a new tour, do not specify a tour id or bookmark ids for the new entities to be created.
@@ -930,7 +820,6 @@ All bookmarks in a tour must belong to the same collection and the user
     If a tour id is specified and it exists, any specified fields are updated. 
     Delete all existing bookmarks and add bookmarks defined in the bookmarks JSON object to the tour.
     The sequence ids of the bookmarks are automatically generated based on the order they are received.
-        
     If an invalid tour Id, bookmark Id or bookmark sequence Id is specified then the request will fail.
 
  
@@ -944,12 +833,10 @@ All bookmarks in a tour must belong to the same collection and the user
 Deletes the specified tour.
  
 **Example**
- 
     HTTP verb: DELETE
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}/tour2
-            
+    
     Request body:
     {
         id: "5c07b2bf-65e1-45e1-a9cd-792a7767d685"
@@ -978,12 +865,10 @@ Adds a list of bookmarks to an existing tour.
 A list of guids of tour guid followed by new bookmark guids in JSON format.
  
 **Example**
- 
-    HTTP verb: DELETE
-            
+    HTTP verb: PUT
     URL:
     http://{URL}/api/{supercollection}/{collection}/{collectionName}/bookmark
-            
+    
     Request body:
     {
          id: "0123456789"
@@ -1009,12 +894,10 @@ A list of guids of tour guid followed by new bookmark guids in JSON format.
 Delete a list of bookmarks belonging to the same tour.
  
 **Example**
- 
     HTTP verb: DELETE
-            
     URL:
     http://{URL}/api/{supercollection}/{collection}/bookmark
-            
+    
     Request body:
     {
          id: "0123456789"
@@ -1037,20 +920,16 @@ Delete a list of bookmarks belonging to the same tour.
  
 ### GetContentPath ###
  
-Retrieves a path to the given content id.
-            
-            For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
+Retrieves a path to the given content id. For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
  
 **Returns**
 The full path to the content.
  
 **Example**
-
-            HTTP verb: GET
-            
-            URL:
-            http://{URL}/api/{supercollection}/{collection}/{reference}/contentpath
-            
+    HTTP verb: GET
+    URL:
+    http://{URL}/api/{supercollection}/{collection}/{reference}/contentpath
+    
 
  
 **Parameters**
@@ -1066,9 +945,7 @@ None.
 Retrieve the list of all supercollections.
  
 **Example**
- 
     HTTP verb: GET
-            
     URL:
     http://{URL}/api/supercollections
     
@@ -1087,9 +964,7 @@ None.
 Retrieve the list of all collections.
  
 **Example**
- 
     HTTP verb: GET
-            
     URL:
     http://{URL}/api/{superCollection}/collections
     
@@ -1103,16 +978,14 @@ None.
  
 ----------
  
-### GetMemiTypeByUrl ###
+### GetMimeTypeByUrl ###
  
 Retrieve file mime type by url
  
 **Example**
- 
     HTTP verb: GET
-            
     URL:
-    http://{URL}/api/getmimetypebyurl
+    http://{URL}/api/mimetypebyurl
     
 
  

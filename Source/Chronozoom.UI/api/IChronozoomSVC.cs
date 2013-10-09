@@ -401,9 +401,8 @@ namespace Chronozoom.UI
         /// Creates or updates a tour with bookmark support.
         /// </summary>
         /// <remarks>
-        /// All bookmarks in a tour must belong to the same collection and the user 
-        /// must have permission to modify that collection.
-        /// Supported operations include:
+        /// All bookmarks in a tour must belong to the same collection and the user must have permission
+        /// to modify that collection. Supported operations include:
         /// To Create a new tour, do not specify a tour id or bookmark ids for the new entities to be created.
         /// To modify an existing tour, specify the tour id and any of the tour fields (id, description, audio) that need to be modified.
         /// If a tour id is specified and it does not exist, a "not found" status is returned.
