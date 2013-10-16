@@ -1,4 +1,4 @@
-﻿/* Height of input element */
+/* Height of input element */
 /* Font-size of error message */
 /* Error messages */
 .error-message {
@@ -567,6 +567,12 @@ iframe[sutra=picker] + div {
 .welcome-block-toggle .toggle-block[data-toggle~="hide"] {
   display: none;
 }
+.toggle-block[data-toggle~="show"] {
+  display: block;
+}
+.toggle-block[data-toggle~="hide"] {
+  display: none;
+}
 .WelcomeBlock {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -633,6 +639,9 @@ iframe[sutra=picker] + div {
   cursor: pointer;
 }
 .FavoriteTimelinesBlock {
+  color: #fff;
+}
+.MyTimelinesBlock {
   color: #fff;
 }
 .template-invisible {
@@ -885,6 +894,18 @@ iframe[sutra=picker] + div {
     box-sizing: border-box;
     overflow: auto;
   }
+  .FavoriteTimelinesBlock {
+    float: right;
+    margin: 5px;
+    padding: 5px;
+    width: 45%;
+    min-width: 400px;
+    height: 60%;
+    background-color: transparent;
+    vertical-align: top;
+    box-sizing: border-box;
+    overflow: auto;
+  }
   .welcome-box-1 {
     font-size: 15px;
     white-space: nowrap;
@@ -937,6 +958,16 @@ iframe[sutra=picker] + div {
     overflow: auto;
   }
   .TwitterBlock {
+    float: right;
+    margin: 5px;
+    padding: 5px;
+    width: 32%;
+    height: 100%;
+    min-height: 300px;
+    box-sizing: border-box;
+    overflow: auto;
+  }
+  .FavoriteTimelinesBlock {
     float: right;
     margin: 5px;
     padding: 5px;
@@ -1005,6 +1036,20 @@ iframe[sutra=picker] + div {
     overflow: auto;
   }
   .TwitterBlock {
+    float: right;
+    margin: 5px;
+    padding: 5px;
+    width: 32%;
+    height: 100%;
+    min-height: 300px;
+    background-color: transparent;
+    vertical-align: top;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: auto;
+  }
+  .FavoriteTimelinesBlock {
     float: right;
     margin: 5px;
     padding: 5px;

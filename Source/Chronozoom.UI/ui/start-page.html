@@ -18,14 +18,14 @@
             </div>
         </div>
 
-        <div id="FavoriteTimelinesBlock" class="FavoriteTimelinesBlock toggle-block" data-toggle="hide">
+    <div id="MyTimelinesBlock" class="MyTimelinesBlock toggle-block" data-toggle="hide">
             <div class="block-header">              
-                <h2 class="header-text">Favorite Timelines</h2>
-                <div class="list-view-icon" data-enabled="true" onclick="CZ.StartPage.listFlip('FavoriteTimelinesBlock');">
+                <h2 class="header-text">My Timelines</h2>
+                <div class="list-view-icon" data-enabled="true" onclick="CZ.StartPage.listFlip('MyTimelinesBlock');">
                 </div>
             </div>
-            <div id="FavoriteTimelinesBlock-tiles" class="FTTiles"></div>
-            <div id="FavoriteTimelinesBlock-list" class="FTList"></div>
+            <div id="MyTimelinesBlock-tiles" class="FTTiles"></div>
+            <div id="MyTimelinesBlock-list" class="FTList"></div>
         </div>
     </div>
 
@@ -39,7 +39,7 @@
         <div id="FeaturedTimelinesBlock-list" class="FTList"></div>
     </div>
 
-    <div id="TwitterBlock" class="TwitterBlock">
+    <div id="TwitterBlock" class="TwitterBlock toggle-block" data-toggle="hide">
         <div class="block-header">              
             <h2 class="header-text">Latest News</h2>
             <div class="list-view-icon" data-enabled="true" onclick="CZ.StartPage.listFlip('TwitterBlock');">
@@ -48,6 +48,18 @@
         <div id="TwitterBlock-tiles" class="FTTiles"></div>
         <div id="TwitterBlock-list" class="FTList"></div>
     </div>
+
+    <div id="FavoriteTimelinesBlock" class="FavoriteTimelinesBlock toggle-block" data-toggle="hide">
+        <div class="block-header">              
+                <h2 class="header-text">Favorite Timelines</h2>
+                <div class="list-view-icon" data-enabled="true" onclick="CZ.StartPage.listFlip('FavoriteTimelinesBlock');">
+                </div>
+            </div>
+            <div id="FavoriteTimelinesBlock-tiles" class="FTTiles"></div>
+            <div id="FavoriteTimelinesBlock-list" class="FTList"></div>
+        </div>
+    </div>
+
 
     <div id="template-list" class="template-invisible">
         <div class="list-item">

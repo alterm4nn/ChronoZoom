@@ -122,6 +122,20 @@ var CZ;
                     "box ex3 ex4 ex6",
                     "box ex3 ex4 ex6"
                 ]
+            },
+            {
+                "Name": "#MyTimelinesBlock-tiles",
+                "Visibility": [
+                    "box",
+                    "box",
+                    "box ex3",
+                    "box ex3 ex4",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
+                ]
             }
         ];
 
@@ -407,6 +421,55 @@ var CZ;
         }
         StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
 
+        function fillMyTimelines(timelines) {
+            var $template = $("#template-tile .box");
+            var layout = CZ.StartPage.tileLayout[4];
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = "http://test.chronozoom.com/#/t" + timelines[0].id;
+                if (i > 0)
+                    timelineUrl += "/t" + timeline.id;
+                var $startPage = $("#start-page");
+                var $tile = $template.clone(true, true);
+                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
+
+                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "my" + i).click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                });
+
+                $tileTitle.text(timeline.title.trim() || "No title :(");
+            }
+        }
+        StartPage.fillMyTimelines = fillMyTimelines;
+
+        function fillMyTimelinesList(timelines) {
+            var template = "#template-timeline-list .timeline-list-item";
+            var target = "#MyTimelinesBlock-list";
+
+            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
+                var timeline = timelines[i];
+
+                var timelineUrl = "http://test.chronozoom.com/#/t" + timelines[0].id;
+                if (i > 0)
+                    timelineUrl += "/t" + timeline.id;
+
+                var $timelineListItem = $(template).clone(true, true).appendTo(target);
+
+                var Name = "my-list-elem" + i;
+                var idx = 1;
+
+                $timelineListItem.attr("id", "lmy" + idx + "i" + i);
+                $timelineListItem.click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                });
+
+                $timelineListItem.attr("data-title", timeline.title.trim() || "No title :(");
+            }
+        }
+        StartPage.fillMyTimelinesList = fillMyTimelinesList;
+
         function TwitterLayout(target, idx) {
             var ListTemplate = "#template-tweet-list .tweet-list-item";
             var ListElem = "#TwitterBlock-list";
@@ -540,6 +603,19 @@ var CZ;
                 }
             }, function (error) {
                 console.log("[ERROR] getUserFavorites");
+            });
+
+            CZ.Service.getTimelines(null).done(function (response) {
+                var roottimeline = response;
+                var mytimelines = new Array();
+                var i = 0;
+                mytimelines[0] = roottimeline;
+                roottimeline.timelines.forEach(function (timeline) {
+                    i++;
+                    mytimelines[i] = timeline;
+                });
+                fillMyTimelines(mytimelines);
+                fillMyTimelinesList(mytimelines);
             });
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
