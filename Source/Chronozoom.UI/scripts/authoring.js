@@ -404,7 +404,12 @@ var CZ;
                 CZ.Common.vc.virtualCanvas("requestInvalidate");
                 deferred.resolve();
             });
+            var isRoot = !t.parent.guid;
             CZ.VCContent.removeChild(t.parent, t.id);
+
+            if (isRoot) {
+                document.location.reload(true);
+            }
         }
         Authoring.removeTimeline = removeTimeline;
 
