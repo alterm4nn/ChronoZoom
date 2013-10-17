@@ -11,9 +11,6 @@ This guide covers everything you need know to install the ChronoZoom development
 
 If you are new to GitHub, we recommend reading [Learning to use GitHub for ChronoZoom development](/../LearningTouseGithub.md/) for more information on setting up your source code repository.
 
-<!-- Note: Some of the APIs for ChronoZoom are not yet available for the public. -->
-
-
 ----------
 
 ## Contents ##
@@ -25,6 +22,8 @@ If you are new to GitHub, we recommend reading [Learning to use GitHub for Chron
 [Deploy ChronoZoom to Azure](#deploy-chronozoom-to-azure)
 
 [How to set up Bing search API](#how-to-set-up-bing-search-api)
+
+[How to document code](#how-to-document-code)
 
 ----------
 
@@ -178,3 +177,14 @@ Bing search API is used in Authoring Tool, you need to provide Windows Azure Mar
 	<add key="AzureMarketplaceAccountKey" value="" />
 	```
 and paste your copied **Account Key** in **value** field.
+
+## How to document code ##
+When making additions to ChronoZoom code it may be necessary to add or update triple-slash documentation comments. Documentation is currently generated for the following classes:
+
+- Chronozoom.Entities
+- Chronozoom.UI
+
+If you make any changes to any members in either of these classes, you will need to:
+
+1. Add new triple-slash comments or edit existing triple-slash comments according to your changes.
+2. Run the [API doc conversion tool](https://github.com/alterm4nn/ChronoZoom/blob/master/Doc/tools/Using_API_Conversion_Tool.md).

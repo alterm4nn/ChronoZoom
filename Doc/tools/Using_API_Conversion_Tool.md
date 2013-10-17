@@ -18,37 +18,35 @@ Everything begins with the paths, strings and regular expressions that are defin
 
 When APICON is run, the `makeDoc()` function is called first. This function groups together all of the other functions, and is responsible for generating the output file. APICON is built specifically to generate REST API documentation for the Chronozoom.UI and Chronozoom.Entities. Because of this, the two main functions (`getMembers()`, `getEntities()`) are specific to the APIs they convert (more about extensibility below).
 
-### A note about XML documentation file ###
-Code examples are presented within a CDATA block, which presents issues for Visual Studio as it parses the XML documentation file. Specifically, if there is a blank line in the triple-slash block (perfectly acceptable), there can NOT be any spaces. For some reason this interferes with the way Visual Studio indents the XML file. 
+### A note about triple-slash comment formatting ###
+Code examples are presented within a CDATA block, which presents issues for Visual Studio as it creates the XML documentation file. Specifically, if there is a blank line in the triple-slash block (perfectly acceptable), there can NOT be any spaces. For some reason this interferes with the way Visual Studio indents the XML file. 
 
 ## Using APICON ##
 
 To use APICON, take the following steps:
 
 1. Open the **czApiRefCon** solution.
-2. In Properties\Settings.settings, update the following properties to point to the respective files/locations on your local computer:
-
-    - MemberPath
-    - EntityPath
-    - TopMatter
-    - OutFile
-
+2. In Properties\Settings.settings, update the following properties to point to the respective files/locations on your local computer: `MemberPath`, `EntityPath`, `TopMatter`, `OutFile`.
 3. Build the latest version of ChronoZoom.
-4. Run **czApiRefCon**.
+4. Build `Doc\tools\apicon\czApiRefCon.sln`
+5. Run `Doc\tools\apicon\apicon\bin\Debug\xslcon.exe`.
+
+By default the tool outputs the resulting file to two locations:
+- `Doc\ChronoZoom_REST_API.md`: This is the official doc that will be available on GitHub.
+- `Doc\tools\apicon\apicon\output\ChronoZoom_REST_API.md`: This is for convenience while locally testing.
+
+Be sure to submit changes to `ChronoZoom_REST_API.md` along with your other changes.
 
 **Note:** if more than one person is using the tool, it would be worthwhile to have Git ignore the configuration file. To do this, run this command (substitute **path/to/Settings.settings** with the actual path):
 
-    `git update-index --assume-unchanged path/to/Settings.settings`
+    git update-index --assume-unchanged path/to/Settings.settings
 
 Once you have done this, git will completely ignore any changes on that file; they will not show up when running git status or git diff, nor will they ever be committed.
 
 To make git track the file again, simply run:
 
-    `git update-index --no-assume-unchanged path/to/Settings.settings`
+    git update-index --no-assume-unchanged path/to/Settings.settings
 
 ## Extending and Maintaining APICON ##
 
 In this section we discuss addressing changes to the API naming/structure, and the potential to extend the tool should it become necessary. As mentioned earlier APICON is set up to extract documentation from XML for specific API members. Member name changes and other refactoring could cause this tool to break. At some future point new APIs may be added to the REST API. This tool will need to be updated to accommodate the new APIs.
-
-[When in doubt, refer to makeDoc().]
-[All of the functions should work with other APIs that are similar. What is a good way to say this?]
