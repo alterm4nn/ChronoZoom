@@ -1,7 +1,3 @@
-/// <reference path='uiloader.ts'/>
-/// <reference path='../ui/media/bing-mediapicker.ts'/>
-/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
-/// <reference path='typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (Media) {
@@ -22,7 +18,6 @@ var CZ;
         });
 
         function initialize() {
-            // TODO: Register media pickers. The order is essential for MediaList.
             registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
 
             if (CZ.Media.SkyDriveMediaPicker.isEnabled) {

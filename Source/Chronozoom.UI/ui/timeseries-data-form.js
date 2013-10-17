@@ -1,7 +1,3 @@
-/// <reference path='controls/formbase.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../scripts/data.ts'/>
-/// <reference path='../scripts/cz.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -13,7 +9,6 @@ var CZ;
     (function (UI) {
         var TimeSeriesDataForm = (function (_super) {
             __extends(TimeSeriesDataForm, _super);
-            // We only need to add additional initialization in constructor.
             function TimeSeriesDataForm(container, formInfo) {
                 _super.call(this, container, formInfo);
 
@@ -136,7 +131,6 @@ var CZ;
                 var file = this.input[0].files[0];
                 var fileReader = new FileReader();
 
-                //TODO: add verifivation of input file
                 fileReader.onloadstart = callbacks["onloadstart"];
                 fileReader.onerror = callbacks["onerror"];
                 fileReader.onabort = callbacks["onabort"];

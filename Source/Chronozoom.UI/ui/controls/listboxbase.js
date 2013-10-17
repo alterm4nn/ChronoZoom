@@ -1,15 +1,6 @@
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path="../../scripts/typings/jqueryui/jqueryui.d.ts" />
 var CZ;
 (function (CZ) {
     (function (UI) {
-        /**
-        * Base class for a listbox.
-        * - container: a jQuery object with listbox's container.
-        * - listBoxInfo: information about listbox's data and settings.
-        * - listItemInfo: information about types of listitems.
-        * - getType: a function to define type of listitems depending on their data.
-        */
         var ListBoxBase = (function () {
             function ListBoxBase(container, listBoxInfo, listItemsInfo, getType) {
                 if (typeof getType === "undefined") { getType = function (context) {
@@ -32,7 +23,6 @@ var CZ;
                     this.add(context[i]);
                 }
 
-                // Setup default handlers
                 this.itemDblClickHandler = function (item, idx) {
                 };
                 this.itemRemoveHandler = function (item, idx) {
@@ -40,7 +30,6 @@ var CZ;
                 this.itemMoveHandler = function (item, idx1, idx2) {
                 };
 
-                // Apply jQueryUI sortable widget.
                 var self = this;
                 if (listBoxInfo.sortableSettings) {
                     var origStart = listBoxInfo.sortableSettings.start;
@@ -63,10 +52,6 @@ var CZ;
                     this.container.sortable(listBoxInfo.sortableSettings);
                 }
             }
-            /**
-            * Produces listitem from data and add it to a listbox.
-            * - context: a data to display in a listitem.
-            */
             ListBoxBase.prototype.add = function (context) {
                 var type = this.getType(context);
                 var typeInfo = this.listItemsInfo[type];
@@ -81,9 +66,6 @@ var CZ;
                 return item;
             };
 
-            /**
-            * Removes listitem from a listbox.
-            */
             ListBoxBase.prototype.remove = function (item) {
                 var i = this.items.indexOf(item);
 
@@ -94,9 +76,6 @@ var CZ;
                 }
             };
 
-            /**
-            * Clears all listitems from a listbox.
-            */
             ListBoxBase.prototype.clear = function () {
                 for (var i = 0, len = this.items.length; i < len; ++i) {
                     var item = this.items[i];
@@ -105,9 +84,6 @@ var CZ;
                 this.items.length = 0;
             };
 
-            /**
-            * Selects an element of the listbox
-            */
             ListBoxBase.prototype.selectItem = function (item) {
                 var i = this.items.indexOf(item);
 
@@ -116,23 +92,14 @@ var CZ;
                 }
             };
 
-            /**
-            * Setup listitem clicked handler
-            */
             ListBoxBase.prototype.itemDblClick = function (handler) {
                 this.itemDblClickHandler = handler;
             };
 
-            /**
-            * Setup listitem removed handler
-            */
             ListBoxBase.prototype.itemRemove = function (handler) {
                 this.itemRemoveHandler = handler;
             };
 
-            /**
-            * Setup listitem move handler
-            */
             ListBoxBase.prototype.itemMove = function (handler) {
                 this.itemMoveHandler = handler;
             };
@@ -140,13 +107,6 @@ var CZ;
         })();
         UI.ListBoxBase = ListBoxBase;
 
-        /**
-        * Base class for a listitem.
-        * - parent: parent listbox.
-        * - container: a jQuery object with listitem's container.
-        * - uiMap: uiMap: a set of CSS selectors for elements in HTML code of listitem's container.
-        * - context: a data to display in a listitem.
-        */
         var ListItemBase = (function () {
             function ListItemBase(parent, container, uiMap, context) {
                 var _this = this;
@@ -158,12 +118,10 @@ var CZ;
                 this.container = container;
                 this.data = context;
 
-                // Setup click on a listitem
                 this.container.dblclick(function (_) {
                     return _this.parent.selectItem(_this);
                 });
 
-                // Setup close button of a listitem.
                 this.closeButton = this.container.find(uiMap.closeButton);
 
                 if (this.closeButton.length) {
@@ -172,12 +130,8 @@ var CZ;
                     });
                 }
 
-                // Append listitems container to a listbox.
                 this.parent.container.append(this.container);
             }
-            /**
-            * Closes an item and removes it from a listbox.
-            */
             ListItemBase.prototype.close = function () {
                 this.parent.remove(this);
             };

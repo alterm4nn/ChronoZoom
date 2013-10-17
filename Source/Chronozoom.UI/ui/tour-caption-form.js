@@ -1,6 +1,3 @@
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/tours.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -183,7 +180,6 @@ var CZ;
                     complete: function () {
                         _this.tourPlayer.exit();
 
-                        // Enable hashchange event.
                         CZ.Common.hashHandle = true;
                     }
                 });

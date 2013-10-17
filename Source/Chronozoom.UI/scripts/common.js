@@ -8,9 +8,6 @@
         Common.isAxisFreezed = true;
         Common.startHash;
 
-        /*
-        Array for logging of inners messages and exceptions
-        */
         var searchString;
         Common.ax;
         Common.axis;
@@ -36,11 +33,8 @@
         Common.supercollection = "";
         Common.collection = "";
 
-        // Initial Content contains the identifier (e.g. ID or Title) of the content that should be loaded initially.
         Common.initialContent = null;
 
-        /* Initialize the JQuery UI Widgets
-        */
         function initialize() {
             Common.ax = ($)('#axis');
             Common.axis = new CZ.Timescale(Common.ax);
@@ -51,25 +45,15 @@
         }
         Common.initialize = initialize;
 
-        /* Calculates local offset of mouse cursor in specified jQuery element.
-        @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
-        @param event   (Mouse event args) mouse event args describing mouse cursor.
-        */
         function getXBrowserMouseOrigin(jqelement, event) {
             var offsetX;
 
-            ///if (!event.offsetX)
             offsetX = event.pageX - jqelement[0].offsetLeft;
 
-            //else
-            //    offsetX = event.offsetX;
             var offsetY;
 
-            //if (!event.offsetY)
             offsetY = event.pageY - jqelement[0].offsetTop;
 
-            //else
-            //    offsetY = event.offsetY;
             return {
                 x: offsetX,
                 y: offsetY
@@ -82,9 +66,6 @@
         }
         Common.sqr = sqr;
 
-        // Prevents the event from bubbling.
-        // In non IE browsers, use e.stopPropagation() instead.
-        // To cancel event bubbling across browsers, you should check for support for e.stopPropagation(), and proceed accordingly:
         function preventbubble(e) {
             if (e && e.stopPropagation)
                 e.stopPropagation();
@@ -124,7 +105,6 @@ else
         }
         Common.showFooter = showFooter;
 
-        /*Animation tooltip parameter*/
         Common.animationTooltipRunning = null;
         Common.tooltipMode = "default";
 
@@ -137,8 +117,6 @@ else
 
                 Common.animationTooltipRunning = null;
 
-                //tooltipMode = "default"; //default
-                //tooltipIsShown = false;
                 $(".bubbleInfo").attr("id", "defaultBox");
 
                 $(".bubbleInfo").hide();
@@ -146,15 +124,11 @@ else
         }
         Common.stopAnimationTooltip = stopAnimationTooltip;
 
-        // Compares 2 visibles. Returns true if they are equal with an allowable imprecision
         function compareVisibles(vis1, vis2) {
             return vis2 != null ? (Math.abs(vis1.centerX - vis2.centerX) < CZ.Settings.allowedVisibileImprecision && Math.abs(vis1.centerY - vis2.centerY) < CZ.Settings.allowedVisibileImprecision && Math.abs(vis1.scale - vis2.scale) < CZ.Settings.allowedVisibileImprecision) : false;
         }
         Common.compareVisibles = compareVisibles;
 
-        /*
-        Is called by direct user actions like links, bread crumbs clicking, etc.
-        */
         function setVisibleByUserDirectly(visible) {
             CZ.Tours.pauseTourAtAnyAnimation = false;
             if (CZ.Tours.tour != undefined && CZ.Tours.tour.state == "play")
@@ -175,9 +149,7 @@ else
         }
         Common.updateMarker = updateMarker;
 
-        // Retrieves the URL to download the data from
         function loadDataUrl() {
-            // The following regexp extracts the pattern dataurl=url from the page hash to enable loading timelines from arbitrary sources.
             var match = /dataurl=([^\/]*)/g.exec(window.location.hash);
             if (match) {
                 return unescape(match[1]);
@@ -195,7 +167,6 @@ else
             }
         }
 
-        //loading the data from the service
         function loadData() {
             return CZ.Data.getTimelines(null).then(function (response) {
                 if (!response) {
@@ -314,7 +285,6 @@ else
                 bottom: cosmosTimeline.y + cosmosTimeline.height
             };
 
-            // update virtual canvas horizontal borders
             CZ.Settings.maxPermitedTimeRange = {
                 left: cosmosTimeline.left,
                 right: cosmosTimeline.right
@@ -328,7 +298,6 @@ else
 
             Common.vc.virtualCanvas("updateViewport");
 
-            //ax.axis("updateWidth");
             updateAxis(Common.vc, Common.ax);
 
             CZ.BreadCrumbs.updateBreadCrumbsLabels();

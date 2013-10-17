@@ -460,7 +460,10 @@ module CZ {
         export function fillMyTimelines(roottimeline,timelines) {
             var $template = $("#template-tile .box");
             var layout = CZ.StartPage.tileLayout[4];
-            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length + 1); i < len; i++) {
+            var length;
+            if (timelines != null) length = timelines.length + 1;
+            else length = 1;
+            for (var i = 0, len = Math.min(layout.Visibility.length, length); i < len; i++) {
                 var timeline;
                 if (i == 0) timeline = roottimeline;
                 else timeline = timelines[i - 1];
@@ -487,8 +490,10 @@ module CZ {
         export function fillMyTimelinesList(roottimeline,timelines) {
             var template = "#template-timeline-list .timeline-list-item";
             var target = "#MyTimelinesBlock-list";
-
-            for (var i = 0; i < Math.min(tileData.length, timelines.length + 1) ; i++) {
+            var length;
+            if (timelines != null) length = timelines.length + 1;
+            else length = 1;
+            for (var i = 0; i < Math.min(tileData.length, length) ; i++) {
                 var timeline;
                 if (i == 0) timeline = roottimeline;
                 else timeline = timelines[i - 1];

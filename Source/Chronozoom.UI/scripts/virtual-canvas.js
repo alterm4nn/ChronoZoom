@@ -1,32 +1,10 @@
-﻿/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
-/// <reference path='settings.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='viewport.ts'/>
-/// <reference path='vccontent.ts'/>
-var CZ;
+﻿var CZ;
 (function (CZ) {
     (function (VirtualCanvas) {
-        /*  Defines a Virtual Canvas widget (based on jQuery ui).
-        @remarks The widget renders different objects defined in a virtual space within a <div> element.
-        The widget allows to update current visible region, i.e. perform panning and zooming.
-        
-        Technically, the widget uses a <canvas> element to render most types of objects; some of elements
-        can be positioned using CSS on a top of the canvas.
-        The widget is split into layers, each layer corresponds to a <div> within a root <div> element.
-        Next <div> is rendered on the top of previous one.
-        */
         function initialize() {
             ($).widget("ui.virtualCanvas", {
-                /* Root element of the widget content.
-                Element of type CanvasItemsRoot.
-                */
                 _layersContent: undefined,
-                /* Array of jqueries to layer div elements
-                (saved to avoid building jqueries every time we need it).
-                */
                 _layers: [],
-                /* Constructs a widget
-                */
                 _create: function () {
                     var self = this;
                     self.element.addClass("virtualCanvas");
@@ -50,22 +28,17 @@ var CZ;
 
                     var layerDivs = self.element.children("div");
                     layerDivs.each(function (index) {
-                        // make a layer from (div)
                         $(this).addClass("virtualCanvasLayerDiv unselectable").zIndex(index * 3);
 
-                        // creating canvas element
                         var layerCanvasJq = $("<canvas></canvas>").appendTo($(this)).addClass("virtualCanvasLayerCanvas").zIndex(index * 3 + 1);
                         self._layers.push($(this));
                     });
 
-                    // creating layers' content root element
                     this._layersContent = new CZ.VCContent.CanvasRootElement(self, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
 
-                    // default visible region
                     this.options.visible = new CZ.Viewport.VisibleRegion2d(0, 0, 1);
                     this.updateViewport();
 
-                    // start up the mouse handling
                     self.element.bind('mousemove.' + this.widgetName, function (e) {
                         self.mouseMove(e);
                     });
@@ -86,13 +59,9 @@ var CZ;
                         self._mouseLeave(e);
                     });
                 },
-                /* Destroys a widget
-                */
                 destroy: function () {
                     this._destroy();
                 },
-                /* Handles mouse down event within the widget
-                */
                 _mouseDown: function (e) {
                     var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
                     this.lastClickPosition = {
@@ -100,15 +69,10 @@ var CZ;
                         y: origin.y
                     };
 
-                    //Bug (176751): Infodots/video. Mouseup event handling.
-                    //Chrome/Firefox solution
                     $("iframe").css("pointer-events", "none");
 
-                    //IE solution
                     $('#iframe_layer').css("display", "block").css("z-index", "99999");
                 },
-                /* Handles mouse up event within the widget
-                */
                 _mouseUp: function (e) {
                     var viewport = this.getViewport();
                     var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
@@ -117,16 +81,10 @@ var CZ;
                     if (this.lastClickPosition && this.lastClickPosition.x == origin.x && this.lastClickPosition.y == origin.y)
                         this._mouseClick(e);
 
-                    //Bug (176751): Infodots/video. Mouseup event handling.
-                    //Chrome/Firefox solution
                     $("iframe").css("pointer-events", "auto");
 
-                    //IE solution
                     $('#iframe_layer').css("display", "none");
                 },
-                /*
-                Handles mouseleave event within the widget
-                */
                 _mouseLeave: function (e) {
                     if (this.currentlyHoveredContentItem != null && this.currentlyHoveredContentItem.onmouseleave != null)
                         this.currentlyHoveredContentItem.onmouseleave(e);
@@ -135,21 +93,15 @@ var CZ;
                     if (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.onmouseunhover != null)
                         this.currentlyHoveredTimeline.onmouseunhover(null, e);
 
-                    // hide tooltip now
                     CZ.Common.stopAnimationTooltip();
 
-                    // remove last mouse position from canvas to prevent unexpected highlight of canvas elements
                     this.lastEvent = null;
                 },
-                /* Mouse click happens when mouse up happens at the same point as previous mouse down.
-                Returns true, if the event was handled.
-                */
                 _mouseClick: function (e) {
                     var viewport = this.getViewport();
                     var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
                     var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
 
-                    // the function handle mouse click an a content item
                     var _mouseClickNode = function (contentItem, pv) {
                         var inside = contentItem.isInside(pv);
                         if (!inside)
@@ -167,31 +119,17 @@ var CZ;
                         return false;
                     };
 
-                    // Start handling the event from root element
                     _mouseClickNode(this._layersContent, posv);
                 },
-                /*
-                getter of currentlyHoveredTimeline
-                */
                 getHoveredTimeline: function () {
                     return this.currentlyHoveredTimeline;
                 },
-                /*
-                getter of currentlyHoveredInfodot
-                */
                 getHoveredInfodot: function () {
                     return this.currentlyHoveredInfodot;
                 },
-                /*
-                Returns the time value that corresponds to the current cursor position
-                */
                 getCursorPosition: function () {
                     return this.cursorPosition;
                 },
-                /*
-                Sets the constraines applied by the infordot exploration
-                param e     (CanvasInfodot) an infodot that is used to calculate constraints
-                */
                 _setConstraintsByInfodotHover: function (e) {
                     var val;
                     if (e) {
@@ -201,23 +139,14 @@ var CZ;
                         val = undefined;
                     this.RaiseInnerZoomConstraintChanged(val);
                 },
-                /*
-                Fires the event with a new inner zoom constrainted value
-                */
                 RaiseInnerZoomConstraintChanged: function (e) {
                     this.innerZoomConstraintChangedEvent.zoomValue = e;
                     this.element.trigger(this.innerZoomConstraintChangedEvent);
                 },
-                /*
-                Fires the event of cursor position changed
-                */
                 RaiseCursorChanged: function () {
                     this.cursorPositionChangedEvent.Time = this.cursorPosition;
                     this.element.trigger(this.cursorPositionChangedEvent);
                 },
-                /*
-                Updates tooltip position
-                */
                 updateTooltipPosition: function (posv) {
                     var scrPoint = this.viewport.pointVirtualToScreen(posv.x, posv.y);
 
@@ -244,15 +173,12 @@ else if (CZ.Common.tooltipMode == 'timeline')
                     if (height > this.canvasHeight)
                         scrPoint.y = this.canvasHeight - obj.panelHeight - heigthOffset + 1;
 
-                    // Update tooltip position.
                     $('.bubbleInfo').css({
                         position: "absolute",
                         top: scrPoint.y,
                         left: scrPoint.x
                     });
                 },
-                /* Handles mouse move event within the widget
-                */
                 mouseMove: function (e) {
                     var viewport = this.getViewport();
                     var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
@@ -270,8 +196,7 @@ else if (CZ.Common.tooltipMode == 'timeline')
 
                     var mouseInStack = [];
 
-                    // the function handle mouse move event
-                    var _mouseMoveNode = function (contentItem/*an element to handle mouse move*/ , forceOutside/*if true, we know that pv is outside of the contentItem*/ , pv/*clicked point in virtual coordinates*/ ) {
+                    var _mouseMoveNode = function (contentItem, forceOutside, pv) {
                         if (forceOutside) {
                             if (contentItem.reactsOnMouse && contentItem.isMouseIn && contentItem.onmouseleave) {
                                 contentItem.onmouseleave(pv, e);
@@ -314,7 +239,6 @@ else if (CZ.Common.tooltipMode == 'timeline')
                         }
                     };
 
-                    // Start handling the event from root element
                     _mouseMoveNode(this._layersContent, false, posv);
 
                     if (mouseInStack.length == 0) {
@@ -352,23 +276,17 @@ else if (CZ.Common.tooltipMode == 'timeline')
                             }
                         }
 
-                        // update position of tooltip
                         this.updateTooltipPosition(posv);
                     }
 
-                    // last mouse move event
                     this.lastEvent = e;
                 },
-                // Returns last mouse move event
                 getLastEvent: function () {
                     return this.lastEvent;
                 },
-                // Returns root of the element tree.
                 getLayerContent: function () {
                     return this._layersContent;
                 },
-                // Recursively finds and returns an element with given id.
-                // If not found, returns null.
                 findElement: function (id) {
                     var rfind = function (el, id) {
                         if (el.id === id)
@@ -392,7 +310,6 @@ else if (CZ.Common.tooltipMode == 'timeline')
 
                     return rfind(this._layersContent, id);
                 },
-                // Destroys the widget.
                 _destroy: function () {
                     this.element.removeClass("virtualCanvas");
                     this.element.children(".virtualCanvasLayerDiv").each(function (index) {
@@ -404,8 +321,6 @@ else if (CZ.Common.tooltipMode == 'timeline')
                     this._layersContent = undefined;
                     return this;
                 },
-                /* Produces {Left,Right,Top,Bottom} object which corresponds to visible region in virtual space, using current viewport.
-                */
                 _visibleToViewBox: function (visible) {
                     var view = this.getViewport();
                     var w = view.widthScreenToVirtual(view.width);
@@ -414,30 +329,17 @@ else if (CZ.Common.tooltipMode == 'timeline')
                     var y = visible.centerY - h / 2;
                     return { Left: x, Right: x + w, Top: y, Bottom: y + h };
                 },
-                /* Updates and renders a visible region in virtual space that corresponds to a physical window.
-                @param newVisible   (VisibleRegion2d) New visible region.
-                @remarks Rebuilds the current viewport.
-                */
                 setVisible: function (newVisible, isInAnimation) {
                     delete this.viewport;
                     this.options.visible = newVisible;
                     this.isInAnimation = isInAnimation && isInAnimation.isActive;
 
-                    //console.log("newvs",newVisible);
-                    // rendering canvas (we should update the image because of new visible region)
                     var viewbox_v = this._visibleToViewBox(newVisible);
 
-                    //console.log(viewbox_v);
                     var viewport = this.getViewport();
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },
-                /* Update viewport's physical width and height in correspondence with the <div> element.
-                @remarks The method should be called when the <div> element, which hosts the virtual canvas, resizes.
-                It sets width and height attributes of layers' <div> and <canvas> to width and height of the widget's <div>, and
-                then updates visible region and renders the content.
-                */
                 updateViewport: function () {
-                    // updating width and height of layers' <canvas>-es in accordance with actual size of widget's <div>.
                     var size = this._getClientSize();
                     var n = this._layers.length;
                     for (var i = 0; i < n; i++) {
@@ -450,24 +352,17 @@ else if (CZ.Common.tooltipMode == 'timeline')
                         }
                     }
 
-                    // update canvas width and height
                     this.canvasWidth = CZ.Common.vc.width();
                     this.canvasHeight = CZ.Common.vc.height();
 
                     this.setVisible(this.options.visible);
                 },
-                /* Produces {width, height} object from actual width and height of widget's <div> (in pixels).
-                */
                 _getClientSize: function () {
                     return {
                         width: this.element[0].clientWidth,
                         height: this.element[0].clientHeight
                     };
                 },
-                /* Gets current viewport.
-                @remarks The widget caches viewport as this.viewport property and rebuilds it only when it is invalidated, i.e. this.viewport=undefined.
-                Viewport is currently invalidated by setVisible and updateViewport methods.
-                */
                 getViewport: function () {
                     if (!this.viewport) {
                         var size = this._getClientSize();
@@ -476,18 +371,11 @@ else if (CZ.Common.tooltipMode == 'timeline')
                     }
                     return this.viewport;
                 },
-                /* Renders elements tree on all layers' canvases.
-                @param elementsRoot     (CanvasItemsRoot) Root of widget's elements tree
-                @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in virtual space
-                @param viewport         (Viewport2d) current viewport
-                @todo                   Possible optimization is to render only actually updated layers.
-                */
                 _renderCanvas: function (elementsRoot, visibleBox_v, viewport) {
                     var n = this._layers.length;
                     if (n == 0)
                         return;
 
-                    // first we get 2d contexts for each layers' canvas:
                     var contexts = {};
                     for (var i = 0; i < n; i++) {
                         var layer = this._layers[i];
@@ -498,27 +386,18 @@ else if (CZ.Common.tooltipMode == 'timeline')
                         contexts[layerid] = ctx;
                     }
 
-                    // rendering the tree recursively
                     elementsRoot.render(contexts, visibleBox_v, viewport);
                 },
-                /* Renders the virtual canvas content.
-                */
                 invalidate: function () {
                     var viewbox_v = this._visibleToViewBox(this.options.visible);
                     var viewport = this.getViewport();
 
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },
-                /*
-                Fires the trigger that currently observed (the visible region is inside this timeline) timeline is changed
-                */
                 breadCrumbsChanged: function () {
                     this.breadCrumbsChangedEvent.breadCrumbs = this.breadCrumbs;
                     this.element.trigger(this.breadCrumbsChangedEvent);
                 },
-                /* If virtual canvas is during animation now, the method does nothing;
-                otherwise, it sets the timeout to invalidate the image.
-                */
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
 
@@ -543,9 +422,6 @@ else if (CZ.Common.tooltipMode == 'timeline')
                             self.requestInvalidate();
                     }, 1000.0 / CZ.Settings.targetFps);
                 },
-                /*
-                Finds the LCA(Lowest Common Ancestor) timeline which contains wnd
-                */
                 _findLca: function (tl, wnd) {
                     for (var i = 0; i < tl.children.length; i++) {
                         if (tl.children[i].type === 'timeline' && tl.children[i].contains(wnd)) {
@@ -575,21 +451,11 @@ else if (CZ.Common.tooltipMode == 'timeline')
 
                     return this._findLca(cosmosTimeline, wnd);
                 },
-                /*
-                Checks if we have all the data to render wnd at scale
-                */
                 _inBuffer: function (tl, wnd, scale) {
                     if (tl.intersects(wnd) && tl.isVisibleOnScreen(scale)) {
                         if (!tl.isBuffered) {
                             return false;
                         } else {
-                            /*
-                            for (var i = 0; i < tl.children.length; i++) {
-                            if (tl.children[i].type === 'infodot')
-                            if (!tl.children[i].isBuffered)
-                            return false;
-                            }
-                            */
                             var b = true;
                             for (var i = 0; i < tl.children.length; i++) {
                                 if (tl.children[i].type === 'timeline')

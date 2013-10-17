@@ -1,8 +1,4 @@
-﻿/// <reference path='urlnav.ts'/>
-/// <reference path='vccontent.ts'/>
-/// <reference path='settings.ts'/>
-/// <reference path='typings/jquery/jquery.d.ts'/>
-var CZ;
+﻿var CZ;
 (function (CZ) {
     (function (Bibliography) {
         function initializeBibliography() {
@@ -18,7 +14,6 @@ var CZ;
         var pendingBibliographyForExhibitID = null;
 
         function showBibliography(descr, element, id) {
-            // Bibliography link that raised showBibliohraphy.
             var sender;
 
             try  {
@@ -39,12 +34,10 @@ var CZ;
 
             window.location.hash = nav;
 
-            // Remove 'onmouseclick' handler from current bibliography link to prevent multiple opening animation of bibliography window.
             sender.onmouseclick = null;
             var a = $("#bibliographyBack").css("display");
             if ($("#bibliographyBack").css("display") == "none") {
                 $("#bibliographyBack").show('clip', {}, 'slow', function () {
-                    // After bibliography window was fully opened, reset 'onmouseclick' handler for sender of bibliography link.
                     sender.onmouseclick = function (e) {
                         CZ.Common.vc.css('cursor', 'default');
                         showBibliography({ infodot: descr.infodot, contentItems: descr.contentItems }, element, id);
@@ -53,7 +46,6 @@ var CZ;
                     };
                 });
             } else {
-                // After bibliography window was fully opened, reset 'onmouseclick' handler for sender of bibliography link.
                 sender.onmouseclick = function (e) {
                     CZ.Common.vc.css('cursor', 'default');
                     showBibliography({ infodot: descr.infodot, contentItems: descr.contentItems }, element, id);
@@ -62,7 +54,6 @@ var CZ;
                 };
             }
 
-            // clearing all fields
             $("#bibliography .sources").empty();
 
             if (descr) {

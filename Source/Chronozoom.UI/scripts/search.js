@@ -1,18 +1,9 @@
-﻿/// <reference path='urlnav.ts'/>
-/// <reference path='settings.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='vccontent.ts'/>
-/// <reference path='service.ts'/>
-/* This file contains code to perform search over the CZ database and show the results in UI.
-The page design must correspond to the schema and naming conventions presented here.
-*/
-var CZ;
+﻿var CZ;
 (function (CZ) {
     (function (Search) {
         Search.isSearchWindowVisible = false;
         var delayedSearchRequest = null;
 
-        // The method is called when the search button is clicked
         function onSearchClicked() {
             if (CZ.Tours.isTourWindowVisible && CZ.Tours.onTourClicked)
                 CZ.Tours.onTourClicked();
@@ -97,8 +88,6 @@ var CZ;
         }
         Search.goToSearchResult = goToSearchResult;
 
-        // Recursively finds and returns an element with given id.
-        // If not found, returns null.
         function findVCElement(root, id, elementType) {
             var lookingForCI = elementType === "contentItem";
 
@@ -212,7 +201,6 @@ var CZ;
                 return;
             }
 
-            // isSearching is false
             isSearching = true;
 
             if (!searchString || searchString === '') {

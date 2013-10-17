@@ -1,7 +1,4 @@
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../settings.ts'/>
 (function ($) {
-    // jQuery plugin. Shows error message under field.
     $.fn.showError = function (msg, className, props) {
         className = className || "error";
         props = props || {};
@@ -49,7 +46,6 @@
         return result;
     };
 
-    // jQuery plugin. Hides error message under field.
     $.fn.hideError = function () {
         var $allErrors = $();
         var $errorElems = $();

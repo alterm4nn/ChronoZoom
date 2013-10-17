@@ -1,4 +1,3 @@
-/// <reference path='typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UILoader) {

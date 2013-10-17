@@ -1,6 +1,4 @@
-﻿/// <reference path='settings.ts'/>
-/// <reference path='search.ts'/>
-var CZ;
+﻿var CZ;
 (function (CZ) {
     (function (BreadCrumbs) {
         var hiddenFromLeft = [];
@@ -9,8 +7,6 @@ var CZ;
 
         var breadCrumbs;
 
-        // Updates current breadcrumbs path, raised when breadcrumbs path has changed.
-        // @param  newBreadCrumbs       (array) new breadcrumbs path.
         function updateBreadCrumbsLabels(newBreadCrumbs) {
             if (newBreadCrumbs) {
                 if (breadCrumbs == null) {
@@ -48,8 +44,6 @@ else if (newBreadCrumbs[i].vcElement.id != breadCrumbs[i].vcElement.id) {
         }
         BreadCrumbs.updateBreadCrumbsLabels = updateBreadCrumbsLabels;
 
-        // Update hidden breadcrumb links arrays. Breadcrumb is hidden, if more than 1/3 of its width
-        // is not visible and this breadcrumb is not animating.
         function updateHiddenBreadCrumbs() {
             hiddenFromLeft = [];
             hiddenFromRight = [];
@@ -90,9 +84,6 @@ else
         }
         BreadCrumbs.updateHiddenBreadCrumbs = updateHiddenBreadCrumbs;
 
-        // Moves hidden from left (right) breadcrumb to left (right) side of breadcrumb panel.
-        // @param direction     (string) direction of navigation.
-        // @param index         (number) index of breadcrumb to show, shows first hidden element if param is null.
         function showHiddenBreadCrumb(direction, index) {
             if (index == null) {
                 updateHiddenBreadCrumbs();
@@ -135,7 +126,6 @@ else
 
                 $("#breadcrumbs-table tr").animate({ "left": str }, "slow", function () {
                     $("#breadcrumbs-table tr td").each(function () {
-                        // clear "moving" attributes for each breadcrumb
                         $(this).attr("moving", "false");
                     });
                     updateHiddenBreadCrumbs();
@@ -143,15 +133,11 @@ else
             }
         }
 
-        // Moves breadcrumbs path to the right edge of visible area of breadcrumbs if it is allowed.
-        // @param   callback            (function) callback function at the end of animation.
         function moveToRightEdge(callback) {
             var tableOffset = $("#breadcrumbs-table tr").position().left;
             var tableWidth = $("#breadcrumbs-table tr").width();
 
             if (tableOffset <= 0) {
-                // some breadcrumbs are hidden
-                // var hidden = tableOffset; // width in px of hidden from the left side part of breadcrumbs
                 var tableVisible = tableWidth + tableOffset;
 
                 var difference = 0;
@@ -160,10 +146,8 @@ else
                     if (tableVisible > BreadCrumbs.visibleAreaWidth)
                         difference = BreadCrumbs.visibleAreaWidth - tableVisible - 1;
 else
-                        // move to the right edge of visible area
                         difference = BreadCrumbs.visibleAreaWidth - tableVisible - 1;
 else
-                    // width of hidden part is not enought to fill whole visible area
                     difference = -tableOffset;
 
                 $("#breadcrumbs-table tr").stop();
@@ -173,7 +157,6 @@ else
 
                     $("#breadcrumbs-table tr").animate({ "left": str }, "fast", function () {
                         $("#breadcrumbs-table tr td").each(function () {
-                            // clear "moving" attributes for each breadcrumb
                             $(this).attr("moving", "false");
                         });
 
@@ -185,7 +168,6 @@ else
             }
         }
 
-        // Removes last breadcrumb link.
         function removeBreadCrumb() {
             var length = $("#breadcrumbs-table tr td").length;
 
@@ -200,12 +182,9 @@ else
             }
         }
 
-        // Adds new breadcrumb link.
-        // @param  element      (object) breadcrumb to be added.
         function addBreadCrumb(element) {
             var length = $("#breadcrumbs-table tr td").length;
 
-            // add breadcrumb to table
             $("#breadcrumbs-table tr").append($("<td></td>", {
                 id: "bc_" + length
             }).append($("<div></div>", {
@@ -239,7 +218,6 @@ else
                     break;
             }
 
-            // hide context search button for new breadcrumb element
             $("#bc_" + length + " .breadcrumb-separator").hide();
 
             if (length > 0)
@@ -254,7 +232,6 @@ else
             });
         }
 
-        // Handles click over navigate to left button.
         function breadCrumbNavLeft() {
             var movingLeftBreadCrumbs = 0;
             var num = 0;
@@ -278,7 +255,6 @@ else
         }
         BreadCrumbs.breadCrumbNavLeft = breadCrumbNavLeft;
 
-        // Handles click over navigate to right button.
         function breadCrumbNavRight() {
             var movingRightBreadCrumbs = 0;
             var num = 0;
@@ -301,9 +277,6 @@ else
         }
         BreadCrumbs.breadCrumbNavRight = breadCrumbNavRight;
 
-        // Handles click over breadcrumb link.
-        // @param   timelineID          (string) id of timeline to navigate.
-        // @param   breadCrumbLinkID    (string) id of table element which breadcrumb link was cliked.
         function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
             CZ.Search.goToSearchResult(timelineID);
 
@@ -320,8 +293,6 @@ else if (elementOffset + elementWidth > BreadCrumbs.visibleAreaWidth)
         }
         BreadCrumbs.clickOverBreadCrumb = clickOverBreadCrumb;
 
-        // Functions to change breadcrumb's link color, to avoid bug when <class:hover> doesn't work in IE when mouse enter breadcrumb link
-        // through image that is right to it.
         function breadCrumbMouseOut(element) {
             $(element).removeClass("breadcrumb-hover");
         }
@@ -330,13 +301,11 @@ else if (elementOffset + elementWidth > BreadCrumbs.visibleAreaWidth)
             $(element).addClass("breadcrumb-hover");
         }
 
-        // Changes image from <off> state to <on> state
         function changeToOff(element) {
             var src = element.getAttribute("src");
             element.setAttribute("src", src.replace("_on", "_off"));
         }
 
-        // Changes image from <on> state to <off> state
         function changeToOn(element) {
             var src = element.getAttribute("src");
             element.setAttribute("src", src.replace("_off", "_on"));

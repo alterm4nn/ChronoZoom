@@ -1,36 +1,3 @@
-/// <reference path='settings.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='timescale.ts'/>
-/// <reference path='viewport-controller.ts'/>
-/// <reference path='gestures.ts'/>
-/// <reference path='tours.ts'/>
-/// <reference path='virtual-canvas.ts'/>
-/// <reference path='uiloader.ts'/>
-/// <reference path='media.ts'/>
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../ui/controls/datepicker.ts'/>
-/// <reference path='../ui/controls/medialist.ts'/>
-/// <reference path='../ui/auth-edit-timeline-form.ts'/>
-/// <reference path='../ui/auth-edit-exhibit-form.ts'/>
-/// <reference path='../ui/auth-edit-contentitem-form.ts'/>
-/// <reference path='../ui/auth-edit-tour-form.ts'/>
-/// <reference path='../ui/header-edit-form.ts' />
-/// <reference path='../ui/header-edit-profile-form.ts'/>
-/// <reference path='../ui/header-login-form.ts'/>
-/// <reference path='../ui/header-search-form.ts' />
-/// <reference path='../ui/timeseries-graph-form.ts'/>
-/// <reference path='../ui/timeseries-data-form.ts'/>
-/// <reference path='../ui/tourslist-form.ts'/>
-/// <reference path='../ui/tour-caption-form.ts'/>
-/// <reference path='../ui/message-window.ts'/>
-/// <reference path='../ui/header-session-expired-form.ts'/>
-/// <reference path='../ui/mediapicker-form.ts'/>
-/// <reference path='typings/jquery/jquery.d.ts'/>
-/// <reference path='extensions/extensions.ts'/>
-/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
-/// <reference path='../ui/start-page.ts'/>
-/// <reference path='plugins/error-plugin.ts'/>
-/// <reference path='plugins/utility-plugins.ts'/>
 var constants;
 
 var CZ;
@@ -40,7 +7,6 @@ var CZ;
     CZ.rightDataSet;
 
     (function (HomePageViewModel) {
-        // Contains mapping: CSS selector -> html file.
         var _uiMap = {
             "#header-edit-form": "/ui/header-edit-form.html",
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
@@ -74,12 +40,6 @@ var CZ;
 
         HomePageViewModel.sessionForm;
 
-        // Basic Flight-Control (Tracks the features that are enabled)
-        //
-        // FEATURES CAN ONLY BE ACTIVATED IN ROOTCOLLECTION AFTER HITTING ZERO ACTIVE BUGS.
-        //
-        // REMOVING THIS COMMENT OR BYPASSING THIS CHECK MAY BRING YOU BAD KARMA, ITS TRUE.
-        //
         var _featureMap = [
             {
                 Name: "Login",
@@ -218,7 +178,6 @@ else
         var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
 
         $(document).ready(function () {
-            //Ensures there will be no 'console is undefined' errors
             window.console = window.console || (function () {
                 var c = {};
                 c.log = c.warn = c.debug = c.info = c.log = c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () {
@@ -234,13 +193,10 @@ else
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
 
-            // Apply features
             ApplyFeatureActivation();
 
-            // Register ChronoZoom Extensions
             CZ.Extensions.registerExtensions();
 
-            // Register ChronoZoom Media Pickers.
             CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
 
@@ -500,7 +456,6 @@ else
                         $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
-                    //retrieving the data
                     CZ.Common.loadData().then(function (response) {
                         if (!response) {
                             if (CZ.Authoring.isEnabled) {
@@ -630,19 +585,16 @@ else
             });
 
             if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
-                // Suppress the default iOS elastic pan/zoom actions.
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();
                 });
             }
 
             if (navigator.userAgent.indexOf('Mac') != -1) {
-                // Disable Mac OS Scrolling Bounce Effect
                 var body = document.getElementsByTagName('body')[0];
                 (body).style.overflow = "hidden";
             }
 
-            // init seadragon. set path to image resources for nav buttons
             Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
 
             CZ.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 };
@@ -686,7 +638,6 @@ else
 
             var hashChangeFromOutside = true;
 
-            // URL Nav: update URL when animation is complete
             CZ.Common.controller.onAnimationComplete.push(function (id) {
                 hashChangeFromOutside = false;
                 if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) {
@@ -702,7 +653,6 @@ else
                 CZ.Common.setNavigationStringTo = null;
             });
 
-            // URL Nav: handle URL changes from outside
             window.addEventListener("hashchange", function () {
                 if (window.location.hash && hashChangeFromOutside && CZ.Common.hashHandle) {
                     var hash = window.location.hash;
@@ -721,29 +671,19 @@ else
                     hashChangeFromOutside = true;
             });
 
-            // Axis: enable showing thresholds
             CZ.Common.controller.onAnimationComplete.push(function () {
-                //CZ.Common.ax.axis("enableThresholds", true);
-                //if (window.console && console.log("thresholds enabled"));
             });
 
-            //Axis: disable showing thresholds
             CZ.Common.controller.onAnimationStarted.push(function () {
-                //CZ.Common.ax.axis("enableThresholds", true);
-                //if (window.console && console.log("thresholds disabled"));
             });
 
-            // Axis: enable showing thresholds
             CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
                 if (oldId != undefined && newId == undefined) {
                     setTimeout(function () {
-                        //CZ.Common.ax.axis("enableThresholds", true);
-                        //if (window.console && console.log("thresholds enabled"));
                     }, 500);
                 }
             });
 
-            //Tour: notifyng tour that the bookmark is reached
             CZ.Common.controller.onAnimationComplete.push(function (id) {
                 if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
                     CZ.Tours.tourBookmarkTransitionCompleted(id);
@@ -751,7 +691,6 @@ else
                     CZ.Tours.pauseTourAtAnyAnimation = true;
             });
 
-            //Tour: notifyng tour that the transition was interrupted
             CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
                 if (CZ.Tours.tour != undefined) {
                     if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) {
@@ -784,7 +723,6 @@ else
                 }
             });
 
-            // Reacting on the event when one of the infodot exploration causes inner zoom constraint
             CZ.Common.vc.bind("innerZoomConstraintChanged", function (constraint) {
                 CZ.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue;
                 CZ.Common.axis.allowMarkerMovesOnHover = !constraint.zoomValue;
@@ -798,7 +736,6 @@ else
                 CZ.timeSeriesChart.updateCanvasHeight();
                 CZ.Common.updateLayout();
 
-                //updating timeSeries chart
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 updateTimeSeriesChart(vp);
             });
@@ -814,8 +751,6 @@ else
 
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
             if (bid) {
-                //bid[0] - source string
-                //bid[1] - found match
                 $("#bibliography .sources").empty();
                 $("#bibliography .title").append($("<span></span>", {
                     text: "Loading..."
