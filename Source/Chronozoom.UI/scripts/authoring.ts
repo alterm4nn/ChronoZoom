@@ -581,7 +581,14 @@ module CZ {
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                         deferred.resolve();
                     })
+            var isRoot = !t.parent.guid;
             CZ.VCContent.removeChild(t.parent, t.id);
+
+            if (isRoot) {
+                // Root timeline, refresh page
+                document.location.reload(true);
+            }
+
         }
 
         /**
