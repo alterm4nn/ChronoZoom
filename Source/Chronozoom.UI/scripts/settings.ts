@@ -3,8 +3,8 @@
 module CZ {
     export module Settings {
         export var isAuthorized = false; // user is authorized flag
-        export var superCollectionName = "";
-        export var collectionName = "";
+        export var userSuperCollectionName = "";
+        export var userCollectionName = "";
 
         export var favoriteTimelines = []; // guids of favorite timelines of current user
 

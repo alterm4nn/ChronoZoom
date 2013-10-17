@@ -464,7 +464,7 @@ module CZ {
                 var timeline;
                 if (i == 0) timeline = roottimeline;
                 else timeline = timelines[i - 1];
-                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.superCollectionName + "#/t" + roottimeline.id;
+                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.userSuperCollectionName + "#/t" + roottimeline.id;
                 if (i > 0) timelineUrl += "/t" + timeline.id;  
                 var $startPage = $("#start-page");
                 var $tile = $template.clone(true, true);
@@ -492,7 +492,7 @@ module CZ {
                 var timeline;
                 if (i == 0) timeline = roottimeline;
                 else timeline = timelines[i - 1];
-                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.superCollectionName + "#/t" + timelines[0].id;
+                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.userSuperCollectionName + "#/t" + timelines[0].id;
                 if (i > 0) timelineUrl += "/t" + timeline.id;
 
                 var $timelineListItem = $(template).clone(true, true).appendTo(target);
@@ -682,18 +682,17 @@ module CZ {
 
             /*This part is filling MyTimelines with content*/
             CZ.Service.getProfile().done(data => {
-                if ((data != "") || (data.DisplayName == null)){
-                    CZ.Settings.superCollectionName = data.DisplayName;
-                    CZ.Settings.collectionName = data.DisplayName;
+                if ((data != "") && (data.DisplayName != null)){
+                    CZ.Settings.userSuperCollectionName = data.DisplayName;
+                    CZ.Settings.userCollectionName = data.DisplayName;
                 }
-            });
 
-            CZ.Service.getTimelines(null, CZ.Settings.superCollectionName,CZ.Settings.collectionName).done(function (response) {
-                var roottimeline = response;
-                fillMyTimelines(roottimeline,roottimeline.timelines);
-                fillMyTimelinesList(roottimeline,roottimeline.timelines);
+                CZ.Service.getTimelines(null, CZ.Settings.userSuperCollectionName,CZ.Settings.userCollectionName).done(function (response) {
+                    var roottimeline = response;
+                    fillMyTimelines(roottimeline,roottimeline.timelines);
+                    fillMyTimelinesList(roottimeline,roottimeline.timelines);
+                });
             });
-
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);

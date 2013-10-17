@@ -3,8 +3,8 @@ var CZ;
 (function (CZ) {
     (function (Settings) {
         Settings.isAuthorized = false;
-        Settings.superCollectionName = "";
-        Settings.collectionName = "";
+        Settings.userSuperCollectionName = "";
+        Settings.userCollectionName = "";
 
         Settings.favoriteTimelines = [];
 
