@@ -457,13 +457,15 @@ module CZ {
             }
         }
 
-        export function fillMyTimelines(timelines) {
+        export function fillMyTimelines(roottimeline,timelines) {
             var $template = $("#template-tile .box");
             var layout = CZ.StartPage.tileLayout[4];
-            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
-                var timeline = timelines[i];
-                var timelineUrl = "http://test.chronozoom.com/#/t" + timelines[0].id;
-                if (i > 0) timelineUrl += "/t" + timeline.id;
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length + 1); i < len; i++) {
+                var timeline;
+                if (i == 0) timeline = roottimeline;
+                else timeline = timelines[i - 1];
+                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.superCollectionName + "#/t" + roottimeline.id;
+                if (i > 0) timelineUrl += "/t" + timeline.id;  
                 var $startPage = $("#start-page");
                 var $tile = $template.clone(true, true);
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
@@ -482,14 +484,15 @@ module CZ {
             }
         }
 
-        export function fillMyTimelinesList(timelines) {
+        export function fillMyTimelinesList(roottimeline,timelines) {
             var template = "#template-timeline-list .timeline-list-item";
             var target = "#MyTimelinesBlock-list";
 
-            for (var i = 0; i < Math.min(tileData.length, timelines.length) ; i++) {
-                var timeline = timelines[i];
-
-                var timelineUrl = "http://test.chronozoom.com/#/t" + timelines[0].id;
+            for (var i = 0; i < Math.min(tileData.length, timelines.length + 1) ; i++) {
+                var timeline;
+                if (i == 0) timeline = roottimeline;
+                else timeline = timelines[i - 1];
+                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.superCollectionName + "#/t" + timelines[0].id;
                 if (i > 0) timelineUrl += "/t" + timeline.id;
 
                 var $timelineListItem = $(template).clone(true, true).appendTo(target);
@@ -678,18 +681,17 @@ module CZ {
             //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
 
             /*This part is filling MyTimelines with content*/
-            CZ.Service.getTimelines(null).done(function (response) {
-                // Show the newest featured timelines first.
+            CZ.Service.getProfile().done(data => {
+                if ((data != "") || (data.DisplayName == null)){
+                    CZ.Settings.superCollectionName = data.DisplayName;
+                    CZ.Settings.collectionName = data.DisplayName;
+                }
+            });
+
+            CZ.Service.getTimelines(null, CZ.Settings.superCollectionName,CZ.Settings.collectionName).done(function (response) {
                 var roottimeline = response;
-                var mytimelines = new Array();
-                var i = 0;
-                mytimelines[0] = roottimeline;
-                roottimeline.timelines.forEach(function (timeline) {
-                    i++;
-                    mytimelines[i] = timeline;
-                });
-                fillMyTimelines(mytimelines);
-                fillMyTimelinesList(mytimelines);
+                fillMyTimelines(roottimeline,roottimeline.timelines);
+                fillMyTimelinesList(roottimeline,roottimeline.timelines);
             });
 
 

@@ -1,7 +1,15 @@
-﻿var CZ;
+﻿/// <reference path='authoring.ts'/>
+/// <reference path='settings.ts'/>
+/// <reference path='layout.ts'/>
+/// <reference path='../ui/controls/datepicker.ts'/>
+/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
+/// <reference path='typings/jquery/jquery.d.ts'/>
+var CZ;
 (function (CZ) {
     (function (Authoring) {
         (function (UI) {
+            // Mouseup handlers.
+            // Opens a window for creating new tour.
             function createTour() {
                 if (CZ.Layout.animatingElements.length != 0) {
                     return;

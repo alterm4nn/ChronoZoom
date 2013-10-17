@@ -1,4 +1,8 @@
-﻿var __extends = this.__extends || function (d, b) {
+﻿/// <reference path='../ui/controls/formbase.ts'/>
+/// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -92,6 +96,7 @@ var CZ;
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
                             if (curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
+                                //such username exists
                                 alert("Sorry, this username is already in use. Please try again.");
                                 return;
                             }
@@ -124,6 +129,7 @@ var CZ;
                     window.location.assign("/pages/logoff.aspx");
                 });
 
+                // Prevent default behavior of Enter key for input elements.
                 var preventEnterKeyPress = function (event) {
                     if (event.which == 13) {
                         event.preventDefault();

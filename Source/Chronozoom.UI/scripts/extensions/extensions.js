@@ -1,3 +1,4 @@
+/// <reference path='rinplayer.ts'/>
 var CZ;
 (function (CZ) {
     (function (Extensions) {

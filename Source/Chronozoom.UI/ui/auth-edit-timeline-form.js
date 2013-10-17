@@ -1,3 +1,6 @@
+/// <reference path='../ui/controls/formbase.ts'/>
+/// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9,6 +12,7 @@ var CZ;
     (function (UI) {
         var FormEditTimeline = (function (_super) {
             __extends(FormEditTimeline, _super);
+            // We only need to add additional initialization in constructor.
             function FormEditTimeline(container, formInfo) {
                 var _this = this;
                 _super.call(this, container, formInfo);
@@ -91,6 +95,7 @@ var CZ;
                             self.isCancel = false;
                             self.close();
 
+                            //Move to new created timeline
                             self.timeline.onmouseclick();
                         }, function (error) {
                             if (error !== undefined && error !== null) {

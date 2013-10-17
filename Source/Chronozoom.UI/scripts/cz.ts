@@ -601,6 +601,8 @@ module CZ {
                             }
                         }
                         else {
+                            CZ.Settings.superCollectionName = data.DisplayName;
+                            CZ.Settings.collectionName = data.DisplayName;
                             $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);

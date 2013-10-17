@@ -1,11 +1,16 @@
-﻿var CZ;
+﻿/// <reference path='typings/jquery/jquery.d.ts'/>
+var CZ;
 (function (CZ) {
     (function (Settings) {
         Settings.isAuthorized = false;
+        Settings.superCollectionName = "";
+        Settings.collectionName = "";
+
         Settings.favoriteTimelines = [];
 
         Settings.czDataSource = 'db';
 
+        // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
         Settings.czVersion = "main";
 
         Settings.ellipticalZoomZoomoutFactor = 0.5;
@@ -28,6 +33,7 @@
 
         Settings.fallbackImageUri = '/images/Temp-Thumbnail2.png';
 
+        // Styles of timelines
         Settings.timelineHeaderMargin = 1.0 / 18.0;
         Settings.timelineHeaderSize = 1.0 / 9.0;
         Settings.timelineTooltipMaxHeaderSize = 5;
@@ -79,6 +85,7 @@
         Settings.contentItemHeaderFontName = 'Arial';
         Settings.contentItemHeaderFontColor = 'white';
 
+        // See also contentItemDescriptionText class in the Styles/cz.css which decorates the description block in a content item
         Settings.contentItemBoundingBoxBorderWidth = 13.0 / 520;
         Settings.contentItemBoundingBoxFillColor = 'rgb(36,36,36)';
         Settings.contentItemBoundingBoxBorderColor = undefined;
@@ -86,6 +93,7 @@
 
         Settings.contentAppearanceAnimationStep = 0.01;
 
+        //navigation constraints
         Settings.infoDotZoomConstraint = 0.005;
         Settings.infoDotAxisFreezeThreshold = 0.75;
         Settings.maxPermitedTimeRange = { left: -13700000000, right: 0 };
@@ -93,9 +101,10 @@
             { left: -14000000000, right: -1000000000, scale: 1000 },
             { left: -1000000000, right: -1000000, scale: 1 },
             { left: -1000000, right: -12000, scale: 0.001 },
-            { left: -12000, right: 0, scale: 0.00006 }
+            { left: -12000/*approx 10k BC */ , right: 0, scale: 0.00006 }
         ];
 
+        // Timescale constants
         Settings.maxTickArrangeIterations = 3;
         Settings.spaceBetweenLabels = 15;
         Settings.spaceBetweenSmallTicks = 10;
@@ -124,36 +133,45 @@
         Settings.markerWidth = 85;
         Settings.panelWidth = 185;
 
+        // IDs of regime timelines
         Settings.cosmosTimelineID = "00000000-0000-0000-0000-000000000000";
         Settings.earthTimelineID = "48fbb8a8-7c5d-49c3-83e1-98939ae2ae67";
         Settings.lifeTimelineID = "d4809be4-3cf9-4ddd-9703-3ca24e4d3a26";
         Settings.prehistoryTimelineID = "a6b821df-2a4d-4f0e-baf5-28e47ecb720b";
         Settings.humanityTimelineID = "4afb5bb6-1544-4416-a949-8c8f473e544d";
 
+        //tours
         Settings.toursAudioFormats = [
             { ext: 'mp3' },
             { ext: 'wav' }
         ];
         Settings.tourDefaultTransitionTime = 10;
 
+        // seadragon
         Settings.seadragonServiceURL = "http://api.zoom.it/v1/content/?url=";
         Settings.seadragonImagePath = "/images/seadragonControls/";
         Settings.seadragonMaxConnectionAttempts = 3;
         Settings.seadragonRetryInterval = 2000;
 
+        // breadcrumb
         Settings.navigateNextMaxCount = 2;
         Settings.longNavigationLength = 10;
 
+        // progresive loading
         Settings.serverUrlHost = location.protocol + "//" + location.host;
         Settings.minTimelineWidth = 100;
 
+        // Login constants
         Settings.signinUrlMicrosoft = "";
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
         Settings.sessionTime = 3600;
 
+        // General constants
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
 
+        // NOTE: IE version detection.
+        //       https://gist.github.com/padolsey/527683
         Settings.ie = ((function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];
             while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><br><![endif]-->', a[0])
@@ -161,6 +179,7 @@
             return (v > 4) ? v : undefined;
         })());
 
+        // Theme constants
         Settings.theme;
         function applyTheme(theme) {
             if (!theme) {
@@ -209,15 +228,18 @@
         }
         Settings.applyTheme = applyTheme;
 
+        // Bing search API constants
         Settings.defaultBingSearchTop = 50;
         Settings.defaultBingSearchSkip = 0;
 
+        // Authoring mediapicker constants
         Settings.mediapickerImageThumbnailMaxWidth = 240;
         Settings.mediapickerImageThumbnailMaxHeight = 155;
 
         Settings.mediapickerVideoThumbnailMaxWidth = 190;
         Settings.mediapickerVideoThumbnailMaxHeight = 130;
 
+        // WL API constants
         Settings.WLAPIClientID = "0000000040101FFA";
         Settings.WLAPIRedirectUrl = "http://test.chronozoom.com/";
 

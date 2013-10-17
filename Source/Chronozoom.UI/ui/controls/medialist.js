@@ -1,3 +1,5 @@
+/// <reference path='../../scripts/media.ts'/>
+/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -12,10 +14,12 @@ var CZ;
             }
             MediaList.prototype.fillListOfLinks = function () {
                 var _this = this;
+                // Sort mediaPickers keys by 'order' property.
                 var sortedMediaPickersKeys = Object.keys(this.mediaPickers).sort(function (key1, key2) {
                     return _this.mediaPickers[key1].order - _this.mediaPickers[key2].order;
                 });
 
+                // Construct list of links dynamically.
                 sortedMediaPickersKeys.forEach(function (key) {
                     if (_this.mediaPickers.hasOwnProperty(key)) {
                         var mp = _this.mediaPickers[key];

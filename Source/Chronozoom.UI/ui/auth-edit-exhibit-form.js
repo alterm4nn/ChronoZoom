@@ -1,3 +1,7 @@
+/// <reference path='contentitem-listbox.ts' />
+/// <reference path='../ui/controls/formbase.ts' />
+/// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -60,6 +64,7 @@ var CZ;
                     this.saveButton.show();
                     this.deleteButton.hide();
 
+                    // this.closeButton.click() is handled by base
                     this.createArtifactButton.off();
                     this.createArtifactButton.click(function () {
                         return _this.onCreateArtifact();
@@ -90,6 +95,7 @@ var CZ;
                     this.saveButton.show();
                     this.deleteButton.show();
 
+                    // this.closeButton.click() is handled by base
                     this.createArtifactButton.off();
                     this.createArtifactButton.click(function () {
                         return _this.onCreateArtifact();

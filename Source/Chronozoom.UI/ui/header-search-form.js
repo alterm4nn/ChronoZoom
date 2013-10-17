@@ -1,3 +1,6 @@
+/// <reference path='../ui/controls/formbase.ts'/>
+/// <reference path='../scripts/search.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -50,6 +53,9 @@ var CZ;
 
                 this.searchTextbox.on("input search", onSearchQueryChanged);
 
+                // NOTE: Workaround for IE9. IE9 doesn't fire 'input' event on backspace/delete buttons.
+                //       http://www.useragentman.com/blog/2011/05/12/fixing-oninput-in-ie9-using-html5widgets/
+                //       https://github.com/zoltan-dulac/html5Forms.js/blob/master/shared/js/html5Widgets.js
                 var isIE9 = (CZ.Settings.ie === 9);
                 if (isIE9) {
                     this.searchTextbox.on("keyup", function (event) {
@@ -82,6 +88,7 @@ var CZ;
                     return;
                 }
 
+                // There are search results. Show them.
                 var resultTypes = {
                     0: "exhibit",
                     1: "timeline",
@@ -124,6 +131,7 @@ var CZ;
             };
 
             FormHeaderSearch.prototype.fillFormWithSearchResults = function () {
+                // NOTE: Initially the form is hidden. Show it to compute heights and then hide again.
                 this.container.show();
                 this.searchResultsBox.css("height", "calc(100% - 150px)");
                 this.searchResultsBox.css("height", "-moz-calc(100% - 150px)");

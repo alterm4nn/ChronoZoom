@@ -1,3 +1,7 @@
+/// <reference path='../ui/tourstop-listbox.ts' />
+/// <reference path='../ui/controls/formbase.ts'/>
+/// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -91,6 +95,7 @@ var CZ;
             });
 
             TourStop.prototype.GetThumbnail = function (element) {
+                // uncomment for debug: return "http://upload.wikimedia.org/wikipedia/commons/7/71/Ivan_kramskoy_self_portrait_tr.gif";
                 var defaultThumb = "/images/Temp-Thumbnail2.png";
                 try  {
                     if (!element)
@@ -191,6 +196,7 @@ var CZ;
 
         var FormEditTour = (function (_super) {
             __extends(FormEditTour, _super);
+            // We only need to add additional initialization in constructor.
             function FormEditTour(container, formInfo) {
                 _super.call(this, container, formInfo);
 
@@ -255,11 +261,14 @@ var CZ;
                 return CZ.Service.deleteTour(this.tour.id);
             };
 
+            // Creates new tour instance from the current state of the UI.
+            // Returns a promise of the created tour. May fail.
             FormEditTour.prototype.putTourAsync = function (sequenceNum) {
                 var deferred = $.Deferred();
                 var self = this;
                 var stops = this.getStops();
 
+                // Add the tour to the local tours collection
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
                 var category = "tours";
@@ -270,9 +279,11 @@ var CZ;
                     tourId = this.tour.id;
                 }
 
+                // Posting the tour to the service
                 var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, category, n, stops));
 
                 request.done(function (q) {
+                    // build array of bookmarks of current tour
                     var tourBookmarks = new Array();
                     for (var j = 0; j < n; j++) {
                         var tourstop = stops[j];
@@ -338,6 +349,7 @@ else if (_this.tourStopsListBox.items.length == 0)
                     _this.saveButton.prop('disabled', true);
 
                     if (_this.tour == null) {
+                        // Add the tour to the local tours collection
                         _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
                             self.tour = tour;
                             CZ.Tours.tours.push(tour);
@@ -390,6 +402,7 @@ else if (_this.tourStopsListBox.items.length == 0)
                 });
             };
 
+            // Gets an array of TourStops as they are currently in the listbox.
             FormEditTour.prototype.getStops = function () {
                 var n = this.tourStopsListBox.items.length;
                 var stops = new Array(n);
@@ -459,6 +472,7 @@ else if (_this.tourStopsListBox.items.length == 0)
                 }
             };
 
+            // New tour stop is added.
             FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
                 CZ.Authoring.mode = "editTour";
                 CZ.Authoring.hideMessageWindow();

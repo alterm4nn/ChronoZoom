@@ -1,4 +1,9 @@
-﻿var CZ;
+﻿/// <reference path='settings.ts'/>
+/// <reference path='vccontent.ts'/>
+/// <reference path='common.ts'/>
+/// <reference path='viewport.ts'/>
+/// <reference path='viewport-animation.ts'/>
+var CZ;
 (function (CZ) {
     (function (Layout) {
         var isLayoutAnimation = true;
@@ -30,6 +35,7 @@
             timeline.left = CZ.Dates.getCoordinateFromDecimalYear(timeline.start);
             timeline.right = CZ.Dates.getCoordinateFromDecimalYear(timeline.end);
 
+            // save timeline end date in case if it is '9999'
             timeline.endDate = timeline.end;
 
             if (timeline.exhibits instanceof Array) {
@@ -37,6 +43,7 @@
                     exhibit.x = CZ.Dates.getCoordinateFromDecimalYear(exhibit.time);
 
                     exhibit.contentItems.forEach(function (contentItem) {
+                        // For content items that contain an extension, activate it.
                         CZ.Extensions.activateExtension(contentItem.mediaType);
                     });
                 });
@@ -60,6 +67,17 @@ else if (!timeline.AspectRatio && !timeline.Height)
             if (timeline.ID == CZ.Settings.cosmosTimelineID) {
                 timeline.AspectRatio = 10;
             }
+            /*
+            else if (timeline.ID == earthTimelineID) {
+            timeline.AspectRatio = 1.0;
+            } else if (timeline.ID == lifeTimelineID) {
+            timeline.AspectRatio = 47.0 / 22.0;
+            } else if (timeline.ID == prehistoryTimelineID) {
+            timeline.AspectRatio = 37.0 / 11.0;
+            } else if (timeline.ID == humanityTimelineID) {
+            timeline.AspectRatio = 55.0 / 4.0;
+            }
+            */
         }
 
         function LayoutTimeline(timeline, parentWidth, measureContext) {
@@ -76,14 +94,17 @@ else if (!timeline.AspectRatio && !timeline.Height)
                     if (tl.AspectRatio) {
                         tl.height = (tl.right - tl.left) / tl.AspectRatio;
                     } else if (timeline.height && tl.Height) {
+                        //If Child timeline has height in percentage of parent, calculate it before layout pass
                         tl.height = Math.min(timeline.height * tl.Height, (tl.right - tl.left) * CZ.Settings.timelineMinAspect);
                     }
 
+                    //Calculate layout for each child timeline
                     LayoutTimeline(tl, timelineWidth, measureContext);
                 });
             }
 
             if (!timeline.height) {
+                //Searching for timeline with the biggest ratio between its height percentage and real height
                 var scaleCoef = undefined;
                 if (timeline.timelines instanceof Array) {
                     timeline.timelines.forEach(function (tl) {
@@ -108,14 +129,18 @@ else if (!timeline.AspectRatio && !timeline.Height)
                         });
                     }
 
+                    //Set final timelineHeight
                     timeline.height = scaleCoef;
                 }
             }
 
+            //Now positioning child content and title
             var exhibitSize = CalcInfodotSize(timeline);
 
+            //Layout only timelines to check that they fit into parent timeline
             var tlRes = LayoutChildTimelinesOnly(timeline);
 
+            //First layout iteration of full content (taking Sequence in account)
             var res = LayoutContent(timeline, exhibitSize);
             if (timeline.height) {
                 var titleObject = GenerateTitleObject(timeline.height, timeline, measureContext);
@@ -130,11 +155,23 @@ else if (!timeline.AspectRatio && !timeline.Height)
                 }
 
                 if ((res.max - res.min) > (timeline.height - titleObject.bboxHeight)) {
+                    //console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.title);
                     var contentHeight = res.max - res.min;
                     var fullHeight = contentHeight / (1 - headerPercent);
                     var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
                     timeline.height = fullHeight;
                 } else {
+                    //var scale = (timeline.height - titleObject.bboxHeight) / (res.max - res.min);
+                    //if (scale > 1) {
+                    //    timeline.timelines.forEach(function (tl) {
+                    //        tl.realY *= scale;
+                    //        if (!tl.AspectRatio)
+                    //            Scale(tl, scale, measureContext);
+                    //    });
+                    //    timeline.exhibits.forEach(function (eb) {
+                    //        eb.realY *= scale;
+                    //    });
+                    //}
                 }
 
                 timeline.titleRect = titleObject;
@@ -145,6 +182,7 @@ else if (!timeline.AspectRatio && !timeline.Height)
                 var minAspect = 1.0 / CZ.Settings.timelineMinAspect;
                 var minHeight = timelineWidth / minAspect;
 
+                //Measure title
                 var contentHeight = Math.max((1 - headerPercent) * minHeight, max - min);
                 var fullHeight = contentHeight / (1 - headerPercent);
                 var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
@@ -182,6 +220,7 @@ else if (!timeline.AspectRatio && !timeline.Height)
                 var y = 0;
 
                 if (usedY.length > 0) {
+                    //Find free segments
                     var segmentPoints = new Array();
                     usedY.forEach(function (segment) {
                         segmentPoints.push({ type: "bottom", value: segment.bottom });
@@ -204,6 +243,7 @@ else
                             freeSegments.push({ bottom: segmentPoints[i].value, top: segmentPoints[i + 1].value });
                     }
 
+                    //Find suitable free segment
                     var foundPlace = false;
                     for (var i = 0; i < freeSegments.length; i++) {
                         if ((freeSegments[i].top - freeSegments[i].bottom) > el.realHeight) {
@@ -225,6 +265,7 @@ else
         }
 
         function LayoutContent(timeline, exhibitSize) {
+            //Prepare arrays for ordered and unordered content
             var sequencedContent = new Array();
             var unsequencedContent = new Array();
 
@@ -265,6 +306,7 @@ else
                 return l.Sequence - r.Sequence;
             });
 
+            //Prepare measure arrays
             var arrangedElements = new Array();
 
             PositionContent(sequencedContent, arrangedElements, function (el, ael) {
@@ -389,6 +431,7 @@ else
         Layout.GenerateTitleObject = GenerateTitleObject;
 
         function Convert(parent, timeline) {
+            //Creating timeline
             var tlColor = GetTimelineColor(timeline);
             var t1 = CZ.VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.id, {
                 isBuffered: timeline.timelines instanceof Array,
@@ -458,6 +501,7 @@ else
                 for (var i = 0; i < n; i++) {
                     var childTimeline = timeline.timelines[i];
                     if (childTimeline.id == id) {
+                        // timeline was found
                         result = childTimeline;
                         break;
                     } else {
@@ -491,18 +535,30 @@ else
 
         function Load(root, timeline) {
             if (timeline) {
+                //Transform timeline start and end dates
                 Prepare(timeline);
 
+                //Measure child content for each timiline in tree
                 var measureContext = (document.createElement("canvas")).getContext('2d');
                 LayoutTimeline(timeline, 0, measureContext);
 
+                //Calculating final placement of the data
                 Arrange(timeline);
 
+                //Load timline to Virtual Canvas
                 LoadTimeline(root, timeline);
             }
         }
         Layout.Load = Load;
 
+        /*
+        ---------------------------------------------------------------------------
+        DYNAMIC LAYOUT
+        ---------------------------------------------------------------------------
+        */
+        // takes a metadata timeline (FromTimeUnit, FromYear, FromMonth, FromDay, ToTimeUnit, ToYear, ToMonth, ToDay)
+        // and returns a corresponding scenegraph (x, y, width, height)
+        // todo: remove dependency on virtual canvas (vc)
         function generateLayout(tmd, tsg) {
             try  {
                 if (!tmd.AspectRatio)
@@ -515,6 +571,7 @@ else
             }
         }
 
+        // converts a scenegraph element in absolute coords to relative coords
         function convertRelativeToAbsoluteCoords(el, delta) {
             if (!delta)
                 return;
@@ -531,6 +588,7 @@ else
             });
         }
 
+        // shifts a scenegraph element in absolute coords by delta
         function shiftAbsoluteCoords(el, delta) {
             if (!delta)
                 return;
@@ -543,6 +601,8 @@ else
             });
         }
 
+        // calculates the net force excerted on each child timeline and infodot
+        // after expansion of child timelines to fit the newly added content
         function calculateForceOnChildren(tsg) {
             var eps = tsg.height / 10;
 
@@ -570,6 +630,7 @@ else
                             var ael = v[j];
                             if (ael.x > l && ael.x < r || ael.x + ael.width > l && ael.x + ael.width < r || ael.x + ael.width > l && ael.x + ael.width === 0 && r === 0) {
                                 if (ael.y < b) {
+                                    // ael overlaps with el
                                     ael.force += el.delta;
 
                                     l = Math.min(l, ael.x);
@@ -648,6 +709,7 @@ else
                 Layout.animatingElements.length++;
             }
 
+            // calculates new animation frame of element
             elem.calculateNewFrame = function () {
                 var curTime = (new Date()).getTime();
                 var t;
@@ -683,11 +745,20 @@ else
             };
         }
 
+        // utiltity function for debugging
         function numberWithCommas(n) {
             var parts = n.toString().split(".");
             return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (parts[1] ? "." + parts[1] : "");
         }
 
+        // src = metadata tree (responsedump.txt + isBuffered)
+        // dest = scenegraph tree (tree of CanvasTimelines)
+        // returns void.
+        // mutates scenegraph tree (dest) by appending missing data from metadata tree (src).
+        // dest timelines can be in 1 of 3 states
+        // 1. No Metadata.  (isBuffered == false)
+        // 2. All Metadata. (isBuffered == false)
+        // 3. All Content.  (isBuffered == true)
         function merge(src, dest) {
             if (src.id === dest.guid) {
                 var srcChildTimelines = (src.timelines instanceof Array) ? src.timelines : [];
@@ -699,6 +770,7 @@ else
                 if (srcChildTimelines.length === destChildTimelines.length) {
                     dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
 
+                    // cal bbox (top, bottom) for child timelines and infodots
                     var origTop = Number.MAX_VALUE;
                     var origBottom = Number.MIN_VALUE;
                     for (var i = 0; i < dest.children.length; i++) {
@@ -710,10 +782,12 @@ else
                         }
                     }
 
+                    // merge child timelines
                     dest.delta = 0;
                     for (var i = 0; i < srcChildTimelines.length; i++)
                         merge(srcChildTimelines[i], destChildTimelines[i]);
 
+                    // check if child timelines have expanded
                     var haveChildTimelineExpanded = false;
                     for (var i = 0; i < destChildTimelines.length; i++)
                         if (destChildTimelines[i].delta)
@@ -724,11 +798,13 @@ else
                             if (destChildTimelines[i].delta)
                                 destChildTimelines[i].newHeight += destChildTimelines[i].delta;
 
+                        // shift all timelines and infodots above and below a expanding timeline
                         calculateForceOnChildren(dest);
                         for (var i = 0; i < dest.children.length; i++)
                             if (dest.children[i].force)
                                 shiftAbsoluteCoords(dest.children[i], dest.children[i].force);
 
+                        // cal bbox (top, bottom) for child timelines and infodots after expansion
                         var top = Number.MAX_VALUE;
                         var bottom = Number.MIN_VALUE;
                         var bottomElementName = "";
@@ -743,8 +819,11 @@ else
                             }
                         }
 
+                        // update title pos after expansion
                         dest.delta = Math.max(0, (bottom - top) - (origBottom - origTop));
 
+                        // hide animating text
+                        // TODO: find the better way to fix text shacking bug if possible
                         dest.titleObject.newY += dest.delta;
                         dest.titleObject.newBaseline += dest.delta;
                         dest.titleObject.opacity = 0;
@@ -774,6 +853,7 @@ else
                     var margin = Math.min(t.width, t.newHeight) * CZ.Settings.timelineHeaderMargin;
                     dest.delta = Math.max(0, t.newHeight - dest.newHeight);
 
+                    // replace dest.children (timelines, infodots, titleObject) with matching t.children
                     dest.children.splice(0);
                     for (var i = 0; i < t.children.length; i++)
                         dest.children.push(t.children[i]);

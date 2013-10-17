@@ -3,6 +3,9 @@ var CZ;
 (function (CZ) {
     (function (Settings) {
         Settings.isAuthorized = false;
+        Settings.superCollectionName = "";
+        Settings.collectionName = "";
+
         Settings.favoriteTimelines = [];
 
         Settings.czDataSource = 'db';
@@ -4534,12 +4537,14 @@ var CZ;
         * Chronozoom.svc Requests.
         */
         // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
-        function getTimelines(r) {
+        function getTimelines(r, sc, c) {
+            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
+            if (typeof c === "undefined") { c = Service.collectionName; }
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
-            request.addParameter("supercollection", Service.superCollectionName);
-            request.addParameter("collection", Service.collectionName);
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
             request.addParameters(r);
 
             console.log("[GET] " + request.url);
@@ -16725,12 +16730,16 @@ var CZ;
         }
         StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
 
-        function fillMyTimelines(timelines) {
+        function fillMyTimelines(roottimeline, timelines) {
             var $template = $("#template-tile .box");
             var layout = CZ.StartPage.tileLayout[4];
-            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
-                var timeline = timelines[i];
-                var timelineUrl = "http://test.chronozoom.com/#/t" + timelines[0].id;
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length + 1); i < len; i++) {
+                var timeline;
+                if (i == 0)
+                    timeline = roottimeline;
+else
+                    timeline = timelines[i - 1];
+                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.superCollectionName + "#/t" + roottimeline.id;
                 if (i > 0)
                     timelineUrl += "/t" + timeline.id;
                 var $startPage = $("#start-page");
@@ -16750,14 +16759,17 @@ var CZ;
         }
         StartPage.fillMyTimelines = fillMyTimelines;
 
-        function fillMyTimelinesList(timelines) {
+        function fillMyTimelinesList(roottimeline, timelines) {
             var template = "#template-timeline-list .timeline-list-item";
             var target = "#MyTimelinesBlock-list";
 
-            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
-                var timeline = timelines[i];
-
-                var timelineUrl = "http://test.chronozoom.com/#/t" + timelines[0].id;
+            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length + 1); i++) {
+                var timeline;
+                if (i == 0)
+                    timeline = roottimeline;
+else
+                    timeline = timelines[i - 1];
+                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.superCollectionName + "#/t" + timelines[0].id;
                 if (i > 0)
                     timelineUrl += "/t" + timeline.id;
 
@@ -16937,18 +16949,17 @@ var CZ;
             //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
             //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
             /*This part is filling MyTimelines with content*/
-            CZ.Service.getTimelines(null).done(function (response) {
-                // Show the newest featured timelines first.
+            CZ.Service.getProfile().done(function (data) {
+                if ((data != "") || (data.DisplayName == null)) {
+                    CZ.Settings.superCollectionName = data.DisplayName;
+                    CZ.Settings.collectionName = data.DisplayName;
+                }
+            });
+
+            CZ.Service.getTimelines(null, CZ.Settings.superCollectionName, CZ.Settings.collectionName).done(function (response) {
                 var roottimeline = response;
-                var mytimelines = new Array();
-                var i = 0;
-                mytimelines[0] = roottimeline;
-                roottimeline.timelines.forEach(function (timeline) {
-                    i++;
-                    mytimelines[i] = timeline;
-                });
-                fillMyTimelines(mytimelines);
-                fillMyTimelinesList(mytimelines);
+                fillMyTimelines(roottimeline, roottimeline.timelines);
+                fillMyTimelinesList(roottimeline, roottimeline.timelines);
             });
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
@@ -17668,6 +17679,8 @@ else
                                 profileForm.close();
                             }
                         } else {
+                            CZ.Settings.superCollectionName = data.DisplayName;
+                            CZ.Settings.collectionName = data.DisplayName;
                             $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);

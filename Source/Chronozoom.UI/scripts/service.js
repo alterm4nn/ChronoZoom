@@ -1,4 +1,7 @@
-﻿var CZ;
+﻿/// <reference path='settings.ts'/>
+/// <reference path='typings/jquery/jquery.d.ts'/>
+/// <reference path='../ui/auth-edit-tour-form.ts'/>
+var CZ;
 (function (CZ) {
     (function (Service) {
         var Map;
@@ -127,15 +130,22 @@
         Service.Request = Request;
         ;
 
+        // NOTE: Clear collections to let the server decide what to load.
         Service.collectionName = "";
         Service.superCollectionName = "";
 
-        function getTimelines(r) {
+        /**
+        * Chronozoom.svc Requests.
+        */
+        // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
+        function getTimelines(r, sc, c) {
+            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
+            if (typeof c === "undefined") { c = Service.collectionName; }
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
-            request.addParameter("supercollection", Service.superCollectionName);
-            request.addParameter("collection", Service.collectionName);
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
             request.addParameters(r);
 
             console.log("[GET] " + request.url);
@@ -149,6 +159,11 @@
         }
         Service.getTimelines = getTimelines;
 
+        /**
+        * Information Retrieval.
+        */
+        // .../{superCollectionName}/collections
+        // NOTE: Not implemented in current API.
         function getCollections(superCollectionName) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -164,6 +179,8 @@
         }
         Service.getCollections = getCollections;
 
+        // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
+        // NOTE: Not implemented in current API.
         function getStructure(r) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -181,6 +198,8 @@
         }
         Service.getStructure = getStructure;
 
+        // .../{supercollection}/{collection}/data
+        // NOTE: Not implemented in current API.
         function postData(r) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -199,6 +218,10 @@
         }
         Service.postData = postData;
 
+        /**
+        * Information Modification.
+        */
+        // .../{supercollection}/{collection}
         function putCollection(superCollectionName, collectionName, c) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -216,6 +239,7 @@
         }
         Service.putCollection = putCollection;
 
+        // .../{supercollection}/{collection}
         function deleteCollection(c) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -232,6 +256,7 @@
         }
         Service.deleteCollection = deleteCollection;
 
+        // .../{supercollection}/{collection}/timeline
         function putTimeline(t) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -252,6 +277,7 @@
         }
         Service.putTimeline = putTimeline;
 
+        // .../{supercollection}/{collection}/timeline
         function deleteTimeline(t) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -271,6 +297,7 @@
         }
         Service.deleteTimeline = deleteTimeline;
 
+        // .../{supercollection}/{collection}/exhibit
         function putExhibit(e) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -291,6 +318,7 @@
         }
         Service.putExhibit = putExhibit;
 
+        // .../{supercollection}/{collection}/exhibit
         function deleteExhibit(e) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -310,6 +338,7 @@
         }
         Service.deleteExhibit = deleteExhibit;
 
+        // .../{supercollection}/{collection}/contentitem
         function putContentItem(ci) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -330,6 +359,7 @@
         }
         Service.putContentItem = putContentItem;
 
+        // .../{supercollection}/{collection}/contentitem
         function deleteContentItem(ci) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -349,6 +379,8 @@
         }
         Service.deleteContentItem = deleteContentItem;
 
+        // .../{supercollection}/{collection}/tour
+        // Creates or updates a tour
         function putTour2(t) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -369,6 +401,8 @@
         }
         Service.putTour2 = putTour2;
 
+        // .../{supercollection}/{collection}/tour
+        // Deletes a tour
         function deleteTour(tourId) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -389,6 +423,7 @@
         }
         Service.deleteTour = deleteTour;
 
+        // .../{supercollection}/{collection}/tours
         function getTours() {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -407,6 +442,7 @@
         }
         Service.getTours = getTours;
 
+        // .../search
         function getSearch(query) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -431,6 +467,7 @@
         }
         Service.getSearch = getSearch;
 
+        // .../bing/getImages
         function getBingImages(query, top, skip) {
             if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
             if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
@@ -458,6 +495,7 @@
         }
         Service.getBingImages = getBingImages;
 
+        // .../bing/getVideos
         function getBingVideos(query, top, skip) {
             if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
             if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
@@ -485,6 +523,8 @@
         }
         Service.getBingVideos = getBingVideos;
 
+        // .../bing/getDocuments
+        // set doctype to undefined if you want it to be omited
         function getBingDocuments(query, doctype, top, skip) {
             if (typeof doctype === "undefined") { doctype = undefined; }
             if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
@@ -514,6 +554,7 @@
         }
         Service.getBingDocuments = getBingDocuments;
 
+        // .../twitter/getRecentTweets
         function getRecentTweets() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("twitter/getRecentTweets");
@@ -532,6 +573,7 @@
         }
         Service.getRecentTweets = getRecentTweets;
 
+        // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         function getServiceInformation() {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -546,6 +588,7 @@
         }
         Service.getServiceInformation = getServiceInformation;
 
+        // .../{supercollection}/{collection}/{reference}/contentpath
         function getContentPath(reference) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -563,12 +606,16 @@
         }
         Service.getContentPath = getContentPath;
 
+        /**
+        * Auxiliary Methods.
+        */
         function putExhibitContent(e, oldContentItems) {
             CZ.Authoring.resetSessionTimer();
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
 
+            // Send PUT request for all exhibit's content items.
             var promises = e.contentItems.map(function (ci) {
                 return putContentItem(ci).then(function (response) {
                     ci.id = ci.guid = response;
@@ -583,6 +630,11 @@
         }
         Service.putExhibitContent = putExhibitContent;
 
+        /**
+        * Update user profile.
+        * @param  {Object} username .
+        * @param  {Object} email .
+        */
         function putProfile(displayName, email) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -601,6 +653,10 @@
         }
         Service.putProfile = putProfile;
 
+        /**
+        * Delete user profile.
+        * @param  {Object} username .
+        */
         function deleteProfile(displayName) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -758,6 +814,7 @@
         }
         Service.putUserFeatured = putUserFeatured;
 
+        //Triples
         function putTriplet(subject, predicate, object) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);

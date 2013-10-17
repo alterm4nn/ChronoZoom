@@ -1,6 +1,8 @@
+/// <reference path='settings.ts'/>
 var CZ;
 (function (CZ) {
     (function (Dates) {
+        // array of month names to use in labels
         Dates.months = [
             'January',
             'February',
@@ -16,6 +18,7 @@ var CZ;
             'December'
         ];
 
+        // array of numbers of days for each month, 28 days in february by default
         Dates.daysInMonth = [
             31,
             28,
@@ -31,9 +34,11 @@ var CZ;
             31
         ];
 
+        // by give date gives coordinate in virtual coordinates
         function getCoordinateFromYMD(year, month, day) {
             var sign = (year === -1) ? 1 : year / Math.abs(year), isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, coord = (year > -1) ? year : year + 1;
 
+            // Get the number of day in the year.
             var sumDaysOfMonths = function (s, d, i) {
                 return s + +(i < month) * d;
             };
@@ -51,6 +56,9 @@ var CZ;
             if (typeof MarkerCorrection === "undefined") { MarkerCorrection = false; }
             var absCoord = Math.abs(coord), floorCoord = Math.floor(coord), sign = (coord === 0) ? 1 : coord / absCoord, day = 0, month = 0, year = (coord >= 1) ? floorCoord : floorCoord - 1, isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, daysFraction = sign * (absCoord - Math.abs(floorCoord));
 
+            // NOTE: Using Math.round() here causes day to be rounded to 365(366)
+            //       in case of the last day in a year. Do not increment day in
+            //       in this case.
             day = Math.round(daysFraction * daysInYear);
             if (MarkerCorrection)
                 day = Math.floor(daysFraction * daysInYear);
@@ -72,7 +80,12 @@ var CZ;
         }
         Dates.getYMDFromCoordinate = getYMDFromCoordinate;
 
+        // convert decimal year to virtual coordinate
+        // 9999 -> present day
+        // TODO: currently in database 1 BCE = -1 in virtual coords, but on client side 1 BCE = 0 in virtual coords
+        // decimalYear in database has to be equal to virtual coordinate?
         function getCoordinateFromDecimalYear(decimalYear) {
+            // get virtual coordinate of present day
             var localPresent = getPresent();
             var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
 
@@ -80,7 +93,9 @@ var CZ;
         }
         Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
 
+        // convert virtual coordinate to decimal year
         function getDecimalYearFromCoordinate(coordinate) {
+            // in database 1 BCE = -1, on client side 1 BCE = 0
             return coordinate < 1 ? --coordinate : coordinate;
         }
         Dates.getDecimalYearFromCoordinate = getDecimalYearFromCoordinate;
@@ -106,12 +121,21 @@ var CZ;
             } else if (coordinate < 1) {
                 year.year = (year.year - 1) / (-1);
 
+                // remove fraction part of year
                 year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             } else {
+                // remove fraction part of year
                 year.year = Math.floor(year.year);
             }
 
+            //if (year.regime === 'BCE') {
+            //    year.year += 2;
+            //   }
+            //if ((year.regime === 'CE') && (year.year === 0)) {
+            //    year.regime = 'BCE';
+            //    year.year = 1;
+            //   }
             return year;
         }
         Dates.convertCoordinateToYear = convertCoordinateToYear;

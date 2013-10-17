@@ -39,6 +39,7 @@ var CZ;
                 this.initializeContent(rinDiv);
 
                 this.onRemove = function () {
+                    //Handle the remove of RIN resources if any
                     var rinplayerControl = rin.getPlayerControl(rinDiv);
                     if (rinplayerControl) {
                         rinplayerControl.pause();

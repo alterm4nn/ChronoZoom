@@ -1,8 +1,11 @@
+/// <reference path='../scripts/cz.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (StartPage) {
         var _isRegimesVisible;
 
+        /* Dummy data in an approximate format that might be returned from a service ... */
         StartPage.tileData = [
             {
                 "Idx": 0,
@@ -69,6 +72,16 @@ var CZ;
             }
         ];
 
+        /* ---------------- Tile Layout -------------------
+        * Depending on how the tiles need to may layed out on reformat, these classnames in this list below will change.
+        * From smallest to largest:
+        * - Three rows of tiles 1 and 2
+        * - Three rows of tiles 1 through 3
+        * - One top row of tiles 1-4, and two columns of tiles 1-4
+        * - Three columns of tiles 1-6
+        *
+        * With a different layout where uneven numbers of tiles is used there will be differences between the three sections
+        */
         StartPage.tileLayout = [
             {
                 "Name": "#combo0-icons",
@@ -142,6 +155,7 @@ var CZ;
         function resizeCrop($image, imageProps, isListView) {
             var $startPage = $("#start-page");
 
+            // Get size of the tile.
             var width = $image.parent().width();
             var height = $image.parent().height();
 
@@ -220,6 +234,8 @@ var CZ;
         StartPage.cloneTweetTemplate = cloneTweetTemplate;
 
         function PlayIntroTour() {
+            // "Introduction to ChronoZoom tour"
+            // TODO: implement search of tour by title
             var introTour = CZ.Tours.tours[0];
 
             if (typeof introTour === "undefined") {
@@ -272,17 +288,22 @@ var CZ;
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
 
+                // Set appearance and click handler.
+                // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 }).invisible();
 
+                // Resize and crop image on load.
                 $tileImage.load($tile, function (event) {
                     var $this = $(this);
                     var imageProps = event.target || event.srcElement;
 
+                    // Resize and crop the image.
                     resizeCrop($this, imageProps);
 
+                    // Resize and crop the image on window resize.
                     $(window).resize({
                         $image: $this,
                         imageProps: imageProps
@@ -290,6 +311,7 @@ var CZ;
                         resizeCrop(event.data.$image, event.data.imageProps);
                     });
 
+                    // Show the tile with transition.
                     setTimeout(function () {
                         event.data.visible();
                     }, 0);
@@ -298,6 +320,7 @@ var CZ;
                     alt: timeline.Title
                 });
 
+                // Set title and author.
                 $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
@@ -331,6 +354,7 @@ var CZ;
                     var $this = $(this);
                     var imageProps = event.target || event.srcElement;
 
+                    // Resize and crop the image.
                     resizeCrop($this, imageProps, true);
                 }).attr({
                     src: timeline.ImageUrl,
@@ -353,17 +377,22 @@ var CZ;
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
 
+                // Set appearance and click handler.
+                // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "favorite" + i).click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 }).invisible();
 
+                // Resize and crop image on load.
                 $tileImage.load($tile, function (event) {
                     var $this = $(this);
                     var imageProps = event.target || event.srcElement;
 
+                    // Resize and crop the image.
                     resizeCrop($this, imageProps);
 
+                    // Resize and crop the image on window resize.
                     $(window).resize({
                         $image: $this,
                         imageProps: imageProps
@@ -371,6 +400,7 @@ var CZ;
                         resizeCrop(event.data.$image, event.data.imageProps);
                     });
 
+                    // Show the tile with transition.
                     setTimeout(function () {
                         event.data.visible();
                     }, 0);
@@ -379,6 +409,7 @@ var CZ;
                     alt: timeline.Title
                 });
 
+                // Set title and author.
                 $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
@@ -412,6 +443,7 @@ var CZ;
                     var $this = $(this);
                     var imageProps = event.target || event.srcElement;
 
+                    // Resize and crop the image.
                     resizeCrop($this, imageProps, true);
                 }).attr({
                     src: timeline.ImageUrl,
@@ -421,36 +453,46 @@ var CZ;
         }
         StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
 
-        function fillMyTimelines(timelines) {
+        function fillMyTimelines(roottimeline, timelines) {
             var $template = $("#template-tile .box");
             var layout = CZ.StartPage.tileLayout[4];
-            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
-                var timeline = timelines[i];
-                var timelineUrl = "http://test.chronozoom.com/#/t" + timelines[0].id;
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length + 1); i < len; i++) {
+                var timeline;
+                if (i == 0)
+                    timeline = roottimeline;
+else
+                    timeline = timelines[i - 1];
+                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.superCollectionName + "#/t" + roottimeline.id;
                 if (i > 0)
                     timelineUrl += "/t" + timeline.id;
                 var $startPage = $("#start-page");
                 var $tile = $template.clone(true, true);
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
 
+                // Set appearance and click handler.
+                // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "my" + i).click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 });
 
+                // Set title
                 $tileTitle.text(timeline.title.trim() || "No title :(");
             }
         }
         StartPage.fillMyTimelines = fillMyTimelines;
 
-        function fillMyTimelinesList(timelines) {
+        function fillMyTimelinesList(roottimeline, timelines) {
             var template = "#template-timeline-list .timeline-list-item";
             var target = "#MyTimelinesBlock-list";
 
-            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
-                var timeline = timelines[i];
-
-                var timelineUrl = "http://test.chronozoom.com/#/t" + timelines[0].id;
+            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length + 1); i++) {
+                var timeline;
+                if (i == 0)
+                    timeline = roottimeline;
+else
+                    timeline = timelines[i - 1];
+                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.superCollectionName + "#/t" + timelines[0].id;
                 if (i > 0)
                     timelineUrl += "/t" + timeline.id;
 
@@ -497,24 +539,30 @@ var CZ;
 
                     convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
 
+                    // Show content of Tweet tile on avatar load.
                     $tweetTileMeta.invisible(true);
                     $tileAvatar.load($tweetTileMeta, function (event) {
                         event.data.visible();
                     });
 
+                    // Replace all @authors with links.
                     text = text.replace(/(@([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
                         href='https://twitter.com/$2'>$1</a>");
 
+                    // Replace all #tags with links.
                     text = text.replace(/(#([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
                         href='https://twitter.com/search?q=$2&f=realtime'>$1</a>");
 
+                    // Set tweet's properties to corresponding elements.
                     $tileMessage.html(text).attr("href", tweetLink);
                     $tileUsername.text("@" + username).attr("href", tweetUsernameLink);
                     $tileFullname.text(fullname);
                     $tileDate.text(convertedDate);
 
+                    // Set avatar.
                     $tileAvatar.attr("src", photo);
 
+                    // List View.
                     var $tweetListItem = $(ListTemplate).clone(true, true).appendTo(ListElem);
                     var $listItemMessage = $tweetListItem.find(".tweet-li-message");
                     var $listItemUsername = $tweetListItem.find(".tweet-li-header .tweet-li-username");
@@ -537,17 +585,22 @@ var CZ;
             var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
             $(".home-icon").addClass("active");
 
+            // Disable buttons: save click handlers and remove them.
             $disabledButtons.attr("disabled", "disabled").each(function (i, el) {
                 var events = $(el).data("events");
                 $(el).data("onclick", events && events.click && events.click[0]);
             }).off();
 
+            // Hide regimes.
             $(".header-regimes").invisible();
 
+            // Hide breadcrumbs.
             $(".header-breadcrumbs").invisible();
 
+            // Hide all forms.
             CZ.HomePageViewModel.closeAllForms();
 
+            // Show home page.
             $("#start-page").fadeIn();
         }
         StartPage.show = show;
@@ -556,6 +609,7 @@ var CZ;
             var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
             $(".home-icon").removeClass("active");
 
+            // Enable buttons: add saved handlers.
             $disabledButtons.removeAttr("disabled").each(function (i, el) {
                 $(el).click($(el).data("onclick"));
             });
@@ -564,15 +618,19 @@ var CZ;
                 $(".header-regimes").visible();
             }
 
+            // Show breadcrumbs.
             $(".header-breadcrumbs").visible();
 
+            // Hide home page.
             $("#start-page").fadeOut();
         }
         StartPage.hide = hide;
 
         function initialize() {
+            // Is regimes visible initially?
             _isRegimesVisible = $(".header-regimes").is(":visible");
 
+            // Toggle for home button.
             $(".home-icon").click(function () {
                 if ($("#start-page").is(":visible")) {
                     hide();
@@ -581,7 +639,9 @@ var CZ;
                 }
             });
 
+            // TODO: Replace with current user.
             CZ.Service.getUserFeatured().done(function (response) {
+                // Show the newest featured timelines first.
                 var timelines = response ? response.reverse() : [];
                 fillFeaturedTimelines(timelines);
                 fillFeaturedTimelinesList(timelines);
@@ -590,7 +650,10 @@ var CZ;
             CZ.Service.getUserFavorites().then(function (response) {
                 var timelines = response ? response.reverse() : [];
 
+                // saving guids of favorite timelines
                 timelines.forEach(function (timeline) {
+                    // timelineUrl pattern is /{collection}/{supercollection}#{/t{guid}}+/t{favorite timeline guid}
+                    // favorite timeline guid is the latest guid in url
                     CZ.Settings.favoriteTimelines.push(timeline.TimelineUrl.split("/").pop().slice(1));
                 });
 
@@ -605,22 +668,27 @@ var CZ;
                 console.log("[ERROR] getUserFavorites");
             });
 
-            CZ.Service.getTimelines(null).done(function (response) {
+            // CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
+            //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
+            //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
+            /*This part is filling MyTimelines with content*/
+            CZ.Service.getProfile().done(function (data) {
+                if ((data != "") || (data.DisplayName == null)) {
+                    CZ.Settings.superCollectionName = data.DisplayName;
+                    CZ.Settings.collectionName = data.DisplayName;
+                }
+            });
+
+            CZ.Service.getTimelines(null, CZ.Settings.superCollectionName, CZ.Settings.collectionName).done(function (response) {
                 var roottimeline = response;
-                var mytimelines = new Array();
-                var i = 0;
-                mytimelines[0] = roottimeline;
-                roottimeline.timelines.forEach(function (timeline) {
-                    i++;
-                    mytimelines[i] = timeline;
-                });
-                fillMyTimelines(mytimelines);
-                fillMyTimelinesList(mytimelines);
+                fillMyTimelines(roottimeline, roottimeline.timelines);
+                fillMyTimelinesList(roottimeline, roottimeline.timelines);
             });
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
 
+            // Show home page if this is a root URL of ChronoZoom.
             var hash = CZ.UrlNav.getURL().hash;
             if (!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
                 show();
