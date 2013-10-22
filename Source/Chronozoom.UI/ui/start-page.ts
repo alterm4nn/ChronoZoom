@@ -484,8 +484,9 @@ module CZ {
                 // Resize and crop image on load.
                 $tileImage.load($tile, function (event) {
                     var $this = $(this);
+                    $tileImage.show();
                     var imageProps = event.target || event.srcElement;
-
+                    $tileImage.hide();
                     // Resize and crop the image.
                     resizeCrop($this, imageProps);
 
@@ -724,10 +725,8 @@ module CZ {
                     CZ.Settings.userSuperCollectionName = data.DisplayName;
                     CZ.Settings.userCollectionName = data.DisplayName;
                 }
-                console.log(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName);
                 CZ.Service.getUserMyTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(response => {
                     var timelines = response ? response.reverse() : [];
-                    console.log(timelines);
                     fillMyTimelines(timelines);
                     fillMyTimelinesList(timelines);
                 },

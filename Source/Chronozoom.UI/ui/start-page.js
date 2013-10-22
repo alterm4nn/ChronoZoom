@@ -441,7 +441,9 @@ var CZ;
 
                 $tileImage.load($tile, function (event) {
                     var $this = $(this);
+                    $tileImage.show();
                     var imageProps = event.target || event.srcElement;
+                    $tileImage.hide();
 
                     resizeCrop($this, imageProps);
 
@@ -642,10 +644,8 @@ var CZ;
                     CZ.Settings.userSuperCollectionName = data.DisplayName;
                     CZ.Settings.userCollectionName = data.DisplayName;
                 }
-                console.log(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName);
                 CZ.Service.getUserMyTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(function (response) {
                     var timelines = response ? response.reverse() : [];
-                    console.log(timelines);
                     fillMyTimelines(timelines);
                     fillMyTimelinesList(timelines);
                 }, function (error) {
