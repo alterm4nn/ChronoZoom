@@ -685,6 +685,51 @@ module CZ {
             return result;
         }
 
+      /*  export function getTimelines(r, sc = superCollectionName, c = collectionName) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath("gettimelines");
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
+            request.addParameters(r);
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,о
+                dataType: "json",
+                url: request.url
+            });
+        }*/
+
+       /* export function getUserMyTimelines(sc = superCollectionName, c= collectionName) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("usermytimelines");
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }*/
+
+        export function getUserMyTimelines() {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("usermytimelines");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+
         export function getUserFavorites(){
             var result = "";
             CZ.Authoring.resetSessionTimer();

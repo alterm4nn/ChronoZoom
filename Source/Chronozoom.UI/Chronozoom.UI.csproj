@@ -238,6 +238,9 @@
     <Compile Include="api\Featured.svc.cs">
       <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
+    <Compile Include="api\MyTimelines.cvs.cs">
+    <DependentUpon>chronozoom.svc</DependentUpon>
+    </Compile>
     <Compile Include="api\Triples.svc.cs">
       <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
@@ -754,7 +757,6 @@
     <PostBuildEvent>tsc -target ES5 --out "$(ProjectDir)cz.js" "$(ProjectDir)scripts\cz.ts" "$(ProjectDir)scripts\plugins\error-plugin.ts"
       exit 0</PostBuildEvent>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
@@ -766,7 +768,6 @@
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" />
-
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

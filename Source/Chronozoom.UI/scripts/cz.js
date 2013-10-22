@@ -449,7 +449,8 @@ else
                 }).always(function () {
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
-                        $("#WelcomeBlock").attr("data-toggle", "show");
+
+                        $("#MyTimelinesBlock").attr("data-toggle", "show");
                         $("#TwitterBlock").attr("data-toggle", "show");
                     } else {
                         $("#FavoriteTimelinesBlock").attr("data-toggle", "show");

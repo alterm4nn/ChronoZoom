@@ -663,6 +663,20 @@
         }
         Service.getMimeTypeByUrl = getMimeTypeByUrl;
 
+        function getUserMyTimelines() {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("usermytimelines");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getUserMyTimelines = getUserMyTimelines;
+
         function getUserFavorites() {
             var result = "";
             CZ.Authoring.resetSessionTimer();

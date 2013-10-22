@@ -421,58 +421,63 @@ var CZ;
         }
         StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
 
-        function fillMyTimelines(roottimeline, timelines) {
+        function fillMyTimelines(timelines) {
             var $template = $("#template-tile .box");
             var layout = CZ.StartPage.tileLayout[4];
-            var length;
-            if (timelines != null)
-                length = timelines.length + 1;
-else
-                length = 1;
-            for (var i = 0, len = Math.min(layout.Visibility.length, length); i < len; i++) {
-                var timeline;
-                if (i == 0)
-                    timeline = roottimeline;
-else
-                    timeline = timelines[i - 1];
-                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.userSuperCollectionName + "#/t" + roottimeline.id;
-                if (i > 0)
-                    timelineUrl += "/t" + timeline.id;
+
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
                 var $startPage = $("#start-page");
                 var $tile = $template.clone(true, true);
+                var $tileImage = $tile.find(".boxInner .tile-photo img");
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
+                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
 
                 $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "my" + i).click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
+                }).invisible();
+
+                $tileImage.load($tile, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    resizeCrop($this, imageProps);
+
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
+                    });
+
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
                 });
 
-                $tileTitle.text(timeline.title.trim() || "No title :(");
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
+                $tileAuthor.text(timeline.Author);
             }
         }
         StartPage.fillMyTimelines = fillMyTimelines;
 
-        function fillMyTimelinesList(roottimeline, timelines) {
+        function fillMyTimelinesList(timelines) {
             var template = "#template-timeline-list .timeline-list-item";
             var target = "#MyTimelinesBlock-list";
-            var length;
-            if (timelines != null)
-                length = timelines.length + 1;
-else
-                length = 1;
-            for (var i = 0; i < Math.min(StartPage.tileData.length, length); i++) {
-                var timeline;
-                if (i == 0)
-                    timeline = roottimeline;
-else
-                    timeline = timelines[i - 1];
-                var timelineUrl = CZ.Settings.serverUrlHost + "/" + CZ.Settings.userSuperCollectionName + "#/t" + timelines[0].id;
-                if (i > 0)
-                    timelineUrl += "/t" + timeline.id;
+
+            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
 
                 var $timelineListItem = $(template).clone(true, true).appendTo(target);
+                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
 
-                var Name = "my-list-elem" + i;
+                var Name = "favorite-list-elem" + i;
                 var idx = 1;
 
                 $timelineListItem.attr("id", "lmy" + idx + "i" + i);
@@ -481,7 +486,18 @@ else
                     hide();
                 });
 
-                $timelineListItem.attr("data-title", timeline.title.trim() || "No title :(");
+                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
+                $timelineListItem.attr("data-author", timeline.Author);
+
+                $timelineListItemImage.load($timelineListItemImage, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    resizeCrop($this, imageProps, true);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
             }
         }
         StartPage.fillMyTimelinesList = fillMyTimelinesList;
@@ -621,17 +637,12 @@ else
                 console.log("[ERROR] getUserFavorites");
             });
 
-            CZ.Service.getProfile().done(function (data) {
-                if ((data != "") && (data.DisplayName != null)) {
-                    CZ.Settings.userSuperCollectionName = data.DisplayName;
-                    CZ.Settings.userCollectionName = data.DisplayName;
-                }
-
-                CZ.Service.getTimelines(null, CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).done(function (response) {
-                    var roottimeline = response;
-                    fillMyTimelines(roottimeline, roottimeline.timelines);
-                    fillMyTimelinesList(roottimeline, roottimeline.timelines);
-                });
+            CZ.Service.getUserMyTimelines().then(function (response) {
+                var timelines = response ? response.reverse() : [];
+                fillMyTimelines(timelines);
+                fillMyTimelinesList(timelines);
+            }, function (error) {
+                console.log("[ERROR] getUserMyTimelines");
             });
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
