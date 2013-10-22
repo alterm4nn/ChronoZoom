@@ -5116,45 +5116,19 @@ var CZ;
         }
         Service.getMimeTypeByUrl = getMimeTypeByUrl;
 
-        /*  export function getTimelines(r, sc = superCollectionName, c = collectionName) {
-        CZ.Authoring.resetSessionTimer();
-        var request = new Request(_serviceUrl);
-        request.addToPath("gettimelines");
-        request.addParameter("supercollection", sc);
-        request.addParameter("collection", c);
-        request.addParameters(r);
-        
-        console.log("[GET] " + request.url);
-        
-        return $.ajax({
-        type: "GET",
-        cache: false,о
-        dataType: "json",
-        url: request.url
-        });
-        }*/
-        /* export function getUserMyTimelines(sc = superCollectionName, c= collectionName) {
-        CZ.Authoring.resetSessionTimer();
-        var request = new Service.Request(_serviceUrl);
-        request.addToPath("usermytimelines");
-        request.addParameter("supercollection", sc);
-        request.addParameter("collection", c);
-        return $.ajax({
-        type: "GET",
-        cache: false,
-        dataType: "json",
-        url: request.url
-        });
-        }*/
-        function getUserMyTimelines() {
+        function getUserMyTimelines(sc, c) {
+            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
+            if (typeof c === "undefined") { c = Service.collectionName; }
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("usermytimelines");
+            request.addParameter("superCollection", sc);
+            request.addParameter("Collection", c);
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
+                dataType: "json",
                 url: request.url
             });
         }
@@ -6050,7 +6024,13 @@ var CZ;
                 CZ.Common.vc.virtualCanvas("requestInvalidate");
                 deferred.resolve();
             });
+            var isRoot = !t.parent.guid;
             CZ.VCContent.removeChild(t.parent, t.id);
+
+            if (isRoot) {
+                // Root timeline, refresh page
+                document.location.reload(true);
+            }
         }
         Authoring.removeTimeline = removeTimeline;
 
@@ -17076,15 +17056,23 @@ var CZ;
                 console.log("[ERROR] getUserFavorites");
             });
 
-            // CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
+            //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
             //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
             //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
-            CZ.Service.getUserMyTimelines().then(function (response) {
-                var timelines = response ? response.reverse() : [];
-                fillMyTimelines(timelines);
-                fillMyTimelinesList(timelines);
-            }, function (error) {
-                console.log("[ERROR] getUserMyTimelines");
+            CZ.Service.getProfile().done(function (data) {
+                if ((data != "") && (data.DisplayName != null)) {
+                    CZ.Settings.userSuperCollectionName = data.DisplayName;
+                    CZ.Settings.userCollectionName = data.DisplayName;
+                }
+                console.log(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName);
+                CZ.Service.getUserMyTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(function (response) {
+                    var timelines = response ? response.reverse() : [];
+                    console.log(timelines);
+                    fillMyTimelines(timelines);
+                    fillMyTimelinesList(timelines);
+                }, function (error) {
+                    console.log("[ERROR] getUserMyTimelines");
+                });
             });
 
             /*This part is filling MyTimelines with content*/
@@ -17738,9 +17726,7 @@ else
                 }).always(function () {
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
-
-                        //$("#WelcomeBlock").attr("data-toggle", "show");
-                        $("#MyTimelinesBlock").attr("data-toggle", "show");
+                        $("#WelcomeBlock").attr("data-toggle", "show");
                         $("#TwitterBlock").attr("data-toggle", "show");
                     } else {
                         $("#FavoriteTimelinesBlock").attr("data-toggle", "show");

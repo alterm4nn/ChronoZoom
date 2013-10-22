@@ -637,12 +637,20 @@ var CZ;
                 console.log("[ERROR] getUserFavorites");
             });
 
-            CZ.Service.getUserMyTimelines().then(function (response) {
-                var timelines = response ? response.reverse() : [];
-                fillMyTimelines(timelines);
-                fillMyTimelinesList(timelines);
-            }, function (error) {
-                console.log("[ERROR] getUserMyTimelines");
+            CZ.Service.getProfile().done(function (data) {
+                if ((data != "") && (data.DisplayName != null)) {
+                    CZ.Settings.userSuperCollectionName = data.DisplayName;
+                    CZ.Settings.userCollectionName = data.DisplayName;
+                }
+                console.log(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName);
+                CZ.Service.getUserMyTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(function (response) {
+                    var timelines = response ? response.reverse() : [];
+                    console.log(timelines);
+                    fillMyTimelines(timelines);
+                    fillMyTimelinesList(timelines);
+                }, function (error) {
+                    console.log("[ERROR] getUserMyTimelines");
+                });
             });
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
