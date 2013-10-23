@@ -446,6 +446,7 @@ var CZ;
                     $tileImage.hide();
 
                     resizeCrop($this, imageProps);
+                    $tileImage.show();
 
                     $(window).resize({
                         $image: $this,

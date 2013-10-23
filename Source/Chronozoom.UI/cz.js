@@ -16783,6 +16783,7 @@ var CZ;
 
                     // Resize and crop the image.
                     resizeCrop($this, imageProps);
+                    $tileImage.show();
 
                     // Resize and crop the image on window resize.
                     $(window).resize({
