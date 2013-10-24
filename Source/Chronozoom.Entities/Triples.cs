@@ -36,6 +36,34 @@ namespace Chronozoom.Entities
                 return name;
         }
 
+        /// <summary>Build list of triples that reference specified object</summary>
+        /// <param name="predicate">Optional predicate name</param>
+        /// <param name="obj">Object full name</param>
+        /// <returns>List of triples</returns>
+        public List<Triple> GetIncomingTriplets(string predicate, string obj)
+        {
+            var objectName = EnsurePrefix(TripleName.Parse(obj)).ToString();
+            IQueryable<Triple> triples;
+            if (!String.IsNullOrEmpty(predicate))
+            {
+                var predicateName = EnsurePrefix(TripleName.Parse(predicate)).ToString();
+                triples = Triples.Where(t => t.Predicate == predicateName);
+            }
+            else
+                // Not very efficient as it enumerates entire database
+                triples = Triples;
+            
+            return triples.
+                Include(o => o.Objects). // Include Objects collection
+                Where(t => t.Objects.Any(o => o.Object == objectName)).
+                ToArray(). // Stop LINQ to SQL and use simple collection transformations
+                Select(t => new Triple {  
+                    Subject = t.Subject, 
+                    Predicate = t.Predicate, 
+                    Objects = new Collection<TripleObject>(t.Objects.Where(o => o.Object == objectName).ToArray())
+                }).ToList();
+        }
+
         /// <summary>
         /// Get triple by specified parameters.
         /// </summary>

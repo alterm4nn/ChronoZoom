@@ -23,7 +23,15 @@ namespace Chronozoom.UI
                     return collection != null && collection.User != null ? collection.User.Id.ToString() : null;
                 case TripleName.ArtifactPrefix:
                     collection = RetrieveCollection(storage, storage.GetCollectionFromContentItemGuid(Guid.Parse(name.Name)));
-                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;                    
+                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;  
+                case TripleName.TourPrefix:
+                    var tourId = Guid.Parse(name.Name);
+                    var tour = storage.Tours.FirstOrDefault(t => t.Id == tourId);
+                    if (tour == null)
+                        return null;
+                    storage.Entry(tour).Reference(t => t.Collection).Load();
+                    collection = RetrieveCollection(storage, tour.Collection.Id);
+                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;
                 default:
                     return null;
             }
@@ -34,10 +42,12 @@ namespace Chronozoom.UI
             try
             {
                 using (var storage = new Storage())
-                    return storage.GetTriplet(
-                        HttpUtility.UrlDecode(subject), 
-                        predicate == null ? null : HttpUtility.UrlDecode(predicate), 
-                        @object == null ? null : HttpUtility.UrlDecode(@object));
+                    return subject == null?
+                        storage.GetIncomingTriplets(predicate,@object) :
+                        storage.GetTriplet(
+                            HttpUtility.UrlDecode(subject), 
+                            predicate == null ? null : HttpUtility.UrlDecode(predicate), 
+                            @object == null ? null : HttpUtility.UrlDecode(@object));
             }
             catch (ArgumentException exc)
             {
