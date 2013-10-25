@@ -508,9 +508,11 @@ module CZ {
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
+                        $("#TwitterBlock").attr("data-toggle", "show");
                     }
                     else {
                         $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
+                        $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
                     //retrieving the data
@@ -599,6 +601,8 @@ module CZ {
                             }
                         }
                         else {
+                            CZ.Settings.userSuperCollectionName = data.DisplayName;
+                            CZ.Settings.userCollectionName = data.DisplayName;
                             $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);

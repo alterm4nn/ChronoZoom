@@ -450,8 +450,10 @@ else
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
+                        $("#TwitterBlock").attr("data-toggle", "show");
                     } else {
                         $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
+                        $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
                     CZ.Common.loadData().then(function (response) {
@@ -525,6 +527,8 @@ else
                                 profileForm.close();
                             }
                         } else {
+                            CZ.Settings.userSuperCollectionName = data.DisplayName;
+                            CZ.Settings.userCollectionName = data.DisplayName;
                             $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);

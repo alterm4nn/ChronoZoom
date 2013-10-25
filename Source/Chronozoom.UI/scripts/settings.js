@@ -2,6 +2,9 @@
 (function (CZ) {
     (function (Settings) {
         Settings.isAuthorized = false;
+        Settings.userSuperCollectionName = "";
+        Settings.userCollectionName = "";
+
         Settings.favoriteTimelines = [];
 
         Settings.czDataSource = 'db';
