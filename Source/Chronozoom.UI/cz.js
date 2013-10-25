@@ -16757,7 +16757,6 @@ var CZ;
         function fillMyTimelines(timelines) {
             var $template = $("#template-tile .box");
             var layout = CZ.StartPage.tileLayout[4];
-
             for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
                 var timeline = timelines[i];
                 var timelineUrl = timeline.TimelineUrl;

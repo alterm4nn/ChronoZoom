@@ -34,18 +34,20 @@ namespace Chronozoom.UI
 
                 if (timeline != null)
                     elements.Add(storage.GetTimelineShortcut(timeline));
-
-                foreach (var t in roottimeline.ChildTimelines)
+                if (roottimeline.ChildTimelines != null)
                 {
-                       timeline = storage.Timelines.Where(x => x.Id == t.Id)
-                            .Include("Collection")
-                            .Include("Collection.User")
-                            .Include("Exhibits")
-                            .Include("Exhibits.ContentItems")
-                            .FirstOrDefault();
+                    foreach (var t in roottimeline.ChildTimelines)
+                    {
+                        timeline = storage.Timelines.Where(x => x.Id == t.Id)
+                             .Include("Collection")
+                             .Include("Collection.User")
+                             .Include("Exhibits")
+                             .Include("Exhibits.ContentItems")
+                             .FirstOrDefault();
 
                         if (timeline != null)
                             elements.Add(storage.GetTimelineShortcut(timeline));
+                    }
                 }
 
                 return elements;
