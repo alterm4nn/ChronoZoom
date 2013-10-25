@@ -686,11 +686,11 @@ module CZ {
         }
 
 
-        export function getUserMyTimelines(sc = superCollectionName, c = collectionName) {
+        export function getUserTimelines(sc = superCollectionName, c = collectionName) {
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("usermytimelines");
+            request.addToPath("usertimelines");
             request.addParameter("superCollection", sc);
             request.addParameter("Collection", c);
             return $.ajax({

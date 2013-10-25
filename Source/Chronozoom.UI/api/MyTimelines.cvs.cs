@@ -10,7 +10,7 @@ namespace Chronozoom.UI
 {
     public partial class ChronozoomSVC
     {
-        public Collection<TimelineShortcut> GetUserMyTimelines(string superCollection, string Collection)
+        public Collection<TimelineShortcut> GetUserTimelines(string superCollection, string Collection)
         {
             return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
             {

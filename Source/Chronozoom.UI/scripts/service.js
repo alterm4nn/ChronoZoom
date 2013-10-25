@@ -663,13 +663,13 @@
         }
         Service.getMimeTypeByUrl = getMimeTypeByUrl;
 
-        function getUserMyTimelines(sc, c) {
+        function getUserTimelines(sc, c) {
             if (typeof sc === "undefined") { sc = Service.superCollectionName; }
             if (typeof c === "undefined") { c = Service.collectionName; }
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("usermytimelines");
+            request.addToPath("usertimelines");
             request.addParameter("superCollection", sc);
             request.addParameter("Collection", c);
             return $.ajax({
@@ -679,7 +679,7 @@
                 url: request.url
             });
         }
-        Service.getUserMyTimelines = getUserMyTimelines;
+        Service.getUserTimelines = getUserTimelines;
 
         function getUserFavorites() {
             var result = "";

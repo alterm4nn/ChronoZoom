@@ -593,8 +593,8 @@ namespace Chronozoom.UI
 
         #region MyTimelines
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/usermytimelines?superCollection={superCollection}&Collection={Collection}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        Collection<TimelineShortcut> GetUserMyTimelines(string superCollection, string Collection);
+        [WebInvoke(Method = "GET", UriTemplate = "/usertimelines?superCollection={superCollection}&Collection={Collection}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Collection<TimelineShortcut> GetUserTimelines(string superCollection, string Collection);
         #endregion
 
     }

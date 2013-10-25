@@ -724,13 +724,13 @@ module CZ {
                     CZ.Settings.userSuperCollectionName = data.DisplayName;
                     CZ.Settings.userCollectionName = data.DisplayName;
                 }
-                CZ.Service.getUserMyTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(response => {
+                CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(response => {
                     var timelines = response ? response.reverse() : [];
                     fillMyTimelines(timelines);
                     fillMyTimelinesList(timelines);
                 },
                     error => {
-                        console.log("[ERROR] getUserMyTimelines");
+                        console.log("[ERROR] getUserTimelines");
                     });
             });
 
