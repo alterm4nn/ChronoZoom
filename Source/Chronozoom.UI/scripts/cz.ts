@@ -212,7 +212,8 @@ module CZ {
                             editTour: allowEditing ? tour => {
                                 if (CZ.Authoring.showEditTourForm)
                                     CZ.Authoring.showEditTourForm(tour);
-                            } : null
+                            } : null,
+                            createTour: ".cz-form-create-tour"
                         });
                         form.show();
                     }

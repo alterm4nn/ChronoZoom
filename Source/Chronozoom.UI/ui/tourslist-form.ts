@@ -11,6 +11,7 @@ module CZ {
             tours: any;
             takeTour: (tour: any) => void;
             editTour: (tour: any) => void;
+            createTour: string;
         }
 
         export class FormToursList extends CZ.UI.FormBase {
@@ -19,6 +20,7 @@ module CZ {
             private isCancel: boolean;
             private takeTour: (tour: any) => void;
             private editTour: (tour: any) => void;
+            private createTourBtn: JQuery;
 
             // We only need to add additional initialization in constructor.
             constructor(container: JQuery, formInfo: IFormToursListInfo) {
@@ -32,11 +34,20 @@ module CZ {
                         this.onTakeTour(tour);
                     },
                     this.editTour ? tour => { this.onEditTour(tour); } : null);
-
+                this.createTourBtn = this.container.find(formInfo.createTour);
+                if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName)) $("#cz-tours-list-title").text("My Tours");
+                else $("#cz-tours-list-title").text("Tours");
+                if (formInfo.tours.length != 0) $("#tours-missed-warning").hide();
+                if (formInfo.tours.length == 0) $("#take-tour-proposal").hide();
                 this.initialize();
             }
 
             private initialize(): void {
+                console.log("this.toursListBox", this.toursListBox);
+                this.createTourBtn.click(event => {
+                    CZ.Authoring.UI.createTour();
+                    this.close();
+                });
 
             }
 
@@ -86,7 +97,7 @@ module CZ {
             private onWindowResize(e: JQueryEventObject) {
                 var height = $(window).height();
                 this.container.height(height - 70);
-                this.container.find("#tours").height(height - 200);
+                this.container.find("#tours").height(height*0.7);
             }
         }
     }

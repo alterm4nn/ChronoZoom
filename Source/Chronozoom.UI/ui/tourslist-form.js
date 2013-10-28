@@ -23,10 +23,24 @@ var CZ;
                 }, this.editTour ? function (tour) {
                     _this.onEditTour(tour);
                 } : null);
-
+                this.createTourBtn = this.container.find(formInfo.createTour);
+                if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName))
+                    $("#cz-tours-list-title").text("My Tours");
+else
+                    $("#cz-tours-list-title").text("Tours");
+                if (formInfo.tours.length != 0)
+                    $("#tours-missed-warning").hide();
+                if (formInfo.tours.length == 0)
+                    $("#take-tour-proposal").hide();
                 this.initialize();
             }
             FormToursList.prototype.initialize = function () {
+                var _this = this;
+                console.log("this.toursListBox", this.toursListBox);
+                this.createTourBtn.click(function (event) {
+                    CZ.Authoring.UI.createTour();
+                    _this.close();
+                });
             };
 
             FormToursList.prototype.show = function () {
@@ -76,7 +90,7 @@ var CZ;
             FormToursList.prototype.onWindowResize = function (e) {
                 var height = $(window).height();
                 this.container.height(height - 70);
-                this.container.find("#tours").height(height - 200);
+                this.container.find("#tours").height(height * 0.7);
             };
             return FormToursList;
         })(CZ.UI.FormBase);

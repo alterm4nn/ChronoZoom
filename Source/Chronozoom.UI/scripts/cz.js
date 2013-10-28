@@ -163,7 +163,8 @@ var CZ;
                             editTour: allowEditing ? function (tour) {
                                 if (CZ.Authoring.showEditTourForm)
                                     CZ.Authoring.showEditTourForm(tour);
-                            } : null
+                            } : null,
+                            createTour: ".cz-form-create-tour"
                         });
                         form.show();
                     }
