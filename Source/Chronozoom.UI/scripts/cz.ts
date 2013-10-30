@@ -195,27 +195,29 @@ module CZ {
             var onToursInitialized = function () {
                 $("#tours_index").click(function () { // show form
                     var toursListForm = getFormById("#toursList");
-
+                    console.log("toursListForm",toursListForm);
                     if (toursListForm.isFormVisible) {
                         toursListForm.close();
                     }
                     else {
-                        closeAllForms();
-                        var form = new CZ.UI.FormToursList(forms[9], {
-                            activationSource: $(this),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            tourTemplate: forms[10],
-                            tours: CZ.Tours.tours,
-                            takeTour: onTakeTour,
-                            editTour: allowEditing ? tour => {
-                                if (CZ.Authoring.showEditTourForm)
-                                    CZ.Authoring.showEditTourForm(tour);
-                            } : null,
-                            createTour: ".cz-form-create-tour"
-                        });
-                        form.show();
+                        if (!$("#start-page").is(":visible")) {
+                            closeAllForms();
+                            var form = new CZ.UI.FormToursList(forms[9], {
+                                activationSource: $(this),
+                                navButton: ".cz-form-nav",
+                                closeButton: ".cz-form-close-btn > .cz-form-btn",
+                                titleTextblock: ".cz-form-title",
+                                tourTemplate: forms[10],
+                                tours: CZ.Tours.tours,
+                                takeTour: onTakeTour,
+                                editTour: allowEditing ? tour => {
+                                    if (CZ.Authoring.showEditTourForm)
+                                        CZ.Authoring.showEditTourForm(tour);
+                                } : null,
+                                createTour: ".cz-form-create-tour"
+                            });
+                            form.show();
+                       }
                     }
                 });
             };
@@ -629,6 +631,7 @@ module CZ {
                 });
                 if (IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
+                    CZ.StartPage.show();
                 }
             });
 

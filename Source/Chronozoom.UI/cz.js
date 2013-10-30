@@ -6465,17 +6465,24 @@ var CZ;
                 this.createTourBtn = this.container.find(formInfo.createTour);
                 if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName))
                     $("#cz-tours-list-title").text("My Tours");
-else
+else {
                     $("#cz-tours-list-title").text("Tours");
-                if (formInfo.tours.length != 0)
+                    $("#tours-create-button").hide();
+                }
+
+                if (formInfo.tours.length != 0) {
+                    $("#take-tour-proposal").show();
                     $("#tours-missed-warning").hide();
+                } else {
+                    $("#take-tour-proposal").hide();
+                    $("#tours-missed-warning").show();
+                }
                 if (formInfo.tours.length == 0)
                     $("#take-tour-proposal").hide();
                 this.initialize();
             }
             FormToursList.prototype.initialize = function () {
                 var _this = this;
-                console.log("this.toursListBox", this.toursListBox);
                 this.createTourBtn.click(function (event) {
                     CZ.Authoring.UI.createTour();
                     _this.close();
@@ -6529,7 +6536,7 @@ else
             FormToursList.prototype.onWindowResize = function (e) {
                 var height = $(window).height();
                 this.container.height(height - 70);
-                this.container.find("#tours").height(height * 0.7);
+                this.container.find("#tours").height(height - 270);
             };
             return FormToursList;
         })(CZ.UI.FormBase);
@@ -17364,26 +17371,28 @@ var CZ;
             var onToursInitialized = function () {
                 $("#tours_index").click(function () {
                     var toursListForm = getFormById("#toursList");
-
+                    console.log("toursListForm", toursListForm);
                     if (toursListForm.isFormVisible) {
                         toursListForm.close();
                     } else {
-                        closeAllForms();
-                        var form = new CZ.UI.FormToursList(forms[9], {
-                            activationSource: $(this),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            tourTemplate: forms[10],
-                            tours: CZ.Tours.tours,
-                            takeTour: onTakeTour,
-                            editTour: allowEditing ? function (tour) {
-                                if (CZ.Authoring.showEditTourForm)
-                                    CZ.Authoring.showEditTourForm(tour);
-                            } : null,
-                            createTour: ".cz-form-create-tour"
-                        });
-                        form.show();
+                        if (!$("#start-page").is(":visible")) {
+                            closeAllForms();
+                            var form = new CZ.UI.FormToursList(forms[9], {
+                                activationSource: $(this),
+                                navButton: ".cz-form-nav",
+                                closeButton: ".cz-form-close-btn > .cz-form-btn",
+                                titleTextblock: ".cz-form-title",
+                                tourTemplate: forms[10],
+                                tours: CZ.Tours.tours,
+                                takeTour: onTakeTour,
+                                editTour: allowEditing ? function (tour) {
+                                    if (CZ.Authoring.showEditTourForm)
+                                        CZ.Authoring.showEditTourForm(tour);
+                                } : null,
+                                createTour: ".cz-form-create-tour"
+                            });
+                            form.show();
+                        }
                     }
                 });
             };
@@ -17776,6 +17785,7 @@ else
                 });
                 if (IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
+                    CZ.StartPage.show();
                 }
             });
 

@@ -36,14 +36,23 @@ module CZ {
                     this.editTour ? tour => { this.onEditTour(tour); } : null);
                 this.createTourBtn = this.container.find(formInfo.createTour);
                 if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName)) $("#cz-tours-list-title").text("My Tours");
-                else $("#cz-tours-list-title").text("Tours");
-                if (formInfo.tours.length != 0) $("#tours-missed-warning").hide();
+                else {
+                    $("#cz-tours-list-title").text("Tours");
+                    $("#tours-create-button").hide();
+                }
+
+                if (formInfo.tours.length != 0) {
+                    $("#take-tour-proposal").show();
+                    $("#tours-missed-warning").hide();
+                } else {
+                    $("#take-tour-proposal").hide();
+                    $("#tours-missed-warning").show();
+                }
                 if (formInfo.tours.length == 0) $("#take-tour-proposal").hide();
                 this.initialize();
             }
 
             private initialize(): void {
-                console.log("this.toursListBox", this.toursListBox);
                 this.createTourBtn.click(event => {
                     CZ.Authoring.UI.createTour();
                     this.close();
@@ -97,7 +106,7 @@ module CZ {
             private onWindowResize(e: JQueryEventObject) {
                 var height = $(window).height();
                 this.container.height(height - 70);
-                this.container.find("#tours").height(height*0.7);
+                this.container.find("#tours").height(height - 270);
             }
         }
     }
