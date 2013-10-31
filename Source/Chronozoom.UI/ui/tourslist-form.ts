@@ -107,7 +107,7 @@ module CZ {
             private onWindowResize(e: JQueryEventObject) {
                 var height = $(window).height();
                 this.container.height(height - 70);
-                this.container.find("#tour-listbox-wrapper").css("max-height",(height - 230) + "px");
+                this.container.find("#tour-listbox-wrapper").css("max-height",(height - 250) + "px");
             }
         }
     }
