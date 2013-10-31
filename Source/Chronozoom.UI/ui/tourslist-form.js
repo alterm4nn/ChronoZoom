@@ -95,8 +95,9 @@ else {
             };
 
             FormToursList.prototype.onWindowResize = function (e) {
-                var height = this.tourAmount * 85;
-                this.container.find("#tours").height(height);
+                var height = $(window).height();
+                this.container.height(height - 70);
+                this.container.find("#tour-listbox-wrapper").css("max-height", (height - 230) + "px");
             };
             return FormToursList;
         })(CZ.UI.FormBase);
