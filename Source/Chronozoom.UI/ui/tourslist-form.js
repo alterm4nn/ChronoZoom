@@ -12,7 +12,7 @@ var CZ;
             function FormToursList(container, formInfo) {
                 var _this = this;
                 _super.call(this, container, formInfo);
-
+                this.tourAmount = formInfo.tours.length;
                 this.takeTour = formInfo.takeTour;
                 this.editTour = formInfo.editTour;
                 var tours = formInfo.tours.sort(function (a, b) {
@@ -95,9 +95,8 @@ else {
             };
 
             FormToursList.prototype.onWindowResize = function (e) {
-                var height = $(window).height();
-                this.container.height(height - 70);
-                this.container.find("#tours").height(height - 270);
+                var height = this.tourAmount * 85;
+                this.container.find("#tours").height(height);
             };
             return FormToursList;
         })(CZ.UI.FormBase);

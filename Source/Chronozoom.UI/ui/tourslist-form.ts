@@ -21,11 +21,12 @@ module CZ {
             private takeTour: (tour: any) => void;
             private editTour: (tour: any) => void;
             private createTourBtn: JQuery;
+            private tourAmount;
 
             // We only need to add additional initialization in constructor.
             constructor(container: JQuery, formInfo: IFormToursListInfo) {
                 super(container, formInfo);
-
+                this.tourAmount = formInfo.tours.length;
                 this.takeTour = formInfo.takeTour;
                 this.editTour = formInfo.editTour;
                 var tours = formInfo.tours.sort((a, b) => a.sequenceNum - b.sequenceNum);
@@ -104,9 +105,8 @@ module CZ {
             }
 
             private onWindowResize(e: JQueryEventObject) {
-                var height = $(window).height();
-                this.container.height(height - 70);
-                this.container.find("#tours").height(height - 270);
+                var height = this.tourAmount * 85;
+                this.container.find("#tours").height(height);
             }
         }
     }
