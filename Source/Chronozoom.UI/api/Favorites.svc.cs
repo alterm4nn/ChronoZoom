@@ -79,7 +79,10 @@ namespace Chronozoom.UI
                     Cache.Remove(cacheKey);
                 }
 
-                return storage.PutTriplet(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
+                return storage.PutTriplet(
+                    TripleName.Parse(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty)), 
+                    TripleName.Parse("czpred:favorite"), 
+                    TripleName.Parse(String.Format("cztimeline:{0}", favoriteGUID)));
             });
         }
 
@@ -105,7 +108,10 @@ namespace Chronozoom.UI
                     Cache.Remove(cacheKey);
                 }
 
-                return storage.DeleteTriplet(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty), "czpred:favorite", String.Format("cztimeline:{0}", favoriteGUID));
+                return storage.DeleteTriplet(
+                    TripleName.Parse(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty)),
+                    TripleName.Parse("czpred:favorite"),
+                    TripleName.Parse(String.Format("cztimeline:{0}", favoriteGUID)));
             });
         }
     }

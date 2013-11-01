@@ -161,7 +161,7 @@ namespace Chronozoom.Entities.UnitTests
             string objectStr = String.Format("cztimeline:{0}", timelineId);
             const string predicateStr = "czpred:favorite";
 
-            bool result = Storage.PutTriplet(subjectStr, predicateStr, objectStr);
+            bool result = Storage.PutTriplet(TripleName.Parse(subjectStr), TripleName.Parse(predicateStr), TripleName.Parse(objectStr));
             Assert.IsTrue(result, "Triplet has not created");
 
             List<Triple> triples = Storage.GetTriplet(subjectStr, predicateStr);
@@ -185,7 +185,7 @@ namespace Chronozoom.Entities.UnitTests
             string objectStr2 = String.Format("cztimeline:{0}", secondTimelineId);
             const string predicateStr = "czpred:favorite";
 
-            bool result = Storage.PutTriplet(subjectStr, predicateStr, objectStr);
+            bool result = Storage.PutTriplet(TripleName.Parse(subjectStr), TripleName.Parse(predicateStr), TripleName.Parse(objectStr));
             Assert.IsTrue(result, "Triplet has not created");
 
             List<Triple> triples = Storage.GetTriplet(subjectStr, predicateStr);
@@ -197,7 +197,7 @@ namespace Chronozoom.Entities.UnitTests
             }
             Assert.IsTrue(tr);
 
-            bool result2 = Storage.PutTriplet(subjectStr, predicateStr, objectStr2);
+            bool result2 = Storage.PutTriplet(TripleName.Parse(subjectStr), TripleName.Parse(predicateStr), TripleName.Parse(objectStr2));
             Assert.IsTrue(result2, "Triplet has not created");
 
             List<Triple> triples2 = Storage.GetTriplet(subjectStr, predicateStr);
@@ -220,7 +220,7 @@ namespace Chronozoom.Entities.UnitTests
             string subjectStr = String.Format("czusr:{0}", userId);
             string objectStr = String.Format("cztimeline:{0}", timelineId);
 
-            bool result = Storage.PutTriplet(subjectStr, predicateStr, objectStr);
+            bool result = Storage.PutTriplet(TripleName.Parse(subjectStr), TripleName.Parse(predicateStr), TripleName.Parse(objectStr));
             Assert.IsFalse(result, "Triplet has created");
         }
 
@@ -234,7 +234,7 @@ namespace Chronozoom.Entities.UnitTests
             string subjectStr = String.Format("czusr:{0}", userId);
             string objectStr = String.Format("cztimeline:{0}", timelineId);
             
-            bool result = Storage.PutTriplet(subjectStr, predicateStr, objectStr);
+            bool result = Storage.PutTriplet(TripleName.Parse(subjectStr), TripleName.Parse(predicateStr), TripleName.Parse(objectStr));
             Assert.IsFalse(result, "Triplet has created");
         }
 

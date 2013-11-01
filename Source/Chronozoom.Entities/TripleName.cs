@@ -18,6 +18,13 @@ namespace Chronozoom.Entities
             if(ns == null && prefix == null)
                 throw new ArgumentException("Both namespace and prefix cannot be null", "name");
 
+            if (prefix == "_")
+            {
+                Guid dummy;
+                if (!Guid.TryParse(name, out dummy))
+                    throw new ArgumentException("bNode name must be GUID");
+            }
+
             this.prefix = prefix;
             this.ns = ns;
             this.name = name;

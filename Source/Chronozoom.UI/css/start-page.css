@@ -1,4 +1,4 @@
-﻿/* Height of input element */
+/* Height of input element */
 /* Font-size of error message */
 /* Error messages */
 .error-message {
@@ -264,6 +264,12 @@ input.error {
 .welcome-block-toggle .toggle-block[data-toggle~="hide"] {
   display: none;
 }
+.toggle-block[data-toggle~="show"] {
+  display: block;
+}
+.toggle-block[data-toggle~="hide"] {
+  display: none;
+}
 .WelcomeBlock {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -330,6 +336,9 @@ input.error {
   cursor: pointer;
 }
 .FavoriteTimelinesBlock {
+  color: #fff;
+}
+.MyTimelinesBlock {
   color: #fff;
 }
 .template-invisible {
@@ -484,6 +493,9 @@ input.error {
   .tweet-meta-title {
     display: none;
   }
+  .list-view-icon {
+    display: none;
+  }
   .tweet-meta-text {
     font-size: 10px;
   }
@@ -527,6 +539,9 @@ input.error {
   .tweet-avatar-icon {
     display: none;
   }
+  .list-view-icon {
+    display: block;
+  }
   .tweet-meta-title {
     font-size: 10px;
   }
@@ -565,12 +580,24 @@ input.error {
     height: 60%;
     background-color: transparent;
     vertical-align: top;
-    -moz-box-sizing: border-box;
+    overflow: auto;
     -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  .TwitterBlock {
+    float: right;
+    margin: 5px;
+    padding: 5px;
+    width: 45%;
+    min-width: 400px;
+    height: 60%;
+    background-color: transparent;
+    vertical-align: top;
     box-sizing: border-box;
     overflow: auto;
   }
-  .TwitterBlock {
+  .FavoriteTimelinesBlock {
     float: right;
     margin: 5px;
     padding: 5px;
@@ -613,6 +640,9 @@ input.error {
   .FTTiles {
     overflow: hidden;
   }
+  .list-view-icon {
+    display: block;
+  }
   .welcome-block-toggle {
     float: left;
     margin: 5px;
@@ -634,6 +664,16 @@ input.error {
     overflow: auto;
   }
   .TwitterBlock {
+    float: right;
+    margin: 5px;
+    padding: 5px;
+    width: 32%;
+    height: 100%;
+    min-height: 300px;
+    box-sizing: border-box;
+    overflow: auto;
+  }
+  .FavoriteTimelinesBlock {
     float: right;
     margin: 5px;
     padding: 5px;
@@ -683,8 +723,8 @@ input.error {
     min-height: 600px;
     background-color: transparent;
     vertical-align: top;
-    -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
   .FeaturedTimelinesBlock {
@@ -695,11 +735,10 @@ input.error {
     height: 100%;
     min-height: 300px;
     background-color: transparent;
-    vertical-align: top;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
     overflow: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
   }
   .TwitterBlock {
     float: right;
@@ -710,9 +749,23 @@ input.error {
     min-height: 300px;
     background-color: transparent;
     vertical-align: top;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
     overflow: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  .FavoriteTimelinesBlock {
+    float: right;
+    margin: 5px;
+    padding: 5px;
+    width: 32%;
+    height: 100%;
+    min-height: 300px;
+    background-color: transparent;
+    vertical-align: top;
+    overflow: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
   }
 }

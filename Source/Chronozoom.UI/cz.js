@@ -3,6 +3,9 @@ var CZ;
 (function (CZ) {
     (function (Settings) {
         Settings.isAuthorized = false;
+        Settings.userSuperCollectionName = "";
+        Settings.userCollectionName = "";
+
         Settings.favoriteTimelines = [];
 
         Settings.czDataSource = 'db';
@@ -4534,12 +4537,14 @@ var CZ;
         * Chronozoom.svc Requests.
         */
         // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
-        function getTimelines(r) {
+        function getTimelines(r, sc, c) {
+            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
+            if (typeof c === "undefined") { c = Service.collectionName; }
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
-            request.addParameter("supercollection", Service.superCollectionName);
-            request.addParameter("collection", Service.collectionName);
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
             request.addParameters(r);
 
             console.log("[GET] " + request.url);
@@ -5110,6 +5115,24 @@ var CZ;
             return result;
         }
         Service.getMimeTypeByUrl = getMimeTypeByUrl;
+
+        function getUserTimelines(sc, c) {
+            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
+            if (typeof c === "undefined") { c = Service.collectionName; }
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("usertimelines");
+            request.addParameter("superCollection", sc);
+            request.addParameter("Collection", c);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getUserTimelines = getUserTimelines;
 
         function getUserFavorites() {
             var result = "";
@@ -6431,7 +6454,7 @@ var CZ;
             function FormToursList(container, formInfo) {
                 var _this = this;
                 _super.call(this, container, formInfo);
-
+                this.tourAmount = formInfo.tours.length;
                 this.takeTour = formInfo.takeTour;
                 this.editTour = formInfo.editTour;
                 var tours = formInfo.tours.sort(function (a, b) {
@@ -6442,10 +6465,31 @@ var CZ;
                 }, this.editTour ? function (tour) {
                     _this.onEditTour(tour);
                 } : null);
+                this.createTourBtn = this.container.find(formInfo.createTour);
+                if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName))
+                    $("#cz-tours-list-title").text("My Tours");
+else {
+                    $("#cz-tours-list-title").text("Tours");
+                    $("#tours-create-button").hide();
+                }
 
+                if (formInfo.tours.length != 0) {
+                    $("#take-tour-proposal").show();
+                    $("#tours-missed-warning").hide();
+                } else {
+                    $("#take-tour-proposal").hide();
+                    $("#tours-missed-warning").show();
+                }
+                if (formInfo.tours.length == 0)
+                    $("#take-tour-proposal").hide();
                 this.initialize();
             }
             FormToursList.prototype.initialize = function () {
+                var _this = this;
+                this.createTourBtn.click(function (event) {
+                    CZ.Authoring.UI.createTour();
+                    _this.close();
+                });
             };
 
             FormToursList.prototype.show = function () {
@@ -6495,7 +6539,7 @@ var CZ;
             FormToursList.prototype.onWindowResize = function (e) {
                 var height = $(window).height();
                 this.container.height(height - 70);
-                this.container.find("#tours").height(height - 200);
+                this.container.find("#tour-listbox-wrapper").css("max-height", (height - 250) + "px");
             };
             return FormToursList;
         })(CZ.UI.FormBase);
@@ -16416,6 +16460,20 @@ var CZ;
                     "box ex3 ex4 ex6",
                     "box ex3 ex4 ex6"
                 ]
+            },
+            {
+                "Name": "#MyTimelinesBlock-tiles",
+                "Visibility": [
+                    "box",
+                    "box",
+                    "box ex3",
+                    "box ex3 ex4",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
+                ]
             }
         ];
 
@@ -16720,6 +16778,97 @@ var CZ;
         }
         StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
 
+        function fillMyTimelines(timelines) {
+            var $template = $("#template-tile .box");
+            var layout = CZ.StartPage.tileLayout[4];
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+                var $startPage = $("#start-page");
+                var $tile = $template.clone(true, true);
+                var $tileImage = $tile.find(".boxInner .tile-photo img");
+                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
+                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
+
+                // Set appearance and click handler.
+                // Initially the tile is hidden. Show it on image load.
+                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "my" + i).click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                }).invisible();
+
+                // Resize and crop image on load.
+                $tileImage.load($tile, function (event) {
+                    var $this = $(this);
+                    $tileImage.show();
+                    var imageProps = event.target || event.srcElement;
+                    $tileImage.hide();
+
+                    // Resize and crop the image.
+                    resizeCrop($this, imageProps);
+                    $tileImage.show();
+
+                    // Resize and crop the image on window resize.
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
+                    });
+
+                    // Show the tile with transition.
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+
+                // Set title and author.
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
+                $tileAuthor.text(timeline.Author);
+            }
+        }
+        StartPage.fillMyTimelines = fillMyTimelines;
+
+        function fillMyTimelinesList(timelines) {
+            var template = "#template-timeline-list .timeline-list-item";
+            var target = "#MyTimelinesBlock-list";
+
+            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+
+                var $timelineListItem = $(template).clone(true, true).appendTo(target);
+                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
+
+                var Name = "favorite-list-elem" + i;
+                var idx = 1;
+
+                $timelineListItem.attr("id", "lmy" + idx + "i" + i);
+                $timelineListItem.click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                });
+
+                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
+                $timelineListItem.attr("data-author", timeline.Author);
+
+                $timelineListItemImage.load($timelineListItemImage, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    // Resize and crop the image.
+                    resizeCrop($this, imageProps, true);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+            }
+        }
+        StartPage.fillMyTimelinesList = fillMyTimelinesList;
+
         function TwitterLayout(target, idx) {
             var ListTemplate = "#template-tweet-list .tweet-list-item";
             var ListElem = "#TwitterBlock-list";
@@ -16876,9 +17025,23 @@ var CZ;
                 console.log("[ERROR] getUserFavorites");
             });
 
-            // CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
+            //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
             //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
             //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
+            CZ.Service.getProfile().done(function (data) {
+                if ((data != "") && (data.DisplayName != null)) {
+                    CZ.Settings.userSuperCollectionName = data.DisplayName;
+                    CZ.Settings.userCollectionName = data.DisplayName;
+                }
+                CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(function (response) {
+                    var timelines = response ? response.reverse() : [];
+                    fillMyTimelines(timelines);
+                    fillMyTimelinesList(timelines);
+                }, function (error) {
+                    console.log("[ERROR] getUserTimelines");
+                });
+            });
+
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
 
@@ -17211,25 +17374,28 @@ var CZ;
             var onToursInitialized = function () {
                 $("#tours_index").click(function () {
                     var toursListForm = getFormById("#toursList");
-
+                    console.log("toursListForm", toursListForm);
                     if (toursListForm.isFormVisible) {
                         toursListForm.close();
                     } else {
-                        closeAllForms();
-                        var form = new CZ.UI.FormToursList(forms[9], {
-                            activationSource: $(this),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            tourTemplate: forms[10],
-                            tours: CZ.Tours.tours,
-                            takeTour: onTakeTour,
-                            editTour: allowEditing ? function (tour) {
-                                if (CZ.Authoring.showEditTourForm)
-                                    CZ.Authoring.showEditTourForm(tour);
-                            } : null
-                        });
-                        form.show();
+                        if (!$("#start-page").is(":visible")) {
+                            closeAllForms();
+                            var form = new CZ.UI.FormToursList(forms[9], {
+                                activationSource: $(this),
+                                navButton: ".cz-form-nav",
+                                closeButton: ".cz-form-close-btn > .cz-form-btn",
+                                titleTextblock: ".cz-form-title",
+                                tourTemplate: forms[10],
+                                tours: CZ.Tours.tours,
+                                takeTour: onTakeTour,
+                                editTour: allowEditing ? function (tour) {
+                                    if (CZ.Authoring.showEditTourForm)
+                                        CZ.Authoring.showEditTourForm(tour);
+                                } : null,
+                                createTour: ".cz-form-create-tour"
+                            });
+                            form.show();
+                        }
                     }
                 });
             };
@@ -17518,8 +17684,10 @@ else
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
+                        $("#TwitterBlock").attr("data-toggle", "show");
                     } else {
                         $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
+                        $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
                     //retrieving the data
@@ -17594,6 +17762,8 @@ else
                                 profileForm.close();
                             }
                         } else {
+                            CZ.Settings.userSuperCollectionName = data.DisplayName;
+                            CZ.Settings.userCollectionName = data.DisplayName;
                             $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
@@ -17618,6 +17788,7 @@ else
                 });
                 if (IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
+                    CZ.StartPage.show();
                 }
             });
 
