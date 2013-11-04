@@ -9,50 +9,6 @@ namespace Chronozoom.UI
 {
     public partial class ChronozoomSVC
     {
-        private string GetSubjectOwner(Storage storage, TripleName name, List<string> bNodes = null)
-        {
-            name = storage.EnsurePrefix(name); 
-            switch(name.Prefix) {
-                case TripleName.UserPrefix:
-                    return name.Name; 
-                case TripleName.TimelinePrefix:
-                    var collection = RetrieveCollection(storage, storage.GetCollectionFromTimeline(Guid.Parse(name.Name)));
-                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;
-                case TripleName.ExhibitPrefix:
-                    collection = RetrieveCollection(storage, storage.GetCollectionFromExhibitGuid(Guid.Parse(name.Name)));
-                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;
-                case TripleName.ArtifactPrefix:
-                    collection = RetrieveCollection(storage, storage.GetCollectionFromContentItemGuid(Guid.Parse(name.Name)));
-                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;  
-                case TripleName.TourPrefix:
-                    var tourId = Guid.Parse(name.Name);
-                    var tour = storage.Tours.FirstOrDefault(t => t.Id == tourId);
-                    if (tour == null)
-                        return null;
-                    storage.Entry(tour).Reference(t => t.Collection).Load();
-                    collection = RetrieveCollection(storage, tour.Collection.Id);
-                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;
-                case "_":
-                    var subject = name.ToString();
-                    // Guard against infinite loop
-                    if (bNodes.Contains(subject))
-                        return null; 
-                    // Find subject of any triple that uses passed subject as object
-                    var linkedSubject = storage.TripleObjects.Where(to => to.Object == subject).
-                        Join(storage.Triples, to => to.TripleObject_Id, tr => tr.Id, (to, tr) => tr.Subject).FirstOrDefault();
-                    if (String.IsNullOrEmpty(linkedSubject))
-                        return null;
-                    // Get owner of linked subject
-                    if(bNodes == null)
-                        bNodes = new List<string>(new string[] { subject });
-                    else
-                        bNodes.Add(subject);
-                    return GetSubjectOwner(storage, TripleName.Parse(linkedSubject), bNodes);
-                default:
-                    return null;
-            }
-        }
-
         public IEnumerable<Entities.Triple> GetTriplets(string subject, string predicate, string @object)
         {
             try
@@ -88,7 +44,7 @@ namespace Chronozoom.UI
                     } 
                     else 
                     {
-                        if(GetSubjectOwner(storage, TripleName.Parse(triple.Subject)) == user.Id.ToString())
+                        if(storage.GetSubjectOwner(TripleName.Parse(triple.Subject)) == user.Id.ToString())
                         {
 #else
                             using(var storage = new Storage()) 
@@ -126,12 +82,23 @@ namespace Chronozoom.UI
                     }
                     else
                     {
-                        if (GetSubjectOwner(storage, subjectName) == user.Id.ToString())
+                        objectName = storage.EnsurePrefix(objectName);
+                        if (objectName.Prefix == "_")
+                        {
+                            var tripleOwner = storage.GetSubjectOwner(objectName);
+                            if (tripleOwner != null && tripleOwner != user.Id.ToString())
+                                SetStatusCode(HttpStatusCode.BadRequest, "Object bNode belongs to another user");
+                        }
+
+                        if (storage.GetSubjectOwner(subjectName) == user.Id.ToString())
                         {
 #else
                             using(var storage = new Storage()) 
-#endif  
+#endif
+                            {
+
                                 SetStatusCode(storage.PutTriplet(subjectName, predicateName, objectName) ? HttpStatusCode.OK : HttpStatusCode.NotModified, "");
+                            }
 #if RELEASE
                         }
                         else

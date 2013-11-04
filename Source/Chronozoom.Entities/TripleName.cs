@@ -25,6 +25,17 @@ namespace Chronozoom.Entities
                     throw new ArgumentException("bNode name must be GUID");
             }
 
+            if (prefix == UserPrefix || ns == PrefixesAndNamespaces[UserPrefix] ||
+                prefix == TimelinePrefix || ns == PrefixesAndNamespaces[TimelinePrefix] ||
+                prefix == ArtifactPrefix || ns == PrefixesAndNamespaces[ArtifactPrefix] ||
+                prefix == TourPrefix || ns == PrefixesAndNamespaces[TourPrefix] ||
+                prefix == ExhibitPrefix || ns == PrefixesAndNamespaces[ExhibitPrefix])
+            {
+                Guid dummy;
+                if (!Guid.TryParse(name, out dummy))
+                    throw new ArgumentException("Name with Chronozoom entities prefixes should be GUID");
+            }
+
             this.prefix = prefix;
             this.ns = ns;
             this.name = name;

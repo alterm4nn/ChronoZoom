@@ -131,7 +131,7 @@ namespace Chronozoom.Entities
             var shortSubjectStr = subjectName.ToString();
             var shortPredicateStr = predicateName.ToString();
             var shortObjectStr = objectName.ToString();
-
+            
             var tr = Triples.Where(t => t.Subject == shortSubjectStr && t.Predicate == shortPredicateStr).Include(o => o.Objects).FirstOrDefault();
             if (tr != null)
             {

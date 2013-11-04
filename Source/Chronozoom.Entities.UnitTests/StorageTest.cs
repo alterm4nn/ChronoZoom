@@ -211,32 +211,104 @@ namespace Chronozoom.Entities.UnitTests
         }
 
         [TestMethod]
-        public void TripletShouldNotBeCreatedIfUserIdIsNotGuid()
+        [ExpectedException(typeof(ArgumentException))]
+        public void TripletNameShouldNotBeParsedIfUserIdIsNotGuid()
         {
-            //This test is failed
-            const string userId = "not guid";
-            const string predicateStr = "czpred:favorite";
-            string timelineId = Guid.NewGuid().ToString();
-            string subjectStr = String.Format("czusr:{0}", userId);
-            string objectStr = String.Format("cztimeline:{0}", timelineId);
-
-            bool result = Storage.PutTriplet(TripleName.Parse(subjectStr), TripleName.Parse(predicateStr), TripleName.Parse(objectStr));
-            Assert.IsFalse(result, "Triplet has created");
+            TripleName.Parse("czusr:not-guid");
         }
 
         [TestMethod]
-        public void TripletShouldNotBeCreatedIfTimelineIdIsNotGuid()
+        [ExpectedException(typeof(ArgumentException))]
+        public void TripletNameShouldNotBeParsedIfTimelineIdIsNotGuid()
         {
-            const string timelineId = "not guid";
-            const string predicateStr = "czpred:favorite";
-
-            string userId = Guid.NewGuid().ToString();
-            string subjectStr = String.Format("czusr:{0}", userId);
-            string objectStr = String.Format("cztimeline:{0}", timelineId);
-            
-            bool result = Storage.PutTriplet(TripleName.Parse(subjectStr), TripleName.Parse(predicateStr), TripleName.Parse(objectStr));
-            Assert.IsFalse(result, "Triplet has created");
+            TripleName.Parse("cztimeline:not-guid");
         }
 
+        [TestMethod]
+        public void GetSubjectOwnerForTimelineTest()
+        {
+            var timeline = Storage.Timelines.First();
+            Storage.Entry(timeline).Reference(t => t.Collection).Load();
+            var collection = timeline.Collection;
+            Storage.Entry(collection).Reference(c => c.User).Load();
+            var user = collection.User;
+
+            Assert.AreEqual(
+                user.Id.ToString(),
+                Storage.GetSubjectOwner(TripleName.Parse(String.Format("cztimeline:{0}", timeline.Id))));
+        }
+
+        [TestMethod]
+        public void GetSubjectOwnerForExhibitTest()
+        {
+            var exhibit = Storage.Exhibits.First();
+            Storage.Entry(exhibit).Reference(e => e.Collection).Load();
+            var collection = exhibit.Collection;
+            Storage.Entry(collection).Reference(c => c.User).Load();
+            var user = collection.User;
+
+            Assert.AreEqual(
+                user.Id.ToString(),
+                Storage.GetSubjectOwner(TripleName.Parse(String.Format("czexhibit:{0}", exhibit.Id))));
+        }
+
+        [TestMethod]
+        public void GetSubjectOwnerForArtifactTest()
+        {
+            var artifact = Storage.ContentItems.First();
+            Storage.Entry(artifact).Reference(a => a.Collection).Load();
+            var collection = artifact.Collection;
+            Storage.Entry(collection).Reference(c => c.User).Load();
+            var user = collection.User;
+
+            Assert.AreEqual(
+                user.Id.ToString(),
+                Storage.GetSubjectOwner(TripleName.Parse(String.Format("czartifact:{0}", artifact.Id))));
+        }
+
+        [TestMethod]
+        public void GetSubjectOwnerForTourTest()
+        {
+            var tour = Storage.Tours.First();
+            Storage.Entry(tour).Reference(t => t.Collection).Load();
+            var collection = tour.Collection;
+            Storage.Entry(collection).Reference(c => c.User).Load();
+            var user = collection.User;
+
+            Assert.AreEqual(
+                user.Id.ToString(),
+                Storage.GetSubjectOwner(TripleName.Parse(String.Format("cztour:{0}", tour.Id))));
+        }
+
+        [TestMethod]
+        public void GetSubjectOwnerForUserTest()
+        {
+            var user = Storage.Users.First();
+
+            Assert.AreEqual(
+                user.Id.ToString(),
+                Storage.GetSubjectOwner(TripleName.Parse(String.Format("czusr:{0}", user.Id))));
+        }
+
+        [TestMethod]
+        public void GetSubjectOwnerForBNodeTest()
+        {
+            var timeline = Storage.Timelines.First();
+            Storage.Entry(timeline).Reference(t => t.Collection).Load();
+            var collection = timeline.Collection;
+            Storage.Entry(collection).Reference(c => c.User).Load();
+            var user = collection.User;
+
+            var bNodeId = Guid.NewGuid();
+            var bNodeName = TripleName.Parse(String.Format("_:{0}", bNodeId));
+
+            Storage.PutTriplet(
+                TripleName.Parse(String.Format("cztimeline:{0}", timeline.Id)),
+                TripleName.Parse("czpred:connect"),
+                bNodeName);
+            Assert.AreEqual(
+                user.Id.ToString(),
+                Storage.GetSubjectOwner(bNodeName));
+        }
     }
 }

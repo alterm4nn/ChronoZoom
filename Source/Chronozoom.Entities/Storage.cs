@@ -533,5 +533,80 @@ namespace Chronozoom.Entities
             var bookmarkTour = Database.SqlQuery<Tour>("SELECT * FROM Tours WHERE Id in (SELECT Tour_Id FROM Bookmarks WHERE Id = {0})", bookmark.Id);
             return bookmarkTour.FirstOrDefault();
         }
+
+        /// <summary>Get owner of the collection</summary>
+        /// <param name="collection">Collection object. May be null.</param>
+        /// <returns>String representation of owning user ID</returns>
+        public string GetCollectionOwner(Collection collection)
+        {
+            if (collection == null)
+                return null;
+            Entry(collection).Reference(c => c.User).Load();
+            return collection.User != null ? collection.User.Id.ToString() : null;
+        }
+
+        /// <summary>Gets owner of the triplet</summary>
+        /// <param name="name">Name of the triplet. Triplets referring to timelines, exhibits, artifacts and bNodes are supported.
+        /// In all other cases method returns null.</param>
+        /// <param name="bNodes">List of previously examined bNodes to avoid endless recursion</param>
+        /// <returns>String representation of owning user ID</returns>
+        public string GetSubjectOwner(TripleName name, List<string> bNodes = null)
+        {
+            name = EnsurePrefix(name);
+            switch (name.Prefix)
+            {
+                case TripleName.UserPrefix:
+                    return name.Name;
+                case TripleName.TimelinePrefix:
+                    var timelineId = Guid.Parse(name.Name);
+                    var timeline = Timelines.Where(t => t.Id == timelineId).FirstOrDefault();
+                    if (timeline == null)
+                        return null;
+                    Entry(timeline).Reference(t => t.Collection).Load();
+                    return GetCollectionOwner(timeline.Collection);
+                case TripleName.ExhibitPrefix:
+                    var exhibitId = Guid.Parse(name.Name);
+                    var exhibit = Exhibits.Where(e => e.Id == exhibitId).FirstOrDefault();
+                    if (exhibit == null)
+                        return null;
+                    Entry(exhibit).Reference(e => e.Collection).Load();
+                    return GetCollectionOwner(exhibit.Collection);
+                case TripleName.ArtifactPrefix:
+                    var artifactId = Guid.Parse(name.Name);
+                    var artifact = ContentItems.Where(c => c.Id == artifactId).FirstOrDefault();
+                    if (artifact == null)
+                        return null;
+                    Entry(artifact).Reference(a => a.Collection).Load();
+                    return GetCollectionOwner(artifact.Collection);
+                case TripleName.TourPrefix:
+                    var tourId = Guid.Parse(name.Name);
+                    var tour = Tours.FirstOrDefault(t => t.Id == tourId);
+                    if (tour == null)
+                        return null;
+                    Entry(tour).Reference(t => t.Collection).Load();
+                    return GetCollectionOwner(tour.Collection);
+                case "_":
+                    var subject = name.ToString();
+                    // Guard against infinite loop
+                    if (bNodes != null && bNodes.Contains(subject))
+                        return null;
+                    // Find subject of any triple that uses passed subject as object
+                    var linkedSubject = Triples.
+                        Include(t => t.Objects).
+                        Where(t => t.Objects.Any(o => o.Object == subject)).
+                        Select(t => t.Subject).FirstOrDefault();
+                    if (String.IsNullOrEmpty(linkedSubject))
+                        return null;
+                    // Get owner of linked subject
+                    if (bNodes == null)
+                        bNodes = new List<string>(new string[] { subject });
+                    else
+                        bNodes.Add(subject);
+                    return GetSubjectOwner(TripleName.Parse(linkedSubject), bNodes);
+                default:
+                    return null;
+            }
+        }
+
     }
 }
