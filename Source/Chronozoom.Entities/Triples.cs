@@ -9,6 +9,9 @@ namespace Chronozoom.Entities
 {
     public partial class Storage
     {
+        /// <summary>Ensures that triple name has prefix. If triple name has namespace, it is converted to prefix</summary>
+        /// <param name="name">Name of the triple</param>
+        /// <returns>Name of the triple with prefix available</returns>
         public TripleName EnsurePrefix(TripleName name) 
         {
             if(name.Prefix == null) {
@@ -34,6 +37,34 @@ namespace Chronozoom.Entities
                 return tr != null ? new TripleName(tr.Namespace, name.Prefix, name.Name) : name;
             } else
                 return name;
+        }
+
+        /// <summary>Build list of triples that reference specified object</summary>
+        /// <param name="predicate">Optional predicate name</param>
+        /// <param name="obj">Object full name</param>
+        /// <returns>List of triples</returns>
+        public List<Triple> GetIncomingTriplets(string predicate, string obj)
+        {
+            var objectName = EnsurePrefix(TripleName.Parse(obj)).ToString();
+            IQueryable<Triple> triples;
+            if (!String.IsNullOrEmpty(predicate))
+            {
+                var predicateName = EnsurePrefix(TripleName.Parse(predicate)).ToString();
+                triples = Triples.Where(t => t.Predicate == predicateName);
+            }
+            else
+                // Not very efficient as it enumerates entire database
+                triples = Triples;
+            
+            return triples.
+                Include(o => o.Objects). // Include Objects collection
+                Where(t => t.Objects.Any(o => o.Object == objectName)).
+                ToArray(). // Stop LINQ to SQL and use simple collection transformations
+                Select(t => new Triple {  
+                    Subject = t.Subject, 
+                    Predicate = t.Predicate, 
+                    Objects = new Collection<TripleObject>(t.Objects.Where(o => o.Object == objectName).ToArray())
+                }).ToList();
         }
 
         /// <summary>
@@ -92,12 +123,15 @@ namespace Chronozoom.Entities
         /// <param name="objectStr">Object</param>
         /// <returns>Returns 'True' if operation completed succeful, 'False' otherwise.</returns>
         /// <example>PutTriplet( “czusr:76087518-4f8e-4d3a-9bfb-2fd2332376eb”, “czpred:favorite”, "cztimeline:3a87bb5c-85f7-4305-8b2f-f2002580cd25")</example>
-        public bool PutTriplet(string subjectStr, string predicateStr, string objectStr)
+        public bool PutTriplet(TripleName subjectName, TripleName predicateName, TripleName objectName)
         {
-            var shortSubjectStr = EnsurePrefix(TripleName.Parse(subjectStr)).ToString();
-            var shortPredicateStr = EnsurePrefix(TripleName.Parse(predicateStr)).ToString();
-            var shortObjectStr = EnsurePrefix(TripleName.Parse(objectStr)).ToString();
-
+            subjectName = EnsurePrefix(subjectName);
+            predicateName = EnsurePrefix(predicateName);
+            objectName = EnsurePrefix(objectName);
+            var shortSubjectStr = subjectName.ToString();
+            var shortPredicateStr = predicateName.ToString();
+            var shortObjectStr = objectName.ToString();
+            
             var tr = Triples.Where(t => t.Subject == shortSubjectStr && t.Predicate == shortPredicateStr).Include(o => o.Objects).FirstOrDefault();
             if (tr != null)
             {
@@ -140,15 +174,19 @@ namespace Chronozoom.Entities
         /// <summary>
         /// Delete triple with specified parameters.
         /// </summary>
-        /// <param name="subjectStr">Subject</param>
-        /// <param name="predicateStr">Predicate</param>
-        /// <param name="objectStr">Object</param>
+        /// <param name="subjectName">Subject</param>
+        /// <param name="predicateName">Predicate</param>
+        /// <param name="objectName">Object</param>
         /// <returns>Returns 'True' if operation completed succeful, 'False' otherwise.</returns>
-        public bool DeleteTriplet(string subjectStr, string predicateStr, string objectStr)
+        public bool DeleteTriplet(TripleName subjectName, TripleName predicateName, TripleName objectName)
         {
-            var shortSubjectStr = EnsurePrefix(TripleName.Parse(subjectStr)).ToString();
-            var shortPredicateStr = EnsurePrefix(TripleName.Parse(predicateStr)).ToString();
-            var shortObjectStr = EnsurePrefix(TripleName.Parse(objectStr)).ToString();
+            subjectName = EnsurePrefix(subjectName);
+            predicateName = EnsurePrefix(predicateName);
+            objectName = EnsurePrefix(objectName);
+
+            var shortSubjectStr = subjectName.ToString();
+            var shortPredicateStr = predicateName.ToString();
+            var shortObjectStr = objectName.ToString();
 
             var tr = Triples.Where(t => t.Subject == shortSubjectStr && t.Predicate == shortPredicateStr).Include(o => o.Objects).FirstOrDefault();
             if (tr != null)

@@ -807,10 +807,13 @@ module CZ {
         }
 
         export function getTriplets(subject, predicate = null, object = null) {
+            if (subject == null && predicate == null && object == null)
+                throw "Arguments error: all three criteria cannot be null at the same time";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("triples");
-            request.addParameter("subject", encodeURIComponent(subject));
+            if(subject != null)
+                request.addParameter("subject", encodeURIComponent(subject));
             if(predicate != null)
                 request.addParameter("predicate", encodeURIComponent(predicate));
             if(object != null)

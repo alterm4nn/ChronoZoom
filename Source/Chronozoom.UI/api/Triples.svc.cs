@@ -9,35 +9,17 @@ namespace Chronozoom.UI
 {
     public partial class ChronozoomSVC
     {
-        private string GetSubjectOwner(Storage storage, string subject)
-        {
-            var name = storage.EnsurePrefix(TripleName.Parse(subject)); 
-            switch(name.Prefix) {
-                case TripleName.UserPrefix:
-                    return name.Name; 
-                case TripleName.TimelinePrefix:
-                    var collection = RetrieveCollection(storage, storage.GetCollectionFromTimeline(Guid.Parse(name.Name)));
-                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;
-                case TripleName.ExhibitPrefix:
-                    collection = RetrieveCollection(storage, storage.GetCollectionFromExhibitGuid(Guid.Parse(name.Name)));
-                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;
-                case TripleName.ArtifactPrefix:
-                    collection = RetrieveCollection(storage, storage.GetCollectionFromContentItemGuid(Guid.Parse(name.Name)));
-                    return collection != null && collection.User != null ? collection.User.Id.ToString() : null;                    
-                default:
-                    return null;
-            }
-        }
-
         public IEnumerable<Entities.Triple> GetTriplets(string subject, string predicate, string @object)
         {
             try
             {
                 using (var storage = new Storage())
-                    return storage.GetTriplet(
-                        HttpUtility.UrlDecode(subject), 
-                        predicate == null ? null : HttpUtility.UrlDecode(predicate), 
-                        @object == null ? null : HttpUtility.UrlDecode(@object));
+                    return subject == null?
+                        storage.GetIncomingTriplets(predicate,@object) :
+                        storage.GetTriplet(
+                            HttpUtility.UrlDecode(subject), 
+                            predicate == null ? null : HttpUtility.UrlDecode(predicate), 
+                            @object == null ? null : HttpUtility.UrlDecode(@object));
             }
             catch (ArgumentException exc)
             {
@@ -48,72 +30,89 @@ namespace Chronozoom.UI
 
         public void DeleteTriplet(SingleTriple triple)
         {
-#if RELEASE // Authenticate only in RELEASE mode 
-            ApiOperation(delegate(User user, Storage storage)
+            try
             {
-                if (user == null)
+                var subjectName = TripleName.Parse(triple.Subject);
+                var predicateName = TripleName.Parse(triple.Predicate);
+                var objectName = TripleName.Parse(triple.Object); 
+#if RELEASE // Authenticate only in RELEASE mode 
+                ApiOperation(delegate(User user, Storage storage)
                 {
-                    SetStatusCode(HttpStatusCode.Unauthorized, "Anonymous users cannot delete triple");
-                } 
-                else 
-                {
-                    if(GetSubjectOwner(storage, triple.Subject) == user.Id.ToString())
+                    if (user == null)
                     {
+                        SetStatusCode(HttpStatusCode.Unauthorized, "Anonymous users cannot delete triple");
+                    } 
+                    else 
+                    {
+                        if(storage.GetSubjectOwner(TripleName.Parse(triple.Subject)) == user.Id.ToString())
+                        {
 #else
-                    using(var storage = new Storage()) 
+                            using(var storage = new Storage()) 
 #endif
-                        try
-                        {
-                            SetStatusCode(storage.DeleteTriplet(triple.Subject, triple.Predicate, triple.Object) ? HttpStatusCode.OK : HttpStatusCode.NotModified, "");
-                        }
-                        catch (ArgumentException exc)
-                        {
-                            SetStatusCode(HttpStatusCode.BadRequest, exc.Message);
-                        }
+                                SetStatusCode(storage.DeleteTriplet(subjectName, predicateName, objectName) ? HttpStatusCode.OK : HttpStatusCode.NotModified, "");
 #if RELEASE
+                        }
+                        else
+                        {
+                            SetStatusCode(HttpStatusCode.Unauthorized, "Only subject owners can delete triple");
+                        }
                     }
-                    else
-                    {
-                        SetStatusCode(HttpStatusCode.Unauthorized, "Only subject owners can delete triple");
-                    }
-                }
-            });
+                });
 #endif
+            }
+            catch (ArgumentException exc)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, exc.Message);
+            }
         }
 
         public void PutTriplet(SingleTriple triple)
         {
-#if RELEASE
-            ApiOperation(delegate(User user, Storage storage)
+            try
             {
-                if (user == null)
-                {
-                    SetStatusCode(HttpStatusCode.Unauthorized, "Anonymous users cannot modify triple");
-                }
-                else
-                {
-                    if (GetSubjectOwner(storage, triple.Subject) == user.Id.ToString())
-                    {
-#else
-                    using(var storage = new Storage()) 
-#endif
-                        try
-                        {
-                            SetStatusCode(storage.PutTriplet(triple.Subject, triple.Predicate, triple.Object) ? HttpStatusCode.OK : HttpStatusCode.NotModified, "");
-                        }
-                        catch (ArgumentException exc)
-                        {
-                            SetStatusCode(HttpStatusCode.BadRequest, exc.Message);
-                        }
+                var subjectName = TripleName.Parse(triple.Subject);
+                var predicateName = TripleName.Parse(triple.Predicate);
+                var objectName = TripleName.Parse(triple.Object);
 #if RELEASE
+                ApiOperation(delegate(User user, Storage storage)
+                {
+                    if (user == null)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, "Anonymous users cannot modify triple");
                     }
                     else
                     {
-                        SetStatusCode(HttpStatusCode.Unauthorized, "Only subject owners can modify triple");
-                    }
-                }
-            });
+                        objectName = storage.EnsurePrefix(objectName);
+                        if (objectName.Prefix == "_")
+                        {
+                            var tripleOwner = storage.GetSubjectOwner(objectName);
+                            if (tripleOwner != null && tripleOwner != user.Id.ToString())
+                                SetStatusCode(HttpStatusCode.BadRequest, "Object bNode belongs to another user");
+                        }
+
+                        if (storage.GetSubjectOwner(subjectName) == user.Id.ToString())
+                        {
+#else
+                            using(var storage = new Storage()) 
 #endif
+                            {
+
+                                SetStatusCode(storage.PutTriplet(subjectName, predicateName, objectName) ? HttpStatusCode.OK : HttpStatusCode.NotModified, "");
+                            }
+#if RELEASE
+                        }
+                        else
+                        {
+                            SetStatusCode(HttpStatusCode.Unauthorized, "Only subject owners can modify triple");
+                        }
+                    }
+                });
+#endif
+            }
+            catch (ArgumentException exc)
+            {
+                SetStatusCode(HttpStatusCode.BadRequest, exc.Message);
+            }            
         }
 
 
