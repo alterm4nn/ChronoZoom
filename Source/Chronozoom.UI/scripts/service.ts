@@ -133,12 +133,12 @@ module CZ {
         */
 
         // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
-        export function getTimelines(r) {
+        export function getTimelines(r,sc = superCollectionName,c = collectionName) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
-            request.addParameter("supercollection", superCollectionName);
-            request.addParameter("collection", collectionName);
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
             request.addParameters(r);
 
             console.log("[GET] " + request.url);
@@ -683,6 +683,22 @@ module CZ {
                     result = mime;
             });
             return result;
+        }
+
+
+        export function getUserTimelines(sc = superCollectionName, c = collectionName) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("usertimelines");
+            request.addParameter("superCollection", sc);
+            request.addParameter("Collection", c);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
         }
 
         export function getUserFavorites(){

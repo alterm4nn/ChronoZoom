@@ -147,25 +147,28 @@ var CZ;
             var onToursInitialized = function () {
                 $("#tours_index").click(function () {
                     var toursListForm = getFormById("#toursList");
-
+                    console.log("toursListForm", toursListForm);
                     if (toursListForm.isFormVisible) {
                         toursListForm.close();
                     } else {
-                        closeAllForms();
-                        var form = new CZ.UI.FormToursList(forms[9], {
-                            activationSource: $(this),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            tourTemplate: forms[10],
-                            tours: CZ.Tours.tours,
-                            takeTour: onTakeTour,
-                            editTour: allowEditing ? function (tour) {
-                                if (CZ.Authoring.showEditTourForm)
-                                    CZ.Authoring.showEditTourForm(tour);
-                            } : null
-                        });
-                        form.show();
+                        if (!$("#start-page").is(":visible")) {
+                            closeAllForms();
+                            var form = new CZ.UI.FormToursList(forms[9], {
+                                activationSource: $(this),
+                                navButton: ".cz-form-nav",
+                                closeButton: ".cz-form-close-btn > .cz-form-btn",
+                                titleTextblock: ".cz-form-title",
+                                tourTemplate: forms[10],
+                                tours: CZ.Tours.tours,
+                                takeTour: onTakeTour,
+                                editTour: allowEditing ? function (tour) {
+                                    if (CZ.Authoring.showEditTourForm)
+                                        CZ.Authoring.showEditTourForm(tour);
+                                } : null,
+                                createTour: ".cz-form-create-tour"
+                            });
+                            form.show();
+                        }
                     }
                 });
             };
@@ -450,8 +453,10 @@ else
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
+                        $("#TwitterBlock").attr("data-toggle", "show");
                     } else {
                         $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
+                        $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
                     CZ.Common.loadData().then(function (response) {
@@ -525,6 +530,8 @@ else
                                 profileForm.close();
                             }
                         } else {
+                            CZ.Settings.userSuperCollectionName = data.DisplayName;
+                            CZ.Settings.userCollectionName = data.DisplayName;
                             $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
@@ -549,6 +556,7 @@ else
                 });
                 if (IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
+                    CZ.StartPage.show();
                 }
             });
 

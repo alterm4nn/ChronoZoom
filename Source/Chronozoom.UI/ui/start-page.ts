@@ -138,6 +138,20 @@ module CZ {
                     "box ex3 ex4 ex6"
                 ],
             },
+                        {
+                "Name": "#MyTimelinesBlock-tiles",
+                "Visibility": [
+                    "box",
+                    "box",
+                    "box ex3",
+                    "box ex3 ex4",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
+                ],
+            },
         ];
 
         function resizeCrop($image: JQuery, imageProps: any, isListView?: boolean): void {
@@ -443,6 +457,98 @@ module CZ {
             }
         }
 
+        export function fillMyTimelines(timelines) {
+            var $template = $("#template-tile .box");
+            var layout = CZ.StartPage.tileLayout[4];
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+                var $startPage = $("#start-page");
+                var $tile = $template.clone(true, true);
+                var $tileImage = $tile.find(".boxInner .tile-photo img");
+                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
+                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
+
+                // Set appearance and click handler.
+                // Initially the tile is hidden. Show it on image load.
+                $tile.appendTo(layout.Name)
+                    .addClass(layout.Visibility[i])
+                    .attr("id", "my" + i)
+                    .click(timelineUrl, function (event) {
+                        window.location.href = event.data;
+                        hide();
+                    })
+                    .invisible();
+
+                // Resize and crop image on load.
+                $tileImage.load($tile, function (event) {
+                    var $this = $(this);
+                    $tileImage.show();
+                    var imageProps = event.target || event.srcElement;
+                    $tileImage.hide();
+                    // Resize and crop the image.
+                    resizeCrop($this, imageProps);
+                    $tileImage.show();
+                    // Resize and crop the image on window resize.
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                            resizeCrop(event.data.$image, event.data.imageProps);
+                        });
+
+                    // Show the tile with transition.
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
+                }).attr({
+                        src: timeline.ImageUrl,
+                        alt: timeline.Title
+                    });
+
+                // Set title and author.
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
+                $tileAuthor.text(timeline.Author);
+            }
+        }
+
+        export function fillMyTimelinesList(timelines) {
+            var template = "#template-timeline-list .timeline-list-item";
+            var target = "#MyTimelinesBlock-list";
+
+            for (var i = 0; i < Math.min(tileData.length, timelines.length); i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+
+                var $timelineListItem = $(template).clone(true, true).appendTo(target);
+                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
+
+                var Name = "favorite-list-elem" + i;
+                var idx = 1;
+
+                $timelineListItem.attr("id", "lmy" + idx + "i" + i);
+                $timelineListItem.click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                });
+
+                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
+                $timelineListItem.attr("data-author", timeline.Author);
+
+                $timelineListItemImage.load($timelineListItemImage, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    // Resize and crop the image.
+                    resizeCrop($this, imageProps, true);
+                }).attr({
+                        src: timeline.ImageUrl,
+                        alt: timeline.Title
+                    });
+            }
+        }
+
+ 
         export function TwitterLayout(target, idx) {
             var ListTemplate = "#template-tweet-list .tweet-list-item";
             var ListElem = "#TwitterBlock-list";
@@ -609,9 +715,25 @@ module CZ {
                 console.log("[ERROR] getUserFavorites");
             });
 
-            // CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
+            //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
             //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
             //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
+
+            CZ.Service.getProfile().done(data => {
+                if ((data != "") && (data.DisplayName != null)) {
+                    CZ.Settings.userSuperCollectionName = data.DisplayName;
+                    CZ.Settings.userCollectionName = data.DisplayName;
+                }
+                CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(response => {
+                    var timelines = response ? response.reverse() : [];
+                    fillMyTimelines(timelines);
+                    fillMyTimelinesList(timelines);
+                },
+                    error => {
+                        console.log("[ERROR] getUserTimelines");
+                    });
+            });
+
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);

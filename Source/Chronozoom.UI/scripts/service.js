@@ -130,12 +130,14 @@
         Service.collectionName = "";
         Service.superCollectionName = "";
 
-        function getTimelines(r) {
+        function getTimelines(r, sc, c) {
+            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
+            if (typeof c === "undefined") { c = Service.collectionName; }
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
-            request.addParameter("supercollection", Service.superCollectionName);
-            request.addParameter("collection", Service.collectionName);
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
             request.addParameters(r);
 
             console.log("[GET] " + request.url);
@@ -660,6 +662,24 @@
             return result;
         }
         Service.getMimeTypeByUrl = getMimeTypeByUrl;
+
+        function getUserTimelines(sc, c) {
+            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
+            if (typeof c === "undefined") { c = Service.collectionName; }
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("usertimelines");
+            request.addParameter("superCollection", sc);
+            request.addParameter("Collection", c);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getUserTimelines = getUserTimelines;
 
         function getUserFavorites() {
             var result = "";
