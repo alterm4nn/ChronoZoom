@@ -198,10 +198,11 @@ var CZ;
                         if (errorMessage !== "") {
                             _this.errorMessage.text(errorMessage);
                             var that = _this;
+                            console.log(that, that.contentItemsListBox, that.contentItemsListBox.items);
                             var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
                             errCI.forEach(function (contentItemIndex) {
                                 var item = that.contentItemsListBox.items[contentItemIndex];
-                                item.container[0].lastChild.style.borderColor = "red";
+                                item.container.find(".cz-listitem").css("border-color", "red");
                             });
                         } else {
                             _this.errorMessage.text("Sorry, internal server error :(");
@@ -244,7 +245,7 @@ var CZ;
                 }
 
                 var item = this.contentItemsListBox.items[idx];
-                item.container[0].lastChild.style.borderColor = "#c7c7c7";
+                item.container.find(".cz-listitem").css("border-color", "#c7c7c7");
 
                 if (idx >= 0) {
                     this.clickedListItem = item;
