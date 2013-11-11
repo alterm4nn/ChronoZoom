@@ -196,23 +196,27 @@ module CZ {
                     this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
 
                     this.saveButton.prop('disabled', true);
-                    CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
-                        success => {
-                            this.isCancel = false;
-                            this.isModified = false;
-                            this.close();
+                        CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
+                            success => {
+                                this.isCancel = false;
+                                this.isModified = false;
+                                this.close();
 
-                            this.exhibit.id = arguments[0].id;
+                                this.exhibit.id = arguments[0].id;
 
-                            this.exhibit.onmouseclick();
+                                this.exhibit.onmouseclick();
 
-                        },
-                        error => {
-                            var errorMessage = JSON.parse(error.responseText).errorMessage;
-                            if (errorMessage !== "") {
-                                this.errorMessage.text(errorMessage);
-                                var errCI = CZ.Authoring.ErroneousContentItemsList(error.responseText);
-                                console.log(errCI);
+                            },
+                            error => {
+                                var errorMessage = JSON.parse(error.responseText).errorMessage;
+                                if (errorMessage !== "") {
+                                    this.errorMessage.text(errorMessage);
+                                    var that = this;
+                                    var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
+                                    errCI.forEach(function (contentItemIndex) {
+                                        var item = that.contentItemsListBox.items[contentItemIndex];
+                                        item.container[0].lastChild.style.borderColor = "red";
+                                    });
                             }
                             else {
                                 this.errorMessage.text("Sorry, internal server error :(")
@@ -256,6 +260,9 @@ module CZ {
                 } else {
                     idx = -1;
                 }
+
+                var item = this.contentItemsListBox.items[idx];
+                item.container[0].lastChild.style.borderColor = "#c7c7c7";
 
                 if (idx >= 0) {
                     this.clickedListItem = <ContentItemListItem>item;

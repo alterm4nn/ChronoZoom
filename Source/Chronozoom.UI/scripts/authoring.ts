@@ -624,12 +624,10 @@ module CZ {
                         newExhibit.id = "e" + response.ExhibitId;
 
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
-                        console.log(response);
                         deferred.resolve(newExhibit);
                     },
                     error => {
                         console.log("Error connecting to service: update exhibit.\n" + error.responseText);
-
                         deferred.reject(error);
                     }
                 );
@@ -768,10 +766,11 @@ module CZ {
         export function isNotEmpty(obj) {
             return (obj !== '' && obj !== null);
         }
-
-
-        export function IsValidURL(url) {
-            var objRE = /(^https?:\/\/)?[a-z0-9~_\-\.]+\.[a-z]{2,9}(\/|:|\?[!-~]*)?$/i;
+        /**
+         * Validates,if url is adequate
+        */
+        export function isValidURL(url) {
+            var objRE = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return objRE.test(url);
         }
         /**
@@ -885,17 +884,20 @@ module CZ {
             return isValid;
         }
 
-        export function ErroneousContentItemsList(errormassage) {
+        /**
+        * Returns list of erroneous content items
+        */
+        export function erroneousContentItemsList(errorMassage) {
             var pos;
             var errCI = [];
-            if (errormassage.indexOf("ErroneousContentItemId") + 1) {
-                pos = errormassage.indexOf("ErroneousContentItemId") + 24;
-                while (errormassage[pos] != ']') {
-                    if ((errormassage[pos] == ",") || (errormassage[pos] == "[")) {
+            if (errorMassage.indexOf("ErroneousContentItemId") + 1) {
+                pos = errorMassage.indexOf("ErroneousContentItemId") + 24;
+                while (errorMassage[pos] != ']') {
+                    if ((errorMassage[pos] == ",") || (errorMassage[pos] == "[")) {
                         var str1 = "";
                         pos++;
-                        while ((errormassage[pos] != ",") && (errormassage[pos] != "]")) {
-                            str1 += errormassage[pos];
+                        while ((errorMassage[pos] != ",") && (errorMassage[pos] != "]")) {
+                            str1 += errorMassage[pos];
                             pos++;
                         }
                         errCI.push(parseInt(str1));

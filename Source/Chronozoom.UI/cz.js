@@ -6210,11 +6210,14 @@ var CZ;
         }
         Authoring.isNotEmpty = isNotEmpty;
 
-        function IsValidURL(url) {
-            var objRE = /(^https?:\/\/)?[a-z0-9~_\-\.]+\.[a-z]{2,9}(\/|:|\?[!-~]*)?$/i;
+        /**
+        * Validates,if url is adequate
+        */
+        function isValidURL(url) {
+            var objRE = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return objRE.test(url);
         }
-        Authoring.IsValidURL = IsValidURL;
+        Authoring.isValidURL = isValidURL;
 
         /**
         * Validates,if timeline size is not negative or null
@@ -6326,6 +6329,30 @@ var CZ;
             return isValid;
         }
         Authoring.validateContentItems = validateContentItems;
+
+        /**
+        * Returns list of erroneous content items
+        */
+        function erroneousContentItemsList(errorMassage) {
+            var pos;
+            var errCI = [];
+            if (errorMassage.indexOf("ErroneousContentItemId") + 1) {
+                pos = errorMassage.indexOf("ErroneousContentItemId") + 24;
+                while (errorMassage[pos] != ']') {
+                    if ((errorMassage[pos] == ",") || (errorMassage[pos] == "[")) {
+                        var str1 = "";
+                        pos++;
+                        while ((errorMassage[pos] != ",") && (errorMassage[pos] != "]")) {
+                            str1 += errorMassage[pos];
+                            pos++;
+                        }
+                        errCI.push(parseInt(str1));
+                    }
+                }
+            }
+            return errCI;
+        }
+        Authoring.erroneousContentItemsList = erroneousContentItemsList;
 
         /**
         * Opens "session ends" form
@@ -15087,24 +15114,13 @@ var CZ;
                         var errorMessage = JSON.parse(error.responseText).errorMessage;
                         if (errorMessage !== "") {
                             _this.errorMessage.text(errorMessage);
-                            var errCI = [];
-                            var mas1 = error.responseText;
-                            var pos;
-                            if (mas1.indexOf("ErroneousContentItemId") + 1) {
-                                pos = mas1.indexOf("ErroneousContentItemId") + 24;
-                                while (mas1[pos] != ']') {
-                                    if ((mas1[pos] == ",") || (mas1[pos] == "[")) {
-                                        var str1 = "";
-                                        pos++;
-                                        while ((mas1[pos] != ",") && (mas1[pos] != "]")) {
-                                            str1 += mas1[pos];
-                                            pos++;
-                                        }
-                                        errCI.push(parseInt(str1));
-                                    }
-                                }
-                            }
-                            console.log("fff", errCI);
+                            var that = _this;
+                            var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
+                            errCI.forEach(function (contentItemIndex) {
+                                console.log(that.contentItemsListBox.items[contentItemIndex]);
+                                // that.contentItemsListBox.items[contentItemIndex].css("border-color:red");
+                            });
+                            console.log(_this.contentItemsListBox.items);
                         } else {
                             _this.errorMessage.text("Sorry, internal server error :(");
                         }
@@ -15397,8 +15413,11 @@ else
                 if (!CZ.Authoring.isNotEmpty(newContentItem.uri)) {
                     this.mediaInput.showError("URL can't be empty");
                 }
+                if (!CZ.Authoring.isValidURL(newContentItem.uri)) {
+                    this.mediaInput.showError("URL is wrong");
+                }
 
-                if (CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) {
+                if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
                         if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;

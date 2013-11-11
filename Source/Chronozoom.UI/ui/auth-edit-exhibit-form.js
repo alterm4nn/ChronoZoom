@@ -197,8 +197,12 @@ var CZ;
                         var errorMessage = JSON.parse(error.responseText).errorMessage;
                         if (errorMessage !== "") {
                             _this.errorMessage.text(errorMessage);
-                            var errCI = CZ.Authoring.ErroneousContentItemsList(error.responseText);
-                            console.log(errCI);
+                            var that = _this;
+                            var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
+                            errCI.forEach(function (contentItemIndex) {
+                                var item = that.contentItemsListBox.items[contentItemIndex];
+                                item.container[0].lastChild.style.borderColor = "red";
+                            });
                         } else {
                             _this.errorMessage.text("Sorry, internal server error :(");
                         }
@@ -238,6 +242,9 @@ var CZ;
                 } else {
                     idx = -1;
                 }
+
+                var item = this.contentItemsListBox.items[idx];
+                item.container[0].lastChild.style.borderColor = "#c7c7c7";
 
                 if (idx >= 0) {
                     this.clickedListItem = item;
