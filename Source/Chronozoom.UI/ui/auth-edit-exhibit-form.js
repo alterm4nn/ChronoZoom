@@ -195,9 +195,10 @@ var CZ;
                         _this.exhibit.onmouseclick();
                     }, function (error) {
                         var errorMessage = JSON.parse(error.responseText).errorMessage;
-
                         if (errorMessage !== "") {
                             _this.errorMessage.text(errorMessage);
+                            var errCI = CZ.Authoring.ErroneousContentItemsList(error.responseText);
+                            console.log(errCI);
                         } else {
                             _this.errorMessage.text("Sorry, internal server error :(");
                         }

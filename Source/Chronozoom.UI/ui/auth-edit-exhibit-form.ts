@@ -209,9 +209,10 @@ module CZ {
                         },
                         error => {
                             var errorMessage = JSON.parse(error.responseText).errorMessage;
-
                             if (errorMessage !== "") {
                                 this.errorMessage.text(errorMessage);
+                                var errCI = CZ.Authoring.ErroneousContentItemsList(error.responseText);
+                                console.log(errCI);
                             }
                             else {
                                 this.errorMessage.text("Sorry, internal server error :(")

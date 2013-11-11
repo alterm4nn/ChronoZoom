@@ -6069,10 +6069,11 @@ var CZ;
                     newExhibit.id = "e" + response.ExhibitId;
 
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
-
+                    console.log(response);
                     deferred.resolve(newExhibit);
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+
                     deferred.reject(error);
                 });
             } else {
@@ -6208,6 +6209,12 @@ var CZ;
             return (obj !== '' && obj !== null);
         }
         Authoring.isNotEmpty = isNotEmpty;
+
+        function IsValidURL(url) {
+            var objRE = /(^https?:\/\/)?[a-z0-9~_\-\.]+\.[a-z]{2,9}(\/|:|\?[!-~]*)?$/i;
+            return objRE.test(url);
+        }
+        Authoring.IsValidURL = IsValidURL;
 
         /**
         * Validates,if timeline size is not negative or null
@@ -15078,9 +15085,26 @@ var CZ;
                         _this.exhibit.onmouseclick();
                     }, function (error) {
                         var errorMessage = JSON.parse(error.responseText).errorMessage;
-
                         if (errorMessage !== "") {
                             _this.errorMessage.text(errorMessage);
+                            var errCI = [];
+                            var mas1 = error.responseText;
+                            var pos;
+                            if (mas1.indexOf("ErroneousContentItemId") + 1) {
+                                pos = mas1.indexOf("ErroneousContentItemId") + 24;
+                                while (mas1[pos] != ']') {
+                                    if ((mas1[pos] == ",") || (mas1[pos] == "[")) {
+                                        var str1 = "";
+                                        pos++;
+                                        while ((mas1[pos] != ",") && (mas1[pos] != "]")) {
+                                            str1 += mas1[pos];
+                                            pos++;
+                                        }
+                                        errCI.push(parseInt(str1));
+                                    }
+                                }
+                            }
+                            console.log("fff", errCI);
                         } else {
                             _this.errorMessage.text("Sorry, internal server error :(");
                         }

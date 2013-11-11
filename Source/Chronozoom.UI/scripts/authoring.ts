@@ -1,4 +1,4 @@
-/// <reference path='settings.ts'/>
+﻿/// <reference path='settings.ts'/>
 /// <reference path='common.ts'/>
 /// <reference path='vccontent.ts'/>
 /// <reference path='service.ts'/>
@@ -624,11 +624,12 @@ module CZ {
                         newExhibit.id = "e" + response.ExhibitId;
 
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
-
+                        console.log(response);
                         deferred.resolve(newExhibit);
                     },
                     error => {
                         console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+
                         deferred.reject(error);
                     }
                 );
@@ -767,6 +768,12 @@ module CZ {
         export function isNotEmpty(obj) {
             return (obj !== '' && obj !== null);
         }
+
+
+        export function IsValidURL(url) {
+            var objRE = /(^https?:\/\/)?[a-z0-9~_\-\.]+\.[a-z]{2,9}(\/|:|\?[!-~]*)?$/i;
+            return objRE.test(url);
+        }
         /**
          * Validates,if timeline size is not negative or null
         */
@@ -876,6 +883,26 @@ module CZ {
                 i++;
             }
             return isValid;
+        }
+
+        export function ErroneousContentItemsList(errormassage) {
+            var pos;
+            var errCI = [];
+            if (errormassage.indexOf("ErroneousContentItemId") + 1) {
+                pos = errormassage.indexOf("ErroneousContentItemId") + 24;
+                while (errormassage[pos] != ']') {
+                    if ((errormassage[pos] == ",") || (errormassage[pos] == "[")) {
+                        var str1 = "";
+                        pos++;
+                        while ((errormassage[pos] != ",") && (errormassage[pos] != "]")) {
+                            str1 += errormassage[pos];
+                            pos++;
+                        }
+                        errCI.push(parseInt(str1));
+                    }
+                }
+            }
+            return errCI;
         }
 
         /**
