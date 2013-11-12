@@ -601,8 +601,6 @@ else
 
             Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
 
-            CZ.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 };
-
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash;
 

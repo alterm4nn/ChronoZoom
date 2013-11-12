@@ -2,7 +2,7 @@
 (function (CZ) {
     (function (Common) {
         Common.maxPermitedScale;
-        Common.maxPermitedVerticalRange;
+        Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 };
 
         Common.controller;
         Common.isAxisFreezed = true;

@@ -349,6 +349,8 @@ module CZ {
                 }
                 this.activationSource.removeClass("active");
                 CZ.Authoring.isActive = false;
+
+                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
             }
         }
     }

@@ -54,17 +54,27 @@ module CZ {
 
                     self.cursorPosition = 0.0;
 
+                    // elements that cover top, right, bottom & left space between corresponding root timeline's
+                    // border and corresponding canvas edge
+                    this.topCloak = $(".root-cloak-top");
+                    this.rightCloak = $(".root-cloak-right");
+                    this.bottomCloak = $(".root-cloak-bottom");
+                    this.leftCloak = $(".root-cloak-left");
+
+                    // indicates whether cloak should be shown or not
+                    this.showCloak = false;
+
                     var layerDivs = self.element.children("div");
                     layerDivs.each(function (index) { // for each internal (div)
                         // make a layer from (div)
                         $(this).addClass("virtualCanvasLayerDiv unselectable")
-                                .zIndex(index * 3);
+                            .zIndex(index * 3);
 
                         // creating canvas element
                         var layerCanvasJq = $("<canvas></canvas>")
-                                            .appendTo($(this))
-                                            .addClass("virtualCanvasLayerCanvas")
-                                            .zIndex(index * 3 + 1);
+                            .appendTo($(this))
+                            .addClass("virtualCanvasLayerCanvas")
+                            .zIndex(index * 3 + 1);
                         self._layers.push($(this)); // save jquery for this layer for further use
                     });
 
@@ -352,7 +362,7 @@ module CZ {
 
                     // update tooltip for currently tooltiped infodot|t if tooltip is enabled for this infodot|timeline
                     if ((this.currentlyHoveredInfodot != null && this.currentlyHoveredInfodot.tooltipEnabled == true)
-                    || (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.tooltipEnabled == true && CZ.Common.tooltipMode != "infodot")) {
+                        || (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.tooltipEnabled == true && CZ.Common.tooltipMode != "infodot")) {
 
                         var obj = null;
 
@@ -409,7 +419,7 @@ module CZ {
                     this.element.removeClass("virtualCanvas");
                     this.element.children(".virtualCanvasLayerDiv").each(function (index) {
                         $(this).removeClass("virtualCanvasLayerDiv")
-                                .removeClass("unselectable");
+                            .removeClass("unselectable");
                         $(this).remove(".virtualCanvasLayerCanvas");
                     });
                     this.element.unbind('.' + this.widgetName);
@@ -457,7 +467,7 @@ module CZ {
                     for (var i = 0; i < n; i++) {
                         var layer = this._layers[i]; // jq to <div> element
                         layer.width(size.width)
-                                .height(size.height);
+                            .height(size.height);
                         var canvas = layer.children(".virtualCanvasLayerCanvas").first()[0];
                         if (canvas) {
                             canvas.width = size.width;
@@ -513,8 +523,12 @@ module CZ {
                         var layerid = layer[0].id;
                         contexts[layerid] = ctx;
                     }
+
                     // rendering the tree recursively
                     elementsRoot.render(contexts, visibleBox_v, viewport);
+                    
+                    // update position of cloak for space outside root timeline
+                    this.updateCloakPosition(viewport);                    
                 },
 
                 /* Renders the virtual canvas content.
@@ -532,7 +546,7 @@ module CZ {
                     this.breadCrumbsChangedEvent.breadCrumbs = this.breadCrumbs;
                     this.element.trigger(this.breadCrumbsChangedEvent);
                 }
-                ,
+                    ,
                 /* If virtual canvas is during animation now, the method does nothing;
                 otherwise, it sets the timeout to invalidate the image.
                 */
@@ -647,6 +661,70 @@ module CZ {
                 options: {
                     aspectRatio: 1, /* (number)    how many h-units are in a single time unit */
                     visible: { centerX: 0, centerY: 0, scale: 1 } /* (VisibleRegion2d) describes the visible region */
+                },
+
+                /**
+                 * Shows top, right, bottom & left cloaks that hide empty space between root timeline's borders and
+                 * canvas edges.
+                 */
+                cloakNonRootVirtualSpace: function () {
+                    this.showCloak = true;
+                    var viewport = this.getViewport();
+
+                    this.updateCloakPosition(viewport);
+
+                    this.topCloak.addClass("visible");
+                    this.rightCloak.addClass("visible");
+                    this.bottomCloak.addClass("visible");
+                    this.leftCloak.addClass("visible");
+                },
+
+                /**
+                 * Hides top, right, bottom & left cloaks that hide empty space between root timeline's borders and
+                 * canvas edges.
+                 */
+                showNonRootVirtualSpace: function () {
+                    this.showCloak = false;
+
+                    this.topCloak.removeClass("visible");
+                    this.rightCloak.removeClass("visible");
+                    this.bottomCloak.removeClass("visible");
+                    this.leftCloak.removeClass("visible");
+                },
+
+                /**
+                 * Updates width and height of top, right, bottom & left cloaks that hide empty space between root
+                 * timeline's borders and canvas edges.
+                 */
+                updateCloakPosition: function (viewport) {
+                    if (!this.showCloak) return;
+
+                    var rootTimeline = this._layersContent.children[0];
+
+                    var top = rootTimeline.y;
+                    var right = rootTimeline.x + rootTimeline.width;
+                    var bottom = rootTimeline.y + rootTimeline.height;
+                    var left = rootTimeline.x;
+
+                    // calculate sizes of cloaks
+                    top = Math.max(0, viewport.pointVirtualToScreen(0, top).y);
+                    right = Math.max(0, viewport.pointVirtualToScreen(right, 0).x);
+                    bottom = Math.max(0, viewport.pointVirtualToScreen(0, bottom).y);
+                    left = Math.max(0, viewport.pointVirtualToScreen(left, 0).x);
+
+                    // set width of left and right cloaks
+                    this.rightCloak.css("width", Math.max(0, viewport.width - right) + "px");
+                    this.leftCloak.css("width", left + "px");
+
+                    // set height of top and bottom cloaks
+                    this.bottomCloak.css("height", Math.max(0, viewport.height - bottom) + "px");
+                    this.topCloak.css("height", top + "px");
+
+                    // prevent intersection of bottom & top cloaks with left & right cloaks
+                    this.topCloak.css("left", left + "px");
+                    this.topCloak.css("right", Math.max(0, viewport.width - right) + "px");
+                    this.bottomCloak.css("left", left + "px");
+                    this.bottomCloak.css("right", Math.max(0, viewport.width - right) + "px");
                 }
             });
         }

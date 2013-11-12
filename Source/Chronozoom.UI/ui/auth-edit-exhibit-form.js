@@ -337,6 +337,8 @@ var CZ;
                 }
                 this.activationSource.removeClass("active");
                 CZ.Authoring.isActive = false;
+
+                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
             };
             return FormEditExhibit;
         })(UI.FormUpdateEntity);
