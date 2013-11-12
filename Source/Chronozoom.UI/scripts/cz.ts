@@ -27,6 +27,10 @@
 /// <reference path='../ui/mediapicker-form.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
+/// <reference path='../ui/start-page.ts'/>
+/// <reference path='plugins/error-plugin.ts'/>
+/// <reference path='plugins/utility-plugins.ts'/>
 
 var constants: any;
 
@@ -56,7 +60,8 @@ module CZ {
             "#header-search-form": "/ui/header-search-form.html", // 14
             "#header-session-expired-form": "/ui/header-session-expired-form.html", // 15
             "#tour-caption-form": "/ui/tour-caption-form.html", // 16
-            "#mediapicker-form": "/ui/mediapicker-form.html" // 17
+            "#mediapicker-form": "/ui/mediapicker-form.html", // 17
+            "#start-page":"/ui/start-page.html"
         };
 
         export enum FeatureActivation {
@@ -70,9 +75,9 @@ module CZ {
         export interface FeatureInfo {
             Name: string;
             Activation: FeatureActivation;
-            JQueryReference: string;
-            IsEnabled: bool;
-            HasBeenActivated: bool;
+            JQueryReference?: string;
+            IsEnabled?: boolean;
+            HasBeenActivated?: boolean;
         }
 
         export var sessionForm: CZ.UI.FormHeaderSessionExpired;
@@ -137,9 +142,18 @@ module CZ {
                 Name: "Themes",
                 Activation: FeatureActivation.NotProduction
             },
+            {
+                Name: "Skydrive",
+                Activation: FeatureActivation.Enabled
+            },
+            {
+                Name: "StartPage",
+                Activation: FeatureActivation.NotProduction,
+                JQueryReference: ".header-icon.home-icon"
+            },
         ];
 
-        export var rootCollection: bool;
+        export var rootCollection: boolean;
 
         function UserCanEditCollection(profile) {
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
@@ -158,7 +172,6 @@ module CZ {
             var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
 
             var onTakeTour = tour => {
-                //CZ.Tours.tourCaptionForm = CZ.HomePageViewModel.getFormById("#tour-caption-form");
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
                     activationSource: $(".tour-icon"),
@@ -180,29 +193,31 @@ module CZ {
             };
 
             var onToursInitialized = function () {
-                CZ.Tours.initializeToursUI();
                 $("#tours_index").click(function () { // show form
                     var toursListForm = getFormById("#toursList");
-
+                    console.log("toursListForm",toursListForm);
                     if (toursListForm.isFormVisible) {
                         toursListForm.close();
                     }
                     else {
-                        closeAllForms();
-                        var form = new CZ.UI.FormToursList(forms[9], {
-                            activationSource: $(this),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            tourTemplate: forms[10],
-                            tours: CZ.Tours.tours,
-                            takeTour: onTakeTour,
-                            editTour: allowEditing ? tour => {
-                                if (CZ.Authoring.showEditTourForm)
-                                    CZ.Authoring.showEditTourForm(tour);
-                            } : null
-                        });
-                        form.show();
+                        if (!$("#start-page").is(":visible")) {
+                            closeAllForms();
+                            var form = new CZ.UI.FormToursList(forms[9], {
+                                activationSource: $(this),
+                                navButton: ".cz-form-nav",
+                                closeButton: ".cz-form-close-btn > .cz-form-btn",
+                                titleTextblock: ".cz-form-title",
+                                tourTemplate: forms[10],
+                                tours: CZ.Tours.tours,
+                                takeTour: onTakeTour,
+                                editTour: allowEditing ? tour => {
+                                    if (CZ.Authoring.showEditTourForm)
+                                        CZ.Authoring.showEditTourForm(tour);
+                                } : null,
+                                createTour: ".cz-form-create-tour"
+                            });
+                            form.show();
+                       }
                     }
                 });
             };
@@ -222,14 +237,23 @@ module CZ {
                     c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () { };
                 return c;
             })();
-
+           
             $('.bubbleInfo').hide();
-            var canvasIsEmpty;
+
+            var url = CZ.UrlNav.getURL();
+            rootCollection = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
+            CZ.Common.initialContent = url.content;
+
+            // Apply features
+            ApplyFeatureActivation();
 
             // Register ChronoZoom Extensions
             CZ.Extensions.registerExtensions();
 
             // Register ChronoZoom Media Pickers.
+            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
 
             CZ.Common.initialize();
@@ -349,7 +373,25 @@ module CZ {
                         form.show();
                     },
                     showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.hideMessageWindow();
                         CZ.Authoring.mode = "createTimeline";
+                        var form = new CZ.UI.FormEditTimeline(forms[1], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            startDate: ".cz-form-time-start",
+                            endDate: ".cz-form-time-end",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
+                            context: timeline
+                        });
+                        form.show();
+                    },
+                    showCreateRootTimelineForm: function (timeline) {
+                        CZ.Authoring.mode = "createRootTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -382,6 +424,7 @@ module CZ {
                         form.show();
                     },
                     showCreateExhibitForm: function (exhibit) {
+                        CZ.Authoring.hideMessageWindow();
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
                             activationSource: $(".header-icon.edit-icon"),
                             navButton: ".cz-form-nav",
@@ -442,11 +485,6 @@ module CZ {
                     }
                 });
 
-                if (canvasIsEmpty) {
-                    CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                }
-
-
                 sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
                     activationSource: $("#header-session-expired-form"),
                     navButton: ".cz-form-nav",
@@ -461,9 +499,46 @@ module CZ {
                 CZ.Service.getProfile().done(data => {
                     //Authorized
                     if (data != "") {
+                        CZ.Settings.isAuthorized = true;
                         CZ.Authoring.timer = setTimeout(() => { CZ.Authoring.showSessionForm(); }, (CZ.Settings.sessionTime - 60) * 1000);
                     }
-                }).fail((error) => {  });
+
+                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
+                }).fail((error) => {
+                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
+                }).always(() => {
+                    if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
+                        $(".edit-icon").hide();
+                        $("#WelcomeBlock").attr("data-toggle", "show");
+                        $("#TwitterBlock").attr("data-toggle", "show");
+                    }
+                    else {
+                        $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
+                        $("#MyTimelinesBlock").attr("data-toggle", "show");
+                    }
+
+                    //retrieving the data
+                    CZ.Common.loadData().then(function (response) {
+                        // collection is empty
+                        if (!response) {
+                            // author should create a root timeline
+                            // TODO: store 'user' variable in CZ that is the response of getProfile()
+                            if (CZ.Authoring.isEnabled) {
+                                if (CZ.Authoring.showCreateRootTimelineForm) {
+                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
+                                }
+                            }
+                            // show message for other users that collection is empty
+                            else {
+                                CZ.Authoring.showMessageWindow(
+                                    "Looks like this collection is empty. Come back later when author will fill it with content.",
+                                    "Collection is empty :("
+                                );
+                            }
+                        }
+                    });
+                });
 
                 var profileForm = new CZ.UI.FormEditProfile(forms[5], {
                     activationSource: $("#login-panel"),
@@ -529,22 +604,18 @@ module CZ {
                             }
                         }
                         else {
+                            CZ.Settings.userSuperCollectionName = data.DisplayName;
+                            CZ.Settings.userCollectionName = data.DisplayName;
                             $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
                         }
 
-                        CZ.Authoring.isEnabled = UserCanEditCollection(data);
                         InitializeToursUI(data, forms);
                     }).fail((error) => {
                         $("#login-panel").show();
 
-                        CZ.Authoring.isEnabled = UserCanEditCollection(null);
                         InitializeToursUI(null, forms);
-                    }).always(() => {
-                        if (!CZ.Authoring.isEnabled) {
-                            $(".edit-icon").hide();
-                        }
                     });
                 }
 
@@ -558,6 +629,10 @@ module CZ {
                         loginForm.close();
                     }
                 });
+                if (IsFeatureEnabled(_featureMap, "StartPage")) {
+                    CZ.StartPage.initialize();
+                    CZ.StartPage.show();
+                }
             });
 
             CZ.Service.getServiceInformation().then(
@@ -568,21 +643,18 @@ module CZ {
                     CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
                 });
 
-            var url = CZ.UrlNav.getURL();
-            rootCollection = url.superCollectionName === undefined;
-            CZ.Service.superCollectionName = url.superCollectionName;
-            CZ.Service.collectionName = url.collectionName;
-            CZ.Common.initialContent = url.content;
-
             CZ.Settings.applyTheme(null);
-            CZ.Service.getCollections(CZ.Service.superCollectionName).then(
-                function (response) {
+
+            // If not the root URL.
+            if (CZ.Service.superCollectionName) {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(response => {
                     $(response).each((index) => {
                         if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
                             CZ.Settings.applyTheme(response[index].theme);
                         }
                     });
                 });
+            }
 
             $('#breadcrumbs-nav-left')
                 .click(CZ.BreadCrumbs.breadCrumbNavLeft);
@@ -592,8 +664,6 @@ module CZ {
             $('#biblCloseButton')
                 .mouseout(() => { CZ.Common.toggleOffImage('biblCloseButton', 'png'); })
                 .mouseover(() => { CZ.Common.toggleOnImage('biblCloseButton', 'png'); })
-
-            ApplyFeatureActivation();
 
             if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
                 // Suppress the default iOS elastic pan/zoom actions.
@@ -613,15 +683,6 @@ module CZ {
 
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
-
-            CZ.Common.loadData().then(function (response) {
-                if (!response) {
-                    canvasIsEmpty = true;
-                    if (CZ.Authoring.showCreateTimelineForm) {
-                        CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                    }
-                }
-            }); //retrieving the data
 
             CZ.Search.initializeSearch();
             CZ.Bibliography.initializeBibliography();
@@ -806,7 +867,12 @@ module CZ {
         }
 
         export function closeAllForms() {
-            $('.cz-major-form').each((i, f) => { var form = $(f).data('form'); if (form) { form.close(); } });
+            $('.cz-major-form').each((i, f) => {
+                var form = $(f).data('form');
+                if (form && form.isFormVisible === true) {
+                    form.close();
+                }
+            });
 
         }
 
@@ -953,7 +1019,7 @@ module CZ {
                 var feature = _featureMap[idxFeature];
 
                 if (feature.IsEnabled === undefined) {
-                    var enabled: bool = true;
+                    var enabled: boolean = true;
                     if (feature.Activation === FeatureActivation.Disabled) {
                         enabled = false;
                     }

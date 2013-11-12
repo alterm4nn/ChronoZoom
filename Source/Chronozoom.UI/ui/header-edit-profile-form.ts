@@ -1,10 +1,12 @@
 ﻿/// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+
 
 module CZ {
     export module UI {
-
+        declare var WL: any;
 
         export interface FormEditProfileInfo extends CZ.UI.IFormUpdateEntityInfo {
             logoutButton: string;
@@ -15,25 +17,25 @@ module CZ {
             profilePanel: string;
             loginPanelLogin: string;
             context: Object;
-            allowRedirect: bool;
+            allowRedirect: boolean;
             collectionTheme: string;
             collectionThemeInput: string;
             collectionThemeWrapper: string;
         }
 
         export class FormEditProfile extends CZ.UI.FormUpdateEntity {
-            private saveButton: JQuery;
+            public saveButton: JQuery;
             private logoutButton: JQuery;
             private titleInput: JQuery;
 
-            private isCancel: bool;
+            private isCancel: boolean;
             private usernameInput: JQuery;
             private emailInput: JQuery;
             private agreeInput: JQuery;
             private loginPanel: JQuery;
             private profilePanel: JQuery;
             private loginPanelLogin: JQuery;
-            private allowRedirect: bool;
+            private allowRedirect: boolean;
             private collectionTheme: string;
             private collectionThemeInput: JQuery;
             private collectionThemeWrapper: JQuery;
@@ -160,6 +162,7 @@ module CZ {
 
                 this.logoutButton.click(event =>
                 {
+                    WL.logout();
                     window.location.assign("/pages/logoff.aspx");
                 });
 

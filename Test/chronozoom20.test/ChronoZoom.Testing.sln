@@ -4,12 +4,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.UI", "Tests.UI\Tests.UI.csproj", "{482D59BA-663E-46CF-B79F-F83CB4D9067D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3A81DC60-E939-4B89-A2FE-13606C393FF4}"
+	ProjectSection(SolutionItems) = preProject
+		chronozoom.testsettings = chronozoom.testsettings
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{37B416F4-C8A8-42A3-BDC5-4AB2030BEF3C}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.BL", "Tests.BL\Tests.BL.csproj", "{D6228D33-1A86-474F-989A-AD6E85A5D4E4}"
@@ -19,6 +21,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Helper", "Application.Helper\Application.Helper.csproj", "{5BDF5DC6-03B4-4A08-8861-51EBAF9742DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageSearchEngine", "ImageSearchEngine\ImageSearchEngine.csproj", "{6899B01E-EE1E-45CD-ACD3-B44D0790975C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomDataGenerator", "RandomDataGenerator\RandomDataGenerator.csproj", "{3703CA82-5BEF-42EC-BA7C-A6FF5A3E91FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubIssueWatcher", "GitHubIssueWatcher\GitHubIssueWatcher.csproj", "{0B6AB4D8-F0F4-4BF2-9629-1F9FEAC0D9A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +52,14 @@ Global
 		{6899B01E-EE1E-45CD-ACD3-B44D0790975C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6899B01E-EE1E-45CD-ACD3-B44D0790975C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6899B01E-EE1E-45CD-ACD3-B44D0790975C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3703CA82-5BEF-42EC-BA7C-A6FF5A3E91FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3703CA82-5BEF-42EC-BA7C-A6FF5A3E91FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3703CA82-5BEF-42EC-BA7C-A6FF5A3E91FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3703CA82-5BEF-42EC-BA7C-A6FF5A3E91FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B6AB4D8-F0F4-4BF2-9629-1F9FEAC0D9A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B6AB4D8-F0F4-4BF2-9629-1F9FEAC0D9A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B6AB4D8-F0F4-4BF2-9629-1F9FEAC0D9A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B6AB4D8-F0F4-4BF2-9629-1F9FEAC0D9A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

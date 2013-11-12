@@ -8,9 +8,9 @@ module CZ {
     export module Tours {
 
         export var isTourWindowVisible = false;
-        private isBookmarksWindowVisible = false;
-        private isBookmarksWindowExpanded = true;
-        private isBookmarksTextShown = true;
+        var isBookmarksWindowVisible = false;
+        var isBookmarksWindowExpanded = true;
+        var isBookmarksTextShown = true;
         export var isNarrationOn = true;
 
         export var tours; // list of loaded tours
@@ -20,9 +20,11 @@ module CZ {
 
         export var pauseTourAtAnyAnimation = false;
 
-        private bookmarkAnimation; // current animation of bookmark' description text sliding
+        var bookmarkAnimation; // current animation of bookmark' description text sliding
 
         var isToursDebugEnabled = false; // enables rebug output
+
+        export var TourEndMessage = "Thank you for watching this tour!"; // message for user in the end of tour
 
         export var tourCaptionFormContainer: JQuery;
         export var tourCaptionForm: CZ.UI.FormTourCaption;
@@ -58,7 +60,7 @@ module CZ {
             animationId: number;
         }
 
-        export function hasActiveTour(): bool {
+        export function hasActiveTour(): boolean {
             return tour != undefined;
         }
 
@@ -175,7 +177,7 @@ module CZ {
                     });
                     self.audioElement.addEventListener("progress", function () {
                         if (self.audioElement && self.audioElement.buffered.length > 0)
-                            if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audio.buffered.end(self.audio.buffered.length - 1) / self.audio.duration)));
+                            if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " downloaded " + (self.audioElement.buffered.end(self.audioElement.buffered.length - 1) / self.audioElement.duration)));
                     });
 
                     self.audioElement.controls = false;
@@ -257,6 +259,17 @@ module CZ {
 
                     if (isToursDebugEnabled && window.console && console.log("Transitioning to the bm index " + newBookmark));
 
+                    var targetVisible = getBookmarkVisible(bookmark);
+                    
+                    // bookmark was removed from canvas
+                    if (!targetVisible) {
+                        if (isToursDebugEnabled && window.console && console.log("bookmark index " + newBookmark + " references to nonexistent item"));
+                        // skip nonexistent bookmark
+                        goBack ? self.prev() : self.next();
+                        return; 
+                        //self.goToTheNextBookmark(goBack);
+                    }
+
                     // start new EllipticalZoom animation if needed
                     self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
                 }
@@ -267,7 +280,7 @@ module CZ {
                 */
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
                     if (!self.audio) return;
-                    if (isToursDebugEnabled && window.console && console.log("playing source: " + self.audio.currentSrc));
+                    if (isToursDebugEnabled && window.console && console.log("playing source: " + self.audioElement.currentSrc));
 
                     self.audioElement.pause();
 
@@ -370,8 +383,15 @@ module CZ {
                     self.state = 'play';
 
                     var visible = self.vc.virtualCanvas("getViewport").visible;
+                    var bookmarkVisible = getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]);
 
-                    if (self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, getBookmarkVisible(self.bookmarks[self.currentPlace.bookmark]))) {
+                    // skip bookmark if it references to nonexistent element
+                    if (bookmarkVisible === null) {
+                        self.next();
+                        return;
+                    }
+
+                    if (self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, bookmarkVisible)) {
                         // current visible is equal to visible of bookmark
                         self.currentPlace = <Place>{ type: 'bookmark', bookmark: self.currentPlace.bookmark };
                     } else {
@@ -380,6 +400,8 @@ module CZ {
                     }
 
                     var bookmark = self.bookmarks[self.currentPlace.bookmark];
+
+                    showBookmark(tour, bookmark);
 
                     // indicates if animation to first bookmark is required
                     var isInTransitionToFirstBookmark = (self.currentPlace.bookmark == 0 && self.currentPlace.type == 'goto');
@@ -443,23 +465,20 @@ module CZ {
                         bookmark.elapsed += (new Date().getTime() - self.currentPlace.startTime) / 1000; // sec
                 };
 
-                self.next = function next() { // goes to the next bookmark
-                    // ignore if last bookmark
-                    if (self.currentPlace.bookmark != self.bookmarks.length - 1) {
-                        if (self.state === 'play') {
-                            // clear active bookmark timer
-                            if (self.timerOnBookmarkIsOver) clearTimeout(self.timerOnBookmarkIsOver);
-                            self.timerOnBookmarkIsOver = undefined;
-                        }
-
-                        self.onBookmarkIsOver(false); // goes to the next bookmark            
+                self.next = function next() { // goes to the next bookmark. Ends tour if last bookmark
+                    if (self.state === 'play') {
+                        // clear active bookmark timer
+                        if (self.timerOnBookmarkIsOver) clearTimeout(self.timerOnBookmarkIsOver);
+                        self.timerOnBookmarkIsOver = undefined;
                     }
+
+                    self.onBookmarkIsOver(false); // goes to the next bookmark
                 };
 
                 self.prev = function prev() { // goes to the previous bookmark
                     // ignore if first bookmark
                     if (self.currentPlace.bookmark == 0) {
-                        //self.currentPlace = { type: 'goto', bookmark: 0, animationId: self.currentPlace.animationId };
+                        //self.currentPlace = <Place>{ type: 'bookmark', bookmark: self.currentPlace.bookmark };
                         return;
                     }
                     if (self.state === 'play') {
@@ -520,7 +539,7 @@ module CZ {
 
                 // add new tourFinished callback function
                 tour.tour_TourFinished.push(function (tour) {
-                    hideBookmark(tour);
+                    showTourEndMessage();
                     tourPause();
                     hideBookmarks();
                 });
@@ -555,8 +574,6 @@ module CZ {
             }
 
             // hide tour' UI
-            var tourControlDiv = document.getElementById("tour_control");
-            tourControlDiv.style.display = "none";
             if (tour) {
                 hideBookmarks();
                 $("#bookmarks .header").text("");
@@ -647,8 +664,9 @@ module CZ {
             isBookmarksWindowVisible = false;
 
             var curURL = CZ.UrlNav.getURL();
-            delete curURL.hash.params["tour"];
-            delete curURL.hash.params["bookmark"];
+            if (curURL.hash.params["tour"]) {
+                delete curURL.hash.params["tour"];
+            }
             CZ.UrlNav.setURL(curURL);
         }
 
@@ -668,6 +686,10 @@ module CZ {
         */
         function hideBookmark(tour) {
             tourCaptionForm.hideBookmark();
+        }
+
+        function showTourEndMessage() {
+            tourCaptionForm.showTourEndMessage();
         }
 
         /*

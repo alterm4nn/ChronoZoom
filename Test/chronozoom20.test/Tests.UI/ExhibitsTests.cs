@@ -1,4 +1,5 @@
 ﻿using Application.Helper.Entities;
+using GitHubIssueWatcher;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.ObjectModel;
 
@@ -66,7 +67,7 @@ namespace Tests
         #endregion
 
         [TestMethod]
-        public void new_exhibit_content_shoul_be_correctly()
+        public void new_exhibit_content_should_be_correctly()
         {
             for (int i = 0; i < Exhibit.ContentItems.Count; i++)
             {
@@ -94,7 +95,6 @@ namespace Tests
                                 "Content items Urls are not equal");
             }
         }
-
 
         [TestMethod]
         public void new_exhibit_should_have_a_content_items()

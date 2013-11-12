@@ -18,13 +18,13 @@ module CZ {
         }
 
         export class FormEditExhibit extends FormUpdateEntity {
-            private titleTextblock: JQuery;
+            public titleTextblock: JQuery;
             private titleInput: JQuery;
             private datePicker: DatePicker;
             private createArtifactButton: JQuery;
             public contentItemsListBox: ContentItemListBox;
             private errorMessage: JQuery;
-            private saveButton: JQuery;
+            public saveButton: JQuery;
             private deleteButton: JQuery;
 
             private contentItemsTemplate: JQuery;
@@ -33,8 +33,8 @@ module CZ {
             private exhibitCopy: any;
 
             private mode; // create | edit
-            private isCancel: bool; // is form closed without saving changes
-            public isModified: bool;
+            private isCancel: boolean; // is form closed without saving changes
+            public isModified: boolean;
 
             public clickedListItem: ContentItemListItem; // the contentitem on which the user dbl clicked
 
@@ -49,6 +49,10 @@ module CZ {
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
+
+                this.titleInput.focus(() => {
+                    this.titleInput.hideError();
+                });
 
                 this.contentItemsTemplate = formInfo.contentItemsTemplate;
 
@@ -75,7 +79,6 @@ module CZ {
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-                    console.log("this.datePicker.");
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -151,8 +154,7 @@ module CZ {
                 }
             }
 
-            private onSave() {
-                
+            private onSave() {                
                 var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
                 var exhibit_y = this.exhibit.y;
 
@@ -181,6 +183,14 @@ module CZ {
                     type: "infodot"
                 };
 
+                if (!CZ.Authoring.isNotEmpty(this.titleInput.val())) {
+                    this.titleInput.showError("Title can't be empty");
+                }
+
+                if (CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true)) {
+                    this.errorMessage.text("Exhibit intersects other elemenets");
+                }
+
                 if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) &&
                     CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) &&
                     this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
@@ -198,7 +208,16 @@ module CZ {
 
                         },
                         error => {
-                            alert("Unable to save changes. Please try again later.");
+                            var errorMessage = JSON.parse(error.responseText).errorMessage;
+
+                            if (errorMessage !== "") {
+                                this.errorMessage.text(errorMessage);
+                            }
+                            else {
+                                this.errorMessage.text("Sorry, internal server error :(")
+                            }
+
+                            this.errorMessage.show().delay(7000).fadeOut();
                         }
                     ).always(() => {
                         this.saveButton.prop('disabled', false);
@@ -212,7 +231,7 @@ module CZ {
                         .delay(7000)
                         .fadeOut(() => self.errorMessage.text(origMsg));
                 } else {
-                    this.errorMessage.show().delay(7000).fadeOut();
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
             }
 
@@ -220,7 +239,7 @@ module CZ {
                 if (confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
                     CZ.Authoring.removeExhibit(this.exhibit);
                     this.isCancel = false;
-                    this.isModified = true;
+                    this.isModified = false;
                     this.close();
                 }
                 
@@ -277,7 +296,7 @@ module CZ {
                 CZ.Common.vc.virtualCanvas("requestInvalidate");
             }
 
-            public show(noAnimation?: bool = false) {
+            public show(noAnimation: boolean = false) {
                 CZ.Authoring.isActive = true;
                 this.activationSource.addClass("active");
                 this.errorMessage.hide();
@@ -288,7 +307,7 @@ module CZ {
                 });
             }
 
-            public hide(noAnimation?: bool = false) {
+            public hide(noAnimation: boolean = false) {
                 super.close(noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
@@ -297,13 +316,14 @@ module CZ {
                 this.activationSource.removeClass("active");
             }
 
-            public close(noAnimation?: bool = false) {
+            public close(noAnimation: boolean = false) {
                 if (this.isModified) {
-                    var r = window.confirm("There is unsaved data. Do you want to close without saving?");
-                    if (r != true) {
-                        return;
+                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
                     }
-                    this.isModified = false;
+                    else {
+                        return;
+                    }                   
                 }
 
                 super.close(noAnimation ? undefined : {
@@ -313,6 +333,7 @@ module CZ {
                     complete: () => {
                         this.datePicker.remove();
                         this.contentItemsListBox.clear();
+                        this.titleInput.hideError();
                     }
                 });
                 if (this.isCancel) {

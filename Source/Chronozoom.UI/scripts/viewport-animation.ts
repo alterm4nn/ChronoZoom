@@ -176,10 +176,18 @@ module CZ {
             }
 
             //is used in the visible center point coordinates calculation according the article
-            //@param s    (number)  chenges between [0;this.S]
+            // return value changes between [0; this.pathLen]
+            //@param s    (number)  changes between [0;this.S]
             this.u = function (s) {
-                var val = this.startScale / Math.pow(this.ro, 2) * cosh(this.r0) * tanh(this.ro * s + this.r0) - this.startScale / Math.pow(this.ro, 2) * sinh(this.r0) + this.u0;
-                return val;
+                var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
+
+                // due to math imprecision val may not reach its max value which is pathLen 
+                if (this.uS < this.pathLen) {
+                    val = val * this.uSRatio;
+                }
+
+                // due to math imprecision calculated value might exceed path length, which is the max value
+                return Math.min(val, this.pathLen);
             }
 
             //calculates the scale of the visible region taking t parameter that indicates the requid position in the transition curve
@@ -262,12 +270,14 @@ module CZ {
                 //calculating parameters for further animation frames calculation
 
                 this.r0 = Math.log(-b0 + Math.sqrt(b0 * b0 + 1));
-                if (this.r0 == -Infinity) //happens when the double precision of r0 calculation yields infinity
+                if (this.r0 == -Infinity) { //happens when the double precision of r0 calculation yields infinity
                     this.r0 = -Math.log(2 * b0); //instead approximating with the first element of the teylor series
+                }
 
                 this.r1 = Math.log(-b1 + Math.sqrt(b1 * b1 + 1));
-                if (this.r1 == -Infinity)  // the same reaction on Infinity as in r0 calculation
+                if (this.r1 == -Infinity) { // the same reaction on Infinity as in r0 calculation
                     this.r1 = -Math.log(2 * b1);
+                }
 
                 this.S = (this.r1 - this.r0) / ro;
                 this.duration = CZ.Settings.ellipticalZoomDuration / 300 * this.S; //300 is a number to make animation eye candy. Please adjust ellipticalZoomDuration in settings.js instead of 300 constant here.
@@ -299,6 +309,12 @@ module CZ {
                     return this.startScale + (this.endScale - this.startScale) * s;
                 }
             }
+
+            // calculate constants for optimization
+            this.coshR0 = cosh(this.r0);
+            this.sinhR0 = sinh(this.r0);
+            this.uS = this.u(this.S); // right boundary value of this.u
+            this.uSRatio = this.pathLen / this.uS; // ratio of max value of this.u to its actual right boundary value
         }
 
         //function to make animation EaseInOut. [0,1] -> [0,1]

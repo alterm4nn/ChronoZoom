@@ -61,9 +61,11 @@ namespace Application.Driver.UserActions
             {
                 IWebElement element = WebDriver.FindElement(by);
                 element.Highlight();
+                //Update element state
+                element = WebDriver.FindElement(by);
                 return element;
             }
-            catch (Exception ex)
+            catch (NoSuchElementException ex)
             {
                 throw new NoSuchElementException("Can not find element " + by, ex);
             }
@@ -76,7 +78,18 @@ namespace Application.Driver.UserActions
 
         protected void Click(By by)
         {
-            FindElement(by).Click();
+            try
+            {
+                FindElement(by).Click();
+            }
+            catch (ElementNotVisibleException ex)
+            {
+                throw new ElementNotVisibleException("Element is not visible " + by, ex);
+            }
+            catch (StaleElementReferenceException ex)
+            {
+                throw new StaleElementReferenceException(by.ToString(), ex);
+            }
         }
 
         protected void SelectByText(By by, String text)
@@ -99,6 +112,11 @@ namespace Application.Driver.UserActions
         protected string GetPageTitle()
         {
             return WebDriver.Title;
+        }
+
+        protected string GetPageSource()
+        {
+            return WebDriver.PageSource;
         }
 
         protected ReadOnlyCollection<Cookie> GetAllCookies()
@@ -163,8 +181,8 @@ namespace Application.Driver.UserActions
             IWebElement element = FindElement(by);
             element.Clear();
             element.SendKeys(text);
-        }  
-        
+        }
+
         protected void SetFilePath(By by, string text)
         {
             IWebElement element = FindElement(by);
@@ -201,7 +219,12 @@ namespace Application.Driver.UserActions
 
         protected string GetJavaScriptExecutionResult(string script)
         {
-            return Executor.ExecuteScript("return " + script).ToString();
+            object executionResult = Executor.ExecuteScript("return " + script);
+            if (executionResult != null)
+            {
+                return executionResult.ToString();
+            }
+            return string.Empty;
         }
 
         protected bool IsElementExisted(By by)
@@ -217,16 +240,11 @@ namespace Application.Driver.UserActions
             }
         }
 
-        protected void Refresh()
-        {
-            WebDriver.Navigate().Refresh();
-        }
-
         protected static void InvokeChain(Func<Actions> chain)
         {
             chain.Invoke().Build().Perform();
         }
-        
+
         protected void ClickElementAndType(By by, string text)
         {
             IWebElement element = FindElement(by);
@@ -248,7 +266,8 @@ namespace Application.Driver.UserActions
         {
             foreach (string item in WebDriver.WindowHandles)
             {
-                if (WebDriver.SwitchTo().Window(item).Title.Contains(name))
+                string currentTitle = WebDriver.SwitchTo().Window(item).Title;
+                if (currentTitle == name || currentTitle.Contains(name))
                 {
                     WebDriver.SwitchTo().Window(item);
                     break;
@@ -256,9 +275,15 @@ namespace Application.Driver.UserActions
             }
         }
 
-        protected string GetCurrentWindowTitle()
+        protected void CloseAllWindowsButThis(string name)
         {
-            return WebDriver.Title;
+            foreach (string item in WebDriver.WindowHandles)
+            {
+                if (WebDriver.SwitchTo().Window(item).Title != name)
+                {
+                    WebDriver.SwitchTo().Window(item).Close();
+                }
+            }
         }
 
         protected void MoveToElementAndClick(By by)
@@ -271,16 +296,21 @@ namespace Application.Driver.UserActions
         {
             IWebElement element = FindElement(by);
             InvokeChain(() => Builder.MoveToElement(element, x, y));
-        }  
-        
+        }
+
         protected void ClickByCoordinates(int x, int y)
         {
-            InvokeChain(() => Builder.MoveToElement(FindElement(By.XPath("//body")),0,0).MoveByOffset(x,y).Click());
+            InvokeChain(() => Builder.MoveToElement(FindElement(By.XPath("//body")), 0, 0).MoveByOffset(x, y).Click());
         }
 
         protected string GetAttributeValue(By by, string attributeName)
         {
             return FindElement(by).GetAttribute(attributeName);
+        }
+
+        protected string GetElementValue(By by)
+        {
+            return FindElement(by).GetAttribute("value");
         }
 
         protected void WaitAjaxComplete(int timeoutInSeconds)
@@ -321,33 +351,9 @@ namespace Application.Driver.UserActions
             return result;
         }
 
-        protected void CloseCurrentWindow()
-        {
-            WebDriver.Close();
-        }
-
         protected void Sleep(int sec)
         {
             Thread.Sleep(TimeSpan.FromSeconds(sec));
-        }
-
-        protected ReadOnlyCollection<string> GetHandles()
-        {
-            ReadOnlyCollection<string> handles;
-            try
-            {
-                handles = WebDriver.WindowHandles;
-            }
-            catch (Exception)
-            {
-                throw new Exception("Can not get browser handles");
-            }
-            return handles;
-        }
-
-        protected string GetCurrentHandle()
-        {
-            return WebDriver.CurrentWindowHandle;
         }
 
         protected void WaitAnimation()

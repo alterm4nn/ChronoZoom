@@ -11,19 +11,22 @@ module CZ {
             tours: any;
             takeTour: (tour: any) => void;
             editTour: (tour: any) => void;
+            createTour: string;
         }
 
         export class FormToursList extends CZ.UI.FormBase {
 
             private toursListBox: TourListBox;
-            private isCancel: bool;
+            private isCancel: boolean;
             private takeTour: (tour: any) => void;
             private editTour: (tour: any) => void;
+            private createTourBtn: JQuery;
+            private tourAmount;
 
             // We only need to add additional initialization in constructor.
             constructor(container: JQuery, formInfo: IFormToursListInfo) {
                 super(container, formInfo);
-
+                this.tourAmount = formInfo.tours.length;
                 this.takeTour = formInfo.takeTour;
                 this.editTour = formInfo.editTour;
                 var tours = formInfo.tours.sort((a, b) => a.sequenceNum - b.sequenceNum);
@@ -32,11 +35,29 @@ module CZ {
                         this.onTakeTour(tour);
                     },
                     this.editTour ? tour => { this.onEditTour(tour); } : null);
+                this.createTourBtn = this.container.find(formInfo.createTour);
+                if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName)) $("#cz-tours-list-title").text("My Tours");
+                else {
+                    $("#cz-tours-list-title").text("Tours");
+                    $("#tours-create-button").hide();
+                }
 
+                if (formInfo.tours.length != 0) {
+                    $("#take-tour-proposal").show();
+                    $("#tours-missed-warning").hide();
+                } else {
+                    $("#take-tour-proposal").hide();
+                    $("#tours-missed-warning").show();
+                }
+                if (formInfo.tours.length == 0) $("#take-tour-proposal").hide();
                 this.initialize();
             }
 
             private initialize(): void {
+                this.createTourBtn.click(event => {
+                    CZ.Authoring.UI.createTour();
+                    this.close();
+                });
 
             }
 
@@ -86,7 +107,7 @@ module CZ {
             private onWindowResize(e: JQueryEventObject) {
                 var height = $(window).height();
                 this.container.height(height - 70);
-                this.container.find("#tours").height(height - 200);
+                this.container.find("#tour-listbox-wrapper").css("max-height",(height - 250) + "px");
             }
         }
     }

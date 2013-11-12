@@ -45,7 +45,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;RELEASE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -56,10 +56,20 @@
     <Content Include="css\media.css">
       <DependentUpon>media.less</DependentUpon>
     </Content>
+    <Content Include="css\start-page.css">
+      <DependentUpon>start-page.less</DependentUpon>
+    </Content>
+    <Content Include="dumps\extensions\GaribaldiTourJSON.js" />
+    <Content Include="dumps\extensions\narrative.js" />
     <Content Include="dumps\extensions\rin-sample.js" />
     <Content Include="dumps\sample.csv" />
     <Content Include="dumps\extensions-get.json" />
     <Content Include="css\media.less" />
+    <Content Include="css\start-page.less" />
+    <Content Include="css\_mixins.less" />
+    <Content Include="css\_colors.less" />
+    <Content Include="css\_vars.less" />
+    <Content Include="dumps\rin-dump.json" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -81,6 +91,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Hammock.ClientProfile">
+      <HintPath>..\..\External\TweetSharp\Hammock.ClientProfile.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.0.0-rc2\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
@@ -99,6 +112,10 @@
     <Reference Include="Microsoft.Data.OData, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Data.OData.5.2.0\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Services">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Data.Services.5.0.0\lib\net40\Microsoft.Data.Services.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -170,33 +187,39 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.20710.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Web.Routing">
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Web.WebPages.Deployment, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -207,9 +230,27 @@
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Reference Include="TweetSharp">
+      <HintPath>..\..\External\TweetSharp\TweetSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\Bing.svc.cs">
+      <DependentUpon>chronozoom.svc</DependentUpon>
+    </Compile>
+    <Compile Include="api\Favorites.svc.cs">
+      <DependentUpon>chronozoom.svc</DependentUpon>
+    </Compile>
+    <Compile Include="api\Featured.svc.cs">
+      <DependentUpon>chronozoom.svc</DependentUpon>
+    </Compile>
+    <Compile Include="api\MyTimelines.cvs.cs">
+    <DependentUpon>chronozoom.svc</DependentUpon>
+    </Compile>
+    <Compile Include="api\Triples.svc.cs">
+      <DependentUpon>chronozoom.svc</DependentUpon>
+    </Compile>
+    <Compile Include="api\Twitter.svc.cs">
       <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
     <Compile Include="api\errorhandler.cs" />
@@ -256,25 +297,41 @@
     <Content Include="cz.js" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
+    <Content Include="images\arrow-left-hover.png" />
+    <Content Include="images\arrow-left.png" />
+    <Content Include="images\arrow-right-hover.png" />
+    <Content Include="images\arrow-right.png" />
     <Content Include="images\chronozoom.png" />
     <Content Include="images\credits\github.png" />
     <Content Include="images\credits\msr.png" />
     <Content Include="images\credits\msu.png" />
     <Content Include="images\credits\ucb.png" />
     <Content Include="images\credits\uw.png" />
+    <Content Include="images\default-tile.png" />
     <Content Include="images\edit-icon.png" />
-    <Content Include="images\media\bing-icon.png" />
+    <Content Include="images\home-icon.png" />
+    <Content Include="images\icon_home.png" />
+    <Content Include="images\icon_right_arrow.png" />
+    <Content Include="images\icon_twitter.png" />
+    <Content Include="images\media\bing-import-50x150.png" />
+    <Content Include="images\media\bing-import-50x50.png" />
+    <Content Include="images\media\SkyDrive-Import-50X150.png" />
+    <Content Include="images\media\skydrive-import-50x50.png" />
     <Content Include="images\narration-off.png" />
     <Content Include="images\narration-on.png" />
     <Content Include="images\profile-icon.png" />
     <Content Include="images\search-icon.png" />
+    <Content Include="images\star.svg" />
     <Content Include="images\Temp-Thumbnail-Aqua.png" />
+    <Content Include="images\tile_bighistory.jpg" />
+    <Content Include="images\tile_gradient.png" />
     <Content Include="images\timeseries-icon.png" />
     <Content Include="images\tour-icon.png" />
     <Content Include="images\tour-next.png" />
     <Content Include="images\tour-pause.png" />
     <Content Include="images\tour-play.png" />
     <Content Include="images\tour-prev.png" />
+    <Content Include="images\twitter_profile_pic.gif" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
     <Content Include="pages\crawler.aspx" />
@@ -287,34 +344,47 @@
     <Content Include="samples\custom-mediapicker\mediapicker-example.js">
       <DependentUpon>mediapicker-example.ts</DependentUpon>
     </Content>
-    <Content Include="samples\custom-mediapicker\mediapicker-example.ts" />
+    <TypeScriptCompile Include="samples\custom-mediapicker\mediapicker-example.ts" />
     <Content Include="samples\bingSearchSample.html" />
     <Content Include="scripts\extensions\extensions.js">
       <DependentUpon>extensions.ts</DependentUpon>
     </Content>
+    <Content Include="scripts\extensions\rin-scripts\raphael.js" />
+    <Content Include="scripts\extensions\rin-scripts\rin-core-1.0.js" />
+    <Content Include="scripts\extensions\rin-scripts\rin-experiences-1.0.js" />
+    <Content Include="scripts\extensions\rin-scripts\tagInk.js" />
     <Content Include="scripts\extensions\rinplayer.js">
       <DependentUpon>rinplayer.ts</DependentUpon>
     </Content>
     <Content Include="scripts\external\ACS.js" />
-    <Content Include="scripts\authoring.ts" />
+    <TypeScriptCompile Include="scripts\authoring.ts" />
     <Content Include="scripts\authoring.js">
       <DependentUpon>authoring.ts</DependentUpon>
     </Content>
     <Content Include="scripts\authoring-ui.js">
       <DependentUpon>authoring-ui.ts</DependentUpon>
     </Content>
-    <Content Include="scripts\authoring-ui.ts" />
-    <Content Include="scripts\bibliography.ts" />
-    <Content Include="scripts\breadcrumbs.ts" />
-    <Content Include="scripts\common.ts" />
+    <TypeScriptCompile Include="scripts\authoring-ui.ts" />
+    <TypeScriptCompile Include="scripts\bibliography.ts" />
+    <TypeScriptCompile Include="scripts\breadcrumbs.ts" />
+    <TypeScriptCompile Include="scripts\common.ts" />
     <Content Include="scripts\external\csvToArray.v2.1.js" />
     <Content Include="scripts\external\jquery-1.7.2.min.js" />
     <Content Include="scripts\external\jquery-ui.js" />
+    <Content Include="scripts\external\jquery.dotdotdot.js" />
     <Content Include="scripts\external\jquery.mousewheel.js" />
     <Content Include="scripts\media.js">
       <DependentUpon>media.ts</DependentUpon>
     </Content>
-    <Content Include="scripts\media.ts" />
+    <TypeScriptCompile Include="scripts\media.ts" />
+    <TypeScriptCompile Include="scripts\plugins\error-plugin.ts" />
+    <Content Include="scripts\plugins\error-plugin.js">
+      <DependentUpon>error-plugin.ts</DependentUpon>
+    </Content>
+    <Content Include="scripts\plugins\utility-plugins.js">
+      <DependentUpon>utility-plugins.ts</DependentUpon>
+    </Content>
+    <TypeScriptCompile Include="scripts\plugins\utility-plugins.ts" />
     <Content Include="ui\auth-edit-tour-form.html" />
     <Content Include="ui\auth-edit-tour-form.js">
       <DependentUpon>auth-edit-tour-form.ts</DependentUpon>
@@ -323,17 +393,17 @@
     <Content Include="ui\controls\formbase.js">
       <DependentUpon>formbase.ts</DependentUpon>
     </Content>
-    <Content Include="ui\controls\formbase.ts" />
-    <Content Include="scripts\data.ts" />
+    <TypeScriptCompile Include="ui\controls\formbase.ts" />
+    <TypeScriptCompile Include="scripts\data.ts" />
     <Content Include="ui\controls\listboxbase.js">
       <DependentUpon>listboxbase.ts</DependentUpon>
     </Content>
-    <Content Include="ui\controls\listboxbase.ts" />
+    <TypeScriptCompile Include="ui\controls\listboxbase.ts" />
     <Content Include="scripts\data.js">
       <DependentUpon>data.ts</DependentUpon>
     </Content>
-    <Content Include="scripts\dates.ts" />
-    <Content Include="ui\controls\datepicker.ts" />
+    <TypeScriptComplie Include="scripts\dates.ts" />
+    <TypeScriptCompile Include="ui\controls\datepicker.ts" />
     <Content Include="ui\controls\datepicker.js">
       <DependentUpon>datepicker.ts</DependentUpon>
     </Content>
@@ -343,32 +413,32 @@
     <Content Include="scripts\cz.js">
       <DependentUpon>cz.ts</DependentUpon>
     </Content>
-    <Content Include="scripts\settings.ts" />
-    <Content Include="scripts\cz.ts" />
-    <Content Include="scripts\service.ts" />
+    <TypeScriptCompile Include="scripts\settings.ts" />
+    <TypeScriptCompile Include="scripts\cz.ts" />
+    <TypeScriptCompile Include="scripts\service.ts" />
     <Content Include="scripts\external\flash_detect.js" />
     <Content Include="scripts\external\jquery.cookie.js" />
     <Content Include="scripts\external\jquery.signalR-1.0.0-rc2.js" />
     <Content Include="scripts\external\rx.jQuery.js" />
     <Content Include="scripts\external\rx.js" />
-    <Content Include="scripts\gestures.ts" />
-    <Content Include="scripts\layout.ts" />
-    <Content Include="scripts\search.ts" />
-    <Content Include="scripts\timescale.ts" />
-    <Content Include="scripts\tours.ts" />
+    <TypeScriptCompile Include="scripts\gestures.ts" />
+    <TypeScriptCompile Include="scripts\layout.ts" />
+    <TypeScriptCompile Include="scripts\search.ts" />
+    <TypeScriptCompile Include="scripts\timescale.ts" />
+    <TypeScriptCompile Include="scripts\tours.ts" />
     <Content Include="scripts\typings\jqueryui\jqueryui.d.ts" />
     <Content Include="scripts\typings\jquery\jquery.d.ts" />
     <Content Include="scripts\typings\rx.js\rx.js.d.ts" />
     <Content Include="scripts\uiloader.js">
       <DependentUpon>uiloader.ts</DependentUpon>
     </Content>
-    <Content Include="scripts\uiloader.ts" />
-    <Content Include="scripts\urlnav.ts" />
-    <Content Include="scripts\vccontent.ts" />
-    <Content Include="scripts\viewport.ts" />
-    <Content Include="scripts\viewport-animation.ts" />
-    <Content Include="scripts\viewport-controller.ts" />
-    <Content Include="scripts\virtual-canvas.ts" />
+    <TypeScriptCompile Include="scripts\uiloader.ts" />
+    <TypeScriptCompile Include="scripts\urlnav.ts" />
+    <TypeScriptCompile Include="scripts\vccontent.ts" />
+    <TypeScriptCompile Include="scripts\viewport.ts" />
+    <TypeScriptCompile Include="scripts\viewport-animation.ts" />
+    <TypeScriptCompile Include="scripts\viewport-controller.ts" />
+    <TypeScriptCompile Include="scripts\virtual-canvas.ts" />
     <Compile Include="ACS\Hrd\HrdClient.cs" />
     <Compile Include="ACS\Hrd\HrdRequest.cs" />
     <Compile Include="ACS\Models\HrdIdentityProvider.cs" />
@@ -380,26 +450,26 @@
     <Content Include="samples\custom-form\form-example.js">
       <DependentUpon>form-example.ts</DependentUpon>
     </Content>
-    <Content Include="samples\custom-form\form-example.ts" />
+    <TypeScriptCompile Include="samples\custom-form\form-example.ts" />
     <Content Include="samples\custom-form\main.html" />
     <Content Include="samples\custom-listbox\listbox-example.html" />
     <Content Include="samples\custom-listbox\listbox-example.js">
       <DependentUpon>listbox-example.ts</DependentUpon>
     </Content>
-    <Content Include="samples\custom-listbox\listbox-example.ts" />
+    <TypeScriptCompile Include="samples\custom-listbox\listbox-example.ts" />
     <Content Include="samples\custom-listbox\main.html" />
     <Content Include="samples\datepicker.html" />
     <Content Include="ui\auth-edit-exhibit-form.html" />
-    <Content Include="ui\auth-edit-exhibit-form.ts" />
+    <TypeScriptCompile Include="ui\auth-edit-exhibit-form.ts" />
     <Content Include="ui\auth-edit-exhibit-form.js">
       <DependentUpon>auth-edit-exhibit-form.ts</DependentUpon>
     </Content>
     <Content Include="ui\auth-edit-contentitem-form.html" />
-    <Content Include="ui\auth-edit-contentitem-form.ts" />
+    <TypeScriptCompile Include="ui\auth-edit-contentitem-form.ts" />
     <Content Include="ui\auth-edit-contentitem-form.js">
       <DependentUpon>auth-edit-contentitem-form.ts</DependentUpon>
     </Content>
-    <Content Include="ui\auth-edit-timeline-form.ts" />
+    <TypeScriptCompile Include="ui\auth-edit-timeline-form.ts" />
     <Content Include="ui\auth-edit-timeline-form.js">
       <DependentUpon>auth-edit-timeline-form.ts</DependentUpon>
     </Content>
@@ -408,38 +478,42 @@
     <Content Include="ui\contentitem-listbox.js">
       <DependentUpon>contentitem-listbox.ts</DependentUpon>
     </Content>
-    <Content Include="ui\contentitem-listbox.ts" />
-    <Content Include="ui\auth-edit-tour-form.ts" />
+    <TypeScriptCompile Include="ui\contentitem-listbox.ts" />
+    <TypeScriptCompile Include="ui\auth-edit-tour-form.ts" />
     <Content Include="ui\controls\medialist.js">
       <DependentUpon>medialist.ts</DependentUpon>
     </Content>
-    <Content Include="ui\controls\medialist.ts" />
+    <TypeScriptCompile Include="ui\controls\medialist.ts" />
     <Content Include="ui\header-session-expired-form.js">
       <DependentUpon>header-session-expired-form.ts</DependentUpon>
     </Content>
-    <Content Include="ui\header-session-expired-form.ts" />
+    <TypeScriptCompile Include="ui\header-session-expired-form.ts" />
     <Content Include="ui\header-search-form.html" />
     <Content Include="ui\header-search-form.js">
       <DependentUpon>header-search-form.ts</DependentUpon>
     </Content>
-    <Content Include="ui\header-search-form.ts" />
+    <TypeScriptCompile Include="ui\header-search-form.ts" />
     <Content Include="ui\header-session-expired-form.html" />
     <Content Include="ui\mediapicker-form.html" />
     <Content Include="ui\mediapicker-form.js">
       <DependentUpon>mediapicker-form.ts</DependentUpon>
     </Content>
-    <Content Include="ui\mediapicker-form.ts" />
+    <TypeScriptCompile Include="ui\mediapicker-form.ts" />
     <Content Include="ui\media\bing-mediapicker.html" />
     <Content Include="ui\media\bing-mediapicker.js">
       <DependentUpon>bing-mediapicker.ts</DependentUpon>
     </Content>
-    <Content Include="ui\media\bing-mediapicker.ts" />
+    <TypeScriptCompile Include="ui\media\bing-mediapicker.ts" />
+    <Content Include="ui\media\skydrive-mediapicker.js">
+      <DependentUpon>skydrive-mediapicker.ts</DependentUpon>
+    </Content>
+    <TypeScriptCompile Include="ui\media\skydrive-mediapicker.ts" />
     <Content Include="ui\message-window.js">
       <DependentUpon>message-window.ts</DependentUpon>
     </Content>
-    <Content Include="ui\message-window.ts" />
+    <TypeScriptCompile Include="ui\message-window.ts" />
     <Content Include="ui\header-edit-form.html" />
-    <Content Include="ui\header-edit-form.ts" />
+    <TypeScriptCompile Include="ui\header-edit-form.ts" />
     <Content Include="ui\header-edit-form.js">
       <DependentUpon>header-edit-form.ts</DependentUpon>
     </Content>
@@ -447,17 +521,17 @@
     <Content Include="ui\header-login-form.js">
       <DependentUpon>header-login-form.ts</DependentUpon>
     </Content>
-    <Content Include="ui\header-login-form.ts" />
+    <TypeScriptCompile Include="ui\header-login-form.ts" />
     <Content Include="ui\header-logout-form.html" />
     <Content Include="ui\header-logout-form.js">
       <DependentUpon>header-logout-form.ts</DependentUpon>
     </Content>
-    <Content Include="ui\header-logout-form.ts" />
+    <TypeScriptCompile Include="ui\header-logout-form.ts" />
     <Content Include="ui\header-edit-profile-form.html" />
     <Content Include="ui\header-edit-profile-form.js">
       <DependentUpon>header-edit-profile-form.ts</DependentUpon>
     </Content>
-    <Content Include="ui\header-edit-profile-form.ts" />
+    <TypeScriptCompile Include="ui\header-edit-profile-form.ts" />
     <Content Include="favicon.ico" />
     <Content Include="images\background.jpg" />
     <Content Include="images\backgroundWithBlur.jpg" />
@@ -568,6 +642,11 @@
     </Content>
     <Content Include="css\Site.css" />
     <Content Include="ui\message-window.html" />
+    <TypeScriptCompile Include="ui\start-page.ts" />
+    <Content Include="ui\start-page.html" />
+    <Content Include="ui\start-page.js">
+      <DependentUpon>start-page.ts</DependentUpon>
+    </Content>
     <Content Include="ui\timeseries-data-form.html" />
     <TypeScriptCompile Include="ui\timeseries-data-form.ts" />
     <Content Include="ui\timeseries-data-form.js">
@@ -577,12 +656,12 @@
     <Content Include="ui\timeseries-graph-form.js">
       <DependentUpon>timeseries-graph-form.ts</DependentUpon>
     </Content>
-    <Content Include="ui\timeseries-graph-form.ts" />
+    <TypeScriptCompile Include="ui\timeseries-graph-form.ts" />
     <Content Include="ui\tour-caption-form.html" />
     <Content Include="ui\tour-caption-form.js">
       <DependentUpon>tour-caption-form.ts</DependentUpon>
     </Content>
-    <Content Include="ui\tour-caption-form.ts" />
+    <TypeScriptCompile Include="ui\tour-caption-form.ts" />
     <Content Include="ui\tour-listbox.html" />
     <TypeScriptCompile Include="ui\tour-listbox.ts" />
     <Content Include="ui\tour-listbox.js">
@@ -592,12 +671,12 @@
     <Content Include="ui\tourslist-form.js">
       <DependentUpon>tourslist-form.ts</DependentUpon>
     </Content>
-    <Content Include="ui\tourslist-form.ts" />
+    <TypeScriptCompile Include="ui\tourslist-form.ts" />
     <Content Include="ui\tourstop-listbox.html" />
     <Content Include="ui\tourstop-listbox.js">
       <DependentUpon>tourstop-listbox.ts</DependentUpon>
     </Content>
-    <Content Include="ui\tourstop-listbox.ts" />
+    <TypeScriptCompile Include="ui\tourstop-listbox.ts" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -622,7 +701,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="fonts\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -681,9 +760,21 @@
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PostBuildEvent>tsc -target ES5 --out "$(ProjectDir)cz.js" "$(ProjectDir)scripts\cz.ts"
+    <PostBuildEvent>tsc -target ES5 --out "$(ProjectDir)cz.js" "$(ProjectDir)scripts\cz.ts" "$(ProjectDir)scripts\plugins\error-plugin.ts"
       exit 0</PostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')"/>
+
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

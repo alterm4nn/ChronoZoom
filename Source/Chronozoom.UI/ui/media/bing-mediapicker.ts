@@ -42,9 +42,19 @@ module CZ {
                     form.close();
                 });
 
+                // Align search results on window resize.
+                var onWindowResize = () => mediaPicker.onWindowResize();
+
+                $(window).on("resize", onWindowResize);
+
+                $(form).on("closecompleted", event => {
+                    $(window).off("resize", onWindowResize);
+                });
+
                 form.show();
             }
 
+            private editContentItemForm: CZ.UI.FormEditCI;
             private container: JQuery;
             private contentItem: any;
 
@@ -58,20 +68,18 @@ module CZ {
                 this.container = container;
                 this.contentItem = context;
 
-                this.searchTextbox = this.container.find(".cz-form-search-input");
+                this.editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                this.searchTextbox = this.container.find(".cz-bing-search-input");
                 this.mediaTypeRadioButtons = this.container.find(":radio");
                 this.progressBar = this.container.find(".cz-form-progress-bar");
-                this.searchResultsBox = this.container.find(".cz-form-bing-search-results");
-                this.searchButton = this.container.find(".cz-form-search-button");
+                this.searchResultsBox = this.container.find(".cz-bing-search-results");
+                this.searchButton = this.container.find(".cz-bing-search-button");
 
                 this.initialize();
             }
 
             private initialize(): void {
                 this.progressBar.css("opacity", 0);
-                this.searchResultsBox.empty();
-                this.searchTextbox.val("");
-                this.mediaTypeRadioButtons.first().attr("checked", "true");
                 this.searchTextbox.off();
                 this.searchButton.off();
                 $(this).off();
@@ -96,10 +104,8 @@ module CZ {
             }
 
             private onSearchResultClick(mediaInfo: CZ.Media.MediaInfo): void {
-                // NOTE: Is there a better way to handle this? Possible solution: pass host form to Media List.
-                var editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
                 $.extend(this.contentItem, mediaInfo);
-                editContentItemForm.updateMediaInfo();
+                this.editContentItemForm.updateMediaInfo();
             }
 
             private getMediaType(): string {
@@ -107,17 +113,38 @@ module CZ {
             }
 
             private convertResultToMediaInfo(result: any, mediaType: string): CZ.Media.MediaInfo {
-                return <CZ.Media.MediaInfo> {
-                    uri: result.MediaUrl || result.Url,
-                    mediaType: mediaType,
-                    mediaSource: result.SourceUrl,
-                    attribution: result.SourceUrl
+                var mediaInfoMap = {
+                    image: <CZ.Media.MediaInfo> {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.SourceUrl,
+                        attribution: result.SourceUrl
+                    },
+                    video: <CZ.Media.MediaInfo> {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.MediaUrl,
+                        attribution: result.MediaUrl
+                    },
+                    pdf: <CZ.Media.MediaInfo> {
+                        uri: result.Url,
+                        mediaType: mediaType,
+                        mediaSource: result.Url,
+                        attribution: result.Url
+                    }
                 };
+                
+                return mediaInfoMap[mediaType];
             }
 
             private search(): void {
                 var query = this.searchTextbox.val();
                 var mediaType = this.getMediaType();
+
+                if (query.trim() === "") {
+                    return;
+                }
+
                 this.searchResultsBox.empty();
                 this.showProgressBar();
 
@@ -147,11 +174,17 @@ module CZ {
                         var result = response.d[i];
                         var resultContainer = this.createImageResult(result);
                         this.searchResultsBox.append(resultContainer);
+                        this.alignThumbnails();
                     }
+                }).fail(error => {
+                    this.hideProgressBar();
+                    this.showErrorMessage(error);
                 });
             }
 
             private searchVideos(query: string): void {
+                // NOTE: Only YouTube and Vimeo videos are supported.
+                query += " (+site:youtube.com OR +site:vimeo.com)";
                 CZ.Service.getBingVideos(query).done(response => {
                     this.hideProgressBar();
 
@@ -164,7 +197,11 @@ module CZ {
                         var result = response.d[i];
                         var resultContainer = this.createVideoResult(result);
                         this.searchResultsBox.append(resultContainer);
+                        this.alignThumbnails();
                     }
+                }).fail(error => {
+                    this.hideProgressBar();
+                    this.showErrorMessage(error);
                 });
             }
 
@@ -183,18 +220,32 @@ module CZ {
                         var resultContainer = this.createDocumentResult(result);
                         this.searchResultsBox.append(resultContainer);
                     }
+                }).fail(error => {
+                    this.hideProgressBar();
+                    this.showErrorMessage(error);
                 });
             }
 
             private createImageResult(result: any): JQuery {
+                // thumbnail size
+                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height,
+                    CZ.Settings.mediapickerImageThumbnailMaxWidth,
+                    CZ.Settings.mediapickerImageThumbnailMaxHeight
+                    );
+
+                // vertical offset to align image vertically
+                var imageOffset = (CZ.Settings.mediapickerImageThumbnailMaxHeight - rectangle.height) / 2;
+
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: rectangle.width,
+                    "data-actual-width": rectangle.width
                 });
 
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
 
                 var size = $("<div></div>", {
@@ -207,37 +258,61 @@ module CZ {
                     class: "cz-bing-result-description cz-lightgray",
                     text: result.DisplayUrl,
                     href: result.MediaUrl,
+                    title: result.DisplayUrl,
+                    "media-source": result.SourceUrl,
                     target: "_blank"
                 });
 
-                var thumbnail = $("<img></img>", {
-                    src: result.Thumbnail.MediaUrl,
-                    height: 183,
-                    width: 183 * result.Thumbnail.Width / result.Thumbnail.Height,
-                    class: "cz-bing-result-thumbnail"
+                var thumbnailContainer = $("<div></div>", {
+                    width: "100%",
+                    height: CZ.Settings.mediapickerImageThumbnailMaxHeight
                 });
 
-                thumbnail.add(title)
+                var thumbnail = $("<img></img>", {
+                    class: "cz-bing-result-thumbnail",
+                    src: result.Thumbnail.MediaUrl,
+                    height: rectangle.height,
+                    width: "100%"
+                });
+                thumbnail.css("padding-top", imageOffset + "px");
+
+                thumbnailContainer.add(title)
                     .add(size)
                     .click(event => {
                         $(this).trigger("resultclick", this.convertResultToMediaInfo(result, "image"));
                     });
 
-                return container.append(thumbnail)
+                thumbnailContainer.append(thumbnail);
+
+                return container.append(thumbnailContainer)
                     .append(title)
                     .append(size)
                     .append(url);
             }
 
             private createVideoResult(result: any): JQuery {
+                // Set default thumbnail if there is no any.
+                result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
+
+                // thumbnail size
+                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height,
+                    CZ.Settings.mediapickerVideoThumbnailMaxWidth,
+                    CZ.Settings.mediapickerVideoThumbnailMaxHeight
+                    );
+
+                // vertical offset to align image vertically
+                var imageOffset = (CZ.Settings.mediapickerVideoThumbnailMaxHeight - rectangle.height) / 2;
+
                 var container = $("<div></div>", {
                     class: "cz-bing-result-container",
-                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height
+                    width: rectangle.width,
+                    "data-actual-width": rectangle.width
                 });
 
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
 
                 var size = $("<div></div>", {
@@ -247,25 +322,34 @@ module CZ {
 
                 var url = $("<a></a>", {
                     class: "cz-bing-result-description cz-lightgray",
-                    text: result.DisplayUrl,
+                    text: result.MediaUrl,
                     href: result.MediaUrl,
+                    title: result.MediaUrl,
                     target: "_blank"
                 });
 
-                var thumbnail = $("<img></img>", {
-                    src: result.Thumbnail.MediaUrl,
-                    height: 140,
-                    width: 140 * result.Thumbnail.Width / result.Thumbnail.Height,
-                    class: "cz-bing-result-thumbnail"
+                var thumbnailContainer = $("<div></div>", {
+                    width: "100%",
+                    height: CZ.Settings.mediapickerVideoThumbnailMaxHeight
                 });
 
-                thumbnail.add(title)
+                var thumbnail = $("<img></img>", {
+                    class: "cz-bing-result-thumbnail",
+                    src: result.Thumbnail.MediaUrl,
+                    height: rectangle.height,
+                    width: "100%"
+                });
+                thumbnail.css("padding-top", imageOffset + "px");
+
+                thumbnailContainer.add(title)
                     .add(size)
                     .click(event => {
                         $(this).trigger("resultclick", this.convertResultToMediaInfo(result, "video"));
                     });
 
-                return container.append(thumbnail)
+                thumbnailContainer.append(thumbnail);
+
+                return container.append(thumbnailContainer)
                     .append(title)
                     .append(size)
                     .append(url);
@@ -279,7 +363,8 @@ module CZ {
 
                 var title = $("<div></div>", {
                     class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title
+                    text: result.Title,
+                    title: result.Title
                 });
 
                 var descr = $("<div></div>", {
@@ -292,6 +377,7 @@ module CZ {
                     class: "cz-bing-result-description cz-lightgray",
                     text: result.DisplayUrl,
                     href: result.Url,
+                    title: result.DisplayUrl,
                     target: "_blank"
                 });
 
@@ -320,6 +406,93 @@ module CZ {
 
             private showNoResults(): void {
                 this.searchResultsBox.text("No results.");
+            }
+
+            private createDefaultThumbnail() {
+                return {
+                    ContentType: "image/png",
+                    FileSize: 4638,
+                    Width: 500,
+                    Height: 500,
+                    MediaUrl: "/images/Temp-Thumbnail2.png"
+                };
+            }
+
+            private showErrorMessage(error: any): void {
+                var errorMessagesByStatus = {
+                    "400": "The search request is formed badly. Please contact developers about the error.",
+                    "403": "Please sign in to ChronoZoom to use Bing search.",
+                    "500": "We are sorry, but something went wrong. Please try again later."
+                };
+
+                var errorMessage = $("<span></span>", {
+                    class: "cz-red",
+                    text: errorMessagesByStatus[error.status]
+                });
+
+                this.searchResultsBox.append(errorMessage);
+            }
+
+            public onWindowResize() {
+                this.alignThumbnails();
+            }
+
+            public alignThumbnails() {
+                var container = this.searchResultsBox;
+                var elements = container.children();
+
+                if (elements.length === 0) {
+                    return;
+                }
+
+                var rowWidth = container.width(); // current width of search results row
+                var currentRow = { // current row
+                    elements: [],
+                    width: 0
+                };
+
+                for (var i = 0, len = elements.length; i < len; i++) {
+                    var curElement = $(elements[i]);
+                    var curElementActualWidth = +curElement.attr("data-actual-width");
+                    var curElementOuterWidth = curElement.outerWidth(true);
+                    var curElementInnerWidth = curElement.innerWidth();
+
+                    // next thumbnail exceed row width
+                    if (rowWidth < currentRow.width + curElementActualWidth) {
+                        var delta = rowWidth - currentRow.width; // available free space in row
+                        for (var j = 0, rowLen = currentRow.elements.length; j < rowLen; j++) {
+                            var rowElement = currentRow.elements[j];
+                            var rowElementActualWidth = +rowElement.attr("data-actual-width");
+                            rowElement.width(rowElementActualWidth + delta / rowLen);
+                        }
+                        currentRow.elements = [];
+                        currentRow.elements.push(curElement);
+                        // content width + margin + padding + border width
+                        currentRow.width = Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                    }
+                    // next thumbnail is within row width
+                    else {
+                        currentRow.elements.push(curElement);
+                        // content width + margin + padding + border width
+                        currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                    }
+                }
+            }
+
+            private fitThumbnailToContainer(aspectRatio, maxWidth, maxHeight) {
+                var maxAspectRatio = maxWidth / maxHeight;
+                var output = {
+                    width: maxHeight * aspectRatio,
+                    height: maxHeight
+                }
+
+                // doesn't fit in default rectangle
+                if (aspectRatio > maxAspectRatio) {
+                    output.width = maxWidth;
+                    output.height = maxWidth / aspectRatio;
+                }
+
+                return output;
             }
         }
     }

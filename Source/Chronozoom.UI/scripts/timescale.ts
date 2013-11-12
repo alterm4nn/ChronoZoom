@@ -697,7 +697,7 @@ module CZ {
                     return divPool[i];
                 }
                 else {
-                    var div = $("<div>" + inner + "</div>");
+                    var div: any = $("<div>" + inner + "</div>");
                     isUsedPool[len] = true;
                     divPool[len] = div;
                     inners[len] = inner;
@@ -817,11 +817,13 @@ module CZ {
             // maximum number of decimal digits
             var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4);
             // divide tick coordinate by level of cosmos zoom
-            text = -x / this.level;
+            text = Math.abs(x) / this.level;
+
             if (n < 0) {
                 text = (new Number(text)).toFixed(-n);
             }
-            text += " " + this.regime;
+
+            text += " " + (x < 0 ? this.regime : String(this.regime).charAt(0));
             return text;
         };
 
@@ -941,8 +943,16 @@ module CZ {
             var labelText;
             this.getRegime(range.min, range.max);
             var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
-            labelText = (-time / this.level).toFixed(Math.abs(numOfDigits));
-            labelText += " " + this.regime;
+            labelText = (Math.abs(time / this.level)).toFixed(Math.abs(numOfDigits));
+
+            var localPresent = CZ.Dates.getPresent();
+            var presentDate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+
+            if (time == presentDate) {
+                if (this.regime !== "ka") labelText = 0
+                else labelText = 2;
+            }
+            labelText += " " + (time < 0 ? this.regime : String(this.regime).charAt(0));
             return labelText;
         };
 
@@ -1095,17 +1105,27 @@ module CZ {
         };
 
         this.getMarkerLabel = function (range, time) {
+            var labelText: string = "";
+
             this.getRegime(range.min, range.max);
-            var labelText = parseFloat(new Number(time - this.firstYear).toFixed(2));
-            labelText += (labelText > 0 ? -0.5 : -1.5);
-            labelText = Math.round(labelText);
-            if (labelText < 0) labelText = -labelText;
-            else if (labelText == 0) labelText = 1;
+            var currentDate: number = parseFloat(new Number(time - this.firstYear).toFixed(2));
+            currentDate += currentDate > 0 ? -0.5 : -1.5;
+            currentDate = Math.round(currentDate);
+            if (currentDate < 0) {
+                currentDate = -currentDate;
+            }
+            else if (currentDate == 0) {
+                currentDate = 1;
+            }
+
+            labelText = currentDate.toString();
+
             if (time < this.firstYear + 1) {
                 labelText += " " + "BCE";
             } else {
                 labelText += " " + "CE";
             }
+
             return labelText;
         };
 
@@ -1353,7 +1373,7 @@ module CZ {
 
         this.getMarkerLabel = function (range, time) {
             this.getRegime(range.min, range.max);
-            var date = CZ.Dates.getYMDFromCoordinate(time);
+            var date = CZ.Dates.getYMDFromCoordinate(time,true);
             var labelText = date.year + "." + (date.month + 1) + "." + date.day;
             return labelText;
         };

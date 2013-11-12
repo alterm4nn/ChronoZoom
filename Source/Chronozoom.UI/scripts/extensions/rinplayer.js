@@ -3,12 +3,13 @@ var CZ;
     (function (Extensions) {
         (function (RIN) {
             function getScript() {
-                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js";
+                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/lib/rin-core-1.0.js";
             }
             RIN.getScript = getScript;
+
             function getExtension(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload) {
                 var rinDiv;
-                if(!rinDiv) {
+                if (!rinDiv) {
                     rinDiv = document.createElement('div');
                     rinDiv.setAttribute("id", id);
                     rinDiv.setAttribute("class", "rinPlayer");
@@ -16,11 +17,14 @@ var CZ;
                     rinDiv.addEventListener("mousedown", CZ.Common.preventbubble, false);
                     rinDiv.addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
                     rinDiv.addEventListener("mousewheel", CZ.Common.preventbubble, false);
-                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/').then(function () {
+
+                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/').then(function () {
                         var playerElement = document.getElementById(id);
                         var playerControl = rin.getPlayerControl(rinDiv);
-                        var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
-                        playerControl.load(contentSource);
+                        if (playerControl) {
+                            var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
+                            playerControl.load(contentSource);
+                        }
                     });
                 } else {
                     rinDiv.isAdded = false;
@@ -28,21 +32,24 @@ var CZ;
                 return new RINPlayer(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload, rinDiv);
             }
             RIN.getExtension = getExtension;
+
             function RINPlayer(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload, rinDiv) {
                 this.base = CZ.VCContent.CanvasDomItem;
                 this.base(vc, layerid, id, vx, vy, vw, vh, z);
                 this.initializeContent(rinDiv);
+
                 this.onRemove = function () {
                     var rinplayerControl = rin.getPlayerControl(rinDiv);
-                    if(rinplayerControl) {
+                    if (rinplayerControl) {
                         rinplayerControl.pause();
-                        if(rinplayerControl.unload) {
+                        if (rinplayerControl.unload) {
                             rinplayerControl.unload();
                         }
                         rinplayerControl = null;
                     }
                     this.prototype.onRemove.call(this);
                 };
+
                 this.prototype = new CZ.VCContent.CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
             }
         })(Extensions.RIN || (Extensions.RIN = {}));

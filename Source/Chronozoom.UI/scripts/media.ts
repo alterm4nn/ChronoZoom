@@ -1,9 +1,10 @@
 /// <reference path='uiloader.ts'/>
 /// <reference path='../ui/media/bing-mediapicker.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 /// <reference path='typings/jquery/jquery.d.ts'/>
-
 module CZ {
     export module Media {
+        declare var WL: any;
 
         export interface MediaInfo {
             uri: string;
@@ -22,8 +23,8 @@ module CZ {
         var _mediaPickers: any = {};
         var _mediaPickersViews: any = {};
 
-        declare export var mediaPickers: any;
-        declare export var mediaPickersViews: any;
+        export declare var mediaPickers: any;
+        export declare var mediaPickersViews: any;
         Object.defineProperties(CZ.Media, {
             mediaPickers: {
                 get: () => {
@@ -41,13 +42,28 @@ module CZ {
             // TODO: Register media pickers. The order is essential for MediaList.
             registerMediaPicker(
                 "bing",
-                "/images/media/bing-icon.png",
-                "/ui/media/bing-mediapicker.html",
-                CZ.Media.BingMediaPicker
+                "/images/media/bing-import-50x150.png",
+                CZ.Media.BingMediaPicker,
+                "/ui/media/bing-mediapicker.html"
             );
+
+            if (CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                registerMediaPicker(
+                    "skydrive",
+                    "/images/media/skydrive-import-50x150.png",
+                    CZ.Media.SkyDriveMediaPicker
+                ).done(() => {
+                    WL.init({
+                        client_id: CZ.Settings.WLAPIClientID,
+                        redirect_uri: CZ.Settings.WLAPIRedirectUrl,
+                        response_type: "token",
+                        scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
+                    });
+                });
+            }
         }
 
-        export function registerMediaPicker(title: string, iconUrl: string, viewUrl: string, type: any, selector?: string): JQueryPromise {
+        export function registerMediaPicker(title: string, iconUrl: string, type: any, viewUrl?: string, selector?: string): any {
             var order = Object.keys(_mediaPickers).length;
             var setup = type.setup;
             selector = selector || "$('<div></div>')";

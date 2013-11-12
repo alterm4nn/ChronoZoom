@@ -27,7 +27,7 @@ namespace Application.Helper.Helpers
             string preloadedFileName =
                 GetText(
                     By.XPath(String.Format(
-                        "//*[@id='existingTimeSeries']/li[{0}]//a[@class='cz-form-preloadedrecord']",
+                        "//*[@id='existingTimeSeries']/li[{0}]//a[@class='cz-form-preloadedrecord'][2]",
                         preloadedFileNumber)));
             Logger.Log("-> file name: " + preloadedFileName);
             return preloadedFileName;
@@ -53,7 +53,7 @@ namespace Application.Helper.Helpers
         public void CloseUploadFileForm()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='timeSeriesDataForm']//li[@class='cz-form-close-btn']"));
+            Click(By.CssSelector("#timeSeriesDataForm li.cz-form-close-btn"));
             Logger.Log("->");
         }
 
@@ -85,7 +85,7 @@ namespace Application.Helper.Helpers
 
         private void ClickPreloadedFile(int preloadedFileNumber)
         {
-            string xpath = String.Format("//*[@id='existingTimeSeries']/li[{0}]/a[@class='cz-form-btn']",
+            string xpath = String.Format("//*[@id='existingTimeSeries']/li[{0}]//a[@class='cz-form-preloadedrecord'][1]",
                                          preloadedFileNumber);
             Click(By.XPath(xpath));
         }

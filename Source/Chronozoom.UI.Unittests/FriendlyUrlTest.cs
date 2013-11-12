@@ -11,11 +11,35 @@ namespace Chronozoom.UI.Test
         [TestMethod]
         public void TestUI_FriendlyUrl_EncodesCorrectly()
         {
-            string originalUrl = "with space";
-            string expectedUrl = "with-space";
+            const string originalUrl = "with space";
+            const string expectedUrl = "with+space";
             string encodedUrl = FriendlyUrl.FriendlyUrlEncode(originalUrl);
 
             Assert.AreEqual(expectedUrl, encodedUrl, "Unexpected encoding");
+        } 
+        
+        [TestMethod]
+        public void TestUI_FriendlyUrl_Encode_Null_Value_Correctly()
+        {
+            string encodedUrl = FriendlyUrl.FriendlyUrlEncode(null);
+            Assert.IsNull(encodedUrl, "Unexpected encoding");
+        }    
+        
+        [TestMethod]
+        public void TestUI_FriendlyUrl_Decode_Null_Value_Correctly()
+        {
+            string encodedUrl = FriendlyUrl.FriendlyUrlDecode(null);
+            Assert.IsNull(encodedUrl, "Unexpected encoding");
         }
+
+        [TestMethod]
+        public void TestUI_FriendlyUrl_DecodesCorrectly()
+        {
+            const string expectedUrl = "100% true";
+            const string originalUrl = "100%%20true";
+            string encodedUrl = FriendlyUrl.FriendlyUrlDecode(originalUrl);
+
+            Assert.AreEqual(expectedUrl, encodedUrl, "Unexpected encoding");
+        } 
     }
 }

@@ -5,9 +5,15 @@ module CZ {
         
         export function loadHtml(selector, filepath) {
             var container = $(selector);
-            var promise = new $.Deferred();
+            var promise = $.Deferred();
 
-            if (!selector || !filepath || !container.length) {
+            // NOTE: Allow undefined filepath. The method will return initial container.
+            if (!filepath) {
+                promise.resolve(container);
+                return promise;
+            }
+            
+            if (!selector || !container.length) {
                 throw "Unable to load " + filepath + " " + selector;
             }
 

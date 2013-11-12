@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="xslcon.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="apicon.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="MemberPath" Type="System.String" Scope="Application">
@@ -11,14 +11,8 @@
     <Setting Name="MemberClass" Type="System.String" Scope="Application">
       <Value Profile="(Default)">M:Chronozoom.UI.IChronozoomSVC.</Value>
     </Setting>
-    <Setting Name="MemberRgx" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">M:Chronozoom\.UI\.IChronozoomSVC\.\w*</Value>
-    </Setting>
     <Setting Name="EntityTypeClass" Type="System.String" Scope="Application">
       <Value Profile="(Default)">T:Chronozoom.Entities.</Value>
-    </Setting>
-    <Setting Name="EntityTypeRgx" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">T:Chronozoom\.Entities\.\w*</Value>
     </Setting>
     <Setting Name="EntityPropClass" Type="System.String" Scope="Application">
       <Value Profile="(Default)">P:Chronozoom.Entities.</Value>
@@ -27,7 +21,20 @@
       <Value Profile="(Default)">C:\Users\v-wfren\Documents\GitHub\ChronoZoom\Doc\Chronozoom_REST_API_top.md</Value>
     </Setting>
     <Setting Name="OutFile" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">C:\Users\v-wfren\Documents\GitHub\docteam\xslcon\xslcon\output\ChronoZoom_REST_API.md</Value>
+      <Value Profile="(Default)">C:\Users\v-wfren\Documents\GitHub\ChronoZoom\Doc\tools\apicon\apicon\output\ChronoZoom_REST_API.md</Value>
+    </Setting>
+    <Setting Name="OutFile2" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\Users\v-wfren\Documents\GitHub\ChronoZoom\Doc\ChronoZoom_REST_API.md</Value>
+    </Setting>
+    <Setting Name="ExcludeList" Type="System.Collections.Specialized.StringCollection" Scope="Application">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;string&gt;entityPropRgx&lt;/string&gt;
+  &lt;string&gt;RemoveRITree&lt;/string&gt;
+  &lt;string&gt;AddRITreeWithIndex&lt;/string&gt;
+  &lt;string&gt;Properties.Resources&lt;/string&gt;
+  &lt;string&gt;RemoveBetaFields&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
     </Setting>
   </Settings>
 </SettingsFile>

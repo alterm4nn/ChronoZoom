@@ -17,11 +17,10 @@ namespace Application.Driver
         private readonly DesiredCapabilities _capability;
         readonly string _browserName = Configuration.BrowserName;
         readonly bool _isUsingGrid = Configuration.IsUsingGrid;
-        private static string _webDriversDirectory;
+        private const string WebDriversDirectory = ".";
 
         internal Environment()
         {
-            _webDriversDirectory = Directory.Exists(WebDriverDirectories.WebDriversDirectoryCommandLineRun) ? WebDriverDirectories.WebDriversDirectoryCommandLineRun : WebDriverDirectories.WebDriversDirectoryVsRun;
             string browserVersion = Configuration.BrowserVersion;
             string platform = Configuration.Platform;
             _capability = new DesiredCapabilities(_browserName, browserVersion, new Platform(NormalizePlatformName(platform)));
@@ -38,7 +37,7 @@ namespace Application.Driver
 
                     if (!_isUsingGrid)
                     {
-                        _driver = new ChromeDriver(_webDriversDirectory, chromeOptions);
+                        _driver = new ChromeDriver(WebDriversDirectory, chromeOptions);
                     }
                     else
                     {
@@ -59,7 +58,7 @@ namespace Application.Driver
                         {
                             EnableNativeEvents = true
                         };
-                        _driver = new InternetExplorerDriver(_webDriversDirectory,internetExplorerOptions);
+                        _driver = new InternetExplorerDriver(WebDriversDirectory,internetExplorerOptions);
                         _driver.Manage().Window.Maximize();
                     }
                     break;

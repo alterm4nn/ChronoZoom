@@ -41,8 +41,8 @@ module CZ {
                 coord = (year > -1) ? year : year + 1;
 
             // Get the number of day in the year.
-            var sumDaysOfMonths = function (s, d, i) {
-                return s + (i < month) * d;
+            var sumDaysOfMonths = function (s: any, d: any, i: any): number {
+                return s + +(i < month) * d;
             }
             var days = daysInMonth.reduce(sumDaysOfMonths, +(isLeap && month > 1)) + day;
 
@@ -53,7 +53,7 @@ module CZ {
             return coord;
         }
 
-        export function getYMDFromCoordinate(coord) {
+        export function getYMDFromCoordinate(coord, MarkerCorrection = false) {
             var absCoord = Math.abs(coord),
                 floorCoord = Math.floor(coord),
                 sign = (coord === 0) ? 1 : coord / absCoord,
@@ -68,6 +68,7 @@ module CZ {
             //       in case of the last day in a year. Do not increment day in
             //       in this case.
             day = Math.round(daysFraction * daysInYear);
+            if (MarkerCorrection) day = Math.floor(daysFraction * daysInYear);
             day += +(day < daysInYear);
 
             // Evaluate day and month of the year.

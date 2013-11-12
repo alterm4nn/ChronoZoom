@@ -54,9 +54,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiTests\FavoritesTests.cs" />
+    <Compile Include="AuthoringSkyDriveTests.cs" />
     <Compile Include="AuthoringTests.cs" />
+    <Compile Include="AuthoringTour.cs" />
     <Compile Include="AuthorizationTests.cs" />
     <Compile Include="BibliographyTests.cs" />
+    <Compile Include="BingSearchTests.cs" />
+    <Compile Include="RandomDataTimelineTests.cs" />
+    <Compile Include="RandomDataExhibitsTests.cs" />
     <Compile Include="ExhibitsTests.cs" />
     <Compile Include="FooterTests.cs" />
     <Compile Include="PhanerozoicAgeTests.cs" />
@@ -88,15 +94,24 @@
       <Project>{5bdf5dc6-03b4-4a08-8861-51ebaf9742de}</Project>
       <Name>Application.Helper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GitHubIssueWatcher\GitHubIssueWatcher.csproj">
+      <Project>{0b6ab4d8-f0f4-4bf2-9629-1f9feac0d9a1}</Project>
+      <Name>GitHubIssueWatcher</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RandomDataGenerator\RandomDataGenerator.csproj">
+      <Project>{3703ca82-5bef-42ec-ba7c-a6ff5a3e91fc}</Project>
+      <Name>RandomDataGenerator</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PreBuildEvent>copy "..\..\TimeSeriesFiles\*" "$(TargetDir)" /y
-</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

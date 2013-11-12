@@ -14,7 +14,7 @@ module CZ {
         }
 
         export class FormEditTimeline extends CZ.UI.FormUpdateEntity {
-            private saveButton: JQuery;
+            public saveButton: JQuery;
             private deleteButton: JQuery;
             private startDate: CZ.UI.DatePicker;
             private endDate: CZ.UI.DatePicker;
@@ -22,7 +22,7 @@ module CZ {
             private errorMessage: JQuery;
 
             private timeline: any;
-            private isCancel: bool;
+            private isCancel: boolean;
 
             // We only need to add additional initialization in constructor.
             constructor(container: JQuery, formInfo: IFormEditTimelineInfo) {
@@ -40,6 +40,10 @@ module CZ {
                 this.saveButton.off();
                 this.deleteButton.off();
 
+                this.titleInput.focus(() => {
+                    this.titleInput.hideError();
+                });
+
                 this.initialize();
             }
 
@@ -54,6 +58,12 @@ module CZ {
                     this.deleteButton.show();
                     this.titleTextblock.text("Edit Timeline");
                     this.saveButton.text("update timeline");
+                }
+                else if (CZ.Authoring.mode === "createRootTimeline") {
+                    this.deleteButton.hide();
+                    this.closeButton.hide();
+                    this.titleTextblock.text("Create Root Timeline");
+                    this.saveButton.text("create timeline");
                 }
                 else {
                     console.log("Unexpected authoring mode in timeline form.");
@@ -73,17 +83,15 @@ module CZ {
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
                 this.saveButton.click(event => {
-                    
-                    this.startDate.setDate("d");
-                    var result = this.startDate.getDate();
                     this.errorMessage.empty();
                     var isDataValid = false;
                     isDataValid = CZ.Authoring.validateTimelineData(this.startDate.getDate(), this.endDate.getDate(), this.titleInput.val());
                     // Other cases are covered by datepicker
                     if (!CZ.Authoring.isNotEmpty(this.titleInput.val())) {
-                        this.errorMessage.text('Title is empty');
+                        this.titleInput.showError("Title can't be empty");
                     }
-                    else if (!CZ.Authoring.isIntervalPositive(this.startDate.getDate(), this.endDate.getDate())) {
+
+                    if (!CZ.Authoring.isIntervalPositive(this.startDate.getDate(), this.endDate.getDate())) {
                         this.errorMessage.text('Time interval should no less than one day');
                     }      
                     
@@ -109,10 +117,10 @@ module CZ {
                             },
                             function (error) {
                                 if (error !== undefined && error !== null) {
-                                    self.errorMessage.text(error);
+                                    self.errorMessage.text(error).show().delay(7000).fadeOut();
                                 }
                                 else {
-                                    alert("Unable to save changes. Please try again later.");
+                                    self.errorMessage.text("Sorry, internal server error :(").show().delay(7000).fadeOut();
                                 }
                                 console.log(error);
                             }
@@ -124,6 +132,7 @@ module CZ {
 
                 this.deleteButton.click(event => {
                     if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
+                        var isDataValid = true;
                         CZ.Authoring.removeTimeline(this.timeline);
                         this.close();
                     }
@@ -150,6 +159,7 @@ module CZ {
                     complete: () => {
                         this.endDate.remove();
                         this.startDate.remove();
+                        this.titleInput.hideError();
                     }
                 });
 

@@ -1,5 +1,13 @@
-﻿module CZ {
+﻿/// <reference path='typings/jquery/jquery.d.ts'/>
+
+module CZ {
     export module Settings {
+        export var isAuthorized = false; // user is authorized flag
+        export var userSuperCollectionName = "";
+        export var userCollectionName = "";
+
+        export var favoriteTimelines = []; // guids of favorite timelines of current user
+
         export var czDataSource = 'db'; // possible values: db, relay, dump
         // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
         
@@ -224,5 +232,18 @@
         // Bing search API constants
         export var defaultBingSearchTop = 50; // the number of the results to return
         export var defaultBingSearchSkip = 0; // offset requested for the srarting point of returned results
+
+        // Authoring mediapicker constants
+        export var mediapickerImageThumbnailMaxWidth = 240; // the max allowed width of thumbnail
+        export var mediapickerImageThumbnailMaxHeight = 155; // the max allowed height of thumbnail
+
+        export var mediapickerVideoThumbnailMaxWidth = 190; // the max allowed width of thumbnail
+        export var mediapickerVideoThumbnailMaxHeight = 130; // the max allowed height of thumbnail
+
+        // WL API constants
+        export var WLAPIClientID = "0000000040101FFA";
+        export var WLAPIRedirectUrl = "http://test.chronozoom.com/";
+
+        export var errorMessageSlideDuration = 0; // slide animation duration of input error messages
     }
 }

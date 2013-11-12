@@ -7,18 +7,20 @@ namespace Tests
     {
         #region Initialize and Cleanup
         public TestContext TestContext { get; set; }
+        private static string _homePageTitle;
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
         {
-
+            BrowserStateManager.RefreshState();
+            HomePageHelper.OpenPage();
+            _homePageTitle = HomePageHelper.GetTitle();
         }
 
         [TestInitialize]
         public void TestInitialize()
         {
-            BrowserStateManager.RefreshState();
-            NavigationHelper.OpenHomePage();
+
         }
 
         [ClassCleanup]
@@ -30,36 +32,42 @@ namespace Tests
         public void TestCleanup()
         {
             CreateScreenshotsIfTestFail(TestContext);
+            HomePageHelper.CloseAllTabsButThis(_homePageTitle);
         }
 
         #endregion
+
         [TestMethod]
         public void HelpLink()
         {
+            const string title = "User Guide – ChronoZoom Project";
             HomePageHelper.OpenHelpLink();
-            Assert.AreEqual("User Guide – ChronoZoom Project", HomePageHelper.GetTitle());
-            Assert.AreEqual("http://join.chronozoom.com/user-guide/", HomePageHelper.GetUrl());
+            Assert.AreEqual(title, HomePageHelper.GetNewTabTitle(title));
         }
 
         [TestMethod]
         public void FeedbackLink()
         {
+            const string title = "Forum: Discuss - ChronoZoom Project";
             HomePageHelper.OpenFeedbackLink();
-            Assert.AreEqual("Forum: Discuss - ChronoZoom Project", HomePageHelper.GetTitle());
+            Assert.AreEqual(title, HomePageHelper.GetNewTabTitle(title));
+
         }
 
         [TestMethod]
         public void NoticeLink()
         {
+            const string title = "Notices – ChronoZoom Project";
             HomePageHelper.OpenNoticeLink();
-            Assert.AreEqual("Notices – ChronoZoom Project", HomePageHelper.GetTitle());
+            Assert.AreEqual(title, HomePageHelper.GetNewTabTitle(title));
         }
 
         [TestMethod]
         public void DevelopersLink()
         {
+            const string title = "Develop – ChronoZoom Project";
             HomePageHelper.OpenDevelopersLink();
-            Assert.AreEqual("Develop – ChronoZoom Project", HomePageHelper.GetTitle());
+            Assert.AreEqual(title, HomePageHelper.GetNewTabTitle(title));
         }
 
     }

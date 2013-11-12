@@ -1,0 +1,813 @@
+﻿body {
+}
+
+@import "_colors";
+@import "_mixins";
+
+// TODO: Move these variable to external files;
+@bg-purple: #505068;
+@border-blue-thin: 1px solid #00BCE0;
+@border-transparent-thin: 1px solid transparent;
+@text-blue: #00BCE0;
+@text-white: #FFFFFF;
+@text-gray: #B0B0B0;
+
+@img-arrow-left-icon: url(/images/arrow-left.png);
+@img-arrow-left-icon-hover: url(/images/arrow-left-hover.png);
+@img-arrow-right-icon: url(/images/arrow-right.png);
+@img-arrow-right-icon-hover: url(/images/arrow-right-hover.png);
+
+@sp-welcome-link-height: 65px;
+@sp-list-view-icon-size: 36px;
+@sp-block-header-height: 74px;
+@sp-welcome-header-font-size: 34px;
+@sp-welcome-text-font-size: 18px;
+@sp-welcome-link-font-size: 22px;
+@sp-block-header-font-size: 26px;
+
+// Mixin for start page text link.
+.start-page-text-link(@default, @hover) {
+    text-decoration: none;
+
+    &:link,
+    &:active,
+    &:visited {
+        color: @default;
+    }
+
+    &:hover {
+        color: @hover;
+    }
+}
+
+.start-page-screen {
+    display: none;
+    position: absolute;
+    top: 35px;
+    bottom: 25px;
+    left: 0;
+    right: 0;
+    width:100.1%;
+    cursor: default;        
+    overflow: hidden;
+    z-index: 1000;
+    background: url(/images/background.jpg) no-repeat;
+    background-size: cover;
+    font-family: "Segoe UI Light";
+    font-weight: lighter;
+    min-width: 700px;
+
+    h1, h2, h3 {
+        margin: 0;
+        font-weight: lighter;
+    }
+}
+
+.ContentContainer {
+    position: relative;
+    margin: 0 auto;
+    height: 100%;
+}
+
+.FTList {
+    display: none;
+    color: white;
+}
+
+.cleardiv {
+    clear: both;
+    width: 100%;
+    height: 5px;
+}
+
+.bigcleardiv {
+    clear: both;
+    width: 100%;
+    height: 25px;
+}
+
+.li-title {
+    float: left;
+    text-align: left;
+    width: 66.3333%;
+    a:hover {
+      color:#00BADE;  
+    }
+}
+
+.li-author {
+    float: left;
+    text-align: right;
+    width: 33.3333%;
+    &:hover {
+      color:#00BADE;  
+    }
+}
+
+.li-icon {
+    float: left;
+    width: 33.3333%;
+}
+
+.boxInner {
+    background-color: #313131;
+    border-top: 3px #666 solid;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.tile-photo {
+    .box-sizing;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-image: url('../images/default-tile.png');
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+
+.tile-gradient {
+
+    background: -moz-linear-gradient(top, rgba(53,53,53,0.9) 0%, rgba(53,53,53,0.8) 45%, rgba(53,53,53,0) 100%); 
+    background: -moz-linear-gradient(top, rgba(53,53,53,0.9) 0%, rgba(53,53,53,0.8) 45%, rgba(53,53,53,0) 100%); 
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(53,53,53,0.9)), color-stop(45%,rgba(53,53,53,0.8)), color-stop(100%,rgba(53,53,53,0)));
+    background: -webkit-linear-gradient(top, rgba(53,53,53,0.9) 0%,rgba(53,53,53,0.8) 45%,rgba(53,53,53,0) 100%); 
+    background: -o-linear-gradient(top, rgba(53,53,53,0.9) 0%,rgba(53,53,53,0.8) 45%,rgba(53,53,53,0) 100%); 
+    background: -ms-linear-gradient(top, rgba(53,53,53,0.9) 0%,rgba(53,53,53,0.8) 45%,rgba(53,53,53,0) 100%); 
+    background: linear-gradient(to bottom, rgba(53,53,53,0.9) 0%,rgba(53,53,53,0.8) 45%,rgba(53,53,53,0) 100%); 
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='rgba(53,53,53,0.9)', endColorstr='rgba(53,53,53,0)',GradientType=0 );
+    
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+    .tile-gradient img {
+        width: 100%;
+        height: 100%;
+    }
+
+.tile-meta {
+    padding: 5%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.tweet-meta {
+    .transition(opacity @fade-duration ease-in-out, visibility @fade-duration ease-in-out);
+    height: 100%;
+    overflow: visible;
+    padding: 5%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.tile-meta-title {
+    font-weight: bold;
+    color: #FFF;
+    font-size: 14px;
+    display: block;
+}
+
+.tweet-meta-title {
+    float: left;
+    font-weight: bold;
+    color: #FFF;
+    font-size: 13px;
+    display: block;
+}
+
+.tile-meta-author {
+    font-weight: normal;
+    color: #999;
+    font-size: 12px;
+}
+
+.tweet-avatar-icon {
+    float: left;
+    height: 35px;
+    width: 35px;
+}
+
+.tweet-icon {
+    float: right;
+    margin: 3px;
+    background-image: url('../images/icon_twitter.png');
+    height: 14px;
+    width: 17px;
+}
+
+.tweet-meta-author {
+    .start-page-text-link(@text-blue, @text-white);
+
+    font-weight: normal;
+    font-size: 12px;
+    color: #10A5C6;
+    display: block;
+}
+
+.tile-meta-time {
+    display: inline-block;
+    font-size: 12px;
+    color: #B0B0B0;
+    float: right;
+}
+
+.twitter-time-container {
+    position:absolute;
+    margin:5px;
+    bottom:15px;
+    left:5px;
+    right:5px;
+    border-top: 1px #666 solid;
+}
+
+.tile-meta-text {
+    font-weight: normal;
+    color: #B0B0B0;
+    font-size: 12px;
+    display: block;
+}
+
+.tweet-meta-text {
+    .start-page-text-link(@text-gray, @text-white);
+
+    font-weight: normal;
+    color: #B0B0B0;
+    font-size: 12px;
+    display: block;
+    overflow: hidden;
+    height:65px;
+}
+
+.welcome-block-toggle {
+    .toggle-block {
+        &[data-toggle~="show"] {
+            display: block;
+        }
+
+        &[data-toggle~="hide"] {
+            display: none;
+        }
+    }
+}
+
+    .toggle-block {
+        &[data-toggle~="show"] {
+            display: block;
+        }
+
+        &[data-toggle~="hide"] {
+            display: none;
+        }
+    }
+
+.WelcomeBlock {
+    .box-sizing;
+    color: white;
+    overflow: hidden;
+
+    .welcome-box-1 {
+        margin-top: 3px;
+        text-align: bottom;
+
+        h1 {
+            font-size: @sp-welcome-header-font-size;
+            margin: 10px 0 35px;
+        }
+    }
+
+    .welcome-box-2 {
+        font-size: @sp-welcome-text-font-size;
+
+        .welcome-link {
+            color: @text-blue;
+            padding: 0 30px;
+            height: @sp-welcome-link-height;
+            border: @border-transparent-thin;
+            line-height: @sp-welcome-link-height;
+            font-size: @sp-welcome-link-font-size;
+
+            &:hover {
+                border: @border-blue-thin;
+                background: @img-arrow-right-icon-hover no-repeat 95% center fade(@bg-purple, 70%);
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.welcome-link {
+    color:#03A1BF;
+}
+
+.block-header {
+    color: white;
+    border-top: 3px #666 solid;
+    text-align: left;
+
+    .header-text {
+        font-size: @sp-block-header-font-size;
+        line-height: @sp-block-header-height;
+    }
+ }
+
+.list-view-icon
+{
+    float: right;
+    width: @sp-list-view-icon-size;
+    height: @sp-list-view-icon-size;
+    background-image: @img-arrow-right-icon;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: ((@sp-block-header-height - @sp-list-view-icon-size) / 2) 0;
+    cursor: pointer;
+
+    &:hover {
+        background-image: @img-arrow-right-icon-hover;
+        cursor: pointer;
+    }
+
+    &.active {
+        background-image: @img-arrow-left-icon;
+        cursor: pointer;
+
+        &:hover {
+            background-image: @img-arrow-left-icon-hover;
+            cursor: pointer;
+        }
+    }
+}
+
+.FavoriteTimelinesBlock {
+    color: #fff;
+}
+
+.MyTimelinesBlock {
+    color: #fff;
+}
+
+.template-invisible {
+    display: none;
+}
+
+.header-text {
+    display: inline-block;
+}
+
+.box {
+    .transition(opacity @fade-duration ease-in-out, visibility @fade-duration ease-in-out);
+    position: relative;
+    margin: 5px;
+    display: inline-block;
+    text-align: left;
+}
+
+.TwitterBlock {
+    text-align: center;
+}
+
+.box {
+    visibility: visible important!;
+}
+
+.tweet-message-link {
+    .start-page-text-link(@text-blue, @text-white);
+}
+
+// Twitter List View.
+.tweet-list-item {
+    text-align: left;
+    margin: 20px 0;
+
+    &:nth-of-type(1) {
+        margin-top: 0;
+    }
+
+    .tweet-li-header {
+        .text-ellipsis;
+        height: 48px;
+        display: table;
+
+        .tweet-li-avatar {
+            width: 48px;
+            height: 48px;
+            margin-right: 10px;
+        }
+
+        .tweet-li-fullname,
+        .tweet-li-username {
+            font-size: 20px;
+            line-height: 48px;
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .tweet-li-username {
+            .start-page-text-link(@text-blue, @text-white);
+        }
+    }
+
+    .tweet-li-message {
+        .start-page-text-link(@text-white, @text-white);
+        font-size: 16px;
+    }
+
+    .tweet-li-footer {
+        height: 14px;
+        margin-top: 10px;
+
+        .tweet-icon {
+            margin-left: 10px;
+        }
+
+        .tweet-li-date {
+            font-size: 14px;
+            color: @text-gray;
+            float: right;
+        }
+    }
+}
+
+// Timelines List View
+.timeline-list-item {
+    .box-sizing;
+    position: relative;
+    border: @border-transparent-thin;
+    margin: 20px 0;
+    padding: 10px;
+
+    &:nth-of-type(1) {
+        margin-top: 0;
+    }
+
+    &:hover {
+        border: @border-blue-thin;
+        background-color: fade(@bg-purple, 70%);
+        cursor: pointer;
+    }
+
+    .timeline-li-image {
+        width: 64px;
+        height: 64px;
+        display: block;
+        overflow: hidden;
+        background-color: #313131;
+
+        img {
+            width: 64px;
+            height: 64px;
+            display: block;
+        }
+    }
+
+    &:before {
+        position: absolute;
+        content: attr(data-title);
+        left: 84px;
+        top: 10px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    &:after {
+        position: absolute;
+        content: attr(data-author);
+        left: 84px;
+        top: 50%;
+        color: @text-gray;
+        text-align: center;
+    }
+}
+
+@media only screen and (max-width : 880px), screen and (orientation: landscape) and (max-device-width : 480px) {
+    /* Small Tablet view: 3 rows, 2 columns */
+        .FTTiles {
+        overflow: hidden;
+        text-align: center;
+    }
+        .tweet-meta-title {
+        display: none;
+    }
+
+    .list-view-icon
+    {
+        display:none;
+    }
+
+    .tweet-meta-text {
+        font-size: 10px;
+    }
+
+    .tweet-avatar-icon {
+        display: none;
+    }
+
+
+    .ex6, .ex9 {
+        display: none;
+    }
+
+    .box {
+        height:150px;
+        width:  150px;
+        overflow: hidden;
+    }
+
+    .welcome-block-toggle {
+        width: 100%;
+        height: 20%;
+        min-height: 250px;
+    }
+
+    .welcome-box-1 {
+        padding: 0px;
+        overflow: visible;
+    //    height: 40%;
+    }
+
+    .welcome-box-2 {
+        float: left;
+        font-size: 11px;
+        overflow: auto;
+    }
+
+    .welcome-box-3 {
+        float: left;
+        display: none;
+    }
+}
+
+@media only screen and (max-width : 1200px) and (min-width : 881px) {
+    /* Tablet view: 1 row 4 columns and 2 x 2 columns below */
+
+    .FTTiles {
+        overflow: hidden;
+        text-align: center;
+    }
+    .tweet-avatar-icon {
+        display: none;
+    }
+
+    .list-view-icon
+    {
+        display:block;
+    }
+
+    .tweet-meta-title {
+        font-size: 10px;
+    }
+
+    .tweet-meta-author {
+        font-size: 10px;
+    }
+
+    .box {
+        height:150px;
+        width:  150px;
+    }
+
+    .ex3, .ex4 {
+        display: inline-block;
+    }
+
+    .ex6, .ex9 {
+        display: none;
+    }
+
+    .welcome-block-toggle {
+        float: left;
+        margin: 5px;
+        padding: 5px;
+        width: 100%;
+        height: 30%;
+        background-color: transparent;
+        vertical-align: top;
+        overflow:visible;
+        min-height:250px;
+    }
+
+    .FeaturedTimelinesBlock {
+        float: left;
+        margin: 5px;
+        padding: 5px;
+        width: 45%;
+        min-width: 400px;
+        height: 60%;
+        background-color: transparent;
+        vertical-align: top;
+        overflow:auto;
+        .box-sizing();
+    }
+
+    .TwitterBlock {
+        float: right;
+        margin: 5px;
+        padding: 5px;
+        width: 45%;
+        min-width: 400px;
+        height: 60%;
+        background-color: transparent;
+        vertical-align: top;
+        box-sizing: border-box;
+        overflow:auto;
+    }
+
+    .FavoriteTimelinesBlock {
+        float: right;
+        margin: 5px;
+        padding: 5px;
+        width: 45%;
+        min-width: 400px;
+        height: 60%;
+        background-color: transparent;
+        vertical-align: top;
+        box-sizing: border-box;
+        overflow:auto;
+    }
+
+    .welcome-box-1 {
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: visible;
+    }
+
+    .welcome-box-2 {
+        float: left;
+        font-size: 14px;
+        overflow: auto;
+        .welcome-link {
+            width:40%;
+        }
+    }
+
+    .welcome-box-3 {
+        float: left;
+        overflow: auto;
+        display: none;
+    }
+}
+
+@media only screen and (max-width : 1700px) and (min-width : 1201px) {
+    .box {
+        height:150px;
+        width:  150px;
+        float: left;
+    }
+
+    .ex9 {
+        display: none;
+    };
+
+    .FTTiles {
+        overflow:hidden;
+    }
+
+    .list-view-icon
+    {
+        display:block;
+    }
+
+    .welcome-block-toggle {
+        float: left;
+        margin: 5px;
+        padding: 5px;
+        width: 32%;
+        height: 100%;
+        min-height: 500px;
+        overflow:hidden;
+    }
+
+    .FeaturedTimelinesBlock {
+        float: left;
+        margin: 5px;
+        padding: 5px;
+        width: 32%;
+        height: 100%;
+        min-height: 300px;
+        background-color: transparent;
+        box-sizing:border-box;
+        overflow:auto;        
+    }
+
+    .TwitterBlock {
+        float: right;
+        margin: 5px;
+        padding: 5px;
+        width: 32%;
+        height: 100%;
+        min-height: 300px;
+        box-sizing:border-box;
+        overflow:auto;
+    }
+
+    .FavoriteTimelinesBlock {
+        float: right;
+        margin: 5px;
+        padding: 5px;
+        width: 32%;
+        height: 100%;
+        min-height: 300px;
+        box-sizing:border-box;
+        overflow:auto;
+    }
+
+    .welcome-box-1 {
+        overflow: visible;
+        vertical-align: top;
+        font-size: 15px;
+    }
+
+    .welcome-box-2 {
+        float: left;
+        overflow: visible;
+        height: calc(40% - 10px);
+        height: -webkit-calc(40% - 10px);
+    }
+
+    .welcome-box-3 {
+        float: left;
+        overflow: visible;
+        vertical-align: top;
+    }
+    /* Medium desktop: 6 columns, 3 rows */
+}
+
+@media only screen and (min-width : 1701px) {
+    /* Large desktop: 6 columns, 3 rows, extra margin tiles */
+
+    .FTTiles {
+        overflow:hidden;
+    }
+
+    .twitter-time-container {
+        bottom: 25px;
+    }
+
+    .box {
+        height:160px;
+        width:160px;
+        float: left;
+    }
+
+    .welcome-block-toggle {
+        float: left;
+        margin: 5px;
+        padding: 5px;
+        width: 32%;
+        height: 100%;
+        min-height: 600px;
+        background-color: transparent;
+        vertical-align: top;
+        .box-sizing();
+    }
+
+    .FeaturedTimelinesBlock {
+        float: left;
+        margin: 5px;
+        padding: 5px;
+        width: 32%;
+        height: 100%;
+        min-height: 300px;
+        background-color: transparent;
+        overflow:auto;
+        .box-sizing();
+    }
+
+    .TwitterBlock {
+        float: right;
+        margin: 5px;
+        padding: 5px;
+        width: 32%;
+        height: 100%;
+        min-height: 300px;
+        background-color: transparent;
+        vertical-align: top;
+        overflow:auto;
+        .box-sizing();
+    }
+
+    .FavoriteTimelinesBlock {
+        float: right;
+        margin: 5px;
+        padding: 5px;
+        width: 32%;
+        height: 100%;
+        min-height: 300px;
+        background-color: transparent;
+        vertical-align: top;
+        overflow:auto;
+        .box-sizing();
+    }
+}

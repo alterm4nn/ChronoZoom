@@ -83,7 +83,7 @@ module CZ {
                 }
             }
 
-            private sendSearchQuery(query): JQueryPromise {
+            private sendSearchQuery(query): any {
                 return (query === "") ? $.Deferred().resolve(null).promise() : 
                                         CZ.Service.getSearch(query);
             }
