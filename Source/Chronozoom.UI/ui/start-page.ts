@@ -227,11 +227,7 @@ module CZ {
                 var o = $(template).clone(true, true).appendTo(target[idx].Name);
                 o.attr("class", target[idx].Visibility[i]);
                 o.attr("id", "m" + idx + "i" + i);
-
-                $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
-                    watch: "window",
-                });
-            }
+               }
         }
 
         export function PlayIntroTour() {
@@ -619,6 +615,11 @@ module CZ {
                     $listItemFullname.text(fullname);
                     $listItemDate.text(convertedDate);
                     $listItemAvatar.attr("src", photo);
+
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
+                        watch: "window",
+                    });
+
                 }
             });
         }
