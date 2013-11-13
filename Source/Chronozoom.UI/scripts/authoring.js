@@ -651,8 +651,8 @@
         function erroneousContentItemsList(errorMassage) {
             var pos;
             var errCI = [];
-            if (errorMassage.indexOf("ErroneousContentItemId") + 1) {
-                pos = errorMassage.indexOf("ErroneousContentItemId") + 24;
+            if (errorMassage.indexOf("ErroneousContentItemIndex") + 1) {
+                pos = errorMassage.indexOf("ErroneousContentItemIndex") + 27;
                 while (errorMassage[pos] != ']') {
                     if ((errorMassage[pos] == ",") || (errorMassage[pos] == "[")) {
                         var str1 = "";

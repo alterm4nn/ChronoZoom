@@ -209,10 +209,10 @@ module CZ {
                             },
                             error => {
                                 var errorMessage = JSON.parse(error.responseText).errorMessage;
+                                this.errorMessage.text(errorMessage);
                                 if (errorMessage !== "") {
                                     this.errorMessage.text(errorMessage);
                                     var that = this;
-                                    console.log(that, that.contentItemsListBox, that.contentItemsListBox.items);
                                     var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
                                     errCI.forEach(function (contentItemIndex) {
                                         var item = that.contentItemsListBox.items[contentItemIndex];

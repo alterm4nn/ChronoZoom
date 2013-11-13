@@ -79,7 +79,7 @@ namespace Chronozoom.UI
     public class PutExhibitResult
     {
         private List<Guid> _contentItemId;
-        private List<int> _erroneouscontentItemId;
+        private List<int> _erroneouscontentItemIndex;
         public string errorMessage;
 
         public Guid ExhibitId { get; set; }
@@ -91,18 +91,18 @@ namespace Chronozoom.UI
             }
         }
 
-        public IEnumerable<int> ErroneousContentItemId
+        public IEnumerable<int> ErroneousContentItemIndex
         {
             get
             {
-                return _erroneouscontentItemId.AsEnumerable();
+                return _erroneouscontentItemIndex.AsEnumerable();
             }
         }
 
         internal PutExhibitResult()
         {
             _contentItemId = new List<Guid>();
-            _erroneouscontentItemId = new List<int>();
+            _erroneouscontentItemIndex = new List<int>();
             errorMessage = "";
         }
 
@@ -113,7 +113,7 @@ namespace Chronozoom.UI
 
         internal void ErrCIAdd(int id)
         {
-            _erroneouscontentItemId.Add(id);
+            _erroneouscontentItemIndex.Add(id);
         }
 
     }

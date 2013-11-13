@@ -6334,8 +6334,8 @@ var CZ;
         function erroneousContentItemsList(errorMassage) {
             var pos;
             var errCI = [];
-            if (errorMassage.indexOf("ErroneousContentItemId") + 1) {
-                pos = errorMassage.indexOf("ErroneousContentItemId") + 24;
+            if (errorMassage.indexOf("ErroneousContentItemIndex") + 1) {
+                pos = errorMassage.indexOf("ErroneousContentItemIndex") + 27;
                 while (errorMassage[pos] != ']') {
                     if ((errorMassage[pos] == ",") || (errorMassage[pos] == "[")) {
                         var str1 = "";
@@ -15110,10 +15110,10 @@ var CZ;
                         _this.exhibit.onmouseclick();
                     }, function (error) {
                         var errorMessage = JSON.parse(error.responseText).errorMessage;
+                        _this.errorMessage.text(errorMessage);
                         if (errorMessage !== "") {
                             _this.errorMessage.text(errorMessage);
                             var that = _this;
-                            console.log(that, that.contentItemsListBox, that.contentItemsListBox.items);
                             var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
                             errCI.forEach(function (contentItemIndex) {
                                 var item = that.contentItemsListBox.items[contentItemIndex];
