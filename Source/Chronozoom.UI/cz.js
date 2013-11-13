@@ -6069,7 +6069,6 @@ var CZ;
                     newExhibit.id = "e" + response.ExhibitId;
 
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
-
                     deferred.resolve(newExhibit);
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
@@ -6210,6 +6209,15 @@ var CZ;
         Authoring.isNotEmpty = isNotEmpty;
 
         /**
+        * Validates,if url is adequate
+        */
+        function isValidURL(url) {
+            var objRE = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return objRE.test(url);
+        }
+        Authoring.isValidURL = isValidURL;
+
+        /**
         * Validates,if timeline size is not negative or null
         */
         function isIntervalPositive(start, end) {
@@ -6319,6 +6327,30 @@ var CZ;
             return isValid;
         }
         Authoring.validateContentItems = validateContentItems;
+
+        /**
+        * Returns list of erroneous content items
+        */
+        function erroneousContentItemsList(errorMassage) {
+            var pos;
+            var errCI = [];
+            if (errorMassage.indexOf("ErroneousContentItemIndex") + 1) {
+                pos = errorMassage.indexOf("ErroneousContentItemIndex") + 27;
+                while (errorMassage[pos] != ']') {
+                    if ((errorMassage[pos] == ",") || (errorMassage[pos] == "[")) {
+                        var str1 = "";
+                        pos++;
+                        while ((errorMassage[pos] != ",") && (errorMassage[pos] != "]")) {
+                            str1 += errorMassage[pos];
+                            pos++;
+                        }
+                        errCI.push(parseInt(str1));
+                    }
+                }
+            }
+            return errCI;
+        }
+        Authoring.erroneousContentItemsList = erroneousContentItemsList;
 
         /**
         * Opens "session ends" form
@@ -15078,9 +15110,15 @@ var CZ;
                         _this.exhibit.onmouseclick();
                     }, function (error) {
                         var errorMessage = JSON.parse(error.responseText).errorMessage;
-
+                        _this.errorMessage.text(errorMessage);
                         if (errorMessage !== "") {
                             _this.errorMessage.text(errorMessage);
+                            var that = _this;
+                            var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
+                            errCI.forEach(function (contentItemIndex) {
+                                var item = that.contentItemsListBox.items[contentItemIndex];
+                                item.container.find(".cz-listitem").css("border-color", "red");
+                            });
                         } else {
                             _this.errorMessage.text("Sorry, internal server error :(");
                         }
@@ -15120,6 +15158,9 @@ var CZ;
                 } else {
                     idx = -1;
                 }
+
+                var item = this.contentItemsListBox.items[idx];
+                item.container.find(".cz-listitem").css("border-color", "#c7c7c7");
 
                 if (idx >= 0) {
                     this.clickedListItem = item;
@@ -15373,8 +15414,11 @@ else
                 if (!CZ.Authoring.isNotEmpty(newContentItem.uri)) {
                     this.mediaInput.showError("URL can't be empty");
                 }
+                if (!CZ.Authoring.isValidURL(newContentItem.uri)) {
+                    this.mediaInput.showError("URL is wrong");
+                }
 
-                if (CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) {
+                if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
                         if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
