@@ -172,6 +172,7 @@ module CZ {
 
                 this.activationSource.removeClass("active");
 
+                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
             }
         }
     }

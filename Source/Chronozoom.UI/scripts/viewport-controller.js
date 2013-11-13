@@ -80,6 +80,7 @@ else {
                     PanViewport(initialViewport, gesture);
                 }
 
+                self.coerceVisible(initialViewport, gesture);
                 return initialViewport;
             }
 

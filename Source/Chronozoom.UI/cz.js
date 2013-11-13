@@ -9676,7 +9676,7 @@ else {
                     PanViewport(initialViewport, gesture);
                 }
 
-                //self.coerceVisible(initialViewport, gesture); //applying navigaion constraints
+                self.coerceVisible(initialViewport, gesture);
                 return initialViewport;
             }
 
@@ -11501,6 +11501,16 @@ var CZ;
 
                     self.cursorPosition = 0.0;
 
+                    // elements that cover top, right, bottom & left space between corresponding root timeline's
+                    // border and corresponding canvas edge
+                    this.topCloak = $(".root-cloak-top");
+                    this.rightCloak = $(".root-cloak-right");
+                    this.bottomCloak = $(".root-cloak-bottom");
+                    this.leftCloak = $(".root-cloak-left");
+
+                    // indicates wheter cloak should be shown or not
+                    this.showCloak = false;
+
                     var layerDivs = self.element.children("div");
                     layerDivs.each(function (index) {
                         // make a layer from (div)
@@ -11953,6 +11963,9 @@ else if (CZ.Common.tooltipMode == 'timeline')
 
                     // rendering the tree recursively
                     elementsRoot.render(contexts, visibleBox_v, viewport);
+
+                    // update position of cloak for space outside root timeline
+                    this.updateCloakPosition(viewport);
                 },
                 /* Renders the virtual canvas content.
                 */
@@ -12076,6 +12089,68 @@ else if (CZ.Common.tooltipMode == 'timeline')
                 options: {
                     aspectRatio: 1,
                     visible: { centerX: 0, centerY: 0, scale: 1 }
+                },
+                /**
+                * Shows top, right, bottom & left cloaks that hide empty space between root timeline's borders and
+                * canvas edges.
+                */
+                cloakNonRootVirtualSpace: function () {
+                    this.showCloak = true;
+                    var viewport = this.getViewport();
+
+                    this.updateCloakPosition(viewport);
+
+                    this.topCloak.addClass("visible");
+                    this.rightCloak.addClass("visible");
+                    this.bottomCloak.addClass("visible");
+                    this.leftCloak.addClass("visible");
+                },
+                /**
+                * Hides top, right, bottom & left cloaks that hide empty space between root timeline's borders and
+                * canvas edges.
+                */
+                showNonRootVirtualSpace: function () {
+                    this.showCloak = false;
+
+                    this.topCloak.removeClass("visible");
+                    this.rightCloak.removeClass("visible");
+                    this.bottomCloak.removeClass("visible");
+                    this.leftCloak.removeClass("visible");
+                },
+                /**
+                * Updates width and height of top, right, bottom & left cloaks that hide empty space between root
+                * timeline's borders and canvas edges.
+                */
+                updateCloakPosition: function (viewport) {
+                    if (!this.showCloak)
+                        return;
+
+                    var rootTimeline = this._layersContent.children[0];
+
+                    var top = rootTimeline.y;
+                    var right = rootTimeline.x + rootTimeline.width;
+                    var bottom = rootTimeline.y + rootTimeline.height;
+                    var left = rootTimeline.x;
+
+                    // calculate sizes of cloaks
+                    top = Math.max(0, viewport.pointVirtualToScreen(0, top).y);
+                    right = Math.max(0, viewport.pointVirtualToScreen(right, 0).x);
+                    bottom = Math.max(0, viewport.pointVirtualToScreen(0, bottom).y);
+                    left = Math.max(0, viewport.pointVirtualToScreen(left, 0).x);
+
+                    // set width of left and right cloaks
+                    this.rightCloak.css("width", Math.max(0, viewport.width - right) + "px");
+                    this.leftCloak.css("width", left + "px");
+
+                    // set height of top and bottom cloaks
+                    this.bottomCloak.css("height", Math.max(0, viewport.height - bottom) + "px");
+                    this.topCloak.css("height", top + "px");
+
+                    // prevent intersection of bottom & top cloaks with left & right cloaks
+                    this.topCloak.css("left", left + "px");
+                    this.topCloak.css("right", Math.max(0, viewport.width - right) + "px");
+                    this.bottomCloak.css("left", left + "px");
+                    this.bottomCloak.css("right", Math.max(0, viewport.width - right) + "px");
                 }
             });
         }
@@ -12468,10 +12543,13 @@ var CZ;
                 messageForm.closeButton.click(function (event) {
                     CZ.Authoring.isActive = prevIsActive;
                     CZ.Authoring.mode = prevMode;
+                    CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
                 });
 
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createTimeline";
+
+                CZ.Common.vc.virtualCanvas("cloakNonRootVirtualSpace");
             }
             UI.createTimeline = createTimeline;
 
@@ -12499,10 +12577,13 @@ var CZ;
                 messageForm.closeButton.click(function (event) {
                     CZ.Authoring.isActive = prevIsActive;
                     CZ.Authoring.mode = prevMode;
+                    CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
                 });
 
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createExhibit";
+
+                CZ.Common.vc.virtualCanvas("cloakNonRootVirtualSpace");
             }
             UI.createExhibit = createExhibit;
 
@@ -13417,7 +13498,7 @@ var CZ;
 (function (CZ) {
     (function (Common) {
         Common.maxPermitedScale;
-        Common.maxPermitedVerticalRange;
+        Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 };
 
         Common.controller;
         Common.isAxisFreezed = true;
@@ -14785,6 +14866,8 @@ var CZ;
                 CZ.Authoring.isActive = false;
 
                 this.activationSource.removeClass("active");
+
+                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
             };
             return FormEditTimeline;
         })(CZ.UI.FormUpdateEntity);
@@ -15220,6 +15303,8 @@ var CZ;
                 }
                 this.activationSource.removeClass("active");
                 CZ.Authoring.isActive = false;
+
+                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
             };
             return FormEditExhibit;
         })(UI.FormUpdateEntity);
@@ -17835,8 +17920,6 @@ else
 
             // init seadragon. set path to image resources for nav buttons
             Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
-
-            CZ.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 };
 
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash;
