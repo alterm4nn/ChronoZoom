@@ -1,4 +1,4 @@
-/* Height of input element */
+﻿/* Height of input element */
 /* Font-size of error message */
 /* Error messages */
 .error-message {
@@ -70,7 +70,6 @@ input.error {
   z-index: 1000;
   background: url(/images/background.jpg) no-repeat;
   background-size: cover;
-  font-family: "Segoe UI Light";
   font-weight: lighter;
   min-width: 700px;
 }
@@ -125,6 +124,7 @@ input.error {
   position: absolute;
   width: 100%;
   height: 100%;
+  cursor: pointer;
 }
 .tile-photo {
   -webkit-box-sizing: border-box;
@@ -134,7 +134,7 @@ input.error {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-image: url('../images/default-tile.png');
+  background-image: url(../images/default-tile.png);
 }
 .tile-photo:hover {
   cursor: pointer;
@@ -202,7 +202,7 @@ input.error {
 .tweet-icon {
   float: right;
   margin: 3px;
-  background-image: url('../images/icon_twitter.png');
+  background-image: url(../images/icon_twitter.png);
   height: 14px;
   width: 17px;
 }
@@ -283,7 +283,7 @@ input.error {
 }
 .WelcomeBlock .welcome-box-1 h1 {
   font-size: 34px;
-  margin: 10px 0 35px;
+  margin: 14px 0 16px;
 }
 .WelcomeBlock .welcome-box-2 {
   font-size: 18px;
@@ -291,6 +291,7 @@ input.error {
 .WelcomeBlock .welcome-box-2 .welcome-link {
   color: #00bce0;
   padding: 0 30px;
+  margin: 10px 0;
   height: 65px;
   border: 1px solid transparent;
   line-height: 65px;
