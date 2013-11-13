@@ -16962,6 +16962,15 @@ var CZ;
         }
         StartPage.show = show;
 
+        function compareTimelineTitles(first, second) {
+            if (first.Title.charAt(0) < second.Title.charAt(0))
+                return -1;
+else if (first.Title.charAt(0) > second.Title.charAt(0))
+                return 1;
+else
+                return 0;
+        }
+
         function hide() {
             var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
             $(".home-icon").removeClass("active");
@@ -17000,12 +17009,17 @@ var CZ;
             CZ.Service.getUserFeatured().done(function (response) {
                 // Show the newest featured timelines first.
                 var timelines = response ? response.reverse() : [];
+
+                timelines.sort(compareTimelineTitles);
+
                 fillFeaturedTimelines(timelines);
                 fillFeaturedTimelinesList(timelines);
             });
 
             CZ.Service.getUserFavorites().then(function (response) {
                 var timelines = response ? response.reverse() : [];
+
+                timelines.sort(compareTimelineTitles);
 
                 // saving guids of favorite timelines
                 timelines.forEach(function (timeline) {
@@ -17016,7 +17030,7 @@ var CZ;
 
                 if (timelines.length === 0) {
                     $("#FavoriteTimelinesBlock .list-view-icon").hide();
-                    $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." + "Click star icon of the timeline you like to save it as favorite.");
+                    $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." + " Click star icon of the timeline you like to save it as favorite.");
                 } else {
                     fillFavoriteTimelines(timelines);
                     fillFavoriteTimelinesList(timelines);
