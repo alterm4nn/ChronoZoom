@@ -373,6 +373,7 @@ iframe[sutra=picker] + div {
   z-index: 1000;
   background: url(/images/background.jpg) no-repeat;
   background-size: cover;
+  font-family: "Segoe UI Light";
   font-weight: lighter;
   min-width: 700px;
 }
@@ -427,7 +428,6 @@ iframe[sutra=picker] + div {
   position: absolute;
   width: 100%;
   height: 100%;
-  cursor: pointer;
 }
 .tile-photo {
   -webkit-box-sizing: border-box;
@@ -437,7 +437,7 @@ iframe[sutra=picker] + div {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-image: url(../images/default-tile.png);
+  background-image: url('../images/default-tile.png');
 }
 .tile-photo:hover {
   cursor: pointer;
@@ -505,7 +505,7 @@ iframe[sutra=picker] + div {
 .tweet-icon {
   float: right;
   margin: 3px;
-  background-image: url(../images/icon_twitter.png);
+  background-image: url('../images/icon_twitter.png');
   height: 14px;
   width: 17px;
 }
@@ -586,7 +586,7 @@ iframe[sutra=picker] + div {
 }
 .WelcomeBlock .welcome-box-1 h1 {
   font-size: 34px;
-  margin: 14px 0 16px;
+  margin: 10px 0 35px;
 }
 .WelcomeBlock .welcome-box-2 {
   font-size: 18px;
@@ -594,7 +594,6 @@ iframe[sutra=picker] + div {
 .WelcomeBlock .welcome-box-2 .welcome-link {
   color: #00bce0;
   padding: 0 30px;
-  margin: 10px 0;
   height: 65px;
   border: 1px solid transparent;
   line-height: 65px;
@@ -1192,7 +1191,7 @@ a:visited {
   width: 170px;
   background-repeat: no-repeat;
   background-position: center;
-  background-image: url(../images/chronozoom.png);
+  background-image: url('../images/chronozoom.png');
   margin-left: 10px;
 }
 .header-regimes {
@@ -1250,26 +1249,26 @@ a:visited {
   background-color: transparent;
 }
 .tour-icon {
-  background-image: url(../images/tour-icon.png);
+  background-image: url('../images/tour-icon.png');
 }
 .search-icon {
-  background-image: url(../images/search-icon.png);
+  background-image: url('../images/search-icon.png');
 }
 .timeSeries-icon {
-  background-image: url(../images/timeseries-icon.png);
+  background-image: url('../images/timeseries-icon.png');
 }
 .view-icon {
-  background-image: url(../images/view-icon.png);
+  background-image: url('../images/view-icon.png');
   opacity: .5;
 }
 .edit-icon {
-  background-image: url(../images/edit-icon.png);
+  background-image: url('../images/edit-icon.png');
 }
 .home-icon {
-  background-image: url(../images/home-icon.png);
+  background-image: url('../images/home-icon.png');
 }
 .profile-icon {
-  background-image: url(../images/profile-icon.png);
+  background-image: url('../images/profile-icon.png');
   background-position-x: 3px;
   display: inline-block;
 }
@@ -1280,7 +1279,7 @@ a:visited {
   background-color: #0464a2;
 }
 .header__tour-icon {
-  background-image: url(../images/tour-icon.png);
+  background-image: url('../images/tour-icon.png');
   background-repeat: no-repeat;
   background-position: center;
   height: 36px;
@@ -1310,6 +1309,7 @@ a:visited {
   padding-top: 38px;
   height: 100%;
   min-height: 100%;
+  position: relative;
 }
 #vc {
   overflow: hidden;
@@ -1506,22 +1506,22 @@ a:visited {
   opacity: 0.9;
 }
 #defaultBox {
-  background-image: url(../images/defaultGradientBox.jpg);
+  background-image: url('../images/defaultGradientBox.jpg');
 }
 #cosmosRegimeBox {
-  background-image: url(../images/cosmosRegimeBox.jpg);
+  background-image: url('../images/cosmosRegimeBox.jpg');
 }
 #earthRegimeBox {
-  background-image: url(../images/earthRegimeBox.jpg);
+  background-image: url('../images/earthRegimeBox.jpg');
 }
 #humanityRegimeBox {
-  background-image: url(../images/humanityRegimeBox.jpg);
+  background-image: url('../images/humanityRegimeBox.jpg');
 }
 #lifeRegimeBox {
-  background-image: url(../images/lifeRegimeBox.jpg);
+  background-image: url('../images/lifeRegimeBox.jpg');
 }
 #prehistoryRegimeBox {
-  background-image: url(../images/prehistoryRegimeBox.jpg);
+  background-image: url('../images/prehistoryRegimeBox.jpg');
   background-position: center;
 }
 .bubbleInfo span {
@@ -1689,7 +1689,7 @@ img.fallbackBackground {
   margin-left: -450px;
   width: 900px;
   height: 482px;
-  background-image: url(../images/fallbackOuterBackground.jpg);
+  background-image: url('../images/fallbackOuterBackground.jpg');
   background-position: top center;
   cursor: default;
 }
@@ -2630,4 +2630,66 @@ img.fallbackBackground {
   cursor: pointer;
   width: auto;
   display: inline;
+}
+.root-cloak {
+  position: absolute;
+  display: none;
+  z-index: 8;
+  cursor: not-allowed;
+  background: rgba(160, 160, 106, 0.5);
+}
+.root-cloak.visible {
+  display: block;
+}
+.root-cloak-left {
+  position: absolute;
+  display: none;
+  z-index: 8;
+  cursor: not-allowed;
+  background: rgba(160, 160, 106, 0.5);
+  top: 38px;
+  bottom: 0;
+  left: 0;
+}
+.root-cloak-left.visible {
+  display: block;
+}
+.root-cloak-right {
+  position: absolute;
+  display: none;
+  z-index: 8;
+  cursor: not-allowed;
+  background: rgba(160, 160, 106, 0.5);
+  top: 38px;
+  bottom: 0;
+  right: 0;
+}
+.root-cloak-right.visible {
+  display: block;
+}
+.root-cloak-top {
+  position: absolute;
+  display: none;
+  z-index: 8;
+  cursor: not-allowed;
+  background: rgba(160, 160, 106, 0.5);
+  top: 38px;
+  left: 0;
+  right: 0;
+}
+.root-cloak-top.visible {
+  display: block;
+}
+.root-cloak-bottom {
+  position: absolute;
+  display: none;
+  z-index: 8;
+  cursor: not-allowed;
+  background: rgba(160, 160, 106, 0.5);
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.root-cloak-bottom.visible {
+  display: block;
 }

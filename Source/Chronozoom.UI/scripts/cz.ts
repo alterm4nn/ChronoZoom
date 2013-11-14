@@ -679,8 +679,6 @@ module CZ {
             // init seadragon. set path to image resources for nav buttons 
             Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
 
-            CZ.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
-
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
 
