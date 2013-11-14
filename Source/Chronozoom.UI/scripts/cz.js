@@ -556,7 +556,6 @@ else
                 });
                 if (IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
-                    CZ.StartPage.show();
                 }
             });
 

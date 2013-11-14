@@ -654,7 +654,7 @@ else
             });
 
             CZ.Service.getProfile().done(function (data) {
-                if ((data != "") && (data.DisplayName != null)) {
+                if ((data !== "") && (data.DisplayName !== null)) {
                     CZ.Settings.userSuperCollectionName = data.DisplayName;
                     CZ.Settings.userCollectionName = data.DisplayName;
                 }

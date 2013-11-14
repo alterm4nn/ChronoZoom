@@ -736,18 +736,20 @@ module CZ {
             //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
 
             CZ.Service.getProfile().done(data => {
-                if ((data != "") && (data.DisplayName != null)) {
+                if ((data !== "") && (data.DisplayName !== null)) {
                     CZ.Settings.userSuperCollectionName = data.DisplayName;
                     CZ.Settings.userCollectionName = data.DisplayName;
                 }
-                CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(response => {
-                    var timelines = response ? response.reverse() : [];
-                    fillMyTimelines(timelines);
-                    fillMyTimelinesList(timelines);
-                },
+                CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(
+                    response => {
+                        var timelines = response ? response.reverse() : [];
+                        fillMyTimelines(timelines);
+                        fillMyTimelinesList(timelines);
+                    },
                     error => {
                         console.log("[ERROR] getUserTimelines");
-                    });
+                    }
+                );
             });
 
 
