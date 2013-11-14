@@ -209,7 +209,6 @@ module CZ {
                             },
                             error => {
                                 var errorMessage = JSON.parse(error.responseText).errorMessage;
-                                this.errorMessage.text(errorMessage);
                                 if (errorMessage !== "") {
                                     this.errorMessage.text(errorMessage);
                                     var that = this;
@@ -218,6 +217,8 @@ module CZ {
                                         var item = that.contentItemsListBox.items[contentItemIndex];
                                         item.container.find(".cz-listitem").css("border-color", "red");
                                     });
+                                    errorMessage = "(1/" + errCI.length + ") " + JSON.parse(error.responseText).errorMessage;;
+                                    this.errorMessage.text(errorMessage);
                             }
                             else {
                                 this.errorMessage.text("Sorry, internal server error :(")

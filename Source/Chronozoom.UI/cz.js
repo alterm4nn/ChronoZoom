@@ -15110,7 +15110,6 @@ var CZ;
                         _this.exhibit.onmouseclick();
                     }, function (error) {
                         var errorMessage = JSON.parse(error.responseText).errorMessage;
-                        _this.errorMessage.text(errorMessage);
                         if (errorMessage !== "") {
                             _this.errorMessage.text(errorMessage);
                             var that = _this;
@@ -15119,6 +15118,9 @@ var CZ;
                                 var item = that.contentItemsListBox.items[contentItemIndex];
                                 item.container.find(".cz-listitem").css("border-color", "red");
                             });
+                            errorMessage = "(1/" + errCI.length + ") " + JSON.parse(error.responseText).errorMessage;
+                            ;
+                            _this.errorMessage.text(errorMessage);
                         } else {
                             _this.errorMessage.text("Sorry, internal server error :(");
                         }
