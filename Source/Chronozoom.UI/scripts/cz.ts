@@ -631,7 +631,6 @@ module CZ {
                 });
                 if (IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
-                    CZ.StartPage.show();
                 }
             });
 

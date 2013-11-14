@@ -79,6 +79,11 @@ input.error {
   margin: 0;
   font-weight: lighter;
 }
+.start-page-screen * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
 .ContentContainer {
   position: relative;
   margin: 0 auto;
@@ -562,49 +567,54 @@ input.error {
     display: none;
   }
   .welcome-block-toggle {
+    height: calc(30% - 10px);
+    height: -webkit-calc(30% - 10px);
+    height: -moz-calc(30% - 10px);
     float: left;
     margin: 5px;
     padding: 5px;
     width: 100%;
-    height: 30%;
     background-color: transparent;
     vertical-align: top;
     overflow: visible;
     min-height: 250px;
   }
   .FeaturedTimelinesBlock {
+    height: calc(60% - 10px);
+    height: -webkit-calc(60% - 10px);
+    height: -moz-calc(60% - 10px);
     float: left;
     margin: 5px;
     padding: 5px;
     width: 45%;
     min-width: 400px;
-    height: 60%;
     background-color: transparent;
     vertical-align: top;
     overflow: auto;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
   }
   .TwitterBlock {
+    height: calc(60% - 10px);
+    height: -webkit-calc(60% - 10px);
+    height: -moz-calc(60% - 10px);
     float: right;
     margin: 5px;
     padding: 5px;
     width: 45%;
     min-width: 400px;
-    height: 60%;
     background-color: transparent;
     vertical-align: top;
     box-sizing: border-box;
     overflow: auto;
   }
   .FavoriteTimelinesBlock {
+    height: calc(60% - 10px);
+    height: -webkit-calc(60% - 10px);
+    height: -moz-calc(60% - 10px);
     float: right;
     margin: 5px;
     padding: 5px;
     width: 45%;
     min-width: 400px;
-    height: 60%;
     background-color: transparent;
     vertical-align: top;
     box-sizing: border-box;

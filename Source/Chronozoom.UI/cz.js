@@ -1,5 +1,4 @@
-﻿/// <reference path='typings/jquery/jquery.d.ts'/>
-var CZ;
+﻿var CZ;
 (function (CZ) {
     (function (Settings) {
         Settings.isAuthorized = false;
@@ -10,7 +9,6 @@ var CZ;
 
         Settings.czDataSource = 'db';
 
-        // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
         Settings.czVersion = "main";
 
         Settings.ellipticalZoomZoomoutFactor = 0.5;
@@ -33,7 +31,6 @@ var CZ;
 
         Settings.fallbackImageUri = '/images/Temp-Thumbnail2.png';
 
-        // Styles of timelines
         Settings.timelineHeaderMargin = 1.0 / 18.0;
         Settings.timelineHeaderSize = 1.0 / 9.0;
         Settings.timelineTooltipMaxHeaderSize = 5;
@@ -85,7 +82,6 @@ var CZ;
         Settings.contentItemHeaderFontName = 'Arial';
         Settings.contentItemHeaderFontColor = 'white';
 
-        // See also contentItemDescriptionText class in the Styles/cz.css which decorates the description block in a content item
         Settings.contentItemBoundingBoxBorderWidth = 13.0 / 520;
         Settings.contentItemBoundingBoxFillColor = 'rgb(36,36,36)';
         Settings.contentItemBoundingBoxBorderColor = undefined;
@@ -93,7 +89,6 @@ var CZ;
 
         Settings.contentAppearanceAnimationStep = 0.01;
 
-        //navigation constraints
         Settings.infoDotZoomConstraint = 0.005;
         Settings.infoDotAxisFreezeThreshold = 0.75;
         Settings.maxPermitedTimeRange = { left: -13700000000, right: 0 };
@@ -101,10 +96,9 @@ var CZ;
             { left: -14000000000, right: -1000000000, scale: 1000 },
             { left: -1000000000, right: -1000000, scale: 1 },
             { left: -1000000, right: -12000, scale: 0.001 },
-            { left: -12000/*approx 10k BC */ , right: 0, scale: 0.00006 }
+            { left: -12000, right: 0, scale: 0.00006 }
         ];
 
-        // Timescale constants
         Settings.maxTickArrangeIterations = 3;
         Settings.spaceBetweenLabels = 15;
         Settings.spaceBetweenSmallTicks = 10;
@@ -133,45 +127,36 @@ var CZ;
         Settings.markerWidth = 85;
         Settings.panelWidth = 185;
 
-        // IDs of regime timelines
         Settings.cosmosTimelineID = "00000000-0000-0000-0000-000000000000";
         Settings.earthTimelineID = "48fbb8a8-7c5d-49c3-83e1-98939ae2ae67";
         Settings.lifeTimelineID = "d4809be4-3cf9-4ddd-9703-3ca24e4d3a26";
         Settings.prehistoryTimelineID = "a6b821df-2a4d-4f0e-baf5-28e47ecb720b";
         Settings.humanityTimelineID = "4afb5bb6-1544-4416-a949-8c8f473e544d";
 
-        //tours
         Settings.toursAudioFormats = [
             { ext: 'mp3' },
             { ext: 'wav' }
         ];
         Settings.tourDefaultTransitionTime = 10;
 
-        // seadragon
         Settings.seadragonServiceURL = "http://api.zoom.it/v1/content/?url=";
         Settings.seadragonImagePath = "/images/seadragonControls/";
         Settings.seadragonMaxConnectionAttempts = 3;
         Settings.seadragonRetryInterval = 2000;
 
-        // breadcrumb
         Settings.navigateNextMaxCount = 2;
         Settings.longNavigationLength = 10;
 
-        // progresive loading
         Settings.serverUrlHost = location.protocol + "//" + location.host;
         Settings.minTimelineWidth = 100;
 
-        // Login constants
         Settings.signinUrlMicrosoft = "";
         Settings.signinUrlGoogle = "";
         Settings.signinUrlYahoo = "";
         Settings.sessionTime = 3600;
 
-        // General constants
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
 
-        // NOTE: IE version detection.
-        //       https://gist.github.com/padolsey/527683
         Settings.ie = ((function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];
             while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><br><![endif]-->', a[0])
@@ -179,7 +164,6 @@ var CZ;
             return (v > 4) ? v : undefined;
         })());
 
-        // Theme constants
         Settings.theme;
         function applyTheme(theme) {
             if (!theme) {
@@ -228,18 +212,15 @@ var CZ;
         }
         Settings.applyTheme = applyTheme;
 
-        // Bing search API constants
         Settings.defaultBingSearchTop = 50;
         Settings.defaultBingSearchSkip = 0;
 
-        // Authoring mediapicker constants
         Settings.mediapickerImageThumbnailMaxWidth = 240;
         Settings.mediapickerImageThumbnailMaxHeight = 155;
 
         Settings.mediapickerVideoThumbnailMaxWidth = 190;
         Settings.mediapickerVideoThumbnailMaxHeight = 130;
 
-        // WL API constants
         Settings.WLAPIClientID = "0000000040101FFA";
         Settings.WLAPIRedirectUrl = "http://test.chronozoom.com/";
 
@@ -247,7 +228,6 @@ var CZ;
     })(CZ.Settings || (CZ.Settings = {}));
     var Settings = CZ.Settings;
 })(CZ || (CZ = {}));
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -339,26 +319,11 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='vccontent.ts'/>
 var CZ;
 (function (CZ) {
     (function (UrlNav) {
-        // Helper routines to perform URL to/from visible conversion
         UrlNav.navigationAnchor = null;
 
-        /* Builds a navigation string for the given typed virtual canvas element.
-        @param vcelem   (CanvasElement) An element of a virtual canvas.
-        @scale          (number) Optional scale (default is 1.0) that is a factor on the element size.
-        
-        Remarks:
-        Example of the navigation string is '/t10/t24/e12/c10@w=1.5&h=1.0&x=0.33&y=0.25' which means
-        timeline with id 10
-        which has child timeline with id 25
-        which has child infodot with id 12
-        which has child contentItem with id 10
-        with position (0.33,0.255) of the visible region center so left-upper corner is (0,0), right-bottom is (1,1)
-        with width 1.5x size of the element width so height 1.0 shows entire element vertically.
-        */
         function vcelementToNavString(vcElem, vp) {
             var nav = '';
             var el = vcElem;
@@ -383,27 +348,12 @@ var CZ;
 
                     if (typeof URL.hash.params['bookmark'] != 'undefined')
                         nav += "&bookmark=" + URL.hash.params["bookmark"];
-                    //if (typeof URL.hash.params['b'] != 'undefined')
-                    //    nav += "&b=" + URL.hash.params["b"];
                 }
             }
             return nav;
         }
         UrlNav.vcelementToNavString = vcelementToNavString;
 
-        /* Finds a virtual canvas element by given navigation string without scale.
-        @param nav      (String) A navigation string.
-        @param root     (CanvasElement) Root element for the canvas tree.
-        @returns {x,y,width,height} or null.
-        
-        Remarks:
-        Example of the navigation string is '/t10/t24/e12/c10' which means
-        timeline with id 10
-        which has child timeline with id 25
-        which has child infodot with id 12
-        which has child contentItem with id 10
-        #/t55/e118
-        */
         function navStringTovcElement(nav, root) {
             if (!nav)
                 return null;
@@ -418,7 +368,6 @@ var CZ;
 
                 var lookup = function (id, root) {
                     if (typeof root.type !== 'undefined' && root.type === 'infodot') {
-                        // If we are looking for a content item ('c...'), it is possible that they are not loaded actually in a virtual canvas.
                         return CZ.VCContent.getContentItem(root, id);
                     }
                     if (!root.children || root.children.length == 0)
@@ -459,18 +408,6 @@ var CZ;
         }
         UrlNav.navStringTovcElement = navStringTovcElement;
 
-        /* Builds VisibleRegion2d from the navigation string for the virtual canvas.
-        @param nav      (String) A navigation string.
-        @param vc       jquery's virtual canvas widget
-        
-        Remarks:
-        Example of the navigation string is '/t10/t24/e12/c10' which means
-        timeline with id 10
-        which has child timeline with id 25
-        which has child infodot with id 12
-        which has child contentItem with id 10
-        #/t55/e118
-        */
         function navStringToVisible(nav, vc) {
             var k = nav.indexOf('@');
             var w = 1.05;
@@ -507,7 +444,6 @@ else if (start == "h=")
             var wc = w * element.width;
             var hc = h * element.height;
 
-            // Adjusting the w,h to current aspect ratio:
             var ar0 = vp.width / vp.height;
             var ar1 = wc / hc;
             if (ar0 > ar1) {
@@ -523,40 +459,6 @@ else if (start == "h=")
         }
         UrlNav.navStringToVisible = navStringToVisible;
 
-        /* Returns structure built from URL string
-        Remarks:
-        Example of the navigation string is 'http://localhost:4949/cz.htm?a=b&c=d#/t55/t174/t66@x=0.06665506329113924&y=-0.03591540681832514' which means
-        Example of strcuture:
-        URLstrcut = Object()
-        {
-        host = "localhost"
-        port = "4949"
-        protocol = "http"
-        path = "cz.htm"
-        params = Array()
-        {
-        [a] = "b"
-        [c] = "d"
-        }
-        hash = Object()
-        {
-        path = "/t55/t174/t66"
-        params = Array()
-        {
-        [x] = "0.06665506329113924"
-        [y] = "-0.03591540681832514"
-        }
-        }
-        }
-        
-        Usage example:
-        var URL = getURL();
-        URL.hash.params["a"] = "d";
-        delete URL.hash.params["c"];
-        setURL(URL);
-        
-        Note to check object fields for 'null' & 'undefined'. If URL string has no parameters, there is not array.
-        */
         function getURL() {
             var url;
 
@@ -621,12 +523,6 @@ else if (start == "h=")
         }
         UrlNav.getURL = getURL;
 
-        /* Set current URL string to address given in parameter
-        @param url (Object) URL structure generated by getURL() function
-        @param reload (boolean) Not required. Some kind of security. If changing hash string not page reload required. In case when we need to chenge GET parameters page reload in necessary.
-        IF reload = true, full URL modifications, this may reload page if needed.
-        IF reload = false, hash modification only, no page reload
-        */
         function setURL(url, reload) {
             if (reload == null) {
                 reload = false;
@@ -663,10 +559,6 @@ else if (start == "h=")
     })(CZ.UrlNav || (CZ.UrlNav = {}));
     var UrlNav = CZ.UrlNav;
 })(CZ || (CZ = {}));
-/// <reference path='urlnav.ts'/>
-/// <reference path='vccontent.ts'/>
-/// <reference path='settings.ts'/>
-/// <reference path='typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (Bibliography) {
@@ -683,7 +575,6 @@ var CZ;
         var pendingBibliographyForExhibitID = null;
 
         function showBibliography(descr, element, id) {
-            // Bibliography link that raised showBibliohraphy.
             var sender;
 
             try  {
@@ -704,12 +595,10 @@ var CZ;
 
             window.location.hash = nav;
 
-            // Remove 'onmouseclick' handler from current bibliography link to prevent multiple opening animation of bibliography window.
             sender.onmouseclick = null;
             var a = $("#bibliographyBack").css("display");
             if ($("#bibliographyBack").css("display") == "none") {
                 $("#bibliographyBack").show('clip', {}, 'slow', function () {
-                    // After bibliography window was fully opened, reset 'onmouseclick' handler for sender of bibliography link.
                     sender.onmouseclick = function (e) {
                         CZ.Common.vc.css('cursor', 'default');
                         showBibliography({ infodot: descr.infodot, contentItems: descr.contentItems }, element, id);
@@ -718,7 +607,6 @@ var CZ;
                     };
                 });
             } else {
-                // After bibliography window was fully opened, reset 'onmouseclick' handler for sender of bibliography link.
                 sender.onmouseclick = function (e) {
                     CZ.Common.vc.css('cursor', 'default');
                     showBibliography({ infodot: descr.infodot, contentItems: descr.contentItems }, element, id);
@@ -727,7 +615,6 @@ var CZ;
                 };
             }
 
-            // clearing all fields
             $("#bibliography .sources").empty();
 
             if (descr) {
@@ -839,7 +726,6 @@ var CZ;
                 this.initializeContent(rinDiv);
 
                 this.onRemove = function () {
-                    //Handle the remove of RIN resources if any
                     var rinplayerControl = rin.getPlayerControl(rinDiv);
                     if (rinplayerControl) {
                         rinplayerControl.pause();
@@ -858,7 +744,6 @@ var CZ;
     })(CZ.Extensions || (CZ.Extensions = {}));
     var Extensions = CZ.Extensions;
 })(CZ || (CZ = {}));
-/// <reference path='rinplayer.ts'/>
 var CZ;
 (function (CZ) {
     (function (Extensions) {
@@ -951,7 +836,7 @@ var CZ;
         }
         VCContent.getVisibleForElement = getVisibleForElement;
 
-        var zoomToElementHandler = function (sender, e, scale/* n [time units] / m [pixels] */ ) {
+        var zoomToElementHandler = function (sender, e, scale) {
             var vp = sender.vc.getViewport();
             var visible = getVisibleForElement(sender, scale, vp, true);
             elementclick.newvisible = visible;
@@ -960,19 +845,6 @@ var CZ;
             return true;
         };
 
-        /*  Represents a base element that can be added to the VirtualCanvas.
-        @remarks CanvasElement has extension in virtual space, that enables to check visibility of an object and render it.
-        @param vc   (jquery to virtual canvas) note that vc.element[0] is the virtual canvas object
-        @param layerid   (any type) id of the layer for this object
-        @param id   (any type) id of the object
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @remarks
-        If element.isRendered defined and true, the element was actually rendered on a canvas.
-        If element.onIsRenderedChanged defined, it is called when isRendered changes.
-        */
         function CanvasElement(vc, layerid, id, vx, vy, vw, vh) {
             this.vc = vc;
             this.id = id;
@@ -987,78 +859,29 @@ var CZ;
             this.children = [];
             this.fadeIn = false;
 
-            /* Checks whether this object is visible in the given visible box (in virtual space)
-            @param visibleBox_v   ({Left,Top,Right,Bottom}) Visible region in virtual space
-            @returns    True, if visible.
-            */
             this.isVisible = function (visibleBox_v) {
                 var objRight = this.x + this.width;
                 var objBottom = this.y + this.height;
                 return Math.max(this.x, visibleBox_v.Left) <= Math.min(objRight, visibleBox_v.Right) && Math.max(this.y, visibleBox_v.Top) <= Math.min(objBottom, visibleBox_v.Bottom);
             };
 
-            /* Checks whether the given point (virtual) is inside the object
-            (should take into account the shape) */
             this.isInside = function (point_v) {
                 return point_v.x >= this.x && point_v.x <= this.x + this.width && point_v.y >= this.y && point_v.y <= this.y + this.height;
             };
 
-            /* Renders a CanvasElement.
-            @param ctx              (context2d) Canvas context2d to render on.
-            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
-            @param viewport2d       (Viewport2d) current viewport
-            @param size_p           ({x,y}) size of bounding box of this element in pixels
-            @param opacity          (float in [0,1]) 0 means transparent, 1 means opaque.
-            @remarks The method is implemented for each particular VirtualCanvas element.
-            */
             this.render = function (ctx, visibleBox_v, viewport2d, size_p, opacity) {
             };
         }
         VCContent.CanvasElement = CanvasElement;
 
-        /* Adds a rectangle as a child of the given virtual canvas element.
-        @param element   (CanvasElement) Parent element, whose children is to be new element.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the rectangle appearance
-        */
         VCContent.addRectangle = function (element, layerid, id, vx, vy, vw, vh, settings) {
             return VCContent.addChild(element, new CanvasRectangle(element.vc, layerid, id, vx, vy, vw, vh, settings), false);
         };
 
-        /* Adds a circle as a child of the given virtual canvas element.
-        @param element   (CanvasElement) Parent element, whose children is to be new element.
-        @param layerid   (any type) id of the layer for this element
-        @param id        (any type) id of an element
-        @param vxc       (number) center x in virtual space
-        @param vyc       (number) center y in virtual space
-        @param vradius   (number) radius in virtual space
-        @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the circle appearance
-        @remarks
-        The element is always rendered as a circle and ignores the aspect ratio of the viewport.
-        For this, circle radius in pixels is computed from its virtual width.
-        */
         VCContent.addCircle = function (element, layerid, id, vxc, vyc, vradius, settings, suppressCheck) {
             return VCContent.addChild(element, new CanvasCircle(element.vc, layerid, id, vxc, vyc, vradius, settings), suppressCheck);
         };
 
-        /* Adds an image as a child of the given virtual canvas element.
-        @param element   (CanvasElement) Parent element, whose children is to be new element.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param z    (number) z-index
-        @param imgSrc (string) image URI
-        @param onload (optional callback function) called when image is loaded
-        @param parent (CanvasElement) Parent element, whose children is to be new element.
-        */
         VCContent.addImage = function (element, layerid, id, vx, vy, vw, vh, imgSrc, onload) {
             if (vw <= 0 || vh <= 0)
                 throw "Image size must be positive";
@@ -1083,94 +906,26 @@ var CZ;
             return VCContent.addChild(element, initializer(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
 
-        /* Adds a video as a child of the given virtual canvas element.
-        @param element   (CanvasElement) Parent element, whose children is to be new element.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param videoSource (string) video URI
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param z (number) z-index
-        */
         VCContent.addVideo = function (element, layerid, id, videoSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasVideoItem(element.vc, layerid, id, videoSource, vx, vy, vw, vh, z), false);
         };
 
-        /* Adds a pdf as a child of the given virtual canvas element.
-        @param element   (CanvasElement) Parent element, whose children is to be new element.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param pdfSource (string) pdf URI
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param z (number) z-index
-        */
         VCContent.addPdf = function (element, layerid, id, pdfSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasPdfItem(element.vc, layerid, id, pdfSource, vx, vy, vw, vh, z), false);
         };
 
-        /* Adds an audio as a child of the given virtual canvas element.
-        @param element   (CanvasElement) Parent element, whose children is to be new element.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param audioSource (string) audio URI
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param z (number) z-index
-        */
         var addAudio = function (element, layerid, id, audioSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
         };
 
-        /* Adds a embed skydrive document as a child of the given virtual canvas element.
-        @param element   (CanvasElement) Parent element, whose children is to be new element.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param embedSource (string) embed document code
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param z (number) z-index
-        */
         VCContent.addSkydriveDocument = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasSkydriveDocumentItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
 
-        /* Adds a embed skydrive image as a child of the given virtual canvas element.
-        @param element   (CanvasElement) Parent element, whose children is to be new element.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param embedSource (string) embed image code. pattern: {url} {width} {height}
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param z (number) z-index
-        */
         VCContent.addSkydriveImage = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
 
-        /*  Adds a text element as a child of the given virtual canvas element.
-        @param element   (CanvasElement) Parent element, whose children is to be new element.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param baseline (number) y coordinate of the baseline in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param settings     ({ fillStyle, fontName }) Parameters of the text appearance
-        @param vw (number) optional width of the text; if undefined, it is automatically asigned to width of the given text line.
-        @remarks
-        Text width is adjusted using measureText() on first render call.
-        */
         function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw) {
             return VCContent.addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
         }
@@ -1183,18 +938,6 @@ var CZ;
         VCContent.addScrollText = addScrollText;
         ;
 
-        /*  Adds a multiline text element as a child of the given virtual canvas element.
-        @param element   (CanvasElement) Parent element, whose children is to be new element.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vh   (number) height of a text
-        @param lineWidth (number) width of a line to text output
-        @param settings     ({ fillStyle, fontName }) Parameters of the text appearance
-        @remarks
-        Text width is adjusted using measureText() on first render call.
-        */
         function addMultiLineText(element, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings) {
             return VCContent.addChild(element, new CanvasMultiLineTextItem(element.vc, layerid, id, vx, vy, vh, text, lineWidth, settings), false);
         }
@@ -1212,13 +955,6 @@ var CZ;
             }
         }
 
-        /* Renders a CanvasElement recursively
-        @param element          (CanvasElement) element to render
-        @param contexts         (map<layerid,context2d>) Contexts for layers' canvases.
-        @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
-        @param viewport2d       (Viewport2d) current viewport
-        @param opacity          (float in [0,1]) 0 means transparent, 1 means opaque.
-        */
         VCContent.render = function (element, contexts, visibleBox_v, viewport2d, opacity) {
             if (!element.isVisible(visibleBox_v)) {
                 if (element.isRendered)
@@ -1252,29 +988,14 @@ var CZ;
             }
         };
 
-        /* Adds a CanvasElement instance to the children array of this element.
-        @param  element     (CanvasElement) new child of this element
-        @returns    the added element
-        @remarks    Bounding box of element must be included in bounding box of the this element. Otherwise, throws an exception.
-        The method must be called within the BeginEdit/EndEdit of the root item.
-        */
         VCContent.addChild = function (parent, element, suppresCheck) {
             var isWithin = parent.width == Infinity || (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) && (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
 
-            // if (!isWithin)
-            //     console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
-            //if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
             parent.children.push(element);
             element.parent = parent;
             return element;
         };
 
-        /* Looks up an element with given id in the children of this element and removes it with its children.
-        @param id   (any) id of an element
-        @returns    true, if element found and removed; otherwise, false.
-        @remarks    The method must be called within the BeginEdit/EndEdit of the root item.
-        If a child has onRemove() method, it is called right after removing of the child and clearing of all its children (recursively).
-        */
         VCContent.removeChild = function (parent, id) {
             var n = parent.children.length;
             for (var i = 0; i < n; i++) {
@@ -1305,15 +1026,10 @@ var CZ;
                 if (timeline.onRemove)
                     timeline.onRemove();
 
-                //child.parent = null;
                 child.parent = timeline.parent;
             }
         };
 
-        /* Removes all children elements of this object (recursively).
-        @remarks    The method must be called within the BeginEdit/EndEdit of the root item.
-        For each descendant element that has onRemove() method, the method is called right after its removing and clearing of all its children (recursively).
-        */
         function clear(element) {
             var n = element.children.length;
             for (var i = 0; i < n; i++) {
@@ -1333,11 +1049,6 @@ var CZ;
         }
         ;
 
-        /* Finds and returns a child element with given id (no recursion)
-        @param id   (any) id of a child element
-        @returns    The children object (derived from CanvasContentItem)
-        @exception  if there is no child with the id
-        */
         function getChild(element, id) {
             var n = element.children.length;
             for (var i = 0; i < n; i++) {
@@ -1349,58 +1060,28 @@ var CZ;
         VCContent.getChild = getChild;
         ;
 
-        /*****************************************************************************************/
-        /* Root element                                                                          */
-        /*  A root of an element tree of a VirtualCanvas.
-        @param vc   (VirtualCanvas) A virtual canvas that own this element tree.
-        @param layerid   (any type) id of the layer for this object
-        @param id   (any type) id of the object
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        */
         function CanvasRootElement(vc, layerid, id, vx, vy, vw, vh) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
             this.opacity = 0;
 
-            /* Overrides base function. Root element is visible when it has at least one child. */
             this.isVisible = function (visibleBox_v) {
                 return this.children.length != 0;
             };
 
-            /* Begins editing of the element tree.
-            @returns This element.
-            @remarks Call BeginEdit prior to modify an element tree. The EndEdit method must be called, when editing is to be completed.
-            The VirtualCanvas is invalidated on EndEdit only.
-            */
             this.beginEdit = function () {
                 return this;
             };
 
-            /* Ends editing of the element tree.
-            @param dontRender   (number) if zero (default value), invalidates and renders the virtual canvas content.
-            @returns This element.
-            @remarks Call BeginEdit prior to modify an element tree. The EndEdit method must be called, when editing is to be completed.
-            The VirtualCanvas is invalidated on EndEdit only, if dontRender is false.
-            */
             this.endEdit = function (dontRender) {
                 if (!dontRender)
                     this.vc.invalidate();
             };
 
-            /* Checks whether the given point (virtual) is inside the object
-            (should take into account the shape) */
             this.isInside = function (point_v) {
                 return true;
             };
 
-            /* Renders a CanvasElement recursively
-            @param contexts         (map<layerid,context2d>) Contexts for layers' canvases.
-            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
-            @param viewport2d       (Viewport2d) current viewport
-            */
             this.render = function (contexts, visibleBox_v, viewport2d) {
                 this.vc.breadCrumbs = [];
                 if (!this.isVisible(visibleBox_v))
@@ -1425,12 +1106,6 @@ var CZ;
         }
         VCContent.CanvasRootElement = CanvasRootElement;
 
-        /*****************************************************************************************/
-        /* Dynamic Level of Details element                                                      */
-        /* Gets the zoom level for the given size of an element (in pixels).
-        @param size_p           ({x,y}) size of bounding box of this element in pixels
-        @returns (number)   zoom level which minimum natural number or zero zl so that max(size_p.x,size_p.y) <= 2^zl
-        */
         function getZoomLevel(size_p) {
             var sz = Math.max(size_p.x, size_p.y);
             if (sz <= 1)
@@ -1448,10 +1123,6 @@ else
             return zl;
         }
 
-        /* A base class for elements those support different content for different zoom levels.
-        @remarks
-        Property "removeWhenInvisible" is optional. If set, the content is completely removed every time when isRendered changes from true to false.
-        */
         function CanvasDynamicLOD(vc, layerid, id, vx, vy, vw, vh) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -1463,9 +1134,6 @@ else
 
             var self = this;
 
-            /* Returns new content elements tree for the given zoom level, if it should change, or null.
-            @returns { zoomLevel: number, content: CanvasElement}, or null.
-            */
             this.changeZoomLevel = function (currentZoomLevel, newZoomLevel) {
                 return null;
             };
@@ -1494,13 +1162,6 @@ else
                 }
             };
 
-            /* Renders a rectangle.
-            @param ctx              (context2d) Canvas context2d to render on.
-            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
-            @param viewport2d       (Viewport2d) current viewport
-            @param size_p           ({x,y}) size of bounding box of this element in pixels
-            @remarks The method is implemented for each particular VirtualCanvas element.
-            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 if (this.asyncContent)
                     return;
@@ -1523,9 +1184,6 @@ else
                     var renderTimeDiff = renderTime.getTime() - self.lastRenderTime;
                     self.lastRenderTime = renderTime.getTime();
 
-                    // Override the default contentAppearanceAnimationStep,
-                    // instead of being a constant it now depends on the time,
-                    // such that each transition animation takes about 1.6 sec.
                     var contentAppearanceAnimationStep = renderTimeDiff / 1600;
 
                     var doInvalidate = false;
@@ -1572,23 +1230,12 @@ else
                         this.content = null;
                     }
 
-                    /* Set hasContentItems to false for parent infodot.
-                    if (this.parent.hasContentItems != null || this.parent.hasContentItems)
-                    this.parent.hasContentItems = false; */
                     this.zoomLevel = 0;
                 }
             };
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
 
-        /*****************************************************************************************/
-        /* Primitive elements                                                                    */
-        /*  An element which doesn't have visual representation, but can contain other elements.
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        */
         function ContainerElement(vc, layerid, id, vx, vy, vw, vh) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -1599,28 +1246,12 @@ else
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
 
-        /*  A rectangle element that can be added to a VirtualCanvas.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param settings  ({strokeStyle,lineWidth,fillStyle,outline:boolean}) Parameters of the rectangle appearance
-        */
         function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
             this.settings = settings;
             this.type = "rectangle";
 
-            /* Renders a rectangle.
-            @param ctx              (context2d) Canvas context2d to render on.
-            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
-            @param viewport2d       (Viewport2d) current viewport
-            @param size_p           ({x,y}) size of bounding box of this element in pixels
-            @remarks The method is implemented for each particular VirtualCanvas element.
-            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 var p = viewport2d.pointVirtualToScreen(this.x, this.y);
                 var p2 = viewport2d.pointVirtualToScreen(this.x + this.width, this.y + this.height);
@@ -1714,15 +1345,6 @@ else
         }
         VCContent.CanvasRectangle = CanvasRectangle;
 
-        /*  A Timeline element that can be added to a VirtualCanvas (Rect + caption + bread crumbs tracing).
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the rectangle appearance
-        */
         function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo) {
             this.base = CanvasRectangle;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -1762,7 +1384,6 @@ else
                 this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
             }
 
-            //this.opacity = timelineinfo.opacity;
             this.reactsOnMouse = true;
 
             this.tooltipEnabled = true;
@@ -1781,7 +1402,6 @@ else
                     }
                 }
 
-                //make currentTimeline to this
                 this.vc.currentlyHoveredTimeline = this;
 
                 this.settings.strokeStyle = CZ.Settings.timelineHoveredBoxBorderColor;
@@ -1861,16 +1481,8 @@ else
                 this.vc.requestInvalidate();
             };
 
-            //saving render call before overriding it
             this.base_render = this.render;
 
-            /* Renders a timeline.
-            @param ctx              (context2d) Canvas context2d to render on.
-            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
-            @param viewport2d       (Viewport2d) current viewport
-            @param size_p           ({x,y}) size of bounding box of this element in pixels
-            @remarks The method is implemented for each particular VirtualCanvas element.
-            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 this.titleObject.initialized = false;
 
@@ -1878,7 +1490,6 @@ else
                     this.settings.gradientOpacity = Math.min(1, Math.max(0, this.settings.gradientOpacity + this.settings.hoverAnimationDelta));
                 }
 
-                //rendering itself
                 this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
 
                 if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0) {
@@ -1916,7 +1527,6 @@ else
                         this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                     };
 
-                    // remove event handlers to prevent their stacking
                     this.favoriteBtn.onRemove = function () {
                         this.onmousehover = undefined;
                         this.onmouseunhover = undefined;
@@ -1945,7 +1555,6 @@ else
                         this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                     };
 
-                    // remove event handlers to prevent their stacking
                     this.editButton.onRemove = function () {
                         this.onmousehover = undefined;
                         this.onmouseunhover = undefined;
@@ -1963,10 +1572,8 @@ else
                 var p = viewport2d.pointVirtualToScreen(this.x, this.y);
                 var p2 = { x: p.x + size_p.x, y: p.y + size_p.y };
 
-                // is center of canvas inside timeline
                 var isCenterInside = viewport2d.visible.centerX - CZ.Settings.timelineCenterOffsetAcceptableImplicity <= this.x + this.width && viewport2d.visible.centerX + CZ.Settings.timelineCenterOffsetAcceptableImplicity >= this.x && viewport2d.visible.centerY - CZ.Settings.timelineCenterOffsetAcceptableImplicity <= this.y + this.height && viewport2d.visible.centerY + CZ.Settings.timelineCenterOffsetAcceptableImplicity >= this.y;
 
-                // is timeline inside "breadcrumb offset box"
                 var isVisibleInTheRectangle = ((p.x < CZ.Settings.timelineBreadCrumbBorderOffset && p2.x > viewport2d.width - CZ.Settings.timelineBreadCrumbBorderOffset) || (p.y < CZ.Settings.timelineBreadCrumbBorderOffset && p2.y > viewport2d.height - CZ.Settings.timelineBreadCrumbBorderOffset));
 
                 if (isVisibleInTheRectangle && isCenterInside) {
@@ -1983,33 +1590,14 @@ else
             this.prototype = new CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings);
         }
 
-        /*  A circle element that can be added to a VirtualCanvas.
-        @param layerid   (any type) id of the layer for this element
-        @param id        (any type) id of an element
-        @param vxc       (number) center x in virtual space
-        @param vyc       (number) center y in virtual space
-        @param vradius   (number) radius in virtual space
-        @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the circle appearance
-        @remarks
-        The element is always rendered as a circle and ignores the aspect ratio of the viewport.
-        For this, circle radius in pixels is computed from its virtual width.
-        */
         function CanvasCircle(vc, layerid, id, vxc, vyc, vradius, settings) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vxc - vradius, vyc - vradius, 2.0 * vradius, 2.0 * vradius);
             this.settings = settings;
             this.isObservedNow = false;
 
-            //that takes large enough rendering space according to infoDotAxisFreezeThreshold var in settings.js
             this.type = "circle";
 
-            /* Renders a circle.
-            @param ctx              (context2d) Canvas context2d to render on.
-            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
-            @param viewport2d       (Viewport2d) current viewport
-            @param size_p           ({x,y}) size of bounding box of this element in pixels
-            @remarks The method is implemented for each particular VirtualCanvas element.
-            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 var rad = this.width / 2.0;
                 var xc = this.x + rad;
@@ -2039,8 +1627,6 @@ else
                 }
             };
 
-            /* Checks whether the given point (virtual) is inside the object
-            (should take into account the shape) */
             this.isInside = function (point_v) {
                 var len2 = CZ.Common.sqr(point_v.x - vxc) + CZ.Common.sqr(point_v.y - this.y - this.height / 2);
                 return len2 <= vradius * vradius;
@@ -2049,8 +1635,6 @@ else
             this.prototype = new CanvasElement(vc, layerid, id, vxc - vradius / 2, vyc - vradius / 2, vradius, vradius);
         }
 
-        /*A popup window element
-        */
         function addPopupWindow(url, id, width, height, scrollbars, resizable) {
             var w = width;
             var h = height;
@@ -2060,10 +1644,6 @@ else
             window.open(url, id, features);
         }
 
-        /*
-        Draws text by scaling canvas to match fontsize rather than change fontsize.
-        This behaviour minimizes text shaking in chrome.
-        */
         function drawText(text, ctx, x, y, fontSize, fontName) {
             var br = ($).browser;
             var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
@@ -2083,20 +1663,6 @@ else
             }
         }
 
-        /*  A text element on a virtual canvas.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param baseline (number) y coordinate of the baseline in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param settings     ({ fillStyle, fontName, textAlign, textBaseLine, wrapText, numberOfLines, adjustWidth }) Parameters of the text appearance
-        @param vw (number) optional width of the text; if undefined, it is automatically asigned to width of the given text line.
-        @remarks
-        Text width is adjusted using measureText() on first render call.
-        If textAlign is center, then width must be provided.
-        */
         function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, wv ? wv : 0, vh);
@@ -2114,13 +1680,6 @@ else
             this.initialized = false;
             this.screenFontSize = 0;
 
-            /* Renders text.
-            @param ctx              (context2d) Canvas context2d to render on.
-            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
-            @param viewport2d       (Viewport2d) current viewport
-            @param size_p           ({x,y}) size of bounding box of this element in pixels
-            @remarks The method is implemented for each particular VirtualCanvas element.
-            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 var p = viewport2d.pointVirtualToScreen(this.x, this.newY);
                 var bp = viewport2d.pointVirtualToScreen(this.x, this.newBaseline).y;
@@ -2142,7 +1701,6 @@ else
                         while (true) {
                             ctx.font = fontSize + "pt " + this.settings.fontName;
 
-                            // Splitting the text into lines
                             var mlines = this.text.split('\n');
                             var textHeight = 0;
                             var lines = [];
@@ -2267,17 +1825,6 @@ else if (this.settings.textAlign === 'right')
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, wv ? wv : 0, vh);
         }
 
-        /*  A multiline text element on a virtual canvas.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vh   (number) height of a text
-        @param lineWidth (number) width of a line to text output
-        @param settings     ({ fillStyle, fontName }) Parameters of the text appearance
-        @remarks
-        Text width is adjusted using measureText() on first render call.
-        */
         function CanvasMultiLineTextItem(vc, layerid, id, vx, vy, vh, text, lineWidth, settings) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vh * 10, vh);
@@ -2321,23 +1868,11 @@ else if (this.settings.textAlign === 'right')
                 ctx.textBaseline = 'top';
                 var height = viewport2d.heightVirtualToScreen(this.height);
                 textOutput(ctx, this.text, p.x, p.y, height, lineWidth * height);
-                // ctx.fillText(this.text, p.x, p.y);
             };
 
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vh * 10, vh);
         }
 
-        /*  Represents an image on a virtual canvas.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param onload (optional callback function) called when image is loaded
-        @remarks
-        optional property onLoad() is called if defined when the image is loaded and the element is completely initialized.
-        */
         function CanvasImage(vc, layerid, id, imageSource, vx, vy, vw, vh, onload) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -2356,13 +1891,11 @@ else if (this.settings.textAlign === 'right')
                         var ar0 = self.width / self.height;
                         var ar1 = img.naturalWidth / img.naturalHeight;
                         if (ar0 > ar1) {
-                            // vh ~ img.height, vw is to be adjusted
                             var imgWidth = ar1 * self.height;
                             var offset = (self.width - imgWidth) / 2.0;
                             self.x += offset;
                             self.width = imgWidth;
                         } else if (ar0 < ar1) {
-                            // vw ~ img.width, vh is to be adjusted
                             var imgHeight = self.width / ar1;
                             var offset = (self.height - imgHeight) / 2.0;
                             self.y += offset;
@@ -2413,16 +1946,6 @@ else if (this.settings.textAlign === 'right')
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
 
-        /*  Represents an image on a virtual canvas with support of dynamic level of detail.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param imageSources   [{ zoomLevel, imageSource }] Ordered array of image sources for different zoom levels
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param onload (optional callback function) called when image is loaded
-        */
         function CanvasLODImage(vc, layerid, id, imageSources, vx, vy, vw, vh, onload) {
             this.base = CanvasDynamicLOD;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -2448,23 +1971,10 @@ else if (this.settings.textAlign === 'right')
             this.prototype = new CanvasDynamicLOD(vc, layerid, id, vx, vy, vw, vh);
         }
 
-        /* A canvas element which can host any of HTML elements.
-        @param vc        (jquery to virtual canvas) note that vc.element[0] is the virtual canvas object
-        @param layerid   (any type) id of the layer for this element
-        @param id        (any type) id of an element
-        @param vx        (number)   x of left top corner in virtual space
-        @param vy        (number)   y of left top corner in virtual space
-        @param vw        (number)   width of in virtual space
-        @param vh        (number)   height of in virtual space
-        @param z         (number) z-index
-        */
         function CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
 
-            /* Initializes content of the CanvasDomItem.
-            @param content          HTML element to add to virtual canvas
-            @remarks The method assigns this.content property and sets up the styles of the content. */
             this.initializeContent = function (content) {
                 this.content = content;
                 if (content) {
@@ -2474,7 +1984,6 @@ else if (this.settings.textAlign === 'right')
                 }
             };
 
-            /* This function is called when isRendered changes, i.e. when we stop or start render this element. */
             this.onIsRenderedChanged = function () {
                 if (!this.content)
                     return;
@@ -2486,7 +1995,6 @@ else if (this.settings.textAlign === 'right')
                     }
                     this.content.style.display = 'block';
                 } else {
-                    /* If we stop render it, we make it invisible */
                     this.content.style.display = 'none';
                 }
             };
@@ -2495,17 +2003,13 @@ else if (this.settings.textAlign === 'right')
                     return;
                 var p = viewport2d.pointVirtualToScreen(this.x, this.y);
 
-                // p.x = p.x + 8; p.y = p.y + 8; // todo: properly position relative to VC and remove this offset
-                //Define screen rectangle
                 var screenTop = 0;
                 var screenBottom = viewport2d.height;
                 var screenLeft = 0;
                 var screenRight = viewport2d.width;
 
-                //Define clip rectangle. By defautlt, video is not clipped. If video element crawls from screen rect, clip it
                 var clipRectTop = 0, clipRectLeft = 0, clipRectBottom = size_p.y, clipRectRight = size_p.x;
 
-                //Vertical intersection ([a1,a2] are screen top and bottom, [b1,b2] are iframe top and bottom)
                 var a1 = screenTop;
                 var a2 = screenBottom;
                 var b1 = p.y;
@@ -2517,7 +2021,6 @@ else if (this.settings.textAlign === 'right')
                     clipRectBottom = c2 - p.y;
                 }
 
-                //Horizontal intersection ([a1,a2] are screen left and right, [b1,b2] are iframe left and right)
                 a1 = screenLeft;
                 a2 = screenRight;
                 b1 = p.x;
@@ -2529,7 +2032,6 @@ else if (this.settings.textAlign === 'right')
                     clipRectRight = c2 - p.x;
                 }
 
-                //Finally, reset iframe style.
                 this.content.style.left = p.x + 'px';
                 this.content.style.top = p.y + 'px';
                 this.content.style.width = size_p.x + 'px';
@@ -2539,7 +2041,6 @@ else if (this.settings.textAlign === 'right')
                 this.content.style.filter = 'alpha(opacity=' + (opacity * 100) + ')';
             };
 
-            /* The functions is called when the canvas element is removed from the elements tree */
             this.onRemove = function () {
                 if (!this.content)
                     return;
@@ -2559,26 +2060,10 @@ else if (this.settings.textAlign === 'right')
         }
         VCContent.CanvasDomItem = CanvasDomItem;
 
-        /*Represents Text block with scroll*/
-        /*  Represents an image on a virtual canvas.
-        @param videoSrc     video source
-        @param vx           x of left top corner in virtual space
-        @param vy           y of left top corner in virtual space
-        @param vw           width of in virtual space
-        @param vh           height of in virtual space
-        @param z            z-index
-        @param settings     Parameters of the appearance
-        */
         function CanvasScrollTextItem(vc, layerid, id, vx, vy, vw, vh, text, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
 
-            //Creating content element
-            //Our text will be drawn on div
-            //To enable overflow:auto effect in IE, we have to use position:relative
-            //But in vccontent we use position:absolute
-            //So, we create "wrapping" div elemWrap, with position:absolute
-            //Inside elemWrap, create child div with position:relative
             var elem = $("<div></div>", {
                 id: "citext_" + id,
                 class: "contentItemDescription"
@@ -2591,11 +2076,9 @@ else if (this.settings.textAlign === 'right')
             var textElem = $("<div style='position:relative' class='text'></div>");
             textElem.text(text).appendTo(elem);
 
-            //Initialize content
             this.initializeContent(elem[0]);
 
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
-                //Scale new font size
                 var fontSize = size_p.y / CZ.Settings.contentItemDescriptionNumberOfLines;
                 elem.css('font-size', fontSize + "px");
 
@@ -2615,14 +2098,6 @@ else if (this.settings.textAlign === 'right')
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
-        /*Represents PDF element
-        @param pdfSrc     pdf source
-        @param vx           x of left top corner in virtual space
-        @param vy           y of left top corner in virtual space
-        @param vw           width of in virtual space
-        @param vh           height of in virtual space
-        @param z            z-index
-        */
         function CanvasPdfItem(vc, layerid, id, pdfSrc, vx, vy, vw, vh, z) {
             var pdfViewer = "http://docs.google.com/viewer?url=";
             this.base = CanvasDomItem;
@@ -2648,14 +2123,6 @@ else
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
-        /*Represents video element
-        @param videoSrc     video source
-        @param vx           x of left top corner in virtual space
-        @param vy           y of left top corner in virtual space
-        @param vw           width of in virtual space
-        @param vh           height of in virtual space
-        @param z            z-index
-        */
         function CanvasVideoItem(vc, layerid, id, videoSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
@@ -2675,16 +2142,6 @@ else
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
-        /*Represents Audio element*/
-        /*  Represents an image on a virtual canvas.
-        @param audioSrc     audio source
-        @param vx           x of left top corner in virtual space
-        @param vy           y of left top corner in virtual space
-        @param vw           width of in virtual space
-        @param vh           height of in virtual space
-        @param z            z-index
-        @param settings     Parameters of the appearance
-        */
         function CanvasAudioItem(vc, layerid, id, audioSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
@@ -2699,14 +2156,6 @@ else
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
-        /*Represents skydrive embed document
-        @param embedSrc     embed document source code
-        @param vx           x of left top corner in virtual space
-        @param vy           y of left top corner in virtual space
-        @param vw           width of in virtual space
-        @param vh           height of in virtual space
-        @param z            z-index
-        */
         function CanvasSkydriveDocumentItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
@@ -2719,20 +2168,10 @@ else
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
-        /*Represents skydrive embed image
-        Image is scaled to fit entire container.
-        @param embedSrc     embed image source code. pattern: {url} {width} {height}
-        @param vx           x of left top corner in virtual space
-        @param vy           y of left top corner in virtual space
-        @param vw           width of in virtual space
-        @param vh           height of in virtual space
-        @param z            z-index
-        */
         function CanvasSkydriveImageItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
 
-            // parse src params
             var srcData = embededSrc.split(" ");
 
             var elem = document.createElement('iframe');
@@ -2748,18 +2187,14 @@ else
 
                 var p = viewport2d.pointVirtualToScreen(this.x, this.y);
 
-                // p.x = p.x + 8; p.y = p.y + 8; // todo: properly position relative to VC and remove this offset
-                // parse base size of iframe
                 var width = parseFloat(srcData[1]);
                 var height = parseFloat(srcData[2]);
 
-                // calculate scale level
                 var scale = size_p.x / width;
                 if (height / width > size_p.y / size_p.x) {
                     scale = size_p.y / height;
                 }
 
-                // position image in center of container
                 this.content.style.left = (p.x + size_p.x / 2) + 'px';
                 this.content.style.top = (p.y + size_p.y / 2) + 'px';
                 this.content.style.marginLeft = (-width / 2) + 'px';
@@ -2770,7 +2205,6 @@ else
                 this.content.style.opacity = opacity;
                 this.content.style.filter = 'alpha(opacity=' + (opacity * 100) + ')';
 
-                // scale iframe to fit entire container
                 this.content.style.webkitTransform = "scale(" + scale + ")";
                 this.content.style.msTransform = "scale(" + scale + ")";
                 this.content.style.MozTransform = "scale(" + scale + ")";
@@ -2779,16 +2213,6 @@ else
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
-        /*Represents a Seadragon based image
-        @param imageSource  image source
-        @param vx           x of left top corner in virtual space
-        @param vy           y of left top corner in virtual space
-        @param vw           width of in virtual space
-        @param vh           height of in virtual space
-        @param z            z-index
-        @param onload       (optional callback function) called when image is loaded
-        @oaram parent       parent element, whose child is to be seadragon image.
-        */
         function SeadragonImage(vc, parent, layerid, id, imageSource, vx, vy, vw, vh, z, onload) {
             var self = this;
             this.base = CanvasDomItem;
@@ -2820,7 +2244,6 @@ else
 
             this.onSuccess = function (resp) {
                 if (resp.error) {
-                    // the URL is malformed or the service is down
                     self.showFallbackImage();
                     return;
                 }
@@ -2886,23 +2309,11 @@ else
                 VCContent.addImage(parent, layerid, id, vx, vy, vw, vh, imageSource);
             };
 
-            // run
             self.requestDZI();
 
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
-        /*******************************************************************************************************/
-        /* Timelines                                                                                           */
-        /*******************************************************************************************************/
-        /* Adds a timeline composite element into a virtual canvas.
-        @param element   (CanvasElement) Parent element, whose children is to be new timeline.
-        @param layerid   (any type) id of the layer for this element
-        @param id        (any type) id of an element
-        @param timelineinfo  ({ timeStart (minus number of years BP), timeEnd (minus number of years BP), top (number), height (number),
-        header (string), fillStyle (color) })
-        @returns         root of the timeline tree
-        */
         function addTimeline(element, layerid, id, timelineinfo) {
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
             var timeline = VCContent.addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
@@ -2915,23 +2326,6 @@ else
         }
         VCContent.addTimeline = addTimeline;
 
-        /*******************************************************************************************************/
-        /* Infodots & content items                                                                            */
-        /*******************************************************************************************************/
-        /*  Represents an image on a virtual canvas with support of dynamic level of detail.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param contentItem ({ id, guid, date (string), title (string), description (string), mediaUrl (string), mediaType (string) }) describes content of this content item
-        @remarks Supported media types (contentItem.mediaType) are:
-        - image
-        - video
-        - audio
-        - pdf
-        */
         function ContentItem(vc, layerid, id, vx, vy, vw, vh, contentItem) {
             this.base = CanvasDynamicLOD;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -2939,7 +2333,6 @@ else
             this.type = 'contentItem';
             this.contentItem = contentItem;
 
-            // Building content of the item
             var titleHeight = vh * CZ.Settings.contentItemTopTitleHeight * 0.8;
             var mediaHeight = vh * CZ.Settings.contentItemMediaHeight;
             var descrHeight = CZ.Settings.contentItemFontHeight * vh;
@@ -2955,7 +2348,6 @@ else
             var sourceHeight = vh * CZ.Settings.contentItemSourceHeight * 0.8;
             var titleTop = sourceTop + verticalMargin + sourceHeight;
 
-            // Bounding rectangle
             var rect = VCContent.addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh, {
                 strokeStyle: CZ.Settings.contentItemBoundingBoxBorderColor,
                 lineWidth: CZ.Settings.contentItemBoundingBoxBorderWidth * vw,
@@ -2993,7 +2385,6 @@ else
 
                     var container = new ContainerElement(vc, layerid, id + "__content", vx, vy, vw, vh);
 
-                    // Media
                     var mediaID = id + "__media__";
                     var imageElem = null;
                     if (this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
@@ -3016,7 +2407,6 @@ else
                         VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
 
-                    // Title
                     var titleText = this.contentItem.title;
                     addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0, 0.9 * titleHeight, titleText, {
                         fontName: CZ.Settings.contentItemHeaderFontName,
@@ -3028,7 +2418,6 @@ else
                         numberOfLines: 1
                     }, contentWidth);
 
-                    // Source
                     var sourceText = this.contentItem.attribution;
                     var mediaSource = this.contentItem.mediaSource;
                     if (sourceText) {
@@ -3065,7 +2454,6 @@ else
                         addSourceText(vx + leftOffset, contentWidth, sourceTop);
                     }
 
-                    // Description
                     var descrTop = titleTop + titleHeight + verticalMargin;
                     var descr = addScrollText(container, layerid, id + "__description__", vx + leftOffset, descrTop, contentWidth, descrHeight, this.contentItem.description, 30, {});
 
@@ -3120,15 +2508,6 @@ else
             this.prototype = new CanvasDynamicLOD(vc, layerid, id, vx, vy, vw, vh);
         }
 
-        /*  An Infodot element that can be added to a VirtualCanvas.
-        @param layerid   (any type) id of the layer for this element
-        @param id   (any type) id of an element
-        @param vx   (number) x of left top corner in virtual space
-        @param vy   (number) y of left top corner in virtual space
-        @param vw   (number) width of a bounding box in virtual space
-        @param vh   (number) height of a bounding box in virtual space
-        @param infodotDescription  ({title})
-        */
         function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
             this.base = CanvasCircle;
             this.base(vc, layerid, id, time, vyc, radv, { strokeStyle: CZ.Settings.infoDotBorderColor, lineWidth: CZ.Settings.infoDotBorderWidth * radv, fillStyle: CZ.Settings.infoDotFillColor, isLineWidthVirtual: true });
@@ -3185,7 +2564,6 @@ else
                 this.vc.requestInvalidate();
 
                 if (this.vc.currentlyHoveredTimeline != null) {
-                    // stop active tooltip fadein animation and hide tooltip
                     CZ.Common.stopAnimationTooltip();
                     this.vc.currentlyHoveredTimeline.tooltipIsShown = false;
                 }
@@ -3229,10 +2607,8 @@ else
                 return zoomToElementHandler(this, e, 1.0);
             };
 
-            //Bibliography flag accroding to BUG 215750
             var bibliographyFlag = true;
 
-            // Building dynamic LOD content
             var infodot = this;
             var root = new CanvasDynamicLOD(vc, layerid, id + "_dlod", time - innerRad, vyc - innerRad, 2 * innerRad, 2 * innerRad);
             root.removeWhenInvisible = true;
@@ -3250,7 +2626,6 @@ else
                     if (curZl >= CZ.Settings.infodotShowContentThumbZoomLevel && curZl < CZ.Settings.infodotShowContentZoomLevel)
                         return null;
 
-                    // Tooltip is enabled now.
                     infodot.tooltipEnabled = true;
 
                     var contentItem = null;
@@ -3275,7 +2650,6 @@ else
                     if (curZl >= CZ.Settings.infodotShowContentZoomLevel)
                         return null;
 
-                    // Tooltip is disabled now.
                     infodot.tooltipEnabled = false;
 
                     if (infodot.tooltipIsShown == true) {
@@ -3314,7 +2688,6 @@ else
                                 title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + (exhibitYMD.month + 1) + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
                             }
                         } else {
-                            // Format year title with fixed precision
                             title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                         }
                     }
@@ -3377,11 +2750,8 @@ else
                         this.vc.element.css('cursor', 'default');
                     };
 
-                    //Parse url for parameter b (bibliography).
                     var bid = window.location.hash.match("b=([a-z0-9_\-]+)");
                     if (bid && bibliographyFlag) {
-                        //bid[0] - source string
-                        //bid[1] - found match
                         CZ.Bibliography.showBibliography({ infodot: infodotDescription, contentItems: infodot.contentItems }, contentItem, bid[1]);
                     }
 
@@ -3393,7 +2763,6 @@ else
                         };
                     }
                 } else {
-                    // Tooltip is enabled now.
                     infodot.tooltipEnabled = true;
 
                     infodot.hasContentItems = false;
@@ -3428,7 +2797,6 @@ else
                 }
             };
 
-            // Applying Jessica's proportions
             var _rad = 450.0 / 2.0;
             var k = 1.0 / _rad;
             var _wc = (252.0 + 0) * k;
@@ -3440,13 +2808,6 @@ else
             var xlt1 = _wc / 2 * radv + time;
             var ylt1 = _hc / 2 * radv + vyc;
 
-            /* Renders an infodot.
-            @param ctx              (context2d) Canvas context2d to render on.
-            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
-            @param viewport2d       (Viewport2d) current viewport
-            @param size_p           ({x,y}) size of bounding box of this element in pixels
-            @remarks The method is implemented for each particular VirtualCanvas element.
-            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 this.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
 
@@ -3473,8 +2834,6 @@ else
                 ctx.strokeStyle = CZ.Settings.contentItemBoundingBoxFillColor;
             };
 
-            /* Checks whether the given point (virtual) is inside the object
-            (should take into account the shape) */
             this.isInside = function (point_v) {
                 var len2 = CZ.Common.sqr(point_v.x - this.x - (this.width / 2)) + CZ.Common.sqr(point_v.y - this.y - (this.height / 2));
                 var rad = this.width / 2.0;
@@ -3484,11 +2843,6 @@ else
             this.prototype = new CanvasCircle(vc, layerid, id, time, vyc, radv, { strokeStyle: CZ.Settings.infoDotBorderColor, lineWidth: CZ.Settings.infoDotBorderWidth * radv, fillStyle: CZ.Settings.infoDotFillColor, isLineWidthVirtual: true });
         }
 
-        /*
-        @param infodot {CanvasElement}  Parent of the content item
-        @param cid  {string}            id of the content item
-        Returns {id,x,y,width,height,parent,type,vc} of a content item even if it is not presented yet in the infodot children collection.
-        */
         function getContentItem(infodot, cid) {
             if (infodot.type !== 'infodot' || infodot.contentItems.length === 0)
                 return null;
@@ -3514,14 +2868,6 @@ else
         }
         VCContent.getContentItem = getContentItem;
 
-        /* Adds an infodot composite element into a virtual canvas.
-        @param vc        (VirtualCanvas) VirtualCanvas hosting this element
-        @param element   (CanvasElement) Parent element, whose children is to be new timeline.
-        @param layerid   (any type) id of the layer for this element
-        @param id        (any type) id of an element
-        @param contentItems (array of { id, date (string), title (string), description (string), mediaUrl (string), mediaType (string) }) content items of the infodot, first is central.
-        @returns         root of the content item tree
-        */
         function addInfodot(element, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
             var infodot = new CanvasInfodot(element.vc, layerid, id, time, vyc, radv, contentItems, infodotDescription);
             return VCContent.addChild(element, infodot, true);
@@ -3556,7 +2902,6 @@ else
             var xr = xc + rad * (_xrc - _lw / 2);
             var yb = yc + rad * (_ybc - _lh / 2);
 
-            // build content items
             var vcitems = [];
 
             for (var i = 0, len = Math.min(CZ.Settings.infodotMaxContentItemsCount, n); i < len; i++) {
@@ -3575,17 +2920,12 @@ else
             return vcitems;
         }
 
-        /* Arranges given number of content items in a single part of an infodot, along a single coordinate axis (either x or y).
-        @param n    (number) Number of content items to arrange
-        @param dx   (number) Size of content item along the axis on which we arrange content items.
-        @returns null, if n is 0; array of lefts (tops) for each coordinate item. */
         function arrangeContentItemsInField(n, dx) {
             if (n == 0)
                 return null;
             var margin = 0.05 * dx;
             var x1, x2, x3, x4;
             if (n % 2 == 0) {
-                // 3 1 2 4
                 x1 = -margin / 2 - dx;
                 x2 = margin / 2;
                 if (n == 4) {
@@ -3595,7 +2935,6 @@ else
                 }
                 return [x1, x2];
             } else {
-                // 3 1 2
                 x1 = -dx / 2;
                 if (n > 1) {
                     x2 = dx / 2 + margin;
@@ -3608,18 +2947,9 @@ else
     })(CZ.VCContent || (CZ.VCContent = {}));
     var VCContent = CZ.VCContent;
 })(CZ || (CZ = {}));
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path="../../scripts/typings/jqueryui/jqueryui.d.ts" />
 var CZ;
 (function (CZ) {
     (function (UI) {
-        /**
-        * Base class for a listbox.
-        * - container: a jQuery object with listbox's container.
-        * - listBoxInfo: information about listbox's data and settings.
-        * - listItemInfo: information about types of listitems.
-        * - getType: a function to define type of listitems depending on their data.
-        */
         var ListBoxBase = (function () {
             function ListBoxBase(container, listBoxInfo, listItemsInfo, getType) {
                 if (typeof getType === "undefined") { getType = function (context) {
@@ -3642,7 +2972,6 @@ var CZ;
                     this.add(context[i]);
                 }
 
-                // Setup default handlers
                 this.itemDblClickHandler = function (item, idx) {
                 };
                 this.itemRemoveHandler = function (item, idx) {
@@ -3650,7 +2979,6 @@ var CZ;
                 this.itemMoveHandler = function (item, idx1, idx2) {
                 };
 
-                // Apply jQueryUI sortable widget.
                 var self = this;
                 if (listBoxInfo.sortableSettings) {
                     var origStart = listBoxInfo.sortableSettings.start;
@@ -3673,10 +3001,6 @@ var CZ;
                     this.container.sortable(listBoxInfo.sortableSettings);
                 }
             }
-            /**
-            * Produces listitem from data and add it to a listbox.
-            * - context: a data to display in a listitem.
-            */
             ListBoxBase.prototype.add = function (context) {
                 var type = this.getType(context);
                 var typeInfo = this.listItemsInfo[type];
@@ -3691,9 +3015,6 @@ var CZ;
                 return item;
             };
 
-            /**
-            * Removes listitem from a listbox.
-            */
             ListBoxBase.prototype.remove = function (item) {
                 var i = this.items.indexOf(item);
 
@@ -3704,9 +3025,6 @@ var CZ;
                 }
             };
 
-            /**
-            * Clears all listitems from a listbox.
-            */
             ListBoxBase.prototype.clear = function () {
                 for (var i = 0, len = this.items.length; i < len; ++i) {
                     var item = this.items[i];
@@ -3715,9 +3033,6 @@ var CZ;
                 this.items.length = 0;
             };
 
-            /**
-            * Selects an element of the listbox
-            */
             ListBoxBase.prototype.selectItem = function (item) {
                 var i = this.items.indexOf(item);
 
@@ -3726,23 +3041,14 @@ var CZ;
                 }
             };
 
-            /**
-            * Setup listitem clicked handler
-            */
             ListBoxBase.prototype.itemDblClick = function (handler) {
                 this.itemDblClickHandler = handler;
             };
 
-            /**
-            * Setup listitem removed handler
-            */
             ListBoxBase.prototype.itemRemove = function (handler) {
                 this.itemRemoveHandler = handler;
             };
 
-            /**
-            * Setup listitem move handler
-            */
             ListBoxBase.prototype.itemMove = function (handler) {
                 this.itemMoveHandler = handler;
             };
@@ -3750,13 +3056,6 @@ var CZ;
         })();
         UI.ListBoxBase = ListBoxBase;
 
-        /**
-        * Base class for a listitem.
-        * - parent: parent listbox.
-        * - container: a jQuery object with listitem's container.
-        * - uiMap: uiMap: a set of CSS selectors for elements in HTML code of listitem's container.
-        * - context: a data to display in a listitem.
-        */
         var ListItemBase = (function () {
             function ListItemBase(parent, container, uiMap, context) {
                 var _this = this;
@@ -3768,12 +3067,10 @@ var CZ;
                 this.container = container;
                 this.data = context;
 
-                // Setup click on a listitem
                 this.container.dblclick(function (_) {
                     return _this.parent.selectItem(_this);
                 });
 
-                // Setup close button of a listitem.
                 this.closeButton = this.container.find(uiMap.closeButton);
 
                 if (this.closeButton.length) {
@@ -3782,12 +3079,8 @@ var CZ;
                     });
                 }
 
-                // Append listitems container to a listbox.
                 this.parent.container.append(this.container);
             }
-            /**
-            * Closes an item and removes it from a listbox.
-            */
             ListItemBase.prototype.close = function () {
                 this.parent.remove(this);
             };
@@ -3797,9 +3090,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path="../scripts/authoring.ts" />
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../ui/controls/listboxbase.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -3908,10 +3198,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/tourstop-listbox.ts' />
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -3999,7 +3285,6 @@ var CZ;
             });
 
             TourStop.prototype.GetThumbnail = function (element) {
-                // uncomment for debug: return "http://upload.wikimedia.org/wikipedia/commons/7/71/Ivan_kramskoy_self_portrait_tr.gif";
                 var defaultThumb = "/images/Temp-Thumbnail2.png";
                 try  {
                     if (!element)
@@ -4100,7 +3385,6 @@ var CZ;
 
         var FormEditTour = (function (_super) {
             __extends(FormEditTour, _super);
-            // We only need to add additional initialization in constructor.
             function FormEditTour(container, formInfo) {
                 _super.call(this, container, formInfo);
 
@@ -4165,14 +3449,11 @@ var CZ;
                 return CZ.Service.deleteTour(this.tour.id);
             };
 
-            // Creates new tour instance from the current state of the UI.
-            // Returns a promise of the created tour. May fail.
             FormEditTour.prototype.putTourAsync = function (sequenceNum) {
                 var deferred = $.Deferred();
                 var self = this;
                 var stops = this.getStops();
 
-                // Add the tour to the local tours collection
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
                 var category = "tours";
@@ -4183,11 +3464,9 @@ var CZ;
                     tourId = this.tour.id;
                 }
 
-                // Posting the tour to the service
                 var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, category, n, stops));
 
                 request.done(function (q) {
-                    // build array of bookmarks of current tour
                     var tourBookmarks = new Array();
                     for (var j = 0; j < n; j++) {
                         var tourstop = stops[j];
@@ -4253,7 +3532,6 @@ else if (_this.tourStopsListBox.items.length == 0)
                     _this.saveButton.prop('disabled', true);
 
                     if (_this.tour == null) {
-                        // Add the tour to the local tours collection
                         _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
                             self.tour = tour;
                             CZ.Tours.tours.push(tour);
@@ -4306,7 +3584,6 @@ else if (_this.tourStopsListBox.items.length == 0)
                 });
             };
 
-            // Gets an array of TourStops as they are currently in the listbox.
             FormEditTour.prototype.getStops = function () {
                 var n = this.tourStopsListBox.items.length;
                 var stops = new Array(n);
@@ -4376,7 +3653,6 @@ else if (_this.tourStopsListBox.items.length == 0)
                 }
             };
 
-            // New tour stop is added.
             FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
                 CZ.Authoring.mode = "editTour";
                 CZ.Authoring.hideMessageWindow();
@@ -4397,9 +3673,6 @@ else if (_this.tourStopsListBox.items.length == 0)
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
-/// <reference path='typings/jquery/jquery.d.ts'/>
-/// <reference path='../ui/auth-edit-tour-form.ts'/>
 var CZ;
 (function (CZ) {
     (function (Service) {
@@ -4493,6 +3766,11 @@ var CZ;
 
         var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
 
+        var _isLocalHost = constants.environment === "Localhost";
+        var _dumpTweetsUrl = "/dumps/home/tweets.json";
+        var _dumpTimelinesUrl = "/dumps/home/timelines.json";
+        var _testLogin = false;
+
         function Request(urlBase) {
             var _url = urlBase;
             var _hasParameters = false;
@@ -4529,14 +3807,9 @@ var CZ;
         Service.Request = Request;
         ;
 
-        // NOTE: Clear collections to let the server decide what to load.
         Service.collectionName = "";
         Service.superCollectionName = "";
 
-        /**
-        * Chronozoom.svc Requests.
-        */
-        // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
         function getTimelines(r, sc, c) {
             if (typeof sc === "undefined") { sc = Service.superCollectionName; }
             if (typeof c === "undefined") { c = Service.collectionName; }
@@ -4558,11 +3831,6 @@ var CZ;
         }
         Service.getTimelines = getTimelines;
 
-        /**
-        * Information Retrieval.
-        */
-        // .../{superCollectionName}/collections
-        // NOTE: Not implemented in current API.
         function getCollections(superCollectionName) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4578,8 +3846,6 @@ var CZ;
         }
         Service.getCollections = getCollections;
 
-        // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
-        // NOTE: Not implemented in current API.
         function getStructure(r) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4597,8 +3863,6 @@ var CZ;
         }
         Service.getStructure = getStructure;
 
-        // .../{supercollection}/{collection}/data
-        // NOTE: Not implemented in current API.
         function postData(r) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4617,10 +3881,6 @@ var CZ;
         }
         Service.postData = postData;
 
-        /**
-        * Information Modification.
-        */
-        // .../{supercollection}/{collection}
         function putCollection(superCollectionName, collectionName, c) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4638,7 +3898,6 @@ var CZ;
         }
         Service.putCollection = putCollection;
 
-        // .../{supercollection}/{collection}
         function deleteCollection(c) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4655,7 +3914,6 @@ var CZ;
         }
         Service.deleteCollection = deleteCollection;
 
-        // .../{supercollection}/{collection}/timeline
         function putTimeline(t) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4676,7 +3934,6 @@ var CZ;
         }
         Service.putTimeline = putTimeline;
 
-        // .../{supercollection}/{collection}/timeline
         function deleteTimeline(t) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4696,7 +3953,6 @@ var CZ;
         }
         Service.deleteTimeline = deleteTimeline;
 
-        // .../{supercollection}/{collection}/exhibit
         function putExhibit(e) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4717,7 +3973,6 @@ var CZ;
         }
         Service.putExhibit = putExhibit;
 
-        // .../{supercollection}/{collection}/exhibit
         function deleteExhibit(e) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4737,7 +3992,6 @@ var CZ;
         }
         Service.deleteExhibit = deleteExhibit;
 
-        // .../{supercollection}/{collection}/contentitem
         function putContentItem(ci) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4758,7 +4012,6 @@ var CZ;
         }
         Service.putContentItem = putContentItem;
 
-        // .../{supercollection}/{collection}/contentitem
         function deleteContentItem(ci) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4778,8 +4031,6 @@ var CZ;
         }
         Service.deleteContentItem = deleteContentItem;
 
-        // .../{supercollection}/{collection}/tour
-        // Creates or updates a tour
         function putTour2(t) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4800,8 +4051,6 @@ var CZ;
         }
         Service.putTour2 = putTour2;
 
-        // .../{supercollection}/{collection}/tour
-        // Deletes a tour
         function deleteTour(tourId) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4822,7 +4071,6 @@ var CZ;
         }
         Service.deleteTour = deleteTour;
 
-        // .../{supercollection}/{collection}/tours
         function getTours() {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -4841,7 +4089,6 @@ var CZ;
         }
         Service.getTours = getTours;
 
-        // .../search
         function getSearch(query) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -4866,7 +4113,6 @@ var CZ;
         }
         Service.getSearch = getSearch;
 
-        // .../bing/getImages
         function getBingImages(query, top, skip) {
             if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
             if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
@@ -4894,7 +4140,6 @@ var CZ;
         }
         Service.getBingImages = getBingImages;
 
-        // .../bing/getVideos
         function getBingVideos(query, top, skip) {
             if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
             if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
@@ -4922,8 +4167,6 @@ var CZ;
         }
         Service.getBingVideos = getBingVideos;
 
-        // .../bing/getDocuments
-        // set doctype to undefined if you want it to be omited
         function getBingDocuments(query, doctype, top, skip) {
             if (typeof doctype === "undefined") { doctype = undefined; }
             if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
@@ -4953,7 +4196,6 @@ var CZ;
         }
         Service.getBingDocuments = getBingDocuments;
 
-        // .../twitter/getRecentTweets
         function getRecentTweets() {
             var request = new Service.Request(_serviceUrl);
             request.addToPath("twitter/getRecentTweets");
@@ -4965,14 +4207,13 @@ var CZ;
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: request.url,
+                url: _isLocalHost ? _dumpTweetsUrl : request.url,
                 success: function (response) {
                 }
             });
         }
         Service.getRecentTweets = getRecentTweets;
 
-        // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         function getServiceInformation() {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -4987,7 +4228,6 @@ var CZ;
         }
         Service.getServiceInformation = getServiceInformation;
 
-        // .../{supercollection}/{collection}/{reference}/contentpath
         function getContentPath(reference) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -5005,16 +4245,12 @@ var CZ;
         }
         Service.getContentPath = getContentPath;
 
-        /**
-        * Auxiliary Methods.
-        */
         function putExhibitContent(e, oldContentItems) {
             CZ.Authoring.resetSessionTimer();
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
             });
 
-            // Send PUT request for all exhibit's content items.
             var promises = e.contentItems.map(function (ci) {
                 return putContentItem(ci).then(function (response) {
                     ci.id = ci.guid = response;
@@ -5029,11 +4265,6 @@ var CZ;
         }
         Service.putExhibitContent = putExhibitContent;
 
-        /**
-        * Update user profile.
-        * @param  {Object} username .
-        * @param  {Object} email .
-        */
         function putProfile(displayName, email) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -5052,10 +4283,6 @@ var CZ;
         }
         Service.putProfile = putProfile;
 
-        /**
-        * Delete user profile.
-        * @param  {Object} username .
-        */
         function deleteProfile(displayName) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -5074,12 +4301,13 @@ var CZ;
         Service.deleteProfile = deleteProfile;
 
         function getProfile(displayName) {
-            if (typeof displayName === "undefined") { displayName = ""; }
+            if (typeof displayName === "undefined") { displayName = _testLogin ? "anonymous" : ""; }
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
-            if (displayName != "")
+            if (displayName != "") {
                 request.addParameter("name", displayName);
+            }
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -5129,7 +4357,7 @@ var CZ;
                 type: "GET",
                 cache: false,
                 dataType: "json",
-                url: request.url
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
         Service.getUserTimelines = getUserTimelines;
@@ -5142,8 +4370,8 @@ var CZ;
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
-                url: request.url
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
         Service.getUserFavorites = getUserFavorites;
@@ -5191,8 +4419,8 @@ var CZ;
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
-                url: request.url
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
         Service.getUserFeatured = getUserFeatured;
@@ -5231,7 +4459,6 @@ var CZ;
         }
         Service.putUserFeatured = putUserFeatured;
 
-        //Triples
         function putTriplet(subject, predicate, object) {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -5307,11 +4534,9 @@ var CZ;
     })(CZ.Service || (CZ.Service = {}));
     var Service = CZ.Service;
 })(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
 var CZ;
 (function (CZ) {
     (function (Dates) {
-        // array of month names to use in labels
         Dates.months = [
             'January',
             'February',
@@ -5327,7 +4552,6 @@ var CZ;
             'December'
         ];
 
-        // array of numbers of days for each month, 28 days in february by default
         Dates.daysInMonth = [
             31,
             28,
@@ -5343,11 +4567,9 @@ var CZ;
             31
         ];
 
-        // by give date gives coordinate in virtual coordinates
         function getCoordinateFromYMD(year, month, day) {
             var sign = (year === -1) ? 1 : year / Math.abs(year), isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, coord = (year > -1) ? year : year + 1;
 
-            // Get the number of day in the year.
             var sumDaysOfMonths = function (s, d, i) {
                 return s + +(i < month) * d;
             };
@@ -5365,9 +4587,6 @@ var CZ;
             if (typeof MarkerCorrection === "undefined") { MarkerCorrection = false; }
             var absCoord = Math.abs(coord), floorCoord = Math.floor(coord), sign = (coord === 0) ? 1 : coord / absCoord, day = 0, month = 0, year = (coord >= 1) ? floorCoord : floorCoord - 1, isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, daysFraction = sign * (absCoord - Math.abs(floorCoord));
 
-            // NOTE: Using Math.round() here causes day to be rounded to 365(366)
-            //       in case of the last day in a year. Do not increment day in
-            //       in this case.
             day = Math.round(daysFraction * daysInYear);
             if (MarkerCorrection)
                 day = Math.floor(daysFraction * daysInYear);
@@ -5389,12 +4608,7 @@ var CZ;
         }
         Dates.getYMDFromCoordinate = getYMDFromCoordinate;
 
-        // convert decimal year to virtual coordinate
-        // 9999 -> present day
-        // TODO: currently in database 1 BCE = -1 in virtual coords, but on client side 1 BCE = 0 in virtual coords
-        // decimalYear in database has to be equal to virtual coordinate?
         function getCoordinateFromDecimalYear(decimalYear) {
-            // get virtual coordinate of present day
             var localPresent = getPresent();
             var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
 
@@ -5402,9 +4616,7 @@ var CZ;
         }
         Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
 
-        // convert virtual coordinate to decimal year
         function getDecimalYearFromCoordinate(coordinate) {
-            // in database 1 BCE = -1, on client side 1 BCE = 0
             return coordinate < 1 ? --coordinate : coordinate;
         }
         Dates.getDecimalYearFromCoordinate = getDecimalYearFromCoordinate;
@@ -5430,21 +4642,12 @@ var CZ;
             } else if (coordinate < 1) {
                 year.year = (year.year - 1) / (-1);
 
-                // remove fraction part of year
                 year.year = Math.ceil(year.year);
                 year.regime = 'BCE';
             } else {
-                // remove fraction part of year
                 year.year = Math.floor(year.year);
             }
 
-            //if (year.regime === 'BCE') {
-            //    year.year += 2;
-            //   }
-            //if ((year.regime === 'CE') && (year.year === 0)) {
-            //    year.regime = 'BCE';
-            //    year.year = 1;
-            //   }
             return year;
         }
         Dates.convertCoordinateToYear = convertCoordinateToYear;
@@ -5509,52 +4712,34 @@ var CZ;
     })(CZ.Dates || (CZ.Dates = {}));
     var Dates = CZ.Dates;
 })(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='vccontent.ts'/>
-/// <reference path='service.ts'/>
-/// <reference path='dates.ts' />
-/**
-* The CZ submodule for Authoring Tool functionality.
-* Use initialize() method to bind UI with Authoring Tool.
-*/
 var CZ;
 (function (CZ) {
     (function (Authoring) {
-        // Virtual canvas widget.
         var _vcwidget;
 
-        // Mouse position.
         var _dragStart = {};
         var _dragPrev = {};
         var _dragCur = {};
 
-        // Current hovered object in virtual canvas.
         var _hovered = {};
 
-        // New timeline rectangle.
         var _rectPrev = { type: "rectangle" };
         var _rectCur = { type: "rectangle" };
 
-        // New exhibit circle.
         var _circlePrev = { type: "circle" };
         var _circleCur = { type: "circle" };
 
-        // Selected objects for editing.
         Authoring.selectedTimeline = {};
         Authoring.selectedExhibit = {};
         Authoring.selectedContentItem = {};
 
-        // Authoring Tool state.
         Authoring.isActive = false;
         Authoring.isEnabled = false;
         Authoring.isDragging = false;
 
-        //TODO: use enum for authoring modes when new authoring forms will be completly integrated
         Authoring.mode = null;
         Authoring.contentItemMode = null;
 
-        // Forms' handlers.
         Authoring.showCreateTimelineForm = null;
         Authoring.showCreateRootTimelineForm = null;
         Authoring.showEditTimelineForm = null;
@@ -5565,17 +4750,10 @@ var CZ;
         Authoring.showMessageWindow = null;
         Authoring.hideMessageWindow = null;
 
-        // Generic callback function set by the form when waits user's input (e.g. mouse click) to continue.
         Authoring.callback = null;
 
         Authoring.timer;
 
-        /**
-        * Tests a timeline/exhibit on intersection with another virtual canvas object.
-        * @param  {Object}  te   A timeline/exhibit to test.
-        * @param  {Object}  obj  Virtual canvas object.
-        * @return {Boolean}      True in case of intersection, False otherwise.
-        */
         function isIntersecting(te, obj) {
             switch (obj.type) {
                 case "timeline":
@@ -5586,12 +4764,6 @@ var CZ;
             }
         }
 
-        /**
-        * Tests a virtual canvas object on inclusion in a timeline.
-        * @param  {Object}  tp  An estimated parent timeline.
-        * @param  {Object}  obj An estimated child virtual canvas object.
-        * @return {Boolean}     True in case of inclusion, False otherwise.
-        */
         function isIncluded(tp, obj) {
             switch (obj.type) {
                 case "infodot":
@@ -5606,16 +4778,6 @@ var CZ;
             }
         }
 
-        /**
-        * The main function to test a timeline on intersections.
-        * First of all it tests on inclusion in parent timeline.
-        * Then it tests a timeline on intersection with each parent's child.
-        * Also tests on inclusion all timeline's children if it has some.
-        * @param  {Object} tp       An estimated parent timeline.
-        * @param  {Object} tc       An estimated child timeline. This one will be tested.
-        * @param  {Boolean} editmode If true, it doesn't take into account edited timeline.
-        * @return {Boolean}          True if test is passed, False otherwise.
-        */
         function checkTimelineIntersections(tp, tc, editmode) {
             var i = 0;
             var len = 0;
@@ -5647,15 +4809,6 @@ var CZ;
             return true;
         }
 
-        /**
-        * The main function to test an exhibit on intersections.
-        * First of all it tests on inclusion in parent timeline.
-        * Then it tests a timeline on intersection with each parent's child.
-        * @param  {Object} tp       An estimated parent timeline.
-        * @param  {Object} ec       An estimated child exhibit. This one will be tested.
-        * @param  {Boolean} editmode If true, it doesn't take into account edited exhibit.
-        * @return {Boolean}          True if test is passed, False otherwise.
-        */
         function checkExhibitIntersections(tp, ec, editmode) {
             var i = 0;
             var len = 0;
@@ -5669,18 +4822,13 @@ var CZ;
         }
         Authoring.checkExhibitIntersections = checkExhibitIntersections;
 
-        /**
-        * Updates rectangle of new timeline during creation.
-        */
         function updateNewRectangle() {
-            // Update rectangle's size and position.
             _rectCur.x = Math.min(_dragStart.x, _dragCur.x);
             _rectCur.y = Math.min(_dragStart.y, _dragCur.y);
             _rectCur.width = Math.abs(_dragStart.x - _dragCur.x);
             _rectCur.height = Math.abs(_dragStart.y - _dragCur.y);
 
             if (checkTimelineIntersections(_hovered, _rectCur, false)) {
-                // Set border's color of timeline's rectangle.
                 var settings = $.extend({}, _hovered.settings);
                 settings.strokeStyle = "yellow";
 
@@ -5693,12 +4841,7 @@ var CZ;
             }
         }
 
-        /**
-        * Updates circle of new exhibit during creation.
-        */
         function updateNewCircle() {
-            // Update circle's position and radius.
-            // NOTE: These values are heuristic.
             _circleCur.r = (_hovered.width > _hovered.height) ? _hovered.height / 27.7 : _hovered.width / 10.0;
 
             _circleCur.x = _dragCur.x - _circleCur.r;
@@ -5717,12 +4860,6 @@ var CZ;
             }
         }
 
-        /**
-        * Removes and then adds exhibit and all of its nested content from canvas. Used to simplify
-        * update of exhibit's info.
-        * Use it in when you need to update exhibit's or some of its content item's info.
-        * @param  {Object} e    An exhibit to renew.
-        */
         function renewExhibit(e) {
             var vyc = e.y + e.height / 2;
             var time = e.x + e.width / 2;
@@ -5735,16 +4872,11 @@ var CZ;
             var parent = e.parent;
             var radv = e.outerRad;
 
-            // remove and then adding infodot to position content items properly
             CZ.VCContent.removeChild(parent, id);
             return CZ.VCContent.addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
         }
         Authoring.renewExhibit = renewExhibit;
 
-        /**
-        * Creates new timeline and adds it to virtual canvas.
-        * @return {Object} Created timeline.
-        */
         function createNewTimeline() {
             return CZ.VCContent.addTimeline(_hovered, _hovered.layerid, undefined, {
                 timeStart: _rectCur.x,
@@ -5761,10 +4893,6 @@ var CZ;
         }
         Authoring.createNewTimeline = createNewTimeline;
 
-        /**
-        * Creates new exhibit and adds it to virtual canvas.
-        * @return {Object} Created exhibit.
-        */
         function createNewExhibit() {
             CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
             return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [], {
@@ -5774,23 +4902,15 @@ var CZ;
             });
         }
 
-        /**
-        * Updates title of edited timeline. It creates new CanvasText
-        * object for title for recalculation of title's size.
-        * @param  {Object} t Edited timeline, whose title to update.
-        */
         function updateTimelineTitle(t) {
-            // computing titleBorderBox - margins, width, height of canvas text based on algorithm in layout.ts
             var canvas = document.createElement("canvas");
             var ctx = canvas.getContext("2d");
             t.left = t.x;
             t.right = t.x + t.width;
             var titleBorderBox = CZ.Layout.GenerateTitleObject(t.height, t, ctx);
 
-            // remove old timeline header
             CZ.VCContent.removeChild(t, t.id + "__header__");
 
-            // add new timeline's header
             var baseline = t.y + titleBorderBox.marginTop + titleBorderBox.height / 2.0;
             t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + titleBorderBox.marginLeft, t.y + titleBorderBox.marginTop, baseline, titleBorderBox.height, t.title, {
                 fontName: CZ.Settings.timelineHeaderFontName,
@@ -5814,11 +4934,6 @@ var CZ;
             }
         }
 
-        /**
-        * Represents a collection of mouse events' handlers for each mode.
-        * Example of using: CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mouseup"]();
-        *                   (calls mouseup event handler for current mode)
-        */
         Authoring.modeMouseHandlers = {
             createTimeline: {
                 mousemove: function () {
@@ -5879,13 +4994,6 @@ var CZ;
             }
         };
 
-        /**
-        * The main function for binding UI and Authoring Tool.
-        * It assigns additional handlers for virtual canvas mouse
-        * events and forms' handlers.
-        * @param  {Object} vc           jQuery instance of virtual canvas.
-        * @param  {Object} formHandlers An object with the same "show..." methods as Authoring object.
-        */
         function initialize(vc, formHandlers) {
             _vcwidget = vc.data("ui-virtualCanvas");
 
@@ -5913,7 +5021,6 @@ var CZ;
                     _dragPrev = _dragCur;
                     _dragCur = posv;
 
-                    // NOTE: Using global variable to disable animation on click!
                     CZ.Common.controller.stopAnimation();
 
                     CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mouseup"]();
@@ -5933,7 +5040,6 @@ var CZ;
                 }
             });
 
-            // Assign forms' handlers.
             Authoring.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {
             };
             Authoring.showCreateRootTimelineForm = formHandlers && formHandlers.showCreateRootTimelineForm || function () {
@@ -5955,13 +5061,6 @@ var CZ;
         }
         Authoring.initialize = initialize;
 
-        /**
-        * Updates timeline's properties.
-        * Use it externally from forms' handlers.
-        * @param  {Object} t    A timeline to update.
-        * @param  {Object} prop An object with properties' values.
-        * @param  {Widget} form A dialog form for editing timeline.
-        */
         function updateTimeline(t, prop) {
             var deffered = jQuery.Deferred();
 
@@ -5986,18 +5085,15 @@ var CZ;
                     ]);
                 }
 
-                // Update title.
                 t.title = prop.title;
                 updateTimelineTitle(t);
 
                 CZ.Service.putTimeline(t).then(function (success) {
-                    // update ids if existing elements with returned from server
                     t.id = "t" + success;
                     t.guid = success;
                     t.titleObject.id = "t" + success + "__header__";
 
                     if (!t.parent.guid) {
-                        // Root timeline, refresh page
                         document.location.reload(true);
                     } else {
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
@@ -6015,11 +5111,6 @@ var CZ;
         Authoring.updateTimeline = updateTimeline;
         ;
 
-        /**
-        * Removes a timeline from virtual canvas.
-        * Use it externally from form's handlers.
-        * @param  {Object} t A timeline to remove.
-        */
         function removeTimeline(t) {
             var deferred = $.Deferred();
 
@@ -6031,18 +5122,11 @@ var CZ;
             CZ.VCContent.removeChild(t.parent, t.id);
 
             if (isRoot) {
-                // Root timeline, refresh page
                 document.location.reload(true);
             }
         }
         Authoring.removeTimeline = removeTimeline;
 
-        /**
-        * Updates exhibit's properties.
-        * Use it externally from forms' handlers.
-        * @param  {Object} e    An exhibit to update.
-        * @param  {Object} args An object with properties' values.
-        */
         function updateExhibit(oldExhibit, args) {
             var deferred = $.Deferred();
 
@@ -6053,7 +5137,6 @@ var CZ;
                 delete newExhibit.contentItems;
                 $.extend(true, newExhibit, args);
 
-                // pass cloned objects to CZ.Service calls to avoid any side effects
                 CZ.Service.putExhibit(newExhibit).then(function (response) {
                     newExhibit.guid = response.ExhibitId;
                     for (var i = 0; i < newExhibit.contentItems.length; i++) {
@@ -6083,11 +5166,6 @@ var CZ;
         }
         Authoring.updateExhibit = updateExhibit;
 
-        /**
-        * Removes an exhibit from virtual canvas.
-        * Use it externally from form's handlers.
-        * @param  {Object} e An exhibit to remove.
-        */
         function removeExhibit(e) {
             var deferred = $.Deferred();
 
@@ -6111,13 +5189,6 @@ var CZ;
         }
         Authoring.removeExhibit = removeExhibit;
 
-        /**
-        * Updates content item's properties in selected exhibit.
-        * Use it externally from forms' handlers.
-        * @param  {CanvasInfodot} e A selected exhibit.
-        * @param  {ContentItemMetadata} c A content item in selected exhibit.
-        * @param  {Object} args An object with updated property values.
-        */
         function updateContentItem(e, c, args) {
             var deferred = $.Deferred();
 
@@ -6142,12 +5213,6 @@ var CZ;
         }
         Authoring.updateContentItem = updateContentItem;
 
-        /**
-        * Removes content item from selected exhibit.
-        * Use it externally from form's handlers.
-        * @param  {CanvasInfodot} e A selected exhibit.
-        * @param  {ContentItemMetadata} c A content item in selected exhibit.
-        */
         function removeContentItem(e, c) {
             var deferred = $.Deferred();
 
@@ -6171,9 +5236,6 @@ var CZ;
         }
         Authoring.removeContentItem = removeContentItem;
 
-        /**
-        * Validates possible input errors for timelines.
-        */
         function validateTimelineData(start, end, title) {
             var isValid = (start !== false) && (end !== false);
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
@@ -6182,9 +5244,6 @@ var CZ;
         }
         Authoring.validateTimelineData = validateTimelineData;
 
-        /**
-        * Validates possible input errors for exhibits.
-        */
         function validateExhibitData(date, title, contentItems) {
             var isValid = date !== false;
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
@@ -6193,33 +5252,21 @@ var CZ;
         }
         Authoring.validateExhibitData = validateExhibitData;
 
-        /**
-        * Validates,if number is valid.
-        */
         function validateNumber(number) {
             return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number) && (number !== false);
         }
         Authoring.validateNumber = validateNumber;
 
-        /**
-        * Validates,if field is empty.
-        */
         function isNotEmpty(obj) {
             return (obj !== '' && obj !== null);
         }
         Authoring.isNotEmpty = isNotEmpty;
 
-        /**
-        * Validates,if timeline size is not negative or null
-        */
         function isIntervalPositive(start, end) {
             return (parseFloat(start) + 1 / 366 <= parseFloat(end));
         }
         Authoring.isIntervalPositive = isIntervalPositive;
 
-        /**
-        * Validates,if content item data is correct.
-        */
         function validateContentItems(contentItems, mediaInput) {
             var isValid = true;
             if (contentItems.length == 0) {
@@ -6247,10 +5294,8 @@ var CZ;
                         }
                     }
                 } else if (ci.mediaType.toLowerCase() === "video") {
-                    // Youtube
                     var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&]+&v=|\/user\/\S+))([^\/&#]{10,12})/;
 
-                    // Vimeo
                     var vimeo = /vimeo\.com\/([0-9]+)/i;
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i;
 
@@ -6261,7 +5306,6 @@ var CZ;
                         var vimeoVideoId = ci.uri.match(vimeo)[1];
                         ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
                     } else if (vimeoEmbed.test(ci.uri)) {
-                        //Embedded link provided
                     } else {
                         if (mediaInput) {
                             mediaInput.showError("Sorry, only YouTube or Vimeo videos are supported.");
@@ -6270,8 +5314,6 @@ var CZ;
                         isValid = false;
                     }
                 } else if (ci.mediaType.toLowerCase() === "pdf") {
-                    //Google PDF viewer
-                    //Example: http://docs.google.com/viewer?url=http%3A%2F%2Fwww.selab.isti.cnr.it%2Fws-mate%2Fexample.pdf&embedded=true
                     var pdf = /\.(pdf)$|\.(pdf)\?/i;
 
                     if (!pdf.test(ci.uri)) {
@@ -6284,7 +5326,6 @@ var CZ;
                         }
                     }
                 } else if (ci.mediaType.toLowerCase() === "skydrive-document") {
-                    // Skydrive embed link
                     var skydrive = /skydrive\.live\.com\/embed/;
 
                     if (!skydrive.test(ci.uri)) {
@@ -6292,16 +5333,12 @@ var CZ;
                         isValid = false;
                     }
                 } else if (ci.mediaType.toLowerCase() === "skydrive-image") {
-                    // uri pattern is - {url} {width} {height}
                     var splited = ci.uri.split(' ');
 
-                    // Skydrive embed link
                     var skydrive = /skydrive\.live\.com\/embed/;
 
-                    // validate width
                     var width = /[0-9]/;
 
-                    // validate height
                     var height = /[0-9]/;
 
                     if (!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
@@ -6320,17 +5357,11 @@ var CZ;
         }
         Authoring.validateContentItems = validateContentItems;
 
-        /**
-        * Opens "session ends" form
-        */
         function showSessionForm() {
             CZ.HomePageViewModel.sessionForm.show();
         }
         Authoring.showSessionForm = showSessionForm;
 
-        /**
-        * Resets timer to default
-        */
         function resetSessionTimer() {
             if (CZ.Authoring.timer != null) {
                 clearTimeout(CZ.Authoring.timer);
@@ -6343,9 +5374,6 @@ var CZ;
     })(CZ.Authoring || (CZ.Authoring = {}));
     var Authoring = CZ.Authoring;
 })(CZ || (CZ = {}));
-/// <reference path="../scripts/authoring.ts" />
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../ui/controls/listboxbase.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -6441,16 +5469,11 @@ else
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../ui/tour-listbox.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
         var FormToursList = (function (_super) {
             __extends(FormToursList, _super);
-            // We only need to add additional initialization in constructor.
             function FormToursList(container, formInfo) {
                 var _this = this;
                 _super.call(this, container, formInfo);
@@ -6547,9 +5570,6 @@ else {
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/tours.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -6726,7 +5746,6 @@ var CZ;
                     complete: function () {
                         _this.tourPlayer.exit();
 
-                        // Enable hashchange event.
                         CZ.Common.hashHandle = true;
                     }
                 });
@@ -6757,11 +5776,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
-/// <reference path='../ui/tourslist-form.ts' />
-/// <reference path='../ui/tour-caption-form.ts' />
-/// <reference path='urlnav.ts'/>
-/// <reference path='common.ts'/>
 var CZ;
 (function (CZ) {
     (function (Tours) {
@@ -6787,11 +5801,6 @@ var CZ;
         Tours.tourCaptionFormContainer;
         Tours.tourCaptionForm;
 
-        /* TourBookmark represents a place in the virtual space with associated audio.
-        @param url  (string) Url that contains a state of the virtual canvas
-        @param caption (string) text describing the bookmark
-        @param lapseTime (number) a position in the audiotreck of the bookmark in seconds
-        */
         var TourBookmark = (function () {
             function TourBookmark(url, caption, lapseTime, text) {
                 this.url = url;
@@ -6808,9 +5817,6 @@ var CZ;
         })();
         Tours.TourBookmark = TourBookmark;
 
-        /*
-        @returns VisibleRegion2d for the bookmark
-        */
         function getBookmarkVisible(bookmark) {
             return CZ.UrlNav.navStringToVisible(bookmark.url, CZ.Common.vc);
         }
@@ -6830,18 +5836,6 @@ var CZ;
         Tours.bookmarkUrlToElement = bookmarkUrlToElement;
 
         var Tour = (function () {
-            /* Tour represents a sequence of bookmarks.
-            @param title        (string)    Title of the tour.
-            @param bookmarks    (non empty array of TourBookmark) A sequence of bookmarks
-            @param zoomTo       (func (VisibleRegion2d, onSuccess, onFailure, bookmark) : number) Allows the tour to zoom into required places, returns a unique animation id, which is then passed to callbacks.
-            @param vc           (jquery)    VirtualCanvas
-            @param category (String) category of the tour
-            @param sequenceNum (number) an ordering number
-            @callback tour_BookmarkStarted      Array of (func(tour, bookmark)) The function is called when new bookmark starts playing
-            @callback tour_BookmarkFinished     Array of (func(tour, bookmark)) The function is called when new bookmark is finished
-            @callback tour_TourFinished     Array of (func(tour)) The function is called when the tour is finished
-            @callback tour_TourStarted      Array of (func(tour)) The function is called when the tour is finished
-            */
             function Tour(id, title, bookmarks, zoomTo, vc, category, audio, sequenceNum, description) {
                 this.id = id;
                 this.title = title;
@@ -6868,7 +5862,6 @@ var CZ;
                 var self = this;
                 this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.jpg';
 
-                //ordering the bookmarks by the lapsetime
                 bookmarks.sort(function (b1, b2) {
                     return b1.lapseTime - b2.lapseTime;
                 });
@@ -6880,10 +5873,6 @@ var CZ;
                 bookmarks[bookmarks.length - 1].duration = 10;
                 bookmarks[bookmarks.length - 1].number = bookmarks.length;
 
-                /*
-                Enables or disables an audio playback of the tour.
-                @param isOn (Boolean) whether the audio is enabled
-                */
                 self.toggleAudio = function toggleAudio(isOn) {
                     if (isOn && self.audio)
                         self.isAudioEnabled = true;
@@ -6903,7 +5892,6 @@ else
 
                     self.isAudioLoaded = false;
 
-                    // reinitialize audio element
                     self.audioElement = document.createElement('audio');
 
                     self.audioElement.addEventListener("loadedmetadata", function () {
@@ -6913,7 +5901,6 @@ else
                             ;
                     });
                     self.audioElement.addEventListener("canplaythrough", function () {
-                        // audio track is fully loaded
                         self.isAudioLoaded = true;
 
                         if (isToursDebugEnabled && window.console && console.log("Tour " + self.title + " readystate 4"))
@@ -6932,7 +5919,6 @@ else
 
                     self.audioElement.preload = "none";
 
-                    // add audio sources of different audio file extensions for audio element
                     var blobPrefix = self.audio.substring(0, self.audio.length - 3);
                     for (var i = 0; i < CZ.Settings.toursAudioFormats.length; i++) {
                         var audioSource = document.createElement("Source");
@@ -6945,15 +5931,10 @@ else
                         ;
                 };
 
-                /*
-                Raises that bookmark playback is over. Called only if state is "play" and currentPlace is bookmark
-                @param goBack (boolen) specifies the direction to move (prev - true, next - false)
-                */
                 self.onBookmarkIsOver = function onBookmarkIsOver(goBack) {
                     self.bookmarks[self.currentPlace.bookmark].elapsed = 0;
 
                     if ((self.currentPlace.bookmark == self.bookmarks.length - 1) && !goBack) {
-                        // reset tour state
                         self.state = 'pause';
                         self.currentPlace = { type: 'goto', bookmark: 0 };
                         self.RaiseTourFinished();
@@ -6962,10 +5943,6 @@ else
                     }
                 };
 
-                /*
-                Moves the tour to the next or to the prev bookmark activating elliptical zoom
-                @param goBack(boolen) specifies the direction to move(prev - true, next - false)
-                */
                 self.goToTheNextBookmark = function goToTheNextBookmark(goBack) {
                     var newBookmark = self.currentPlace.bookmark;
                     var oldBookmark = newBookmark;
@@ -6976,10 +5953,8 @@ else
                         newBookmark = Math.min(self.bookmarks.length - 1, newBookmark + 1);
                     }
 
-                    // raise bookmark finished callback functions
                     self.RaiseBookmarkFinished(oldBookmark);
 
-                    // change current position in tour and start EllipticalZoom animation
                     self.currentPlace = { type: 'goto', bookmark: newBookmark };
 
                     var bookmark = self.bookmarks[self.currentPlace.bookmark];
@@ -7003,20 +5978,13 @@ else
                         if (isToursDebugEnabled && window.console && console.log("bookmark index " + newBookmark + " references to nonexistent item"))
                             ;
 
-                        // skip nonexistent bookmark
                         goBack ? self.prev() : self.next();
                         return;
-                        //self.goToTheNextBookmark(goBack);
                     }
 
-                    // start new EllipticalZoom animation if needed
                     self.currentPlace.animationId = self.zoomTo(getBookmarkVisible(bookmark), self.onGoToSuccess, self.onGoToFailure, bookmark.url);
                 };
 
-                /*
-                Resumes/starts audio narration for bookmark.
-                @param bookmark         (bookmark) bookmark which audio narration part should be played.
-                */
                 self.startBookmarkAudio = function startBookmarkAudio(bookmark) {
                     if (!self.audio)
                         return;
@@ -7040,31 +6008,24 @@ else
                     self.audioElement.play();
                 };
 
-                /*
-                Sets up the transition to the next bookmark timer. Resets the currently active one.
-                */
                 self.setTimer = function setTimer(bookmark) {
                     if (self.timerOnBookmarkIsOver) {
                         clearTimeout(self.timerOnBookmarkIsOver);
                     }
 
-                    // calculate time to the end of active bookmark
                     var duration = bookmark.duration;
                     if (bookmark.elapsed != 0) {
                         duration = Math.max(duration - bookmark.elapsed, 0);
                     }
 
-                    // save start time
                     self.currentPlace.startTime = new Date().getTime();
 
                     if (isToursDebugEnabled && window.console && console.log("transition to next bookmark will be in " + duration + " seconds"))
                         ;
 
-                    // activate new timer
                     self.timerOnBookmarkIsOver = setTimeout(self.onBookmarkIsOver, duration * 1000);
                 };
 
-                // Zoom animation callbacks:
                 self.onGoToSuccess = function onGoToSuccess(animationId) {
                     if (!self.currentPlace || self.currentPlace.animationId == undefined || self.currentPlace.animationId != animationId)
                         return;
@@ -7074,8 +6035,6 @@ else
                         curURL.hash.params = [];
                     curURL.hash.params["tour"] = Tours.tour.sequenceNum;
 
-                    //curURL.hash.params["bookmark"] = self.currentPlace.bookmark+1;
-                    //This flag is used to overcome hashchange event handler
                     CZ.Common.hashHandle = false;
                     CZ.UrlNav.setURL(curURL);
 
@@ -7085,7 +6044,6 @@ else
                     self.currentPlace = { type: 'bookmark', bookmark: self.currentPlace.bookmark };
 
                     if (self.currentPlace.bookmark == 0) {
-                        // raise bookmark started callback functions
                         var bookmark = self.bookmarks[self.currentPlace.bookmark];
                         self.RaiseBookmarkStarted(bookmark);
 
@@ -7106,7 +6064,6 @@ else
                     if (!self.currentPlace || self.currentPlace.animationId == undefined || self.currentPlace.animationId != animationId)
                         return;
 
-                    // pause tour
                     self.pause();
 
                     if (isToursDebugEnabled && window.console && console.log("tour interrupted by user during transition"))
@@ -7131,10 +6088,8 @@ else
                     }
 
                     if (self.currentPlace != null && self.currentPlace.bookmark != null && CZ.Common.compareVisibles(visible, bookmarkVisible)) {
-                        // current visible is equal to visible of bookmark
                         self.currentPlace = { type: 'bookmark', bookmark: self.currentPlace.bookmark };
                     } else {
-                        // current visible is not equal to visible of bookmark, animation is required
                         self.currentPlace = { type: 'goto', bookmark: self.currentPlace.bookmark };
                     }
 
@@ -7142,7 +6097,6 @@ else
 
                     showBookmark(Tours.tour, bookmark);
 
-                    // indicates if animation to first bookmark is required
                     var isInTransitionToFirstBookmark = (self.currentPlace.bookmark == 0 && self.currentPlace.type == 'goto');
 
                     if (self.currentPlace.type == 'bookmark' || self.currentPlace.bookmark != 0) {
@@ -7170,7 +6124,6 @@ else
                     if (typeof curURL.hash.params["tour"] == 'undefined') {
                         curURL.hash.params["tour"] = Tours.tour.sequenceNum;
 
-                        //This flag is used to overcome hashchange event handler
                         CZ.Common.hashHandle = false;
                         CZ.UrlNav.setURL(curURL);
                     }
@@ -7215,7 +6168,6 @@ else
 
                 self.prev = function prev() {
                     if (self.currentPlace.bookmark == 0) {
-                        //self.currentPlace = <Place>{ type: 'bookmark', bookmark: self.currentPlace.bookmark };
                         return;
                     }
                     if (self.state === 'play') {
@@ -7227,7 +6179,6 @@ else
                     self.onBookmarkIsOver(true);
                 };
 
-                // calls every bookmarkStarted callback function
                 self.RaiseBookmarkStarted = function RaiseBookmarkStarted(bookmark) {
                     if (self.tour_BookmarkStarted.length > 0) {
                         for (var i = 0; i < self.tour_BookmarkStarted.length; i++)
@@ -7236,7 +6187,6 @@ else
                     showBookmark(this, bookmark);
                 };
 
-                // calls every bookmarkFinished callback function
                 self.RaiseBookmarkFinished = function RaiseBookmarkFinished(bookmark) {
                     if (self.tour_BookmarkFinished.length > 0) {
                         for (var i = 0; i < self.tour_BookmarkFinished.length; i++)
@@ -7245,7 +6195,6 @@ else
                     hideBookmark(this);
                 };
 
-                // calls every tourStarted callback function
                 self.RaiseTourStarted = function RaiseTourStarted() {
                     if (self.tour_TourStarted.length > 0) {
                         for (var i = 0; i < self.tour_TourStarted.length; i++)
@@ -7253,7 +6202,6 @@ else
                     }
                 };
 
-                // calls every tourFinished callback function
                 self.RaiseTourFinished = function RaiseTourFinished() {
                     if (self.tour_TourFinished.length > 0) {
                         for (var i = 0; i < self.tour_TourFinished.length; i++)
@@ -7265,11 +6213,6 @@ else
         })();
         Tours.Tour = Tour;
 
-        /*
-        Activates tour contol UI.
-        @param    tour (Tour). A tour to play.
-        @param    isAudioEnabled (Boolean) Whether to play audio during the tour or not
-        */
         function activateTour(newTour, isAudioEnabled) {
             if (isAudioEnabled == undefined)
                 isAudioEnabled = Tours.isNarrationOn;
@@ -7277,7 +6220,6 @@ else
             if (newTour != undefined) {
                 Tours.tour = newTour;
 
-                // add new tourFinished callback function
                 Tours.tour.tour_TourFinished.push(function (tour) {
                     showTourEndMessage();
                     tourPause();
@@ -7289,7 +6231,6 @@ else
                 for (var i = 0; i < Tours.tour.bookmarks.length; i++)
                     Tours.tour.bookmarks[i].elapsed = 0;
 
-                // reset active tour' bookmark
                 Tours.tour.currentPlace.bookmark = 0;
 
                 if (isAudioEnabled == true) {
@@ -7297,15 +6238,11 @@ else
                     Tours.tour.isAudioLoaded = true;
                 }
 
-                // start a tour
                 tourResume();
             }
         }
         Tours.activateTour = activateTour;
 
-        /*
-        Deactivates a tour. Removes all tour controls.
-        */
         function removeActiveTour() {
             if (Tours.tour) {
                 tourPause();
@@ -7320,14 +6257,10 @@ else
                     Tours.tour.audioElement = undefined;
             }
 
-            // reset active tour
             Tours.tour = undefined;
         }
         Tours.removeActiveTour = removeActiveTour;
 
-        /*
-        Handling of prev button click in UI
-        */
         function tourPrev() {
             if (Tours.tour != undefined) {
                 Tours.tour.prev();
@@ -7335,9 +6268,6 @@ else
         }
         Tours.tourPrev = tourPrev;
 
-        /*
-        Handling of next button click in UI
-        */
         function tourNext() {
             if (Tours.tour != undefined) {
                 Tours.tour.next();
@@ -7345,30 +6275,21 @@ else
         }
         Tours.tourNext = tourNext;
 
-        /*
-        switch the tour in the paused state
-        */
         function tourPause() {
             Tours.tourCaptionForm.setPlayPauseButtonState("play");
             if (Tours.tour != undefined) {
                 $("#tour_playpause").attr("src", "/images/tour_play_off.jpg");
 
-                // pause tour
                 Tours.tour.pause();
 
-                // stop active animation
                 CZ.Common.controller.stopAnimation();
 
-                // remove animation callbacks
                 Tours.tour.tourBookmarkTransitionInterrupted = undefined;
                 Tours.tour.tourBookmarkTransitionCompleted = undefined;
             }
         }
         Tours.tourPause = tourPause;
 
-        /*
-        switch the tour in the running state
-        */
         function tourResume() {
             Tours.tourCaptionForm.setPlayPauseButtonState("pause");
             $("#tour_playpause").attr("src", "/images/tour_pause_off.jpg");
@@ -7376,9 +6297,6 @@ else
         }
         Tours.tourResume = tourResume;
 
-        /*
-        Handling of play/pause button click in UI
-        */
         function tourPlayPause() {
             if (Tours.tour != undefined) {
                 if (Tours.tour.state == "pause") {
@@ -7386,21 +6304,11 @@ else
                 } else if (Tours.tour.state == "play") {
                     tourPause();
                 }
-                //        var curURL = getURL();
-                //        if (typeof curURL.hash.params == 'undefined')
-                //            curURL.hash.params = new Array();
-                //        curURL.hash.params["tour"] = tour.sequenceNum;
-                //        curURL.hash.params["bookmark"] = tour.currentPlace.bookmark + 1;
-                //        setURL(curURL);
             }
         }
         Tours.tourPlayPause = tourPlayPause;
 
-        /*
-        Handling of close button click in UI.
-        */
         function tourAbort() {
-            // close tour and hide all tour' UI elements
             removeActiveTour();
             $("#bookmarks").hide();
             isBookmarksWindowVisible = false;
@@ -7416,7 +6324,6 @@ else
         function initializeToursUI() {
             $("#tours").hide();
 
-            // Bookmarks window
             hideBookmarks();
         }
         Tours.initializeToursUI = initializeToursUI;
@@ -7428,9 +6335,6 @@ else
         }
         Tours.initializeToursContent = initializeToursContent;
 
-        /*
-        Hides bookmark description text.
-        */
         function hideBookmark(tour) {
             Tours.tourCaptionForm.hideBookmark();
         }
@@ -7439,24 +6343,15 @@ else
             Tours.tourCaptionForm.showTourEndMessage();
         }
 
-        /*
-        Shows bookmark description text.
-        */
         function showBookmark(tour, bookmark) {
             Tours.tourCaptionForm.showBookmark(bookmark);
         }
 
-        /*
-        Closes bookmark description window.
-        */
         function hideBookmarks() {
             $("#bookmarks").hide();
             isBookmarksWindowVisible = false;
         }
 
-        /*
-        Tours button handler.
-        */
         function onTourClicked() {
             if (CZ.Search.isSearchWindowVisible)
                 CZ.Search.onSearchClicked();
@@ -7472,9 +6367,6 @@ else
         }
         Tours.onTourClicked = onTourClicked;
 
-        /*
-        Collapses bookmark description window.
-        */
         function collapseBookmarks() {
             if (!isBookmarksWindowExpanded)
                 return;
@@ -7489,15 +6381,11 @@ else
             $("#bookmarksCollapse").attr("src", "/images/expand-right.png");
         }
 
-        /*
-        Expands bookmark description window.
-        */
         function expandBookmarks() {
             if (isBookmarksWindowExpanded)
                 return;
             isBookmarksWindowExpanded = true;
 
-            //$("#bookmarks").switchClass('bookmarksWindow', 'bookmarksWindowCollapsed', 'slow',
             $("#bookmarks").effect('size', { to: { width: '200px', height: 'auto' } }, 'slow', function () {
                 $("#bookmarks").css('width', '200px');
                 $("#bookmarks").css('height', 'auto');
@@ -7509,9 +6397,6 @@ else
             $("#bookmarksCollapse").attr("src", "/images/collapse-left.png");
         }
 
-        /*
-        Collapses/expands bookmark description window.
-        */
         function onBookmarksCollapse() {
             if (!isBookmarksWindowExpanded) {
                 expandBookmarks();
@@ -7521,9 +6406,6 @@ else
         }
         Tours.onBookmarksCollapse = onBookmarksCollapse;
 
-        /*
-        Handles click in tour narration window.
-        */
         function onNarrationClick() {
             if (Tours.isNarrationOn) {
                 $("#tours-narration-on").removeClass("narration-selected", "slow");
@@ -7536,10 +6418,6 @@ else
         }
         Tours.onNarrationClick = onNarrationClick;
 
-        /*
-        Called after successful response from tours request.
-        @param content      (array) an array of tours that were returned by request
-        */
         function parseTours(content) {
             Tours.tours = new Array();
 
@@ -7550,7 +6428,6 @@ else
                 if ((typeof tourString.bookmarks == 'undefined') || (typeof tourString.name == 'undefined') || (typeof tourString.sequence == 'undefined') || (tourString.bookmarks.length == 0))
                     continue;
 
-                // build array of bookmarks of current tour
                 var tourBookmarks = new Array();
 
                 for (var j = 0; j < tourString.bookmarks.length; j++) {
@@ -7567,7 +6444,6 @@ else
                 if (!areBookmarksValid)
                     continue;
 
-                // tour is correct and can be played
                 var tour = new Tour(tourString.id, tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence, tourString.description);
                 Tours.tours.push(tour);
             }
@@ -7575,16 +6451,12 @@ else
         }
         Tours.parseTours = parseTours;
 
-        /*
-        Bookmark' transition handler function to be passed to tours.
-        */
         function bookmarkTransition(visible, onCompleted, onInterrupted, bookmark) {
             Tours.tourBookmarkTransitionCompleted = onCompleted;
             Tours.tourBookmarkTransitionInterrupted = onInterrupted;
 
             Tours.pauseTourAtAnyAnimation = false;
 
-            // id of this bookmark' transition animation
             var animId = CZ.Common.setVisible(visible);
 
             if (animId && bookmark) {
@@ -7607,7 +6479,6 @@ else
                     onTourClicked();
                 }
 
-                //var mytour = tours[curURL.hash.params["tour"] - 1];
                 Tours.tour = Tours.tours[curURL.hash.params["tour"] - 1];
 
                 $(".touritem-selected").removeClass("touritem-selected", "slow");
@@ -7615,45 +6486,23 @@ else
                 activateTour(Tours.tour, true);
 
                 if (Tours.tour.audio) {
-                    // pause unwanted audio playback
                     Tours.tour.audio.pause();
 
-                    // prohibit unwated audio playback after loading of audio
                     Tours.tour.audio.preload = "none";
                 }
                 tourPause();
-                //        var tourControlDiv = document.getElementById("tour_control");
-                //        tourControlDiv.style.display = "block";
-                //        tour.tour_TourFinished.push(function (tour) {
-                //            hideBookmark(tour);
-                //            tourPause();
-                //            hideBookmarks();
-                //        });
-                //tour.toggleAudio(true);
-                //tour.currentPlace = { type: 'goto', bookmark: 0 };
-                //showBookmark(tour, 0);
-                //$("#tour_playpause").attr("src", "images/tour_play_off.jpg");
             }
         }
         Tours.loadTourFromURL = loadTourFromURL;
     })(CZ.Tours || (CZ.Tours = {}));
     var Tours = CZ.Tours;
 })(CZ || (CZ = {}));
-/// <reference path='urlnav.ts'/>
-/// <reference path='settings.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='vccontent.ts'/>
-/// <reference path='service.ts'/>
-/* This file contains code to perform search over the CZ database and show the results in UI.
-The page design must correspond to the schema and naming conventions presented here.
-*/
 var CZ;
 (function (CZ) {
     (function (Search) {
         Search.isSearchWindowVisible = false;
         var delayedSearchRequest = null;
 
-        // The method is called when the search button is clicked
         function onSearchClicked() {
             if (CZ.Tours.isTourWindowVisible && CZ.Tours.onTourClicked)
                 CZ.Tours.onTourClicked();
@@ -7738,8 +6587,6 @@ var CZ;
         }
         Search.goToSearchResult = goToSearchResult;
 
-        // Recursively finds and returns an element with given id.
-        // If not found, returns null.
         function findVCElement(root, id, elementType) {
             var lookingForCI = elementType === "contentItem";
 
@@ -7853,7 +6700,6 @@ var CZ;
                 return;
             }
 
-            // isSearching is false
             isSearching = true;
 
             if (!searchString || searchString === '') {
@@ -7899,8 +6745,6 @@ var CZ;
     })(CZ.Search || (CZ.Search = {}));
     var Search = CZ.Search;
 })(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
-/// <reference path='search.ts'/>
 var CZ;
 (function (CZ) {
     (function (BreadCrumbs) {
@@ -7910,8 +6754,6 @@ var CZ;
 
         var breadCrumbs;
 
-        // Updates current breadcrumbs path, raised when breadcrumbs path has changed.
-        // @param  newBreadCrumbs       (array) new breadcrumbs path.
         function updateBreadCrumbsLabels(newBreadCrumbs) {
             if (newBreadCrumbs) {
                 if (breadCrumbs == null) {
@@ -7949,8 +6791,6 @@ else if (newBreadCrumbs[i].vcElement.id != breadCrumbs[i].vcElement.id) {
         }
         BreadCrumbs.updateBreadCrumbsLabels = updateBreadCrumbsLabels;
 
-        // Update hidden breadcrumb links arrays. Breadcrumb is hidden, if more than 1/3 of its width
-        // is not visible and this breadcrumb is not animating.
         function updateHiddenBreadCrumbs() {
             hiddenFromLeft = [];
             hiddenFromRight = [];
@@ -7991,9 +6831,6 @@ else
         }
         BreadCrumbs.updateHiddenBreadCrumbs = updateHiddenBreadCrumbs;
 
-        // Moves hidden from left (right) breadcrumb to left (right) side of breadcrumb panel.
-        // @param direction     (string) direction of navigation.
-        // @param index         (number) index of breadcrumb to show, shows first hidden element if param is null.
         function showHiddenBreadCrumb(direction, index) {
             if (index == null) {
                 updateHiddenBreadCrumbs();
@@ -8036,7 +6873,6 @@ else
 
                 $("#breadcrumbs-table tr").animate({ "left": str }, "slow", function () {
                     $("#breadcrumbs-table tr td").each(function () {
-                        // clear "moving" attributes for each breadcrumb
                         $(this).attr("moving", "false");
                     });
                     updateHiddenBreadCrumbs();
@@ -8044,15 +6880,11 @@ else
             }
         }
 
-        // Moves breadcrumbs path to the right edge of visible area of breadcrumbs if it is allowed.
-        // @param   callback            (function) callback function at the end of animation.
         function moveToRightEdge(callback) {
             var tableOffset = $("#breadcrumbs-table tr").position().left;
             var tableWidth = $("#breadcrumbs-table tr").width();
 
             if (tableOffset <= 0) {
-                // some breadcrumbs are hidden
-                // var hidden = tableOffset; // width in px of hidden from the left side part of breadcrumbs
                 var tableVisible = tableWidth + tableOffset;
 
                 var difference = 0;
@@ -8061,10 +6893,8 @@ else
                     if (tableVisible > BreadCrumbs.visibleAreaWidth)
                         difference = BreadCrumbs.visibleAreaWidth - tableVisible - 1;
 else
-                        // move to the right edge of visible area
                         difference = BreadCrumbs.visibleAreaWidth - tableVisible - 1;
 else
-                    // width of hidden part is not enought to fill whole visible area
                     difference = -tableOffset;
 
                 $("#breadcrumbs-table tr").stop();
@@ -8074,7 +6904,6 @@ else
 
                     $("#breadcrumbs-table tr").animate({ "left": str }, "fast", function () {
                         $("#breadcrumbs-table tr td").each(function () {
-                            // clear "moving" attributes for each breadcrumb
                             $(this).attr("moving", "false");
                         });
 
@@ -8086,7 +6915,6 @@ else
             }
         }
 
-        // Removes last breadcrumb link.
         function removeBreadCrumb() {
             var length = $("#breadcrumbs-table tr td").length;
 
@@ -8101,12 +6929,9 @@ else
             }
         }
 
-        // Adds new breadcrumb link.
-        // @param  element      (object) breadcrumb to be added.
         function addBreadCrumb(element) {
             var length = $("#breadcrumbs-table tr td").length;
 
-            // add breadcrumb to table
             $("#breadcrumbs-table tr").append($("<td></td>", {
                 id: "bc_" + length
             }).append($("<div></div>", {
@@ -8140,7 +6965,6 @@ else
                     break;
             }
 
-            // hide context search button for new breadcrumb element
             $("#bc_" + length + " .breadcrumb-separator").hide();
 
             if (length > 0)
@@ -8155,7 +6979,6 @@ else
             });
         }
 
-        // Handles click over navigate to left button.
         function breadCrumbNavLeft() {
             var movingLeftBreadCrumbs = 0;
             var num = 0;
@@ -8179,7 +7002,6 @@ else
         }
         BreadCrumbs.breadCrumbNavLeft = breadCrumbNavLeft;
 
-        // Handles click over navigate to right button.
         function breadCrumbNavRight() {
             var movingRightBreadCrumbs = 0;
             var num = 0;
@@ -8202,9 +7024,6 @@ else
         }
         BreadCrumbs.breadCrumbNavRight = breadCrumbNavRight;
 
-        // Handles click over breadcrumb link.
-        // @param   timelineID          (string) id of timeline to navigate.
-        // @param   breadCrumbLinkID    (string) id of table element which breadcrumb link was cliked.
         function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
             CZ.Search.goToSearchResult(timelineID);
 
@@ -8221,8 +7040,6 @@ else if (elementOffset + elementWidth > BreadCrumbs.visibleAreaWidth)
         }
         BreadCrumbs.clickOverBreadCrumb = clickOverBreadCrumb;
 
-        // Functions to change breadcrumb's link color, to avoid bug when <class:hover> doesn't work in IE when mouse enter breadcrumb link
-        // through image that is right to it.
         function breadCrumbMouseOut(element) {
             $(element).removeClass("breadcrumb-hover");
         }
@@ -8231,13 +7048,11 @@ else if (elementOffset + elementWidth > BreadCrumbs.visibleAreaWidth)
             $(element).addClass("breadcrumb-hover");
         }
 
-        // Changes image from <off> state to <on> state
         function changeToOff(element) {
             var src = element.getAttribute("src");
             element.setAttribute("src", src.replace("_on", "_off"));
         }
 
-        // Changes image from <on> state to <off> state
         function changeToOn(element) {
             var src = element.getAttribute("src");
             element.setAttribute("src", src.replace("_off", "_on"));
@@ -8248,9 +7063,6 @@ else if (elementOffset + elementWidth > BreadCrumbs.visibleAreaWidth)
 var CZ;
 (function (CZ) {
     (function (Viewport) {
-        // Creates an instance of VisibleRegion.
-        // @param centerX, centerY  (number)     center point of visible rectangle (in virtual coordinates)
-        // @param scale             (number)     how many time units in a single screen pixel (time unit/pixel)
         function VisibleRegion2d(centerX, centerY, scale) {
             this.centerX = centerX;
             this.centerY = centerY;
@@ -8258,53 +7070,28 @@ var CZ;
         }
         Viewport.VisibleRegion2d = VisibleRegion2d;
 
-        // Creates an instance of Viewport2d.
-        // @param aspectRatio      (number)    how many h-units are in a single time unit
-        // @param width, height    (number)    sizes of the visible region (in screen coordinates)
-        // @param visible          (VisibleRegion2d) describes the visible region
-        // @remarks Virtual coordinate system is R^2 space, axis X goes to the right, axis Y goes down.
-        // Screen coordinate system: origin is the left-top corner of a viewport and X goes to the right, Y goes down.
-        // Viewport is a physical window where we render virtual canvas,
-        // (width,height) is a size of a viewport window in pixels.
-        // Visible describes the same window in the virtual space.
         function Viewport2d(aspectRatio, width, height, visible) {
             this.aspectRatio = aspectRatio;
             this.visible = visible;
             this.width = width;
             this.height = height;
 
-            // Converts pixels in h-units
-            // @param wp    (number)    Amount of pixels
-            // @returns amount of h-units
             this.widthScreenToVirtual = function (wp) {
                 return this.visible.scale * wp;
             };
 
-            // Converts pixels in t-units
-            // @param hp    (number)    Amount of pixels
-            // @returns amount of t-units
             this.heightScreenToVirtual = function (hp) {
                 return this.aspectRatio * this.visible.scale * hp;
             };
 
-            // Converts h-units into pixels
-            // @param wv    (number)    Amount of h-units
-            // @returns amount of pixels
             this.widthVirtualToScreen = function (wv) {
                 return wv / this.visible.scale;
             };
 
-            // Converts t-units into pixels
-            // @param hv    (number)    Amount of t-units
-            // @returns amount of pixels
             this.heightVirtualToScreen = function (hv) {
                 return hv / (this.aspectRatio * this.visible.scale);
             };
 
-            // Converts a vector of a virtual space into screen space.
-            // @param vx    (number)    Amount of t-units
-            // @param vy    (number)    Amount of h-units
-            // @returns     ({x:number, y:number})  vector (in screen pixels)
             this.vectorVirtualToScreen = function (vx, vy) {
                 return {
                     x: vx / this.visible.scale,
@@ -8312,10 +7099,6 @@ var CZ;
                 };
             };
 
-            // Converts a point of a virtual space into screen space.
-            // @param px    (number)    Coordinate in t-units
-            // @param py    (number)    Coordinate in h-units
-            // @returns     ({x:number, y:number})  vector (in screen pixels)
             this.pointVirtualToScreen = function (px, py) {
                 return {
                     x: (px - this.visible.centerX) / this.visible.scale + this.width / 2.0,
@@ -8323,10 +7106,6 @@ var CZ;
                 };
             };
 
-            // Converts a point of a virtual space into screen space.
-            // @param vx    (number)    Coordinate in t-units
-            // @param vy    (number)    Coordinate in h-units
-            // @returns     ({x:number, y:number})  vector (t-units,h-units)
             this.pointScreenToVirtual = function (px, py) {
                 return {
                     x: (px - this.width / 2.0) * this.visible.scale + this.visible.centerX,
@@ -8334,10 +7113,6 @@ var CZ;
                 };
             };
 
-            // Converts a vector of a virtual space into screen space.
-            // @param vx    (number)    Amount of t-units
-            // @param vy    (number)    Amount of h-units
-            // @returns     ({x:number, y:number})  vector (t-units,h-units)
             this.vectorScreenToVirtual = function (px, py) {
                 return {
                     x: px * this.visible.scale,
@@ -8349,17 +7124,11 @@ var CZ;
     })(CZ.Viewport || (CZ.Viewport = {}));
     var Viewport = CZ.Viewport;
 })(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
-/// <reference path='viewport.ts'/>
 var CZ;
 (function (CZ) {
     (function (ViewportAnimation) {
         var globalAnimationID = 1;
 
-        /*the animation of zooming and panning where the animation speed is proportinal to the "distance" to target visible region
-        to make animation work one must call setTargetViewport method before requesting any animation frames
-        @param startViewport (Viewport2D) The state of the viewport at the begining of the animation
-        */
         function PanZoomAnimation(startViewport) {
             this.isForciblyStoped = false;
             this.ID = globalAnimationID++;
@@ -8373,22 +7142,16 @@ var CZ;
             this.startViewport = new CZ.Viewport.Viewport2d(startViewport.aspectRatio, startViewport.width, startViewport.height, new CZ.Viewport.VisibleRegion2d(startVisible.centerX, startVisible.centerY, startVisible.scale));
             this.estimatedEndViewport;
 
-            //estinmated start and end visible centers in the screen coordinate system of a start viewport
             this.endCenterInSC;
             this.startCenterInSC = this.startViewport.pointVirtualToScreen(startVisible.centerX, startVisible.centerY);
 
-            //previous animation frame is prepared according to current viewport state
             this.previousFrameCenterInSC = this.startCenterInSC;
             this.previousFrameViewport = this.startViewport;
             this.prevFrameTime = new Date();
 
-            //visible center moving direction in the screen coodinate of the start viewport
             this.direction;
             this.pathLeng;
 
-            //updates the target viewport
-            //the method sets the previous frame as a start animation frame and do all calculation with a respect of that
-            //@param estimatedEndViewport   (Viewport2D)    a new target state of the viewport that must be achieved at the end of the animation
             this.setTargetViewport = function (estimatedEndViewport) {
                 this.estimatedEndViewport = estimatedEndViewport;
 
@@ -8396,7 +7159,6 @@ var CZ;
 
                 this.startViewport = new CZ.Viewport.Viewport2d(this.previousFrameViewport.aspectRatio, this.previousFrameViewport.width, this.previousFrameViewport.height, new CZ.Viewport.VisibleRegion2d(prevVis.centerX, prevVis.centerY, prevVis.scale));
 
-                //updating all coordinates according to the screen coodinate system of new start Viewport
                 this.startCenterInSC = this.startViewport.pointVirtualToScreen(prevVis.centerX, prevVis.centerY);
                 this.previousFrameCenterInSC = {
                     x: this.startCenterInSC.x,
@@ -8426,9 +7188,7 @@ var CZ;
                 }
             };
 
-            //returns the viewport visible to be set on the next animation frame
             this.produceNextVisible = function (currentViewport) {
-                //determining current state of the viewport
                 var currentCenterInSC = this.startViewport.pointVirtualToScreen(currentViewport.visible.centerX, currentViewport.visible.centerY);
                 var currScale = currentViewport.visible.scale;
 
@@ -8443,7 +7203,6 @@ var CZ;
 
                 var curDist = Math.max(1.0, Math.sqrt(dx * dx + dy * dy));
 
-                //updating previous frame info. This will be returned as the requested animation frame
                 var prevFrameVisible = this.previousFrameViewport.visible;
                 var updatedVisible = new CZ.Viewport.VisibleRegion2d(prevFrameVisible.centerX, prevFrameVisible.centerY, prevFrameVisible.scale);
                 this.previousFrameCenterInSC.x += curDist * k * this.direction.X;
@@ -8451,7 +7210,6 @@ var CZ;
                 updatedVisible.scale += (this.estimatedEndViewport.visible.scale - updatedVisible.scale) * k;
                 this.prevFrameTime = curTime;
 
-                //calculating distance to the start point of the animation
                 dx = this.previousFrameCenterInSC.x - this.startCenterInSC.x;
                 dy = this.previousFrameCenterInSC.y - this.startCenterInSC.y;
 
@@ -8459,7 +7217,6 @@ var CZ;
                 var scaleDistToStart = this.estimatedEndViewport.visible.scale - startVisible.scale;
                 var scaleDistCurrent = updatedVisible.scale - startVisible.scale;
                 if ((distToStart >= this.pathLeng) || Math.abs(scaleDistCurrent) > Math.abs(scaleDistToStart)) {
-                    //we have reach the target visible. stop
                     this.isActive = false;
                     return this.estimatedEndViewport.visible;
                 }
@@ -8477,11 +7234,6 @@ var CZ;
         }
         ViewportAnimation.PanZoomAnimation = PanZoomAnimation;
 
-        /* Implements an "optimal" animated zoom/pan path between two view rectangles.
-        Based on the paper "Smooth and efficient zooming and panning" by Jarke j. van Wijk and Wim A.A. Nuij
-        @param startVisible   (visible2d) a viewport visible region from which the elliptical zoom starts
-        @param endVisible     (visible2d) a viewport visible region that will be reached at the end of elliptical zoom animation
-        */
         function EllipticalZoom(startVisible, endVisible) {
             this.isForciblyStoped = false;
             this.ID = globalAnimationID++;
@@ -8504,9 +7256,6 @@ var CZ;
                 return sinh(x) / cosh(x);
             }
 
-            //is used in the visible center point coordinates calculation according the article
-            // return value changes between [0; this.pathLen]
-            //@param s    (number)  changes between [0;this.S]
             this.u = function (s) {
                 var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
 
@@ -8514,30 +7263,21 @@ var CZ;
                     val = val * this.uSRatio;
                 }
 
-                // due to math imprecision calculated value might exceed path length, which is the max value
                 return Math.min(val, this.pathLen);
             };
 
-            //calculates the scale of the visible region taking t parameter that indicates the requid position in the transition curve
-            //@param t   (number)       changes between [0;1]. 0 coresponds to the beginig of the animatoin. 1 coresponds to the end of the animation
             this.scale = function (t) {
                 return this.startScale * cosh(this.r0) / cosh(this.ro * (t * this.S) + this.r0);
             };
 
-            //calculates the "x" component of the visible center point at the requested moment of the animation
-            //@param t    (number)      changes between [0;1]. 0 coresponds to the beginig of the animatoin. 1 coresponds to the end of the animation
             this.x = function (t) {
                 return startPoint.X + (endPoint.X - startPoint.X) / this.pathLen * this.u(t * this.S);
             };
 
-            //calculates the "y" component of the visible center point at the requested moment of the animation
-            //@param t    (number)      changes between [0;1]. 0 coresponds to the beginig of the animatoin. 1 coresponds to the end of the animation
             this.y = function (t) {
                 return startPoint.Y + (endPoint.Y - startPoint.Y) / this.pathLen * this.u(t * this.S);
             };
 
-            // Returns the visible region for the animation frame according to the current viewport state
-            //param currentViewport (viewport2d) the parameter is ignored in this type of animation. the calculation is performed using only current time
             this.produceNextVisible = function (currentViewport) {
                 var curTime = (new Date()).getTime();
                 var t;
@@ -8547,7 +7287,6 @@ var CZ;
 else
                     t = 1.0;
 
-                // Change t value for accelereation and decceleration effect.
                 t = animationEase(t);
 
                 if (t == 1.0) {
@@ -8589,7 +7328,6 @@ else
                 var b0 = (endScale * endScale - startScale * startScale + Math.pow(ro, 4) * uDiff * uDiff) / (2 * startScale * ro * ro * (-uDiff));
                 var b1 = (endScale * endScale - startScale * startScale - Math.pow(ro, 4) * uDiff * uDiff) / (2 * endScale * ro * ro * (-uDiff));
 
-                //calculating parameters for further animation frames calculation
                 this.r0 = Math.log(-b0 + Math.sqrt(b0 * b0 + 1));
                 if (this.r0 == -Infinity) {
                     this.r0 = -Math.log(2 * b0);
@@ -8607,11 +7345,9 @@ else
                 if (logScaleChange < 0)
                     this.isActive = false;
 
-                //This coefficient helps to avoid constant duration value in cases when centers of endVisible and startVisible are the same
                 var scaleDiff = 0.5;
 
                 if (endScale !== 0 || startScale !== 0) {
-                    //This value is almost the same in all cases, when we click to infodot and then click to main content item and vice versa.
                     scaleDiff = Math.min(endScale, startScale) / Math.max(endScale, startScale);
                 }
 
@@ -8632,7 +7368,6 @@ else
                 };
             }
 
-            // calculate constants for optimization
             this.coshR0 = cosh(this.r0);
             this.sinhR0 = sinh(this.r0);
             this.uS = this.u(this.S);
@@ -8640,8 +7375,6 @@ else
         }
         ViewportAnimation.EllipticalZoom = EllipticalZoom;
 
-        //function to make animation EaseInOut. [0,1] -> [0,1]
-        //@param t    (number)      changes between [0;1]. 0 coresponds to the beginig of the animatoin. 1 coresponds to the end of the animation
         function animationEase(t) {
             return -2 * t * t * t + 3 * t * t;
         }
@@ -8649,11 +7382,6 @@ else
     })(CZ.ViewportAnimation || (CZ.ViewportAnimation = {}));
     var ViewportAnimation = CZ.ViewportAnimation;
 })(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
-/// <reference path='vccontent.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='viewport.ts'/>
-/// <reference path='viewport-animation.ts'/>
 var CZ;
 (function (CZ) {
     (function (Layout) {
@@ -8686,7 +7414,6 @@ var CZ;
             timeline.left = CZ.Dates.getCoordinateFromDecimalYear(timeline.start);
             timeline.right = CZ.Dates.getCoordinateFromDecimalYear(timeline.end);
 
-            // save timeline end date in case if it is '9999'
             timeline.endDate = timeline.end;
 
             if (timeline.exhibits instanceof Array) {
@@ -8694,7 +7421,6 @@ var CZ;
                     exhibit.x = CZ.Dates.getCoordinateFromDecimalYear(exhibit.time);
 
                     exhibit.contentItems.forEach(function (contentItem) {
-                        // For content items that contain an extension, activate it.
                         CZ.Extensions.activateExtension(contentItem.mediaType);
                     });
                 });
@@ -8718,17 +7444,6 @@ else if (!timeline.AspectRatio && !timeline.Height)
             if (timeline.ID == CZ.Settings.cosmosTimelineID) {
                 timeline.AspectRatio = 10;
             }
-            /*
-            else if (timeline.ID == earthTimelineID) {
-            timeline.AspectRatio = 1.0;
-            } else if (timeline.ID == lifeTimelineID) {
-            timeline.AspectRatio = 47.0 / 22.0;
-            } else if (timeline.ID == prehistoryTimelineID) {
-            timeline.AspectRatio = 37.0 / 11.0;
-            } else if (timeline.ID == humanityTimelineID) {
-            timeline.AspectRatio = 55.0 / 4.0;
-            }
-            */
         }
 
         function LayoutTimeline(timeline, parentWidth, measureContext) {
@@ -8745,17 +7460,14 @@ else if (!timeline.AspectRatio && !timeline.Height)
                     if (tl.AspectRatio) {
                         tl.height = (tl.right - tl.left) / tl.AspectRatio;
                     } else if (timeline.height && tl.Height) {
-                        //If Child timeline has height in percentage of parent, calculate it before layout pass
                         tl.height = Math.min(timeline.height * tl.Height, (tl.right - tl.left) * CZ.Settings.timelineMinAspect);
                     }
 
-                    //Calculate layout for each child timeline
                     LayoutTimeline(tl, timelineWidth, measureContext);
                 });
             }
 
             if (!timeline.height) {
-                //Searching for timeline with the biggest ratio between its height percentage and real height
                 var scaleCoef = undefined;
                 if (timeline.timelines instanceof Array) {
                     timeline.timelines.forEach(function (tl) {
@@ -8780,18 +7492,14 @@ else if (!timeline.AspectRatio && !timeline.Height)
                         });
                     }
 
-                    //Set final timelineHeight
                     timeline.height = scaleCoef;
                 }
             }
 
-            //Now positioning child content and title
             var exhibitSize = CalcInfodotSize(timeline);
 
-            //Layout only timelines to check that they fit into parent timeline
             var tlRes = LayoutChildTimelinesOnly(timeline);
 
-            //First layout iteration of full content (taking Sequence in account)
             var res = LayoutContent(timeline, exhibitSize);
             if (timeline.height) {
                 var titleObject = GenerateTitleObject(timeline.height, timeline, measureContext);
@@ -8806,23 +7514,11 @@ else if (!timeline.AspectRatio && !timeline.Height)
                 }
 
                 if ((res.max - res.min) > (timeline.height - titleObject.bboxHeight)) {
-                    //console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.title);
                     var contentHeight = res.max - res.min;
                     var fullHeight = contentHeight / (1 - headerPercent);
                     var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
                     timeline.height = fullHeight;
                 } else {
-                    //var scale = (timeline.height - titleObject.bboxHeight) / (res.max - res.min);
-                    //if (scale > 1) {
-                    //    timeline.timelines.forEach(function (tl) {
-                    //        tl.realY *= scale;
-                    //        if (!tl.AspectRatio)
-                    //            Scale(tl, scale, measureContext);
-                    //    });
-                    //    timeline.exhibits.forEach(function (eb) {
-                    //        eb.realY *= scale;
-                    //    });
-                    //}
                 }
 
                 timeline.titleRect = titleObject;
@@ -8833,7 +7529,6 @@ else if (!timeline.AspectRatio && !timeline.Height)
                 var minAspect = 1.0 / CZ.Settings.timelineMinAspect;
                 var minHeight = timelineWidth / minAspect;
 
-                //Measure title
                 var contentHeight = Math.max((1 - headerPercent) * minHeight, max - min);
                 var fullHeight = contentHeight / (1 - headerPercent);
                 var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
@@ -8871,7 +7566,6 @@ else if (!timeline.AspectRatio && !timeline.Height)
                 var y = 0;
 
                 if (usedY.length > 0) {
-                    //Find free segments
                     var segmentPoints = new Array();
                     usedY.forEach(function (segment) {
                         segmentPoints.push({ type: "bottom", value: segment.bottom });
@@ -8894,7 +7588,6 @@ else
                             freeSegments.push({ bottom: segmentPoints[i].value, top: segmentPoints[i + 1].value });
                     }
 
-                    //Find suitable free segment
                     var foundPlace = false;
                     for (var i = 0; i < freeSegments.length; i++) {
                         if ((freeSegments[i].top - freeSegments[i].bottom) > el.realHeight) {
@@ -8916,7 +7609,6 @@ else
         }
 
         function LayoutContent(timeline, exhibitSize) {
-            //Prepare arrays for ordered and unordered content
             var sequencedContent = new Array();
             var unsequencedContent = new Array();
 
@@ -8957,7 +7649,6 @@ else
                 return l.Sequence - r.Sequence;
             });
 
-            //Prepare measure arrays
             var arrangedElements = new Array();
 
             PositionContent(sequencedContent, arrangedElements, function (el, ael) {
@@ -9082,7 +7773,6 @@ else
         Layout.GenerateTitleObject = GenerateTitleObject;
 
         function Convert(parent, timeline) {
-            //Creating timeline
             var tlColor = GetTimelineColor(timeline);
             var t1 = CZ.VCContent.addTimeline(parent, "layerTimelines", 't' + timeline.id, {
                 isBuffered: timeline.timelines instanceof Array,
@@ -9152,7 +7842,6 @@ else
                 for (var i = 0; i < n; i++) {
                     var childTimeline = timeline.timelines[i];
                     if (childTimeline.id == id) {
-                        // timeline was found
                         result = childTimeline;
                         break;
                     } else {
@@ -9186,30 +7875,18 @@ else
 
         function Load(root, timeline) {
             if (timeline) {
-                //Transform timeline start and end dates
                 Prepare(timeline);
 
-                //Measure child content for each timiline in tree
                 var measureContext = (document.createElement("canvas")).getContext('2d');
                 LayoutTimeline(timeline, 0, measureContext);
 
-                //Calculating final placement of the data
                 Arrange(timeline);
 
-                //Load timline to Virtual Canvas
                 LoadTimeline(root, timeline);
             }
         }
         Layout.Load = Load;
 
-        /*
-        ---------------------------------------------------------------------------
-        DYNAMIC LAYOUT
-        ---------------------------------------------------------------------------
-        */
-        // takes a metadata timeline (FromTimeUnit, FromYear, FromMonth, FromDay, ToTimeUnit, ToYear, ToMonth, ToDay)
-        // and returns a corresponding scenegraph (x, y, width, height)
-        // todo: remove dependency on virtual canvas (vc)
         function generateLayout(tmd, tsg) {
             try  {
                 if (!tmd.AspectRatio)
@@ -9222,7 +7899,6 @@ else
             }
         }
 
-        // converts a scenegraph element in absolute coords to relative coords
         function convertRelativeToAbsoluteCoords(el, delta) {
             if (!delta)
                 return;
@@ -9239,7 +7915,6 @@ else
             });
         }
 
-        // shifts a scenegraph element in absolute coords by delta
         function shiftAbsoluteCoords(el, delta) {
             if (!delta)
                 return;
@@ -9252,8 +7927,6 @@ else
             });
         }
 
-        // calculates the net force excerted on each child timeline and infodot
-        // after expansion of child timelines to fit the newly added content
         function calculateForceOnChildren(tsg) {
             var eps = tsg.height / 10;
 
@@ -9281,7 +7954,6 @@ else
                             var ael = v[j];
                             if (ael.x > l && ael.x < r || ael.x + ael.width > l && ael.x + ael.width < r || ael.x + ael.width > l && ael.x + ael.width === 0 && r === 0) {
                                 if (ael.y < b) {
-                                    // ael overlaps with el
                                     ael.force += el.delta;
 
                                     l = Math.min(l, ael.x);
@@ -9360,7 +8032,6 @@ else
                 Layout.animatingElements.length++;
             }
 
-            // calculates new animation frame of element
             elem.calculateNewFrame = function () {
                 var curTime = (new Date()).getTime();
                 var t;
@@ -9396,20 +8067,11 @@ else
             };
         }
 
-        // utiltity function for debugging
         function numberWithCommas(n) {
             var parts = n.toString().split(".");
             return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (parts[1] ? "." + parts[1] : "");
         }
 
-        // src = metadata tree (responsedump.txt + isBuffered)
-        // dest = scenegraph tree (tree of CanvasTimelines)
-        // returns void.
-        // mutates scenegraph tree (dest) by appending missing data from metadata tree (src).
-        // dest timelines can be in 1 of 3 states
-        // 1. No Metadata.  (isBuffered == false)
-        // 2. All Metadata. (isBuffered == false)
-        // 3. All Content.  (isBuffered == true)
         function merge(src, dest) {
             if (src.id === dest.guid) {
                 var srcChildTimelines = (src.timelines instanceof Array) ? src.timelines : [];
@@ -9421,7 +8083,6 @@ else
                 if (srcChildTimelines.length === destChildTimelines.length) {
                     dest.isBuffered = dest.isBuffered || (src.timelines instanceof Array);
 
-                    // cal bbox (top, bottom) for child timelines and infodots
                     var origTop = Number.MAX_VALUE;
                     var origBottom = Number.MIN_VALUE;
                     for (var i = 0; i < dest.children.length; i++) {
@@ -9433,12 +8094,10 @@ else
                         }
                     }
 
-                    // merge child timelines
                     dest.delta = 0;
                     for (var i = 0; i < srcChildTimelines.length; i++)
                         merge(srcChildTimelines[i], destChildTimelines[i]);
 
-                    // check if child timelines have expanded
                     var haveChildTimelineExpanded = false;
                     for (var i = 0; i < destChildTimelines.length; i++)
                         if (destChildTimelines[i].delta)
@@ -9449,13 +8108,11 @@ else
                             if (destChildTimelines[i].delta)
                                 destChildTimelines[i].newHeight += destChildTimelines[i].delta;
 
-                        // shift all timelines and infodots above and below a expanding timeline
                         calculateForceOnChildren(dest);
                         for (var i = 0; i < dest.children.length; i++)
                             if (dest.children[i].force)
                                 shiftAbsoluteCoords(dest.children[i], dest.children[i].force);
 
-                        // cal bbox (top, bottom) for child timelines and infodots after expansion
                         var top = Number.MAX_VALUE;
                         var bottom = Number.MIN_VALUE;
                         var bottomElementName = "";
@@ -9470,11 +8127,8 @@ else
                             }
                         }
 
-                        // update title pos after expansion
                         dest.delta = Math.max(0, (bottom - top) - (origBottom - origTop));
 
-                        // hide animating text
-                        // TODO: find the better way to fix text shacking bug if possible
                         dest.titleObject.newY += dest.delta;
                         dest.titleObject.newBaseline += dest.delta;
                         dest.titleObject.opacity = 0;
@@ -9504,7 +8158,6 @@ else
                     var margin = Math.min(t.width, t.newHeight) * CZ.Settings.timelineHeaderMargin;
                     dest.delta = Math.max(0, t.newHeight - dest.newHeight);
 
-                    // replace dest.children (timelines, infodots, titleObject) with matching t.children
                     dest.children.splice(0);
                     for (var i = 0; i < t.children.length; i++)
                         dest.children.push(t.children[i]);
@@ -9546,39 +8199,21 @@ else
     })(CZ.Layout || (CZ.Layout = {}));
     var Layout = CZ.Layout;
 })(CZ || (CZ = {}));
-/// <reference path='common.ts'/>
-/// <reference path='viewport-animation.ts'/>
 var CZ;
 (function (CZ) {
     (function (ViewportController) {
-        //constructs the new instance of the viewportController that handles an animations of the viewport
-        //@param setVisible (void setVisible(visible))      a callback which is called when controller wants to set intermediate visible regions while animation.
-        //@param getViewport (Viewport2D getViewport())     a callback which is called when controller wants to get recent state of corresponding viewport.
-        //@param gestureSource (merged RX gesture stream)   an RX stream of gestures described in gestures.js
         function ViewportController2(setVisible, getViewport, gesturesSource) {
             this.activeAnimation;
 
-            //recent FPS value
             this.FPS;
 
-            //the outer visible scale that is permitied to observe.
-            //it is automaticly adjusted on each viewport resize event not to let the user observe the interval
-            //greater that "maxPermitedTimeRange" interval in settings.cs
             this.maximumPermitedScale;
 
-            //the range that are permited to navigate
-            //these values are automaticly updated at each new gesture handling according to present scale of the viewport
-            //to adjust an offset in virtual coords that is specified in a settings.cs in a pixels
-            //through updatePermitedBounds function
             this.leftPermitedBound;
             this.rightPermitedBound;
             this.topPermitedBound;
             this.bottomPermitedBound;
 
-            //a scale constraint value to prevent the user from zooming too deep into the infodot, contentItem, etc
-            //is used in coerceVisibleInnerZoom, and overrides the timelines zooming constraints
-            //is to be set by the page that join the controller and the virtual canvas
-            //(number)
             this.effectiveExplorationZoomConstraint = undefined;
 
             if (!(window).requestAnimFrame)
@@ -9586,41 +8221,24 @@ var CZ;
                     window.setTimeout(callback, 1000 / CZ.Settings.targetFps);
                 };
 
-            //storing screen size to detect window resize
             this.viewportWidth;
             this.viewportHeight;
 
-            //storing callbacks
             this.setVisible = setVisible;
             this.getViewport = getViewport;
 
-            //the latest known state of the viewport
             var self = this;
 
-            //an estimated viewport state that will be at the and of the ongoing pan/zoom animation
             this.estimatedViewport = undefined;
 
-            //a recent copy of the viewport;
             this.recentViewport = undefined;
 
-            //callbacks array. each element will be invoked when animation is completed (viewport took the required state)
-            //callback has one argument - the id of complete animation
             this.onAnimationComplete = [];
 
-            //callbacks array. each element will be invoked when the animation parameters are updated or new animation activated
-            //callback has two arguments - (the id of interupted animation,the id of newly created animation)
-            //if animation is interrapted and no new animation obect is created, a newly created animation id is undefined
-            //if anumation is updated and no new animation object is created, a created id is the same as an interrupted id
             this.onAnimationUpdated = [];
 
-            //callbacks array. each element will be invoked when the animation starts
-            //callback has one argument - (the id of started animation)
             this.onAnimationStarted = [];
 
-            /*Transforms the viewport correcting its visible according to pan gesture passed
-            @param viewport     (Viewport2D)    The viewport to transform
-            @param gesture      (PanGesture) The gesture to apply
-            */
             function PanViewport(viewport, panGesture) {
                 var virtualOffset = viewport.vectorScreenToVirtual(panGesture.xOffset, panGesture.yOffset);
                 var oldVisible = viewport.visible;
@@ -9628,10 +8246,6 @@ var CZ;
                 viewport.visible.centerY = oldVisible.centerY - virtualOffset.y;
             }
 
-            /*Transforms the viewport correcting its visible according to zoom gesture passed
-            @param viewport     (Viewport2D)    The viewport to transform
-            @param gesture      (ZoomGesture) The gesture to apply
-            */
             function ZoomViewport(viewport, zoomGesture) {
                 var oldVisible = viewport.visible;
                 var x = zoomGesture.xOrigin + (viewport.width / 2.0 - zoomGesture.xOrigin) * zoomGesture.scaleFactor;
@@ -9642,12 +8256,6 @@ var CZ;
                 viewport.visible.scale = oldVisible.scale * zoomGesture.scaleFactor;
             }
 
-            /*calculates a viewport that will be actual at the end of the gesture handling animation
-            @param previouslyEstimatedViewport       (Viewport2D)    the state of the viewport that is expacted to be at the end of the ongoing Pan/Zoom animation. undefined if no pan/zoom animation is active
-            @param gesture                  (Gesture)       the gesture to handle (only Pan and Zoom gesture)
-            @param latestViewport           (Viewport2D)    the state of the viewort that is currently observed by the user
-            @remarks    The is no checks for gesture type. So make shure that the gestures only of pan and zoom types would be passed to this method
-            */
             function calculateTargetViewport(latestViewport, gesture, previouslyEstimatedViewport) {
                 var latestVisible = latestViewport.visible;
                 var initialViewport;
@@ -9662,17 +8270,14 @@ else {
                         initialViewport = new CZ.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new CZ.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
                     }
 
-                    //calculating changed viewport according to the gesture
                     ZoomViewport(initialViewport, gesture);
                 } else {
                     if (previouslyEstimatedViewport)
                         initialViewport = previouslyEstimatedViewport;
 else {
-                        //there is no previously estimated viewport and there is no currently active Pan/Zoom animation. Cloning latest viewport (deep copy)
                         initialViewport = new CZ.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new CZ.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
                     }
 
-                    //calculating changed viewport according to the gesture
                     PanViewport(initialViewport, gesture);
                 }
 
@@ -9680,23 +8285,11 @@ else {
                 return initialViewport;
             }
 
-            /*
-            Saves the height and the width of the viewport in screen coordinates and recalculates rependant characteristics (e.g. maximumPermitedScale)
-            @param viewport  (Viewport2D) a viewport to take parameters from
-            */
             this.saveScreenParameters = function (viewport) {
                 self.viewportWidth = viewport.width;
                 self.viewportHeight = viewport.height;
             };
 
-            /*
-            Is used for coercing of the visible regions produced by the controller according to navigation constraints
-            Navigation constraints are set in settings.js file
-            @param vp (Viewport) the viewport.visible region to coerce
-            @param gesture the gesture which caused the viewport to change
-            we need the viewport (width, height) and the (zoom)gesture to
-            undo the (zoom)gesture when it exceed the navigation constraints
-            */
             this.coerceVisible = function (vp, gesture) {
                 this.coerceVisibleInnerZoom(vp, gesture);
                 this.coerceVisibleOuterZoom(vp, gesture);
@@ -9716,11 +8309,6 @@ else {
                 }
             };
 
-            /*
-            Applys out of bounds constraint to the visible region (Preventing the user from observing the future time and the past before set treshold)
-            The bounds are set as maxPermitedTimeRange variable in a settings.js file
-            @param vp (Viewport) the viewport.visible region to coerce
-            */
             this.coerceVisibleHorizontalBound = function (vp) {
                 var visible = vp.visible;
                 if (CZ.Settings.maxPermitedTimeRange) {
@@ -9731,11 +8319,6 @@ else if (visible.centerX < CZ.Settings.maxPermitedTimeRange.left)
                 }
             };
 
-            /*
-            Applys out of bounds constraint to the visible region (Preventing the user from observing the future time and the past before set treshold)
-            The bounds are set as maxPermitedTimeRange variable in a settings.js file
-            @param vp (Viewport) the viewport.visible region to coerce
-            */
             this.coerceVisibleVerticalBound = function (vp) {
                 var visible = vp.visible;
                 if (CZ.Common.maxPermitedVerticalRange) {
@@ -9746,12 +8329,6 @@ else if (visible.centerY < CZ.Common.maxPermitedVerticalRange.top)
                 }
             };
 
-            /*
-            Applys a deeper zoom constraint to the visible region
-            Deeper (minimum scale) zoom constraint is set as deeperZoomConstraints array in a settings.js file
-            @param vp (Viewport) the viewport.visible region to coerce
-            @param gesture the gesture which caused the viewport to change
-            */
             this.coerceVisibleInnerZoom = function (vp, gesture) {
                 var visible = vp.visible;
                 var x = visible.centerX;
@@ -9798,9 +8375,6 @@ else
                     minspan: CZ.Settings.minTimelineWidth * vbox.scale
                 }).then(function (response) {
                     CZ.Layout.Merge(response, lca);
-                    // NYI: Server currently does not support incremental data. Consider/Future:
-                    //      var exhibitIds = extractExhibitIds(response);
-                    //      getMissingExhibits(vbox, lca, exhibitIds);
                 }, function (error) {
                     console.log("Error connecting to service:\n" + error.responseText);
                 });
@@ -9869,7 +8443,6 @@ else
                         if (!self.estimatedViewport) {
                             self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
 
-                            //storing size to handle window resize
                             self.saveScreenParameters(latestViewport);
                         }
 
@@ -9878,7 +8451,6 @@ else
 else
                             self.activeAnimation.velocity = CZ.Settings.zoomSpeedFactor * 0.0025;
 
-                        //set or update the target state of the viewport
                         self.activeAnimation.setTargetViewport(newlyEstimatedViewport);
                         self.estimatedViewport = newlyEstimatedViewport;
                     }
@@ -9896,7 +8468,6 @@ else
             self.updateRecentViewport();
             this.saveScreenParameters(self.recentViewport);
 
-            //requests to stop any ongoing animation
             this.stopAnimation = function () {
                 self.estimatedViewport = undefined;
                 if (self.activeAnimation) {
@@ -9907,23 +8478,16 @@ else
                 }
             };
 
-            /*
-            Notify all subscribers that the ongoiung animation is updated (or halted)
-            */
             function animationUpdated(oldId, newId) {
                 for (var i = 0; i < self.onAnimationUpdated.length; i++)
                     self.onAnimationUpdated[i](oldId, newId);
             }
 
-            /*
-            Notify all subscribers that the animation is started
-            */
             function AnimationStarted(newId) {
                 for (var i = 0; i < self.onAnimationStarted.length; i++)
                     self.onAnimationStarted[i](newId);
             }
 
-            //sets visible and schedules a new call of animation step if the animation still active and needs more frames
             this.animationStep = function (self) {
                 if (self.activeAnimation) {
                     if (self.activeAnimation.isActive)
@@ -9960,7 +8524,6 @@ else {
                 }
             };
 
-            //FrameRate calculation related
             this.frames = 0;
             this.oneSecondFrames = 0;
             window.setInterval(function () {
@@ -9968,12 +8531,8 @@ else {
                 self.oneSecondFrames = 0;
             }, 1000);
 
-            //tests related accessors
             this.PanViewportAccessor = PanViewport;
 
-            //preforms an elliptical zoom to the passed visible region
-            //param visible (Visible2D) a visible region to zoom into
-            //param noAnimation (bool) - method performs instant transition without any animation if true
             this.moveToVisible = function (visible, noAnimation) {
                 var currentViewport = getViewport();
                 var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
@@ -9998,7 +8557,6 @@ else {
                 this.estimatedViewport = undefined;
                 this.activeAnimation = new CZ.ViewportAnimation.EllipticalZoom(vp.visible, visible);
 
-                //storing size to handle window resize
                 self.viewportWidth = vp.width;
                 self.viewportHeight = vp.height;
 
@@ -10006,11 +8564,6 @@ else {
                     if (this.activeAnimation.isActive)
                         AnimationStarted(this.activeAnimation.ID);
 
-                    // Added by Dmitry Voytsekhovskiy, 20/06/2013
-                    // I make the animation step call asynchronous to first return the active animation id, then call the step.
-                    // This would fix a bug when a target viewport is very close to the current viewport and animation finishes in a single step,
-                    // hence it calls the animation completed handlers which accept the animation id, but these handler couldn't yet get the id to expect
-                    // if the call is synchronous.
                     setTimeout(function () {
                         return self.animationStep(self);
                     }, 0);
@@ -10020,16 +8573,11 @@ else {
 
                 return (this.activeAnimation) ? this.activeAnimation.ID : undefined;
             };
-            //end of public fields
         }
         ViewportController.ViewportController2 = ViewportController2;
     })(CZ.ViewportController || (CZ.ViewportController = {}));
     var ViewportController = CZ.ViewportController;
 })(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='dates.ts'/>
-/// <reference path='viewport-controller.ts'/>
 var CZ;
 (function (CZ) {
     function Timescale(container) {
@@ -10065,9 +8613,6 @@ var CZ;
             mouse_clicked = false;
         });
 
-        /**
-        * Private variables of timescale.
-        */
         var that = this;
         var _container = container;
         var _range = { min: 0, max: 1 };
@@ -10104,9 +8649,6 @@ var CZ;
 
         init();
 
-        /*
-        * Properties of timescale.
-        */
         Object.defineProperties(this, {
             position: {
                 configurable: false,
@@ -10166,9 +8708,6 @@ var CZ;
             }
         });
 
-        /**
-        * Initializes timescale.
-        */
         function init() {
             _container.addClass("cz-timescale");
             _container.addClass("unselectable");
@@ -10199,11 +8738,7 @@ var CZ;
             }
         }
 
-        /**
-        * Updates timescale size or its embedded elements' sizes.
-        */
         function updateSize() {
-            // Updates container's children sizes if container's size is changed.
             var prevSize = _size;
 
             _width = _container.outerWidth(true);
@@ -10225,16 +8760,12 @@ var CZ;
             _canvasHeight = (canvas[0]).height;
 
             if (isHorizontal) {
-                // NOTE: No need to calculate max text size of all labels.
                 text_size = (_ticksInfo[0] && _ticksInfo[0].height !== text_size) ? _ticksInfo[0].height : 0;
                 if (text_size !== 0) {
                     labelsDiv.css("height", text_size);
                     (canvas[0]).height = canvasSize;
-                    //_height = text_size + canvasSize;
-                    //_container.css("height", _height);
                 }
             } else {
-                // NOTE: No need to calculate max text size of all labels.
                 text_size = (_ticksInfo[0] && _ticksInfo[0].width !== text_size) ? _ticksInfo[0].width : 0;
 
                 if (text_size !== 0) {
@@ -10247,11 +8778,6 @@ var CZ;
             }
         }
 
-        /**
-        * Sets mode of timescale according to zoom level.
-        * In different zoom levels it allows to use different
-        * ticksources.
-        */
         function setMode() {
             var beta;
 
@@ -10268,9 +8794,6 @@ var CZ;
             }
         }
 
-        /**
-        * Calculates and caches positions of ticks and labels' size.
-        */
         function getTicksInfo() {
             var len = _ticks.length;
             var size;
@@ -10311,9 +8834,6 @@ var CZ;
             }
         }
 
-        /**
-        * Adds new labels to container and apply styles to them.
-        */
         function addNewLabels() {
             var label;
             var labelDiv;
@@ -10332,10 +8852,6 @@ var CZ;
             }
         }
 
-        /**
-        * Checks whether labels are overlayed or not.
-        * @return {[type]}       [description]
-        */
         function checkLabelsArrangement() {
             var delta;
             var deltaSize;
@@ -10380,18 +8896,11 @@ var CZ;
             return false;
         }
 
-        /**
-        * Updates collection of major ticks.
-        * Iteratively insert new ticks and stops when ticks are overlayed.
-        * Or decrease number of ticks until ticks are not overlayed.
-        */
         function updateMajorTicks() {
             var i;
 
-            // Get ticks from current ticksource.
             _ticks = _tickSources[_mode].getTicks(_range);
 
-            // Adjust number of labels and ticks in timescale.
             addNewLabels();
             getTicksInfo();
 
@@ -10420,9 +8929,6 @@ var CZ;
             }
         }
 
-        /**
-        * Render base line of timescale.
-        */
         function renderBaseLine() {
             if (isHorizontal) {
                 if (_position == "bottom") {
@@ -10439,10 +8945,6 @@ var CZ;
             }
         }
 
-        /**
-        * Renders ticks and labels. If range is a single point then renders
-        * only label in the middle of timescale.
-        */
         function renderMajorTicks() {
             var x;
             var shift;
@@ -10490,9 +8992,6 @@ var CZ;
             ctx.closePath();
         }
 
-        /**
-        * Gets and renders small ticks between major ticks.
-        */
         function renderSmallTicks() {
             var minDelta;
             var i;
@@ -10502,7 +9001,6 @@ var CZ;
             ctx.beginPath();
 
             if (smallTicks && smallTicks.length > 0) {
-                // check for enough space
                 minDelta = Math.abs(that.getCoordinateFromTick(smallTicks[1]) - that.getCoordinateFromTick(smallTicks[0]));
                 len = smallTicks.length;
 
@@ -10555,9 +9053,6 @@ var CZ;
             that.setTimeMarker(time);
         }
 
-        /**
-        * Renders marker.
-        */
         this.setTimeMarker = function (time, vcGesture) {
             if (typeof vcGesture === "undefined") { vcGesture = false; }
             if ((!mouse_clicked) && (((!vcGesture) || ((vcGesture) && (!mouse_hovered))))) {
@@ -10574,21 +9069,13 @@ var CZ;
             }
         };
 
-        /**
-        * Main function for timescale rendering.
-        * Updates timescale's visual state.
-        */
         function render() {
-            // Set mode of timescale. Enabled mode depends on zoom level.
             setMode();
 
-            // Update major ticks collection.
             updateMajorTicks();
 
-            // Update size of timescale and its embedded elements.
             updateSize();
 
-            // Setup canvas' context before rendering.
             ctx.strokeStyle = strokeStyle;
             ctx.fillStyle = strokeStyle;
             ctx.lineWidth = CZ.Settings.timescaleThickness;
@@ -10598,18 +9085,11 @@ var CZ;
                 ctx.clearRect(0, 0, canvasSize, _size);
             }
 
-            // Render timescale.
-            // NOTE: http://jsperf.com/fill-vs-fillrect-vs-stroke
             renderBaseLine();
             renderMajorTicks();
             renderSmallTicks();
         }
 
-        /**
-        * Get screen coordinates of tick.
-        * @param  {number} x [description]
-        * @return {[type]}   [description]
-        */
         this.getCoordinateFromTick = function (x) {
             var delta = _deltaRange;
             var k = _size / (_range.max - _range.min);
@@ -10624,9 +9104,6 @@ var CZ;
                 if (beta >= 0) {
                     x1 += k * firstYear;
                 }
-                /*if (beta < 0) {
-                x1 -= k * firstYear;
-                }*/
             }
 
             if (isFinite(delta)) {
@@ -10636,27 +9113,17 @@ var CZ;
             }
         };
 
-        /**
-        * Rerender timescale with new ticks.
-        * @param  {object} range { min, max } values of new range.
-        */
         this.update = function (range) {
             _range = range;
             render();
         };
 
-        /**
-        * Clears container DIV.
-        */
         this.destroy = function () {
             _container[0].innerHTML = "";
             _container.removeClass("cz-timescale");
             _container.removeClass("unselectable");
         };
 
-        /**
-        * Destroys timescale and removes it from parend node.
-        */
         this.remove = function () {
             var parent = _container[0].parentElement;
             if (parent) {
@@ -10668,7 +9135,6 @@ var CZ;
     CZ.Timescale = Timescale;
     ;
 
-    //this is the class for creating ticks
     function TickSource() {
         this.delta, this.beta;
         this.range = { min: -1, max: 0 };
@@ -10688,7 +9154,6 @@ var CZ;
         this.finish;
         this.width = 900;
 
-        // gets first available div (not used) or creates new one
         this.getDiv = function (x) {
             var inner = this.getLabel(x);
             var i = inners.indexOf(inner);
@@ -10719,7 +9184,6 @@ var CZ;
             }
         };
 
-        // make all not used divs invisible (final step)
         this.refreshDivs = function () {
             for (var i = 0; i < len; i++) {
                 if (isUsedPool[i])
@@ -10740,10 +9204,6 @@ else
             return this.createTicks(range);
         };
 
-        /*    this.getMinTicks = function () {
-        this.getRegime(this.range.min, this.range.max);
-        return this.createTicks(this.range);
-        };*/
         this.getLabel = function (x) {
             return x;
         };
@@ -10807,7 +9267,6 @@ else
             }
         };
 
-        //returns text for marker label
         this.getMarkerLabel = function (range, time) {
             return time;
         };
@@ -10823,10 +9282,8 @@ else
         this.getLabel = function (x) {
             var text;
 
-            // maximum number of decimal digits
             var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4);
 
-            // divide tick coordinate by level of cosmos zoom
             text = Math.abs(x) / this.level;
 
             if (n < 0) {
@@ -10842,7 +9299,6 @@ else
                 this.range.min = l;
                 this.range.max = r;
             } else {
-                // default range
                 this.range.min = CZ.Settings.maxPermitedTimeRange.left;
                 this.range.max = CZ.Settings.maxPermitedTimeRange.right;
             }
@@ -10851,16 +9307,13 @@ else
             if (this.range.max > CZ.Settings.maxPermitedTimeRange.right)
                 this.range.max = CZ.Settings.maxPermitedTimeRange.right;
 
-            // set present date
             var localPresent = CZ.Dates.getPresent();
             this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
 
-            // set default constant for arranging ticks
             this.delta = 1;
             this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
 
             if (this.range.min <= -10000000000) {
-                // billions of years ago
                 this.regime = "Ga";
                 this.level = 1000000000;
                 if (this.beta < 7) {
@@ -10868,11 +9321,9 @@ else
                     this.level = 1000000;
                 }
             } else if (this.range.min <= -10000000) {
-                // millions of years ago
                 this.regime = "Ma";
                 this.level = 1000000;
             } else if (this.range.min <= -10000) {
-                // thousands of years ago
                 this.regime = "ka";
                 this.level = 1000;
             }
@@ -10890,13 +9341,10 @@ else if (this.regime == "ka" && this.beta < -1)
 
             var dx = this.delta * Math.pow(10, this.beta);
 
-            // calculate count of ticks to create
             var min = Math.floor(this.range.min / dx);
             var max = Math.floor(this.range.max / dx);
             var count = max - min + 1;
 
-            // calculate rounded ticks values
-            // they are in virtual coordinates (years from present date)
             var num = 0;
             var x0 = min * dx;
             if (dx == 2)
@@ -10914,12 +9362,8 @@ else if (this.regime == "ka" && this.beta < -1)
         };
 
         this.createSmallTicks = function (ticks) {
-            // function to create minor ticks
             var minors = new Array();
 
-            //       var start = Math.max(this.range.left, maxPermitedTimeRange.left);
-            //       var end = Math.min(this.range.right, maxPermitedTimeRange.right);
-            //the amount of small ticks
             var n = 4;
             var k = this.width / (this.range.max - this.range.min);
             var nextStep = true;
@@ -10943,7 +9387,6 @@ else if (this.regime == "ka" && this.beta < -1)
                 }
             }
 
-            // create little ticks after last big tick
             tick = ticks[ticks.length - 1].position + step;
             while (tick < this.range.max) {
                 minors.push(tick);
@@ -11014,7 +9457,6 @@ else
                 this.range.min = l;
                 this.range.max = r;
             } else {
-                // default range
                 this.range.min = CZ.Settings.maxPermitedTimeRange.left;
                 this.range.max = CZ.Settings.maxPermitedTimeRange.right;
             }
@@ -11024,11 +9466,9 @@ else
             if (this.range.max > CZ.Settings.maxPermitedTimeRange.right)
                 this.range.max = CZ.Settings.maxPermitedTimeRange.right;
 
-            // set present date
             var localPresent = CZ.Dates.getPresent();
             this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
 
-            // remember value in virtual coordinates when 1CE starts
             this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
             this.range.max -= this.firstYear;
             this.range.min -= this.firstYear;
@@ -11042,7 +9482,6 @@ else
                 this.endDate = CZ.Dates.getYMDFromCoordinate(this.range.max);
             }
 
-            // set default constant for arranging ticks
             this.delta = 1;
             this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
 
@@ -11058,13 +9497,10 @@ else
 
             var dx = this.delta * Math.pow(10, this.beta);
 
-            // calculate count of ticks to create
             var min = Math.floor(this.range.min / dx);
             var max = Math.floor(this.range.max / dx);
             var count = max - min + 1;
 
-            // calculate rounded ticks values
-            // they are in virtual coordinates (years from present date)
             var num = 0;
             var x0 = min * dx;
             if (dx == 2)
@@ -11083,10 +9519,8 @@ else
         };
 
         this.createSmallTicks = function (ticks) {
-            // function to create minor ticks
             var minors = new Array();
 
-            //the amount of small ticks
             var n = 4;
 
             var beta1 = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
@@ -11115,12 +9549,10 @@ else
                 for (var k = 1; k <= n; k++) {
                     tick = t + step * k;
 
-                    //if (tick < 0) tick += 1;
                     minors.push(tick);
                 }
             }
 
-            // create little ticks after last big tick
             tick = ticks[ticks.length - 1].position + step;
             while (tick < this.range.max) {
                 minors.push(tick);
@@ -11182,7 +9614,6 @@ else
 
         var year, month, day;
 
-        // span between two rendering neighboring days
         var tempDays = 0;
 
         this.getRegime = function (l, r) {
@@ -11190,7 +9621,6 @@ else
                 this.range.min = l;
                 this.range.max = r;
             } else {
-                // default range
                 this.range.min = CZ.Settings.maxPermitedTimeRange.left;
                 this.range.max = CZ.Settings.maxPermitedTimeRange.right;
             }
@@ -11200,17 +9630,14 @@ else
             if (this.range.max > CZ.Settings.maxPermitedTimeRange.right)
                 this.range.max = CZ.Settings.maxPermitedTimeRange.right;
 
-            // set present date
             var localPresent = CZ.Dates.getPresent();
             this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
 
-            // remember value in virtual coordinates when 1CE starts
             this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
 
             this.startDate = CZ.Dates.getYMDFromCoordinate(this.range.min);
             this.endDate = CZ.Dates.getYMDFromCoordinate(this.range.max);
 
-            // set default constant for arranging ticks
             this.delta = 1;
             this.beta = Math.log(this.range.max - this.range.min) * this.log10;
 
@@ -11252,13 +9679,10 @@ else
             var ticks = new Array();
             var num = 0;
 
-            // count number of months to render
             var countMonths = 0;
 
-            // count number of days to render
             var countDays = 0;
 
-            //current year and month to start counting
             var tempYear = this.startDate.year;
             var tempMonth = this.startDate.month;
             while (tempYear < this.endDate.year || (tempYear == this.endDate.year && tempMonth <= this.endDate.month)) {
@@ -11270,11 +9694,8 @@ else
                 }
             }
 
-            // calculate ticks values
-            // they are in virtual coordinates (years from present date)
             year = this.startDate.year;
 
-            // create month ticks
             month = this.startDate.month - 1;
             var month_step = 1;
             var date_step = 1;
@@ -11324,7 +9745,6 @@ else
         };
 
         this.createSmallTicks = function (ticks) {
-            // function to create minor ticks
             var minors = new Array();
 
             var k = this.width / (this.range.max - this.range.min);
@@ -11451,35 +9871,13 @@ else if (this.regime == "Days_Quarters")
     ;
     CZ.DateTickSource.prototype = new CZ.TickSource();
 })(CZ || (CZ = {}));
-/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
-/// <reference path='settings.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='viewport.ts'/>
-/// <reference path='vccontent.ts'/>
 var CZ;
 (function (CZ) {
     (function (VirtualCanvas) {
-        /*  Defines a Virtual Canvas widget (based on jQuery ui).
-        @remarks The widget renders different objects defined in a virtual space within a <div> element.
-        The widget allows to update current visible region, i.e. perform panning and zooming.
-        
-        Technically, the widget uses a <canvas> element to render most types of objects; some of elements
-        can be positioned using CSS on a top of the canvas.
-        The widget is split into layers, each layer corresponds to a <div> within a root <div> element.
-        Next <div> is rendered on the top of previous one.
-        */
         function initialize() {
             ($).widget("ui.virtualCanvas", {
-                /* Root element of the widget content.
-                Element of type CanvasItemsRoot.
-                */
                 _layersContent: undefined,
-                /* Array of jqueries to layer div elements
-                (saved to avoid building jqueries every time we need it).
-                */
                 _layers: [],
-                /* Constructs a widget
-                */
                 _create: function () {
                     var self = this;
                     self.element.addClass("virtualCanvas");
@@ -11513,22 +9911,17 @@ var CZ;
 
                     var layerDivs = self.element.children("div");
                     layerDivs.each(function (index) {
-                        // make a layer from (div)
                         $(this).addClass("virtualCanvasLayerDiv unselectable").zIndex(index * 3);
 
-                        // creating canvas element
                         var layerCanvasJq = $("<canvas></canvas>").appendTo($(this)).addClass("virtualCanvasLayerCanvas").zIndex(index * 3 + 1);
                         self._layers.push($(this));
                     });
 
-                    // creating layers' content root element
                     this._layersContent = new CZ.VCContent.CanvasRootElement(self, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
 
-                    // default visible region
                     this.options.visible = new CZ.Viewport.VisibleRegion2d(0, 0, 1);
                     this.updateViewport();
 
-                    // start up the mouse handling
                     self.element.bind('mousemove.' + this.widgetName, function (e) {
                         self.mouseMove(e);
                     });
@@ -11549,13 +9942,9 @@ var CZ;
                         self._mouseLeave(e);
                     });
                 },
-                /* Destroys a widget
-                */
                 destroy: function () {
                     this._destroy();
                 },
-                /* Handles mouse down event within the widget
-                */
                 _mouseDown: function (e) {
                     var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
                     this.lastClickPosition = {
@@ -11563,15 +9952,10 @@ var CZ;
                         y: origin.y
                     };
 
-                    //Bug (176751): Infodots/video. Mouseup event handling.
-                    //Chrome/Firefox solution
                     $("iframe").css("pointer-events", "none");
 
-                    //IE solution
                     $('#iframe_layer').css("display", "block").css("z-index", "99999");
                 },
-                /* Handles mouse up event within the widget
-                */
                 _mouseUp: function (e) {
                     var viewport = this.getViewport();
                     var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
@@ -11580,16 +9964,10 @@ var CZ;
                     if (this.lastClickPosition && this.lastClickPosition.x == origin.x && this.lastClickPosition.y == origin.y)
                         this._mouseClick(e);
 
-                    //Bug (176751): Infodots/video. Mouseup event handling.
-                    //Chrome/Firefox solution
                     $("iframe").css("pointer-events", "auto");
 
-                    //IE solution
                     $('#iframe_layer').css("display", "none");
                 },
-                /*
-                Handles mouseleave event within the widget
-                */
                 _mouseLeave: function (e) {
                     if (this.currentlyHoveredContentItem != null && this.currentlyHoveredContentItem.onmouseleave != null)
                         this.currentlyHoveredContentItem.onmouseleave(e);
@@ -11598,21 +9976,15 @@ var CZ;
                     if (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.onmouseunhover != null)
                         this.currentlyHoveredTimeline.onmouseunhover(null, e);
 
-                    // hide tooltip now
                     CZ.Common.stopAnimationTooltip();
 
-                    // remove last mouse position from canvas to prevent unexpected highlight of canvas elements
                     this.lastEvent = null;
                 },
-                /* Mouse click happens when mouse up happens at the same point as previous mouse down.
-                Returns true, if the event was handled.
-                */
                 _mouseClick: function (e) {
                     var viewport = this.getViewport();
                     var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
                     var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
 
-                    // the function handle mouse click an a content item
                     var _mouseClickNode = function (contentItem, pv) {
                         var inside = contentItem.isInside(pv);
                         if (!inside)
@@ -11630,31 +10002,17 @@ var CZ;
                         return false;
                     };
 
-                    // Start handling the event from root element
                     _mouseClickNode(this._layersContent, posv);
                 },
-                /*
-                getter of currentlyHoveredTimeline
-                */
                 getHoveredTimeline: function () {
                     return this.currentlyHoveredTimeline;
                 },
-                /*
-                getter of currentlyHoveredInfodot
-                */
                 getHoveredInfodot: function () {
                     return this.currentlyHoveredInfodot;
                 },
-                /*
-                Returns the time value that corresponds to the current cursor position
-                */
                 getCursorPosition: function () {
                     return this.cursorPosition;
                 },
-                /*
-                Sets the constraines applied by the infordot exploration
-                param e     (CanvasInfodot) an infodot that is used to calculate constraints
-                */
                 _setConstraintsByInfodotHover: function (e) {
                     var val;
                     if (e) {
@@ -11664,23 +10022,14 @@ var CZ;
                         val = undefined;
                     this.RaiseInnerZoomConstraintChanged(val);
                 },
-                /*
-                Fires the event with a new inner zoom constrainted value
-                */
                 RaiseInnerZoomConstraintChanged: function (e) {
                     this.innerZoomConstraintChangedEvent.zoomValue = e;
                     this.element.trigger(this.innerZoomConstraintChangedEvent);
                 },
-                /*
-                Fires the event of cursor position changed
-                */
                 RaiseCursorChanged: function () {
                     this.cursorPositionChangedEvent.Time = this.cursorPosition;
                     this.element.trigger(this.cursorPositionChangedEvent);
                 },
-                /*
-                Updates tooltip position
-                */
                 updateTooltipPosition: function (posv) {
                     var scrPoint = this.viewport.pointVirtualToScreen(posv.x, posv.y);
 
@@ -11707,15 +10056,12 @@ else if (CZ.Common.tooltipMode == 'timeline')
                     if (height > this.canvasHeight)
                         scrPoint.y = this.canvasHeight - obj.panelHeight - heigthOffset + 1;
 
-                    // Update tooltip position.
                     $('.bubbleInfo').css({
                         position: "absolute",
                         top: scrPoint.y,
                         left: scrPoint.x
                     });
                 },
-                /* Handles mouse move event within the widget
-                */
                 mouseMove: function (e) {
                     var viewport = this.getViewport();
                     var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
@@ -11733,8 +10079,7 @@ else if (CZ.Common.tooltipMode == 'timeline')
 
                     var mouseInStack = [];
 
-                    // the function handle mouse move event
-                    var _mouseMoveNode = function (contentItem/*an element to handle mouse move*/ , forceOutside/*if true, we know that pv is outside of the contentItem*/ , pv/*clicked point in virtual coordinates*/ ) {
+                    var _mouseMoveNode = function (contentItem, forceOutside, pv) {
                         if (forceOutside) {
                             if (contentItem.reactsOnMouse && contentItem.isMouseIn && contentItem.onmouseleave) {
                                 contentItem.onmouseleave(pv, e);
@@ -11777,7 +10122,6 @@ else if (CZ.Common.tooltipMode == 'timeline')
                         }
                     };
 
-                    // Start handling the event from root element
                     _mouseMoveNode(this._layersContent, false, posv);
 
                     if (mouseInStack.length == 0) {
@@ -11815,23 +10159,17 @@ else if (CZ.Common.tooltipMode == 'timeline')
                             }
                         }
 
-                        // update position of tooltip
                         this.updateTooltipPosition(posv);
                     }
 
-                    // last mouse move event
                     this.lastEvent = e;
                 },
-                // Returns last mouse move event
                 getLastEvent: function () {
                     return this.lastEvent;
                 },
-                // Returns root of the element tree.
                 getLayerContent: function () {
                     return this._layersContent;
                 },
-                // Recursively finds and returns an element with given id.
-                // If not found, returns null.
                 findElement: function (id) {
                     var rfind = function (el, id) {
                         if (el.id === id)
@@ -11855,7 +10193,6 @@ else if (CZ.Common.tooltipMode == 'timeline')
 
                     return rfind(this._layersContent, id);
                 },
-                // Destroys the widget.
                 _destroy: function () {
                     this.element.removeClass("virtualCanvas");
                     this.element.children(".virtualCanvasLayerDiv").each(function (index) {
@@ -11867,8 +10204,6 @@ else if (CZ.Common.tooltipMode == 'timeline')
                     this._layersContent = undefined;
                     return this;
                 },
-                /* Produces {Left,Right,Top,Bottom} object which corresponds to visible region in virtual space, using current viewport.
-                */
                 _visibleToViewBox: function (visible) {
                     var view = this.getViewport();
                     var w = view.widthScreenToVirtual(view.width);
@@ -11877,30 +10212,17 @@ else if (CZ.Common.tooltipMode == 'timeline')
                     var y = visible.centerY - h / 2;
                     return { Left: x, Right: x + w, Top: y, Bottom: y + h };
                 },
-                /* Updates and renders a visible region in virtual space that corresponds to a physical window.
-                @param newVisible   (VisibleRegion2d) New visible region.
-                @remarks Rebuilds the current viewport.
-                */
                 setVisible: function (newVisible, isInAnimation) {
                     delete this.viewport;
                     this.options.visible = newVisible;
                     this.isInAnimation = isInAnimation && isInAnimation.isActive;
 
-                    //console.log("newvs",newVisible);
-                    // rendering canvas (we should update the image because of new visible region)
                     var viewbox_v = this._visibleToViewBox(newVisible);
 
-                    //console.log(viewbox_v);
                     var viewport = this.getViewport();
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },
-                /* Update viewport's physical width and height in correspondence with the <div> element.
-                @remarks The method should be called when the <div> element, which hosts the virtual canvas, resizes.
-                It sets width and height attributes of layers' <div> and <canvas> to width and height of the widget's <div>, and
-                then updates visible region and renders the content.
-                */
                 updateViewport: function () {
-                    // updating width and height of layers' <canvas>-es in accordance with actual size of widget's <div>.
                     var size = this._getClientSize();
                     var n = this._layers.length;
                     for (var i = 0; i < n; i++) {
@@ -11913,24 +10235,17 @@ else if (CZ.Common.tooltipMode == 'timeline')
                         }
                     }
 
-                    // update canvas width and height
                     this.canvasWidth = CZ.Common.vc.width();
                     this.canvasHeight = CZ.Common.vc.height();
 
                     this.setVisible(this.options.visible);
                 },
-                /* Produces {width, height} object from actual width and height of widget's <div> (in pixels).
-                */
                 _getClientSize: function () {
                     return {
                         width: this.element[0].clientWidth,
                         height: this.element[0].clientHeight
                     };
                 },
-                /* Gets current viewport.
-                @remarks The widget caches viewport as this.viewport property and rebuilds it only when it is invalidated, i.e. this.viewport=undefined.
-                Viewport is currently invalidated by setVisible and updateViewport methods.
-                */
                 getViewport: function () {
                     if (!this.viewport) {
                         var size = this._getClientSize();
@@ -11939,18 +10254,11 @@ else if (CZ.Common.tooltipMode == 'timeline')
                     }
                     return this.viewport;
                 },
-                /* Renders elements tree on all layers' canvases.
-                @param elementsRoot     (CanvasItemsRoot) Root of widget's elements tree
-                @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in virtual space
-                @param viewport         (Viewport2d) current viewport
-                @todo                   Possible optimization is to render only actually updated layers.
-                */
                 _renderCanvas: function (elementsRoot, visibleBox_v, viewport) {
                     var n = this._layers.length;
                     if (n == 0)
                         return;
 
-                    // first we get 2d contexts for each layers' canvas:
                     var contexts = {};
                     for (var i = 0; i < n; i++) {
                         var layer = this._layers[i];
@@ -11961,30 +10269,21 @@ else if (CZ.Common.tooltipMode == 'timeline')
                         contexts[layerid] = ctx;
                     }
 
-                    // rendering the tree recursively
                     elementsRoot.render(contexts, visibleBox_v, viewport);
 
                     // update position of cloak for space outside root timeline
                     this.updateCloakPosition(viewport);
                 },
-                /* Renders the virtual canvas content.
-                */
                 invalidate: function () {
                     var viewbox_v = this._visibleToViewBox(this.options.visible);
                     var viewport = this.getViewport();
 
                     this._renderCanvas(this._layersContent, viewbox_v, viewport);
                 },
-                /*
-                Fires the trigger that currently observed (the visible region is inside this timeline) timeline is changed
-                */
                 breadCrumbsChanged: function () {
                     this.breadCrumbsChangedEvent.breadCrumbs = this.breadCrumbs;
                     this.element.trigger(this.breadCrumbsChangedEvent);
                 },
-                /* If virtual canvas is during animation now, the method does nothing;
-                otherwise, it sets the timeout to invalidate the image.
-                */
                 requestInvalidate: function () {
                     this.requestNewFrame = false;
 
@@ -12009,9 +10308,6 @@ else if (CZ.Common.tooltipMode == 'timeline')
                             self.requestInvalidate();
                     }, 1000.0 / CZ.Settings.targetFps);
                 },
-                /*
-                Finds the LCA(Lowest Common Ancestor) timeline which contains wnd
-                */
                 _findLca: function (tl, wnd) {
                     for (var i = 0; i < tl.children.length; i++) {
                         if (tl.children[i].type === 'timeline' && tl.children[i].contains(wnd)) {
@@ -12041,21 +10337,11 @@ else if (CZ.Common.tooltipMode == 'timeline')
 
                     return this._findLca(cosmosTimeline, wnd);
                 },
-                /*
-                Checks if we have all the data to render wnd at scale
-                */
                 _inBuffer: function (tl, wnd, scale) {
                     if (tl.intersects(wnd) && tl.isVisibleOnScreen(scale)) {
                         if (!tl.isBuffered) {
                             return false;
                         } else {
-                            /*
-                            for (var i = 0; i < tl.children.length; i++) {
-                            if (tl.children[i].type === 'infodot')
-                            if (!tl.children[i].isBuffered)
-                            return false;
-                            }
-                            */
                             var b = true;
                             for (var i = 0; i < tl.children.length; i++) {
                                 if (tl.children[i].type === 'timeline')
@@ -12158,20 +10444,13 @@ else if (CZ.Common.tooltipMode == 'timeline')
     })(CZ.VirtualCanvas || (CZ.VirtualCanvas = {}));
     var VirtualCanvas = CZ.VirtualCanvas;
 })(CZ || (CZ = {}));
-/// <reference path='../../scripts/dates.ts'/>
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
-/* TODO: implement public get/set functions for edit mode
-
-*/
 var CZ;
 (function (CZ) {
     (function (UI) {
         var DatePicker = (function () {
             function DatePicker(datePicker) {
                 this.datePicker = datePicker;
-                // Value that represents infinity date
                 this.INFINITY_VALUE = 9999;
-                // Error messages
                 this.WRONG_YEAR_INPUT = "Year should be a number.";
                 if (!(datePicker instanceof jQuery && datePicker.is("div")))
                     throw "DatePicker parameter is invalid! It should be jQuery instance of DIV.";
@@ -12180,9 +10459,6 @@ var CZ;
 
                 this.initialize();
             }
-            /**
-            * Creates datepicker based on given JQuery instance of div
-            */
             DatePicker.prototype.initialize = function () {
                 var _this = this;
                 this.datePicker.addClass("cz-datepicker");
@@ -12220,31 +10496,21 @@ var CZ;
                 this.datePicker.append(this.dateContainer);
                 this.datePicker.append(this.errorMsg);
 
-                // set "year" mode by default
                 this.editModeYear();
                 this.setDate(this.coordinate, true);
             };
 
-            /**
-            * Removes datepicker object
-            */
             DatePicker.prototype.remove = function () {
                 this.datePicker.empty();
 
                 this.datePicker.removeClass("cz-datepicker");
             };
 
-            /**
-            * Adds edit mode "infinite"
-            */
             DatePicker.prototype.addEditMode_Infinite = function () {
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
 
-            /**
-            * Sets date corresponding to given virtual coordinate
-            */
             DatePicker.prototype.setDate = function (coordinate, ZeroYearConversation) {
                 if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
                 if (!this.validateNumber(coordinate)) {
@@ -12296,9 +10562,6 @@ var CZ;
                 }
             };
 
-            /**
-            * Returns date converted to virtual coordinate if date is valid, otherwise returns false.
-            */
             DatePicker.prototype.getDate = function () {
                 var mode = this.modeSelector.find(":selected").val();
                 switch (mode) {
@@ -12315,9 +10578,6 @@ var CZ;
                 }
             };
 
-            /**
-            * Modify date container to match "year" edit mode
-            */
             DatePicker.prototype.editModeYear = function () {
                 var _this = this;
                 this.dateContainer.empty();
@@ -12352,9 +10612,6 @@ var CZ;
                 this.dateContainer.append(this.regimeSelector);
             };
 
-            /**
-            * Modify date container to match "date" edit mode
-            */
             DatePicker.prototype.editModeDate = function () {
                 var _this = this;
                 this.dateContainer.empty();
@@ -12378,7 +10635,6 @@ var CZ;
                 this.monthSelector.change(function (event) {
                     self.daySelector.empty();
 
-                    // update days in days select to match current month
                     var selectedIndex = (self.monthSelector[0]).selectedIndex;
                     for (var i = 0; i < CZ.Dates.daysInMonth[selectedIndex]; i++) {
                         var dayOption = $("<option value='" + (i + 1) + "'>" + (i + 1) + "</option>");
@@ -12391,7 +10647,6 @@ var CZ;
                     this.monthSelector.append(monthOption);
                 }
 
-                // raise change event to initialize days select element
                 self.monthSelector.trigger("change");
 
                 this.dateContainer.append(this.monthSelector);
@@ -12399,16 +10654,10 @@ var CZ;
                 this.dateContainer.append(this.yearSelector);
             };
 
-            /**
-            * Modify date container to match "infinite" edit mode
-            */
             DatePicker.prototype.editModeInfinite = function () {
                 this.dateContainer.empty();
             };
 
-            /**
-            * If year in CE and BCE mode is not integer - remove non integral part in the box
-            */
             DatePicker.prototype.checkAndRemoveNonIntegerPart = function () {
                 var regime = this.regimeSelector.find(":selected").val().toLowerCase();
                 var mode = this.modeSelector.find(":selected").val().toLowerCase();
@@ -12418,19 +10667,14 @@ var CZ;
                 }
             };
 
-            /**
-            * Sets year corresponding to given virtual coordinate
-            */
             DatePicker.prototype.setDate_YearMode = function (coordinate, ZeroYearConversation) {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
                 if ((date.regime.toLowerCase() == "bce") && (ZeroYearConversation))
                     date.year--;
                 this.yearSelector.val(date.year);
 
-                // reset selected regime
                 this.regimeSelector.find(":selected").attr("selected", "false");
 
-                // select appropriate regime
                 this.regimeSelector.find("option").each(function () {
                     if (this.value === date.regime.toLowerCase()) {
                         $(this).attr("selected", "selected");
@@ -12438,23 +10682,17 @@ var CZ;
                 });
             };
 
-            /**
-            * Sets date corresponding to given virtual coordinate
-            */
             DatePicker.prototype.setDate_DateMode = function (coordinate) {
                 var date = CZ.Dates.getYMDFromCoordinate(coordinate);
 
                 this.yearSelector.val(date.year);
                 var self = this;
 
-                // set corresponding month in month select element
                 this.monthSelector.find("option").each(function (index) {
                     if (this.value === CZ.Dates.months[date.month]) {
                         $(this).attr("selected", "selected");
 
-                        // event handler of "month changed" is async. using $.promise to update days selection element as callback
                         $.when(self.monthSelector.trigger("change")).done(function () {
-                            // month was set, now set corresponding day
                             self.daySelector.find("option").each(function () {
                                 if (parseInt(this.value) === date.day) {
                                     $(this).attr("selected", "selected");
@@ -12465,9 +10703,6 @@ var CZ;
                 });
             };
 
-            /**
-            * Returns year converted to virtual coordinate if input is valid, otherwise returns false
-            */
             DatePicker.prototype.getDate_YearMode = function () {
                 var year = this.yearSelector.val();
                 if (!this.validateNumber(year))
@@ -12477,9 +10712,6 @@ var CZ;
                 return CZ.Dates.convertYearToCoordinate(year, regime);
             };
 
-            /**
-            * Returns date converted to virtual coordinate if input is valid, otherwise returns false
-            */
             DatePicker.prototype.getDate_DateMode = function () {
                 var year = this.yearSelector.val();
                 if (!this.validateNumber(year))
@@ -12493,9 +10725,6 @@ var CZ;
                 return CZ.Dates.getCoordinateFromYMD(year, month, day);
             };
 
-            /**
-            * Validates that given string is a non infinite number, returns false if not
-            */
             DatePicker.prototype.validateNumber = function (year) {
                 return !isNaN(Number(year)) && isFinite(Number(year)) && !isNaN(parseFloat(year));
             };
@@ -12505,18 +10734,10 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='authoring.ts'/>
-/// <reference path='settings.ts'/>
-/// <reference path='layout.ts'/>
-/// <reference path='../ui/controls/datepicker.ts'/>
-/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
-/// <reference path='typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (Authoring) {
         (function (UI) {
-            // Mouseup handlers.
-            // Opens a window for creating new tour.
             function createTour() {
                 if (CZ.Layout.animatingElements.length != 0) {
                     return;
@@ -12601,20 +10822,15 @@ var CZ;
     })(CZ.Authoring || (CZ.Authoring = {}));
     var Authoring = CZ.Authoring;
 })(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
-/// <reference path='service.ts'/>
 var CZ;
 (function (CZ) {
-    /// CZ.Data provides an abstraction to CZ.Service to optimize client-server interations with the CZ service.
     (function (Data) {
         function getTimelines(r) {
             if (r === undefined || r === null) {
                 r = {
                     start: -50000000000,
                     end: 9999,
-                    // Until progressive loading gets refined, allow server to retrieve as much data as appropriate.
                     maxElements: null,
-                    // Can't specify minspan on first load since the timeline span will vary significantly.
                     minspan: null
                 };
             }
@@ -12761,14 +10977,9 @@ var CZ;
     })(CZ.Data || (CZ.Data = {}));
     var Data = CZ.Data;
 })(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
-/// <reference path='common.ts'/>
 var CZ;
 (function (CZ) {
     (function (Gestures) {
-        //Gesture for performing Pan operation
-        //Take horizontal and vertical offset in screen coordinates
-        //@param src    Source of gesture stream. ["Mouse", "Touch"]
         function PanGesture(xOffset, yOffset, src) {
             this.Type = "Pan";
             this.Source = src;
@@ -12776,8 +10987,6 @@ var CZ;
             this.yOffset = yOffset;
         }
 
-        //Gesture for perfoming Zoom operation
-        //Takes zoom origin point in screen coordinates and scale value
         function ZoomGesture(xOrigin, yOrigin, scaleFactor, src) {
             this.Type = "Zoom";
             this.Source = src;
@@ -12786,19 +10995,11 @@ var CZ;
             this.scaleFactor = scaleFactor;
         }
 
-        //Gesture for performing Stop of all
-        //current transitions and starting to performing new
         function PinGesture(src) {
             this.Type = "Pin";
             this.Source = src;
         }
 
-        /*****************************************
-        * Gestures for non touch based devices   *
-        * mousedown, mousemove, mouseup          *
-        * xbrowserwheel                          *
-        ******************************************/
-        //Subject that converts input mouse events into Pan gestures
         function createPanSubject(vc) {
             var _doc = ($(document));
 
@@ -12819,7 +11020,6 @@ var CZ;
             return mouseDrags;
         }
 
-        //Subject that converts input mouse events into Pin gestures
         function createPinSubject(vc) {
             var mouseDown = vc.toObservable("mousedown");
 
@@ -12828,7 +11028,6 @@ var CZ;
             });
         }
 
-        //Subject that converts input mouse events into Zoom gestures
         function createZoomSubject(vc) {
             vc.mousewheel(function (event, delta, deltaX, deltaY) {
                 var xevent = ($).Event("xbrowserwheel");
@@ -12850,16 +11049,9 @@ var CZ;
                 return new ZoomGesture(origin.x, origin.y, 1.0 / CZ.Settings.zoomLevelFactor, "Mouse");
             });
 
-            //return mouseWheels.Merge(mousedblclicks); //disabling mouse double clicks, as it causes strange behavior in conjection with elliptical zooming on the clicked item.
             return mouseWheels;
         }
 
-        /*********************************************************
-        * Gestures for iPad (or any webkit based touch browser)  *
-        * touchstart, touchmove, touchend, touchcancel           *
-        * gesturestart, gesturechange, gestureend                *
-        **********************************************************/
-        //Subject that converts input touch events into Pan gestures
         function createTouchPanSubject(vc) {
             var _doc = ($)(document);
 
@@ -12881,7 +11073,6 @@ var CZ;
             return gestures;
         }
 
-        //Subject that converts input touch events into Pin gestures
         function createTouchPinSubject(vc) {
             var touchStart = vc.toObservable("touchstart");
 
@@ -12890,7 +11081,6 @@ var CZ;
             });
         }
 
-        //Subject that converts input touch events into Zoom gestures
         function createTouchZoomSubject(vc) {
             var _doc = ($)(document);
 
@@ -12913,12 +11103,6 @@ var CZ;
             return gestures;
         }
 
-        /**************************************************************
-        * Gestures for IE on Win8                                     *
-        * MSPointerUp, MSPointerDown                                  *
-        * MSGestureStart, MSGestureChange, MSGestureEnd, MSGestureTap *
-        ***************************************************************/
-        //Subject that converts input touch events (on win8+) into Pan gestures
         function createTouchPanSubjectWin8(vc) {
             var gestureStart = vc.toObservable("MSGestureStart");
             var gestureChange = vc.toObservable("MSGestureChange");
@@ -12937,7 +11121,6 @@ var CZ;
             return gestures;
         }
 
-        //Subject that converts input touch events (on win8+) into Pin gestures
         function createTouchPinSubjectWin8(vc) {
             var pointerDown = vc.toObservable("MSPointerDown");
 
@@ -12946,7 +11129,6 @@ var CZ;
             });
         }
 
-        //Subject that converts input touch events (on win8+) into Zoom gestures
         function createTouchZoomSubjectWin8(vc) {
             var gestureStart = vc.toObservable("MSGestureStart");
             var gestureChange = vc.toObservable("MSGestureChange");
@@ -12985,7 +11167,6 @@ var CZ;
         }
         ;
 
-        //Creates gestures stream for specified jQuery element
         function getGesturesStream(source) {
             var panController;
             var zoomController;
@@ -12994,19 +11175,16 @@ var CZ;
             if (window.navigator.msPointerEnabled && (window).MSGesture) {
                 addMSGestureSource(source[0]);
 
-                // win 8
                 panController = createTouchPanSubjectWin8(source);
                 var zoomControllerTouch = createTouchZoomSubjectWin8(source);
                 var zoomControllerMouse = createZoomSubject(source);
                 zoomController = zoomControllerTouch.Merge(zoomControllerMouse);
                 pinController = createTouchPinSubjectWin8(source);
             } else if ('ontouchstart' in document.documentElement) {
-                // webkit browser
                 panController = createTouchPanSubject(source);
                 zoomController = createTouchZoomSubject(source);
                 pinController = createTouchPinSubject(source);
             } else {
-                // no touch support, only mouse events
                 panController = createPanSubject(source);
                 zoomController = createZoomSubject(source);
                 pinController = createPinSubject(source);
@@ -13023,17 +11201,14 @@ var CZ;
             if (window.navigator.msPointerEnabled && (window).MSGesture) {
                 addMSGestureSource(source[0]);
 
-                // win 8
                 panController = createTouchPanSubjectWin8(source);
                 var zoomControllerTouch = createTouchZoomSubjectWin8(source);
                 var zoomControllerMouse = createZoomSubject(source);
                 pinController = createTouchPinSubjectWin8(source);
             } else if ('ontouchstart' in document.documentElement) {
-                // webkit browser
                 panController = createTouchPanSubject(source);
                 pinController = createTouchPinSubject(source);
             } else {
-                // no touch support, only mouse events
                 panController = createPanSubject(source);
                 pinController = createPinSubject(source);
             }
@@ -13045,7 +11220,6 @@ var CZ;
         }
         Gestures.getPanPinGesturesStream = getPanPinGesturesStream;
 
-        //modify the gesture stream to apply the logic of gesture handling by the axis
         function applyAxisBehavior(gestureSequence) {
             return gestureSequence.Where(function (el) {
                 return el.Type != "Zoom";
@@ -13059,11 +11233,6 @@ var CZ;
     })(CZ.Gestures || (CZ.Gestures = {}));
     var Gestures = CZ.Gestures;
 })(CZ || (CZ = {}));
-/// <reference path='controls/formbase.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../scripts/data.ts'/>
-/// <reference path='../scripts/cz.ts'/>
-/// <reference path='../scripts/gestures.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -13205,24 +11374,19 @@ else
 
                 var context = this.context;
 
-                // size of the canvas
                 var xmin = screenLeft, xmax = screenRight;
                 var ymin = 0, ymax = this.canvas.height;
 
                 dataSet.series.forEach(function (seria) {
-                    //setup appearance
                     context.strokeStyle = seria.appearanceSettings.stroke;
                     context.lineWidth = seria.appearanceSettings.thickness;
 
-                    //ctx.lineCap = 'round';
-                    //drawing line
                     var y = seria.values;
 
                     context.beginPath();
                     var x1, x2, y1, y2;
                     var i = 0;
 
-                    // Looking for non-missing value
                     var nextValuePoint = function () {
                         for (; i < n; i++) {
                             if (isNaN(x[i]) || isNaN(y[i]))
@@ -13266,7 +11430,6 @@ else
                         if (Math.abs(x1 - x2) < 1 && Math.abs(y1 - y2) < 1)
                             continue;
 
-                        // Clipping and drawing segment p1 - p2:
                         c1_ = c1;
                         c2_ = c2 = that.code(x2, y2, xmin, xmax, ymin, ymax);
 
@@ -13333,7 +11496,6 @@ else
                 });
             };
 
-            // Clipping algorithms
             LineChart.prototype.code = function (x, y, xmin, xmax, ymin, ymax) {
                 var a = x < xmin ? 1 : 0;
                 var b = x > xmax ? 1 : 0;
@@ -13504,9 +11666,6 @@ var CZ;
         Common.isAxisFreezed = true;
         Common.startHash;
 
-        /*
-        Array for logging of inners messages and exceptions
-        */
         var searchString;
         Common.ax;
         Common.axis;
@@ -13532,11 +11691,8 @@ var CZ;
         Common.supercollection = "";
         Common.collection = "";
 
-        // Initial Content contains the identifier (e.g. ID or Title) of the content that should be loaded initially.
         Common.initialContent = null;
 
-        /* Initialize the JQuery UI Widgets
-        */
         function initialize() {
             Common.ax = ($)('#axis');
             Common.axis = new CZ.Timescale(Common.ax);
@@ -13547,25 +11703,15 @@ var CZ;
         }
         Common.initialize = initialize;
 
-        /* Calculates local offset of mouse cursor in specified jQuery element.
-        @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
-        @param event   (Mouse event args) mouse event args describing mouse cursor.
-        */
         function getXBrowserMouseOrigin(jqelement, event) {
             var offsetX;
 
-            ///if (!event.offsetX)
             offsetX = event.pageX - jqelement[0].offsetLeft;
 
-            //else
-            //    offsetX = event.offsetX;
             var offsetY;
 
-            //if (!event.offsetY)
             offsetY = event.pageY - jqelement[0].offsetTop;
 
-            //else
-            //    offsetY = event.offsetY;
             return {
                 x: offsetX,
                 y: offsetY
@@ -13578,9 +11724,6 @@ var CZ;
         }
         Common.sqr = sqr;
 
-        // Prevents the event from bubbling.
-        // In non IE browsers, use e.stopPropagation() instead.
-        // To cancel event bubbling across browsers, you should check for support for e.stopPropagation(), and proceed accordingly:
         function preventbubble(e) {
             if (e && e.stopPropagation)
                 e.stopPropagation();
@@ -13620,7 +11763,6 @@ else
         }
         Common.showFooter = showFooter;
 
-        /*Animation tooltip parameter*/
         Common.animationTooltipRunning = null;
         Common.tooltipMode = "default";
 
@@ -13633,8 +11775,6 @@ else
 
                 Common.animationTooltipRunning = null;
 
-                //tooltipMode = "default"; //default
-                //tooltipIsShown = false;
                 $(".bubbleInfo").attr("id", "defaultBox");
 
                 $(".bubbleInfo").hide();
@@ -13642,15 +11782,11 @@ else
         }
         Common.stopAnimationTooltip = stopAnimationTooltip;
 
-        // Compares 2 visibles. Returns true if they are equal with an allowable imprecision
         function compareVisibles(vis1, vis2) {
             return vis2 != null ? (Math.abs(vis1.centerX - vis2.centerX) < CZ.Settings.allowedVisibileImprecision && Math.abs(vis1.centerY - vis2.centerY) < CZ.Settings.allowedVisibileImprecision && Math.abs(vis1.scale - vis2.scale) < CZ.Settings.allowedVisibileImprecision) : false;
         }
         Common.compareVisibles = compareVisibles;
 
-        /*
-        Is called by direct user actions like links, bread crumbs clicking, etc.
-        */
         function setVisibleByUserDirectly(visible) {
             CZ.Tours.pauseTourAtAnyAnimation = false;
             if (CZ.Tours.tour != undefined && CZ.Tours.tour.state == "play")
@@ -13671,9 +11807,7 @@ else
         }
         Common.updateMarker = updateMarker;
 
-        // Retrieves the URL to download the data from
         function loadDataUrl() {
-            // The following regexp extracts the pattern dataurl=url from the page hash to enable loading timelines from arbitrary sources.
             var match = /dataurl=([^\/]*)/g.exec(window.location.hash);
             if (match) {
                 return unescape(match[1]);
@@ -13691,7 +11825,6 @@ else
             }
         }
 
-        //loading the data from the service
         function loadData() {
             return CZ.Data.getTimelines(null).then(function (response) {
                 if (!response) {
@@ -13810,7 +11943,6 @@ else
                 bottom: cosmosTimeline.y + cosmosTimeline.height
             };
 
-            // update virtual canvas horizontal borders
             CZ.Settings.maxPermitedTimeRange = {
                 left: cosmosTimeline.left,
                 right: cosmosTimeline.right
@@ -13824,7 +11956,6 @@ else
 
             Common.vc.virtualCanvas("updateViewport");
 
-            //ax.axis("updateWidth");
             updateAxis(Common.vc, Common.ax);
 
             CZ.BreadCrumbs.updateBreadCrumbsLabels();
@@ -13883,7 +12014,6 @@ else
     })(CZ.Common || (CZ.Common = {}));
     var Common = CZ.Common;
 })(CZ || (CZ = {}));
-/// <reference path='typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UILoader) {
@@ -13923,10 +12053,6 @@ var CZ;
     })(CZ.UILoader || (CZ.UILoader = {}));
     var UILoader = CZ.UILoader;
 })(CZ || (CZ = {}));
-/// <reference path='../../scripts/cz.ts'/>
-/// <reference path='../../scripts/media.ts'/>
-/// <reference path='../../ui/controls/formbase.ts'/>
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (Media) {
@@ -13953,7 +12079,6 @@ var CZ;
                     formContainer = $("#mediapicker-form").clone().removeAttr("id").addClass("cz-form-bing-mediapicker").appendTo($("#content"));
                 }
 
-                // Create form for Media Picker and append Media Picker to it.
                 var form = new CZ.UI.FormMediaPicker(formContainer, mediaPickerContainer, "Import from Bing", {
                     activationSource: $(),
                     navButton: ".cz-form-nav",
@@ -13970,7 +12095,6 @@ var CZ;
                     form.close();
                 });
 
-                // Align search results on window resize.
                 var onWindowResize = function () {
                     return mediaPicker.onWindowResize();
                 };
@@ -14091,7 +12215,6 @@ var CZ;
 
             BingMediaPicker.prototype.searchVideos = function (query) {
                 var _this = this;
-                // NOTE: Only YouTube and Vimeo videos are supported.
                 query += " (+site:youtube.com OR +site:vimeo.com)";
                 CZ.Service.getBingVideos(query).done(function (response) {
                     _this.hideProgressBar();
@@ -14115,7 +12238,6 @@ var CZ;
 
             BingMediaPicker.prototype.searchDocuments = function (query) {
                 var _this = this;
-                // NOTE: Currently only PDF is supported.
                 CZ.Service.getBingDocuments(query, "pdf").done(function (response) {
                     _this.hideProgressBar();
 
@@ -14137,10 +12259,8 @@ var CZ;
 
             BingMediaPicker.prototype.createImageResult = function (result) {
                 var _this = this;
-                // thumbnail size
                 var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerImageThumbnailMaxWidth, CZ.Settings.mediapickerImageThumbnailMaxHeight);
 
-                // vertical offset to align image vertically
                 var imageOffset = (CZ.Settings.mediapickerImageThumbnailMaxHeight - rectangle.height) / 2;
 
                 var container = $("<div></div>", {
@@ -14193,13 +12313,10 @@ var CZ;
 
             BingMediaPicker.prototype.createVideoResult = function (result) {
                 var _this = this;
-                // Set default thumbnail if there is no any.
                 result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
 
-                // thumbnail size
                 var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerVideoThumbnailMaxWidth, CZ.Settings.mediapickerVideoThumbnailMaxHeight);
 
-                // vertical offset to align image vertically
                 var imageOffset = (CZ.Settings.mediapickerVideoThumbnailMaxHeight - rectangle.height) / 2;
 
                 var container = $("<div></div>", {
@@ -14276,7 +12393,6 @@ var CZ;
                     target: "_blank"
                 });
 
-                // NOTE: Currently only PDF is supported.
                 title.add(descr).click(function (event) {
                     $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "pdf"));
                 });
@@ -14359,12 +12475,10 @@ var CZ;
                         currentRow.elements = [];
                         currentRow.elements.push(curElement);
 
-                        // content width + margin + padding + border width
                         currentRow.width = Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
                     } else {
                         currentRow.elements.push(curElement);
 
-                        // content width + margin + padding + border width
                         currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
                     }
                 }
@@ -14390,11 +12504,6 @@ var CZ;
     })(CZ.Media || (CZ.Media = {}));
     var Media = CZ.Media;
 })(CZ || (CZ = {}));
-/// <reference path='../../scripts/cz.ts'/>
-/// <reference path='../../scripts/media.ts'/>
-/// <reference path='../../ui/controls/formbase.ts'/>
-/// <reference path='../../scripts/settings.ts'/>
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (Media) {
@@ -14427,10 +12536,6 @@ var CZ;
             }
             SkyDriveMediaPicker.setup = setup;
 
-            /**
-            * Shows file picker's dialog.
-            * @return {Promise} File picker's promise.
-            */
             function showFilePicker() {
                 watchFilePicker(onFilePickerLoad);
                 return WL.fileDialog({
@@ -14439,20 +12544,11 @@ var CZ;
                 });
             }
 
-            /**
-            * Gets embedded HTML code of picked file and removes logout button.
-            * @param  {Object} response SkyDrive's response.
-            */
             function onFilePick(response) {
                 onFilePickerClose();
                 getEmbed(response).then(onContentReceive, onError);
             }
 
-            /**
-            * Gets embedded HTML code of picked file.
-            * @param  {Object}  response SkyDrive's response.
-            * @return {Promise}          Request's promise.
-            */
             function getEmbed(response) {
                 switch (response.data.files[0].type) {
                     case "photo":
@@ -14469,10 +12565,6 @@ var CZ;
                 });
             }
 
-            /**
-            * Extracts URL of file from response and updates content item.
-            * @param  {Object} response SkyDrive's response.
-            */
             function onContentReceive(response) {
                 var src = response.embed_html.match(/src=\"(.*?)\"/i)[1];
 
@@ -14495,10 +12587,6 @@ var CZ;
                 editContentItemForm.updateMediaInfo();
             }
 
-            /**
-            * Shows error of SkyDrive in console.
-            * If a user cancelled file picker or clicked on logout button then remove logout button.
-            */
             function onError(response) {
                 var error = response.error;
                 if (error.code === "user_canceled" || error.code === "request_canceled") {
@@ -14508,9 +12596,6 @@ var CZ;
                 }
             }
 
-            /**
-            * Logout and closes file picker and opens login dialog.
-            */
             function onLogout() {
                 if (window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
                     SkyDriveMediaPicker.logoutButton.hide();
@@ -14518,16 +12603,10 @@ var CZ;
                     SkyDriveMediaPicker.filePicker.cancel();
                     WL.logout();
 
-                    // send response to login.live.com/oatuh20_logout.srf to logout from Skydrive
-                    // More info: http://social.msdn.microsoft.com/Forums/live/en-US/4fd9a484-54d7-4c59-91c4-081f4deee2c7/how-to-sign-out-by-rest-api
                     window.location.assign("https://login.live.com/oauth20_logout.srf?client_id=" + CZ.Settings.WLAPIClientID + "&redirect_uri=" + window.location.toString());
                 }
             }
 
-            /**
-            * Waits file picker to appear in DOM and fires a callback.
-            * @param  {function} callback A callback to fire after file picker appears in DOM.
-            */
             function watchFilePicker(callback) {
                 SkyDriveMediaPicker.filePickerIframe = $("iframe[sutra=picker]");
                 if (SkyDriveMediaPicker.filePickerIframe.length > 0) {
@@ -14537,11 +12616,7 @@ var CZ;
                 }
             }
 
-            /**
-            * Initializes and shows file picker with fade-in animation on load.
-            */
             function onFilePickerLoad() {
-                // Append logout button to file picker.
                 SkyDriveMediaPicker.logoutButton.appendTo("body");
 
                 SkyDriveMediaPicker.helperText.appendTo("body");
@@ -14562,20 +12637,13 @@ var CZ;
                 });
             }
 
-            /**
-            * Finalizes file picker.
-            */
             function onFilePickerClose() {
                 SkyDriveMediaPicker.logoutButton.remove();
                 SkyDriveMediaPicker.helperText.remove();
                 $(window).off("resize", onWindowResize);
             }
 
-            /**
-            * Adjusts position of logout button according to file picker's position.
-            */
             function onWindowResize() {
-                // Source: CSS from SkyDrive.
                 var skyDriveFooterHeight = 56;
                 var iframeOffset = SkyDriveMediaPicker.filePickerIframe.offset();
                 var iframeHeight = SkyDriveMediaPicker.filePickerIframe.outerHeight(true);
@@ -14596,10 +12664,6 @@ var CZ;
     })(CZ.Media || (CZ.Media = {}));
     var Media = CZ.Media;
 })(CZ || (CZ = {}));
-/// <reference path='uiloader.ts'/>
-/// <reference path='../ui/media/bing-mediapicker.ts'/>
-/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
-/// <reference path='typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (Media) {
@@ -14620,7 +12684,6 @@ var CZ;
         });
 
         function initialize() {
-            // TODO: Register media pickers. The order is essential for MediaList.
             registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
 
             if (CZ.Media.SkyDriveMediaPicker.isEnabled) {
@@ -14656,8 +12719,6 @@ var CZ;
     })(CZ.Media || (CZ.Media = {}));
     var Media = CZ.Media;
 })(CZ || (CZ = {}));
-/// <reference path='../../scripts/media.ts'/>
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -14672,12 +12733,10 @@ var CZ;
             }
             MediaList.prototype.fillListOfLinks = function () {
                 var _this = this;
-                // Sort mediaPickers keys by 'order' property.
                 var sortedMediaPickersKeys = Object.keys(this.mediaPickers).sort(function (key1, key2) {
                     return _this.mediaPickers[key1].order - _this.mediaPickers[key2].order;
                 });
 
-                // Construct list of links dynamically.
                 sortedMediaPickersKeys.forEach(function (key) {
                     if (_this.mediaPickers.hasOwnProperty(key)) {
                         var mp = _this.mediaPickers[key];
@@ -14718,15 +12777,11 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
         var FormEditTimeline = (function (_super) {
             __extends(FormEditTimeline, _super);
-            // We only need to add additional initialization in constructor.
             function FormEditTimeline(container, formInfo) {
                 var _this = this;
                 _super.call(this, container, formInfo);
@@ -14809,7 +12864,6 @@ var CZ;
                             self.isCancel = false;
                             self.close();
 
-                            //Move to new created timeline
                             self.timeline.onmouseclick();
                         }, function (error) {
                             if (error !== undefined && error !== null) {
@@ -14875,9 +12929,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path="../scripts/authoring.ts" />
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../ui/controls/listboxbase.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -14964,10 +13015,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='contentitem-listbox.ts' />
-/// <reference path='../ui/controls/formbase.ts' />
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -15024,7 +13071,6 @@ var CZ;
                     this.saveButton.show();
                     this.deleteButton.hide();
 
-                    // this.closeButton.click() is handled by base
                     this.createArtifactButton.off();
                     this.createArtifactButton.click(function () {
                         return _this.onCreateArtifact();
@@ -15055,7 +13101,6 @@ var CZ;
                     this.saveButton.show();
                     this.deleteButton.show();
 
-                    // this.closeButton.click() is handled by base
                     this.createArtifactButton.off();
                     this.createArtifactButton.click(function () {
                         return _this.onCreateArtifact();
@@ -15312,10 +13357,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -15564,15 +13605,11 @@ else
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
         var FormHeaderEdit = (function (_super) {
             __extends(FormHeaderEdit, _super);
-            // We only need to add additional initialization in constructor.
             function FormHeaderEdit(container, formInfo) {
                 _super.call(this, container, formInfo);
 
@@ -15627,10 +13664,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -15719,7 +13752,6 @@ var CZ;
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
                             if (curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
-                                //such username exists
                                 alert("Sorry, this username is already in use. Please try again.");
                                 return;
                             }
@@ -15752,7 +13784,6 @@ var CZ;
                     window.location.assign("/pages/logoff.aspx");
                 });
 
-                // Prevent default behavior of Enter key for input elements.
                 var preventEnterKeyPress = function (event) {
                     if (event.which == 13) {
                         event.preventDefault();
@@ -15792,9 +13823,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -15826,9 +13854,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/search.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -15875,9 +13900,6 @@ var CZ;
 
                 this.searchTextbox.on("input search", onSearchQueryChanged);
 
-                // NOTE: Workaround for IE9. IE9 doesn't fire 'input' event on backspace/delete buttons.
-                //       http://www.useragentman.com/blog/2011/05/12/fixing-oninput-in-ie9-using-html5widgets/
-                //       https://github.com/zoltan-dulac/html5Forms.js/blob/master/shared/js/html5Widgets.js
                 var isIE9 = (CZ.Settings.ie === 9);
                 if (isIE9) {
                     this.searchTextbox.on("keyup", function (event) {
@@ -15910,7 +13932,6 @@ var CZ;
                     return;
                 }
 
-                // There are search results. Show them.
                 var resultTypes = {
                     0: "exhibit",
                     1: "timeline",
@@ -15953,7 +13974,6 @@ var CZ;
             };
 
             FormHeaderSearch.prototype.fillFormWithSearchResults = function () {
-                // NOTE: Initially the form is hidden. Show it to compute heights and then hide again.
                 this.container.show();
                 this.searchResultsBox.css("height", "calc(100% - 150px)");
                 this.searchResultsBox.css("height", "-moz-calc(100% - 150px)");
@@ -16049,16 +14069,11 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='controls/formbase.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../scripts/data.ts'/>
-/// <reference path='../scripts/cz.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
         var TimeSeriesDataForm = (function (_super) {
             __extends(TimeSeriesDataForm, _super);
-            // We only need to add additional initialization in constructor.
             function TimeSeriesDataForm(container, formInfo) {
                 _super.call(this, container, formInfo);
 
@@ -16181,7 +14196,6 @@ var CZ;
                 var file = this.input[0].files[0];
                 var fileReader = new FileReader();
 
-                //TODO: add verifivation of input file
                 fileReader.onloadstart = callbacks["onloadstart"];
                 fileReader.onerror = callbacks["onerror"];
                 fileReader.onabort = callbacks["onabort"];
@@ -16220,8 +14234,6 @@ else if (delimValue === "space")
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../ui/controls/formbase.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -16285,10 +14297,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/service.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -16361,8 +14369,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UI) {
@@ -16408,14 +14414,11 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../scripts/cz.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (StartPage) {
         var _isRegimesVisible;
 
-        /* Dummy data in an approximate format that might be returned from a service ... */
         StartPage.tileData = [
             {
                 "Idx": 0,
@@ -16482,16 +14485,6 @@ var CZ;
             }
         ];
 
-        /* ---------------- Tile Layout -------------------
-        * Depending on how the tiles need to may layed out on reformat, these classnames in this list below will change.
-        * From smallest to largest:
-        * - Three rows of tiles 1 and 2
-        * - Three rows of tiles 1 through 3
-        * - One top row of tiles 1-4, and two columns of tiles 1-4
-        * - Three columns of tiles 1-6
-        *
-        * With a different layout where uneven numbers of tiles is used there will be differences between the three sections
-        */
         StartPage.tileLayout = [
             {
                 "Name": "#combo0-icons",
@@ -16565,7 +14558,6 @@ var CZ;
         function resizeCrop($image, imageProps, isListView) {
             var $startPage = $("#start-page");
 
-            // Get size of the tile.
             var width = $image.parent().width();
             var height = $image.parent().height();
 
@@ -16640,8 +14632,6 @@ var CZ;
         StartPage.cloneTweetTemplate = cloneTweetTemplate;
 
         function PlayIntroTour() {
-            // "Introduction to ChronoZoom tour"
-            // TODO: implement search of tour by title
             var introTour = CZ.Tours.tours[0];
 
             if (typeof introTour === "undefined") {
@@ -16694,22 +14684,17 @@ var CZ;
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
 
-                // Set appearance and click handler.
-                // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 }).invisible();
 
-                // Resize and crop image on load.
                 $tileImage.load($tile, function (event) {
                     var $this = $(this);
                     var imageProps = event.target || event.srcElement;
 
-                    // Resize and crop the image.
                     resizeCrop($this, imageProps);
 
-                    // Resize and crop the image on window resize.
                     $(window).resize({
                         $image: $this,
                         imageProps: imageProps
@@ -16717,7 +14702,6 @@ var CZ;
                         resizeCrop(event.data.$image, event.data.imageProps);
                     });
 
-                    // Show the tile with transition.
                     setTimeout(function () {
                         event.data.visible();
                     }, 0);
@@ -16726,7 +14710,6 @@ var CZ;
                     alt: timeline.Title
                 });
 
-                // Set title and author.
                 $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
@@ -16760,7 +14743,6 @@ var CZ;
                     var $this = $(this);
                     var imageProps = event.target || event.srcElement;
 
-                    // Resize and crop the image.
                     resizeCrop($this, imageProps, true);
                 }).attr({
                     src: timeline.ImageUrl,
@@ -16783,22 +14765,17 @@ var CZ;
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
 
-                // Set appearance and click handler.
-                // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "favorite" + i).click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 }).invisible();
 
-                // Resize and crop image on load.
                 $tileImage.load($tile, function (event) {
                     var $this = $(this);
                     var imageProps = event.target || event.srcElement;
 
-                    // Resize and crop the image.
                     resizeCrop($this, imageProps);
 
-                    // Resize and crop the image on window resize.
                     $(window).resize({
                         $image: $this,
                         imageProps: imageProps
@@ -16806,7 +14783,6 @@ var CZ;
                         resizeCrop(event.data.$image, event.data.imageProps);
                     });
 
-                    // Show the tile with transition.
                     setTimeout(function () {
                         event.data.visible();
                     }, 0);
@@ -16815,7 +14791,6 @@ var CZ;
                     alt: timeline.Title
                 });
 
-                // Set title and author.
                 $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
@@ -16849,7 +14824,6 @@ var CZ;
                     var $this = $(this);
                     var imageProps = event.target || event.srcElement;
 
-                    // Resize and crop the image.
                     resizeCrop($this, imageProps, true);
                 }).attr({
                     src: timeline.ImageUrl,
@@ -16871,25 +14845,20 @@ var CZ;
                 var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
                 var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
 
-                // Set appearance and click handler.
-                // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "my" + i).click(timelineUrl, function (event) {
                     window.location.href = event.data;
                     hide();
                 }).invisible();
 
-                // Resize and crop image on load.
                 $tileImage.load($tile, function (event) {
                     var $this = $(this);
                     $tileImage.show();
                     var imageProps = event.target || event.srcElement;
                     $tileImage.hide();
 
-                    // Resize and crop the image.
                     resizeCrop($this, imageProps);
                     $tileImage.show();
 
-                    // Resize and crop the image on window resize.
                     $(window).resize({
                         $image: $this,
                         imageProps: imageProps
@@ -16897,7 +14866,6 @@ var CZ;
                         resizeCrop(event.data.$image, event.data.imageProps);
                     });
 
-                    // Show the tile with transition.
                     setTimeout(function () {
                         event.data.visible();
                     }, 0);
@@ -16906,7 +14874,6 @@ var CZ;
                     alt: timeline.Title
                 });
 
-                // Set title and author.
                 $tileTitle.text(timeline.Title.trim() || "No title :(");
                 $tileAuthor.text(timeline.Author);
             }
@@ -16940,7 +14907,6 @@ var CZ;
                     var $this = $(this);
                     var imageProps = event.target || event.srcElement;
 
-                    // Resize and crop the image.
                     resizeCrop($this, imageProps, true);
                 }).attr({
                     src: timeline.ImageUrl,
@@ -16976,30 +14942,27 @@ var CZ;
                     var $tileAvatar = $tweetTileMeta.find(".tweet-avatar-icon");
                     var $tileDate = $tweetTileMeta.find(".tile-meta-time");
 
+                    convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
+
                     // Show content of Tweet tile on avatar load.
                     $tweetTileMeta.invisible(true);
                     $tileAvatar.load($tweetTileMeta, function (event) {
                         event.data.visible();
                     });
 
-                    // Replace all @authors with links.
                     text = text.replace(/(@([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
                         href='https://twitter.com/$2'>$1</a>");
 
-                    // Replace all #tags with links.
                     text = text.replace(/(#([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
                         href='https://twitter.com/search?q=$2&f=realtime'>$1</a>");
 
-                    // Set tweet's properties to corresponding elements.
                     $tileMessage.html(text).attr("href", tweetLink);
                     $tileUsername.text("@" + username).attr("href", tweetUsernameLink);
                     $tileFullname.text(fullname);
                     $tileDate.text(convertedDate);
 
-                    // Set avatar.
                     $tileAvatar.attr("src", photo);
 
-                    // List View.
                     var $tweetListItem = $(ListTemplate).clone(true, true).appendTo(ListElem);
                     var $listItemMessage = $tweetListItem.find(".tweet-li-message");
                     var $listItemUsername = $tweetListItem.find(".tweet-li-header .tweet-li-username");
@@ -17026,22 +14989,17 @@ var CZ;
             var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
             $(".home-icon").addClass("active");
 
-            // Disable buttons: save click handlers and remove them.
             $disabledButtons.attr("disabled", "disabled").each(function (i, el) {
                 var events = $(el).data("events");
                 $(el).data("onclick", events && events.click && events.click[0]);
             }).off();
 
-            // Hide regimes.
             $(".header-regimes").invisible();
 
-            // Hide breadcrumbs.
             $(".header-breadcrumbs").invisible();
 
-            // Hide all forms.
             CZ.HomePageViewModel.closeAllForms();
 
-            // Show home page.
             $("#start-page").fadeIn();
         }
         StartPage.show = show;
@@ -17059,7 +15017,6 @@ else
             var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
             $(".home-icon").removeClass("active");
 
-            // Enable buttons: add saved handlers.
             $disabledButtons.removeAttr("disabled").each(function (i, el) {
                 $(el).click($(el).data("onclick"));
             });
@@ -17068,19 +15025,15 @@ else
                 $(".header-regimes").visible();
             }
 
-            // Show breadcrumbs.
             $(".header-breadcrumbs").visible();
 
-            // Hide home page.
             $("#start-page").fadeOut();
         }
         StartPage.hide = hide;
 
         function initialize() {
-            // Is regimes visible initially?
             _isRegimesVisible = $(".header-regimes").is(":visible");
 
-            // Toggle for home button.
             $(".home-icon").click(function () {
                 if ($("#start-page").is(":visible")) {
                     hide();
@@ -17089,9 +15042,7 @@ else
                 }
             });
 
-            // TODO: Replace with current user.
             CZ.Service.getUserFeatured().done(function (response) {
-                // Show the newest featured timelines first.
                 var timelines = response ? response.reverse() : [];
 
                 timelines.sort(compareTimelineTitles);
@@ -17105,10 +15056,7 @@ else
 
                 timelines.sort(compareTimelineTitles);
 
-                // saving guids of favorite timelines
                 timelines.forEach(function (timeline) {
-                    // timelineUrl pattern is /{collection}/{supercollection}#{/t{guid}}+/t{favorite timeline guid}
-                    // favorite timeline guid is the latest guid in url
                     CZ.Settings.favoriteTimelines.push(timeline.TimelineUrl.split("/").pop().slice(1));
                 });
 
@@ -17123,11 +15071,8 @@ else
                 console.log("[ERROR] getUserFavorites");
             });
 
-            //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
-            //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
-            //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
             CZ.Service.getProfile().done(function (data) {
-                if ((data != "") && (data.DisplayName != null)) {
+                if ((data !== "") && (data.DisplayName !== null)) {
                     CZ.Settings.userSuperCollectionName = data.DisplayName;
                     CZ.Settings.userCollectionName = data.DisplayName;
                 }
@@ -17143,7 +15088,6 @@ else
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
 
-            // Show home page if this is a root URL of ChronoZoom.
             var hash = CZ.UrlNav.getURL().hash;
             if (!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
                 show();
@@ -17153,10 +15097,7 @@ else
     })(CZ.StartPage || (CZ.StartPage = {}));
     var StartPage = CZ.StartPage;
 })(CZ || (CZ = {}));
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../settings.ts'/>
 (function ($) {
-    // jQuery plugin. Shows error message under field.
     $.fn.showError = function (msg, className, props) {
         className = className || "error";
         props = props || {};
@@ -17204,7 +15145,6 @@ else
         return result;
     };
 
-    // jQuery plugin. Hides error message under field.
     $.fn.hideError = function () {
         var $allErrors = $();
         var $errorElems = $();
@@ -17243,12 +15183,7 @@ else
         return result;
     };
 })(jQuery);
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 (function ($) {
-    /**
-    * Make the element fully visible using opacity and visibility CSS rules.
-    * @param  {bool} noTransition If true then CSS transition won't be used.
-    */
     $.fn.visible = function (noTransition) {
         return this.each(function () {
             var $this = $(this);
@@ -17264,10 +15199,6 @@ else
         });
     };
 
-    /**
-    * Make the element fully invisible using opacity and visibility CSS rules.
-    * @param  {bool} noTransition If true then CSS transition won't be used.
-    */
     $.fn.invisible = function (noTransition) {
         return this.each(function () {
             var $this = $(this);
@@ -17283,39 +15214,6 @@ else
         });
     };
 })(jQuery);
-/// <reference path='settings.ts'/>
-/// <reference path='common.ts'/>
-/// <reference path='timescale.ts'/>
-/// <reference path='viewport-controller.ts'/>
-/// <reference path='gestures.ts'/>
-/// <reference path='tours.ts'/>
-/// <reference path='virtual-canvas.ts'/>
-/// <reference path='uiloader.ts'/>
-/// <reference path='media.ts'/>
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../ui/controls/datepicker.ts'/>
-/// <reference path='../ui/controls/medialist.ts'/>
-/// <reference path='../ui/auth-edit-timeline-form.ts'/>
-/// <reference path='../ui/auth-edit-exhibit-form.ts'/>
-/// <reference path='../ui/auth-edit-contentitem-form.ts'/>
-/// <reference path='../ui/auth-edit-tour-form.ts'/>
-/// <reference path='../ui/header-edit-form.ts' />
-/// <reference path='../ui/header-edit-profile-form.ts'/>
-/// <reference path='../ui/header-login-form.ts'/>
-/// <reference path='../ui/header-search-form.ts' />
-/// <reference path='../ui/timeseries-graph-form.ts'/>
-/// <reference path='../ui/timeseries-data-form.ts'/>
-/// <reference path='../ui/tourslist-form.ts'/>
-/// <reference path='../ui/tour-caption-form.ts'/>
-/// <reference path='../ui/message-window.ts'/>
-/// <reference path='../ui/header-session-expired-form.ts'/>
-/// <reference path='../ui/mediapicker-form.ts'/>
-/// <reference path='typings/jquery/jquery.d.ts'/>
-/// <reference path='extensions/extensions.ts'/>
-/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
-/// <reference path='../ui/start-page.ts'/>
-/// <reference path='plugins/error-plugin.ts'/>
-/// <reference path='plugins/utility-plugins.ts'/>
 var constants;
 
 var CZ;
@@ -17325,7 +15223,6 @@ var CZ;
     CZ.rightDataSet;
 
     (function (HomePageViewModel) {
-        // Contains mapping: CSS selector -> html file.
         var _uiMap = {
             "#header-edit-form": "/ui/header-edit-form.html",
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
@@ -17359,12 +15256,6 @@ var CZ;
 
         HomePageViewModel.sessionForm;
 
-        // Basic Flight-Control (Tracks the features that are enabled)
-        //
-        // FEATURES CAN ONLY BE ACTIVATED IN ROOTCOLLECTION AFTER HITTING ZERO ACTIVE BUGS.
-        //
-        // REMOVING THIS COMMENT OR BYPASSING THIS CHECK MAY BRING YOU BAD KARMA, ITS TRUE.
-        //
         var _featureMap = [
             {
                 Name: "Login",
@@ -17506,7 +15397,6 @@ else
         var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
 
         $(document).ready(function () {
-            //Ensures there will be no 'console is undefined' errors
             window.console = window.console || (function () {
                 var c = {};
                 c.log = c.warn = c.debug = c.info = c.log = c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () {
@@ -17522,13 +15412,10 @@ else
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
 
-            // Apply features
             ApplyFeatureActivation();
 
-            // Register ChronoZoom Extensions
             CZ.Extensions.registerExtensions();
 
-            // Register ChronoZoom Media Pickers.
             CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
 
@@ -17788,7 +15675,6 @@ else
                         $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
-                    //retrieving the data
                     CZ.Common.loadData().then(function (response) {
                         if (!response) {
                             if (CZ.Authoring.isEnabled) {
@@ -17886,7 +15772,6 @@ else
                 });
                 if (IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
-                    CZ.StartPage.show();
                 }
             });
 
@@ -17919,19 +15804,16 @@ else
             });
 
             if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
-                // Suppress the default iOS elastic pan/zoom actions.
                 document.addEventListener('touchmove', function (e) {
                     e.preventDefault();
                 });
             }
 
             if (navigator.userAgent.indexOf('Mac') != -1) {
-                // Disable Mac OS Scrolling Bounce Effect
                 var body = document.getElementsByTagName('body')[0];
                 (body).style.overflow = "hidden";
             }
 
-            // init seadragon. set path to image resources for nav buttons
             Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
 
             if (window.location.hash)
@@ -17973,7 +15855,6 @@ else
 
             var hashChangeFromOutside = true;
 
-            // URL Nav: update URL when animation is complete
             CZ.Common.controller.onAnimationComplete.push(function (id) {
                 hashChangeFromOutside = false;
                 if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) {
@@ -17989,7 +15870,6 @@ else
                 CZ.Common.setNavigationStringTo = null;
             });
 
-            // URL Nav: handle URL changes from outside
             window.addEventListener("hashchange", function () {
                 if (window.location.hash && hashChangeFromOutside && CZ.Common.hashHandle) {
                     var hash = window.location.hash;
@@ -18008,29 +15888,19 @@ else
                     hashChangeFromOutside = true;
             });
 
-            // Axis: enable showing thresholds
             CZ.Common.controller.onAnimationComplete.push(function () {
-                //CZ.Common.ax.axis("enableThresholds", true);
-                //if (window.console && console.log("thresholds enabled"));
             });
 
-            //Axis: disable showing thresholds
             CZ.Common.controller.onAnimationStarted.push(function () {
-                //CZ.Common.ax.axis("enableThresholds", true);
-                //if (window.console && console.log("thresholds disabled"));
             });
 
-            // Axis: enable showing thresholds
             CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
                 if (oldId != undefined && newId == undefined) {
                     setTimeout(function () {
-                        //CZ.Common.ax.axis("enableThresholds", true);
-                        //if (window.console && console.log("thresholds enabled"));
                     }, 500);
                 }
             });
 
-            //Tour: notifyng tour that the bookmark is reached
             CZ.Common.controller.onAnimationComplete.push(function (id) {
                 if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
                     CZ.Tours.tourBookmarkTransitionCompleted(id);
@@ -18038,7 +15908,6 @@ else
                     CZ.Tours.pauseTourAtAnyAnimation = true;
             });
 
-            //Tour: notifyng tour that the transition was interrupted
             CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
                 if (CZ.Tours.tour != undefined) {
                     if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) {
@@ -18071,7 +15940,6 @@ else
                 }
             });
 
-            // Reacting on the event when one of the infodot exploration causes inner zoom constraint
             CZ.Common.vc.bind("innerZoomConstraintChanged", function (constraint) {
                 CZ.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue;
                 CZ.Common.axis.allowMarkerMovesOnHover = !constraint.zoomValue;
@@ -18085,7 +15953,6 @@ else
                 CZ.timeSeriesChart.updateCanvasHeight();
                 CZ.Common.updateLayout();
 
-                //updating timeSeries chart
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");
                 updateTimeSeriesChart(vp);
             });
@@ -18101,8 +15968,6 @@ else
 
             var bid = window.location.hash.match("b=([a-z0-9_]+)");
             if (bid) {
-                //bid[0] - source string
-                //bid[1] - found match
                 $("#bibliography .sources").empty();
                 $("#bibliography .title").append($("<span></span>", {
                     text: "Loading..."
