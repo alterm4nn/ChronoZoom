@@ -4370,7 +4370,7 @@ var CZ;
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
+                dataType: "json",
                 url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
@@ -4419,7 +4419,7 @@ var CZ;
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
+                dataType: "json",
                 url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }

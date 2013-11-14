@@ -695,7 +695,7 @@
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
+                dataType: "json",
                 url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
@@ -744,7 +744,7 @@
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
+                dataType: "json",
                 url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }

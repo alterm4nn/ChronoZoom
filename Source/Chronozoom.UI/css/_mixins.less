@@ -55,6 +55,18 @@ input.error {
     transition: @props;
 }
 
+.calc-width(@arg) {
+    width: calc(e(@arg));
+    width: -webkit-calc(e(@arg));
+    width: -moz-calc(e(@arg));
+}
+
+.calc-height(@arg) {
+    height: calc(e(@arg));
+    height: -webkit-calc(e(@arg));
+    height: -moz-calc(e(@arg));
+}
+
 /*Start Page*/
 .gradient(@from, @to) {
     background-color: @from;
