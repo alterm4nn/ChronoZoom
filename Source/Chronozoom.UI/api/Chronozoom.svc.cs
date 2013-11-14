@@ -79,6 +79,7 @@ namespace Chronozoom.UI
     public class PutExhibitResult
     {
         private List<Guid> _contentItemId;
+        private List<int> _erroneouscontentItemIndex;
         public string errorMessage;
 
         public Guid ExhibitId { get; set; }
@@ -90,9 +91,18 @@ namespace Chronozoom.UI
             }
         }
 
+        public IEnumerable<int> ErroneousContentItemIndex
+        {
+            get
+            {
+                return _erroneouscontentItemIndex.AsEnumerable();
+            }
+        }
+
         internal PutExhibitResult()
         {
             _contentItemId = new List<Guid>();
+            _erroneouscontentItemIndex = new List<int>();
             errorMessage = "";
         }
 
@@ -100,6 +110,12 @@ namespace Chronozoom.UI
         {
             _contentItemId.Add(id);
         }
+
+        internal void ErrCIAdd(int id)
+        {
+            _erroneouscontentItemIndex.Add(id);
+        }
+
     }
 
     public class TourResult
@@ -297,7 +313,7 @@ namespace Chronozoom.UI
                 {
                     //if (ShouldRetrieveAllTimelines(storage, commonAncestor, collectionId, maxElementsParsed))
                     //{
-                        timelines = storage.RetrieveAllTimelines(collectionId);
+                    timelines = storage.RetrieveAllTimelines(collectionId);
                     //}
                     //else
                     //{
@@ -1008,15 +1024,23 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Exhibit");
                 var returnValue = new PutExhibitResult();
-
+                var isErroneous = false;
+                var index = 0;
                 foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
                 {
                     if (!ValidateContentItemUrl(contentItemRequest, out returnValue.errorMessage))
                     {
-                        returnValue.errorMessage += " in '" + contentItemRequest.Title + "' artifact.";
-                        return returnValue;
+                        if (!isErroneous)
+                        {
+                            returnValue.errorMessage += " in '" + contentItemRequest.Title + "' artifact.";
+                            isErroneous = true;
+                        }
+                        returnValue.ErrCIAdd(index);
                     }
+                    index++;
                 }
+
+                if (isErroneous) return returnValue;
 
                 if (exhibitRequest.Id == Guid.Empty)
                 {
@@ -1230,7 +1254,8 @@ namespace Chronozoom.UI
             }
 
             // Check if MIME type match mediaType (regex test for 'video')
-            switch (contentitem.MediaType) {
+            switch (contentitem.MediaType)
+            {
                 case "image":
                     if (mimeType != "image/jpg"
                         && mimeType != "image/jpeg"
@@ -2034,7 +2059,7 @@ namespace Chronozoom.UI
                 var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
                 if (u != null)
                     user.Id = u.Id;
-    
+
                 return operation(user, storage);
             }
         }
@@ -2138,7 +2163,7 @@ namespace Chronozoom.UI
         /// Documentation under IChronozoomSVC
         /// </summary>
         public string GetMimeTypeByUrl(string url)
-            {
+        {
             // Check if valid url.
             Uri uriResult;
             if (!(Uri.TryCreate(url, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))

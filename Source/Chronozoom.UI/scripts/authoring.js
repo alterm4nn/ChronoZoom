@@ -1,4 +1,4 @@
-var CZ;
+﻿var CZ;
 (function (CZ) {
     (function (Authoring) {
         var _vcwidget;
@@ -438,7 +438,6 @@ var CZ;
                     newExhibit.id = "e" + response.ExhibitId;
 
                     CZ.Common.vc.virtualCanvas("requestInvalidate");
-
                     deferred.resolve(newExhibit);
                 }, function (error) {
                     console.log("Error connecting to service: update exhibit.\n" + error.responseText);
@@ -548,6 +547,12 @@ var CZ;
         }
         Authoring.isNotEmpty = isNotEmpty;
 
+        function isValidURL(url) {
+            var objRE = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return objRE.test(url);
+        }
+        Authoring.isValidURL = isValidURL;
+
         function isIntervalPositive(start, end) {
             return (parseFloat(start) + 1 / 366 <= parseFloat(end));
         }
@@ -642,6 +647,27 @@ var CZ;
             return isValid;
         }
         Authoring.validateContentItems = validateContentItems;
+
+        function erroneousContentItemsList(errorMassage) {
+            var pos;
+            var errCI = [];
+            if (errorMassage.indexOf("ErroneousContentItemIndex") + 1) {
+                pos = errorMassage.indexOf("ErroneousContentItemIndex") + 27;
+                while (errorMassage[pos] != ']') {
+                    if ((errorMassage[pos] == ",") || (errorMassage[pos] == "[")) {
+                        var str1 = "";
+                        pos++;
+                        while ((errorMassage[pos] != ",") && (errorMassage[pos] != "]")) {
+                            str1 += errorMassage[pos];
+                            pos++;
+                        }
+                        errCI.push(parseInt(str1));
+                    }
+                }
+            }
+            return errCI;
+        }
+        Authoring.erroneousContentItemsList = erroneousContentItemsList;
 
         function showSessionForm() {
             CZ.HomePageViewModel.sessionForm.show();
