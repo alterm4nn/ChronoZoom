@@ -16635,10 +16635,6 @@ var CZ;
                 var o = $(template).clone(true, true).appendTo(target[idx].Name);
                 o.attr("class", target[idx].Visibility[i]);
                 o.attr("id", "m" + idx + "i" + i);
-
-                $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
-                    watch: "window"
-                });
             }
         }
         StartPage.cloneTweetTemplate = cloneTweetTemplate;
@@ -16967,7 +16963,8 @@ var CZ;
                     var photo = tweet.User.ProfileImageUrl;
                     var time = tweet.CreatedDate;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
-                    var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
+                    var convertedDate = myDate.getDate() + "." + myDate.getMonth() + "." + myDate.getFullYear();
+
                     var tweetUsernameLink = "https://twitter.com/" + username;
                     var tweetLink = "https://twitter.com/" + username + "/statuses/" + tweet.IdStr;
 
@@ -16978,8 +16975,6 @@ var CZ;
                     var $tileUsername = $tweetTileMeta.find(".tweet-meta-author");
                     var $tileAvatar = $tweetTileMeta.find(".tweet-avatar-icon");
                     var $tileDate = $tweetTileMeta.find(".tile-meta-time");
-
-                    convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
 
                     // Show content of Tweet tile on avatar load.
                     $tweetTileMeta.invisible(true);
@@ -17018,6 +17013,10 @@ var CZ;
                     $listItemFullname.text(fullname);
                     $listItemDate.text(convertedDate);
                     $listItemAvatar.attr("src", photo);
+
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
+                        watch: "window"
+                    });
                 }
             });
         }
