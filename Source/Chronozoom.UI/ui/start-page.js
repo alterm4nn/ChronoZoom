@@ -513,7 +513,8 @@ var CZ;
                     var photo = tweet.User.ProfileImageUrl;
                     var time = tweet.CreatedDate;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
-                    var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
+                    var convertedDate = myDate.getDate() + "." + myDate.getMonth() + "." + myDate.getFullYear();
+
                     var tweetUsernameLink = "https://twitter.com/" + username;
                     var tweetLink = "https://twitter.com/" + username + "/statuses/" + tweet.IdStr;
 
@@ -524,8 +525,6 @@ var CZ;
                     var $tileUsername = $tweetTileMeta.find(".tweet-meta-author");
                     var $tileAvatar = $tweetTileMeta.find(".tweet-avatar-icon");
                     var $tileDate = $tweetTileMeta.find(".tile-meta-time");
-
-                    convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
 
                     $tweetTileMeta.invisible(true);
                     $tileAvatar.load($tweetTileMeta, function (event) {
