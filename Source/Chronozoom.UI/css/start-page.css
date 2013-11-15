@@ -231,11 +231,11 @@ input.error {
   font-size: 12px;
   color: #B0B0B0;
   float: right;
+  margin-top: 4px;
 }
 .twitter-time-container {
   position: absolute;
-  margin: 5px;
-  bottom: 15px;
+  bottom: 5px;
   left: 5px;
   right: 5px;
   border-top: 1px #666 solid;
