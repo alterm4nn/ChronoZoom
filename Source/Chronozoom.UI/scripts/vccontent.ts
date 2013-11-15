@@ -808,7 +808,7 @@ module CZ {
             var marginTop = timelineinfo.titleRect ? timelineinfo.titleRect.marginTop : (1 - CZ.Settings.timelineHeaderMargin) * timelineinfo.height - headerSize;
             var baseline = timelineinfo.top + marginTop + headerSize / 2.0;
 
-            this.titleObject = addText(this, layerid, id + "__header__", timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize,
+            this.titleObject = addText(this, layerid, id + "__header__", CZ.Authoring.isEnabled ? timelineinfo.timeStart + marginLeft + headerSize : timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize,
                 timelineinfo.header, {
                     fontName: CZ.Settings.timelineHeaderFontName,
                     fillStyle: CZ.Settings.timelineHeaderFontColor,
@@ -948,7 +948,7 @@ module CZ {
 
                 // initialize add favorite button if user is authorized
                 if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0) {
-                    var btnX = CZ.Authoring.isEnabled ? this.x + this.width - 1.8 * this.titleObject.height : this.x + this.width - 1.0 * this.titleObject.height;
+                    var btnX = this.x + this.width - 1.0 * this.titleObject.height;
                     var btnY = this.titleObject.y + 0.15 * this.titleObject.height;
 
                     this.favoriteBtn = addImage(this,
@@ -1006,7 +1006,7 @@ module CZ {
 
                 // initialize edit button if it isn't root collection and titleObject was already initialized
                 if (CZ.Authoring.isEnabled && typeof this.editButton === "undefined" && this.titleObject.width !== 0) {
-                    this.editButton = addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y,
+                    this.editButton = addImage(this, layerid, id + "__edit", this.x + this.titleObject.height * 0.15, this.titleObject.y,
                         this.titleObject.height, this.titleObject.height, "/images/edit.svg");
                     this.editButton.reactsOnMouse = true;
 
