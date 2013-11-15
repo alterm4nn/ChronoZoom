@@ -442,7 +442,7 @@ iframe[sutra=picker] + div {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-image: url(../images/default-tile.png);
+  background-image: url('../images/default-tile.png');
 }
 .tile-photo:hover {
   cursor: pointer;
@@ -510,7 +510,7 @@ iframe[sutra=picker] + div {
 .tweet-icon {
   float: right;
   margin: 3px;
-  background-image: url(../images/icon_twitter.png);
+  background-image: url('../images/icon_twitter.png');
   height: 14px;
   width: 17px;
 }
@@ -1202,7 +1202,7 @@ a:visited {
   width: 170px;
   background-repeat: no-repeat;
   background-position: center;
-  background-image: url(../images/chronozoom.png);
+  background-image: url('../images/chronozoom.png');
   margin-left: 10px;
 }
 .header-regimes {
@@ -1260,26 +1260,26 @@ a:visited {
   background-color: transparent;
 }
 .tour-icon {
-  background-image: url(../images/tour-icon.png);
+  background-image: url('../images/tour-icon.png');
 }
 .search-icon {
-  background-image: url(../images/search-icon.png);
+  background-image: url('../images/search-icon.png');
 }
 .timeSeries-icon {
-  background-image: url(../images/timeseries-icon.png);
+  background-image: url('../images/timeseries-icon.png');
 }
 .view-icon {
-  background-image: url(../images/view-icon.png);
+  background-image: url('../images/view-icon.png');
   opacity: .5;
 }
 .edit-icon {
-  background-image: url(../images/edit-icon.png);
+  background-image: url('../images/edit-icon.png');
 }
 .home-icon {
-  background-image: url(../images/home-icon.png);
+  background-image: url('../images/home-icon.png');
 }
 .profile-icon {
-  background-image: url(../images/profile-icon.png);
+  background-image: url('../images/profile-icon.png');
   background-position-x: 3px;
   display: inline-block;
 }
@@ -1290,7 +1290,7 @@ a:visited {
   background-color: #0464a2;
 }
 .header__tour-icon {
-  background-image: url(../images/tour-icon.png);
+  background-image: url('../images/tour-icon.png');
   background-repeat: no-repeat;
   background-position: center;
   height: 36px;
@@ -1320,7 +1320,6 @@ a:visited {
   padding-top: 38px;
   height: 100%;
   min-height: 100%;
-  position: relative;
 }
 #vc {
   overflow: hidden;
@@ -1517,22 +1516,22 @@ a:visited {
   opacity: 0.9;
 }
 #defaultBox {
-  background-image: url(../images/defaultGradientBox.jpg);
+  background-image: url('../images/defaultGradientBox.jpg');
 }
 #cosmosRegimeBox {
-  background-image: url(../images/cosmosRegimeBox.jpg);
+  background-image: url('../images/cosmosRegimeBox.jpg');
 }
 #earthRegimeBox {
-  background-image: url(../images/earthRegimeBox.jpg);
+  background-image: url('../images/earthRegimeBox.jpg');
 }
 #humanityRegimeBox {
-  background-image: url(../images/humanityRegimeBox.jpg);
+  background-image: url('../images/humanityRegimeBox.jpg');
 }
 #lifeRegimeBox {
-  background-image: url(../images/lifeRegimeBox.jpg);
+  background-image: url('../images/lifeRegimeBox.jpg');
 }
 #prehistoryRegimeBox {
-  background-image: url(../images/prehistoryRegimeBox.jpg);
+  background-image: url('../images/prehistoryRegimeBox.jpg');
   background-position: center;
 }
 .bubbleInfo span {
@@ -1700,7 +1699,7 @@ img.fallbackBackground {
   margin-left: -450px;
   width: 900px;
   height: 482px;
-  background-image: url(../images/fallbackOuterBackground.jpg);
+  background-image: url('../images/fallbackOuterBackground.jpg');
   background-position: top center;
   cursor: default;
 }
@@ -2658,8 +2657,8 @@ img.fallbackBackground {
   z-index: 8;
   cursor: not-allowed;
   background: rgba(160, 160, 106, 0.5);
-  top: 38px;
-  bottom: 0;
+  top: 91px;
+  bottom: 25px;
   left: 0;
 }
 .root-cloak-left.visible {
@@ -2671,8 +2670,8 @@ img.fallbackBackground {
   z-index: 8;
   cursor: not-allowed;
   background: rgba(160, 160, 106, 0.5);
-  top: 38px;
-  bottom: 0;
+  top: 91px;
+  bottom: 25px;
   right: 0;
 }
 .root-cloak-right.visible {
@@ -2684,7 +2683,7 @@ img.fallbackBackground {
   z-index: 8;
   cursor: not-allowed;
   background: rgba(160, 160, 106, 0.5);
-  top: 38px;
+  top: 91px;
   left: 0;
   right: 0;
 }
@@ -2697,7 +2696,7 @@ img.fallbackBackground {
   z-index: 8;
   cursor: not-allowed;
   background: rgba(160, 160, 106, 0.5);
-  bottom: 0;
+  bottom: 25px;
   left: 0;
   right: 0;
 }
