@@ -597,11 +597,8 @@ else
                 var body = document.getElementsByTagName('body')[0];
                 (body).style.overflow = "hidden";
             }
-            CZ.Common.maxPermitedVerticalRange = {
-                top: 0,
-                bottom: 10000000
-            };
-            if(window.location.hash) {
+
+            if (window.location.hash)
                 CZ.Common.startHash = window.location.hash;
 
             CZ.Search.initializeSearch();

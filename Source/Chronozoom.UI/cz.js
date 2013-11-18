@@ -1069,6 +1069,11 @@ var CZ;
                 throw "Image size must be positive";
             return VCContent.addChild(element, new CanvasLODImage(element.vc, layerid, id, imgSources, vx, vy, vw, vh, onload), false);
         };
+
+        //export var addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
+        //    if (vw <= 0 || vh <= 0) throw "Image size must be positive";
+        //    return addChild(element, new SeadragonImage(element.vc, /*parent*/element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
+        //};
         VCContent.addExtension = function (extensionName, element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
             if (vw <= 0 || vh <= 0)
                 throw "Extension size must be positive";
@@ -2773,6 +2778,130 @@ else
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
+        /*Represents a Seadragon based image
+        @param imageSource  image source
+        @param vx           x of left top corner in virtual space
+        @param vy           y of left top corner in virtual space
+        @param vw           width of in virtual space
+        @param vh           height of in virtual space
+        @param z            z-index
+        @param onload       (optional callback function) called when image is loaded
+        @oaram parent       parent element, whose child is to be seadragon image.
+        
+        function SeadragonImage(vc, parent, layerid, id, imageSource, vx, vy, vw, vh, z, onload) {
+        var self = this;
+        this.base = CanvasDomItem;
+        this.base(vc, layerid, id, vx, vy, vw, vh, z);
+        this.onload = onload;
+        this.nAttempts = 0;
+        this.timeoutHandles = [];
+        
+        var container = document.createElement('div');
+        container.setAttribute("id", id);
+        container.setAttribute("style", "color: white"); // color to use for displaying messages
+        this.initializeContent(container);
+        
+        this.viewer = new Seadragon.Viewer(container);
+        this.viewer.elmt.addEventListener("mousemove", CZ.Common.preventbubble, false);
+        this.viewer.elmt.addEventListener("mousedown", CZ.Common.preventbubble, false);
+        this.viewer.elmt.addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
+        this.viewer.elmt.addEventListener("mousewheel", CZ.Common.preventbubble, false);
+        
+        this.viewer.addEventListener("open", function (e) {
+        if (self.onload) self.onload();
+        self.vc.requestInvalidate();
+        });
+        
+        this.viewer.addEventListener("resize", function (e) {
+        self.viewer.setDashboardEnabled(e.elmt.clientWidth > 250);
+        });
+        
+        this.onSuccess = function (resp) {
+        if (resp.error) {
+        // the URL is malformed or the service is down
+        self.showFallbackImage();
+        return;
+        }
+        
+        var content = resp.content;
+        if (content.ready) {
+        for (var i = 0; i < self.timeoutHandles.length; i++)
+        clearTimeout(self.timeoutHandles[i]);
+        
+        self.viewer.openDzi(content.dzi);
+        } else if (content.failed) {
+        self.showFallbackImage();
+        } else { // conversion to dzi (deepzoom image format) is in progress
+        if (self.nAttempts < CZ.Settings.seadragonMaxConnectionAttempts) {
+        self.viewer.showMessage("Loading " + Math.round(100 * content.progress) + "% done.");
+        self.timeoutHandles.push(setTimeout(self.requestDZI, CZ.Settings.seadragonRetryInterval)); // retry
+        } else {
+        self.showFallbackImage();
+        }
+        }
+        }
+        
+        this.onError = function () {
+        // ajax query failed
+        if (self.nAttempts < CZ.Settings.seadragonMaxConnectionAttempts) {
+        self.timeoutHandles.push(setTimeout(self.requestDZI, CZ.Settings.seadragonRetryInterval)); // retry
+        } else {
+        self.showFallbackImage();
+        }
+        }
+        
+        this.requestDZI = function () {
+        self.nAttempts++;
+        $.ajax({
+        url: CZ.Settings.seadragonServiceURL + encodeURIComponent(imageSource),
+        dataType: "jsonp",
+        success: self.onSuccess,
+        error: self.onError
+        });
+        }
+        
+        this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+        if (self.viewer.isFullPage())
+        return;
+        
+        this.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
+        if (self.viewer.viewport) {
+        self.viewer.viewport.resize({ x: size_p.x, y: size_p.y });
+        self.viewer.viewport.update();
+        }
+        }
+        
+        this.onRemove = function () {
+        self.viewer.close(); // closes any open content
+        this.prototype.onRemove.call(this);
+        }
+        
+        this.showFallbackImage = function () {
+        for (var i = 0; i < self.timeoutHandles.length; i++)
+        clearTimeout(self.timeoutHandles[i]);
+        
+        self.onRemove(); // removes the dom element
+        removeChild(parent, self.id); // removes the cur seadragon object from the scene graph
+        addImage(parent, layerid, id, vx, vy, vw, vh, imageSource);
+        }
+        
+        // run
+        self.requestDZI();
+        
+        this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+        */
+        /*******************************************************************************************************/
+        /* Timelines                                                                                           */
+        /*******************************************************************************************************/
+        /* Adds a timeline composite element into a virtual canvas.
+        @param element   (CanvasElement) Parent element, whose children is to be new timeline.
+        @param layerid   (any type) id of the layer for this element
+        @param id        (any type) id of an element
+        @param timelineinfo  ({ timeStart (minus number of years BP), timeEnd (minus number of years BP), top (number), height (number),
+        header (string), fillStyle (color) })
+        @returns         root of the timeline tree
+        */
         function addTimeline(element, layerid, id, timelineinfo) {
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
             var timeline = VCContent.addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
@@ -2868,7 +2997,7 @@ else
                     var imageElem = null;
                     if (this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
                         imageElem = VCContent.addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
-                    } else if(this.contentItem.mediaType.toLowerCase() === 'video') {
+                    } else if (this.contentItem.mediaType.toLowerCase() === 'video') {
                         VCContent.addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if (this.contentItem.mediaType.toLowerCase() === 'audio') {
                         mediaTop += CZ.Settings.contentItemAudioTopMargin * vh;
@@ -17850,11 +17979,8 @@ else
                 var body = document.getElementsByTagName('body')[0];
                 (body).style.overflow = "hidden";
             }
-            CZ.Common.maxPermitedVerticalRange = {
-                top: 0,
-                bottom: 10000000
-            };
-            if(window.location.hash) {
+
+            if (window.location.hash)
                 CZ.Common.startHash = window.location.hash;
 
             CZ.Search.initializeSearch();

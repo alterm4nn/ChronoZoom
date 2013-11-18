@@ -79,6 +79,7 @@
                 throw "Image size must be positive";
             return VCContent.addChild(element, new CanvasLODImage(element.vc, layerid, id, imgSources, vx, vy, vw, vh, onload), false);
         };
+
         VCContent.addExtension = function (extensionName, element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
             if (vw <= 0 || vh <= 0)
                 throw "Extension size must be positive";
@@ -1365,7 +1366,7 @@ else
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 if (!this.content)
                     return;
-                }
+
                 var p = viewport2d.pointVirtualToScreen(this.x, this.y);
 
                 var width = parseFloat(srcData[1]);
@@ -1393,6 +1394,7 @@ else
 
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
+
         function addTimeline(element, layerid, id, timelineinfo) {
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
             var timeline = VCContent.addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
@@ -1468,7 +1470,7 @@ else
                     var imageElem = null;
                     if (this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
                         imageElem = VCContent.addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
-                    } else if(this.contentItem.mediaType.toLowerCase() === 'video') {
+                    } else if (this.contentItem.mediaType.toLowerCase() === 'video') {
                         VCContent.addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if (this.contentItem.mediaType.toLowerCase() === 'audio') {
                         mediaTop += CZ.Settings.contentItemAudioTopMargin * vh;
