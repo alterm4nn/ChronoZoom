@@ -100,7 +100,7 @@ var CZ;
             },
             {
                 Name: "StartPage",
-                Activation: FeatureActivation.NotProduction,
+                Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-icon.home-icon"
             }
         ];
