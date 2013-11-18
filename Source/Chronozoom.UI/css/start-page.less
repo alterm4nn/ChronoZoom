@@ -54,7 +54,7 @@
     background: url(/images/background.jpg) no-repeat;
     background-size: cover;
     font-weight: lighter;
-    min-width: 700px;
+    min-width: 580px;
 
     h1, h2, h3 {
         margin: 0;
@@ -144,7 +144,7 @@
     background: -o-linear-gradient(top, rgba(53,53,53,0.9) 0%,rgba(53,53,53,0.8) 45%,rgba(53,53,53,0) 100%); 
     background: -ms-linear-gradient(top, rgba(53,53,53,0.9) 0%,rgba(53,53,53,0.8) 45%,rgba(53,53,53,0) 100%); 
     background: linear-gradient(to bottom, rgba(53,53,53,0.9) 0%,rgba(53,53,53,0.8) 45%,rgba(53,53,53,0) 100%); 
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='rgba(53,53,53,0.9)', endColorstr='rgba(53,53,53,0)',GradientType=0 );
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#353535', endColorstr='#35353500',GradientType=0 );
     
     position: absolute;
     width: 100%;
@@ -498,11 +498,16 @@
 
 @media only screen and (max-width : 880px), screen and (orientation: landscape) and (max-device-width : 480px) {
     /* Small Tablet view: 3 rows, 2 columns */
-        .FTTiles {
+    .start-page-screen
+    {
+        overflow:auto;
+    }
+    
+    .FTTiles {
         overflow: hidden;
         text-align: center;
     }
-        .tweet-meta-title {
+    .tweet-meta-title {
         display: none;
     }
 
@@ -525,7 +530,7 @@
     }
 
     .box {
-        height:150px;
+        height: 150px;
         width:  150px;
         overflow: hidden;
     }
