@@ -1,0 +1,92 @@
+﻿html {}
+
+@import "_colors";
+@import "_vars";
+
+@inputHeight: 29px; /* Height of input element */
+@errorFontSize: 1em; /* Font-size of error message */
+
+/* Error messages */
+
+.error-message {        
+    .box-sizing;
+
+    display: none;
+    width: auto;
+    height: auto;
+    color: @error-light-red;
+}
+
+.input-error-message {
+    .error-message;
+    
+    margin-top: 10px;
+    min-height: @inputHeight;
+    font-size: @errorFontSize;
+    line-height: 2em;
+}
+
+input.error {
+    border: @border-error;
+}
+
+.form-error-message {
+    .error-message;
+
+    margin-top: 10px;
+    padding: 8px 10px;
+    min-height: @inputHeight;
+    font-size: @errorFontSize;
+    line-height: 1em;
+}
+
+/* Common */
+
+.box-sizing {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.transition(...) {
+    @props: ~`"@{arguments}".replace(/[\[\]]/g, '')`;
+    -webkit-transition: @props;
+    -moz-transition: @props;
+    transition: @props;
+}
+
+.calc-width(@arg) {
+    width: calc(e(@arg));
+    width: -webkit-calc(e(@arg));
+    width: -moz-calc(e(@arg));
+}
+
+.calc-height(@arg) {
+    height: calc(e(@arg));
+    height: -webkit-calc(e(@arg));
+    height: -moz-calc(e(@arg));
+}
+
+/*Start Page*/
+.gradient(@from, @to) {
+    background-color: @from;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(@from), to(@to)); /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(top, @from, @to); /* Chrome 10+, Saf5.1+, iOS 5+ */
+    background-image:    -moz-linear-gradient(top, @from, @to); /* FF3.6+ */
+    background-image:     -ms-linear-gradient(top, @from, @to); /* IE10 */
+    background-image:      -o-linear-gradient(top, @from, @to); /* Opera 11.10+ */
+    background-image:         linear-gradient(to bottom, @from, @to);
+    -ms-filter:       progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(@from), endColorstr=quote(@to)); /* IE8 */
+    filter:           progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=quote(@from), endColorstr=quote(@to)); /* IE6 & IE7 */
+}
+
+.text-ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -icab-text-overflow: ellipsis;
+    -khtml-text-overflow: ellipsis;
+    -moz-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
+}

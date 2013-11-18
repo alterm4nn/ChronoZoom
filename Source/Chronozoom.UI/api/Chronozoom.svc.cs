@@ -22,10 +22,13 @@ using System.ServiceModel.Web;
 using System.Text;
 using System.Web;
 using Chronozoom.Entities;
+using System.Data.Entity;
 
 using Chronozoom.UI.Utils;
 using System.ServiceModel.Description;
 using System.Text.RegularExpressions;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace Chronozoom.UI
 {
@@ -76,6 +79,8 @@ namespace Chronozoom.UI
     public class PutExhibitResult
     {
         private List<Guid> _contentItemId;
+        private List<int> _erroneouscontentItemIndex;
+        public string errorMessage;
 
         public Guid ExhibitId { get; set; }
         public IEnumerable<Guid> ContentItemId
@@ -86,15 +91,31 @@ namespace Chronozoom.UI
             }
         }
 
+        public IEnumerable<int> ErroneousContentItemIndex
+        {
+            get
+            {
+                return _erroneouscontentItemIndex.AsEnumerable();
+            }
+        }
+
         internal PutExhibitResult()
         {
             _contentItemId = new List<Guid>();
+            _erroneouscontentItemIndex = new List<int>();
+            errorMessage = "";
         }
 
         internal void Add(Guid id)
         {
             _contentItemId.Add(id);
         }
+
+        internal void ErrCIAdd(int id)
+        {
+            _erroneouscontentItemIndex.Add(id);
+        }
+
     }
 
     public class TourResult
@@ -154,7 +175,7 @@ namespace Chronozoom.UI
             return new Uri(ConfigurationManager.AppSettings["ThumbnailsPath"]);
         });
 
-                // The login URL to sign in with Microsoft account
+        // The login URL to sign in with Microsoft account
         private static Lazy<Uri> _signinUrlMicrosoft = new Lazy<Uri>(() =>
         {
             if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["SignInUrlMicrosoft"]))
@@ -239,6 +260,10 @@ namespace Chronozoom.UI
             public const string InvalidContentItemUrl = "Artifact URL is invalid";
             public const string InvalidMediaSourceUrl = "Media Source URL is invalid";
             public const string CollectionRootTimelineExists = "Root timeline for the collection already exists";
+            public const string InvalidContentItemPdfUrl = "Artifact URL is not a PDF";
+            public const string InvalidContentItemImageUrl = "Artifact URL is not a JPG/GIF/PNG";
+            public const string InvalidContentItemVideoUrl = "Artifact URL is not a Vimeo or Youtube";
+            public const string ResourceAccessFailed = "Failed to access given resource";
         }
 
         private static Lazy<ChronozoomSVC> _sharedService = new Lazy<ChronozoomSVC>(() =>
@@ -286,15 +311,15 @@ namespace Chronozoom.UI
                     timelines = storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed == Guid.Empty ? (Guid?)null : lcaParsed, maxElementsParsed, depthParsed);
                 else
                 {
-                    if (ShouldRetrieveAllTimelines(storage, commonAncestor, collectionId, maxElementsParsed))
-                    {
-                        timelines = storage.RetrieveAllTimelines(collectionId);
-                    }
-                    else
-                    {
-                        Trace.TraceInformation("Get Timelines - Using Progressive Load");
-                        timelines = storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed);
-                    }
+                    //if (ShouldRetrieveAllTimelines(storage, commonAncestor, collectionId, maxElementsParsed))
+                    //{
+                    timelines = storage.RetrieveAllTimelines(collectionId);
+                    //}
+                    //else
+                    //{
+                    //    Trace.TraceInformation("Get Timelines - Using Progressive Load");
+                    //    timelines = storage.TimelineSubtreeQuery(collectionId, lcaParsed, startTime, endTime, span, maxElementsParsed);
+                    //}
                 }
 
                 Timeline timeline = timelines.Where(candidate => candidate.Id == lcaParsed).FirstOrDefault();
@@ -312,21 +337,21 @@ namespace Chronozoom.UI
             });
         }
 
-        private static bool ShouldRetrieveAllTimelines(Storage storage, string commonAncestor, Guid collectionId, int maxElements)
-        {
-            if (!string.IsNullOrEmpty(commonAncestor))
-                return false;
+        //private static bool ShouldRetrieveAllTimelines(Storage storage, string commonAncestor, Guid collectionId, int maxElements)
+        //{
+        //    if (!string.IsNullOrEmpty(commonAncestor))
+        //        return false;
 
-            Timeline rootTimeline = storage.GetRootTimelines(collectionId);
+        //    Timeline rootTimeline = storage.GetRootTimelines(collectionId);
 
-            if (rootTimeline == null)
-                return true;
+        //    if (rootTimeline == null)
+        //        return true;
 
-            if (rootTimeline.SubtreeSize < maxElements)
-                return true;
+        //    if (rootTimeline.SubtreeSize < maxElements)
+        //        return true;
 
-            return false;
-        }
+        //    return false;
+        //}
 
         /// <summary>
         /// Documentation under IChronozoomSVC
@@ -532,7 +557,7 @@ namespace Chronozoom.UI
             return GetUser("");
         }
 
-        
+
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
@@ -543,16 +568,16 @@ namespace Chronozoom.UI
             {
                 if (String.IsNullOrEmpty(name))
                 {
-                
-                        Trace.TraceInformation("Get User");
-                        if (user == null)
-                        {
-                            SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.RequestBodyEmpty);
-                            return new User();
-                        }
-                        var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
-                        if (u != null) return u;
-                        return user;
+
+                    Trace.TraceInformation("Get User");
+                    if (user == null)
+                    {
+                        SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.RequestBodyEmpty);
+                        return new User();
+                    }
+                    var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+                    if (u != null) return u;
+                    return user;
                 }
                 else
                 {
@@ -636,7 +661,7 @@ namespace Chronozoom.UI
                 superCollection.Collections.Add(personalCollection);
 
                 // Add root timeline Cosmos to the personal collection
-                Timeline rootTimeline = new Timeline { Id = Guid.NewGuid(), Title = "Cosmos" , Regime = "Cosmos" };
+                Timeline rootTimeline = new Timeline { Id = Guid.NewGuid(), Title = "Cosmos", Regime = "Cosmos" };
                 rootTimeline.FromYear = -13700000000;
                 rootTimeline.ToYear = 9999;
                 rootTimeline.Collection = personalCollection;
@@ -803,7 +828,7 @@ namespace Chronozoom.UI
                 Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
 
                 collection.Theme = collectionRequest.Theme;
-                
+
                 storage.SaveChanges();
                 return collection.Id;
             });
@@ -900,7 +925,7 @@ namespace Chronozoom.UI
                         newTimeline.SubtreeSize = 1;
                     }
                     storage.Timelines.Add(newTimeline);
-                        
+
                     returnValue = newTimelineGuid;
                 }
                 else
@@ -999,12 +1024,23 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Exhibit");
                 var returnValue = new PutExhibitResult();
-
+                var isErroneous = false;
+                var index = 0;
                 foreach (ContentItem contentItemRequest in exhibitRequest.ContentItems)
                 {
-                    if (!ValidateContentItemUrl(contentItemRequest))
-                        return returnValue;
+                    if (!ValidateContentItemUrl(contentItemRequest, out returnValue.errorMessage))
+                    {
+                        if (!isErroneous)
+                        {
+                            returnValue.errorMessage += " in '" + contentItemRequest.Title + "' artifact.";
+                            isErroneous = true;
+                        }
+                        returnValue.ErrCIAdd(index);
+                    }
+                    index++;
                 }
+
+                if (isErroneous) return returnValue;
 
                 if (exhibitRequest.Id == Guid.Empty)
                 {
@@ -1035,7 +1071,7 @@ namespace Chronozoom.UI
                         parentTimeline.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
                     }
                     parentTimeline.Exhibits.Add(newExhibit);
-                        
+
                     storage.Exhibits.Add(newExhibit);
                     UpdateSubtreeSize(storage, parentTimeline, 1 + (newExhibit.ContentItems != null ? newExhibit.ContentItems.Count() : 0));
 
@@ -1147,9 +1183,10 @@ namespace Chronozoom.UI
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1304:SpecifyCultureInfo", MessageId = "System.String.ToLower")]
-        private static Boolean ValidateContentItemUrl(ContentItem contentitem)
+        private static Boolean ValidateContentItemUrl(ContentItem contentitem, out string error)
         {
             string contentitemURI = contentitem.Uri;
+            error = "";
 
             // Custom validation for Skydrive images
             if (contentitem.MediaType == "skydrive-image")
@@ -1161,6 +1198,8 @@ namespace Chronozoom.UI
                 if (splited.Length != 3)
                 {
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                    error = ErrorDescription.InvalidContentItemUrl;
+
                     return false;
                 }
 
@@ -1171,10 +1210,11 @@ namespace Chronozoom.UI
                 if (!Int32.TryParse(splited[1], out value) || !Int32.TryParse(splited[2], out value))
                 {
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                    error = ErrorDescription.InvalidContentItemUrl;
+
                     return false;
                 }
             }
-
 
             Uri uriResult;
 
@@ -1182,6 +1222,8 @@ namespace Chronozoom.UI
             if (contentitem.MediaSource.Length > 0 && !(Uri.TryCreate(contentitem.MediaSource, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
             {
                 SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidMediaSourceUrl);
+                error = ErrorDescription.InvalidMediaSourceUrl;
+
                 return false;
             }
 
@@ -1189,7 +1231,69 @@ namespace Chronozoom.UI
             if (!(Uri.TryCreate(contentitemURI, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
             {
                 SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                error = ErrorDescription.InvalidContentItemUrl;
+
                 return false;
+            }
+
+            // Get MIME type of Url.
+            var mimeType = "";
+            try
+            {
+                mimeType = MimeTypeOfUrl(contentitem.Uri);
+            }
+            catch (Exception)
+            {
+                if (contentitem.MediaType == "image" || contentitem.MediaType == "pdf")
+                {
+                    SetStatusCode(HttpStatusCode.InternalServerError, ErrorDescription.ResourceAccessFailed);
+                    error = ErrorDescription.InvalidContentItemUrl;
+
+                    return false;
+                }
+            }
+
+            // Check if MIME type match mediaType (regex test for 'video')
+            switch (contentitem.MediaType)
+            {
+                case "image":
+                    if (mimeType != "image/jpg"
+                        && mimeType != "image/jpeg"
+                        && mimeType != "image/gif"
+                        && mimeType != "image/png")
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemImageUrl);
+                        error = ErrorDescription.InvalidContentItemImageUrl;
+
+                        return false;
+                    }
+                    break;
+
+                case "video":
+                    // Youtube
+                    var youtube = new Regex("(?:youtu\\.be\\/|youtube\\.com(?:\\/embed\\/|\\/v\\/|\\/watch\\?v=|[\\S\\?\\&]+&v=|\\/user\\/\\S+))([^\\/&#]{10,12})");
+                    // Vimeo
+                    var vimeo = new Regex("vimeo\\.com\\/([0-9]+)", RegexOptions.IgnoreCase);
+                    var vimeoEmbed = new Regex("player.vimeo.com\\/video\\/([0-9]+)", RegexOptions.IgnoreCase);
+
+                    if (!youtube.IsMatch(contentitem.Uri) && !vimeo.IsMatch(contentitem.Uri) && !vimeoEmbed.IsMatch(contentitem.Uri))
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemVideoUrl);
+                        error = ErrorDescription.InvalidContentItemVideoUrl;
+
+                        return false;
+                    }
+                    break;
+
+                case "pdf":
+                    if (mimeType != "application/pdf")
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemPdfUrl);
+                        error = ErrorDescription.InvalidContentItemPdfUrl;
+
+                        return false;
+                    }
+                    break;
             }
 
             return true;
@@ -1252,7 +1356,7 @@ namespace Chronozoom.UI
                 Timeline parentTimeline = storage.GetExhibitParentTimeline(deleteExhibit.Id);
 
                 storage.Entry(deleteExhibit).Collection(_ => _.ContentItems).Load();
-                UpdateSubtreeSize(storage, parentTimeline, (deleteExhibit.ContentItems != null ? - deleteExhibit.ContentItems.Count() : 0) - 1);
+                UpdateSubtreeSize(storage, parentTimeline, (deleteExhibit.ContentItems != null ? -deleteExhibit.ContentItems.Count() : 0) - 1);
 
                 storage.DeleteExhibit(exhibitRequest.Id);
                 storage.SaveChanges();
@@ -1268,7 +1372,10 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Content Item");
 
-                if (!ValidateContentItemUrl(contentItemRequest))
+                // junk out variable for ValidateContentItemUrl method
+                string junk;
+
+                if (!ValidateContentItemUrl(contentItemRequest, out junk))
                     return Guid.Empty;
 
                 Guid returnValue;
@@ -1300,7 +1407,7 @@ namespace Chronozoom.UI
                     contentItemRequest.Id = UpdateContentItem(storage, collection.Id, contentItemRequest);
                     returnValue = contentItemRequest.Id;
                 }
-                
+
                 storage.SaveChanges();
                 _thumbnailGenerator.Value.CreateThumbnails(contentItemRequest);
 
@@ -1531,9 +1638,9 @@ namespace Chronozoom.UI
                 returnValue.Add(newBookmarkGuid);
                 sequenceId++;
             }
-            
+
         }
-        
+
         private static Guid UpdateBookmark(Storage storage, Tour updateTour, Bookmark bookmarkRequest)
         {
             Bookmark updateBookmark = storage.Bookmarks.Find(bookmarkRequest.Id);
@@ -1799,7 +1906,7 @@ namespace Chronozoom.UI
                 return value;
             });
         }
-        
+
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
@@ -1949,6 +2056,9 @@ namespace Chronozoom.UI
                 User user = new User();
                 user.NameIdentifier = nameIdentifierClaim.Value;
                 user.IdentityProvider = identityProviderClaim.Value;
+                var u = storage.Users.Where(candidate => candidate.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+                if (u != null)
+                    user.Id = u.Id;
 
                 return operation(user, storage);
             }
@@ -2025,7 +2135,7 @@ namespace Chronozoom.UI
         private static Collection RetrieveCollection(Storage storage, Guid collectionId)
         {
             Collection collection = storage.Collections.Find(collectionId);
-            if (collection != null)   
+            if (collection != null)
                 storage.Entry(collection).Reference("User").Load();
             return collection;
         }
@@ -2049,25 +2159,53 @@ namespace Chronozoom.UI
             return true;
         }
 
-        public string GetMemiTypeByUrl(string url)
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public string GetMimeTypeByUrl(string url)
         {
-            string contentType = "";
+            // Check if valid url.
+            Uri uriResult;
+            if (!(Uri.TryCreate(url, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps)))
+            {
+                throw new WebFaultException<string>(ErrorDescription.InvalidContentItemUrl, HttpStatusCode.BadRequest);
+            }
+
+            var mimeType = "";
             try
             {
-                var request = HttpWebRequest.Create(url) as HttpWebRequest;
-                request.Method = "head";
-                if (request != null)
-                {
-                    var response = request.GetResponse() as HttpWebResponse;
-                    if (response != null)
-                        contentType = response.ContentType;
-                }
-                return contentType;
+                mimeType = MimeTypeOfUrl(url);
             }
-            catch
+            catch (Exception)
             {
-                return contentType;
+                throw new WebFaultException<string>(ErrorDescription.ResourceAccessFailed, HttpStatusCode.InternalServerError);
             }
+
+            return mimeType;
+        }
+
+        /// <summary>
+        /// Returns a MIME type of internet resource accessible via given Url. 
+        /// Throws an exception if failed to access internet resource via given Url.
+        /// </summary>
+        /// <param name="url">Url to get MIME type of.</param>
+        /// <returns>MIME type of internet resource accessible via given Url.</returns>
+        private static string MimeTypeOfUrl(string url)
+        {
+            string contentType = "";
+
+            var request = HttpWebRequest.Create(url) as HttpWebRequest;
+            request.Method = "head";
+            if (request != null)
+            {
+                var response = request.GetResponse() as HttpWebResponse;
+                if (response != null)
+                {
+                    contentType = response.ContentType;
+                }
+            }
+
+            return contentType;
         }
     }
 }

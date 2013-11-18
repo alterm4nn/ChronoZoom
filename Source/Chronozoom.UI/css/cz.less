@@ -1,6 +1,10 @@
+@import "_colors";
+@import "_mixins";
+
 @import "timescale";
 @import "datepicker";
 @import "media";
+@import "start-page";
 
 @headerHeight: 36px; /* The height of the page header */
 @headerLogoWidth: 170px; /* The width of the logo area */
@@ -12,6 +16,7 @@
 
 @footerHeight: 25px; /* The height of the page footer */
 @footerLinksWidth: 350px; /* The width of the footers links area */
+
 
 html, body
 {
@@ -175,6 +180,7 @@ a
 }
 
 .header-regimes {
+    .transition(opacity @fade-duration ease-in-out, visibility @fade-duration ease-in-out);
     height: @headerHeight;
     width: @headerRegimesWidth;
     display: none;
@@ -191,6 +197,7 @@ a
 
 .header-breadcrumbs
 {
+    .transition(opacity @fade-duration ease-in-out, visibility @fade-duration ease-in-out);
     height: @headerBreadcrumbsHeight;
     width: 100%;
     display: none;
@@ -218,17 +225,26 @@ a
     line-height: @headerHeight;
     background-repeat: no-repeat;
     background-position: center;
+
+    &.active {
+        background-color: #0464a2;
+    }
+
+    &[data-enabled~="true"] {
+        &:hover {
+            background-color: #0464a2;
+        }
+    }
+
+    &[disabled="disabled"] {
+        opacity: 0.5;
+
+        &.active,
+        &:hover {
+            background-color: transparent;
+        }
+    }
 }
-
-    .header-icon[data-enabled~="true"]:hover
-    {
-        background-color: #0464a2;
-    }
-
-    .header-icon.active
-    {
-        background-color: #0464a2;
-    }
 
 .tour-icon
 {
@@ -254,6 +270,11 @@ a
 .edit-icon
 {
     background-image: url('../images/edit-icon.png');
+}
+
+.home-icon
+{
+    background-image: url('../images/home-icon.png');
 }
 
 .profile-icon
@@ -1105,6 +1126,10 @@ img.fallbackBackground
     user-select: text;
 }
 
+.no-transition {
+    .transition(none);
+}
+
 /***********************************************************
 
                         Form Base
@@ -1202,6 +1227,16 @@ img.fallbackBackground
     text-align: justify;
 }
 
+.cz-input-wrapper {
+    input.error {
+        border: @border-error;
+    }
+
+    div.error {
+        .input-error-message;
+    }
+}
+
 .cz-input
 {
     color: #232323;
@@ -1272,7 +1307,8 @@ img.fallbackBackground
 
 .cz-form-errormsg
 {
-    color: #dd4b39;
+    .form-error-message;
+
     display: block;
 }
 
@@ -1389,6 +1425,12 @@ img.fallbackBackground
     resize: none;
 }
 
+.cz-tourlist-cleardiv {
+    clear: both;
+    width: 100%;
+     height: 14px;
+}
+
 /* Tours List Form */
 .cz-tourlist-form
 {
@@ -1412,7 +1454,6 @@ img.fallbackBackground
         .cz-tourlist-form > .cz-form-content > #tours
         {
             display: block;
-            min-height: 200px;
         }
 
 /* Edit Timeline Form */
@@ -1844,8 +1885,12 @@ img.fallbackBackground
 {
     margin: 15px 0;
     list-style-type: none;
-    height: 200px;
     overflow: auto;
+}
+
+.cz-tour-listbox-wrapper
+{
+    overflow-y: auto;
 }
 
 .cz-listbox-placeholder
@@ -1948,4 +1993,48 @@ img.fallbackBackground
     cursor: pointer;
     width: auto;
     display: inline;
+}
+
+.root-cloak {
+  position: absolute;
+  display: none;
+  z-index: 8;
+  cursor: not-allowed;
+  background: @canvas-disable-cloak;
+
+  &.visible {
+    display: block;
+  }
+}
+
+.root-cloak-left {
+  .root-cloak;
+
+  top: @headerHeight + @headerBreadcrumbsHeight - @headerBreadcrumbsTopMargin + 38px;
+  bottom: @footerHeight;
+  left: 0;
+}
+
+.root-cloak-right {
+  .root-cloak;
+
+  top: @headerHeight + @headerBreadcrumbsHeight - @headerBreadcrumbsTopMargin + 38px;
+  bottom: @footerHeight;
+  right: 0;
+}
+
+.root-cloak-top {
+  .root-cloak;
+
+  top: @headerHeight + @headerBreadcrumbsHeight - @headerBreadcrumbsTopMargin + 38px;
+  left: 0;
+  right: 0;
+}
+
+.root-cloak-bottom {
+  .root-cloak;
+
+  bottom: @footerHeight;
+  left: 0;
+  right: 0;
 }

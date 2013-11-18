@@ -100,7 +100,7 @@ namespace Application.Helper.Helpers
         {
             Logger.Log("<-");
             HelperManager<NavigationHelper>.Instance.NavigateToCosmos();
-            WaitCondition(() => GetItemsCount(By.CssSelector("#breadcrumbs-table td")) == 1, 60);
+            WaitCondition(() => GetItemsCount(By.CssSelector("#breadcrumbs-table td")) == 1, Configuration.ImplicitWait);
             Logger.Log("->");
         }
 
@@ -133,20 +133,26 @@ namespace Application.Helper.Helpers
 
         private void ConfirmDeletion()
         {
+            Logger.Log("<-", LogType.MessageWithoutScreenshot);
             AcceptAlert();
             MoveToElementAndClick(By.ClassName("virtualCanvasLayerCanvas"));
+            Logger.Log("->");
         }
 
         private void ClickDelete()
         {
+            Logger.Log("<-");
             Click(By.CssSelector("#auth-edit-timeline-form .cz-form-delete.cz-button"));
+            Logger.Log("->", LogType.MessageWithoutScreenshot);
         }
 
         private void InitEditForm()
         {
+            Logger.Log("<-");
             ExecuteJavaScript("CZ.Authoring.isActive = true");
             ExecuteJavaScript("CZ.Authoring.mode = 'editTimeline'");
             ExecuteJavaScript("CZ.Authoring.showEditTimelineForm(CZ.Authoring.selectedTimeline)");
+            Logger.Log("->");
         }
 
         private void NavigateToTimeLine(Timeline timeline)
@@ -158,13 +164,19 @@ namespace Application.Helper.Helpers
 
         private void CreateTimeline()
         {
+            Logger.Log("<-");
             Click(By.CssSelector("#auth-edit-timeline-form .cz-form-save.cz-button"));
+            Logger.Log("->");
         }
 
         private void SetTimelineName(string timelineName)
         {
             Logger.Log("<- timeline: " + timelineName);
-            TypeText(By.CssSelector("#auth-edit-timeline-form .cz-form-item-title.cz-input"), timelineName);
+            WaitForElementIsDisplayed(By.Id("auth-edit-timeline-form"));
+            By title = By.CssSelector("#auth-edit-timeline-form .cz-form-item-title.cz-input");
+            WaitForElementIsDisplayed(title);
+            WaitForElementEnabled(title);
+            TypeText(title, timelineName);
             Logger.Log("->");
         }
 
@@ -185,7 +197,9 @@ namespace Application.Helper.Helpers
 
         private void SetDateMode()
         {
+            Logger.Log("<-");
             SelectByText(By.CssSelector(".cz-form-time-start.cz-datepicker .cz-datepicker-mode.cz-input"), "Date");
+            Logger.Log("->");
         }
     }
 }

@@ -89,6 +89,12 @@ module CZ {
 
         var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
 
+        // Testing options.
+        var _isLocalHost = constants.environment === "Localhost";
+        var _dumpTweetsUrl = "/dumps/home/tweets.json";
+        var _dumpTimelinesUrl = "/dumps/home/timelines.json";
+        var _testLogin = false;
+
         export function Request(urlBase) {
             var _url = urlBase;
             var _hasParameters = false;
@@ -133,12 +139,12 @@ module CZ {
         */
 
         // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
-        export function getTimelines(r) {
+        export function getTimelines(r,sc = superCollectionName,c = collectionName) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
-            request.addParameter("supercollection", superCollectionName);
-            request.addParameter("collection", collectionName);
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
             request.addParameters(r);
 
             console.log("[GET] " + request.url);
@@ -535,7 +541,7 @@ module CZ {
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: request.url,
+                url: _isLocalHost ? _dumpTweetsUrl : request.url,
                 success: function (response) {
                 }
             });
@@ -576,7 +582,7 @@ module CZ {
         * Auxiliary Methods.
         */
 
-        export function putExhibitContent(e, oldContentItems): JQueryPromise {
+        export function putExhibitContent(e: any, oldContentItems: any): any {
             CZ.Authoring.resetSessionTimer();
             var newGuids = e.contentItems.map(function (ci) {
                 return ci.guid;
@@ -646,12 +652,13 @@ module CZ {
             });
         }
 
-        export function getProfile(displayName = "") {
+        export function getProfile(displayName = _testLogin ? "anonymous" : "") {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
-            if (displayName != "")
+            if (displayName != "") {
                 request.addParameter("name", displayName);
+            }
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -669,7 +676,7 @@ module CZ {
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
-            request.addToPath("getmimetypebyurl");
+            request.addToPath("mimetypebyurl");
             if (url == "") return result;
             request.addParameter("url", url);
             $.ajax({
@@ -683,6 +690,177 @@ module CZ {
                     result = mime;
             });
             return result;
+        }
+
+
+        export function getUserTimelines(sc = superCollectionName, c = collectionName) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("usertimelines");
+            request.addParameter("superCollection", sc);
+            request.addParameter("Collection", c);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
+            });
+        }
+
+        export function getUserFavorites(){
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfavorites");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
+            });
+        }
+        export function deleteUserFavorite(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfavorites");
+            if (guid == "") return null;
+            request.addToPath(guid);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+
+        export function putUserFavorite(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfavorites");
+            if (guid == "") return null;
+            request.addToPath(guid);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+
+        export function getUserFeatured(guid: string = "default") {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfeatured");
+            request.addToPath(guid);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
+            });
+        }
+
+        export function deleteUserFeatured(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfeatured");
+            if (guid == "") return null;
+            request.addToPath(guid);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+
+        export function putUserFeatured(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfeatured");
+            if (guid == "") return null;
+            request.addToPath(guid);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+
+        //Triples
+
+        export function putTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify({
+                    Subject: subject,
+                    Predicate: predicate,
+                    Object: object
+                })
+            });
+        }
+
+        export function getTriplets(subject, predicate = null, object = null) {
+            if (subject == null && predicate == null && object == null)
+                throw "Arguments error: all three criteria cannot be null at the same time";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            if(subject != null)
+                request.addParameter("subject", encodeURIComponent(subject));
+            if(predicate != null)
+                request.addParameter("predicate", encodeURIComponent(predicate));
+            if(object != null)
+                request.addParameter("object", encodeURIComponent(object));
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+
+        export function deleteTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify({
+                    Subject: subject,
+                    Predicate: predicate,
+                    Object: object
+                })
+            });
+        }
+
+        export function getPrefixes() {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath("prefixes");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
         }
     }
 }

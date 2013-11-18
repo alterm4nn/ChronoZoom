@@ -582,8 +582,8 @@ module CZ {
                 }
                 if (this.prevContent) {
                     var renderTime = new Date();
-                    var renderTimeDiff = renderTime - self.lastRenderTime;
-                    self.lastRenderTime = renderTime;
+                    var renderTimeDiff = renderTime.getTime() - self.lastRenderTime;
+                    self.lastRenderTime = renderTime.getTime();
 
                     // Override the default contentAppearanceAnimationStep,
                     // instead of being a constant it now depends on the time,
@@ -803,12 +803,12 @@ module CZ {
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
             var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : CZ.Settings.timelineHeaderSize * timelineinfo.height;
-            var headerWidth = timelineinfo.titleRect && CZ.Authoring.isEnabled ? timelineinfo.titleRect.width : 0;
+            var headerWidth = timelineinfo.titleRect && (CZ.Authoring.isEnabled || CZ.Settings.isAuthorized) ? timelineinfo.titleRect.width : 0;
             var marginLeft = timelineinfo.titleRect ? timelineinfo.titleRect.marginLeft : CZ.Settings.timelineHeaderMargin * timelineinfo.height; // size of left and top margins (e.g. if timeline is for 100 years, relative margin timelineHeaderMargin=0.05, then absolute margin is 5 years).
             var marginTop = timelineinfo.titleRect ? timelineinfo.titleRect.marginTop : (1 - CZ.Settings.timelineHeaderMargin) * timelineinfo.height - headerSize;
             var baseline = timelineinfo.top + marginTop + headerSize / 2.0;
 
-            this.titleObject = addText(this, layerid, id + "__header__", timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize,
+            this.titleObject = addText(this, layerid, id + "__header__", CZ.Authoring.isEnabled ? timelineinfo.timeStart + marginLeft + headerSize : timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize,
                 timelineinfo.header, {
                     fontName: CZ.Settings.timelineHeaderFontName,
                     fillStyle: CZ.Settings.timelineHeaderFontColor,
@@ -946,9 +946,67 @@ module CZ {
                 //rendering itself
                 this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
 
-                //initialize edit button if it isn't root collection and titleObject was already initialized
+                // initialize add favorite button if user is authorized
+                if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0) {
+                    var btnX = this.x + this.width - 1.0 * this.titleObject.height;
+                    var btnY = this.titleObject.y + 0.15 * this.titleObject.height;
+
+                    this.favoriteBtn = addImage(this,
+                        layerid,
+                        id + "__favorite",
+                        btnX,
+                        btnY,
+                        0.7 * this.titleObject.height,
+                        0.7 * this.titleObject.height,
+                        "/images/star.svg");
+                    this.favoriteBtn.reactsOnMouse = true;
+
+                    this.favoriteBtn.onmouseclick = function () {
+                        if (CZ.Settings.favoriteTimelines.indexOf(this.parent.guid) !== -1) {
+                            CZ.Service.deleteUserFavorite(this.parent.guid).then(success => {
+                                CZ.Authoring.showMessageWindow(
+                                    "Timeline '" + this.parent.title + "' was removed from your favorite timelines.",
+                                    "Timeline removed from favorites"
+                                );
+                            },
+                            error => {
+                                console.log("[ERROR] /deleteUserFavorite with guid " + this.parent.guid + " failed.");
+                            });
+                            CZ.Settings.favoriteTimelines.splice(CZ.Settings.favoriteTimelines.indexOf(this.parent.guid), 1);                            
+                        }
+                        else {
+                            CZ.Service.putUserFavorite(this.parent.guid).then(success => {
+                                CZ.Settings.favoriteTimelines.push(this.parent.guid); CZ.Authoring.showMessageWindow(
+                                        "Timeline '" + this.parent.title + "' was added to your favorite timelines.",
+                                        "Favorite timeline added"
+                                    );
+                            },
+                            error => {
+                                console.log("[ERROR] /putUserFavorite with guid + " + this.parent.guid + " failed.");
+                            });
+                        }
+                        return true;
+                    }
+
+                    this.favoriteBtn.onmousehover = function () {
+                        this.parent.settings.strokeStyle = "yellow";
+                    }
+
+                    this.favoriteBtn.onmouseunhover = function () {
+                        this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+                    }
+
+                    // remove event handlers to prevent their stacking
+                    this.favoriteBtn.onRemove = function () {
+                        this.onmousehover = undefined;
+                        this.onmouseunhover = undefined;
+                        this.onmouseclick = undefined;
+                    }
+                }
+
+                // initialize edit button if it isn't root collection and titleObject was already initialized
                 if (CZ.Authoring.isEnabled && typeof this.editButton === "undefined" && this.titleObject.width !== 0) {
-                    this.editButton = addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y,
+                    this.editButton = addImage(this, layerid, id + "__edit", this.x + this.titleObject.height * 0.15, this.titleObject.y,
                         this.titleObject.height, this.titleObject.height, "/images/edit.svg");
                     this.editButton.reactsOnMouse = true;
 

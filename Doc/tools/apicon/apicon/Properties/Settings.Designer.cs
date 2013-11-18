@@ -54,28 +54,10 @@ namespace apicon.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("M:Chronozoom\\.UI\\.IChronozoomSVC\\.\\w*")]
-        public string MemberRgx {
-            get {
-                return ((string)(this["MemberRgx"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("T:Chronozoom.Entities.")]
         public string EntityTypeClass {
             get {
                 return ((string)(this["EntityTypeClass"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("T:Chronozoom\\.Entities\\.\\w*")]
-        public string EntityTypeRgx {
-            get {
-                return ((string)(this["EntityTypeRgx"]));
             }
         }
         
@@ -113,6 +95,22 @@ namespace apicon.Properties {
         public string OutFile2 {
             get {
                 return ((string)(this["OutFile2"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <string>entityPropRgx</string>
+  <string>RemoveRITree</string>
+  <string>AddRITreeWithIndex</string>
+  <string>Properties.Resources</string>
+  <string>RemoveBetaFields</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection ExcludeList {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["ExcludeList"]));
             }
         }
     }

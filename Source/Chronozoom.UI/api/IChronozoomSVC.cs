@@ -1,6 +1,7 @@
 ﻿using Chronozoom.Entities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright company="Outercurve Foundation">
 //   Copyright (c) 2013, The Outercurve Foundation
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.ServiceModel;
+using System.ServiceModel.Activation;
 using System.ServiceModel.Web;
 using System.Web;
 
@@ -32,13 +34,11 @@ namespace Chronozoom.UI
         /// <param name="maxElements">The maximum number of elements to return.</param>
         /// <param name="depth">The max depth for children timelines.</param>
         /// <returns>Timeline data in JSON format.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL:
         /// http://{URL}/api/gettimelines?supercollection={supercollection}&collection={collection}&start={year}&end={year}
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "End")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
         [OperationContract]
@@ -55,13 +55,11 @@ namespace Chronozoom.UI
         /// <param name="collection">Name of the collection to query.</param>
         /// <param name="searchTerm">The term to search for.</param>
         /// <returns>Search results in JSON format.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL:
         /// http://{URL}/api/search?searchTerm={term}&supercollection={supercollection}&collection={collection}
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
@@ -71,13 +69,11 @@ namespace Chronozoom.UI
         /// Returns a list of tours for the default collection and default superCollection.
         /// </summary>
         /// <returns>A list of tours in JSON format.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL: 
         /// http://{URL}/api/tours
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
@@ -90,13 +86,11 @@ namespace Chronozoom.UI
         /// <param name="superCollection">Name of the superCollection to query.</param>
         /// <param name="collection">Name of the collection to query.</param>
         /// <returns>A list of tours in JSON format.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL: 
         /// http://{URL}/api/{supercollection}/{collection}/tours
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
@@ -114,26 +108,23 @@ namespace Chronozoom.UI
         /// A new superCollection with the user's display name is added.
         /// A new default collection with the user's display name is added to this superCollection.
         /// A new user with the specified attributes is created.
-        ///
         /// If the specified user display name does not exist it is considered an error.
         /// If the user display name is specified and it exists then the user's attributes are updated.
         /// </remarks>
         /// <param name="userRequest">JSON containing the request details.</param>
         /// <returns>The URL for the new user collection.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: PUT
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/user
         /// 
-        /// Request body (JSON):
+        /// Request body:
         /// {
         ///     id: "0123456789",
         ///     displayName: "Joe",
         ///     email: "email@email.com"
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         String PutUser(User userRequest);
@@ -152,18 +143,16 @@ namespace Chronozoom.UI
         /// </summary>
         /// <param name="userRequest">JSON containing the request details.</param>
         /// <returns>HTTP response code.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: DELETE
-        /// 
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/user
-        /// 
-        /// Request body (JSON):
+        ///
+        /// Request body:
         /// {
         ///     displayName: "Neil"
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/user", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void DeleteUser(User userRequest);
@@ -171,18 +160,13 @@ namespace Chronozoom.UI
         /// <summary>
         /// Returns the user by name, if name parameter is empty returns current user.
         /// </summary>
-        /// <example>
-        /// <![CDATA[
-        /// HTTP verb: GET
-        /// 
-        /// URL:
-        /// http://{URL}/api/user
-        /// ]]>
-        /// </example>
         /// <param name="name">The name of user to get.</param>
         /// <returns>JSON containing data for the current user.</returns>
-        /// 
-      
+        /// <example><![CDATA[ 
+        /// HTTP verb: GET
+        /// URL:
+        /// http://{URL}/api/user
+        /// ]]></example>      
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/user?name={name}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -200,19 +184,17 @@ namespace Chronozoom.UI
         /// <param name="collectionName">The name of the collection to create.</param>
         /// <param name="collectionRequest">[Collection](#collection) data in JSON format.</param>
         /// <returns></returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: PUT
-        ///
+        /// <example><![CDATA[  
+        /// HTTP verb: POST
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}
         ///
-        /// Request body (JSON):
+        /// Request body:
         /// {
         ///      id: "{id}",
         ///      title: "{title}"
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "POST", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         Guid PostCollection(string superCollectionName, string collectionName, Collection collectionRequest);
@@ -229,19 +211,17 @@ namespace Chronozoom.UI
         /// <param name="collectionName">The name of the collection to create.</param>
         /// <param name="collectionRequest">[Collection](#collection) data in JSON format.</param>
         /// <returns></returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: PUT
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}
         ///
-        /// Request body (JSON):
+        /// Request body:
         /// {
         ///      id: "{id}",
         ///      title: "{title}"
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         Guid PutCollection(string superCollectionName, string collectionName, Collection collectionRequest);
@@ -252,13 +232,11 @@ namespace Chronozoom.UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to delete.</param>
         /// <returns>HTTP response code.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: DELETE
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void DeleteCollection(string superCollectionName, string collectionName);
@@ -276,13 +254,12 @@ namespace Chronozoom.UI
         /// <param name="collectionName">The name of the collection to update.</param>
         /// <param name="timelineRequest">[Timeline](#timeline) data in JSON format.</param>
         /// <returns>HTTP status code.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: PUT
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/timeline
         ///
-        /// Request body (JSON):
+        /// Request body:
         /// {
         ///      ParentTimelineId: "ff5214e1-1bf4-4af5-8835-96cff2ce2cfd",
         ///      Regime: null - optional,
@@ -290,8 +267,7 @@ namespace Chronozoom.UI
         ///      start: -597.542466,
         ///      title: "Timeline Title"
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         Guid PutTimeline(string superCollectionName, string collectionName, TimelineRaw timelineRequest);
@@ -302,18 +278,16 @@ namespace Chronozoom.UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection from which the timeline should be deleted.</param>
         /// <param name="timelineRequest">The request in JSON format.</param>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: DELETE
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/timeline
         ///
-        /// Request body (JSON):
+        /// Request body:
         /// {
         ///      id: "0123456789"
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest);
@@ -333,13 +307,12 @@ namespace Chronozoom.UI
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="exhibitRequest">[Exhibit](#exhibit) data in JSON format.</param>
         /// <returns>[Exhibit](#exhibit) data in JSON format.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: PUT
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/exhibit
         ///
-        /// Request body (JSON):
+        /// Request body:
         /// {
         ///     ParentTimelineId: "123456"
         ///     id: "0123456789",
@@ -347,8 +320,7 @@ namespace Chronozoom.UI
         ///     contentItems: "{contentItems}" 
         ///     time: 565
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
@@ -360,9 +332,8 @@ namespace Chronozoom.UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="exhibitRequest">The exhibit request data in JSON format.</param>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: DELETE
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/exhibit
         ///
@@ -382,12 +353,11 @@ namespace Chronozoom.UI
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="contentItemRequest">[ContentItem](#contentitem) data in JSON format.</param>
         /// <returns></returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: PUT
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/contentitem
-        ///
+        ///              
         /// Request body:
         /// {
         ///     id: "0123456789",
@@ -405,9 +375,8 @@ namespace Chronozoom.UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="contentItemRequest">The request data in JSON format.</param>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: DELETE
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/contentitem
         ///
@@ -415,8 +384,7 @@ namespace Chronozoom.UI
         /// {
         ///      id: "0123456789"
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void DeleteContentItem(string superCollectionName, string collectionName, ContentItem contentItemRequest);
@@ -433,25 +401,22 @@ namespace Chronozoom.UI
         /// Creates or updates a tour with bookmark support.
         /// </summary>
         /// <remarks>
-        /// All bookmarks in a tour must belong to the same collection and the user 
-        /// must have permission to modify that collection.
-        /// Supported operations include:
+        /// All bookmarks in a tour must belong to the same collection and the user must have permission
+        /// to modify that collection. Supported operations include:
         /// To Create a new tour, do not specify a tour id or bookmark ids for the new entities to be created.
         /// To modify an existing tour, specify the tour id and any of the tour fields (id, description, audio) that need to be modified.
         /// If a tour id is specified and it does not exist, a "not found" status is returned.
         /// If a tour id is specified and it exists, any specified fields are updated. 
         /// Delete all existing bookmarks and add bookmarks defined in the bookmarks JSON object to the tour.
         /// The sequence ids of the bookmarks are automatically generated based on the order they are received.
-        ///     
         /// If an invalid tour Id, bookmark Id or bookmark sequence Id is specified then the request will fail. 
         /// </remarks>
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="tourRequest">The tour data in JSON format.</param>
         /// <returns>A list of guids of the tour guid followed by bookmark guids in JSON format.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: PUT
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/tour2
         ///
@@ -459,8 +424,7 @@ namespace Chronozoom.UI
         /// {
         ///          
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/tour2", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         TourResult PutTour2(string superCollectionName, string collectionName, Tour tourRequest);
@@ -471,9 +435,8 @@ namespace Chronozoom.UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="tourRequest">The tour ID in JSON format.</param>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: DELETE
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/tour2
         ///
@@ -493,9 +456,8 @@ namespace Chronozoom.UI
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="tourRequest">The request in JSON format.</param>
         /// <returns>A list of guids of tour guid followed by new bookmark guids in JSON format.</returns>
-        /// <example><![CDATA[ 
-        /// HTTP verb: DELETE
-        ///
+        /// <example><![CDATA[  
+        /// HTTP verb: PUT
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/{collectionName}/bookmark
         ///
@@ -503,8 +465,7 @@ namespace Chronozoom.UI
         /// {
         ///      id: "0123456789"
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/bookmark", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         TourResult PutBookmarks(string superCollectionName, string collectionName, Tour tourRequest);
@@ -515,9 +476,8 @@ namespace Chronozoom.UI
         /// <param name="superCollectionName">The name of the parent collection.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="tourRequest">The request in JSON format.</param>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[
         /// HTTP verb: DELETE
-        ///
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/bookmark
         ///
@@ -525,25 +485,20 @@ namespace Chronozoom.UI
         /// {
         ///      id: "0123456789"
         /// }
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/bookmark", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void DeleteBookmarks(string superCollectionName, string collectionName, Tour tourRequest);
 
         /// <summary>
-        /// Retrieves a path to the given content id.
-        /// 
-        /// For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
+        /// Retrieves a path to the given content id. For t48fbb8a8-7c5d-49c3-83e1-98939ae2ae6, this API retrieves /t00000000-0000-0000-0000-000000000000/t48fbb8a8-7c5d-49c3-83e1-98939ae2ae67
         /// </summary>
         /// <returns>The full path to the content.</returns>
         /// <example><![CDATA[
         /// HTTP verb: GET
-        /// 
         /// URL:
         /// http://{URL}/api/{supercollection}/{collection}/{reference}/contentpath
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "{supercollection}/{collection}/{reference}/contentpath")]
         string GetContentPath(string superCollection, string collection, string reference);
@@ -551,13 +506,11 @@ namespace Chronozoom.UI
         /// <summary>
         /// Retrieve the list of all supercollections.
         /// </summary>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL:
         /// http://{URL}/api/supercollections
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
         [WebGet(UriTemplate = "/supercollections", ResponseFormat = WebMessageFormat.Json)]
@@ -566,13 +519,11 @@ namespace Chronozoom.UI
         /// <summary>
         /// Retrieve the list of all collections.
         /// </summary>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL:
         /// http://{URL}/api/{superCollection}/collections
-        /// ]]>
-        /// </example>
+        /// ]]></example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
         [WebGet(UriTemplate = "/{superCollectionName}/collections", ResponseFormat = WebMessageFormat.Json)]
@@ -581,17 +532,71 @@ namespace Chronozoom.UI
         /// <summary>
         /// Retrieve file mime type by url
         /// </summary>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL:
-        /// http://{URL}/api/getmimetypebyurl
-        /// ]]>
-        /// </example>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        /// http://{URL}/api/mimetypebyurl
+        /// ]]></example>
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/getmimetypebyurl?url={url}", ResponseFormat = WebMessageFormat.Json)]
-        string GetMemiTypeByUrl(string url);
+        [WebInvoke(Method = "GET", UriTemplate = "/mimetypebyurl?url={url}", ResponseFormat = WebMessageFormat.Json)]
+        string GetMimeTypeByUrl(string url);
+
+        #region Favorites
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/userfavorites", ResponseFormat = WebMessageFormat.Json)]
+        Collection<TimelineShortcut> GetUserFavorites();
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/userfavorites/{favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
+        bool PutUserFavorite(string favoriteGUID);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/userfavorites/{favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
+        bool DeleteUserFavorite(string favoriteGUID);
+        #endregion
+
+        #region Triples
+
+        //[OperationContract]
+        //[WebInvoke(Method = "GET", UriTemplate = "/triples?subject={subject}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        //IEnumerable<Triple> GetTripletsForSubject(string subject);
+
+        //[OperationContract]
+        //[WebInvoke(Method = "GET", UriTemplate = "/triples?subject={subject}&predicate={predicate}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        //IEnumerable<Triple> GetTripletsForPredicate(string subject, string predicate);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/triples?subject={subject}&predicate={predicate}&object={object}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<Triple> GetTriplets(string subject, string predicate, string @object);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/triples", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void DeleteTriplet(SingleTriple triple);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/triples", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void PutTriplet(SingleTriple triple);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/triples/prefixes/{prefix}/{namespace}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void SetPrefix(string prefix, string @namespace);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/triples/prefixes/{prefix}/{namespace}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void DeletePrefix(string prefix, string @namespace);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/triples/prefixes", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Dictionary<string, string> GetPrefixes();
+
+        #endregion
+
+        #region MyTimelines
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/usertimelines?superCollection={superCollection}&Collection={Collection}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Collection<TimelineShortcut> GetUserTimelines(string superCollection, string Collection);
+        #endregion
+
     }
 
     [ServiceContract(Namespace = "")]
@@ -604,13 +609,12 @@ namespace Chronozoom.UI
         /// <param name="top">The number of the results to return.</param>
         /// <param name="skip">The offset requested for the srarting point of returned results.</param>
         /// <returns>Search results (images) in JSON format.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL:
         /// http://{URL}/api/bing/getImages?query={query}&top={top}&skip={skip}
-        /// ]]>
-        /// </example>
+        /// 
+        /// ]]></example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         BaseJsonResult<IEnumerable<Bing.ImageResult>> GetImages(string query, string top, string skip);
@@ -622,13 +626,12 @@ namespace Chronozoom.UI
         /// <param name="top">The number of the results to return.</param>
         /// <param name="skip">The offset requested for the srarting point of returned results.</param>
         /// <returns>Search results (videos) in JSON format.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL:
         /// http://{URL}/api/bing/getVideos?query={query}&top={top}&skip={skip}
-        /// ]]>
-        /// </example>
+        /// 
+        /// ]]></example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         BaseJsonResult<IEnumerable<Bing.VideoResult>> GetVideos(string query, string top, string skip);
@@ -641,13 +644,12 @@ namespace Chronozoom.UI
         /// <param name="top">The number of the results to return.</param>
         /// <param name="skip">The offset requested for the srarting point of returned results.</param>
         /// <returns>Search results (documents) in JSON format.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL:
         /// http://{URL}/api/bing/getDocuments?query={query}&doctype={doctype}&top={top}&skip={skip}
-        /// ]]>
-        /// </example>
+        /// 
+        /// ]]></example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         BaseJsonResult<IEnumerable<Bing.WebResult>> GetDocuments(string query, string doctype, string top, string skip);
@@ -660,15 +662,30 @@ namespace Chronozoom.UI
         /// Returns recent N timeline tweets of ChronoZoom Twitter account.
         /// </summary>
         /// <returns>Recent N timeline tweets of ChronoZoom Twitter account in JSON format.</returns>
-        /// <example><![CDATA[ 
+        /// <example><![CDATA[  
         /// HTTP verb: GET
-        ///
         /// URL:
         /// http://{URL}/api/twitter/getRecentTweets
-        /// ]]>
-        /// </example>
+        /// 
+        /// ]]></example>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         BaseJsonResult<IEnumerable<TweetSharp.TwitterStatus>> GetRecentTweets();
     }
+
+    [ServiceContract(Namespace = "")]
+    public interface IFeaturedAPI
+    {
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/{featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
+        Collection<TimelineShortcut> GetUserFeatured(string featuredGUID);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
+        bool PutUserFeatured(string featuredGUID);
+
+        [OperationContract]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
+        bool DeleteUserFeatured(string featuredGUID);
+    }   
 }

@@ -28,6 +28,9 @@
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
 /// <reference path='../ui/media/skydrive-mediapicker.ts'/>
+/// <reference path='../ui/start-page.ts'/>
+/// <reference path='plugins/error-plugin.ts'/>
+/// <reference path='plugins/utility-plugins.ts'/>
 
 var constants: any;
 
@@ -57,7 +60,8 @@ module CZ {
             "#header-search-form": "/ui/header-search-form.html", // 14
             "#header-session-expired-form": "/ui/header-session-expired-form.html", // 15
             "#tour-caption-form": "/ui/tour-caption-form.html", // 16
-            "#mediapicker-form": "/ui/mediapicker-form.html" // 17
+            "#mediapicker-form": "/ui/mediapicker-form.html", // 17
+            "#start-page":"/ui/start-page.html"
         };
 
         export enum FeatureActivation {
@@ -71,9 +75,9 @@ module CZ {
         export interface FeatureInfo {
             Name: string;
             Activation: FeatureActivation;
-            JQueryReference: string;
-            IsEnabled: bool;
-            HasBeenActivated: bool;
+            JQueryReference?: string;
+            IsEnabled?: boolean;
+            HasBeenActivated?: boolean;
         }
 
         export var sessionForm: CZ.UI.FormHeaderSessionExpired;
@@ -142,9 +146,14 @@ module CZ {
                 Name: "Skydrive",
                 Activation: FeatureActivation.Enabled
             },
+            {
+                Name: "StartPage",
+                Activation: FeatureActivation.NotProduction,
+                JQueryReference: ".header-icon.home-icon"
+            },
         ];
 
-        export var rootCollection: bool;
+        export var rootCollection: boolean;
 
         function UserCanEditCollection(profile) {
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
@@ -186,26 +195,29 @@ module CZ {
             var onToursInitialized = function () {
                 $("#tours_index").click(function () { // show form
                     var toursListForm = getFormById("#toursList");
-
+                    console.log("toursListForm",toursListForm);
                     if (toursListForm.isFormVisible) {
                         toursListForm.close();
                     }
                     else {
-                        closeAllForms();
-                        var form = new CZ.UI.FormToursList(forms[9], {
-                            activationSource: $(this),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            tourTemplate: forms[10],
-                            tours: CZ.Tours.tours,
-                            takeTour: onTakeTour,
-                            editTour: allowEditing ? tour => {
-                                if (CZ.Authoring.showEditTourForm)
-                                    CZ.Authoring.showEditTourForm(tour);
-                            } : null
-                        });
-                        form.show();
+                        if (!$("#start-page").is(":visible")) {
+                            closeAllForms();
+                            var form = new CZ.UI.FormToursList(forms[9], {
+                                activationSource: $(this),
+                                navButton: ".cz-form-nav",
+                                closeButton: ".cz-form-close-btn > .cz-form-btn",
+                                titleTextblock: ".cz-form-title",
+                                tourTemplate: forms[10],
+                                tours: CZ.Tours.tours,
+                                takeTour: onTakeTour,
+                                editTour: allowEditing ? tour => {
+                                    if (CZ.Authoring.showEditTourForm)
+                                        CZ.Authoring.showEditTourForm(tour);
+                                } : null,
+                                createTour: ".cz-form-create-tour"
+                            });
+                            form.show();
+                       }
                     }
                 });
             };
@@ -225,10 +237,8 @@ module CZ {
                     c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () { };
                 return c;
             })();
-
-
+           
             $('.bubbleInfo').hide();
-            var canvasIsEmpty;
 
             var url = CZ.UrlNav.getURL();
             rootCollection = url.superCollectionName === undefined;
@@ -380,6 +390,23 @@ module CZ {
                         });
                         form.show();
                     },
+                    showCreateRootTimelineForm: function (timeline) {
+                        CZ.Authoring.mode = "createRootTimeline";
+                        var form = new CZ.UI.FormEditTimeline(forms[1], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            startDate: ".cz-form-time-start",
+                            endDate: ".cz-form-time-end",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
+                            context: timeline
+                        });
+                        form.show();
+                    },
                     showEditTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
                             activationSource: $(".header-icon.edit-icon"),
@@ -458,10 +485,6 @@ module CZ {
                     }
                 });
 
-                if (canvasIsEmpty) {
-                    CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
-                }
-
                 sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
                     activationSource: $("#header-session-expired-form"),
                     navButton: ".cz-form-nav",
@@ -476,23 +499,42 @@ module CZ {
                 CZ.Service.getProfile().done(data => {
                     //Authorized
                     if (data != "") {
+                        CZ.Settings.isAuthorized = true;
                         CZ.Authoring.timer = setTimeout(() => { CZ.Authoring.showSessionForm(); }, (CZ.Settings.sessionTime - 60) * 1000);
                     }
 
                     CZ.Authoring.isEnabled = UserCanEditCollection(data);
                 }).fail((error) => {
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(() => {
-                    if (!CZ.Authoring.isEnabled) {
+                    if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
                         $(".edit-icon").hide();
+                        $("#WelcomeBlock").attr("data-toggle", "show");
+                        $("#TwitterBlock").attr("data-toggle", "show");
+                    }
+                    else {
+                        $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
+                        $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
                     //retrieving the data
                     CZ.Common.loadData().then(function (response) {
+                        // collection is empty
                         if (!response) {
-                            canvasIsEmpty = true;
-                            if (CZ.Authoring.showCreateTimelineForm) {
-                                CZ.Authoring.showCreateTimelineForm(defaultRootTimeline);
+                            // author should create a root timeline
+                            // TODO: store 'user' variable in CZ that is the response of getProfile()
+                            if (CZ.Authoring.isEnabled) {
+                                if (CZ.Authoring.showCreateRootTimelineForm) {
+                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
+                                }
+                            }
+                            // show message for other users that collection is empty
+                            else {
+                                CZ.Authoring.showMessageWindow(
+                                    "Looks like this collection is empty. Come back later when author will fill it with content.",
+                                    "Collection is empty :("
+                                );
                             }
                         }
                     });
@@ -562,6 +604,8 @@ module CZ {
                             }
                         }
                         else {
+                            CZ.Settings.userSuperCollectionName = data.DisplayName;
+                            CZ.Settings.userCollectionName = data.DisplayName;
                             $("#login-panel").hide();
                             $("#profile-panel").show();
                             $(".auth-panel-login").html(data.DisplayName);
@@ -585,6 +629,9 @@ module CZ {
                         loginForm.close();
                     }
                 });
+                if (IsFeatureEnabled(_featureMap, "StartPage")) {
+                    CZ.StartPage.initialize();
+                }
             });
 
             CZ.Service.getServiceInformation().then(
@@ -630,8 +677,6 @@ module CZ {
 
             // init seadragon. set path to image resources for nav buttons 
             // Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
-
-            CZ.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
 
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded
@@ -971,7 +1016,7 @@ module CZ {
                 var feature = _featureMap[idxFeature];
 
                 if (feature.IsEnabled === undefined) {
-                    var enabled: bool = true;
+                    var enabled: boolean = true;
                     if (feature.Activation === FeatureActivation.Disabled) {
                         enabled = false;
                     }

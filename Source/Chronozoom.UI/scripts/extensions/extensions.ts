@@ -10,13 +10,21 @@ module CZ {
         }
 
         export function registerExtensions() {
-            registerExtension("RIN", CZ.Extensions.RIN.getExtension, "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjs/lib/rin-core-1.0.js");
+            registerExtension(
+                "RIN",
+                CZ.Extensions.RIN.getExtension,
+                [
+                    "/scripts/extensions/rin-scripts/tagInk.js",
+                    "/scripts/extensions/rin-scripts/raphael.js",
+                    "/scripts/extensions/rin-scripts/rin-core-1.0.js"
+                ]
+            );
         }
 
-        function registerExtension(name: string, initializer, script: string) {
+        function registerExtension(name: string, initializer, scripts: string[]) {
             extensions[name.toLowerCase()] = {
                 "initializer": initializer,
-                "script": script
+                "scripts": scripts
             };
         }
 
@@ -25,7 +33,10 @@ module CZ {
                 return;
 
             var extensionName: string = extensionNameFromMediaType(mediaType);
-            addScript(extensionName, getScriptFromExtensionName(extensionName));
+            var scripts = getScriptsFromExtensionName(extensionName);
+            scripts.forEach(function (script, index) {
+                addScript(extensionName, script, index);
+            });
         }
 
         export function getInitializer(mediaType: string) {
@@ -38,8 +49,8 @@ module CZ {
             return mediaType.substring(extensionIndex, mediaType.length);
         }
 
-        function addScript(extensionName: string, scriptPath: string) {
-            var scriptId: string = "extension-" + extensionName;
+        function addScript(extensionName: string, scriptPath: string, index: number) {
+            var scriptId: string = "extension-" + extensionName + index;
             if (document.getElementById(scriptId))
                 return;
 
@@ -50,8 +61,8 @@ module CZ {
             document.getElementsByTagName("head")[0].appendChild(script);
         }
 
-        function getScriptFromExtensionName(name: string) {
-            return extensions[name.toLowerCase()].script;
+        function getScriptsFromExtensionName(name: string) {
+            return extensions[name.toLowerCase()].scripts;
         }
     }
 }

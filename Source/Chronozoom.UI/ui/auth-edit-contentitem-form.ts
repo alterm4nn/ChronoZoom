@@ -21,7 +21,7 @@ module CZ {
         }
 
         export class FormEditCI extends CZ.UI.FormUpdateEntity {
-            private titleTextblock: JQuery;
+            public titleTextblock: JQuery;
             private titleInput: JQuery;
             private mediaInput: JQuery;
             private mediaSourceInput: JQuery;
@@ -29,18 +29,18 @@ module CZ {
             private attributionInput: JQuery;
             private descriptionInput: JQuery;
             private errorMessage: JQuery;
-            private saveButton: JQuery;
+            public saveButton: JQuery;
             private mediaListContainer: JQuery;
 
-            private prevForm: FormBase;
+            public prevForm: FormBase;
             private mediaList: CZ.UI.MediaList;
 
             private exhibit: any; // CanvasInfodot
             private contentItem: any; // ContentItem Metadata
 
             private mode; // create | edit
-            private isCancel: bool; // is form closed without saving changes
-            private isModified: bool;
+            private isCancel: boolean; // is form closed without saving changes
+            private isModified: boolean;
 
             constructor(container: JQuery, formInfo: IFormEditCIInfo) {
                 super(container, formInfo);
@@ -55,6 +55,18 @@ module CZ {
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
+
+                this.titleInput.focus(() => {
+                    this.titleInput.hideError();
+                });
+
+                this.mediaInput.focus(() => {
+                    this.mediaInput.hideError();
+                });
+
+                this.mediaSourceInput.focus(() => {
+                    this.mediaSourceInput.hideError();
+                });
 
                 this.prevForm = formInfo.prevForm;
 
@@ -134,7 +146,19 @@ module CZ {
                     description: this.descriptionInput.val() || "",
                     order: this.contentItem.order
                 };
-                if (CZ.Authoring.validateContentItems([newContentItem])) {
+
+                if (!CZ.Authoring.isNotEmpty(newContentItem.title)) {
+                    this.titleInput.showError("Title can't be empty");
+                }
+
+                if (!CZ.Authoring.isNotEmpty(newContentItem.uri)) {
+                    this.mediaInput.showError("URL can't be empty");
+                }
+                if (!CZ.Authoring.isValidURL(newContentItem.uri)) {
+                    this.mediaInput.showError("URL is wrong");
+                }
+
+                if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
                         if (this.prevForm && this.prevForm instanceof FormEditExhibit) {
                             this.isCancel = false;
@@ -167,7 +191,17 @@ module CZ {
                                     this.close();
                                 },
                                 error => {
-                                    alert("Unable to save changes. Please try again later.");
+                                    var errorMessage = error.statusText;
+
+                                    if (errorMessage.match(/Media Source/)) {
+                                        this.errorMessage.text("One or more fields filled wrong");
+                                        this.mediaSourceInput.showError("Media Source URL is not a valid URL");
+                                    }
+                                    else {
+                                        this.errorMessage.text("Sorry, internal server error :(");
+                                    }
+
+                                    this.errorMessage.show().delay(7000).fadeOut();
                                 }
                             ).always(() => {
                                 this.saveButton.prop('disabled', false);
@@ -175,7 +209,7 @@ module CZ {
                         }
                     }
                 } else {
-                    this.errorMessage.show().delay(7000).fadeOut();
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
             }
 
@@ -186,7 +220,7 @@ module CZ {
                 this.attributionInput.val(this.contentItem.attribution || "");
             }
 
-            public show(noAnimation?: bool = false) {
+            public show(noAnimation?) {
                 CZ.Authoring.isActive = true;
                 this.activationSource.addClass("active");
                 this.errorMessage.hide();
@@ -197,7 +231,7 @@ module CZ {
                 });
             }
 
-            public close(noAnimation?: bool = false) {
+            public close(noAnimation: boolean = false) {
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
@@ -213,6 +247,9 @@ module CZ {
                     duration: 500,
                     complete: () => {
                         this.mediaList.remove();
+                        this.mediaInput.hideError();
+                        this.titleInput.hideError();
+                        this.mediaSourceInput.hideError();
                     }
                 });
                 if (this.isCancel) {

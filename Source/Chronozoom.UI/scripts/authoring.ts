@@ -1,4 +1,4 @@
-/// <reference path='settings.ts'/>
+﻿/// <reference path='settings.ts'/>
 /// <reference path='common.ts'/>
 /// <reference path='vccontent.ts'/>
 /// <reference path='service.ts'/>
@@ -36,9 +36,9 @@ module CZ {
 
 
         // Authoring Tool state.
-        export var isActive: bool = false;
-        export var isEnabled: bool = false;
-        export var isDragging: bool = false;
+        export var isActive: boolean = false;
+        export var isEnabled: boolean = false;
+        export var isDragging: boolean = false;
 
         //TODO: use enum for authoring modes when new authoring forms will be completly integrated
         export var mode: any = null;
@@ -46,6 +46,7 @@ module CZ {
 
         // Forms' handlers.
         export var showCreateTimelineForm: (...args: any[]) => any = null;
+        export var showCreateRootTimelineForm: (...args: any[]) => any = null;
         export var showEditTimelineForm: (...args: any[]) => any = null;
         export var showCreateExhibitForm: (...args: any[]) => any = null;
         export var showEditExhibitForm: (...args: any[]) => any = null;
@@ -349,6 +350,14 @@ module CZ {
                 t.editButton.width = t.titleObject.height;
                 t.editButton.height = t.titleObject.height;
             }
+
+            // remove favorite button to reinitialiez it
+            if (typeof t.favoriteBtn !== "undefined") {
+                t.favoriteBtn.x = t.x + t.width - 1.8 * t.titleObject.height;
+                t.favoriteBtn.y = t.titleObject.y + 0.15 * t.titleObject.height;
+                t.favoriteBtn.width = 0.7 * t.titleObject.height;
+                t.favoriteBtn.height = 0.7 * t.titleObject.height;
+            }
         }
 
         /**
@@ -481,6 +490,7 @@ module CZ {
 
             // Assign forms' handlers.
             showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () { };
+            showCreateRootTimelineForm = formHandlers && formHandlers.showCreateRootTimelineForm || function () { };
             showEditTimelineForm = formHandlers && formHandlers.showEditTimelineForm || function () { };
             showCreateExhibitForm = formHandlers && formHandlers.showCreateExhibitForm || function () { };
             showEditExhibitForm = formHandlers && formHandlers.showEditExhibitForm || function () { };
@@ -498,7 +508,7 @@ module CZ {
          * @param  {Widget} form A dialog form for editing timeline.
          */
         export function updateTimeline(t, prop) {
-            var deffered = new jQuery.Deferred();
+            var deffered = jQuery.Deferred();
 
             var temp = {
                 x: Number(prop.start),
@@ -571,7 +581,14 @@ module CZ {
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
                         deferred.resolve();
                     })
+            var isRoot = !t.parent.guid;
             CZ.VCContent.removeChild(t.parent, t.id);
+
+            if (isRoot) {
+                // Root timeline, refresh page
+                document.location.reload(true);
+            }
+
         }
 
         /**
@@ -607,13 +624,12 @@ module CZ {
                         newExhibit.id = "e" + response.ExhibitId;
 
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
-
                         deferred.resolve(newExhibit);
                     },
-                            error => {
-                                console.log("Error connecting to service: update exhibit.\n" + error.responseText);
-                                deferred.reject();
-                            }
+                    error => {
+                        console.log("Error connecting to service: update exhibit.\n" + error.responseText);
+                        deferred.reject(error);
+                    }
                 );
 
             } else {
@@ -676,7 +692,7 @@ module CZ {
                     },
                     error => {
                         console.log("Error connecting to service: update content item.\n" + error.responseText);
-                        deferred.reject();
+                        deferred.reject(error);
                     }
                 );
             } else {
@@ -733,7 +749,7 @@ module CZ {
         export function validateExhibitData(date, title, contentItems) {
             var isValid = date !== false;
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
-            isValid = isValid && CZ.Authoring.validateContentItems(contentItems);
+            isValid = isValid && CZ.Authoring.validateContentItems(contentItems, null);
             return isValid;
         }
 
@@ -751,6 +767,13 @@ module CZ {
             return (obj !== '' && obj !== null);
         }
         /**
+         * Validates,if url is adequate
+        */
+        export function isValidURL(url) {
+            var objRE = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return objRE.test(url);
+        }
+        /**
          * Validates,if timeline size is not negative or null
         */
         export function isIntervalPositive(start, end) {
@@ -761,15 +784,19 @@ module CZ {
         /**
          * Validates,if content item data is correct.
         */
-        export function validateContentItems(contentItems) {
+        export function validateContentItems(contentItems, mediaInput: any) {
             var isValid = true;
             if (contentItems.length == 0) { return false; }
             var i = 0;
             while (contentItems[i] != null) {
                 var ci = contentItems[i];
                 isValid = isValid && CZ.Authoring.isNotEmpty(ci.title) && CZ.Authoring.isNotEmpty(ci.uri) && CZ.Authoring.isNotEmpty(ci.mediaType);
-                var mime = CZ.Service.getMimeTypeByUrl(ci.uri);
-                console.log("mime:"+ mime);
+
+                var mime;
+                if (ci.mediaType.toLowerCase() !== "video") {
+                    mime = CZ.Service.getMimeTypeByUrl(ci.uri);
+                }
+
                 if (ci.mediaType.toLowerCase() === "image") {
                     var imageReg = /\.(jpg|jpeg|png|gif)$/i;
                     if (!imageReg.test(ci.uri)) {
@@ -777,7 +804,11 @@ module CZ {
                             && mime != "image/jpeg"
                             && mime != "image/gif"
                             && mime != "image/png") {
-                            alert("Sorry, only JPG/PNG/GIF images are supported.");
+
+                            if (mediaInput) {
+                                mediaInput.showError("Sorry, only JPG/PNG/GIF images are supported.");
+                            }
+
                             isValid = false;
                         }
                     }
@@ -797,7 +828,10 @@ module CZ {
                     } else if (vimeoEmbed.test(ci.uri)) {
                         //Embedded link provided
                     } else {
-                        alert("Sorry, only YouTube or Vimeo videos are supported.");
+                        if (mediaInput) {
+                            mediaInput.showError("Sorry, only YouTube or Vimeo videos are supported.");
+                        }
+
                         isValid = false;
 
                     }
@@ -810,7 +844,10 @@ module CZ {
 
                     if (!pdf.test(ci.uri)) {
                         if (mime != "application/pdf") {
-                            alert("Sorry, only PDF extension is supported.");
+                            if (mediaInput) {
+                                mediaInput.showError("Sorry, only PDF extension is supported.");
+                            }
+
                             isValid = false;
                         }
                     }
@@ -834,7 +871,10 @@ module CZ {
                     var height = /[0-9]/;
 
                     if (!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
-                        alert("This is not a Skydrive embed link.");
+                        if (mediaInput) {
+                            mediaInput.showError("This is not a Skydrive embed link.");
+                        }
+
                         isValid = false;
                     }
                 }
@@ -842,6 +882,29 @@ module CZ {
                 i++;
             }
             return isValid;
+        }
+
+        /**
+        * Returns list of erroneous content items
+        */
+        export function erroneousContentItemsList(errorMassage) {
+            var pos;
+            var errCI = [];
+            if (errorMassage.indexOf("ErroneousContentItemIndex") + 1) {
+                pos = errorMassage.indexOf("ErroneousContentItemIndex") + 27;
+                while (errorMassage[pos] != ']') {
+                    if ((errorMassage[pos] == ",") || (errorMassage[pos] == "[")) {
+                        var str1 = "";
+                        pos++;
+                        while ((errorMassage[pos] != ",") && (errorMassage[pos] != "]")) {
+                            str1 += errorMassage[pos];
+                            pos++;
+                        }
+                        errCI.push(parseInt(str1));
+                    }
+                }
+            }
+            return errCI;
         }
 
         /**

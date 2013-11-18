@@ -32,7 +32,7 @@ module CZ {
                 this.coordinate = 0;
 
                 this.initialize();
-            };
+            }
 
             /**
             * Creates datepicker based on given JQuery instance of div

@@ -1,0 +1,134 @@
+﻿<!-- Start Page -->
+<div id="ContentContainer" class="ContentContainer">
+
+    <div class="welcome-block-toggle">
+        <div id="WelcomeBlock" class="WelcomeBlock toggle-block" data-toggle="hide">
+            <div class="welcome-box-1">
+                <h1>Welcome to ChronoZoom!</h1>
+            </div>
+            <div class="welcome-box-2">
+                ChronoZoom is an educational tool for teachers and students who want to put historical events in perspective.
+                A great many resources have been created already in ChronoZoom for your enjoyment and enlightenment.
+                <div class="welcome-link" onclick="CZ.StartPage.hide();">Start Exploring</div>
+                <div class="welcome-box-3">
+                    Use ChronoZoom to get a perspective of the extensive scale of time and historical events relative to what happened around the world.
+                    Become an author yourself! Simply log on with your social networking credentials to record your unique perspective or tell a story that needs to be told.
+                    <div class="welcome-link" onclick="CZ.StartPage.hide(); window.open('http://join.chronozoom.com/teach/', 'new')">New Teacher Resources</div>
+                </div>
+            </div>
+        </div>
+
+    <div id="MyTimelinesBlock" class="MyTimelinesBlock toggle-block" data-toggle="hide">
+            <div class="block-header">              
+                <h2 class="header-text">My Timelines</h2>
+                <div class="list-view-icon" data-enabled="true" onclick="CZ.StartPage.listFlip('MyTimelinesBlock');">
+                </div>
+            </div>
+            <div id="MyTimelinesBlock-tiles" class="FTTiles"></div>
+            <div id="MyTimelinesBlock-list" class="FTList"></div>
+        </div>
+    </div>
+
+    <div id="FeaturedTimelinesBlock" class="FeaturedTimelinesBlock">
+        <div class="block-header">              
+            <h2 class="header-text">Featured Timelines</h2>
+            <div class="list-view-icon" data-enabled="true" onclick="CZ.StartPage.listFlip('FeaturedTimelinesBlock');">
+            </div>
+        </div>
+        <div id="FeaturedTimelinesBlock-tiles" class="FTTiles"></div>
+        <div id="FeaturedTimelinesBlock-list" class="FTList"></div>
+    </div>
+
+    <div id="TwitterBlock" class="TwitterBlock toggle-block" data-toggle="hide">
+        <div class="block-header">              
+            <h2 class="header-text">Latest News</h2>
+            <div class="list-view-icon" data-enabled="true" onclick="CZ.StartPage.listFlip('TwitterBlock');">
+            </div>
+        </div>
+        <div id="TwitterBlock-tiles" class="FTTiles"></div>
+        <div id="TwitterBlock-list" class="FTList"></div>
+    </div>
+
+    <div id="FavoriteTimelinesBlock" class="FavoriteTimelinesBlock toggle-block" data-toggle="hide">
+        <div class="block-header">              
+                <h2 class="header-text">Favorite Timelines</h2>
+                <div class="list-view-icon" data-enabled="true" onclick="CZ.StartPage.listFlip('FavoriteTimelinesBlock');">
+                </div>
+            </div>
+            <div id="FavoriteTimelinesBlock-tiles" class="FTTiles"></div>
+            <div id="FavoriteTimelinesBlock-list" class="FTList"></div>
+        </div>
+    </div>
+
+
+    <div id="template-list" class="template-invisible">
+        <div class="list-item">
+            <div class="li-title"><a></a></div>
+            <a class="li-author"></a>
+          <!--  <div class="li-icon"></div>-->
+            <div class="bigcleardiv"></div>
+        </div>
+    </div>
+
+    <div id="template-tile" class="template-invisible">
+        <div class="box">
+            <div class="boxInner">
+                <div class="tile-photo">
+                    <img></img>
+                </div>  
+                <div class="tile-gradient">
+                   <!-- <img src="images/tile_gradient.png" alt=""/>-->
+                </div>
+                <div class="tile-meta">
+                    <span class="tile-meta-title"></span>
+                    <span class="tile-meta-author"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="template-tweet" class="template-invisible">
+        <div class="box">
+            <div class="boxInner">
+                <div class="tweet-meta">
+                    <img class="tweet-avatar-icon" />
+                    <div>
+                        <span class="tweet-meta-title"></span>
+                        <a class="tweet-meta-author" target="blank"></a>
+                    </div>
+                    <div class="cleardiv"></div>
+                    <a class="tweet-meta-text" target="blank"></a>
+                    <div class="twitter-time-container"> 
+                        <div class="tweet-icon"/>
+                        <div class="tile-meta-time"></div>
+                    </div>
+                </div>
+              </div>
+        </div>
+    </div>
+
+    <div id="template-tweet-list" class="template-invisible">
+        <div class="tweet-list-item">
+            <div class="tweet-li-header">
+                <img class="tweet-li-avatar" src="https://si0.twimg.com/profile_images/378800000228992649/f4c883ae61e7c2609b649011b62bc95e_normal.png">
+                <span class="tweet-li-fullname"></span>
+                &nbsp;&nbsp;
+                <a class="tweet-li-username" target="blank"></a>
+            </div>
+            <a class="tweet-li-message" target="blank"></a>
+            <div class="tweet-li-footer">
+                <div class="tweet-icon" />
+                <span class="tweet-li-date"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="template-timeline-list" class="template-invisible">
+        <div class="timeline-list-item" data-title="" data-author="">
+            <div class="timeline-li-image">
+                <img src="">
+            </div>
+        </div>
+    </div>
+
+</div>

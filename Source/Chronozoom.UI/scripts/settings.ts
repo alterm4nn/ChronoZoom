@@ -1,5 +1,13 @@
-﻿module CZ {
+﻿/// <reference path='typings/jquery/jquery.d.ts'/>
+
+module CZ {
     export module Settings {
+        export var isAuthorized = false; // user is authorized flag
+        export var userSuperCollectionName = "";
+        export var userCollectionName = "";
+
+        export var favoriteTimelines = []; // guids of favorite timelines of current user
+
         export var czDataSource = 'db'; // possible values: db, relay, dump
         // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
         
@@ -235,5 +243,7 @@
         // WL API constants
         export var WLAPIClientID = "00000000440FD1D7";
         export var WLAPIRedirectUrl = "http://www.chronozoom.com/";
+
+        export var errorMessageSlideDuration = 0; // slide animation duration of input error messages
     }
 }

@@ -45,7 +45,7 @@
     <script type="text/javascript" src="/scripts/external/csvToArray.v2.1.js"></script>
     <script type="text/javascript" src="/scripts/external/ACS.js"></script>
     <script type="text/javascript" src="/scripts/external/modernizr.custom.55478.js"></script>
-	
+    <script type="text/javascript" src="/scripts/external/jquery.dotdotdot.js"></script>
 
     <script type="text/javascript">
         function AddScript(path) {
@@ -81,6 +81,9 @@
                 AddScript("/scripts/dates.js");
                 AddScript("/scripts/media.js");
 
+                AddScript("/scripts/plugins/error-plugin.js");
+                AddScript("/scripts/plugins/utility-plugins.js");
+
                 AddScript("/scripts/extensions/extensions.js");
                 AddScript("/scripts/extensions/rinplayer.js");
 
@@ -111,6 +114,7 @@
                 AddScript("/ui/message-window.js");
                 AddScript("/ui/header-session-expired-form.js");
                 AddScript("/ui/mediapicker-form.js");
+                AddScript("/ui/start-page.js");
 
                 AddScript("/scripts/cz.js");
             }
@@ -170,12 +174,17 @@
                 <li class="fright">
                     <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
                 </li>
+  
                 <li class="fright">
                     <div class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
                 </li>
                 <li class="fright">
                     <div id="tours_index" class="header-icon tour-icon" title="Take a Guided Tour" data-enabled="true"></div>
                 </li>
+                <li class="fright">
+                    <div id="home_button" class="header-icon home-icon" title="View Home Screen" data-enabled="true"></div>
+                </li>
+
             </ul>
         </div>
     </header>
@@ -213,6 +222,11 @@
                 <div id="iframe_layer" class="unselectable">
                 </div>
             </div>
+            <div class="root-cloak-top" title="You can't create event here"></div>
+            <div class="root-cloak-right" title="You can't create event here"></div>
+            <div class="root-cloak-bottom" title="You can't create event here"></div>
+            <div class="root-cloak-left" title="You can't create event here"></div>
+
             <div id="timeSeriesContainer" style="display: none;"></div>
         </div>
                 
@@ -243,6 +257,9 @@
         <div id="message-window" class="cz-form cz-form-left cz-major-form cz-message-window unselectable"></div>
         <div id="header-session-expired-form" class="cz-form cz-form-left cz-session-expired"></div>
         <div id="mediapicker-form" class="cz-form cz-form-left unselectable"></div>
+        <!-- Start Page -->
+        <div id="start-page" class="start-page-screen"></div>
+
     </div>
 
     <script src="https://cz-nodelete-chronozoom-prod.accesscontrol.windows.net/v2/metadata/IdentityProviders.js?protocol=wsfederation&amp;realm=http%3a%2f%2fwww.chronozoom.com%2f&amp;reply_to=&amp;context=&amp;request_id=&amp;version=1.0&amp;callback=ShowSigninPage" type="text/javascript"></script>
@@ -280,16 +297,16 @@
         <div class="fright navigation footer-links">
             <ul>
                 <li class="fright">
-                    <a class="footer-link" href="http://join.chronozoom.com/develop/">Developers</a>
+                    <a class="footer-link" target="_blank" href="http://join.chronozoom.com/develop/">Developers</a>
                 </li>
                 <li class="fright">
-                    <a class="footer-link" href="http://join.chronozoom.com/notices">Notices</a>
+                    <a class="footer-link" target="_blank" href="http://join.chronozoom.com/notices">Notices</a>
                 </li>
                 <li class="fright">
-                    <a class="footer-link" href="http://join.chronozoom.com/forum/forums/">Feedback</a>
+                    <a class="footer-link" target="_blank" href="http://join.chronozoom.com/forum/forums/">Feedback</a>
                 </li>
                 <li class="fright">
-                    <a class="footer-link" href="http://help.chronozoom.com/">Help</a>
+                    <a class="footer-link" target="_blank" href="http://help.chronozoom.com/">Help</a>
                 </li>
             </ul>
         </div>

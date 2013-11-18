@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiTests\FavoritesTests.cs" />
     <Compile Include="AuthoringSkyDriveTests.cs" />
     <Compile Include="AuthoringTests.cs" />
     <Compile Include="AuthoringTour.cs" />
@@ -105,6 +106,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>

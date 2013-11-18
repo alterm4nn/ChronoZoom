@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Chronozoom.Entities;
-using Chronozoom.Entities.Test;
 
-
-namespace Chronozoom.Entities.Test
+namespace Chronozoom.Entities.UnitTests
 {
     public partial class StorageTest : StorageTestBase
     {
-        private const int NUM_TEST = 1000; 
+        private const int NumTest = 1000; 
 
         [TestMethod]
         public void TestEntities_DepthField_GeneratedCorrectly()
         {
-            var timeline_random_samples = _storage.Timelines.SqlQuery(String.Format("SELECT TOP {0} * FROM Timelines ORDER BY NEWID()", NUM_TEST));
-            foreach (Timeline t in timeline_random_samples)
+            var timelineRandomSamples = Storage.Timelines.SqlQuery(String.Format("SELECT TOP {0} * FROM Timelines ORDER BY NEWID()", NumTest));
+            foreach (Timeline t in timelineRandomSamples)
             {
                 if (t.ChildTimelines != null)
                 {

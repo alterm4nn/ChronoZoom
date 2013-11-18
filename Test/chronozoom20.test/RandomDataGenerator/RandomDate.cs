@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace RandomDataGenerator
 {
@@ -11,9 +12,9 @@ namespace RandomDataGenerator
             int range = (DateTime.Today - start).Days;
             DateTime d = start.AddDays(gen.Next(range));
             long year = LongRandom(minYear, DateTime.Today.Year, gen);
-            int day = year > 0 ? DateTime.DaysInMonth((int) year, d.Month) : gen.Next(1, 28);
-            var month = d.ToString("MMMM");
-            return new CustomDate {Day = day, Year = year, MonthName = month};
+            int day = year > 0 ? DateTime.DaysInMonth((int)year, d.Month) : gen.Next(1, 28);
+            var month = d.ToString("MMMM", CultureInfo.InvariantCulture);
+            return new CustomDate { Day = day, Year = year, MonthName = month, MonthNumber = d.Month };
         }
 
         private static long LongRandom(long min, long max, Random rand)
@@ -22,7 +23,7 @@ namespace RandomDataGenerator
             rand.NextBytes(buf);
             long longRand = BitConverter.ToInt64(buf, 0);
 
-            return (Math.Abs(longRand%(max - min)) + min);
+            return (Math.Abs(longRand % (max - min)) + min);
         }
     }
 

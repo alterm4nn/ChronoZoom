@@ -14,7 +14,7 @@ module CZ {
             export var filePicker: any;
             export var filePickerIframe: JQuery;
             export var logoutButton: JQuery;
-            export var isEnabled: bool;
+            export var isEnabled: boolean;
             export var helperText: JQuery;
             var mediaType: string;
 

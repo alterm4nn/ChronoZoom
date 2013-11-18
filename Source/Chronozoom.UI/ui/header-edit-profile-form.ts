@@ -17,25 +17,25 @@ module CZ {
             profilePanel: string;
             loginPanelLogin: string;
             context: Object;
-            allowRedirect: bool;
+            allowRedirect: boolean;
             collectionTheme: string;
             collectionThemeInput: string;
             collectionThemeWrapper: string;
         }
 
         export class FormEditProfile extends CZ.UI.FormUpdateEntity {
-            private saveButton: JQuery;
+            public saveButton: JQuery;
             private logoutButton: JQuery;
             private titleInput: JQuery;
 
-            private isCancel: bool;
+            private isCancel: boolean;
             private usernameInput: JQuery;
             private emailInput: JQuery;
             private agreeInput: JQuery;
             private loginPanel: JQuery;
             private profilePanel: JQuery;
             private loginPanelLogin: JQuery;
-            private allowRedirect: bool;
+            private allowRedirect: boolean;
             private collectionTheme: string;
             private collectionThemeInput: JQuery;
             private collectionThemeWrapper: JQuery;

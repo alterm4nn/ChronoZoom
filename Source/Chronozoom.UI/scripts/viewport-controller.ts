@@ -147,7 +147,7 @@ module CZ {
                     PanViewport(initialViewport, gesture);
                 }
 
-                //self.coerceVisible(initialViewport, gesture); //applying navigaion constraints
+                self.coerceVisible(initialViewport, gesture); //applying navigaion constraints
                 return initialViewport;
             }
 

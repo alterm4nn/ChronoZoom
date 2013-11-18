@@ -413,11 +413,11 @@ module CZ {
 
 
             return {
-                width: width - 1.25 * height, // decrease text width for saving place for edit icon
+                width: width - 2.1 * height, // decrease text width for saving place for edit icon
                 height: height,
                 marginTop: tlHeight - height - margin,
                 marginLeft: margin,
-                bboxWidth: width + 2 * margin - 1.25 * height, // decrease bbox width for saving place for edit icon
+                bboxWidth: width + 2 * margin - 2.1 * height, // decrease bbox width for saving place for edit icon
                 bboxHeight: height + 2 * margin
             };
         }
@@ -494,7 +494,7 @@ module CZ {
             }
         }
 
-        export var FindChildTimeline = function (timeline, id, recursive) {
+        export var FindChildTimeline = function (timeline, id, recursive?: boolean) {
             var result = undefined;
 
             if (timeline && timeline.timelines instanceof Array) {

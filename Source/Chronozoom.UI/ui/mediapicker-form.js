@@ -1,4 +1,5 @@
 var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
@@ -9,7 +10,8 @@ var CZ;
         var FormMediaPicker = (function (_super) {
             __extends(FormMediaPicker, _super);
             function FormMediaPicker(container, mediaPickerContainer, title, formInfo) {
-                        _super.call(this, container, formInfo);
+                _super.call(this, container, formInfo);
+
                 this.titleTextblock.text(title);
                 this.contentContainer.append(mediaPickerContainer);
                 $(this).off();
@@ -24,8 +26,10 @@ var CZ;
                         $(_this).trigger("showcompleted");
                     }
                 });
+
                 this.activationSource.addClass("active");
             };
+
             FormMediaPicker.prototype.close = function () {
                 var _this = this;
                 _super.prototype.close.call(this, {
@@ -36,11 +40,12 @@ var CZ;
                         $(_this).trigger("closecompleted");
                     }
                 });
+
                 this.activationSource.removeClass("active");
             };
             return FormMediaPicker;
         })(CZ.UI.FormBase);
-        UI.FormMediaPicker = FormMediaPicker;        
+        UI.FormMediaPicker = FormMediaPicker;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
