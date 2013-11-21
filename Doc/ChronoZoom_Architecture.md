@@ -24,6 +24,12 @@ The following diagram depicts the high-level architecture:
 
 ## Client Architecture ##
 
+![Login](images/architecture_client.png)
+
 ## Server Architecture ##
 
+![Login](images/architecture_server.png)
+
 ## Storage Architecture ##
+
+![Login](images/architecture_storage.png)
