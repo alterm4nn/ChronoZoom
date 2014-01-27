@@ -49,7 +49,7 @@ var CZ;
                 configurable: true
             });
             return TourListBox;
-        })(UI.ListBoxBase);
+        })(CZ.UI.ListBoxBase);
         UI.TourListBox = TourListBox;
 
         var TourListItem = (function (_super) {
@@ -79,7 +79,7 @@ var CZ;
                 this.titleTextblock.text(this.data.title);
                 if (this.data.description)
                     this.descrTextblock.text(this.data.description);
-else
+                else
                     this.descrTextblock.hide();
 
                 this.container.find("#takeTour").click(function (e) {
@@ -94,7 +94,7 @@ else
                 }
             }
             return TourListItem;
-        })(UI.ListItemBase);
+        })(CZ.UI.ListItemBase);
         UI.TourListItem = TourListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;

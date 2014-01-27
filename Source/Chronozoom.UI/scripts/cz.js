@@ -43,64 +43,64 @@ var CZ;
         var _featureMap = [
             {
                 Name: "Login",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: "#login-panel"
             },
             {
                 Name: "Search",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: "#search-button"
             },
             {
                 Name: "Tours",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: "#tours-index"
             },
             {
                 Name: "Authoring",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: ".header-icon.edit-icon"
             },
             {
                 Name: "TourAuthoring",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: ".cz-form-create-tour"
             },
             {
                 Name: "WelcomeScreen",
-                Activation: FeatureActivation.RootCollection,
+                Activation: 2 /* RootCollection */,
                 JQueryReference: "#welcomeScreenBack"
             },
             {
                 Name: "Regimes",
-                Activation: FeatureActivation.RootCollection,
+                Activation: 2 /* RootCollection */,
                 JQueryReference: ".header-regimes"
             },
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.Enabled
+                Activation: 0 /* Enabled */
             },
             {
                 Name: "ManageCollections",
-                Activation: FeatureActivation.Disabled,
+                Activation: 1 /* Disabled */,
                 JQueryReference: "#collections_button"
             },
             {
                 Name: "BreadCrumbs",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: ".header-breadcrumbs"
             },
             {
                 Name: "Themes",
-                Activation: FeatureActivation.NotProduction
+                Activation: 4 /* NotProduction */
             },
             {
                 Name: "Skydrive",
-                Activation: FeatureActivation.Enabled
+                Activation: 0 /* Enabled */
             },
             {
                 Name: "StartPage",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: ".header-icon.home-icon"
             }
         ];
@@ -108,6 +108,10 @@ var CZ;
         HomePageViewModel.rootCollection;
 
         function UserCanEditCollection(profile) {
+            if (!constants || !constants.environment || constants.environment === "localhost") {
+                return true;
+            }
+
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
                 return true;
             }
@@ -174,7 +178,7 @@ var CZ;
             };
             if (CZ.Tours.tours)
                 onToursInitialized();
-else
+            else
                 $("body").bind("toursInitialized", onToursInitialized);
         }
 
@@ -487,10 +491,7 @@ else
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
-                    collectionTheme: CZ.Settings.theme,
-                    collectionThemeInput: "#collection-theme",
-                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
                 });
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
@@ -506,7 +507,6 @@ else
                     event.preventDefault();
                     if (!profileForm.isFormVisible) {
                         closeAllForms();
-                        profileForm.setTheme(CZ.Settings.theme);
                         profileForm.show();
                     } else {
                         profileForm.close();
@@ -524,7 +524,6 @@ else
 
                             if (!profileForm.isFormVisible) {
                                 closeAllForms();
-                                profileForm.setTheme(CZ.Settings.theme);
                                 profileForm.show();
                             } else {
                                 profileForm.close();
@@ -595,7 +594,7 @@ else
 
             if (navigator.userAgent.indexOf('Mac') != -1) {
                 var body = document.getElementsByTagName('body')[0];
-                (body).style.overflow = "hidden";
+                body.style.overflow = "hidden";
             }
 
             Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
@@ -782,7 +781,7 @@ else
             var form = $(name).data("form");
             if (form)
                 return form;
-else
+            else
                 return false;
         }
         HomePageViewModel.getFormById = getFormById;
@@ -926,19 +925,19 @@ else
 
                 if (feature.IsEnabled === undefined) {
                     var enabled = true;
-                    if (feature.Activation === FeatureActivation.Disabled) {
+                    if (feature.Activation === 1 /* Disabled */) {
                         enabled = false;
                     }
 
-                    if (feature.Activation === FeatureActivation.NotRootCollection && HomePageViewModel.rootCollection) {
+                    if (feature.Activation === 3 /* NotRootCollection */ && HomePageViewModel.rootCollection) {
                         enabled = false;
                     }
 
-                    if (feature.Activation === FeatureActivation.RootCollection && !HomePageViewModel.rootCollection) {
+                    if (feature.Activation === 2 /* RootCollection */ && !HomePageViewModel.rootCollection) {
                         enabled = false;
                     }
 
-                    if (feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {
+                    if (feature.Activation === 4 /* NotProduction */ && (constants && constants.environment && constants.environment === "Production")) {
                         enabled = false;
                     }
 

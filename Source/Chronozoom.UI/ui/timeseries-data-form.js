@@ -148,7 +148,7 @@ var CZ;
                 var delimValue = $("#delim").prop("value");
                 if (delimValue === "tab")
                     delimValue = "\t";
-else if (delimValue === "space")
+                else if (delimValue === "space")
                     delimValue = " ";
 
                 try  {

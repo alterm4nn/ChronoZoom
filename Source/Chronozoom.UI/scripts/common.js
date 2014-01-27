@@ -1,4 +1,5 @@
-﻿var CZ;
+﻿
+var CZ;
 (function (CZ) {
     (function (Common) {
         Common.maxPermitedScale;
@@ -36,11 +37,11 @@
         Common.initialContent = null;
 
         function initialize() {
-            Common.ax = ($)('#axis');
+            Common.ax = $('#axis');
             Common.axis = new CZ.Timescale(Common.ax);
 
             CZ.VirtualCanvas.initialize();
-            Common.vc = ($)('#vc');
+            Common.vc = $('#vc');
             Common.vc.virtualCanvas();
         }
         Common.initialize = initialize;
@@ -69,7 +70,7 @@
         function preventbubble(e) {
             if (e && e.stopPropagation)
                 e.stopPropagation();
-else
+            else
                 e.cancelBubble = true;
         }
         Common.preventbubble = preventbubble;

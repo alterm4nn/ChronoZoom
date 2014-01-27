@@ -115,9 +115,9 @@ var CZ;
                     this.titleTextblock.text("Edit");
                     this.saveButton.text("update artifact");
 
-                    if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit)
+                    if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit)
                         this.closeButton.hide();
-else
+                    else
                         this.closeButton.show();
                 } else {
                     console.log("Unexpected authoring mode in content item form.");
@@ -152,25 +152,25 @@ else
 
                 if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
-                        if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
+                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
                             this.isCancel = false;
-                            (this.prevForm).contentItemsListBox.add(newContentItem);
+                            this.prevForm.contentItemsListBox.add(newContentItem);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
-                            (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                            this.prevForm.exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.isModified = false;
                             this.back();
                         }
                     } else if (CZ.Authoring.contentItemMode === "editContentItem") {
-                        if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
+                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
                             this.isCancel = false;
-                            var clickedListItem = (this.prevForm).clickedListItem;
+                            var clickedListItem = this.prevForm.clickedListItem;
                             clickedListItem.iconImg.attr("src", newContentItem.uri);
                             clickedListItem.titleTextblock.text(newContentItem.title);
                             clickedListItem.descrTextblock.text(newContentItem.description);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
-                            (this.prevForm).exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                            (this.prevForm).isModified = true;
+                            this.prevForm.exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                            this.prevForm.isModified = true;
                             CZ.Common.vc.virtualCanvas("requestInvalidate");
                             this.isModified = false;
                             this.back();

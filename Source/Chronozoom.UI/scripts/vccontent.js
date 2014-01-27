@@ -1,7 +1,8 @@
-﻿var CZ;
+﻿
+var CZ;
 (function (CZ) {
     (function (VCContent) {
-        var elementclick = ($).Event("elementclick");
+        var elementclick = $.Event("elementclick");
 
         function getVisibleForElement(element, scale, viewport, use_margin) {
             var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
@@ -303,7 +304,7 @@
                 if (sz & 1) {
                     if (zl > 0)
                         zl = i + 1;
-else
+                    else
                         zl = i;
                 }
             }
@@ -604,7 +605,7 @@ else
 
                 if (this.titleObject.screenFontSize <= CZ.Settings.timelineTooltipMaxHeaderSize)
                     this.tooltipEnabled = true;
-else
+                else
                     this.tooltipEnabled = false;
 
                 if (CZ.Common.tooltipMode != "infodot") {
@@ -752,7 +753,7 @@ else
                 if (this.settings.hoverAnimationDelta) {
                     if (this.settings.gradientOpacity == 0 || this.settings.gradientOpacity == 1)
                         this.settings.hoverAnimationDelta = undefined;
-else
+                    else
                         this.vc.requestInvalidate();
                 }
 
@@ -832,7 +833,7 @@ else
         }
 
         function drawText(text, ctx, x, y, fontSize, fontName) {
-            var br = ($).browser;
+            var br = $.browser;
             var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
 
             if (isIe9) {
@@ -909,7 +910,7 @@ else
                                     } else {
                                         if (currentLine === '')
                                             currentLine = words[iw];
-else
+                                        else
                                             currentLine += ' ' + words[iw];
                                         lineWidth = newWidth;
                                     }
@@ -978,7 +979,7 @@ else
                     ctx.textAlign = this.settings.textAlign;
                     if (this.settings.textAlign === 'center')
                         p.x = p.x + size_p.x / 2.0;
-else if (this.settings.textAlign === 'right')
+                    else if (this.settings.textAlign === 'right')
                         p.x = p.x + size_p.x;
                 }
 
@@ -1298,7 +1299,7 @@ else if (this.settings.textAlign === 'right')
             }
             if (pdfSrc.indexOf('?') == -1)
                 pdfSrc += '?&embedded=true&wmode=opaque';
-else
+            else
                 pdfSrc += '&embedded=true&wmode=opaque';
             elem.setAttribute("src", pdfSrc);
 
@@ -1318,7 +1319,7 @@ else
             elem.setAttribute("id", id);
             if (videoSrc.indexOf('?') == -1)
                 videoSrc += '?wmode=opaque';
-else
+            else
                 videoSrc += '&wmode=opaque';
             elem.setAttribute("src", videoSrc);
             elem.setAttribute("visible", 'true');
@@ -1536,9 +1537,7 @@ else
             var titleTop = sourceTop + verticalMargin + sourceHeight;
 
             var rect = VCContent.addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh, {
-                strokeStyle: CZ.Settings.contentItemBoundingBoxBorderColor,
-                lineWidth: CZ.Settings.contentItemBoundingBoxBorderWidth * vw,
-                fillStyle: CZ.Settings.contentItemBoundingBoxFillColor,
+                strokeStyle: CZ.Settings.contentItemBoundingBoxBorderColor, lineWidth: CZ.Settings.contentItemBoundingBoxBorderWidth * vw, fillStyle: CZ.Settings.contentItemBoundingBoxFillColor,
                 isLineWidthVirtual: true
             });
             this.reactsOnMouse = true;
@@ -1711,15 +1710,15 @@ else
             contentItems.sort(function (a, b) {
                 if (typeof a.order !== 'undefined' && typeof b.order === 'undefined')
                     return -1;
-else if (typeof a.order === 'undefined' && typeof b.order !== 'undefined')
+                else if (typeof a.order === 'undefined' && typeof b.order !== 'undefined')
                     return 1;
-else if (typeof a.order === 'undefined' && typeof b.order === 'undefined')
+                else if (typeof a.order === 'undefined' && typeof b.order === 'undefined')
                     return 0;
-else if (a.order < b.order)
+                else if (a.order < b.order)
                     return -1;
-else if (a.order > b.order)
+                else if (a.order > b.order)
                     return 1;
-else
+                else
                     return 0;
             });
 
@@ -2042,10 +2041,7 @@ else
                 if (citems[i].id == cid)
                     return {
                         id: cid,
-                        x: citems[i].x,
-                        y: citems[i].y,
-                        width: citems[i].width,
-                        height: citems[i].height,
+                        x: citems[i].x, y: citems[i].y, width: citems[i].width, height: citems[i].height,
                         parent: infodot,
                         type: "contentItem",
                         vc: infodot.vc

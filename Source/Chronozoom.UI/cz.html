@@ -55,7 +55,7 @@
         }
 
         if (Modernizr.canvas) {
-            if (constants.environment == 'Localhost') {
+            if (!constants.environment || constants.environment == 'Localhost') {
                 AddScript("/scripts/settings.js");
                 AddScript("/scripts/common.js");
                 AddScript("/scripts/viewport.js");

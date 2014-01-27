@@ -326,7 +326,7 @@ var CZ;
                     var message;
                     if (!_this.tourTitleInput.val())
                         message = "Please enter the title.";
-else if (_this.tourStopsListBox.items.length == 0)
+                    else if (_this.tourStopsListBox.items.length == 0)
                         message = "Please add a tour stop to the tour.";
                     if (message) {
                         alert(message);
@@ -468,7 +468,7 @@ else if (_this.tourStopsListBox.items.length == 0)
                 if (targetElement) {
                     var n = this.tourStopsListBox.items.length;
                     var stop = new TourStop(targetElement);
-                    stop.LapseTime = n == 0 ? 0 : ((this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1]).data).LapseTime + CZ.Settings.tourDefaultTransitionTime;
+                    stop.LapseTime = n == 0 ? 0 : this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1].data.LapseTime + CZ.Settings.tourDefaultTransitionTime;
                     this.tourStopsListBox.add(stop);
                 }
                 this.show();

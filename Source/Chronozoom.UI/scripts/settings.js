@@ -157,12 +157,12 @@
 
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
 
-        Settings.ie = ((function () {
+        Settings.ie = (function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];
             while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><br><![endif]-->', a[0])
                 ;
             return (v > 4) ? v : undefined;
-        })());
+        }());
 
         Settings.theme;
         function applyTheme(theme) {
