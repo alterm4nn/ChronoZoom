@@ -189,7 +189,7 @@ var CZ;
                 this.monthSelector.change(function (event) {
                     self.daySelector.empty();
 
-                    var selectedIndex = (self.monthSelector[0]).selectedIndex;
+                    var selectedIndex = self.monthSelector[0].selectedIndex;
                     for (var i = 0; i < CZ.Dates.daysInMonth[selectedIndex]; i++) {
                         var dayOption = $("<option value='" + (i + 1) + "'>" + (i + 1) + "</option>");
                         self.daySelector.append(dayOption);

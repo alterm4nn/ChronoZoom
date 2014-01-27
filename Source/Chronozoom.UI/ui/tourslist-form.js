@@ -26,7 +26,7 @@ var CZ;
                 this.createTourBtn = this.container.find(formInfo.createTour);
                 if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName))
                     $("#cz-tours-list-title").text("My Tours");
-else {
+                else {
                     $("#cz-tours-list-title").text("Tours");
                     $("#tours-create-button").hide();
                 }

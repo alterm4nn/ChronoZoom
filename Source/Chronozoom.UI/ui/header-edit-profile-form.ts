@@ -18,9 +18,6 @@ module CZ {
             loginPanelLogin: string;
             context: Object;
             allowRedirect: boolean;
-            collectionTheme: string;
-            collectionThemeInput: string;
-            collectionThemeWrapper: string;
         }
 
         export class FormEditProfile extends CZ.UI.FormUpdateEntity {
@@ -36,9 +33,6 @@ module CZ {
             private profilePanel: JQuery;
             private loginPanelLogin: JQuery;
             private allowRedirect: boolean;
-            private collectionTheme: string;
-            private collectionThemeInput: JQuery;
-            private collectionThemeWrapper: JQuery;
 
 
             constructor(container: JQuery, formInfo: FormEditProfileInfo) {
@@ -52,9 +46,6 @@ module CZ {
                 this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
-                this.collectionTheme = formInfo.collectionTheme;
-                this.collectionThemeInput = container.find(formInfo.collectionThemeInput);
-                this.collectionThemeWrapper = container.find(formInfo.collectionThemeWrapper);
 
                 this.usernameInput.off("keypress");
                 this.emailInput.off("keypress");
@@ -78,10 +69,6 @@ module CZ {
 
             private initialize(): void {
                 var profile = CZ.Service.getProfile();
-
-                if (this.collectionThemeWrapper) {
-                    this.collectionThemeWrapper.show();
-                }
 
                 profile.done(data => {
                     if (data.DisplayName != null) {
@@ -121,8 +108,6 @@ module CZ {
                         emailAddress = this.emailInput.val();
                     }
 
-                    this.collectionTheme = this.collectionThemeInput.val();
-
                     Service.getProfile().done((curUser) => {
                         Service.getProfile(this.usernameInput.val()).done((getUser) => {
                             if (curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
@@ -132,23 +117,11 @@ module CZ {
                             }
                             CZ.Service.putProfile(this.usernameInput.val(), emailAddress).then(
                                 success => {
-                                    if (this.collectionTheme) {
-                                        CZ.Service.putCollection(this.usernameInput.val(), this.usernameInput.val(), { theme: this.collectionTheme }).then(() => {
-                                            if (this.allowRedirect) {
-                                                window.location.assign("/" + success);
-                                            }
-                                            else {
-                                                this.close();
-                                            }
-                                        });
+                                    if (this.allowRedirect) {
+                                        window.location.assign("/" + success);
                                     }
                                     else {
-                                        if (this.allowRedirect) {
-                                            window.location.assign("/" + success);
-                                        }
-                                        else {
-                                            this.close();
-                                        }
+                                        this.close();
                                     }
                                 },
                                 function (error) {
@@ -183,7 +156,6 @@ module CZ {
                     duration: 500
                 });
 
-                this.collectionThemeInput.val(this.collectionTheme);
                 this.activationSource.addClass("active");
             }
 
@@ -195,10 +167,6 @@ module CZ {
                 });
 
                 this.activationSource.removeClass("active");
-            }
-
-            public setTheme(theme: string) {
-                this.collectionTheme = theme;
             }
         }
     }

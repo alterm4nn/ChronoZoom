@@ -22,7 +22,7 @@
         }
 
         function createPanSubject(vc) {
-            var _doc = ($(document));
+            var _doc = $(document);
 
             var mouseDown = vc.toObservable("mousedown");
             var mouseMove = vc.toObservable("mousemove");
@@ -51,7 +51,7 @@
 
         function createZoomSubject(vc) {
             vc.mousewheel(function (event, delta, deltaX, deltaY) {
-                var xevent = ($).Event("xbrowserwheel");
+                var xevent = $.Event("xbrowserwheel");
                 xevent.delta = delta;
                 xevent.origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
                 vc.trigger(xevent);
@@ -74,7 +74,7 @@
         }
 
         function createTouchPanSubject(vc) {
-            var _doc = ($)(document);
+            var _doc = $(document);
 
             var touchStart = vc.toObservable("touchstart");
             var touchMove = vc.toObservable("touchmove");
@@ -103,7 +103,7 @@
         }
 
         function createTouchZoomSubject(vc) {
-            var _doc = ($)(document);
+            var _doc = $(document);
 
             var gestureStart = vc.toObservable("gesturestart");
             var gestureChange = vc.toObservable("gesturechange");
@@ -193,7 +193,7 @@
             var zoomController;
             var pinController;
 
-            if (window.navigator.msPointerEnabled && (window).MSGesture) {
+            if (window.navigator.msPointerEnabled && window.MSGesture) {
                 addMSGestureSource(source[0]);
 
                 panController = createTouchPanSubjectWin8(source);
@@ -219,7 +219,7 @@
             var panController;
             var pinController;
 
-            if (window.navigator.msPointerEnabled && (window).MSGesture) {
+            if (window.navigator.msPointerEnabled && window.MSGesture) {
                 addMSGestureSource(source[0]);
 
                 panController = createTouchPanSubjectWin8(source);

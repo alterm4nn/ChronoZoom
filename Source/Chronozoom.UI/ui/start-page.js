@@ -588,9 +588,9 @@ var CZ;
         function compareTimelineTitles(first, second) {
             if (first.Title.charAt(0) < second.Title.charAt(0))
                 return -1;
-else if (first.Title.charAt(0) > second.Title.charAt(0))
+            else if (first.Title.charAt(0) > second.Title.charAt(0))
                 return 1;
-else
+            else
                 return 0;
         }
 

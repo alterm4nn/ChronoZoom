@@ -57,7 +57,7 @@ module CZ {
 
 
         // Generic callback function set by the form when waits user's input (e.g. mouse click) to continue.
-        export var callback: (...args: any[]) => any = null;
+        export var callback: (arg: any) => any = null;
 
         export var timer;
         /**

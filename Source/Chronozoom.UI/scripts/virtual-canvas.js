@@ -2,7 +2,7 @@
 (function (CZ) {
     (function (VirtualCanvas) {
         function initialize() {
-            ($).widget("ui.virtualCanvas", {
+            $.widget("ui.virtualCanvas", {
                 _layersContent: undefined,
                 _layers: [],
                 _create: function () {
@@ -17,7 +17,7 @@
 
                     this.requestNewFrame = false;
 
-                    self.cursorPositionChangedEvent = new ($).Event("cursorPositionChanged");
+                    self.cursorPositionChangedEvent = new $.Event("cursorPositionChanged");
                     self.breadCrumbsChangedEvent = $.Event("breadCrumbsChanged");
                     self.innerZoomConstraintChangedEvent = $.Event("innerZoomConstraintChanged");
                     self.currentlyHoveredInfodot = undefined;
@@ -165,7 +165,7 @@
 
                     if (CZ.Common.tooltipMode == 'infodot')
                         obj = this.currentlyHoveredInfodot;
-else if (CZ.Common.tooltipMode == 'timeline')
+                    else if (CZ.Common.tooltipMode == 'timeline')
                         obj = this.currentlyHoveredTimeline;
 
                     if (obj == null)
@@ -262,7 +262,7 @@ else if (CZ.Common.tooltipMode == 'timeline')
                                     this.hovered.onmouseunhover(posv, e);
                             if (this.currentlyHoveredContentItem)
                                 this.hovered = this.currentlyHoveredContentItem;
-else
+                            else
                                 this.hovered = mouseInStack[n];
                             break;
                         }
@@ -273,7 +273,7 @@ else
 
                         if (CZ.Common.tooltipMode == 'infodot')
                             obj = this.currentlyHoveredInfodot;
-else if (CZ.Common.tooltipMode == 'timeline')
+                        else if (CZ.Common.tooltipMode == 'timeline')
                             obj = this.currentlyHoveredTimeline;
 
                         if (obj != null) {

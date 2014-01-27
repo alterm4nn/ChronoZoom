@@ -103,11 +103,11 @@
                     var start = parts[i].substring(0, 2);
                     if (start == "x=")
                         x = parseFloat(parts[i].substring(2));
-else if (start == "y=")
+                    else if (start == "y=")
                         y = parseFloat(parts[i].substring(2));
-else if (start == "w=")
+                    else if (start == "w=")
                         w = parseFloat(parts[i].substring(2));
-else if (start == "h=")
+                    else if (start == "h=")
                         h = parseFloat(parts[i].substring(2));
                 }
             }

@@ -156,6 +156,11 @@ module CZ {
         export var rootCollection: boolean;
 
         function UserCanEditCollection(profile) {
+            // Allow developers to edit any collection locally (sign-in scenarios are not currently supported in dev box)
+            if (!constants || !constants.environment || constants.environment === "localhost") {
+                return true;
+            }
+            
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
                 return true;
             }
@@ -555,10 +560,7 @@ module CZ {
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
-                    collectionTheme: CZ.Settings.theme,
-                    collectionThemeInput: "#collection-theme",
-                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
                 });
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
@@ -574,7 +576,6 @@ module CZ {
                     event.preventDefault();
                     if (!profileForm.isFormVisible) {
                         closeAllForms();
-                        profileForm.setTheme(CZ.Settings.theme);
                         profileForm.show();
                     }
                     else {
@@ -596,7 +597,6 @@ module CZ {
 
                             if (!profileForm.isFormVisible) {
                                 closeAllForms();
-                                profileForm.setTheme(CZ.Settings.theme);
                                 profileForm.show();
                             }
                             else {
@@ -1029,7 +1029,7 @@ module CZ {
                         enabled = false;
                     }
 
-                    if (feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {
+                    if (feature.Activation === FeatureActivation.NotProduction && (constants && constants.environment && constants.environment === "Production")) {
                         enabled = false;
                     }
 

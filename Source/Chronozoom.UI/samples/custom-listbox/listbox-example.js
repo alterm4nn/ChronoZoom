@@ -1,9 +1,12 @@
+/// <reference path='../../ui/controls/listboxbase.ts'/>
+/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+
 var RedGreenListBox = (function (_super) {
     __extends(RedGreenListBox, _super);
     function RedGreenListBox(container, listBoxInfo, listItemsInfo) {
@@ -56,3 +59,4 @@ var GreenListItem = (function (_super) {
     }
     return GreenListItem;
 })(CZ.UI.ListItemBase);
+//# sourceMappingURL=listbox-example.js.map

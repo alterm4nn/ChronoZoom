@@ -13,8 +13,7 @@ var CZ;
             'September',
             'October',
             'November',
-            'December'
-        ];
+            'December'];
 
         Dates.daysInMonth = [
             31,
@@ -28,8 +27,7 @@ var CZ;
             30,
             31,
             30,
-            31
-        ];
+            31];
 
         function getCoordinateFromYMD(year, month, day) {
             var sign = (year === -1) ? 1 : year / Math.abs(year), isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, coord = (year > -1) ? year : year + 1;

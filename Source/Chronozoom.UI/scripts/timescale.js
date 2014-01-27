@@ -140,18 +140,18 @@
             _container[0].appendChild(labelsDiv[0]);
             _container[0].appendChild(canvas[0]);
             _container[0].appendChild(marker[0]);
-            (canvas[0]).height = canvasSize;
+            canvas[0].height = canvasSize;
 
             text_size = -1;
             strokeStyle = _container ? _container.css("color") : "Black";
-            ctx = (canvas[0]).getContext("2d");
+            ctx = canvas[0].getContext("2d");
             fontSize = 45;
             if (_container.currentStyle) {
                 fontSize = _container.currentStyle["font-size"];
                 ctx.font = fontSize + _container.currentStyle["font-family"];
-            } else if (document.defaultView && (document.defaultView).getComputedStyle) {
-                fontSize = (document.defaultView).getComputedStyle(_container[0], null).getPropertyValue("font-size");
-                ctx.font = fontSize + (document.defaultView).getComputedStyle(_container[0], null).getPropertyValue("font-family");
+            } else if (document.defaultView && document.defaultView.getComputedStyle) {
+                fontSize = document.defaultView.getComputedStyle(_container[0], null).getPropertyValue("font-size");
+                ctx.font = fontSize + document.defaultView.getComputedStyle(_container[0], null).getPropertyValue("font-family");
             } else if (_container.style) {
                 fontSize = _container.style["font-size"];
                 ctx.font = fontSize + _container.style["font-family"];
@@ -166,31 +166,31 @@
             if (isHorizontal) {
                 _size = _width;
                 if (_size != prevSize) {
-                    (canvas[0]).width = _size;
+                    canvas[0].width = _size;
                     labelsDiv.css("width", _size);
                 }
             } else {
                 _size = _height;
                 if (_size != prevSize) {
-                    (canvas[0]).height = _size;
+                    canvas[0].height = _size;
                     labelsDiv.css("height", _size);
                 }
             }
             _deltaRange = (_size - 1) / (_range.max - _range.min);
-            _canvasHeight = (canvas[0]).height;
+            _canvasHeight = canvas[0].height;
 
             if (isHorizontal) {
                 text_size = (_ticksInfo[0] && _ticksInfo[0].height !== text_size) ? _ticksInfo[0].height : 0;
                 if (text_size !== 0) {
                     labelsDiv.css("height", text_size);
-                    (canvas[0]).height = canvasSize;
+                    canvas[0].height = canvasSize;
                 }
             } else {
                 text_size = (_ticksInfo[0] && _ticksInfo[0].width !== text_size) ? _ticksInfo[0].width : 0;
 
                 if (text_size !== 0) {
                     labelsDiv.css("width", text_size);
-                    (canvas[0]).width = canvasSize;
+                    canvas[0].width = canvasSize;
                     var textOffset = 0;
                     _width = text_size + canvasSize + textOffset;
                     _container.css("width", _width);
@@ -608,7 +608,7 @@
             for (var i = 0; i < len; i++) {
                 if (isUsedPool[i])
                     isUsedPool[i] = false;
-else
+                else
                     styles[i].display = "none";
             }
         };
@@ -754,9 +754,9 @@ else
 
             if (this.regime == "Ga" && this.beta < 7)
                 this.beta = 7;
-else if (this.regime == "Ma" && this.beta < 2)
+            else if (this.regime == "Ma" && this.beta < 2)
                 this.beta = 2;
-else if (this.regime == "ka" && this.beta < -1)
+            else if (this.regime == "ka" && this.beta < -1)
                 this.beta = -1;
 
             var dx = this.delta * Math.pow(10, this.beta);
@@ -827,7 +827,7 @@ else if (this.regime == "ka" && this.beta < -1)
             if (time == presentDate) {
                 if (this.regime !== "ka")
                     labelText = 0;
-else
+                else
                     labelText = 2;
             }
             labelText += " " + (time < 0 ? this.regime : String(this.regime).charAt(0));
@@ -855,7 +855,7 @@ else
     }
     CZ.CosmosTickSource = CosmosTickSource;
     ;
-    CZ.CosmosTickSource.prototype = new CZ.TickSource();
+    CZ.CosmosTickSource.prototype = new CZ.TickSource;
 
     function CalendarTickSource() {
         this.base = CZ.TickSource;
@@ -867,7 +867,7 @@ else
             var year = DMY.year;
             if (year <= 0)
                 text = -year + " BCE";
-else
+            else
                 text = year + " CE";
             return text;
         };
@@ -1026,7 +1026,7 @@ else
     }
     CZ.CalendarTickSource = CalendarTickSource;
     ;
-    CZ.CalendarTickSource.prototype = new CZ.TickSource();
+    CZ.CalendarTickSource.prototype = new CZ.TickSource;
 
     function DateTickSource() {
         this.base = CZ.TickSource;
@@ -1178,20 +1178,20 @@ else
 
             if (this.regime == "Quarters_Month")
                 n = 2;
-else if (this.regime == "Month_Weeks")
+            else if (this.regime == "Month_Weeks")
                 n = CZ.Dates.daysInMonth[date.month];
-else if (this.regime == "Weeks_Days")
+            else if (this.regime == "Weeks_Days")
                 n = 7;
-else if (this.regime == "Days_Quarters")
+            else if (this.regime == "Days_Quarters")
                 n = 4;
 
             if (this.regime == "Quarters_Month")
                 step = Math.floor(2 * CZ.Dates.daysInMonth[date.month] / n);
-else if (this.regime == "Month_Weeks")
+            else if (this.regime == "Month_Weeks")
                 step = 1;
-else if (this.regime == "Weeks_Days")
+            else if (this.regime == "Weeks_Days")
                 step = 1;
-else if (this.regime == "Days_Quarters")
+            else if (this.regime == "Days_Quarters")
                 step = 0.25;
 
             if (k * step < CZ.Settings.minSmallTickSpace)
@@ -1289,5 +1289,5 @@ else if (this.regime == "Days_Quarters")
     }
     CZ.DateTickSource = DateTickSource;
     ;
-    CZ.DateTickSource.prototype = new CZ.TickSource();
+    CZ.DateTickSource.prototype = new CZ.TickSource;
 })(CZ || (CZ = {}));

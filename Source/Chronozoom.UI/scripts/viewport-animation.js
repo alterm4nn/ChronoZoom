@@ -158,7 +158,7 @@
 
                 if (this.duration > 0)
                     t = Math.min(1.0, (curTime - this.startTime) / this.duration);
-else
+                else
                     t = 1.0;
 
                 t = animationEase(t);
