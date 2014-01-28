@@ -1,6 +1,3 @@
-/// <reference path='../../scripts/media.ts'/>
-/// <reference path='../../ui/controls/formbase.ts'/>
-/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 var MediaPickerExample = (function () {
     function MediaPickerExample(container, context) {
         var _this = this;
@@ -24,8 +21,6 @@ var MediaPickerExample = (function () {
             _this.context.file = file.name;
         });
     }
-    // NOTE: This method is required!
-    //       The method is called when media type link is clicked in MediaList.
     MediaPickerExample.setup = function (context) {
         var container = CZ.Media.mediaPickersViews["example"];
         var picker = new MediaPickerExample(container, context);
@@ -47,4 +42,3 @@ var MediaPickerExample = (function () {
     };
     return MediaPickerExample;
 })();
-//# sourceMappingURL=mediapicker-example.js.map
