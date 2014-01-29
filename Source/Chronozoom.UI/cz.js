@@ -15383,7 +15383,7 @@ var CZ;
             },
             {
                 Name: "CollectionsAuthoring",
-                Activation: 4 /* NotProduction */
+                Activation: 0 /* Enabled */
             }
         ];
 
