@@ -165,44 +165,22 @@
         }());
 
         Settings.theme;
-        function applyTheme(theme) {
-            if (!theme) {
-                theme = "cosmos";
-            }
-
-            this.theme = theme;
-            var themeData = {
-                "cosmos": {
-                    "background": "url('/images/background.jpg')",
-                    "backgroundColor": "#232323",
-                    "timelineColor": null,
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(92,92,92)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
-                    "timelineGradientFillStyle": null
-                },
-                "gray": {
-                    "background": "none",
-                    "backgroundColor": "#bebebe",
-                    "timelineColor": null,
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(92,92,92)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
-                    "timelineGradientFillStyle": "#9e9e9e"
-                },
-                "aqua": {
-                    "background": "none",
-                    "backgroundColor": "rgb(238, 238, 238)",
-                    "timelineColor": "rgba(52, 76, 130, 0.5)",
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(55,84,123)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail-Aqua.png',
-                    "timelineGradientFillStyle": "rgb(80,123,175)"
-                }
+        function applyTheme(theme, delayLoad) {
+            this.theme = {
+                "backgroundUrl": delayLoad ? "" : "/images/background.jpg",
+                "backgroundColor": "#232323",
+                "timelineColor": null,
+                "timelineHoverAnimation": 3 / 60.0,
+                "infoDotFillColor": 'rgb(92,92,92)',
+                "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                "timelineGradientFillStyle": null
             };
 
-            var themeSettings = themeData[theme];
-            $('#vc').css('background-image', themeSettings.background);
+            if (theme && theme.backgroundUrl)
+                this.theme.backgroundUrl = theme.backgroundUrl;
+
+            var themeSettings = this.theme;
+            $('#vc').css('background-image', "url('" + themeSettings.backgroundUrl + "')");
             $('#vc').css('background-color', themeSettings.backgroundColor);
             CZ.Settings.timelineColor = themeSettings.timelineColor;
             CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;

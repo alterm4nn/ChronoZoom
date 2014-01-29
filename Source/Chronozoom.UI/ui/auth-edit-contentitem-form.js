@@ -48,7 +48,7 @@ var CZ;
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
-                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
                 var that = this;
                 this.saveButton.prop('disabled', false);
 

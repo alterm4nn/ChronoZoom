@@ -6,9 +6,9 @@
 module CZ {
     export module Media {
         export class BingMediaPicker {
-            public static setup(context: any) {
+            public static setup(context: any, formHost: any) {
                 var mediaPickerContainer = CZ.Media.mediaPickersViews["bing"];
-                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context);
+                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context, formHost);
                 var formContainer = $(".cz-form-bing-mediapicker");
 
                 // Create container for Media Picker's form if it doesn't exist.
@@ -54,7 +54,7 @@ module CZ {
                 form.show();
             }
 
-            private editContentItemForm: CZ.UI.FormEditCI;
+            private editContentItemForm: any;
             private container: JQuery;
             private contentItem: any;
 
@@ -64,11 +64,11 @@ module CZ {
             private searchButton: JQuery;
             public searchTextbox: JQuery;
 
-            constructor(container: JQuery, context: any) {
+            constructor(container: JQuery, context: any, formHost: any) {
                 this.container = container;
                 this.contentItem = context;
 
-                this.editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                this.editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
                 this.searchTextbox = this.container.find(".cz-bing-search-input");
                 this.mediaTypeRadioButtons = this.container.find(":radio");
                 this.progressBar = this.container.find(".cz-form-progress-bar");

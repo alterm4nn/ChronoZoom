@@ -1573,6 +1573,24 @@ img.fallbackBackground
         color: #fff;
     }
 
+/* Edit Collection Form */
+.cz-collection-form
+{
+    width: 420px;
+    bottom: 25px;
+    left: 0;
+}
+
+    .cz-collection-form > .cz-form-content
+    {
+        position: absolute;
+        top: 36px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: auto;
+    }
+
 .auth-panel-login
 {
     display: inline-block;
@@ -2037,4 +2055,16 @@ img.fallbackBackground
   bottom: @footerHeight;
   left: 0;
   right: 0;
+}
+
+#editCollectionButton {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    z-index: 100;
+    margin-top: -50px;
+}
+#editCollectionButton > img {
+    width: 50px;
+    height: 50px;
 }

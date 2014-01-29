@@ -756,9 +756,9 @@ module CZ {
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
 
-            // Show home page if this is a root URL of ChronoZoom.
+            // Show home page if this is a root URL of ChronoZoom and if this is not a custom collection
             var hash = CZ.UrlNav.getURL().hash;
-            if (!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
+            if ((!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) && !CZ.Service.superCollectionName) {
                 show();
             }
         }

@@ -11,9 +11,9 @@
             SkyDriveMediaPicker.helperText;
             var mediaType;
 
-            function setup(context) {
+            function setup(context, formHost) {
                 contentItem = context;
-                editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
 
                 SkyDriveMediaPicker.logoutButton = $("<button></button>", {
                     text: "Logout",

@@ -99,6 +99,7 @@
                 AddScript("/ui/auth-edit-exhibit-form.js");
                 AddScript("/ui/auth-edit-contentitem-form.js");
                 AddScript("/ui/auth-edit-tour-form.js");
+                AddScript("/ui/auth-edit-collection-form.js");
                 AddScript("/ui/header-edit-form.js");
                 AddScript("/ui/header-edit-profile-form.js");
                 AddScript("/ui/header-login-form.js");
@@ -225,7 +226,9 @@
             <div class="root-cloak-right" title="You can't create event here"></div>
             <div class="root-cloak-bottom" title="You can't create event here"></div>
             <div class="root-cloak-left" title="You can't create event here"></div>
-
+            <div id="editCollectionButton" style="display: none">
+                <img src="/images/edit.svg" />
+            </div>
             <div id="timeSeriesContainer" style="display: none;"></div>
         </div>
                 
@@ -249,6 +252,7 @@
         <div id="timeSeriesDataForm" class="cz-form cz-form-right cz-major-form unselectable"></div>
         <div id="toursList" class="cz-form cz-form-right cz-major-form cz-tourlist-form unselectable"></div>
         <div id="tour-caption-form" class="cz-form cz-form-left cz-major-form cz-tour-caption-form unselectable"></div>
+        <div id="auth-edit-collection-form" class="cz-form cz-form-left cz-major-form cz-collection-form unselectable"></div>
         <div id="auth-edit-timeline-form" class="cz-form cz-form-left cz-form-timeline unselectable"></div>
         <div id="auth-edit-exhibit-form" class="cz-form cz-form-left cz-form-exhibit unselectable"></div>
         <div id="auth-edit-contentitem-form" class="cz-form cz-form-left cz-form-contentitem unselectable"></div>

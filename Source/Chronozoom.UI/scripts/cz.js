@@ -26,7 +26,8 @@ var CZ;
             "#header-session-expired-form": "/ui/header-session-expired-form.html",
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
-            "#start-page": "/ui/start-page.html"
+            "#start-page": "/ui/start-page.html",
+            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html"
         };
 
         (function (FeatureActivation) {
@@ -91,10 +92,6 @@ var CZ;
                 JQueryReference: ".header-breadcrumbs"
             },
             {
-                Name: "Themes",
-                Activation: 4 /* NotProduction */
-            },
-            {
                 Name: "Skydrive",
                 Activation: 0 /* Enabled */
             },
@@ -102,6 +99,10 @@ var CZ;
                 Name: "StartPage",
                 Activation: 0 /* Enabled */,
                 JQueryReference: ".header-icon.home-icon"
+            },
+            {
+                Name: "CollectionsAuthoring",
+                Activation: 0 /* Enabled */
             }
         ];
 
@@ -285,6 +286,21 @@ var CZ;
                     }
                 });
 
+                $("#editCollectionButton").click(function () {
+                    closeAllForms();
+                    var form = new CZ.UI.FormEditCollection(forms[19], {
+                        activationSource: $(".header-icon.edit-icon"),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        saveButton: ".cz-form-save",
+                        collectionTheme: CZ.Settings.theme,
+                        backgroundInput: $(".cz-form-collection-background"),
+                        mediaListContainer: ".cz-form-medialist"
+                    });
+                    form.show();
+                });
+
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showMessageWindow: function (message, title, onClose) {
                         var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
@@ -463,6 +479,10 @@ var CZ;
                         $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
+                    if (CZ.Authoring.isEnabled && IsFeatureEnabled(_featureMap, "CollectionsAuthoring")) {
+                        $("#editCollectionButton").show();
+                    }
+
                     CZ.Common.loadData().then(function (response) {
                         if (!response) {
                             if (CZ.Authoring.isEnabled) {
@@ -565,13 +585,19 @@ var CZ;
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
 
-            CZ.Settings.applyTheme(null);
+            CZ.Settings.applyTheme(null, CZ.Service.superCollectionName != null);
 
             if (CZ.Service.superCollectionName) {
                 CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
                     $(response).each(function (index) {
                         if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
-                            CZ.Settings.applyTheme(response[index].theme);
+                            var themeData = null;
+                            try  {
+                                themeData = JSON.parse(response[index].theme);
+                            } catch (e) {
+                            }
+
+                            CZ.Settings.applyTheme(themeData, false);
                         }
                     });
                 });

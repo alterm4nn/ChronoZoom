@@ -2,10 +2,11 @@ var CZ;
 (function (CZ) {
     (function (UI) {
         var MediaList = (function () {
-            function MediaList(container, mediaPickers, context) {
+            function MediaList(container, mediaPickers, context, form) {
                 this.container = container;
                 this.mediaPickers = mediaPickers;
                 this.context = context;
+                this.form = form;
 
                 this.container.addClass("cz-medialist");
                 this.fillListOfLinks();
@@ -39,7 +40,7 @@ var CZ;
                 });
 
                 container.click(function (event) {
-                    mp.setup(_this.context);
+                    mp.setup(_this.context, _this.form);
                 });
 
                 container.append(icon);

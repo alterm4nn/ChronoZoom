@@ -670,7 +670,7 @@ var CZ;
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
 
             var hash = CZ.UrlNav.getURL().hash;
-            if (!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
+            if ((!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) && !CZ.Service.superCollectionName) {
                 show();
             }
         }
