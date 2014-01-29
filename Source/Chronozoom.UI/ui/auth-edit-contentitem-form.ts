@@ -1,6 +1,7 @@
 /// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../scripts/authoring.ts'/>
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../scripts/media.ts'/>
 /// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 
 module CZ {
@@ -80,7 +81,7 @@ module CZ {
             }
 
             private initUI() {
-                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
                 var that = this;
                 this.saveButton.prop('disabled', false);
 

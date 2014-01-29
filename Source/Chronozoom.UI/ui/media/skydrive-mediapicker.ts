@@ -9,7 +9,7 @@ module CZ {
         declare var WL: any;
 
         export module SkyDriveMediaPicker {
-            var editContentItemForm: CZ.UI.FormEditCI;
+            var editContentItemForm: any;
             var contentItem: any;
             export var filePicker: any;
             export var filePickerIframe: JQuery;
@@ -18,9 +18,9 @@ module CZ {
             export var helperText: JQuery;
             var mediaType: string;
 
-            export function setup(context: any) {
+            export function setup(context: any, formHost: any) {
                 contentItem = context;
-                editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
 
                 logoutButton = $("<button></button>", {
                     text: "Logout",

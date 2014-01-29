@@ -2,6 +2,16 @@
 
 module CZ {
     export module Settings {
+		export interface ICollectionTheme {
+			backgroundUrl: string;
+			backgroundColor: string;
+            timelineColor: string;
+            timelineHoverAnimation: number;
+            infoDotFillColor: string;
+            fallbackImageUri: string;
+            timelineGradientFillStyle: string;
+        }
+
         export var isAuthorized = false; // user is authorized flag
         export var userSuperCollectionName = "";
         export var userCollectionName = "";
@@ -182,45 +192,22 @@ module CZ {
         }());
 
         // Theme constants
-        export var theme;
-        export function applyTheme(theme: string) {
-            if (!theme) {
-                theme = "cosmos";
-            }
+        export var theme: ICollectionTheme;
+        export function applyTheme(theme: ICollectionTheme, delayLoad: boolean) {
+			this.theme = {
+                "backgroundUrl": delayLoad ? "" : "/images/background.jpg",
+                "backgroundColor": "#232323",
+                "timelineColor": null,
+                "timelineHoverAnimation": 3 / 60.0,
+                "infoDotFillColor": 'rgb(92,92,92)',
+                "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                "timelineGradientFillStyle": null
+            };
 
-            this.theme = theme;
-            var themeData = {
-                "cosmos": {
-                    "background": "url('/images/background.jpg')",
-                    "backgroundColor": "#232323",
-                    "timelineColor": null,
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(92,92,92)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
-                    "timelineGradientFillStyle": null
-                },
-                "gray": {
-                    "background": "none",
-                    "backgroundColor": "#bebebe",
-                    "timelineColor": null,
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(92,92,92)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
-                    "timelineGradientFillStyle": "#9e9e9e"
-                },
-                "aqua": {
-                    "background": "none",
-                    "backgroundColor": "rgb(238, 238, 238)",
-                    "timelineColor": "rgba(52, 76, 130, 0.5)",
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(55,84,123)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail-Aqua.png',
-                    "timelineGradientFillStyle": "rgb(80,123,175)"
-                }
-            }
+            if (theme && theme.backgroundUrl) this.theme.backgroundUrl = theme.backgroundUrl;
 
-            var themeSettings = themeData[theme];
-            $('#vc').css('background-image', themeSettings.background);
+            var themeSettings = this.theme;
+            $('#vc').css('background-image', "url('" + themeSettings.backgroundUrl + "')");
             $('#vc').css('background-color', themeSettings.backgroundColor);
             CZ.Settings.timelineColor = themeSettings.timelineColor;
             CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;

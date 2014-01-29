@@ -165,44 +165,22 @@
         }());
 
         Settings.theme;
-        function applyTheme(theme) {
-            if (!theme) {
-                theme = "cosmos";
-            }
-
-            this.theme = theme;
-            var themeData = {
-                "cosmos": {
-                    "background": "url('/images/background.jpg')",
-                    "backgroundColor": "#232323",
-                    "timelineColor": null,
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(92,92,92)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
-                    "timelineGradientFillStyle": null
-                },
-                "gray": {
-                    "background": "none",
-                    "backgroundColor": "#bebebe",
-                    "timelineColor": null,
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(92,92,92)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
-                    "timelineGradientFillStyle": "#9e9e9e"
-                },
-                "aqua": {
-                    "background": "none",
-                    "backgroundColor": "rgb(238, 238, 238)",
-                    "timelineColor": "rgba(52, 76, 130, 0.5)",
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(55,84,123)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail-Aqua.png',
-                    "timelineGradientFillStyle": "rgb(80,123,175)"
-                }
+        function applyTheme(theme, delayLoad) {
+            this.theme = {
+                "backgroundUrl": delayLoad ? "" : "/images/background.jpg",
+                "backgroundColor": "#232323",
+                "timelineColor": null,
+                "timelineHoverAnimation": 3 / 60.0,
+                "infoDotFillColor": 'rgb(92,92,92)',
+                "fallbackImageUri": '/images/Temp-Thumbnail2.png',
+                "timelineGradientFillStyle": null
             };
 
-            var themeSettings = themeData[theme];
-            $('#vc').css('background-image', themeSettings.background);
+            if (theme && theme.backgroundUrl)
+                this.theme.backgroundUrl = theme.backgroundUrl;
+
+            var themeSettings = this.theme;
+            $('#vc').css('background-image', "url('" + themeSettings.backgroundUrl + "')");
             $('#vc').css('background-color', themeSettings.backgroundColor);
             CZ.Settings.timelineColor = themeSettings.timelineColor;
             CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;
@@ -2075,7 +2053,7 @@ var CZ;
             elem[0].addEventListener("mousedown", CZ.Common.preventbubble, false);
             elem[0].addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousewheel", CZ.Common.preventbubble, false);
-            var textElem = $("<div style='position:relative' class='text'></div>");
+            var textElem = $("<div style='position:relative; white-space: pre-line' class='text'></div>");
             textElem.text(text).appendTo(elem);
 
             this.initializeContent(elem[0]);
@@ -12065,11 +12043,11 @@ var CZ;
 (function (CZ) {
     (function (Media) {
         var BingMediaPicker = (function () {
-            function BingMediaPicker(container, context) {
+            function BingMediaPicker(container, context, formHost) {
                 this.container = container;
                 this.contentItem = context;
 
-                this.editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                this.editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
                 this.searchTextbox = this.container.find(".cz-bing-search-input");
                 this.mediaTypeRadioButtons = this.container.find(":radio");
                 this.progressBar = this.container.find(".cz-form-progress-bar");
@@ -12078,9 +12056,9 @@ var CZ;
 
                 this.initialize();
             }
-            BingMediaPicker.setup = function (context) {
+            BingMediaPicker.setup = function (context, formHost) {
                 var mediaPickerContainer = CZ.Media.mediaPickersViews["bing"];
-                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context);
+                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context, formHost);
                 var formContainer = $(".cz-form-bing-mediapicker");
 
                 if (formContainer.length === 0) {
@@ -12525,9 +12503,9 @@ var CZ;
             SkyDriveMediaPicker.helperText;
             var mediaType;
 
-            function setup(context) {
+            function setup(context, formHost) {
                 contentItem = context;
-                editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
 
                 SkyDriveMediaPicker.logoutButton = $("<button></button>", {
                     text: "Logout",
@@ -12731,10 +12709,11 @@ var CZ;
 (function (CZ) {
     (function (UI) {
         var MediaList = (function () {
-            function MediaList(container, mediaPickers, context) {
+            function MediaList(container, mediaPickers, context, form) {
                 this.container = container;
                 this.mediaPickers = mediaPickers;
                 this.context = context;
+                this.form = form;
 
                 this.container.addClass("cz-medialist");
                 this.fillListOfLinks();
@@ -12768,7 +12747,7 @@ var CZ;
                 });
 
                 container.click(function (event) {
-                    mp.setup(_this.context);
+                    mp.setup(_this.context, _this.form);
                 });
 
                 container.append(icon);
@@ -13420,7 +13399,7 @@ var CZ;
             }
             FormEditCI.prototype.initUI = function () {
                 var _this = this;
-                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
                 var that = this;
                 this.saveButton.prop('disabled', false);
 
@@ -13624,6 +13603,97 @@ var CZ;
             return FormEditCI;
         })(CZ.UI.FormUpdateEntity);
         UI.FormEditCI = FormEditCI;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormEditCollection = (function (_super) {
+            __extends(FormEditCollection, _super);
+            function FormEditCollection(container, formInfo) {
+                var _this = this;
+                _super.call(this, container, formInfo);
+                this.contentItem = {};
+
+                this.saveButton = container.find(formInfo.saveButton);
+                this.backgroundInput = container.find(formInfo.backgroundInput);
+                this.collectionTheme = formInfo.collectionTheme;
+                this.activeCollectionTheme = formInfo.collectionTheme;
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
+
+                this.backgroundInput.on('input', function () {
+                    _this.updateCollectionTheme();
+                });
+
+                this.saveButton.off();
+
+                this.backgroundInput.focus(function () {
+                    _this.backgroundInput.hideError();
+                });
+
+                this.initialize();
+            }
+            FormEditCollection.prototype.initialize = function () {
+                var _this = this;
+                this.saveButton.prop('disabled', false);
+
+                this.backgroundInput.val(this.collectionTheme.backgroundUrl);
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
+
+                this.saveButton.click(function (event) {
+                    _this.updateCollectionTheme();
+                    _this.activeCollectionTheme = _this.collectionTheme;
+
+                    var themeData = {
+                        theme: JSON.stringify(_this.collectionTheme)
+                    };
+
+                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, themeData).always(function () {
+                        _this.saveButton.prop('disabled', false);
+                        _this.close();
+                    });
+                });
+            };
+
+            FormEditCollection.prototype.updateCollectionTheme = function () {
+                this.collectionTheme.backgroundUrl = this.backgroundInput.val();
+
+                CZ.Settings.applyTheme(this.collectionTheme, false);
+            };
+
+            FormEditCollection.prototype.updateMediaInfo = function () {
+                this.backgroundInput.val(this.contentItem.uri || "");
+                this.updateCollectionTheme();
+            };
+
+            FormEditCollection.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+
+                this.activationSource.addClass("active");
+            };
+
+            FormEditCollection.prototype.close = function () {
+                var _this = this;
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.backgroundInput.hideError();
+                        _this.mediaList.remove();
+                    }
+                });
+
+                CZ.Settings.applyTheme(this.activeCollectionTheme, false);
+            };
+            return FormEditCollection;
+        })(CZ.UI.FormUpdateEntity);
+        UI.FormEditCollection = FormEditCollection;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
@@ -15084,7 +15154,7 @@ var CZ;
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
 
             var hash = CZ.UrlNav.getURL().hash;
-            if (!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
+            if ((!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) && !CZ.Service.superCollectionName) {
                 show();
             }
         }
@@ -15237,7 +15307,8 @@ var CZ;
             "#header-session-expired-form": "/ui/header-session-expired-form.html",
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
-            "#start-page": "/ui/start-page.html"
+            "#start-page": "/ui/start-page.html",
+            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html"
         };
 
         (function (FeatureActivation) {
@@ -15302,10 +15373,6 @@ var CZ;
                 JQueryReference: ".header-breadcrumbs"
             },
             {
-                Name: "Themes",
-                Activation: 4 /* NotProduction */
-            },
-            {
                 Name: "Skydrive",
                 Activation: 0 /* Enabled */
             },
@@ -15313,6 +15380,10 @@ var CZ;
                 Name: "StartPage",
                 Activation: 0 /* Enabled */,
                 JQueryReference: ".header-icon.home-icon"
+            },
+            {
+                Name: "CollectionsAuthoring",
+                Activation: 4 /* NotProduction */
             }
         ];
 
@@ -15496,6 +15567,21 @@ var CZ;
                     }
                 });
 
+                $("#editCollectionButton").click(function () {
+                    closeAllForms();
+                    var form = new CZ.UI.FormEditCollection(forms[19], {
+                        activationSource: $(".header-icon.edit-icon"),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        saveButton: ".cz-form-save",
+                        collectionTheme: CZ.Settings.theme,
+                        backgroundInput: $(".cz-form-collection-background"),
+                        mediaListContainer: ".cz-form-medialist"
+                    });
+                    form.show();
+                });
+
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showMessageWindow: function (message, title, onClose) {
                         var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
@@ -15674,6 +15760,10 @@ var CZ;
                         $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
+                    if (CZ.Authoring.isEnabled && IsFeatureEnabled(_featureMap, "CollectionsAuthoring")) {
+                        $("#editCollectionButton").show();
+                    }
+
                     CZ.Common.loadData().then(function (response) {
                         if (!response) {
                             if (CZ.Authoring.isEnabled) {
@@ -15776,13 +15866,19 @@ var CZ;
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
 
-            CZ.Settings.applyTheme(null);
+            CZ.Settings.applyTheme(null, CZ.Service.superCollectionName != null);
 
             if (CZ.Service.superCollectionName) {
                 CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
                     $(response).each(function (index) {
                         if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
-                            CZ.Settings.applyTheme(response[index].theme);
+                            var themeData = null;
+                            try  {
+                                themeData = JSON.parse(response[index].theme);
+                            } catch (e) {
+                            }
+
+                            CZ.Settings.applyTheme(themeData, false);
                         }
                     });
                 });

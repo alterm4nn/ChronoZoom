@@ -14,6 +14,7 @@
 /// <reference path='../ui/auth-edit-exhibit-form.ts'/>
 /// <reference path='../ui/auth-edit-contentitem-form.ts'/>
 /// <reference path='../ui/auth-edit-tour-form.ts'/>
+/// <reference path='../ui/auth-edit-collection-form.ts'/>
 /// <reference path='../ui/header-edit-form.ts' />
 /// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
@@ -61,7 +62,8 @@ module CZ {
             "#header-session-expired-form": "/ui/header-session-expired-form.html", // 15
             "#tour-caption-form": "/ui/tour-caption-form.html", // 16
             "#mediapicker-form": "/ui/mediapicker-form.html", // 17
-            "#start-page":"/ui/start-page.html"
+            "#start-page":"/ui/start-page.html", // 18
+			"#auth-edit-collection-form": "/ui/auth-edit-collection-form.html", // 19
         };
 
         export enum FeatureActivation {
@@ -139,10 +141,6 @@ module CZ {
                 JQueryReference: ".header-breadcrumbs"
             },
             {
-                Name: "Themes",
-                Activation: FeatureActivation.NotProduction
-            },
-            {
                 Name: "Skydrive",
                 Activation: FeatureActivation.Enabled
             },
@@ -150,6 +148,10 @@ module CZ {
                 Name: "StartPage",
                 Activation: FeatureActivation.Enabled,
                 JQueryReference: ".header-icon.home-icon"
+            },
+			{
+                Name: "CollectionsAuthoring",
+                Activation: FeatureActivation.Enabled
             },
         ];
 
@@ -345,6 +347,21 @@ module CZ {
                     }
                 });
 
+				$("#editCollectionButton").click(function () {
+                    closeAllForms();
+                    var form = new CZ.UI.FormEditCollection(forms[19], {
+						activationSource: $(".header-icon.edit-icon"),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        saveButton: ".cz-form-save",
+                        collectionTheme: CZ.Settings.theme,
+                        backgroundInput: $(".cz-form-collection-background"),
+						mediaListContainer: ".cz-form-medialist"
+                    });
+                    form.show();
+                });
+
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showMessageWindow: function (message: string, title?: string, onClose?: () => any) {
                         var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
@@ -523,6 +540,10 @@ module CZ {
                         $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
+					if (CZ.Authoring.isEnabled && IsFeatureEnabled(_featureMap, "CollectionsAuthoring")) {
+						$("#editCollectionButton").show();
+					}
+
                     //retrieving the data
                     CZ.Common.loadData().then(function (response) {
                         // collection is empty
@@ -642,14 +663,19 @@ module CZ {
                     CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
                 });
 
-            CZ.Settings.applyTheme(null);
+            CZ.Settings.applyTheme(null, CZ.Service.superCollectionName != null);
 
             // If not the root URL.
             if (CZ.Service.superCollectionName) {
                 CZ.Service.getCollections(CZ.Service.superCollectionName).then(response => {
                     $(response).each((index) => {
                         if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
-                            CZ.Settings.applyTheme(response[index].theme);
+							var themeData = null;
+							try {
+								themeData = JSON.parse(response[index].theme);
+							} catch(e) {}
+
+                            CZ.Settings.applyTheme(themeData, false);
                         }
                     });
                 });

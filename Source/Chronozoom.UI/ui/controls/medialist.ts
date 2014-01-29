@@ -8,11 +8,13 @@ module CZ {
             private mediaPickers: any;
             private container: JQuery;
             private context: any;
+            private form: any;
 
-            constructor(container: JQuery, mediaPickers: any, context: any) {
+            constructor(container: JQuery, mediaPickers: any, context: any, form: any) {
                 this.container = container;
                 this.mediaPickers = mediaPickers;
                 this.context = context;
+                this.form = form;
 
                 this.container.addClass("cz-medialist");
                 this.fillListOfLinks();
@@ -47,7 +49,7 @@ module CZ {
                 });
 
                 container.click(event => {
-                    mp.setup(this.context);
+                    mp.setup(this.context, this.form);
                 });
 
                 container.append(icon);

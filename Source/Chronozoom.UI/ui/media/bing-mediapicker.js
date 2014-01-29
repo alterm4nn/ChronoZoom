@@ -2,11 +2,11 @@ var CZ;
 (function (CZ) {
     (function (Media) {
         var BingMediaPicker = (function () {
-            function BingMediaPicker(container, context) {
+            function BingMediaPicker(container, context, formHost) {
                 this.container = container;
                 this.contentItem = context;
 
-                this.editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                this.editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
                 this.searchTextbox = this.container.find(".cz-bing-search-input");
                 this.mediaTypeRadioButtons = this.container.find(":radio");
                 this.progressBar = this.container.find(".cz-form-progress-bar");
@@ -15,9 +15,9 @@ var CZ;
 
                 this.initialize();
             }
-            BingMediaPicker.setup = function (context) {
+            BingMediaPicker.setup = function (context, formHost) {
                 var mediaPickerContainer = CZ.Media.mediaPickersViews["bing"];
-                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context);
+                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context, formHost);
                 var formContainer = $(".cz-form-bing-mediapicker");
 
                 if (formContainer.length === 0) {

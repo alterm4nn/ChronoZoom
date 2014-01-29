@@ -2282,6 +2282,22 @@ img.fallbackBackground {
   left: 0;
   overflow-y: auto;
 }
+/* Edit Collection Form */
+.cz-collection-form
+{
+    width: 420px;
+    bottom: 25px;
+    left: 0;
+}
+.cz-collection-form > .cz-form-content
+{
+    position: absolute;
+    top: 36px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+}
 /* Profile Form */
 #profile-form {
   right: 0;
@@ -2705,4 +2721,16 @@ img.fallbackBackground {
 }
 .root-cloak-bottom.visible {
   display: block;
+}
+
+#editCollectionButton {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    z-index: 100;
+    margin-top: -50px;
+}
+#editCollectionButton > img {
+    width: 50px;
+    height: 50px;
 }
