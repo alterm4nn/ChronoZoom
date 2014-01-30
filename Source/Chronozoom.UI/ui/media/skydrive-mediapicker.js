@@ -54,7 +54,7 @@
                         break;
                 }
 
-                this.tempSource = response.data.files[0].source;
+                tempSource = response.data.files[0].source;
                 return WL.api({
                     path: response.data.files[0].id + "/embed",
                     method: "GET"
@@ -77,7 +77,7 @@
                     mediaType: mediaType,
                     mediaSource: src,
                     attribution: src,
-                    tempSource: this.tempSource
+                    tempSource: tempSource
                 };
 
                 $.extend(contentItem, mediaInfo);

@@ -93,11 +93,11 @@ var CZ;
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
                 this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode);
 
-                this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
+                this.timelineBackgroundColorInput.val(this.getColorFromRGBA(this.collectionTheme.timelineColor));
                 this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor));
                 this.timelineBorderColorInput.val(this.collectionTheme.timelineStrokeStyle);
 
-                this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
+                this.exhibitBackgroundColorInput.val(this.getColorFromRGBA(this.collectionTheme.infoDotFillColor));
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor));
                 this.exhibitBorderColorInput.val(this.collectionTheme.infoDotBorderColor);
             };
@@ -130,6 +130,23 @@ var CZ;
                 var parts = rgba.split(",");
                 var lastPart = parts[parts.length - 1].split(")")[0];
                 return parseFloat(lastPart);
+            };
+
+            FormEditCollection.prototype.getColorFromRGBA = function (rgba) {
+                if (!this.colorIsRgba(rgba))
+                    return null;
+
+                var parts = rgba.substr(5, rgba.length - 5 - 1).split(",");
+                var lastPart = parts[parts.length - 1].split(")")[0];
+                return "#" + this.colorHexFromInt(parts[0]) + this.colorHexFromInt(parts[1]) + this.colorHexFromInt(parts[2]);
+            };
+
+            FormEditCollection.prototype.colorHexFromInt = function (colorpart) {
+                var hex = Number(colorpart).toString(16);
+                if (hex.length === 1)
+                    return "0" + hex;
+
+                return hex;
             };
 
             FormEditCollection.prototype.updateCollectionTheme = function (clearError) {
