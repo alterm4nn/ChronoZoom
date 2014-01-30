@@ -17,6 +17,7 @@ module CZ {
             export var isEnabled: boolean;
             export var helperText: JQuery;
             var mediaType: string;
+            var tempSource: string;
 
             export function setup(context: any, formHost: any) {
                 contentItem = context;
@@ -72,6 +73,7 @@ module CZ {
                         break;
                 }
 
+                this.tempSource = response.data.files[0].source;
                 return WL.api({
                     path: response.data.files[0].id + "/embed",
                     method: "GET"
@@ -97,7 +99,8 @@ module CZ {
                     uri: uri,
                     mediaType: mediaType,
                     mediaSource: src,
-                    attribution: src
+                    attribution: src,
+                    tempSource: this.tempSource,
                 };
 
                 $.extend(contentItem, mediaInfo);

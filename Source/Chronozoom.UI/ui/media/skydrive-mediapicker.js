@@ -10,6 +10,7 @@
             SkyDriveMediaPicker.isEnabled;
             SkyDriveMediaPicker.helperText;
             var mediaType;
+            var tempSource;
 
             function setup(context, formHost) {
                 contentItem = context;
@@ -53,6 +54,7 @@
                         break;
                 }
 
+                this.tempSource = response.data.files[0].source;
                 return WL.api({
                     path: response.data.files[0].id + "/embed",
                     method: "GET"
@@ -74,7 +76,8 @@
                     uri: uri,
                     mediaType: mediaType,
                     mediaSource: src,
-                    attribution: src
+                    attribution: src,
+                    tempSource: this.tempSource
                 };
 
                 $.extend(contentItem, mediaInfo);
