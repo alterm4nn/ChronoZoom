@@ -1344,7 +1344,7 @@ img.fallbackBackground
 .cz-form-label
 {
     margin: 5px 0;
-    display: inline-block;
+    display: block;
 }
 
 /***********************************************************
@@ -1882,6 +1882,21 @@ img.fallbackBackground
     background-image: url(../images/narration-off.png);
 }
 
+.cz-form-color
+{
+    display: inline-block;
+    padding: 0px;
+    width: 85px;
+    height: 35px;
+}
+
+.cz-form-range
+{
+    width: 75px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
 /***********************************************************
 
                     ListBox Base
@@ -2067,4 +2082,10 @@ img.fallbackBackground
 #editCollectionButton > img {
     width: 50px;
     height: 50px;
+}
+
+// Prevent SkyDrive clicks
+#embedItemDiv {
+    pointer-events: none;
+    cursor: default;
 }

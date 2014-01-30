@@ -317,6 +317,19 @@
 
                     return rfind(this._layersContent, id);
                 },
+                forEachElement: function (callback) {
+                    var rfind = function (el, callback) {
+                        callback(el);
+                        if (!el.children)
+                            return;
+                        for (var i = 0; i < el.children.length; i++) {
+                            var child = el.children[i];
+                            var res = rfind(child, callback);
+                        }
+                    };
+
+                    return rfind(this._layersContent, callback);
+                },
                 _destroy: function () {
                     this.element.removeClass("virtualCanvas");
                     this.element.children(".virtualCanvasLayerDiv").each(function (index) {

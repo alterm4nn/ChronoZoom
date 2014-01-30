@@ -17,11 +17,47 @@ var CZ;
                 this.saveButton = container.find(formInfo.saveButton);
                 this.backgroundInput = container.find(formInfo.backgroundInput);
                 this.collectionTheme = formInfo.collectionTheme;
-                this.activeCollectionTheme = formInfo.collectionTheme;
+                this.activeCollectionTheme = jQuery.extend(true, {}, formInfo.collectionTheme);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
+                this.kioskmodeInput = formInfo.kioskmodeInput;
+
+                this.timelineBackgroundColorInput = formInfo.timelineBackgroundColorInput;
+                this.timelineBackgroundOpacityInput = formInfo.timelineBackgroundOpacityInput;
+                this.timelineBorderColorInput = formInfo.timelineBorderColorInput;
+                this.exhibitBackgroundColorInput = formInfo.exhibitBackgroundColorInput;
+                this.exhibitBackgroundOpacityInput = formInfo.exhibitBackgroundOpacityInput;
+                this.exhibitBorderColorInput = formInfo.exhibitBorderColorInput;
 
                 this.backgroundInput.on('input', function () {
-                    _this.updateCollectionTheme();
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.kioskmodeInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.timelineBackgroundColorInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.timelineBackgroundOpacityInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.timelineBorderColorInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.exhibitBackgroundColorInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.exhibitBackgroundOpacityInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.exhibitBorderColorInput.change(function () {
+                    _this.updateCollectionTheme(true);
                 });
 
                 this.saveButton.off();
@@ -30,17 +66,14 @@ var CZ;
                     _this.backgroundInput.hideError();
                 });
 
-                this.initialize();
-            }
-            FormEditCollection.prototype.initialize = function () {
-                var _this = this;
-                this.saveButton.prop('disabled', false);
-
-                this.backgroundInput.val(this.collectionTheme.backgroundUrl);
-                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
+                try  {
+                    this.initialize();
+                } catch (e) {
+                    console.log("Error initializing collection form attributes");
+                }
 
                 this.saveButton.click(function (event) {
-                    _this.updateCollectionTheme();
+                    _this.updateCollectionTheme(true);
                     _this.activeCollectionTheme = _this.collectionTheme;
 
                     var themeData = {
@@ -52,17 +85,104 @@ var CZ;
                         _this.close();
                     });
                 });
+            }
+            FormEditCollection.prototype.initialize = function () {
+                this.saveButton.prop('disabled', false);
+
+                this.backgroundInput.val(this.collectionTheme.backgroundUrl);
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
+                this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode);
+
+                this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
+                this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor));
+                this.timelineBorderColorInput.val(this.collectionTheme.timelineStrokeStyle);
+
+                this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
+                this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor));
+                this.exhibitBorderColorInput.val(this.collectionTheme.infoDotBorderColor);
             };
 
-            FormEditCollection.prototype.updateCollectionTheme = function () {
-                this.collectionTheme.backgroundUrl = this.backgroundInput.val();
+            FormEditCollection.prototype.colorIsRgba = function (color) {
+                return color.substr(0, 5) === "rgba(";
+            };
 
-                CZ.Settings.applyTheme(this.collectionTheme, false);
+            FormEditCollection.prototype.rgbaFromColor = function (color, alpha) {
+                if (this.colorIsRgba(color)) {
+                    var parts = color.substr(5, color.length - 5 - 1).split(",");
+                    if (parts.length > 3)
+                        parts[parts.length - 1] = alpha.toString();
+                    else
+                        parts.push(alpha.toString());
+                    return "rgba(" + parts.join(",") + ")";
+                }
+
+                var red = parseInt("0x" + color.substr(1, 2));
+                var green = parseInt("0x" + color.substr(3, 2));
+                var blue = parseInt("0x" + color.substr(5, 2));
+
+                return "rgba(" + red + "," + green + "," + blue + "," + alpha + ")";
+            };
+
+            FormEditCollection.prototype.getOpacityFromRGBA = function (rgba) {
+                if (!rgba)
+                    return null;
+
+                var parts = rgba.split(",");
+                var lastPart = parts[parts.length - 1].split(")")[0];
+                return parseFloat(lastPart);
+            };
+
+            FormEditCollection.prototype.updateCollectionTheme = function (clearError) {
+                this.collectionTheme = {
+                    backgroundUrl: this.backgroundInput.val(),
+                    backgroundColor: "#232323",
+                    timelineColor: this.rgbaFromColor(this.timelineBackgroundColorInput.val(), this.timelineBackgroundOpacityInput.val()),
+                    timelineStrokeStyle: this.timelineBorderColorInput.val(),
+                    infoDotFillColor: this.rgbaFromColor(this.exhibitBackgroundColorInput.val(), this.exhibitBackgroundOpacityInput.val()),
+                    infoDotBorderColor: this.exhibitBorderColorInput.val(),
+                    kioskMode: this.kioskmodeInput.prop("checked")
+                };
+
+                if (this.colorIsRgba(this.timelineBackgroundColorInput.val())) {
+                    this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
+                    this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
+                }
+
+                if (clearError)
+                    this.backgroundInput.hideError();
+
+                this.updateCollectionThemeFromTheme(this.collectionTheme);
+            };
+
+            FormEditCollection.prototype.updateCollectionThemeFromTheme = function (theme) {
+                CZ.Settings.applyTheme(theme, false);
+
+                CZ.Common.vc.virtualCanvas("forEachElement", function (element) {
+                    if (element.type === "timeline") {
+                        element.settings.fillStyle = theme.timelineColor;
+                        element.settings.strokeStyle = theme.timelineStrokeStyle;
+                        element.settings.gradientFillStyle = theme.timelineStrokeStyle;
+                    } else if (element.type === "infodot") {
+                        element.settings.fillStyle = theme.infoDotFillColor;
+                        element.settings.strokeStyle = theme.infoDotBorderColor;
+                    }
+                });
+
+                CZ.Common.vc.virtualCanvas("requestInvalidate");
             };
 
             FormEditCollection.prototype.updateMediaInfo = function () {
-                this.backgroundInput.val(this.contentItem.uri || "");
-                this.updateCollectionTheme();
+                var clearError = true;
+
+                if (this.contentItem.mediaType == "skydrive-image") {
+                    this.backgroundInput.val(this.contentItem.tempSource || "");
+                    clearError = false;
+                    this.backgroundInput.showError("SkyDrive static links are not permanent. Consider hosting it as a public image instead.");
+                } else {
+                    this.backgroundInput.val(this.contentItem.uri || "");
+                }
+
+                this.updateCollectionTheme(clearError);
             };
 
             FormEditCollection.prototype.show = function () {
@@ -87,7 +207,8 @@ var CZ;
                     }
                 });
 
-                CZ.Settings.applyTheme(this.activeCollectionTheme, false);
+                this.backgroundInput.hideError();
+                this.updateCollectionThemeFromTheme(this.activeCollectionTheme);
             };
             return FormEditCollection;
         })(CZ.UI.FormUpdateEntity);

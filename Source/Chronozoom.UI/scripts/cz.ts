@@ -357,7 +357,16 @@ module CZ {
                         saveButton: ".cz-form-save",
                         collectionTheme: CZ.Settings.theme,
                         backgroundInput: $(".cz-form-collection-background"),
-						mediaListContainer: ".cz-form-medialist"
+                        kioskmodeInput: $(".cz-form-collection-kioskmode"),
+                        mediaListContainer: ".cz-form-medialist",
+
+                        timelineBackgroundColorInput: $(".cz-form-timeline-background"),
+                        timelineBackgroundOpacityInput: $(".cz-form-timeline-background-opacity"),
+                        timelineBorderColorInput: $(".cz-form-timeline-border"),
+
+                        exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
+                        exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
+                        exhibitBorderColorInput: $(".cz-form-exhibit-border"),
                     });
                     form.show();
                 });

@@ -11,6 +11,7 @@ module CZ {
             mediaType: string;
             mediaSource: string;
             attribution: string;
+            tempSource: string;
         }
 
         export interface MediaPickerInfo {
