@@ -711,7 +711,7 @@ module CZ {
             }
 
             // init seadragon. set path to image resources for nav buttons 
-            Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
+            // Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
 
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash; // to be processes after the data is loaded

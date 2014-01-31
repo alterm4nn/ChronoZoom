@@ -630,8 +630,6 @@ var CZ;
                 body.style.overflow = "hidden";
             }
 
-            Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
-
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash;
 

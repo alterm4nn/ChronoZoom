@@ -146,10 +146,10 @@ module CZ {
             if (vw <= 0 || vh <= 0) throw "Image size must be positive";
             return addChild(element, new CanvasLODImage(element.vc, layerid, id, imgSources, vx, vy, vw, vh, onload), false);
         };
-        export var addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
-            if (vw <= 0 || vh <= 0) throw "Image size must be positive";
-            return addChild(element, new SeadragonImage(element.vc, /*parent*/element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
-        };
+        //export var addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
+        //    if (vw <= 0 || vh <= 0) throw "Image size must be positive";
+        //    return addChild(element, new SeadragonImage(element.vc, /*parent*/element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
+        //};
 
         export var addExtension = function (extensionName, element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload?) {
             if (vw <= 0 || vh <= 0) throw "Extension size must be positive";
@@ -1865,7 +1865,7 @@ module CZ {
         @param z            z-index
         @param onload       (optional callback function) called when image is loaded
         @oaram parent       parent element, whose child is to be seadragon image.
-        */
+        
         function SeadragonImage(vc, parent, layerid, id, imageSource, vx, vy, vw, vh, z, onload) {
             var self = this;
             this.base = CanvasDomItem;
@@ -1968,6 +1968,7 @@ module CZ {
 
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
+        */
 
         /*******************************************************************************************************/
         /* Timelines                                                                                           */
@@ -2074,9 +2075,10 @@ module CZ {
                     if (this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
                         imageElem = addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
                     }
-                    else if (this.contentItem.mediaType.toLowerCase() === 'deepimage') {
-                        imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
-                    } else if (this.contentItem.mediaType.toLowerCase() === 'video') {
+                    //else if (this.contentItem.mediaType.toLowerCase() === 'deepimage') {
+                    //    imageElem = addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
+                    //}
+                    else if (this.contentItem.mediaType.toLowerCase() === 'video') {
                         addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     }
                     else if (this.contentItem.mediaType.toLowerCase() === 'audio') {

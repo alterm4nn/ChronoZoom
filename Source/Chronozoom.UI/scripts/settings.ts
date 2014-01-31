@@ -255,8 +255,8 @@ module CZ {
         export var mediapickerVideoThumbnailMaxHeight = 130; // the max allowed height of thumbnail
 
         // WL API constants
-        export var WLAPIClientID = "0000000040101FFA";
-        export var WLAPIRedirectUrl = "http://test.chronozoom.com/";
+        export var WLAPIClientID = "00000000440FD1D7";
+        export var WLAPIRedirectUrl = "http://www.chronozoom.com/";
 
         export var errorMessageSlideDuration = 0; // slide animation duration of input error messages
     }

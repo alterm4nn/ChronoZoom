@@ -225,8 +225,8 @@
         Settings.mediapickerVideoThumbnailMaxWidth = 190;
         Settings.mediapickerVideoThumbnailMaxHeight = 130;
 
-        Settings.WLAPIClientID = "0000000040101FFA";
-        Settings.WLAPIRedirectUrl = "http://test.chronozoom.com/";
+        Settings.WLAPIClientID = "00000000440FD1D7";
+        Settings.WLAPIRedirectUrl = "http://www.chronozoom.com/";
 
         Settings.errorMessageSlideDuration = 0;
     })(CZ.Settings || (CZ.Settings = {}));
