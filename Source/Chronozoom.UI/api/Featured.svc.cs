@@ -48,6 +48,7 @@ namespace Chronozoom.UI
                         var timeline = storage.Timelines.Where(x => x.Id == g)
                             .Include("Collection")
                             .Include("Collection.User")
+                            .Include("Collection.SuperCollection")
                             .Include("Exhibits")
                             .Include("Exhibits.ContentItems")
                             .FirstOrDefault();
@@ -75,6 +76,7 @@ namespace Chronozoom.UI
                 {
                     return false;
                 }
+
 
                 var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFeatured - {0}", user.Id);
                 if (Cache.Contains(cacheKey))
