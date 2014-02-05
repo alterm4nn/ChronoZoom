@@ -124,20 +124,31 @@ module CZ {
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
                 this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode);
 
-                this.timelineBackgroundColorInput.val(this.getColorFromRGBA(this.collectionTheme.timelineColor));
-                this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor));
-                this.timelineBorderColorInput.val(this.collectionTheme.timelineStrokeStyle);
+                this.timelineBackgroundColorInput.val(!this.collectionTheme.timelineColor ? "#000000" : this.getHexColorFromColor(this.collectionTheme.timelineColor));
+                this.timelineBackgroundOpacityInput.val(!this.collectionTheme.timelineColor ? 0.25 : this.getOpacityFromRGBA(this.collectionTheme.timelineColor));
+                this.timelineBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineStrokeStyle));
 
-                this.exhibitBackgroundColorInput.val(this.getColorFromRGBA(this.collectionTheme.infoDotFillColor));
+                this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor));
-                this.exhibitBorderColorInput.val(this.collectionTheme.infoDotBorderColor);
+                this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
             }
 
             private colorIsRgba(color: string) {
-                return color.substr(0, 5) === "rgba(";
+                return color ? color.substr(0, 5) === "rgba(" : false;
+            }
+
+            private colorIsRgb(color: string) {
+                return color ? color.substr(0, 4) === "rgb(" : false;
+            }
+
+            private colorIsHex(color: string) {
+                return color ? color.substr(0, 1) === "#" && color.length >= 7 : false;
             }
 
             private rgbaFromColor(color: string, alpha: number) {
+                if (!color)
+                    return color;
+
                 if (this.colorIsRgba(color)) {
                     var parts = color.substr(5, color.length - 5 - 1).split(",");
                     if (parts.length > 3)
@@ -156,16 +167,22 @@ module CZ {
 
             private getOpacityFromRGBA(rgba: string): number {
                 if (!rgba) return null;
+                if (!this.colorIsRgba(rgba)) return 1.0;
 
                 var parts = rgba.split(",");
                 var lastPart = parts[parts.length - 1].split(")")[0];
                 return parseFloat(lastPart);
             }
 
-            private getColorFromRGBA(rgba: string): string {
-                if (!this.colorIsRgba(rgba)) return null;
+            private getHexColorFromColor(color: string): string {
+                if (this.colorIsHex(color))
+                    return color;
 
-                var parts = rgba.substr(5, rgba.length - 5 - 1).split(",");
+                if (!this.colorIsRgb(color) && !this.colorIsRgba(color))
+                    return null;
+
+                var offset = this.colorIsRgb(color) ? 4 : 5;
+                var parts = color.substr(offset, color.length - offset - 1).split(",");
                 var lastPart = parts[parts.length - 1].split(")")[0];
                 return "#" + this.colorHexFromInt(parts[0]) + this.colorHexFromInt(parts[1]) + this.colorHexFromInt(parts[2]);
             }
@@ -193,7 +210,7 @@ module CZ {
                 };
 
                 // If the input holds an rgba color, update the textbox with new alpha value
-                if (this.colorIsRgba(this.timelineBackgroundColorInput.val())) {
+                if (this.colorIsRgb(this.timelineBackgroundColorInput.val())) {
                     this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
                     this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
                 }
