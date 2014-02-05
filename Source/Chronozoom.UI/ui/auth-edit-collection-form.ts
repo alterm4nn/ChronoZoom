@@ -124,8 +124,9 @@ module CZ {
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
                 this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode);
 
-                this.timelineBackgroundColorInput.val(!this.collectionTheme.timelineColor ? "#000000" : this.getHexColorFromColor(this.collectionTheme.timelineColor));
-                this.timelineBackgroundOpacityInput.val(!this.collectionTheme.timelineColor ? 0.25 : this.getOpacityFromRGBA(this.collectionTheme.timelineColor));
+                if (!this.collectionTheme.timelineColor) this.collectionTheme.timelineColor = CZ.Settings.timelineColorOverride;
+                this.timelineBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineColor));
+                this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor));
                 this.timelineBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineStrokeStyle));
 
                 this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
