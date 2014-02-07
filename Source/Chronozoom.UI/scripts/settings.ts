@@ -63,6 +63,7 @@ module CZ {
         export var timelineBreadCrumbBorderOffset = 50; // maximum allowed offset of timeline from canvas edge to show breadcrumb
         export var timelineCenterOffsetAcceptableImplicity = 0.00001; // acceptable implicity in position of center of canvas inside timeline
         export var timelineColor = null; // the default timeline color, this overrides regime colors
+        export var timelineColorOverride = 'rgba(0,0,0,0.25)'; // the default timeline color used to override regime colors
         export var timelineHoverAnimation = 3 / 60.0; // the animation time during hover on a timeline
         export var timelineGradientFillStyle = null; // the gradient style applied on hover
 
