@@ -10,10 +10,11 @@
             SkyDriveMediaPicker.isEnabled;
             SkyDriveMediaPicker.helperText;
             var mediaType;
+            var tempSource;
 
-            function setup(context) {
+            function setup(context, formHost) {
                 contentItem = context;
-                editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
 
                 SkyDriveMediaPicker.logoutButton = $("<button></button>", {
                     text: "Logout",
@@ -53,6 +54,7 @@
                         break;
                 }
 
+                tempSource = response.data.files[0].source;
                 return WL.api({
                     path: response.data.files[0].id + "/embed",
                     method: "GET"
@@ -74,7 +76,8 @@
                     uri: uri,
                     mediaType: mediaType,
                     mediaSource: src,
-                    attribution: src
+                    attribution: src,
+                    tempSource: tempSource
                 };
 
                 $.extend(contentItem, mediaInfo);

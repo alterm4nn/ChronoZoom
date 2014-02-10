@@ -20,9 +20,6 @@ var CZ;
                 this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
                 this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
                 this.allowRedirect = formInfo.allowRedirect;
-                this.collectionTheme = formInfo.collectionTheme;
-                this.collectionThemeInput = container.find(formInfo.collectionThemeInput);
-                this.collectionThemeWrapper = container.find(formInfo.collectionThemeWrapper);
 
                 this.usernameInput.off("keypress");
                 this.emailInput.off("keypress");
@@ -44,10 +41,6 @@ var CZ;
             FormEditProfile.prototype.initialize = function () {
                 var _this = this;
                 var profile = CZ.Service.getProfile();
-
-                if (this.collectionThemeWrapper) {
-                    this.collectionThemeWrapper.show();
-                }
 
                 profile.done(function (data) {
                     if (data.DisplayName != null) {
@@ -87,8 +80,6 @@ var CZ;
                         emailAddress = _this.emailInput.val();
                     }
 
-                    _this.collectionTheme = _this.collectionThemeInput.val();
-
                     CZ.Service.getProfile().done(function (curUser) {
                         CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
                             if (curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
@@ -96,20 +87,10 @@ var CZ;
                                 return;
                             }
                             CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
-                                if (_this.collectionTheme) {
-                                    CZ.Service.putCollection(_this.usernameInput.val(), _this.usernameInput.val(), { theme: _this.collectionTheme }).then(function () {
-                                        if (_this.allowRedirect) {
-                                            window.location.assign("/" + success);
-                                        } else {
-                                            _this.close();
-                                        }
-                                    });
+                                if (_this.allowRedirect) {
+                                    window.location.assign("/" + success);
                                 } else {
-                                    if (_this.allowRedirect) {
-                                        window.location.assign("/" + success);
-                                    } else {
-                                        _this.close();
-                                    }
+                                    _this.close();
                                 }
                             }, function (error) {
                                 alert("Unable to save changes. Please try again later.");
@@ -140,7 +121,6 @@ var CZ;
                     duration: 500
                 });
 
-                this.collectionThemeInput.val(this.collectionTheme);
                 this.activationSource.addClass("active");
             };
 
@@ -152,10 +132,6 @@ var CZ;
                 });
 
                 this.activationSource.removeClass("active");
-            };
-
-            FormEditProfile.prototype.setTheme = function (theme) {
-                this.collectionTheme = theme;
             };
             return FormEditProfile;
         })(CZ.UI.FormUpdateEntity);

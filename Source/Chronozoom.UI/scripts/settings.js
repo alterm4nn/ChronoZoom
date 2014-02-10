@@ -38,15 +38,16 @@
         Settings.timelineHeaderFontColor = 'rgb(232,232,232)';
         Settings.timelineHoveredHeaderFontColor = 'white';
         Settings.timelineStrokeStyle = 'rgb(232,232,232)';
+        Settings.timelineBorderColor = 'rgb(232,232,232)';
         Settings.timelineLineWidth = 1;
         Settings.timelineHoveredLineWidth = 1;
         Settings.timelineMinAspect = 0.2;
         Settings.timelineContentMargin = 0.01;
-        Settings.timelineBorderColor = 'rgb(232,232,232)';
         Settings.timelineHoveredBoxBorderColor = 'rgb(232,232,232)';
         Settings.timelineBreadCrumbBorderOffset = 50;
         Settings.timelineCenterOffsetAcceptableImplicity = 0.00001;
         Settings.timelineColor = null;
+        Settings.timelineColorOverride = 'rgba(0,0,0,0.25)';
         Settings.timelineHoverAnimation = 3 / 60.0;
         Settings.timelineGradientFillStyle = null;
 
@@ -157,58 +158,62 @@
 
         Settings.guidEmpty = "00000000-0000-0000-0000-000000000000";
 
-        Settings.ie = ((function () {
+        Settings.ie = (function () {
             var v = 3, div = document.createElement('div'), a = div.all || [];
             while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><br><![endif]-->', a[0])
                 ;
             return (v > 4) ? v : undefined;
-        })());
+        }());
 
         Settings.theme;
-        function applyTheme(theme) {
-            if (!theme) {
-                theme = "cosmos";
-            }
-
-            this.theme = theme;
-            var themeData = {
-                "cosmos": {
-                    "background": "url('/images/background.jpg')",
-                    "backgroundColor": "#232323",
-                    "timelineColor": null,
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(92,92,92)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
-                    "timelineGradientFillStyle": null
-                },
-                "gray": {
-                    "background": "none",
-                    "backgroundColor": "#bebebe",
-                    "timelineColor": null,
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(92,92,92)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
-                    "timelineGradientFillStyle": "#9e9e9e"
-                },
-                "aqua": {
-                    "background": "none",
-                    "backgroundColor": "rgb(238, 238, 238)",
-                    "timelineColor": "rgba(52, 76, 130, 0.5)",
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(55,84,123)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail-Aqua.png',
-                    "timelineGradientFillStyle": "rgb(80,123,175)"
-                }
+        function applyTheme(theme, delayLoad) {
+            this.theme = {
+                "backgroundUrl": delayLoad ? "" : "/images/background.jpg",
+                "backgroundColor": "#232323",
+                "timelineColor": null,
+                "timelineStrokeStyle": "rgb(232,232,232)",
+                "infoDotFillColor": 'rgb(92,92,92)',
+                "infoDotBorderColor": 'rgb(232,232,232)',
+                "kioskMode": false
             };
 
-            var themeSettings = themeData[theme];
-            $('#vc').css('background-image', themeSettings.background);
+            if (theme && theme.backgroundUrl != null)
+                this.theme.backgroundUrl = theme.backgroundUrl;
+            if (theme && theme.kioskMode != null)
+                this.theme.kioskMode = theme.kioskMode;
+            if (theme && theme.timelineColor != null)
+                this.theme.timelineColor = theme.timelineColor;
+            if (theme && theme.timelineStrokeStyle != null)
+                this.theme.timelineStrokeStyle = theme.timelineStrokeStyle;
+            if (theme && theme.infoDotFillColor != null)
+                this.theme.infoDotFillColor = theme.infoDotFillColor;
+            if (theme && theme.infoDotBorderColor != null)
+                this.theme.infoDotBorderColor = theme.infoDotBorderColor;
+
+            var themeSettings = this.theme;
+            $('#vc').css('background-image', "url('" + themeSettings.backgroundUrl + "')");
             $('#vc').css('background-color', themeSettings.backgroundColor);
+
             CZ.Settings.timelineColor = themeSettings.timelineColor;
-            CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;
+            CZ.Settings.timelineBorderColor = themeSettings.timelineStrokeStyle;
+            CZ.Settings.timelineStrokeStyle = themeSettings.timelineStrokeStyle;
+
             CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;
-            CZ.Settings.fallbackImageUri = themeSettings.fallbackImageUri;
-            CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
+            CZ.Settings.infoDotBorderColor = themeSettings.infoDotBorderColor;
+
+            if (themeSettings.kioskMode) {
+                $(".elements-kiosk-hide").hide();
+                $(".elements-kiosk-disable").on("click", function (e) {
+                    e.preventDefault();
+                });
+                CZ.Settings.infodotBibliographyHeight = 0;
+                CZ.Settings.contentItemSourceHeight = 0;
+            } else {
+                $('.elements-kiosk-hide').show();
+                $(".elements-kiosk-disable").off("click");
+                CZ.Settings.infodotBibliographyHeight = 10.0 / 489;
+                CZ.Settings.contentItemSourceHeight = 10.0 / 540;
+            }
         }
         Settings.applyTheme = applyTheme;
 

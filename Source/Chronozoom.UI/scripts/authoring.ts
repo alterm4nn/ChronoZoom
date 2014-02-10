@@ -1,4 +1,4 @@
-/// <reference path='settings.ts'/>
+﻿/// <reference path='settings.ts'/>
 /// <reference path='common.ts'/>
 /// <reference path='vccontent.ts'/>
 /// <reference path='service.ts'/>
@@ -57,7 +57,7 @@ module CZ {
 
 
         // Generic callback function set by the form when waits user's input (e.g. mouse click) to continue.
-        export var callback: (...args: any[]) => any = null;
+        export var callback: (arg: any) => any = null;
 
         export var timer;
         /**
@@ -624,7 +624,6 @@ module CZ {
                         newExhibit.id = "e" + response.ExhibitId;
 
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
-
                         deferred.resolve(newExhibit);
                     },
                     error => {
@@ -768,6 +767,13 @@ module CZ {
             return (obj !== '' && obj !== null);
         }
         /**
+         * Validates,if url is adequate
+        */
+        export function isValidURL(url) {
+            var objRE = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return objRE.test(url);
+        }
+        /**
          * Validates,if timeline size is not negative or null
         */
         export function isIntervalPositive(start, end) {
@@ -876,6 +882,29 @@ module CZ {
                 i++;
             }
             return isValid;
+        }
+
+        /**
+        * Returns list of erroneous content items
+        */
+        export function erroneousContentItemsList(errorMassage) {
+            var pos;
+            var errCI = [];
+            if (errorMassage.indexOf("ErroneousContentItemIndex") + 1) {
+                pos = errorMassage.indexOf("ErroneousContentItemIndex") + 27;
+                while (errorMassage[pos] != ']') {
+                    if ((errorMassage[pos] == ",") || (errorMassage[pos] == "[")) {
+                        var str1 = "";
+                        pos++;
+                        while ((errorMassage[pos] != ",") && (errorMassage[pos] != "]")) {
+                            str1 += errorMassage[pos];
+                            pos++;
+                        }
+                        errCI.push(parseInt(str1));
+                    }
+                }
+            }
+            return errCI;
         }
 
         /**

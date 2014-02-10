@@ -89,6 +89,12 @@ module CZ {
 
         var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
 
+        // Testing options.
+        var _isLocalHost = constants.environment === "Localhost";
+        var _dumpTweetsUrl = "/dumps/home/tweets.json";
+        var _dumpTimelinesUrl = "/dumps/home/timelines.json";
+        var _testLogin = false;
+
         export function Request(urlBase) {
             var _url = urlBase;
             var _hasParameters = false;
@@ -535,7 +541,7 @@ module CZ {
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: request.url,
+                url: _isLocalHost ? _dumpTweetsUrl : request.url,
                 success: function (response) {
                 }
             });
@@ -646,12 +652,13 @@ module CZ {
             });
         }
 
-        export function getProfile(displayName = "") {
+        export function getProfile(displayName = _testLogin ? "anonymous" : "") {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
-            if (displayName != "")
+            if (displayName != "") {
                 request.addParameter("name", displayName);
+            }
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -697,7 +704,7 @@ module CZ {
                 type: "GET",
                 cache: false,
                 dataType: "json",
-                url: request.url
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
 
@@ -709,8 +716,8 @@ module CZ {
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
-                url: request.url
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
         export function deleteUserFavorite(guid) {
@@ -752,8 +759,8 @@ module CZ {
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
-                url: request.url
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
 

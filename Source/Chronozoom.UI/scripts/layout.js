@@ -52,7 +52,7 @@
             GenerateAspect(timeline);
             if (timeline.Height)
                 timeline.Height /= 100;
-else if (!timeline.AspectRatio && !timeline.Height)
+            else if (!timeline.AspectRatio && !timeline.Height)
                 timeline.Height = CZ.Layout.timelineHeightRate;
         }
 
@@ -197,7 +197,7 @@ else if (!timeline.AspectRatio && !timeline.Height)
                     for (i = 0; i < segmentPoints.length - 1; i++) {
                         if (segmentPoints[i].type == "top")
                             count++;
-else
+                        else
                             count--;
 
                         if (count == 0 && segmentPoints[i + 1].type == "bottom")
@@ -232,7 +232,7 @@ else
                 timeline.timelines.forEach(function (tl) {
                     if (tl.Sequence)
                         sequencedContent.push(tl);
-else
+                    else
                         unsequencedContent.push(tl);
                 });
             }
@@ -256,7 +256,7 @@ else
 
                     if (eb.Sequence)
                         sequencedContent.push(eb);
-else
+                    else
                         unsequencedContent.push(eb);
                 });
             }
@@ -446,7 +446,7 @@ else
             } else if (timeline.Regime == "Humanity") {
                 return "rgba(212, 92, 70, 1.0)";
             } else {
-                return "rgba(255, 255, 255, 0.5)";
+                return null;
             }
         }
 
@@ -493,7 +493,7 @@ else
             if (timeline) {
                 Prepare(timeline);
 
-                var measureContext = (document.createElement("canvas")).getContext('2d');
+                var measureContext = document.createElement("canvas").getContext('2d');
                 LayoutTimeline(timeline, 0, measureContext);
 
                 Arrange(timeline);
@@ -654,7 +654,7 @@ else
 
                 if (elem.animation.duration > 0)
                     t = Math.min(1.0, (curTime - elem.animation.startTime) / elem.animation.duration);
-else
+                else
                     t = 1.0;
 
                 t = CZ.ViewportAnimation.animationEase(t);

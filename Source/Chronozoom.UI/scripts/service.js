@@ -91,6 +91,11 @@
 
         var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
 
+        var _isLocalHost = constants.environment === "Localhost";
+        var _dumpTweetsUrl = "/dumps/home/tweets.json";
+        var _dumpTimelinesUrl = "/dumps/home/timelines.json";
+        var _testLogin = false;
+
         function Request(urlBase) {
             var _url = urlBase;
             var _hasParameters = false;
@@ -527,7 +532,7 @@
                 cache: false,
                 contentType: "application/json",
                 dataType: "json",
-                url: request.url,
+                url: _isLocalHost ? _dumpTweetsUrl : request.url,
                 success: function (response) {
                 }
             });
@@ -621,12 +626,13 @@
         Service.deleteProfile = deleteProfile;
 
         function getProfile(displayName) {
-            if (typeof displayName === "undefined") { displayName = ""; }
+            if (typeof displayName === "undefined") { displayName = _testLogin ? "anonymous" : ""; }
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("user");
-            if (displayName != "")
+            if (displayName != "") {
                 request.addParameter("name", displayName);
+            }
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -676,7 +682,7 @@
                 type: "GET",
                 cache: false,
                 dataType: "json",
-                url: request.url
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
         Service.getUserTimelines = getUserTimelines;
@@ -689,8 +695,8 @@
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
-                url: request.url
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
         Service.getUserFavorites = getUserFavorites;
@@ -738,8 +744,8 @@
             return $.ajax({
                 type: "GET",
                 cache: false,
-                contentType: "application/json",
-                url: request.url
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
         Service.getUserFeatured = getUserFeatured;

@@ -21,7 +21,7 @@ module CZ {
     export module Common {
 
         export var maxPermitedScale;
-        export var maxPermitedVerticalRange;
+        export var maxPermitedVerticalRange = { top: 0, bottom: 10000000 }; //temporary value until there is no data
 
 
         export var controller; //a controller to perform smooth navigation

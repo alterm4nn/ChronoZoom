@@ -4,6 +4,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+
 var FormTest = (function (_super) {
     __extends(FormTest, _super);
     function FormTest(container, formInfo) {

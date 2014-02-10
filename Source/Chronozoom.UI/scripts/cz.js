@@ -26,7 +26,8 @@ var CZ;
             "#header-session-expired-form": "/ui/header-session-expired-form.html",
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
-            "#start-page": "/ui/start-page.html"
+            "#start-page": "/ui/start-page.html",
+            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html"
         };
 
         (function (FeatureActivation) {
@@ -43,71 +44,75 @@ var CZ;
         var _featureMap = [
             {
                 Name: "Login",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: "#login-panel"
             },
             {
                 Name: "Search",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: "#search-button"
             },
             {
                 Name: "Tours",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: "#tours-index"
             },
             {
                 Name: "Authoring",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: ".header-icon.edit-icon"
             },
             {
                 Name: "TourAuthoring",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: ".cz-form-create-tour"
             },
             {
                 Name: "WelcomeScreen",
-                Activation: FeatureActivation.RootCollection,
+                Activation: 2 /* RootCollection */,
                 JQueryReference: "#welcomeScreenBack"
             },
             {
                 Name: "Regimes",
-                Activation: FeatureActivation.RootCollection,
+                Activation: 2 /* RootCollection */,
                 JQueryReference: ".header-regimes"
             },
             {
                 Name: "TimeSeries",
-                Activation: FeatureActivation.Enabled
+                Activation: 0 /* Enabled */
             },
             {
                 Name: "ManageCollections",
-                Activation: FeatureActivation.Disabled,
+                Activation: 1 /* Disabled */,
                 JQueryReference: "#collections_button"
             },
             {
                 Name: "BreadCrumbs",
-                Activation: FeatureActivation.Enabled,
+                Activation: 0 /* Enabled */,
                 JQueryReference: ".header-breadcrumbs"
             },
             {
-                Name: "Themes",
-                Activation: FeatureActivation.NotProduction
-            },
-            {
                 Name: "Skydrive",
-                Activation: FeatureActivation.Enabled
+                Activation: 0 /* Enabled */
             },
             {
                 Name: "StartPage",
-                Activation: FeatureActivation.NotProduction,
+                Activation: 0 /* Enabled */,
                 JQueryReference: ".header-icon.home-icon"
+            },
+            {
+                Name: "CollectionsAuthoring",
+                Activation: 0 /* Enabled */
             }
         ];
 
         HomePageViewModel.rootCollection;
 
         function UserCanEditCollection(profile) {
+            if (!constants || !constants.environment || constants.environment === "localhost") {
+                return true;
+            }
+
             if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
                 return true;
             }
@@ -174,7 +179,7 @@ var CZ;
             };
             if (CZ.Tours.tours)
                 onToursInitialized();
-else
+            else
                 $("body").bind("toursInitialized", onToursInitialized);
         }
 
@@ -279,6 +284,28 @@ else
                             searchForm.show();
                         }
                     }
+                });
+
+                $("#editCollectionButton").click(function () {
+                    closeAllForms();
+                    var form = new CZ.UI.FormEditCollection(forms[19], {
+                        activationSource: $(".header-icon.edit-icon"),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        saveButton: ".cz-form-save",
+                        collectionTheme: CZ.Settings.theme,
+                        backgroundInput: $(".cz-form-collection-background"),
+                        kioskmodeInput: $(".cz-form-collection-kioskmode"),
+                        mediaListContainer: ".cz-form-medialist",
+                        timelineBackgroundColorInput: $(".cz-form-timeline-background"),
+                        timelineBackgroundOpacityInput: $(".cz-form-timeline-background-opacity"),
+                        timelineBorderColorInput: $(".cz-form-timeline-border"),
+                        exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
+                        exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
+                        exhibitBorderColorInput: $(".cz-form-exhibit-border")
+                    });
+                    form.show();
                 });
 
                 CZ.Authoring.initialize(CZ.Common.vc, {
@@ -459,6 +486,10 @@ else
                         $("#MyTimelinesBlock").attr("data-toggle", "show");
                     }
 
+                    if (CZ.Authoring.isEnabled && IsFeatureEnabled(_featureMap, "CollectionsAuthoring")) {
+                        $("#editCollectionButton").show();
+                    }
+
                     CZ.Common.loadData().then(function (response) {
                         if (!response) {
                             if (CZ.Authoring.isEnabled) {
@@ -487,10 +518,7 @@ else
                     profilePanel: "#profile-panel",
                     loginPanelLogin: "#profile-panel.auth-panel-login",
                     context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring"),
-                    collectionTheme: CZ.Settings.theme,
-                    collectionThemeInput: "#collection-theme",
-                    collectionThemeWrapper: IsFeatureEnabled(_featureMap, "Themes") ? "#collection-theme-wrapper" : null
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
                 });
 
                 var loginForm = new CZ.UI.FormLogin(forms[6], {
@@ -506,7 +534,6 @@ else
                     event.preventDefault();
                     if (!profileForm.isFormVisible) {
                         closeAllForms();
-                        profileForm.setTheme(CZ.Settings.theme);
                         profileForm.show();
                     } else {
                         profileForm.close();
@@ -524,7 +551,6 @@ else
 
                             if (!profileForm.isFormVisible) {
                                 closeAllForms();
-                                profileForm.setTheme(CZ.Settings.theme);
                                 profileForm.show();
                             } else {
                                 profileForm.close();
@@ -556,7 +582,6 @@ else
                 });
                 if (IsFeatureEnabled(_featureMap, "StartPage")) {
                     CZ.StartPage.initialize();
-                    CZ.StartPage.show();
                 }
             });
 
@@ -567,13 +592,19 @@ else
                 CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
             });
 
-            CZ.Settings.applyTheme(null);
+            CZ.Settings.applyTheme(null, CZ.Service.superCollectionName != null);
 
             if (CZ.Service.superCollectionName) {
                 CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
                     $(response).each(function (index) {
                         if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
-                            CZ.Settings.applyTheme(response[index].theme);
+                            var themeData = null;
+                            try  {
+                                themeData = JSON.parse(response[index].theme);
+                            } catch (e) {
+                            }
+
+                            CZ.Settings.applyTheme(themeData, false);
                         }
                     });
                 });
@@ -596,12 +627,10 @@ else
 
             if (navigator.userAgent.indexOf('Mac') != -1) {
                 var body = document.getElementsByTagName('body')[0];
-                (body).style.overflow = "hidden";
+                body.style.overflow = "hidden";
             }
 
             Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
-
-            CZ.Common.maxPermitedVerticalRange = { top: 0, bottom: 10000000 };
 
             if (window.location.hash)
                 CZ.Common.startHash = window.location.hash;
@@ -785,7 +814,7 @@ else
             var form = $(name).data("form");
             if (form)
                 return form;
-else
+            else
                 return false;
         }
         HomePageViewModel.getFormById = getFormById;
@@ -929,19 +958,19 @@ else
 
                 if (feature.IsEnabled === undefined) {
                     var enabled = true;
-                    if (feature.Activation === FeatureActivation.Disabled) {
+                    if (feature.Activation === 1 /* Disabled */) {
                         enabled = false;
                     }
 
-                    if (feature.Activation === FeatureActivation.NotRootCollection && HomePageViewModel.rootCollection) {
+                    if (feature.Activation === 3 /* NotRootCollection */ && HomePageViewModel.rootCollection) {
                         enabled = false;
                     }
 
-                    if (feature.Activation === FeatureActivation.RootCollection && !HomePageViewModel.rootCollection) {
+                    if (feature.Activation === 2 /* RootCollection */ && !HomePageViewModel.rootCollection) {
                         enabled = false;
                     }
 
-                    if (feature.Activation === FeatureActivation.NotProduction && (!constants || constants.environment === "Production")) {
+                    if (feature.Activation === 4 /* NotProduction */ && (constants && constants.environment && constants.environment === "Production")) {
                         enabled = false;
                     }
 

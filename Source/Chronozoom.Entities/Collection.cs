@@ -45,5 +45,8 @@ namespace Chronozoom.Entities
         /// </summary>
         [DataMember(Name="theme")]
         public string Theme { get; set; }
+
+        /// <summary>SuperCollection for this collection</summary>
+        public SuperCollection SuperCollection { get; set; }
     }
 }

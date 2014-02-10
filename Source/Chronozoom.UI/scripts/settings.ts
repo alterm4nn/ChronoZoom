@@ -2,6 +2,19 @@
 
 module CZ {
     export module Settings {
+		export interface ICollectionTheme {
+            backgroundUrl: string;
+            backgroundColor: string;
+
+            timelineColor: string;
+            timelineStrokeStyle: string;
+
+            infoDotFillColor: string;
+            infoDotBorderColor: string;
+            
+            kioskMode: boolean;
+        }
+
         export var isAuthorized = false; // user is authorized flag
         export var userSuperCollectionName = "";
         export var userCollectionName = "";
@@ -41,15 +54,16 @@ module CZ {
         export var timelineHeaderFontColor = 'rgb(232,232,232)';
         export var timelineHoveredHeaderFontColor = 'white';
         export var timelineStrokeStyle = 'rgb(232,232,232)'; // border line style
+        export var timelineBorderColor = 'rgb(232,232,232)'; // border line style
         export var timelineLineWidth = 1;        // border line width (pixels)
         export var timelineHoveredLineWidth = 1; // in px
         export var timelineMinAspect = 0.2; //minimal timeline.height / timeline.width
         export var timelineContentMargin = 0.01; //determines margin for child elements of timeline. Margin = timelineWidth * timelineContentMargin
-        export var timelineBorderColor = 'rgb(232,232,232)';
         export var timelineHoveredBoxBorderColor = 'rgb(232,232,232)';
         export var timelineBreadCrumbBorderOffset = 50; // maximum allowed offset of timeline from canvas edge to show breadcrumb
         export var timelineCenterOffsetAcceptableImplicity = 0.00001; // acceptable implicity in position of center of canvas inside timeline
         export var timelineColor = null; // the default timeline color, this overrides regime colors
+        export var timelineColorOverride = 'rgba(0,0,0,0.25)'; // the default timeline color used to override regime colors
         export var timelineHoverAnimation = 3 / 60.0; // the animation time during hover on a timeline
         export var timelineGradientFillStyle = null; // the gradient style applied on hover
 
@@ -182,51 +196,52 @@ module CZ {
         }());
 
         // Theme constants
-        export var theme;
-        export function applyTheme(theme: string) {
-            if (!theme) {
-                theme = "cosmos";
-            }
+        export var theme: ICollectionTheme;
+        export function applyTheme(theme: ICollectionTheme, delayLoad: boolean) {
+			this.theme = {
+                "backgroundUrl": delayLoad ? "" : "/images/background.jpg",
+                "backgroundColor": "#232323",
+                "timelineColor": null,
+                "timelineStrokeStyle": "rgb(232,232,232)",
+                
+                "infoDotFillColor": 'rgb(92,92,92)',
+                "infoDotBorderColor": 'rgb(232,232,232)',
 
-            this.theme = theme;
-            var themeData = {
-                "cosmos": {
-                    "background": "url('/images/background.jpg')",
-                    "backgroundColor": "#232323",
-                    "timelineColor": null,
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(92,92,92)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
-                    "timelineGradientFillStyle": null
-                },
-                "gray": {
-                    "background": "none",
-                    "backgroundColor": "#bebebe",
-                    "timelineColor": null,
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(92,92,92)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail2.png',
-                    "timelineGradientFillStyle": "#9e9e9e"
-                },
-                "aqua": {
-                    "background": "none",
-                    "backgroundColor": "rgb(238, 238, 238)",
-                    "timelineColor": "rgba(52, 76, 130, 0.5)",
-                    "timelineHoverAnimation": 3 / 60.0,
-                    "infoDotFillColor": 'rgb(55,84,123)',
-                    "fallbackImageUri": '/images/Temp-Thumbnail-Aqua.png',
-                    "timelineGradientFillStyle": "rgb(80,123,175)"
-                }
-            }
+                "kioskMode": false,
+            };
 
-            var themeSettings = themeData[theme];
-            $('#vc').css('background-image', themeSettings.background);
+            if (theme && theme.backgroundUrl != null) this.theme.backgroundUrl = theme.backgroundUrl;
+            if (theme && theme.kioskMode != null) this.theme.kioskMode = theme.kioskMode;
+            if (theme && theme.timelineColor != null) this.theme.timelineColor = theme.timelineColor;
+            if (theme && theme.timelineStrokeStyle != null) this.theme.timelineStrokeStyle = theme.timelineStrokeStyle;
+            if (theme && theme.infoDotFillColor != null) this.theme.infoDotFillColor = theme.infoDotFillColor;
+            if (theme && theme.infoDotBorderColor != null) this.theme.infoDotBorderColor = theme.infoDotBorderColor;
+
+            var themeSettings = this.theme;
+            $('#vc').css('background-image', "url('" + themeSettings.backgroundUrl + "')");
             $('#vc').css('background-color', themeSettings.backgroundColor);
+
             CZ.Settings.timelineColor = themeSettings.timelineColor;
-            CZ.Settings.timelineHoverAnimation = themeSettings.timelineHoverAnimation;
+            CZ.Settings.timelineBorderColor = themeSettings.timelineStrokeStyle;
+            CZ.Settings.timelineStrokeStyle = themeSettings.timelineStrokeStyle;
+
             CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;
-            CZ.Settings.fallbackImageUri = themeSettings.fallbackImageUri;
-            CZ.Settings.timelineGradientFillStyle = themeSettings.timelineGradientFillStyle;
+            CZ.Settings.infoDotBorderColor = themeSettings.infoDotBorderColor;
+
+            if (themeSettings.kioskMode) {
+                $(".elements-kiosk-hide").hide();
+                $(".elements-kiosk-disable").on("click", (e) => {
+                    e.preventDefault(); 
+                })
+                CZ.Settings.infodotBibliographyHeight = 0;
+                CZ.Settings.contentItemSourceHeight = 0;
+            }
+            else {
+                $('.elements-kiosk-hide').show();
+                $(".elements-kiosk-disable").off("click");
+                CZ.Settings.infodotBibliographyHeight = 10.0 / 489;
+                CZ.Settings.contentItemSourceHeight = 10.0 / 540;
+            }
         }
 
         // Bing search API constants

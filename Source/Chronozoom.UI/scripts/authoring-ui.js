@@ -10,7 +10,7 @@
                 CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
 
-                Authoring.showEditTourForm(null);
+                CZ.Authoring.showEditTourForm(null);
             }
             UI.createTour = createTour;
 
@@ -28,10 +28,13 @@
                 messageForm.closeButton.click(function (event) {
                     CZ.Authoring.isActive = prevIsActive;
                     CZ.Authoring.mode = prevMode;
+                    CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
                 });
 
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createTimeline";
+
+                CZ.Common.vc.virtualCanvas("cloakNonRootVirtualSpace");
             }
             UI.createTimeline = createTimeline;
 
@@ -59,10 +62,13 @@
                 messageForm.closeButton.click(function (event) {
                     CZ.Authoring.isActive = prevIsActive;
                     CZ.Authoring.mode = prevMode;
+                    CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
                 });
 
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createExhibit";
+
+                CZ.Common.vc.virtualCanvas("cloakNonRootVirtualSpace");
             }
             UI.createExhibit = createExhibit;
 

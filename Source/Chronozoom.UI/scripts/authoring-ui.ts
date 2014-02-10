@@ -42,10 +42,13 @@ module CZ {
                 messageForm.closeButton.click(event => {
                     CZ.Authoring.isActive = prevIsActive;
                     CZ.Authoring.mode = prevMode;
+                    CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
                 });
 
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createTimeline";
+
+                CZ.Common.vc.virtualCanvas("cloakNonRootVirtualSpace");
             }
 
             export function editTimeline () {
@@ -76,10 +79,13 @@ module CZ {
                 messageForm.closeButton.click(event => {
                     CZ.Authoring.isActive = prevIsActive;
                     CZ.Authoring.mode = prevMode;
+                    CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
                 });
 
                 CZ.Authoring.isActive = true;
                 CZ.Authoring.mode = "createExhibit";
+
+                CZ.Common.vc.virtualCanvas("cloakNonRootVirtualSpace");
             }
 
             export function editExhibit () {

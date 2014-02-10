@@ -11,7 +11,7 @@ var MediaPickerExample = (function () {
         this.fileInput.off();
 
         this.fileInput.change(function (event) {
-            var files = (_this.fileInput[0]).files;
+            var files = _this.fileInput[0].files;
             if (files.length === 0) {
                 return;
             }

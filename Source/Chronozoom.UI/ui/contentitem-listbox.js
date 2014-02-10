@@ -55,7 +55,7 @@ var CZ;
                 _super.prototype.remove.call(this, item);
             };
             return ContentItemListBox;
-        })(UI.ListBoxBase);
+        })(CZ.UI.ListBoxBase);
         UI.ContentItemListBox = ContentItemListBox;
 
         var ContentItemListItem = (function (_super) {
@@ -85,7 +85,7 @@ var CZ;
                 });
             }
             return ContentItemListItem;
-        })(UI.ListItemBase);
+        })(CZ.UI.ListItemBase);
         UI.ContentItemListItem = ContentItemListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;

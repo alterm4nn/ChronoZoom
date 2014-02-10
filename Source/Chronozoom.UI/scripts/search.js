@@ -48,7 +48,7 @@
                     if ($('#searchTextBox').val() != "") {
                         $("#loadingImage").fadeIn('slow');
                     }
-                    search(escapeSearchString(($("#searchTextBox")[0]).value.substr(0, 700)));
+                    search(escapeSearchString($("#searchTextBox")[0].value.substr(0, 700)));
                 }, 300);
             });
 
@@ -122,7 +122,7 @@
         }
 
         function onSearchResults(searchString, results) {
-            if (escapeSearchString(($("#searchTextBox")[0]).value).indexOf(searchString) === 0 || searchString === '') {
+            if (escapeSearchString($("#searchTextBox")[0].value).indexOf(searchString) === 0 || searchString === '') {
                 var height;
                 var output = $("#search .searchResults").empty();
                 if (results == null) {

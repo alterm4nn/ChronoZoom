@@ -22,7 +22,7 @@
                 for (var i = 0; i < breadCrumbs.length; i++) {
                     if (newBreadCrumbs[i] == null)
                         removeBreadCrumb();
-else if (newBreadCrumbs[i].vcElement.id != breadCrumbs[i].vcElement.id) {
+                    else if (newBreadCrumbs[i].vcElement.id != breadCrumbs[i].vcElement.id) {
                         for (var j = i; j < breadCrumbs.length; j++)
                             removeBreadCrumb();
                         for (var j = i; j < newBreadCrumbs.length; j++)
@@ -64,7 +64,7 @@ else if (newBreadCrumbs[i].vcElement.id != breadCrumbs[i].vcElement.id) {
                     } else {
                         if (elementOffset + elementWidth / 3 < 0)
                             hiddenFromLeft.push(index);
-else if (elementOffset + elementWidth * 2 / 3 > BreadCrumbs.visibleAreaWidth)
+                        else if (elementOffset + elementWidth * 2 / 3 > BreadCrumbs.visibleAreaWidth)
                             hiddenFromRight.push(index);
                     }
                 }
@@ -74,12 +74,12 @@ else if (elementOffset + elementWidth * 2 / 3 > BreadCrumbs.visibleAreaWidth)
 
             if (hiddenFromLeft.length != 0)
                 $("#breadcrumbs-nav-left").stop(true, true).fadeIn('fast');
-else
+            else
                 $("#breadcrumbs-nav-left").stop(true, true).fadeOut('fast');
 
             if (hiddenFromRight.length != 0)
                 $("#breadcrumbs-nav-right").stop(true, true).fadeIn('fast');
-else
+            else
                 $("#breadcrumbs-nav-right").stop(true, true).fadeOut('fast');
         }
         BreadCrumbs.updateHiddenBreadCrumbs = updateHiddenBreadCrumbs;
@@ -91,13 +91,13 @@ else
                     case "left":
                         if (hiddenFromLeft.length != 0)
                             index = hiddenFromLeft.pop();
-else
+                        else
                             return;
                         break;
                     case "right":
                         if (hiddenFromRight.length != 0)
                             index = hiddenFromRight.pop();
-else
+                        else
                             return;
                         break;
                 }
@@ -145,9 +145,9 @@ else
                 if (tableWidth >= BreadCrumbs.visibleAreaWidth)
                     if (tableVisible > BreadCrumbs.visibleAreaWidth)
                         difference = BreadCrumbs.visibleAreaWidth - tableVisible - 1;
-else
+                    else
                         difference = BreadCrumbs.visibleAreaWidth - tableVisible - 1;
-else
+                else
                     difference = -tableOffset;
 
                 $("#breadcrumbs-table tr").stop();
@@ -288,7 +288,7 @@ else
 
             if (elementOffset < 0)
                 showHiddenBreadCrumb("left", breadCrumbLinkID);
-else if (elementOffset + elementWidth > BreadCrumbs.visibleAreaWidth)
+            else if (elementOffset + elementWidth > BreadCrumbs.visibleAreaWidth)
                 showHiddenBreadCrumb("right", breadCrumbLinkID);
         }
         BreadCrumbs.clickOverBreadCrumb = clickOverBreadCrumb;

@@ -15,8 +15,8 @@
 
             this.effectiveExplorationZoomConstraint = undefined;
 
-            if (!(window).requestAnimFrame)
-                (window).requestAnimFrame = function (callback) {
+            if (!window.requestAnimFrame)
+                window.requestAnimFrame = function (callback) {
                     window.setTimeout(callback, 1000 / CZ.Settings.targetFps);
                 };
 
@@ -62,7 +62,7 @@
                     if (gesture.Source == "Touch") {
                         if (previouslyEstimatedViewport)
                             initialViewport = previouslyEstimatedViewport;
-else {
+                        else {
                             initialViewport = new CZ.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new CZ.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
                         }
                     } else {
@@ -73,13 +73,14 @@ else {
                 } else {
                     if (previouslyEstimatedViewport)
                         initialViewport = previouslyEstimatedViewport;
-else {
+                    else {
                         initialViewport = new CZ.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new CZ.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
                     }
 
                     PanViewport(initialViewport, gesture);
                 }
 
+                self.coerceVisible(initialViewport, gesture);
                 return initialViewport;
             }
 
@@ -112,7 +113,7 @@ else {
                 if (CZ.Settings.maxPermitedTimeRange) {
                     if (visible.centerX > CZ.Settings.maxPermitedTimeRange.right)
                         visible.centerX = CZ.Settings.maxPermitedTimeRange.right;
-else if (visible.centerX < CZ.Settings.maxPermitedTimeRange.left)
+                    else if (visible.centerX < CZ.Settings.maxPermitedTimeRange.left)
                         visible.centerX = CZ.Settings.maxPermitedTimeRange.left;
                 }
             };
@@ -122,7 +123,7 @@ else if (visible.centerX < CZ.Settings.maxPermitedTimeRange.left)
                 if (CZ.Common.maxPermitedVerticalRange) {
                     if (visible.centerY > CZ.Common.maxPermitedVerticalRange.bottom)
                         visible.centerY = CZ.Common.maxPermitedVerticalRange.bottom;
-else if (visible.centerY < CZ.Common.maxPermitedVerticalRange.top)
+                    else if (visible.centerY < CZ.Common.maxPermitedVerticalRange.top)
                         visible.centerY = CZ.Common.maxPermitedVerticalRange.top;
                 }
             };
@@ -134,7 +135,7 @@ else if (visible.centerY < CZ.Common.maxPermitedVerticalRange.top)
                 var constr = undefined;
                 if (this.effectiveExplorationZoomConstraint)
                     constr = this.effectiveExplorationZoomConstraint;
-else
+                else
                     for (var i = 0; i < CZ.Settings.deeperZoomConstraints.length; i++) {
                         var possibleConstr = CZ.Settings.deeperZoomConstraints[i];
                         if (possibleConstr.left <= x && possibleConstr.right > x) {
@@ -246,7 +247,7 @@ else
 
                         if (gesture.Type == "Pan")
                             self.activeAnimation.velocity = CZ.Settings.panSpeedFactor * 0.001;
-else
+                        else
                             self.activeAnimation.velocity = CZ.Settings.zoomSpeedFactor * 0.0025;
 
                         self.activeAnimation.setTargetViewport(newlyEstimatedViewport);
@@ -255,7 +256,7 @@ else
 
                     if (oldId != undefined)
                         animationUpdated(oldId, self.activeAnimation.ID);
-else
+                    else
                         AnimationStarted(self.activeAnimation.ID);
 
                     if (!isAnimationActive)
@@ -289,10 +290,10 @@ else
             this.animationStep = function (self) {
                 if (self.activeAnimation) {
                     if (self.activeAnimation.isActive)
-                        (window).requestAnimFrame(function () {
+                        window.requestAnimFrame(function () {
                             self.animationStep(self);
                         });
-else {
+                    else {
                         var stopAnimationID = self.activeAnimation.ID;
 
                         self.updateRecentViewport();

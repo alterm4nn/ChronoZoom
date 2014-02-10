@@ -1,6 +1,7 @@
 /// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../scripts/authoring.ts'/>
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../scripts/media.ts'/>
 /// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 
 module CZ {
@@ -80,7 +81,7 @@ module CZ {
             }
 
             private initUI() {
-                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem);
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
                 var that = this;
                 this.saveButton.prop('disabled', false);
 
@@ -154,8 +155,11 @@ module CZ {
                 if (!CZ.Authoring.isNotEmpty(newContentItem.uri)) {
                     this.mediaInput.showError("URL can't be empty");
                 }
+                if (!CZ.Authoring.isValidURL(newContentItem.uri)) {
+                    this.mediaInput.showError("URL is wrong");
+                }
 
-                if (CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) {
+                if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
                         if (this.prevForm && this.prevForm instanceof FormEditExhibit) {
                             this.isCancel = false;

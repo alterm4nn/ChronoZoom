@@ -98,7 +98,7 @@
                 self.toggleAudio = function toggleAudio(isOn) {
                     if (isOn && self.audio)
                         self.isAudioEnabled = true;
-else
+                    else
                         self.isAudioEnabled = false;
                 };
 

@@ -1,7 +1,8 @@
-﻿var CZ;
+﻿
+var CZ;
 (function (CZ) {
     (function (VCContent) {
-        var elementclick = ($).Event("elementclick");
+        var elementclick = $.Event("elementclick");
 
         function getVisibleForElement(element, scale, viewport, use_margin) {
             var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
@@ -303,7 +304,7 @@
                 if (sz & 1) {
                     if (zl > 0)
                         zl = i + 1;
-else
+                    else
                         zl = i;
                 }
             }
@@ -555,7 +556,7 @@ else
             var marginTop = timelineinfo.titleRect ? timelineinfo.titleRect.marginTop : (1 - CZ.Settings.timelineHeaderMargin) * timelineinfo.height - headerSize;
             var baseline = timelineinfo.top + marginTop + headerSize / 2.0;
 
-            this.titleObject = addText(this, layerid, id + "__header__", timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize, timelineinfo.header, {
+            this.titleObject = addText(this, layerid, id + "__header__", CZ.Authoring.isEnabled ? timelineinfo.timeStart + marginLeft + headerSize : timelineinfo.timeStart + marginLeft, timelineinfo.top + marginTop, baseline, headerSize, timelineinfo.header, {
                 fontName: CZ.Settings.timelineHeaderFontName,
                 fillStyle: CZ.Settings.timelineHeaderFontColor,
                 textBaseline: 'middle'
@@ -604,7 +605,7 @@ else
 
                 if (this.titleObject.screenFontSize <= CZ.Settings.timelineTooltipMaxHeaderSize)
                     this.tooltipEnabled = true;
-else
+                else
                     this.tooltipEnabled = false;
 
                 if (CZ.Common.tooltipMode != "infodot") {
@@ -680,7 +681,7 @@ else
                 this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
 
                 if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0) {
-                    var btnX = CZ.Authoring.isEnabled ? this.x + this.width - 1.8 * this.titleObject.height : this.x + this.width - 1.0 * this.titleObject.height;
+                    var btnX = this.x + this.width - 1.0 * this.titleObject.height;
                     var btnY = this.titleObject.y + 0.15 * this.titleObject.height;
 
                     this.favoriteBtn = VCContent.addImage(this, layerid, id + "__favorite", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/star.svg");
@@ -722,7 +723,7 @@ else
                 }
 
                 if (CZ.Authoring.isEnabled && typeof this.editButton === "undefined" && this.titleObject.width !== 0) {
-                    this.editButton = VCContent.addImage(this, layerid, id + "__edit", this.x + this.width - 1.15 * this.titleObject.height, this.titleObject.y, this.titleObject.height, this.titleObject.height, "/images/edit.svg");
+                    this.editButton = VCContent.addImage(this, layerid, id + "__edit", this.x + this.titleObject.height * 0.15, this.titleObject.y, this.titleObject.height, this.titleObject.height, "/images/edit.svg");
                     this.editButton.reactsOnMouse = true;
 
                     this.editButton.onmouseclick = function () {
@@ -752,7 +753,7 @@ else
                 if (this.settings.hoverAnimationDelta) {
                     if (this.settings.gradientOpacity == 0 || this.settings.gradientOpacity == 1)
                         this.settings.hoverAnimationDelta = undefined;
-else
+                    else
                         this.vc.requestInvalidate();
                 }
 
@@ -832,7 +833,7 @@ else
         }
 
         function drawText(text, ctx, x, y, fontSize, fontName) {
-            var br = ($).browser;
+            var br = $.browser;
             var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
 
             if (isIe9) {
@@ -909,7 +910,7 @@ else
                                     } else {
                                         if (currentLine === '')
                                             currentLine = words[iw];
-else
+                                        else
                                             currentLine += ' ' + words[iw];
                                         lineWidth = newWidth;
                                     }
@@ -978,7 +979,7 @@ else
                     ctx.textAlign = this.settings.textAlign;
                     if (this.settings.textAlign === 'center')
                         p.x = p.x + size_p.x / 2.0;
-else if (this.settings.textAlign === 'right')
+                    else if (this.settings.textAlign === 'right')
                         p.x = p.x + size_p.x;
                 }
 
@@ -1260,7 +1261,7 @@ else if (this.settings.textAlign === 'right')
             elem[0].addEventListener("mousedown", CZ.Common.preventbubble, false);
             elem[0].addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousewheel", CZ.Common.preventbubble, false);
-            var textElem = $("<div style='position:relative' class='text'></div>");
+            var textElem = $("<div style='position:relative; white-space: pre-line' class='text'></div>");
             textElem.text(text).appendTo(elem);
 
             this.initializeContent(elem[0]);
@@ -1298,7 +1299,7 @@ else if (this.settings.textAlign === 'right')
             }
             if (pdfSrc.indexOf('?') == -1)
                 pdfSrc += '?&embedded=true&wmode=opaque';
-else
+            else
                 pdfSrc += '&embedded=true&wmode=opaque';
             elem.setAttribute("src", pdfSrc);
 
@@ -1318,7 +1319,7 @@ else
             elem.setAttribute("id", id);
             if (videoSrc.indexOf('?') == -1)
                 videoSrc += '?wmode=opaque';
-else
+            else
                 videoSrc += '&wmode=opaque';
             elem.setAttribute("src", videoSrc);
             elem.setAttribute("visible", 'true');
@@ -1366,6 +1367,7 @@ else
             elem.setAttribute("src", srcData[0]);
             elem.setAttribute("scrolling", "no");
             elem.setAttribute("frameborder", "0");
+            elem.setAttribute("sandbox", "allow-forms allow-scripts");
             this.initializeContent(elem);
 
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
@@ -1536,9 +1538,7 @@ else
             var titleTop = sourceTop + verticalMargin + sourceHeight;
 
             var rect = VCContent.addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh, {
-                strokeStyle: CZ.Settings.contentItemBoundingBoxBorderColor,
-                lineWidth: CZ.Settings.contentItemBoundingBoxBorderWidth * vw,
-                fillStyle: CZ.Settings.contentItemBoundingBoxFillColor,
+                strokeStyle: CZ.Settings.contentItemBoundingBoxBorderColor, lineWidth: CZ.Settings.contentItemBoundingBoxBorderWidth * vw, fillStyle: CZ.Settings.contentItemBoundingBoxFillColor,
                 isLineWidthVirtual: true
             });
             this.reactsOnMouse = true;
@@ -1711,15 +1711,15 @@ else
             contentItems.sort(function (a, b) {
                 if (typeof a.order !== 'undefined' && typeof b.order === 'undefined')
                     return -1;
-else if (typeof a.order === 'undefined' && typeof b.order !== 'undefined')
+                else if (typeof a.order === 'undefined' && typeof b.order !== 'undefined')
                     return 1;
-else if (typeof a.order === 'undefined' && typeof b.order === 'undefined')
+                else if (typeof a.order === 'undefined' && typeof b.order === 'undefined')
                     return 0;
-else if (a.order < b.order)
+                else if (a.order < b.order)
                     return -1;
-else if (a.order > b.order)
+                else if (a.order > b.order)
                     return 1;
-else
+                else
                     return 0;
             });
 
@@ -2042,10 +2042,7 @@ else
                 if (citems[i].id == cid)
                     return {
                         id: cid,
-                        x: citems[i].x,
-                        y: citems[i].y,
-                        width: citems[i].width,
-                        height: citems[i].height,
+                        x: citems[i].x, y: citems[i].y, width: citems[i].width, height: citems[i].height,
                         parent: infodot,
                         type: "contentItem",
                         vc: infodot.vc

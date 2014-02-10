@@ -4,6 +4,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+
 var RedGreenListBox = (function (_super) {
     __extends(RedGreenListBox, _super);
     function RedGreenListBox(container, listBoxInfo, listItemsInfo) {

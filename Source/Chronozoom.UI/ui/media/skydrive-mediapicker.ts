@@ -9,7 +9,7 @@ module CZ {
         declare var WL: any;
 
         export module SkyDriveMediaPicker {
-            var editContentItemForm: CZ.UI.FormEditCI;
+            var editContentItemForm: any;
             var contentItem: any;
             export var filePicker: any;
             export var filePickerIframe: JQuery;
@@ -17,10 +17,11 @@ module CZ {
             export var isEnabled: boolean;
             export var helperText: JQuery;
             var mediaType: string;
+            var tempSource: string;
 
-            export function setup(context: any) {
+            export function setup(context: any, formHost: any) {
                 contentItem = context;
-                editContentItemForm = CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
 
                 logoutButton = $("<button></button>", {
                     text: "Logout",
@@ -72,6 +73,7 @@ module CZ {
                         break;
                 }
 
+                tempSource = response.data.files[0].source;
                 return WL.api({
                     path: response.data.files[0].id + "/embed",
                     method: "GET"
@@ -97,7 +99,8 @@ module CZ {
                     uri: uri,
                     mediaType: mediaType,
                     mediaSource: src,
-                    attribution: src
+                    attribution: src,
+                    tempSource: tempSource,
                 };
 
                 $.extend(contentItem, mediaInfo);

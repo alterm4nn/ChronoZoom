@@ -1344,7 +1344,7 @@ img.fallbackBackground
 .cz-form-label
 {
     margin: 5px 0;
-    display: inline-block;
+    display: block;
 }
 
 /***********************************************************
@@ -1571,6 +1571,24 @@ img.fallbackBackground
     {
         width: 134px;
         color: #fff;
+    }
+
+/* Edit Collection Form */
+.cz-collection-form
+{
+    width: 420px;
+    bottom: 25px;
+    left: 0;
+}
+
+    .cz-collection-form > .cz-form-content
+    {
+        position: absolute;
+        top: 36px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: auto;
     }
 
 .auth-panel-login
@@ -1864,6 +1882,21 @@ img.fallbackBackground
     background-image: url(../images/narration-off.png);
 }
 
+.cz-form-color
+{
+    display: inline-block;
+    padding: 0px;
+    width: 85px;
+    height: 35px;
+}
+
+.cz-form-range
+{
+    width: 75px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
 /***********************************************************
 
                     ListBox Base
@@ -1993,4 +2026,66 @@ img.fallbackBackground
     cursor: pointer;
     width: auto;
     display: inline;
+}
+
+.root-cloak {
+  position: absolute;
+  display: none;
+  z-index: 8;
+  cursor: not-allowed;
+  background: @canvas-disable-cloak;
+
+  &.visible {
+    display: block;
+  }
+}
+
+.root-cloak-left {
+  .root-cloak;
+
+  top: @headerHeight + @headerBreadcrumbsHeight - @headerBreadcrumbsTopMargin + 38px;
+  bottom: @footerHeight;
+  left: 0;
+}
+
+.root-cloak-right {
+  .root-cloak;
+
+  top: @headerHeight + @headerBreadcrumbsHeight - @headerBreadcrumbsTopMargin + 38px;
+  bottom: @footerHeight;
+  right: 0;
+}
+
+.root-cloak-top {
+  .root-cloak;
+
+  top: @headerHeight + @headerBreadcrumbsHeight - @headerBreadcrumbsTopMargin + 38px;
+  left: 0;
+  right: 0;
+}
+
+.root-cloak-bottom {
+  .root-cloak;
+
+  bottom: @footerHeight;
+  left: 0;
+  right: 0;
+}
+
+#editCollectionButton {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    z-index: 100;
+    margin-top: -50px;
+}
+#editCollectionButton > img {
+    width: 50px;
+    height: 50px;
+}
+
+// Prevent SkyDrive clicks
+#embedItemDiv {
+    pointer-events: none;
+    cursor: default;
 }

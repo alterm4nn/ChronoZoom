@@ -227,11 +227,7 @@ module CZ {
                 var o = $(template).clone(true, true).appendTo(target[idx].Name);
                 o.attr("class", target[idx].Visibility[i]);
                 o.attr("id", "m" + idx + "i" + i);
-
-                $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
-                    watch: "window",
-                });
-            }
+               }
         }
 
         export function PlayIntroTour() {
@@ -562,7 +558,8 @@ module CZ {
                     var photo = tweet.User.ProfileImageUrl;
                     var time = tweet.CreatedDate;
                     var myDate = new Date(time.match(/\d+/)[0] * 1);
-                    var convertedDate = myDate.toLocaleTimeString() + "; " + myDate.getDate();
+                    var convertedDate = myDate.getDate() + "." + myDate.getMonth() + "." + myDate.getFullYear();
+
                     var tweetUsernameLink = "https://twitter.com/" + username;
                     var tweetLink = "https://twitter.com/" + username + "/statuses/" + tweet.IdStr;
 
@@ -573,8 +570,6 @@ module CZ {
                     var $tileUsername = $tweetTileMeta.find(".tweet-meta-author");
                     var $tileAvatar = $tweetTileMeta.find(".tweet-avatar-icon");
                     var $tileDate = $tweetTileMeta.find(".tile-meta-time");
-
-                    convertedDate += "." + myDate.getMonth() + "." + myDate.getFullYear();
 
                     // Show content of Tweet tile on avatar load.
                     $tweetTileMeta.invisible(true);
@@ -619,6 +614,11 @@ module CZ {
                     $listItemFullname.text(fullname);
                     $listItemDate.text(convertedDate);
                     $listItemAvatar.attr("src", photo);
+
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
+                        watch: "window",
+                    });
+
                 }
             });
         }
@@ -646,6 +646,15 @@ module CZ {
 
             // Show home page.
             $("#start-page").fadeIn();
+        }
+
+        function compareTimelineTitles(first, second) {
+            if (first.Title.charAt(0) < second.Title.charAt(0))
+                return -1;
+            else if (first.Title.charAt(0) > second.Title.charAt(0))
+                return 1;
+            else
+                return 0;
         }
 
         export function hide() {
@@ -683,17 +692,24 @@ module CZ {
                 }
             });
             
+            
+
             // TODO: Replace with current user.
             CZ.Service.getUserFeatured().done(function (response) {
                 // Show the newest featured timelines first.
                 var timelines = response ? response.reverse() : [];
+
+                timelines.sort(compareTimelineTitles);
+
                 fillFeaturedTimelines(timelines);
                 fillFeaturedTimelinesList(timelines);
             });
 
             CZ.Service.getUserFavorites().then(response => {
                 var timelines = response ? response.reverse() : [];
-                
+
+                timelines.sort(compareTimelineTitles);
+
                 // saving guids of favorite timelines
                 timelines.forEach(function (timeline) {
                     // timelineUrl pattern is /{collection}/{supercollection}#{/t{guid}}+/t{favorite timeline guid}
@@ -704,7 +720,7 @@ module CZ {
                 if (timelines.length === 0) {
                     $("#FavoriteTimelinesBlock .list-view-icon").hide();
                     $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." +
-                         "Click star icon of the timeline you like to save it as favorite.");
+                         " Click star icon of the timeline you like to save it as favorite.");
                 }
                 else {
                     fillFavoriteTimelines(timelines);
@@ -720,27 +736,29 @@ module CZ {
             //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
 
             CZ.Service.getProfile().done(data => {
-                if ((data != "") && (data.DisplayName != null)) {
+                if ((data !== "") && (data.DisplayName !== null)) {
                     CZ.Settings.userSuperCollectionName = data.DisplayName;
                     CZ.Settings.userCollectionName = data.DisplayName;
                 }
-                CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(response => {
-                    var timelines = response ? response.reverse() : [];
-                    fillMyTimelines(timelines);
-                    fillMyTimelinesList(timelines);
-                },
+                CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(
+                    response => {
+                        var timelines = response ? response.reverse() : [];
+                        fillMyTimelines(timelines);
+                        fillMyTimelinesList(timelines);
+                    },
                     error => {
                         console.log("[ERROR] getUserTimelines");
-                    });
+                    }
+                );
             });
 
 
             CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
             CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
 
-            // Show home page if this is a root URL of ChronoZoom.
+            // Show home page if this is a root URL of ChronoZoom and if this is not a custom collection
             var hash = CZ.UrlNav.getURL().hash;
-            if (!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) {
+            if ((!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) && !CZ.Service.superCollectionName) {
                 show();
             }
         }

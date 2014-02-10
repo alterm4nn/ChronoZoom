@@ -24,9 +24,9 @@
                 var k = delta / h10;
                 if (k < 1.5)
                     k = 1;
-else if (k < 3.5)
+                else if (k < 3.5)
                     k = 2;
-else
+                else
                     k = 5;
 
                 var imin = Math.ceil(ymin / (k * h10));
@@ -39,9 +39,9 @@ else
                         var h1 = h;
                         if (k1 == 5)
                             k1 = 2;
-else if (k1 == 2)
+                        else if (k1 == 2)
                             k1 = 1;
-else {
+                        else {
                             h1--;
                             k1 = 5;
                         }
@@ -66,7 +66,7 @@ else {
                             h1++;
                         } else if (k1 == 2)
                             k1 = 5;
-else
+                        else
                             k1 = 2;
                         var imin1 = Math.ceil(ymin / (k1 * Math.pow(10, h1)));
                         var imax1 = Math.floor(ymax / (k1 * Math.pow(10, h1)));

@@ -17,7 +17,7 @@ var CZ;
                 this.titleInput = container.find(formInfo.titleInput);
                 this.datePicker = new CZ.UI.DatePicker(container.find(formInfo.datePicker));
                 this.createArtifactButton = container.find(formInfo.createArtifactButton);
-                this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), formInfo.contentItemsTemplate, (formInfo.context).contentItems);
+                this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), formInfo.contentItemsTemplate, formInfo.context.contentItems);
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.deleteButton = container.find(formInfo.deleteButton);
@@ -195,8 +195,16 @@ var CZ;
                         _this.exhibit.onmouseclick();
                     }, function (error) {
                         var errorMessage = JSON.parse(error.responseText).errorMessage;
-
                         if (errorMessage !== "") {
+                            _this.errorMessage.text(errorMessage);
+                            var that = _this;
+                            var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
+                            errCI.forEach(function (contentItemIndex) {
+                                var item = that.contentItemsListBox.items[contentItemIndex];
+                                item.container.find(".cz-listitem").css("border-color", "red");
+                            });
+                            errorMessage = "(1/" + errCI.length + ") " + JSON.parse(error.responseText).errorMessage;
+                            ;
                             _this.errorMessage.text(errorMessage);
                         } else {
                             _this.errorMessage.text("Sorry, internal server error :(");
@@ -237,6 +245,9 @@ var CZ;
                 } else {
                     idx = -1;
                 }
+
+                var item = this.contentItemsListBox.items[idx];
+                item.container.find(".cz-listitem").css("border-color", "#c7c7c7");
 
                 if (idx >= 0) {
                     this.clickedListItem = item;
@@ -337,9 +348,11 @@ var CZ;
                 }
                 this.activationSource.removeClass("active");
                 CZ.Authoring.isActive = false;
+
+                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
             };
             return FormEditExhibit;
-        })(UI.FormUpdateEntity);
+        })(CZ.UI.FormUpdateEntity);
         UI.FormEditExhibit = FormEditExhibit;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;

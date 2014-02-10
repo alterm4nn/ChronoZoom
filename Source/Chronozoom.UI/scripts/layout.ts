@@ -490,7 +490,8 @@ module CZ {
             else if (timeline.Regime == "Humanity") {
                 return "rgba(212, 92, 70, 1.0)";
             } else {
-                return "rgba(255, 255, 255, 0.5)";
+                // Return null to allow the settings configuration to choose color.
+                return null;
             }
         }
 

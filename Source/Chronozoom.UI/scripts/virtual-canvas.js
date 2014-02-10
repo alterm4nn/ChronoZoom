@@ -2,7 +2,7 @@
 (function (CZ) {
     (function (VirtualCanvas) {
         function initialize() {
-            ($).widget("ui.virtualCanvas", {
+            $.widget("ui.virtualCanvas", {
                 _layersContent: undefined,
                 _layers: [],
                 _create: function () {
@@ -17,7 +17,7 @@
 
                     this.requestNewFrame = false;
 
-                    self.cursorPositionChangedEvent = new ($).Event("cursorPositionChanged");
+                    self.cursorPositionChangedEvent = new $.Event("cursorPositionChanged");
                     self.breadCrumbsChangedEvent = $.Event("breadCrumbsChanged");
                     self.innerZoomConstraintChangedEvent = $.Event("innerZoomConstraintChanged");
                     self.currentlyHoveredInfodot = undefined;
@@ -25,6 +25,13 @@
                     self.recentBreadCrumb = { vcElement: { title: "initObject" } };
 
                     self.cursorPosition = 0.0;
+
+                    this.topCloak = $(".root-cloak-top");
+                    this.rightCloak = $(".root-cloak-right");
+                    this.bottomCloak = $(".root-cloak-bottom");
+                    this.leftCloak = $(".root-cloak-left");
+
+                    this.showCloak = false;
 
                     var layerDivs = self.element.children("div");
                     layerDivs.each(function (index) {
@@ -158,7 +165,7 @@
 
                     if (CZ.Common.tooltipMode == 'infodot')
                         obj = this.currentlyHoveredInfodot;
-else if (CZ.Common.tooltipMode == 'timeline')
+                    else if (CZ.Common.tooltipMode == 'timeline')
                         obj = this.currentlyHoveredTimeline;
 
                     if (obj == null)
@@ -255,7 +262,7 @@ else if (CZ.Common.tooltipMode == 'timeline')
                                     this.hovered.onmouseunhover(posv, e);
                             if (this.currentlyHoveredContentItem)
                                 this.hovered = this.currentlyHoveredContentItem;
-else
+                            else
                                 this.hovered = mouseInStack[n];
                             break;
                         }
@@ -266,7 +273,7 @@ else
 
                         if (CZ.Common.tooltipMode == 'infodot')
                             obj = this.currentlyHoveredInfodot;
-else if (CZ.Common.tooltipMode == 'timeline')
+                        else if (CZ.Common.tooltipMode == 'timeline')
                             obj = this.currentlyHoveredTimeline;
 
                         if (obj != null) {
@@ -309,6 +316,19 @@ else if (CZ.Common.tooltipMode == 'timeline')
                     };
 
                     return rfind(this._layersContent, id);
+                },
+                forEachElement: function (callback) {
+                    var rfind = function (el, callback) {
+                        callback(el);
+                        if (!el.children)
+                            return;
+                        for (var i = 0; i < el.children.length; i++) {
+                            var child = el.children[i];
+                            var res = rfind(child, callback);
+                        }
+                    };
+
+                    return rfind(this._layersContent, callback);
                 },
                 _destroy: function () {
                     this.element.removeClass("virtualCanvas");
@@ -387,6 +407,8 @@ else if (CZ.Common.tooltipMode == 'timeline')
                     }
 
                     elementsRoot.render(contexts, visibleBox_v, viewport);
+
+                    this.updateCloakPosition(viewport);
                 },
                 invalidate: function () {
                     var viewbox_v = this._visibleToViewBox(this.options.visible);
@@ -489,6 +511,52 @@ else if (CZ.Common.tooltipMode == 'timeline')
                 options: {
                     aspectRatio: 1,
                     visible: { centerX: 0, centerY: 0, scale: 1 }
+                },
+                cloakNonRootVirtualSpace: function () {
+                    this.showCloak = true;
+                    var viewport = this.getViewport();
+
+                    this.updateCloakPosition(viewport);
+
+                    this.topCloak.addClass("visible");
+                    this.rightCloak.addClass("visible");
+                    this.bottomCloak.addClass("visible");
+                    this.leftCloak.addClass("visible");
+                },
+                showNonRootVirtualSpace: function () {
+                    this.showCloak = false;
+
+                    this.topCloak.removeClass("visible");
+                    this.rightCloak.removeClass("visible");
+                    this.bottomCloak.removeClass("visible");
+                    this.leftCloak.removeClass("visible");
+                },
+                updateCloakPosition: function (viewport) {
+                    if (!this.showCloak)
+                        return;
+
+                    var rootTimeline = this._layersContent.children[0];
+
+                    var top = rootTimeline.y;
+                    var right = rootTimeline.x + rootTimeline.width;
+                    var bottom = rootTimeline.y + rootTimeline.height;
+                    var left = rootTimeline.x;
+
+                    top = Math.max(0, viewport.pointVirtualToScreen(0, top).y);
+                    right = Math.max(0, viewport.pointVirtualToScreen(right, 0).x);
+                    bottom = Math.max(0, viewport.pointVirtualToScreen(0, bottom).y);
+                    left = Math.max(0, viewport.pointVirtualToScreen(left, 0).x);
+
+                    this.rightCloak.css("width", Math.max(0, viewport.width - right) + "px");
+                    this.leftCloak.css("width", left + "px");
+
+                    this.bottomCloak.css("height", Math.max(0, viewport.height - bottom) + "px");
+                    this.topCloak.css("height", top + "px");
+
+                    this.topCloak.css("left", left + "px");
+                    this.topCloak.css("right", Math.max(0, viewport.width - right) + "px");
+                    this.bottomCloak.css("left", left + "px");
+                    this.bottomCloak.css("right", Math.max(0, viewport.width - right) + "px");
                 }
             });
         }
