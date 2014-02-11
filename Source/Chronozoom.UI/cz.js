@@ -690,65 +690,8554 @@ var CZ;
     var Bibliography = CZ.Bibliography;
 })(CZ || (CZ = {}));
 ;
-
 var CZ;
 (function (CZ) {
-    (function (Extensions) {
-        (function (RIN) {
-            function getScript() {
-                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/lib/rin-core-1.0.js";
-            }
-            RIN.getScript = getScript;
+    (function (Dates) {
+        Dates.months = [
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December'];
 
-            function getExtension(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload) {
-                var rinDiv;
-                if (!rinDiv) {
-                    rinDiv = document.createElement('div');
-                    rinDiv.setAttribute("id", id);
-                    rinDiv.setAttribute("class", "rinPlayer");
-                    rinDiv.addEventListener("mousemove", CZ.Common.preventbubble, false);
-                    rinDiv.addEventListener("mousedown", CZ.Common.preventbubble, false);
-                    rinDiv.addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
-                    rinDiv.addEventListener("mousewheel", CZ.Common.preventbubble, false);
+        Dates.daysInMonth = [
+            31,
+            28,
+            31,
+            30,
+            31,
+            30,
+            31,
+            31,
+            30,
+            31,
+            30,
+            31];
 
-                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/').then(function () {
-                        var playerElement = document.getElementById(id);
-                        var playerControl = rin.getPlayerControl(rinDiv);
-                        if (playerControl) {
-                            var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
-                            playerControl.load(contentSource);
-                        }
-                    });
-                } else {
-                    rinDiv.isAdded = false;
+        function getCoordinateFromYMD(year, month, day) {
+            var sign = (year === -1) ? 1 : year / Math.abs(year), isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, coord = (year > -1) ? year : year + 1;
+
+            var sumDaysOfMonths = function (s, d, i) {
+                return s + +(i < month) * d;
+            };
+            var days = Dates.daysInMonth.reduce(sumDaysOfMonths, +(isLeap && month > 1)) + day;
+
+            coord += (days - 1) / daysInYear;
+
+            coord = roundDecimal(coord, CZ.Settings.allowedMathImprecisionDecimals);
+
+            return coord;
+        }
+        Dates.getCoordinateFromYMD = getCoordinateFromYMD;
+
+        function getYMDFromCoordinate(coord, MarkerCorrection) {
+            if (typeof MarkerCorrection === "undefined") { MarkerCorrection = false; }
+            var absCoord = Math.abs(coord), floorCoord = Math.floor(coord), sign = (coord === 0) ? 1 : coord / absCoord, day = 0, month = 0, year = (coord >= 1) ? floorCoord : floorCoord - 1, isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, daysFraction = sign * (absCoord - Math.abs(floorCoord));
+
+            day = Math.round(daysFraction * daysInYear);
+            if (MarkerCorrection)
+                day = Math.floor(daysFraction * daysInYear);
+            day += +(day < daysInYear);
+
+            while (day > Dates.daysInMonth[month] + (+(isLeap && month === 1))) {
+                day -= Dates.daysInMonth[month];
+                if (isLeap && month === 1) {
+                    day--;
                 }
-                return new RINPlayer(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload, rinDiv);
+                month++;
             }
-            RIN.getExtension = getExtension;
 
-            function RINPlayer(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload, rinDiv) {
-                this.base = CZ.VCContent.CanvasDomItem;
-                this.base(vc, layerid, id, vx, vy, vw, vh, z);
-                this.initializeContent(rinDiv);
+            return {
+                year: year,
+                month: month,
+                day: day
+            };
+        }
+        Dates.getYMDFromCoordinate = getYMDFromCoordinate;
 
-                this.onRemove = function () {
-                    var rinplayerControl = rin.getPlayerControl(rinDiv);
-                    if (rinplayerControl) {
-                        rinplayerControl.pause();
-                        if (rinplayerControl.unload) {
-                            rinplayerControl.unload();
-                        }
-                        rinplayerControl = null;
-                    }
-                    this.prototype.onRemove.call(this);
+        function getCoordinateFromDecimalYear(decimalYear) {
+            var localPresent = getPresent();
+            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+
+            return decimalYear === 9999 ? presentDate : (decimalYear < 0 ? decimalYear + 1 : decimalYear);
+        }
+        Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
+
+        function getDecimalYearFromCoordinate(coordinate) {
+            return coordinate < 1 ? --coordinate : coordinate;
+        }
+        Dates.getDecimalYearFromCoordinate = getDecimalYearFromCoordinate;
+
+        function convertCoordinateToYear(coordinate) {
+            var year = {
+                year: coordinate,
+                regime: "CE"
+            };
+            var eps_const = 100000;
+            if (coordinate <= -999999999) {
+                year.year = (year.year - 1) / (-1000000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
+                year.regime = 'Ga';
+            } else if (coordinate <= -999999) {
+                year.year = (year.year - 1) / (-1000000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
+                year.regime = 'Ma';
+            } else if (coordinate <= -9999) {
+                year.year = (year.year - 1) / (-1000);
+                year.year = Math.round(year.year * eps_const) / eps_const;
+                year.regime = 'Ka';
+            } else if (coordinate < 1) {
+                year.year = (year.year - 1) / (-1);
+
+                year.year = Math.ceil(year.year);
+                year.regime = 'BCE';
+            } else {
+                year.year = Math.floor(year.year);
+            }
+
+            return year;
+        }
+        Dates.convertCoordinateToYear = convertCoordinateToYear;
+
+        function convertYearToCoordinate(year, regime) {
+            var coordinate = year;
+
+            switch (regime.toLowerCase()) {
+                case "ga":
+                    coordinate = year * (-1000000000) + 1;
+                    break;
+                case "ma":
+                    coordinate = year * (-1000000) + 1;
+                    break;
+                case "ka":
+                    coordinate = year * (-1000) + 1;
+                    break;
+                case "bce":
+                    coordinate = year * (-1) + 1;
+
+                    break;
+            }
+
+            return coordinate;
+        }
+        Dates.convertYearToCoordinate = convertYearToCoordinate;
+
+        var present = undefined;
+        function getPresent() {
+            if (!present) {
+                present = new Date();
+
+                present.presentDay = present.getUTCDate();
+                present.presentMonth = present.getUTCMonth();
+                present.presentYear = present.getUTCFullYear();
+            }
+            return present;
+        }
+        Dates.getPresent = getPresent;
+
+        function isLeapYear(year) {
+            return (year >= 1582 && (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)));
+        }
+        Dates.isLeapYear = isLeapYear;
+
+        function numberofLeap(year) {
+            var startLeap = 1582;
+            if (year < startLeap)
+                return 0;
+            var years1 = Math.floor(year / 4) - Math.floor(startLeap / 4);
+            years1 -= Math.floor(year / 100) - Math.floor(startLeap / 100);
+            years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
+            if (isLeapYear(year))
+                years1--;
+            return years1;
+        }
+        Dates.numberofLeap = numberofLeap;
+
+        function roundDecimal(decimal, precision) {
+            return Math.round(decimal * Math.pow(10, precision)) / Math.pow(10, precision);
+        }
+    })(CZ.Dates || (CZ.Dates = {}));
+    var Dates = CZ.Dates;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Viewport) {
+        function VisibleRegion2d(centerX, centerY, scale) {
+            this.centerX = centerX;
+            this.centerY = centerY;
+            this.scale = scale;
+        }
+        Viewport.VisibleRegion2d = VisibleRegion2d;
+
+        function Viewport2d(aspectRatio, width, height, visible) {
+            this.aspectRatio = aspectRatio;
+            this.visible = visible;
+            this.width = width;
+            this.height = height;
+
+            this.widthScreenToVirtual = function (wp) {
+                return this.visible.scale * wp;
+            };
+
+            this.heightScreenToVirtual = function (hp) {
+                return this.aspectRatio * this.visible.scale * hp;
+            };
+
+            this.widthVirtualToScreen = function (wv) {
+                return wv / this.visible.scale;
+            };
+
+            this.heightVirtualToScreen = function (hv) {
+                return hv / (this.aspectRatio * this.visible.scale);
+            };
+
+            this.vectorVirtualToScreen = function (vx, vy) {
+                return {
+                    x: vx / this.visible.scale,
+                    y: vy / (this.aspectRatio * this.visible.scale)
+                };
+            };
+
+            this.pointVirtualToScreen = function (px, py) {
+                return {
+                    x: (px - this.visible.centerX) / this.visible.scale + this.width / 2.0,
+                    y: (py - this.visible.centerY) / (this.aspectRatio * this.visible.scale) + this.height / 2.0
+                };
+            };
+
+            this.pointScreenToVirtual = function (px, py) {
+                return {
+                    x: (px - this.width / 2.0) * this.visible.scale + this.visible.centerX,
+                    y: this.visible.centerY - (this.height / 2.0 - py) * (this.aspectRatio * this.visible.scale)
+                };
+            };
+
+            this.vectorScreenToVirtual = function (px, py) {
+                return {
+                    x: px * this.visible.scale,
+                    y: this.aspectRatio * this.visible.scale * py
+                };
+            };
+        }
+        Viewport.Viewport2d = Viewport2d;
+    })(CZ.Viewport || (CZ.Viewport = {}));
+    var Viewport = CZ.Viewport;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (ViewportAnimation) {
+        var globalAnimationID = 1;
+
+        function PanZoomAnimation(startViewport) {
+            this.isForciblyStoped = false;
+            this.ID = globalAnimationID++;
+            var startVisible = startViewport.visible;
+
+            this.velocity = 0.001;
+
+            this.isActive = true;
+            this.type = "PanZoom";
+
+            this.startViewport = new CZ.Viewport.Viewport2d(startViewport.aspectRatio, startViewport.width, startViewport.height, new CZ.Viewport.VisibleRegion2d(startVisible.centerX, startVisible.centerY, startVisible.scale));
+            this.estimatedEndViewport;
+
+            this.endCenterInSC;
+            this.startCenterInSC = this.startViewport.pointVirtualToScreen(startVisible.centerX, startVisible.centerY);
+
+            this.previousFrameCenterInSC = this.startCenterInSC;
+            this.previousFrameViewport = this.startViewport;
+            this.prevFrameTime = new Date();
+
+            this.direction;
+            this.pathLeng;
+
+            this.setTargetViewport = function (estimatedEndViewport) {
+                this.estimatedEndViewport = estimatedEndViewport;
+
+                var prevVis = this.previousFrameViewport.visible;
+
+                this.startViewport = new CZ.Viewport.Viewport2d(this.previousFrameViewport.aspectRatio, this.previousFrameViewport.width, this.previousFrameViewport.height, new CZ.Viewport.VisibleRegion2d(prevVis.centerX, prevVis.centerY, prevVis.scale));
+
+                this.startCenterInSC = this.startViewport.pointVirtualToScreen(prevVis.centerX, prevVis.centerY);
+                this.previousFrameCenterInSC = {
+                    x: this.startCenterInSC.x,
+                    y: this.startCenterInSC.y
+                };
+                var estimatedVisible = this.estimatedEndViewport.visible;
+                this.endCenterInSC = this.startViewport.pointVirtualToScreen(estimatedVisible.centerX, estimatedVisible.centerY);
+
+                this.direction = {
+                    X: this.endCenterInSC.x - this.startCenterInSC.x,
+                    Y: this.endCenterInSC.y - this.startCenterInSC.y
                 };
 
-                this.prototype = new CZ.VCContent.CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+                var dirX = this.direction.X;
+                var dirY = this.direction.Y;
+
+                this.pathLeng = Math.sqrt(dirX * dirX + dirY * dirY);
+
+                if (this.pathLeng < 1e-1) {
+                    this.direction.X = this.direction.Y = 0;
+
+                    if (estimatedVisible.scale == prevVis.scale)
+                        this.isActive = false;
+                } else {
+                    this.direction.X /= this.pathLeng;
+                    this.direction.Y /= this.pathLeng;
+                }
+            };
+
+            this.produceNextVisible = function (currentViewport) {
+                var currentCenterInSC = this.startViewport.pointVirtualToScreen(currentViewport.visible.centerX, currentViewport.visible.centerY);
+                var currScale = currentViewport.visible.scale;
+
+                var startVisible = this.startViewport.visible;
+
+                var curTime = new Date();
+                var timeDiff = curTime.getTime() - this.prevFrameTime.getTime();
+                var k = this.velocity * timeDiff;
+
+                var dx = this.endCenterInSC.x - this.previousFrameCenterInSC.x;
+                var dy = this.endCenterInSC.y - this.previousFrameCenterInSC.y;
+
+                var curDist = Math.max(1.0, Math.sqrt(dx * dx + dy * dy));
+
+                var prevFrameVisible = this.previousFrameViewport.visible;
+                var updatedVisible = new CZ.Viewport.VisibleRegion2d(prevFrameVisible.centerX, prevFrameVisible.centerY, prevFrameVisible.scale);
+                this.previousFrameCenterInSC.x += curDist * k * this.direction.X;
+                this.previousFrameCenterInSC.y += curDist * k * this.direction.Y;
+                updatedVisible.scale += (this.estimatedEndViewport.visible.scale - updatedVisible.scale) * k;
+                this.prevFrameTime = curTime;
+
+                dx = this.previousFrameCenterInSC.x - this.startCenterInSC.x;
+                dy = this.previousFrameCenterInSC.y - this.startCenterInSC.y;
+
+                var distToStart = Math.sqrt(dx * dx + dy * dy);
+                var scaleDistToStart = this.estimatedEndViewport.visible.scale - startVisible.scale;
+                var scaleDistCurrent = updatedVisible.scale - startVisible.scale;
+                if ((distToStart >= this.pathLeng) || Math.abs(scaleDistCurrent) > Math.abs(scaleDistToStart)) {
+                    this.isActive = false;
+                    return this.estimatedEndViewport.visible;
+                }
+                ;
+
+                var virtPoint = this.startViewport.pointScreenToVirtual(this.previousFrameCenterInSC.x, this.previousFrameCenterInSC.y);
+
+                updatedVisible.centerX = virtPoint.x;
+                updatedVisible.centerY = virtPoint.y;
+
+                this.previousFrameViewport.visible = updatedVisible;
+
+                return updatedVisible;
+            };
+        }
+        ViewportAnimation.PanZoomAnimation = PanZoomAnimation;
+
+        function EllipticalZoom(startVisible, endVisible) {
+            this.isForciblyStoped = false;
+            this.ID = globalAnimationID++;
+            this.type = "EllipticalZoom";
+            this.isActive = true;
+            this.targetVisible = new CZ.Viewport.VisibleRegion2d(endVisible.centerX, endVisible.centerY, endVisible.scale);
+            this.startTime = (new Date()).getTime();
+
+            this.imprecision = 0.0001;
+
+            function cosh(x) {
+                return (Math.exp(x) + Math.exp(-x)) / 2;
             }
-        })(Extensions.RIN || (Extensions.RIN = {}));
-        var RIN = Extensions.RIN;
-    })(CZ.Extensions || (CZ.Extensions = {}));
-    var Extensions = CZ.Extensions;
+
+            function sinh(x) {
+                return (Math.exp(x) - Math.exp(-x)) / 2;
+            }
+
+            function tanh(x) {
+                return sinh(x) / cosh(x);
+            }
+
+            this.u = function (s) {
+                var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
+
+                if (this.uS < this.pathLen) {
+                    val = val * this.uSRatio;
+                }
+
+                return Math.min(val, this.pathLen);
+            };
+
+            this.scale = function (t) {
+                return this.startScale * cosh(this.r0) / cosh(this.ro * (t * this.S) + this.r0);
+            };
+
+            this.x = function (t) {
+                return startPoint.X + (endPoint.X - startPoint.X) / this.pathLen * this.u(t * this.S);
+            };
+
+            this.y = function (t) {
+                return startPoint.Y + (endPoint.Y - startPoint.Y) / this.pathLen * this.u(t * this.S);
+            };
+
+            this.produceNextVisible = function (currentViewport) {
+                var curTime = (new Date()).getTime();
+                var t;
+
+                if (this.duration > 0)
+                    t = Math.min(1.0, (curTime - this.startTime) / this.duration);
+                else
+                    t = 1.0;
+
+                t = animationEase(t);
+
+                if (t == 1.0) {
+                    this.isActive = false;
+                }
+
+                return new CZ.Viewport.VisibleRegion2d(this.x(t), this.y(t), this.scale(t));
+            };
+
+            var startPoint = {
+                X: startVisible.centerX,
+                Y: startVisible.centerY
+            };
+
+            var startScale = startVisible.scale;
+
+            var endPoint = {
+                X: endVisible.centerX,
+                Y: endVisible.centerY
+            };
+            var endScale = endVisible.scale;
+
+            var xDiff = startPoint.X - endPoint.X;
+            var yDiff = startPoint.Y - endPoint.Y;
+            this.pathLen = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+
+            var ro = 0.1 * CZ.Settings.ellipticalZoomZoomoutFactor;
+            this.ro = ro;
+            var u0 = 0;
+            this.u0 = u0;
+            var u1 = this.pathLen;
+            this.startPoint = startPoint;
+            this.startScale = startScale;
+            this.endPoint = endPoint;
+            this.endScale = endScale;
+
+            if (Math.abs(u0 - u1) > this.imprecision) {
+                var uDiff = u0 - u1;
+                var b0 = (endScale * endScale - startScale * startScale + Math.pow(ro, 4) * uDiff * uDiff) / (2 * startScale * ro * ro * (-uDiff));
+                var b1 = (endScale * endScale - startScale * startScale - Math.pow(ro, 4) * uDiff * uDiff) / (2 * endScale * ro * ro * (-uDiff));
+
+                this.r0 = Math.log(-b0 + Math.sqrt(b0 * b0 + 1));
+                if (this.r0 == -Infinity) {
+                    this.r0 = -Math.log(2 * b0);
+                }
+
+                this.r1 = Math.log(-b1 + Math.sqrt(b1 * b1 + 1));
+                if (this.r1 == -Infinity) {
+                    this.r1 = -Math.log(2 * b1);
+                }
+
+                this.S = (this.r1 - this.r0) / ro;
+                this.duration = CZ.Settings.ellipticalZoomDuration / 300 * this.S;
+            } else {
+                var logScaleChange = Math.log(Math.abs(endScale - startScale)) + 10;
+                if (logScaleChange < 0)
+                    this.isActive = false;
+
+                var scaleDiff = 0.5;
+
+                if (endScale !== 0 || startScale !== 0) {
+                    scaleDiff = Math.min(endScale, startScale) / Math.max(endScale, startScale);
+                }
+
+                if (scaleDiff === 1) {
+                    this.isActive = false;
+                }
+
+                this.duration = CZ.Settings.ellipticalZoomDuration * scaleDiff * 0.2;
+
+                this.x = function (s) {
+                    return this.startPoint.X;
+                };
+                this.y = function (s) {
+                    return this.startPoint.Y;
+                };
+                this.scale = function (s) {
+                    return this.startScale + (this.endScale - this.startScale) * s;
+                };
+            }
+
+            this.coshR0 = cosh(this.r0);
+            this.sinhR0 = sinh(this.r0);
+            this.uS = this.u(this.S);
+            this.uSRatio = this.pathLen / this.uS;
+        }
+        ViewportAnimation.EllipticalZoom = EllipticalZoom;
+
+        function animationEase(t) {
+            return -2 * t * t * t + 3 * t * t;
+        }
+        ViewportAnimation.animationEase = animationEase;
+    })(CZ.ViewportAnimation || (CZ.ViewportAnimation = {}));
+    var ViewportAnimation = CZ.ViewportAnimation;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (ViewportController) {
+        function ViewportController2(setVisible, getViewport, gesturesSource) {
+            this.activeAnimation;
+
+            this.FPS;
+
+            this.maximumPermitedScale;
+
+            this.leftPermitedBound;
+            this.rightPermitedBound;
+            this.topPermitedBound;
+            this.bottomPermitedBound;
+
+            this.effectiveExplorationZoomConstraint = undefined;
+
+            if (!window.requestAnimFrame)
+                window.requestAnimFrame = function (callback) {
+                    window.setTimeout(callback, 1000 / CZ.Settings.targetFps);
+                };
+
+            this.viewportWidth;
+            this.viewportHeight;
+
+            this.setVisible = setVisible;
+            this.getViewport = getViewport;
+
+            var self = this;
+
+            this.estimatedViewport = undefined;
+
+            this.recentViewport = undefined;
+
+            this.onAnimationComplete = [];
+
+            this.onAnimationUpdated = [];
+
+            this.onAnimationStarted = [];
+
+            function PanViewport(viewport, panGesture) {
+                var virtualOffset = viewport.vectorScreenToVirtual(panGesture.xOffset, panGesture.yOffset);
+                var oldVisible = viewport.visible;
+                viewport.visible.centerX = oldVisible.centerX - virtualOffset.x;
+                viewport.visible.centerY = oldVisible.centerY - virtualOffset.y;
+            }
+
+            function ZoomViewport(viewport, zoomGesture) {
+                var oldVisible = viewport.visible;
+                var x = zoomGesture.xOrigin + (viewport.width / 2.0 - zoomGesture.xOrigin) * zoomGesture.scaleFactor;
+                var y = zoomGesture.yOrigin + (viewport.height / 2.0 - zoomGesture.yOrigin) * zoomGesture.scaleFactor;
+                var newCenter = viewport.pointScreenToVirtual(x, y);
+                viewport.visible.centerX = newCenter.x;
+                viewport.visible.centerY = newCenter.y;
+                viewport.visible.scale = oldVisible.scale * zoomGesture.scaleFactor;
+            }
+
+            function calculateTargetViewport(latestViewport, gesture, previouslyEstimatedViewport) {
+                var latestVisible = latestViewport.visible;
+                var initialViewport;
+                if (gesture.Type == "Zoom") {
+                    if (gesture.Source == "Touch") {
+                        if (previouslyEstimatedViewport)
+                            initialViewport = previouslyEstimatedViewport;
+                        else {
+                            initialViewport = new CZ.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new CZ.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
+                        }
+                    } else {
+                        initialViewport = new CZ.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new CZ.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
+                    }
+
+                    ZoomViewport(initialViewport, gesture);
+                } else {
+                    if (previouslyEstimatedViewport)
+                        initialViewport = previouslyEstimatedViewport;
+                    else {
+                        initialViewport = new CZ.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new CZ.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
+                    }
+
+                    PanViewport(initialViewport, gesture);
+                }
+
+                self.coerceVisible(initialViewport, gesture);
+                return initialViewport;
+            }
+
+            this.saveScreenParameters = function (viewport) {
+                self.viewportWidth = viewport.width;
+                self.viewportHeight = viewport.height;
+            };
+
+            this.coerceVisible = function (vp, gesture) {
+                this.coerceVisibleInnerZoom(vp, gesture);
+                this.coerceVisibleOuterZoom(vp, gesture);
+                this.coerceVisibleHorizontalBound(vp);
+                this.coerceVisibleVerticalBound(vp);
+            };
+
+            this.coerceVisibleOuterZoom = function (vp, gesture) {
+                if (gesture.Type === "Zoom") {
+                    var visible = vp.visible;
+                    if (typeof CZ.Common.maxPermitedScale != 'undefined' && CZ.Common.maxPermitedScale) {
+                        if (visible.scale > CZ.Common.maxPermitedScale) {
+                            gesture.scaleFactor = CZ.Common.maxPermitedScale / visible.scale;
+                            ZoomViewport(vp, gesture);
+                        }
+                    }
+                }
+            };
+
+            this.coerceVisibleHorizontalBound = function (vp) {
+                var visible = vp.visible;
+                if (CZ.Settings.maxPermitedTimeRange) {
+                    if (visible.centerX > CZ.Settings.maxPermitedTimeRange.right)
+                        visible.centerX = CZ.Settings.maxPermitedTimeRange.right;
+                    else if (visible.centerX < CZ.Settings.maxPermitedTimeRange.left)
+                        visible.centerX = CZ.Settings.maxPermitedTimeRange.left;
+                }
+            };
+
+            this.coerceVisibleVerticalBound = function (vp) {
+                var visible = vp.visible;
+                if (CZ.Common.maxPermitedVerticalRange) {
+                    if (visible.centerY > CZ.Common.maxPermitedVerticalRange.bottom)
+                        visible.centerY = CZ.Common.maxPermitedVerticalRange.bottom;
+                    else if (visible.centerY < CZ.Common.maxPermitedVerticalRange.top)
+                        visible.centerY = CZ.Common.maxPermitedVerticalRange.top;
+                }
+            };
+
+            this.coerceVisibleInnerZoom = function (vp, gesture) {
+                var visible = vp.visible;
+                var x = visible.centerX;
+                var scale = visible.scale;
+                var constr = undefined;
+                if (this.effectiveExplorationZoomConstraint)
+                    constr = this.effectiveExplorationZoomConstraint;
+                else
+                    for (var i = 0; i < CZ.Settings.deeperZoomConstraints.length; i++) {
+                        var possibleConstr = CZ.Settings.deeperZoomConstraints[i];
+                        if (possibleConstr.left <= x && possibleConstr.right > x) {
+                            constr = possibleConstr.scale;
+                            break;
+                        }
+                    }
+                if (constr) {
+                    if (scale < constr) {
+                        visible.scale = constr;
+                    }
+                }
+            };
+
+            self.updateRecentViewport = function () {
+                var vp = getViewport();
+                var vis = vp.visible;
+                self.recentViewport = new CZ.Viewport.Viewport2d(vp.aspectRatio, vp.width, vp.height, new CZ.Viewport.VisibleRegion2d(vis.centerX, vis.centerY, vis.scale));
+            };
+
+            var requestTimer = null;
+            this.getMissingData = function (vbox, lca) {
+                if (typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
+                    window.clearTimeout(requestTimer);
+                    requestTimer = window.setTimeout(function () {
+                        getMissingTimelines(vbox, lca);
+                    }, 1000);
+                }
+            };
+
+            function getMissingTimelines(vbox, lca) {
+                CZ.Data.getTimelines({
+                    lca: lca.guid,
+                    start: vbox.left,
+                    end: vbox.right,
+                    minspan: CZ.Settings.minTimelineWidth * vbox.scale
+                }).then(function (response) {
+                    CZ.Layout.Merge(response, lca);
+                }, function (error) {
+                    console.log("Error connecting to service:\n" + error.responseText);
+                });
+            }
+
+            function getMissingExhibits(vbox, lca, exhibitIds) {
+                CZ.Service.postData({
+                    ids: exhibitIds
+                }).then(function (response) {
+                    MergeContentItems(lca, exhibitIds, response.exhibits);
+                }, function (error) {
+                    console.log("Error connecting to service:\n" + error.responseText);
+                });
+            }
+
+            function extractExhibitIds(timeline) {
+                var ids = [];
+                if (timeline.exhibits instanceof Array) {
+                    timeline.exhibits.forEach(function (childExhibit) {
+                        ids.push(childExhibit.id);
+                    });
+                }
+                if (timeline.timelines instanceof Array) {
+                    timeline.timelines.forEach(function (childTimeline) {
+                        ids = ids.concat(extractExhibitIds(childTimeline));
+                    });
+                }
+                return ids;
+            }
+
+            function MergeContentItems(timeline, exhibitIds, exhibits) {
+                timeline.children.forEach(function (child) {
+                    if (child.type === "infodot") {
+                        var idx = exhibitIds.indexOf(child.guid);
+                        if (idx !== -1) {
+                            child.contentItems = exhibits[idx].contentItems;
+                        }
+                    }
+                });
+
+                timeline.children.forEach(function (child) {
+                    if (child.type === "timeline")
+                        MergeContentItems(child, exhibitIds, exhibits);
+                });
+            }
+
+            gesturesSource.Subscribe(function (gesture) {
+                if (typeof gesture != "undefined" && !CZ.Authoring.isActive) {
+                    var isAnimationActive = self.activeAnimation;
+                    var oldId = isAnimationActive ? self.activeAnimation.ID : undefined;
+
+                    self.updateRecentViewport();
+                    var latestViewport = self.recentViewport;
+
+                    if (gesture.Type == "Pin") {
+                        self.stopAnimation();
+                        return;
+                    }
+
+                    if (gesture.Type == "Pan" || gesture.Type == "Zoom") {
+                        var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
+
+                        var vbox = CZ.Common.viewportToViewBox(newlyEstimatedViewport);
+                        var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+
+                        if (!self.estimatedViewport) {
+                            self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
+
+                            self.saveScreenParameters(latestViewport);
+                        }
+
+                        if (gesture.Type == "Pan")
+                            self.activeAnimation.velocity = CZ.Settings.panSpeedFactor * 0.001;
+                        else
+                            self.activeAnimation.velocity = CZ.Settings.zoomSpeedFactor * 0.0025;
+
+                        self.activeAnimation.setTargetViewport(newlyEstimatedViewport);
+                        self.estimatedViewport = newlyEstimatedViewport;
+                    }
+
+                    if (oldId != undefined)
+                        animationUpdated(oldId, self.activeAnimation.ID);
+                    else
+                        AnimationStarted(self.activeAnimation.ID);
+
+                    if (!isAnimationActive)
+                        self.animationStep(self);
+                }
+            });
+
+            self.updateRecentViewport();
+            this.saveScreenParameters(self.recentViewport);
+
+            this.stopAnimation = function () {
+                self.estimatedViewport = undefined;
+                if (self.activeAnimation) {
+                    self.activeAnimation.isForciblyStoped = true;
+                    self.activeAnimation.isActive = false;
+
+                    animationUpdated(self.activeAnimation.ID, undefined);
+                }
+            };
+
+            function animationUpdated(oldId, newId) {
+                for (var i = 0; i < self.onAnimationUpdated.length; i++)
+                    self.onAnimationUpdated[i](oldId, newId);
+            }
+
+            function AnimationStarted(newId) {
+                for (var i = 0; i < self.onAnimationStarted.length; i++)
+                    self.onAnimationStarted[i](newId);
+            }
+
+            this.animationStep = function (self) {
+                if (self.activeAnimation) {
+                    if (self.activeAnimation.isActive)
+                        window.requestAnimFrame(function () {
+                            self.animationStep(self);
+                        });
+                    else {
+                        var stopAnimationID = self.activeAnimation.ID;
+
+                        self.updateRecentViewport();
+                        setVisible(new CZ.Viewport.VisibleRegion2d(self.recentViewport.visible.centerX, self.recentViewport.visible.centerY, self.recentViewport.visible.scale));
+                        if (!self.activeAnimation.isForciblyStoped)
+                            for (var i = 0; i < self.onAnimationComplete.length; i++)
+                                self.onAnimationComplete[i](stopAnimationID);
+                        self.activeAnimation = undefined;
+                        self.estimatedViewport = undefined;
+                        return;
+                    }
+
+                    var vp = self.recentViewport;
+                    if (self.viewportWidth != vp.width || self.viewportHeight != vp.height)
+                        self.stopAnimation();
+
+                    var vis = self.activeAnimation.produceNextVisible(vp);
+                    setVisible(vis);
+                }
+
+                this.frames++;
+                this.oneSecondFrames++;
+
+                var e = CZ.Common.vc.virtualCanvas("getLastEvent");
+                if (e != null) {
+                    CZ.Common.vc.virtualCanvas("mouseMove", e);
+                }
+            };
+
+            this.frames = 0;
+            this.oneSecondFrames = 0;
+            window.setInterval(function () {
+                self.FPS = self.oneSecondFrames;
+                self.oneSecondFrames = 0;
+            }, 1000);
+
+            this.PanViewportAccessor = PanViewport;
+
+            this.moveToVisible = function (visible, noAnimation) {
+                var currentViewport = getViewport();
+                var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
+                var vbox = CZ.Common.viewportToViewBox(targetViewport);
+                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
+
+                if (noAnimation) {
+                    self.stopAnimation();
+                    self.setVisible(visible);
+                    return;
+                }
+
+                var wasAnimationActive = false;
+                var oldId = undefined;
+                if (this.activeAnimation) {
+                    wasAnimationActive = this.activeAnimation.isActive;
+                    oldId = this.activeAnimation.ID;
+                }
+
+                self.updateRecentViewport();
+                var vp = self.recentViewport;
+                this.estimatedViewport = undefined;
+                this.activeAnimation = new CZ.ViewportAnimation.EllipticalZoom(vp.visible, visible);
+
+                self.viewportWidth = vp.width;
+                self.viewportHeight = vp.height;
+
+                if (!wasAnimationActive) {
+                    if (this.activeAnimation.isActive)
+                        AnimationStarted(this.activeAnimation.ID);
+
+                    setTimeout(function () {
+                        return self.animationStep(self);
+                    }, 0);
+                } else {
+                    animationUpdated(oldId, this.activeAnimation.ID);
+                }
+
+                return (this.activeAnimation) ? this.activeAnimation.ID : undefined;
+            };
+        }
+        ViewportController.ViewportController2 = ViewportController2;
+    })(CZ.ViewportController || (CZ.ViewportController = {}));
+    var ViewportController = CZ.ViewportController;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    function Timescale(container) {
+        if (!container) {
+            throw "Container parameter is undefined!";
+        }
+        if (container.tagName !== undefined && container.tagName.toLowerCase() === "div") {
+            container = $(container);
+        } else if (typeof (container) === "string") {
+            container = $("#" + container);
+            if (container.length === 0 || !container.is("div")) {
+                throw "There is no DIV element with such ID.";
+            }
+        } else if (!(container instanceof jQuery && container.is("div"))) {
+            throw "Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV.";
+        }
+
+        var mouse_clicked = false;
+        var mouse_hovered = false;
+
+        container.mouseup(function (e) {
+            mouse_clicked = false;
+        });
+        container.mousedown(function (e) {
+            mouse_clicked = true;
+        });
+        container.mousemove(function (e) {
+            mouse_hovered = true;
+            mouseMove(e);
+        });
+        container.mouseleave(function (e) {
+            mouse_hovered = false;
+            mouse_clicked = false;
+        });
+
+        var that = this;
+        var _container = container;
+        var _range = { min: 0, max: 1 };
+        var _ticks = [];
+        var _ticksInfo = [];
+        var _mode = "cosmos";
+        var _position = "top";
+        var _deltaRange;
+        var _size;
+        var _width;
+        var _height;
+        var _canvasHeight;
+        var _markerPosition;
+
+        var _tickSources = {
+            "cosmos": new CZ.CosmosTickSource(),
+            "calendar": new CZ.CalendarTickSource(),
+            "date": new CZ.DateTickSource()
+        };
+
+        var isHorizontal = (_position === "bottom" || _position === "top");
+        var canvas = $("<canvas></canvas>");
+        var labelsDiv = $("<div></div>");
+
+        var marker = $("<div id='timescale_marker' class='cz-timescale-marker'></div>");
+        var markerText = $("<div id='marker-text'></div>");
+        var markertriangle = $("<div id='marker-triangle'></div>");
+
+        var canvasSize = CZ.Settings.tickLength + CZ.Settings.timescaleThickness;
+        var text_size;
+        var fontSize;
+        var strokeStyle;
+        var ctx;
+
+        init();
+
+        Object.defineProperties(this, {
+            position: {
+                configurable: false,
+                get: function () {
+                    return _position;
+                },
+                set: function (value) {
+                    _position = value;
+                    isHorizontal = (_position === "bottom" || _position === "top");
+                }
+            },
+            mode: {
+                configurable: false,
+                get: function () {
+                    return _mode;
+                },
+                set: function (value) {
+                    _tickSources[_mode].hideDivs();
+                    _mode = value;
+                }
+            },
+            container: {
+                configurable: false,
+                get: function () {
+                    return _container;
+                }
+            },
+            range: {
+                configurable: false,
+                get: function () {
+                    return _range;
+                }
+            },
+            ticks: {
+                configurable: false,
+                get: function () {
+                    return _ticks;
+                }
+            },
+            ticksInfo: {
+                configurable: false,
+                get: function () {
+                    return _ticksInfo;
+                }
+            },
+            tickSource: {
+                configurable: false,
+                get: function () {
+                    return _tickSources[_mode];
+                }
+            },
+            markerPosition: {
+                configurable: false,
+                get: function () {
+                    return _markerPosition;
+                }
+            }
+        });
+
+        function init() {
+            _container.addClass("cz-timescale");
+            _container.addClass("unselectable");
+            marker.addClass("cz-timescale-marker");
+            markertriangle.addClass("cz-timescale-marker-triangle");
+            labelsDiv.addClass("cz-timescale-labels-container");
+
+            marker[0].appendChild(markerText[0]);
+            marker[0].appendChild(markertriangle[0]);
+            _container[0].appendChild(labelsDiv[0]);
+            _container[0].appendChild(canvas[0]);
+            _container[0].appendChild(marker[0]);
+            canvas[0].height = canvasSize;
+
+            text_size = -1;
+            strokeStyle = _container ? _container.css("color") : "Black";
+            ctx = canvas[0].getContext("2d");
+            fontSize = 45;
+            if (_container.currentStyle) {
+                fontSize = _container.currentStyle["font-size"];
+                ctx.font = fontSize + _container.currentStyle["font-family"];
+            } else if (document.defaultView && document.defaultView.getComputedStyle) {
+                fontSize = document.defaultView.getComputedStyle(_container[0], null).getPropertyValue("font-size");
+                ctx.font = fontSize + document.defaultView.getComputedStyle(_container[0], null).getPropertyValue("font-family");
+            } else if (_container.style) {
+                fontSize = _container.style["font-size"];
+                ctx.font = fontSize + _container.style["font-family"];
+            }
+        }
+
+        function updateSize() {
+            var prevSize = _size;
+
+            _width = _container.outerWidth(true);
+            _height = _container.outerHeight(true);
+            if (isHorizontal) {
+                _size = _width;
+                if (_size != prevSize) {
+                    canvas[0].width = _size;
+                    labelsDiv.css("width", _size);
+                }
+            } else {
+                _size = _height;
+                if (_size != prevSize) {
+                    canvas[0].height = _size;
+                    labelsDiv.css("height", _size);
+                }
+            }
+            _deltaRange = (_size - 1) / (_range.max - _range.min);
+            _canvasHeight = canvas[0].height;
+
+            if (isHorizontal) {
+                text_size = (_ticksInfo[0] && _ticksInfo[0].height !== text_size) ? _ticksInfo[0].height : 0;
+                if (text_size !== 0) {
+                    labelsDiv.css("height", text_size);
+                    canvas[0].height = canvasSize;
+                }
+            } else {
+                text_size = (_ticksInfo[0] && _ticksInfo[0].width !== text_size) ? _ticksInfo[0].width : 0;
+
+                if (text_size !== 0) {
+                    labelsDiv.css("width", text_size);
+                    canvas[0].width = canvasSize;
+                    var textOffset = 0;
+                    _width = text_size + canvasSize + textOffset;
+                    _container.css("width", _width);
+                }
+            }
+        }
+
+        function setMode() {
+            var beta;
+
+            if (_range.min <= -10000) {
+                that.mode = "cosmos";
+            } else {
+                beta = Math.floor(Math.log(_range.max - _range.min) * (1 / Math.log(10)));
+
+                if (beta < 0) {
+                    that.mode = "date";
+                } else {
+                    that.mode = "calendar";
+                }
+            }
+        }
+
+        function getTicksInfo() {
+            var len = _ticks.length;
+            var size;
+            var width;
+            var height;
+            var h = isHorizontal ? _canvasHeight : 0;
+            var tick;
+
+            _ticksInfo = new Array(len);
+
+            for (var i = 0; i < len; i++) {
+                tick = _ticks[i];
+
+                if (tick.label) {
+                    size = tick.label._size;
+                    width = size.width;
+                    height = size.height;
+                    if (!width) {
+                        width = ctx.measureText(tick.position).width * 1.5;
+                    }
+                    if (!height) {
+                        height = (isHorizontal ? h : parseFloat(fontSize)) + 8;
+                    }
+                    _ticksInfo[i] = {
+                        position: that.getCoordinateFromTick(tick.position),
+                        width: width,
+                        height: height,
+                        hasLabel: true
+                    };
+                } else {
+                    _ticksInfo[i] = {
+                        position: that.getCoordinateFromTick(tick.position),
+                        width: 0,
+                        height: 0,
+                        hasLabel: false
+                    };
+                }
+            }
+        }
+
+        function addNewLabels() {
+            var label;
+            var labelDiv;
+
+            for (var i = 0, len = _ticks.length; i < len; i++) {
+                label = _ticks[i].label;
+                if (label && !label.hasClass('cz-timescale-label')) {
+                    labelDiv = label[0];
+                    labelsDiv[0].appendChild(labelDiv);
+                    label.addClass('cz-timescale-label');
+                    label._size = {
+                        width: labelDiv.offsetWidth,
+                        height: labelDiv.offsetHeight
+                    };
+                }
+            }
+        }
+
+        function checkLabelsArrangement() {
+            var delta;
+            var deltaSize;
+            var len = _ticks.length - 1;
+
+            if (len == -1) {
+                return false;
+            }
+
+            for (var i1 = 0, i2 = 1; i2 < len; i1 = i2, i2++) {
+                while (i2 < len + 1 && !_ticksInfo[i2].hasLabel) {
+                    i2++;
+                }
+                if (i2 > len) {
+                    break;
+                }
+                if (_ticksInfo[i1].hasLabel) {
+                    delta = Math.abs(_ticksInfo[i2].position - _ticksInfo[i1].position);
+                    if (delta < CZ.Settings.minTickSpace)
+                        return true;
+                    if (isHorizontal) {
+                        deltaSize = (_ticksInfo[i1].width + _ticksInfo[i2].width) / 2;
+                        if (i1 === 0 && (_ticksInfo[i1].position - _ticksInfo[i1].width / 2 < 0)) {
+                            deltaSize -= _ticksInfo[i1].width / 2;
+                        } else if (i2 == len - 1 && (_ticksInfo[i2].position - _ticksInfo[i2].width / 2 > _size)) {
+                            deltaSize -= _ticksInfo[i2].width / 2;
+                        }
+                    } else {
+                        deltaSize = (_ticksInfo[i1].height + _ticksInfo[i2].height) / 2;
+                        if (i1 === 0 && (_ticksInfo[i1].position - _ticksInfo[i1].height / 2 < 0)) {
+                            deltaSize -= _ticksInfo[i1].height / 2;
+                        } else if (i2 == len - 1 && (_ticksInfo[i2].position - _ticksInfo[i2].height / 2 > _size)) {
+                            deltaSize -= _ticksInfo[i2].height / 2;
+                        }
+                    }
+                    if (delta - deltaSize < CZ.Settings.minLabelSpace) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        function updateMajorTicks() {
+            var i;
+
+            _ticks = _tickSources[_mode].getTicks(_range);
+
+            addNewLabels();
+            getTicksInfo();
+
+            if (checkLabelsArrangement()) {
+                for (i = 0; i < CZ.Settings.maxTickArrangeIterations; ++i) {
+                    _ticks = _tickSources[_mode].decreaseTickCount();
+                    addNewLabels();
+                    getTicksInfo();
+                    if (!checkLabelsArrangement()) {
+                        break;
+                    }
+                }
+            } else {
+                for (i = 0; i < CZ.Settings.maxTickArrangeIterations; ++i) {
+                    _ticks = _tickSources[_mode].increaseTickCount();
+                    addNewLabels();
+                    getTicksInfo();
+
+                    if (checkLabelsArrangement()) {
+                        _ticks = _tickSources[_mode].decreaseTickCount();
+                        getTicksInfo();
+                        addNewLabels();
+                        break;
+                    }
+                }
+            }
+        }
+
+        function renderBaseLine() {
+            if (isHorizontal) {
+                if (_position == "bottom") {
+                    ctx.fillRect(0, 0, _size, CZ.Settings.timescaleThickness);
+                } else {
+                    ctx.fillRect(0, CZ.Settings.tickLength, _size, CZ.Settings.timescaleThickness);
+                }
+            } else {
+                if (_position == "right") {
+                    ctx.fillRect(0, 0, CZ.Settings.timescaleThickness, _size);
+                } else {
+                    ctx.fillRect(CZ.Settings.tickLength, 0, CZ.Settings.timescaleThickness, _size);
+                }
+            }
+        }
+
+        function renderMajorTicks() {
+            var x;
+            var shift;
+
+            ctx.beginPath();
+
+            for (var i = 0, len = _ticks.length; i < len; i++) {
+                x = _ticksInfo[i].position;
+                if (isHorizontal) {
+                    shift = _ticksInfo[i].width / 2;
+                    if (i === 0 && x < shift) {
+                        shift = 0;
+                    } else if (i == len - 1 && x + shift > _size) {
+                        shift *= 2;
+                    }
+
+                    ctx.moveTo(x, 1);
+                    ctx.lineTo(x, 1 + CZ.Settings.tickLength);
+
+                    if (_ticks[i].label) {
+                        _ticks[i].label.css("left", x - shift);
+                    }
+                } else {
+                    x = (_size - 1) - x;
+                    shift = _ticksInfo[i].height / 2;
+                    if (i === 0 && x + shift > _size) {
+                        shift *= 2;
+                    } else if (i == len - 1 && x < shift) {
+                        shift = 0;
+                    }
+
+                    ctx.moveTo(1, x);
+                    ctx.lineTo(1 + CZ.Settings.tickLength, x);
+
+                    if (_ticks[i].label) {
+                        _ticks[i].label.css("top", x - shift);
+                        if (_position == "left") {
+                            _ticks[i].label.css("left", text_size - (this.rotateLabels ? _ticksInfo[i].height : _ticksInfo[i].width));
+                        }
+                    }
+                }
+            }
+
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function renderSmallTicks() {
+            var minDelta;
+            var i;
+            var len;
+            var smallTicks = _tickSources[_mode].getSmallTicks(_ticks);
+            var x;
+            ctx.beginPath();
+
+            if (smallTicks && smallTicks.length > 0) {
+                minDelta = Math.abs(that.getCoordinateFromTick(smallTicks[1]) - that.getCoordinateFromTick(smallTicks[0]));
+                len = smallTicks.length;
+
+                for (i = 1; i < len - 1; i++) {
+                    minDelta = Math.min(minDelta, Math.abs(that.getCoordinateFromTick(smallTicks[i + 1]) - that.getCoordinateFromTick(smallTicks[i])));
+                }
+
+                if (minDelta >= CZ.Settings.minSmallTickSpace) {
+                    switch (_position) {
+                        case "bottom":
+                            for (i = 0; i < len; i++) {
+                                x = that.getCoordinateFromTick(smallTicks[i]);
+                                ctx.moveTo(x, 1);
+                                ctx.lineTo(x, 1 + CZ.Settings.smallTickLength);
+                            }
+                            break;
+                        case "top":
+                            for (i = 0; i < len; i++) {
+                                x = that.getCoordinateFromTick(smallTicks[i]);
+                                ctx.moveTo(x, CZ.Settings.tickLength - CZ.Settings.smallTickLength);
+                                ctx.lineTo(x, 1 + CZ.Settings.tickLength);
+                            }
+                            break;
+                        case "left":
+                            for (i = 0; i < len; i++) {
+                                x = that.getCoordinateFromTick(smallTicks[i]);
+                                ctx.moveTo(CZ.Settings.tickLength - CZ.Settings.smallTickLength, _size - x - 1);
+                                ctx.lineTo(CZ.Settings.tickLength, _size - x - 1);
+                            }
+                            break;
+                        case "right":
+                            for (i = 0; i < len; i++) {
+                                x = that.getCoordinateFromTick(smallTicks[i]);
+                                ctx.moveTo(1, _size - x - 1);
+                                ctx.lineTo(1 + CZ.Settings.smallTickLength, _size - x - 1);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function mouseMove(e) {
+            var point = CZ.Common.getXBrowserMouseOrigin(container, e);
+            var k = (_range.max - _range.min) / _width;
+            var time = _range.max - k * (_width - point.x);
+            that.setTimeMarker(time);
+        }
+
+        this.setTimeMarker = function (time, vcGesture) {
+            if (typeof vcGesture === "undefined") { vcGesture = false; }
+            if ((!mouse_clicked) && (((!vcGesture) || ((vcGesture) && (!mouse_hovered))))) {
+                if (time > CZ.Settings.maxPermitedTimeRange.right)
+                    time = CZ.Settings.maxPermitedTimeRange.right;
+                if (time < CZ.Settings.maxPermitedTimeRange.left)
+                    time = CZ.Settings.maxPermitedTimeRange.left;
+                var k = (_range.max - _range.min) / _width;
+                var point = (time - _range.max) / k + _width;
+                var text = _tickSources[_mode].getMarkerLabel(_range, time);
+                _markerPosition = point;
+                markerText.text(text);
+                marker.css("left", point - marker.width() / 2);
+            }
+        };
+
+        function render() {
+            setMode();
+
+            updateMajorTicks();
+
+            updateSize();
+
+            ctx.strokeStyle = strokeStyle;
+            ctx.fillStyle = strokeStyle;
+            ctx.lineWidth = CZ.Settings.timescaleThickness;
+            if (isHorizontal) {
+                ctx.clearRect(0, 0, _size, canvasSize);
+            } else {
+                ctx.clearRect(0, 0, canvasSize, _size);
+            }
+
+            renderBaseLine();
+            renderMajorTicks();
+            renderSmallTicks();
+        }
+
+        this.getCoordinateFromTick = function (x) {
+            var delta = _deltaRange;
+            var k = _size / (_range.max - _range.min);
+            var log10 = 1 / Math.log(10);
+            var x1 = k * (x - _range.min);
+            var beta;
+            var firstYear;
+
+            if (_range.min >= -10000) {
+                beta = Math.log(_range.max - _range.min) * log10;
+                firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
+                if (beta >= 0) {
+                    x1 += k * firstYear;
+                }
+            }
+
+            if (isFinite(delta)) {
+                return x1;
+            } else {
+                return _size / 2;
+            }
+        };
+
+        this.update = function (range) {
+            _range = range;
+            render();
+        };
+
+        this.destroy = function () {
+            _container[0].innerHTML = "";
+            _container.removeClass("cz-timescale");
+            _container.removeClass("unselectable");
+        };
+
+        this.remove = function () {
+            var parent = _container[0].parentElement;
+            if (parent) {
+                parent.removeChild(_container[0]);
+            }
+            this.destroy();
+        };
+    }
+    CZ.Timescale = Timescale;
+    ;
+
+    function TickSource() {
+        this.delta, this.beta;
+        this.range = { min: -1, max: 0 };
+        this.log10 = 1 / Math.log(10);
+        this.startDate = null, this.endDate = null, this.firstYear = null;
+        this.regime = "";
+        this.level = 1;
+        this.present;
+
+        var divPool = [];
+        var isUsedPool = [];
+        var inners = [];
+        var styles = [];
+        var len = 0;
+
+        this.start;
+        this.finish;
+        this.width = 900;
+
+        this.getDiv = function (x) {
+            var inner = this.getLabel(x);
+            var i = inners.indexOf(inner);
+            if (i != -1) {
+                isUsedPool[i] = true;
+                styles[i].display = "block";
+                return divPool[i];
+            } else {
+                var i = isUsedPool.indexOf(false);
+                if (i != -1) {
+                    isUsedPool[i] = true;
+                    styles[i].display = "block";
+                    inners[i] = inner;
+                    var div = divPool[i][0];
+                    div.innerHTML = inner;
+                    divPool[i]._size = { width: div.offsetWidth, height: div.offsetHeight };
+                    return divPool[i];
+                } else {
+                    var div = $("<div>" + inner + "</div>");
+                    isUsedPool[len] = true;
+                    divPool[len] = div;
+                    inners[len] = inner;
+                    styles[len] = div[0].style;
+                    div._size = undefined;
+                    len++;
+                    return div;
+                }
+            }
+        };
+
+        this.refreshDivs = function () {
+            for (var i = 0; i < len; i++) {
+                if (isUsedPool[i])
+                    isUsedPool[i] = false;
+                else
+                    styles[i].display = "none";
+            }
+        };
+
+        this.hideDivs = function () {
+            for (var i = 0; i < len; i++) {
+                styles[i].display = "none";
+            }
+        };
+
+        this.getTicks = function (range) {
+            this.getRegime(range.min, range.max);
+            return this.createTicks(range);
+        };
+
+        this.getLabel = function (x) {
+            return x;
+        };
+
+        this.getRegime = function (l, r) {
+        };
+
+        this.createTicks = function (range) {
+        };
+
+        this.getSmallTicks = function (ticks) {
+            if (ticks.length !== 0) {
+                return this.createSmallTicks(ticks);
+            }
+        };
+
+        this.createSmallTicks = function (ticks) {
+        };
+
+        this.decreaseTickCount = function () {
+            if (this.delta == 1) {
+                this.delta = 2;
+            } else if (this.delta == 2) {
+                this.delta = 5;
+            } else if (this.delta == 5) {
+                this.delta = 1;
+                this.beta++;
+            }
+            return this.createTicks(this.range);
+        };
+
+        this.increaseTickCount = function () {
+            if (this.delta == 1) {
+                this.delta = 5;
+                this.beta--;
+            } else if (this.delta == 2) {
+                this.delta = 1;
+            } else if (this.delta == 5) {
+                this.delta = 2;
+            }
+            return this.createTicks(this.range);
+        };
+
+        this.round = function (x, n) {
+            var pow = 1;
+            var i;
+            if (n <= 0) {
+                n = Math.max(0, Math.min(-n, 15));
+                pow = 1;
+                for (i = 0; i > n; i--) {
+                    pow /= 10;
+                }
+                return Math.round(x * pow) / pow;
+            } else {
+                pow = 1;
+                for (i = 0; i < n; i++) {
+                    pow *= 10;
+                }
+                var val = pow * Math.round(x / pow);
+                return val;
+            }
+        };
+
+        this.getMarkerLabel = function (range, time) {
+            return time;
+        };
+    }
+    CZ.TickSource = TickSource;
+    ;
+
+    function CosmosTickSource() {
+        this.base = CZ.TickSource;
+        this.base();
+        var that = this;
+
+        this.getLabel = function (x) {
+            var text;
+
+            var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4);
+
+            text = Math.abs(x) / this.level;
+
+            if (n < 0) {
+                text = (new Number(text)).toFixed(-n);
+            }
+
+            text += " " + (x < 0 ? this.regime : String(this.regime).charAt(0));
+            return text;
+        };
+
+        this.getRegime = function (l, r) {
+            if (l < r) {
+                this.range.min = l;
+                this.range.max = r;
+            } else {
+                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
+            }
+            if (this.range.min < CZ.Settings.maxPermitedTimeRange.left)
+                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+            if (this.range.max > CZ.Settings.maxPermitedTimeRange.right)
+                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
+
+            var localPresent = CZ.Dates.getPresent();
+            this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
+
+            this.delta = 1;
+            this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
+
+            if (this.range.min <= -10000000000) {
+                this.regime = "Ga";
+                this.level = 1000000000;
+                if (this.beta < 7) {
+                    this.regime = "Ma";
+                    this.level = 1000000;
+                }
+            } else if (this.range.min <= -10000000) {
+                this.regime = "Ma";
+                this.level = 1000000;
+            } else if (this.range.min <= -10000) {
+                this.regime = "ka";
+                this.level = 1000;
+            }
+        };
+
+        this.createTicks = function (range) {
+            var ticks = new Array();
+
+            if (this.regime == "Ga" && this.beta < 7)
+                this.beta = 7;
+            else if (this.regime == "Ma" && this.beta < 2)
+                this.beta = 2;
+            else if (this.regime == "ka" && this.beta < -1)
+                this.beta = -1;
+
+            var dx = this.delta * Math.pow(10, this.beta);
+
+            var min = Math.floor(this.range.min / dx);
+            var max = Math.floor(this.range.max / dx);
+            var count = max - min + 1;
+
+            var num = 0;
+            var x0 = min * dx;
+            if (dx == 2)
+                count++;
+            for (var i = 0; i < count + 1; i++) {
+                var tick_position = this.round(x0 + i * dx, this.beta);
+                if (tick_position >= this.range.min && tick_position <= this.range.max && tick_position != ticks[ticks.length - 1]) {
+                    ticks[num] = { position: tick_position, label: this.getDiv(tick_position) };
+                    num++;
+                }
+            }
+
+            this.refreshDivs();
+            return ticks;
+        };
+
+        this.createSmallTicks = function (ticks) {
+            var minors = new Array();
+
+            var n = 4;
+            var k = this.width / (this.range.max - this.range.min);
+            var nextStep = true;
+            var l = ticks.length > 1 ? ticks[1].position - ticks[0].position : 0;
+            var step = l / (n + 1);
+
+            if (k * step < CZ.Settings.minSmallTickSpace)
+                return null;
+            var tick = ticks[0].position - step;
+
+            while (tick > this.range.min) {
+                minors.push(tick);
+                tick -= step;
+            }
+
+            for (var i = 0; i < ticks.length - 1; i++) {
+                var t = ticks[i].position;
+                for (var k = 1; k <= n; k++) {
+                    tick = t + step * k;
+                    minors.push(tick);
+                }
+            }
+
+            tick = ticks[ticks.length - 1].position + step;
+            while (tick < this.range.max) {
+                minors.push(tick);
+                tick += step;
+            }
+            return minors;
+        };
+
+        this.getMarkerLabel = function (range, time) {
+            var labelText;
+            this.getRegime(range.min, range.max);
+            var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
+            labelText = (Math.abs(time / this.level)).toFixed(Math.abs(numOfDigits));
+
+            var localPresent = CZ.Dates.getPresent();
+            var presentDate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
+
+            if (time == presentDate) {
+                if (this.regime !== "ka")
+                    labelText = 0;
+                else
+                    labelText = 2;
+            }
+            labelText += " " + (time < 0 ? this.regime : String(this.regime).charAt(0));
+            return labelText;
+        };
+
+        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
+            var width = viewport.width - margin;
+            if (width < 0)
+                width = viewport.width;
+            var scaleX = scale * element.width / width;
+
+            var height = viewport.height - margin;
+            if (height < 0)
+                height = viewport.height;
+            var scaleY = scale * element.height / height;
+            var vs = {
+                centerX: element.x + element.width / 2.0,
+                centerY: element.y + element.height / 2.0,
+                scale: Math.max(scaleX, scaleY)
+            };
+            return vs;
+        };
+    }
+    CZ.CosmosTickSource = CosmosTickSource;
+    ;
+    CZ.CosmosTickSource.prototype = new CZ.TickSource;
+
+    function CalendarTickSource() {
+        this.base = CZ.TickSource;
+        this.base();
+
+        this.getLabel = function (x) {
+            var text;
+            var DMY = CZ.Dates.getYMDFromCoordinate(x);
+            var year = DMY.year;
+            if (year <= 0)
+                text = -year + " BCE";
+            else
+                text = year + " CE";
+            return text;
+        };
+
+        this.getRegime = function (l, r) {
+            if (l < r) {
+                this.range.min = l;
+                this.range.max = r;
+            } else {
+                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
+            }
+
+            if (this.range.min < CZ.Settings.maxPermitedTimeRange.left)
+                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+            if (this.range.max > CZ.Settings.maxPermitedTimeRange.right)
+                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
+
+            var localPresent = CZ.Dates.getPresent();
+            this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
+
+            this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
+            this.range.max -= this.firstYear;
+            this.range.min -= this.firstYear;
+
+            this.startDate = this.present;
+            this.endDate = this.present;
+            if (this.range.min < 0) {
+                this.startDate = CZ.Dates.getYMDFromCoordinate(this.range.min);
+            }
+            if (this.range.max < 0) {
+                this.endDate = CZ.Dates.getYMDFromCoordinate(this.range.max);
+            }
+
+            this.delta = 1;
+            this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
+
+            this.regime = "BCE/CE";
+            this.level = 1;
+        };
+
+        this.createTicks = function (range) {
+            var ticks = new Array();
+
+            if (this.beta < 0)
+                this.beta = 0;
+
+            var dx = this.delta * Math.pow(10, this.beta);
+
+            var min = Math.floor(this.range.min / dx);
+            var max = Math.floor(this.range.max / dx);
+            var count = max - min + 1;
+
+            var num = 0;
+            var x0 = min * dx;
+            if (dx == 2)
+                count++;
+            for (var i = 0; i < count + 1; i++) {
+                var tick_position = CZ.Dates.getCoordinateFromYMD(x0 + i * dx, 0, 1);
+                if (tick_position === 0 && dx > 1)
+                    tick_position += 1;
+                if (tick_position >= this.range.min && tick_position <= this.range.max && tick_position != ticks[ticks.length - 1]) {
+                    ticks[num] = { position: tick_position, label: this.getDiv(tick_position) };
+                    num++;
+                }
+            }
+            this.refreshDivs();
+            return ticks;
+        };
+
+        this.createSmallTicks = function (ticks) {
+            var minors = new Array();
+
+            var n = 4;
+
+            var beta1 = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
+            if (beta1 <= 0.3)
+                n = 3;
+
+            var k = this.width / (this.range.max - this.range.min);
+            var nextStep = true;
+            var l = ticks.length > 1 ? ticks[1].position - ticks[0].position : 0;
+            var step = l / (n + 1);
+
+            if (k * step < CZ.Settings.minSmallTickSpace)
+                return null;
+            var tick = ticks[0].position - step;
+
+            while (tick > this.range.min) {
+                minors.push(tick);
+                tick -= step;
+            }
+
+            for (var i = 0; i < ticks.length - 1; i++) {
+                var t = ticks[i].position;
+
+                if (step > 1e-10 + 1 / (n + 1) && Math.abs(t - 1.0) < 1e-10)
+                    t = 0;
+                for (var k = 1; k <= n; k++) {
+                    tick = t + step * k;
+
+                    minors.push(tick);
+                }
+            }
+
+            tick = ticks[ticks.length - 1].position + step;
+            while (tick < this.range.max) {
+                minors.push(tick);
+                tick += step;
+            }
+            return minors;
+        };
+
+        this.getMarkerLabel = function (range, time) {
+            var labelText = "";
+
+            this.getRegime(range.min, range.max);
+            var currentDate = parseFloat(new Number(time - this.firstYear).toFixed(2));
+            currentDate += currentDate > 0 ? -0.5 : -1.5;
+            currentDate = Math.round(currentDate);
+            if (currentDate < 0) {
+                currentDate = -currentDate;
+            } else if (currentDate == 0) {
+                currentDate = 1;
+            }
+
+            labelText = currentDate.toString();
+
+            if (time < this.firstYear + 1) {
+                labelText += " " + "BCE";
+            } else {
+                labelText += " " + "CE";
+            }
+
+            return labelText;
+        };
+
+        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
+            var width = viewport.width - margin;
+            if (width < 0)
+                width = viewport.width;
+            var scaleX = scale * element.width / width;
+
+            var height = viewport.height - margin;
+            if (height < 0)
+                height = viewport.height;
+            var scaleY = scale * element.height / height;
+            var vs = {
+                centerX: element.x + element.width / 2.0,
+                centerY: element.y + element.height / 2.0,
+                scale: scaleX
+            };
+            return vs;
+        };
+    }
+    CZ.CalendarTickSource = CalendarTickSource;
+    ;
+    CZ.CalendarTickSource.prototype = new CZ.TickSource;
+
+    function DateTickSource() {
+        this.base = CZ.TickSource;
+        this.base();
+
+        var year, month, day;
+
+        var tempDays = 0;
+
+        this.getRegime = function (l, r) {
+            if (l < r) {
+                this.range.min = l;
+                this.range.max = r;
+            } else {
+                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
+            }
+
+            if (this.range.min < CZ.Settings.maxPermitedTimeRange.left)
+                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
+            if (this.range.max > CZ.Settings.maxPermitedTimeRange.right)
+                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
+
+            var localPresent = CZ.Dates.getPresent();
+            this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
+
+            this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
+
+            this.startDate = CZ.Dates.getYMDFromCoordinate(this.range.min);
+            this.endDate = CZ.Dates.getYMDFromCoordinate(this.range.max);
+
+            this.delta = 1;
+            this.beta = Math.log(this.range.max - this.range.min) * this.log10;
+
+            if (this.beta >= -0.2)
+                this.regime = "Quarters_Month";
+            if (this.beta <= -0.2 && this.beta >= -0.8)
+                this.regime = "Month_Weeks";
+            if (this.beta <= -0.8 && this.beta >= -1.4)
+                this.regime = "Weeks_Days";
+            if (this.beta <= -1.4)
+                this.regime = "Days_Quarters";
+
+            this.level = 1;
+        };
+
+        this.getLabel = function (x) {
+            var text = CZ.Dates.months[month];
+            var year_temp = year;
+            if (year == 0)
+                year_temp--;
+            if (text == "January")
+                text += " " + year_temp;
+            if (tempDays == 1)
+                text = day + " " + CZ.Dates.months[month];
+            if ((this.regime == "Weeks_Days") && (day == 3))
+                text += ", " + year_temp;
+            if ((this.regime == "Days_Quarters") && (day == 1))
+                text += ", " + year_temp;
+            return text;
+        };
+
+        this.getMinTicks = function () {
+            this.getRegime(this.range.min, this.range.max);
+            return this.createTicks(this.range);
+        };
+
+        this.createTicks = function (range) {
+            tempDays = 0;
+            var ticks = new Array();
+            var num = 0;
+
+            var countMonths = 0;
+
+            var countDays = 0;
+
+            var tempYear = this.startDate.year;
+            var tempMonth = this.startDate.month;
+            while (tempYear < this.endDate.year || (tempYear == this.endDate.year && tempMonth <= this.endDate.month)) {
+                countMonths++;
+                tempMonth++;
+                if (tempMonth >= 12) {
+                    tempMonth = 0;
+                    tempYear++;
+                }
+            }
+
+            year = this.startDate.year;
+
+            month = this.startDate.month - 1;
+            var month_step = 1;
+            var date_step = 1;
+            for (var j = 0; j <= countMonths + 2; j += month_step) {
+                month += month_step;
+                if (month >= 12) {
+                    month = 0;
+                    year++;
+                }
+
+                if ((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
+                    var tick = CZ.Dates.getCoordinateFromYMD(year, month, 1);
+                    if (tick >= this.range.min && tick <= this.range.max) {
+                        if (tempDays != 1) {
+                            if ((month % 3 == 0) || (this.regime == "Month_Weeks")) {
+                                ticks[num] = { position: tick, label: this.getDiv(tick) };
+                                num++;
+                            }
+                        }
+                    }
+                }
+
+                if ((this.regime == "Weeks_Days") || (this.regime == "Days_Quarters")) {
+                    countDays = Math.floor(CZ.Dates.daysInMonth[month]);
+                    if ((month === 1) && (CZ.Dates.isLeapYear(year)))
+                        countDays++;
+                    tempDays = 1;
+                    for (var k = 1; k <= countDays; k += date_step) {
+                        day = k;
+                        tick = CZ.Dates.getCoordinateFromYMD(year, month, day);
+                        if (tick >= this.range.min && tick <= this.range.max) {
+                            if (this.regime == "Weeks_Days") {
+                                if ((k == 3) || (k == 10) || (k == 17) || (k == 24) || (k == 28)) {
+                                    ticks[num] = { position: tick, label: this.getDiv(tick) };
+                                    num++;
+                                }
+                            } else {
+                                ticks[num] = { position: tick, label: this.getDiv(tick) };
+                                num++;
+                            }
+                        }
+                    }
+                }
+            }
+            this.refreshDivs();
+            return ticks;
+        };
+
+        this.createSmallTicks = function (ticks) {
+            var minors = new Array();
+
+            var k = this.width / (this.range.max - this.range.min);
+            var nextStep = true;
+
+            var step;
+
+            var n;
+            var tick = ticks[0].position;
+            var date = CZ.Dates.getYMDFromCoordinate(tick);
+
+            if (this.regime == "Quarters_Month")
+                n = 2;
+            else if (this.regime == "Month_Weeks")
+                n = CZ.Dates.daysInMonth[date.month];
+            else if (this.regime == "Weeks_Days")
+                n = 7;
+            else if (this.regime == "Days_Quarters")
+                n = 4;
+
+            if (this.regime == "Quarters_Month")
+                step = Math.floor(2 * CZ.Dates.daysInMonth[date.month] / n);
+            else if (this.regime == "Month_Weeks")
+                step = 1;
+            else if (this.regime == "Weeks_Days")
+                step = 1;
+            else if (this.regime == "Days_Quarters")
+                step = 0.25;
+
+            if (k * step < CZ.Settings.minSmallTickSpace)
+                return null;
+
+            date.day -= step;
+            tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
+
+            if (this.regime != "Month_Weeks") {
+                while (tick > this.range.min) {
+                    minors.push(tick);
+                    date.day -= step;
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
+                }
+            } else {
+                var j = CZ.Dates.daysInMonth[date.month];
+                while (tick > this.range.min) {
+                    if ((j == 2) || (j == 9) || (j == 16) || (j == 23) || (j == 27)) {
+                        minors.push(tick);
+                    }
+                    date.day -= step;
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
+                    j--;
+                }
+            }
+
+            for (var i = 0; i < ticks.length - 1; i++) {
+                var tick = ticks[i].position;
+                var date = CZ.Dates.getYMDFromCoordinate(tick);
+                var j_step = 1;
+                for (var j = 1; j <= n; j += j_step) {
+                    date.day += step;
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
+                    if (this.regime != "Month_Weeks") {
+                        if (minors.length == 0 || k * (ticks[i + 1].position - tick) > CZ.Settings.minSmallTickSpace)
+                            minors.push(tick);
+                    } else {
+                        if ((j == 2) || (j == 9) || (j == 16) || (j == 23) || (j == 28)) {
+                            if (minors.length == 0 || k * (ticks[i + 1].position - tick) > CZ.Settings.minSmallTickSpace)
+                                minors.push(tick);
+                        }
+                    }
+                }
+            }
+            var tick = ticks[ticks.length - 1].position;
+            var date = CZ.Dates.getYMDFromCoordinate(tick);
+            date.day += step;
+            tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
+
+            if (this.regime != "Month_Weeks") {
+                while (tick < this.range.max) {
+                    minors.push(tick);
+                    date.day += step;
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
+                }
+            } else {
+                var j = 0;
+                while (tick < this.range.max) {
+                    if ((j == 2) || (j == 9) || (j == 16) || (j == 23) || (j == 28)) {
+                        minors.push(tick);
+                    }
+                    date.day += step;
+                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
+                    j++;
+                }
+            }
+            return minors;
+        };
+
+        this.getMarkerLabel = function (range, time) {
+            this.getRegime(range.min, range.max);
+            var date = CZ.Dates.getYMDFromCoordinate(time, true);
+            var labelText = date.year + "." + (date.month + 1) + "." + date.day;
+            return labelText;
+        };
+
+        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
+            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
+            var width = viewport.width - margin;
+            if (width < 0)
+                width = viewport.width;
+            var scaleX = scale * element.width / width;
+
+            var height = viewport.height - margin;
+            if (height < 0)
+                height = viewport.height;
+            var scaleY = scale * element.height / height;
+            var vs = {
+                centerX: element.x + element.width / 2.0,
+                centerY: element.y + element.height / 2.0,
+                scale: Math.min(scaleX, scaleY)
+            };
+            return vs;
+        };
+    }
+    CZ.DateTickSource = DateTickSource;
+    ;
+    CZ.DateTickSource.prototype = new CZ.TickSource;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Gestures) {
+        function PanGesture(xOffset, yOffset, src) {
+            this.Type = "Pan";
+            this.Source = src;
+            this.xOffset = xOffset;
+            this.yOffset = yOffset;
+        }
+
+        function ZoomGesture(xOrigin, yOrigin, scaleFactor, src) {
+            this.Type = "Zoom";
+            this.Source = src;
+            this.xOrigin = xOrigin;
+            this.yOrigin = yOrigin;
+            this.scaleFactor = scaleFactor;
+        }
+
+        function PinGesture(src) {
+            this.Type = "Pin";
+            this.Source = src;
+        }
+
+        function createPanSubject(vc) {
+            var _doc = $(document);
+
+            var mouseDown = vc.toObservable("mousedown");
+            var mouseMove = vc.toObservable("mousemove");
+            var mouseUp = _doc.toObservable("mouseup");
+
+            var mouseMoves = mouseMove.Skip(1).Zip(mouseMove, function (left, right) {
+                return new PanGesture(left.clientX - right.clientX, left.clientY - right.clientY, "Mouse");
+            });
+
+            var stopPanning = mouseUp;
+
+            var mouseDrags = mouseDown.SelectMany(function (md) {
+                return mouseMoves.TakeUntil(stopPanning);
+            });
+
+            return mouseDrags;
+        }
+
+        function createPinSubject(vc) {
+            var mouseDown = vc.toObservable("mousedown");
+
+            return mouseDown.Select(function (md) {
+                return new PinGesture("Mouse");
+            });
+        }
+
+        function createZoomSubject(vc) {
+            vc.mousewheel(function (event, delta, deltaX, deltaY) {
+                var xevent = $.Event("xbrowserwheel");
+                xevent.delta = delta;
+                xevent.origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
+                vc.trigger(xevent);
+            });
+
+            var mouseWheel = vc.toObservable("xbrowserwheel");
+
+            var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
+                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / CZ.Settings.zoomLevelFactor : 1 * CZ.Settings.zoomLevelFactor, "Mouse");
+            });
+
+            var mousedblclick = vc.toObservable("dblclick");
+
+            var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
+                var origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
+                return new ZoomGesture(origin.x, origin.y, 1.0 / CZ.Settings.zoomLevelFactor, "Mouse");
+            });
+
+            return mouseWheels;
+        }
+
+        function createTouchPanSubject(vc) {
+            var _doc = $(document);
+
+            var touchStart = vc.toObservable("touchstart");
+            var touchMove = vc.toObservable("touchmove");
+            var touchEnd = _doc.toObservable("touchend");
+            var touchCancel = _doc.toObservable("touchcancel");
+
+            var gestures = touchStart.SelectMany(function (o) {
+                return touchMove.TakeUntil(touchEnd.Merge(touchCancel)).Skip(1).Zip(touchMove, function (left, right) {
+                    return { "left": left.originalEvent, "right": right.originalEvent };
+                }).Where(function (g) {
+                    return g.left.scale === g.right.scale;
+                }).Select(function (g) {
+                    return new PanGesture(g.left.pageX - g.right.pageX, g.left.pageY - g.right.pageY, "Touch");
+                });
+            });
+
+            return gestures;
+        }
+
+        function createTouchPinSubject(vc) {
+            var touchStart = vc.toObservable("touchstart");
+
+            return touchStart.Select(function (ts) {
+                return new PinGesture("Touch");
+            });
+        }
+
+        function createTouchZoomSubject(vc) {
+            var _doc = $(document);
+
+            var gestureStart = vc.toObservable("gesturestart");
+            var gestureChange = vc.toObservable("gesturechange");
+            var gestureEnd = _doc.toObservable("gestureend");
+            var touchCancel = _doc.toObservable("touchcancel");
+
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd.Merge(touchCancel)).Skip(1).Zip(gestureChange, function (left, right) {
+                    return { "left": left.originalEvent, "right": right.originalEvent };
+                }).Where(function (g) {
+                    return g.left.scale !== g.right.scale && g.right.scale !== 0;
+                }).Select(function (g) {
+                    var delta = g.left.scale / g.right.scale;
+                    return new ZoomGesture(o.originalEvent.layerX, o.originalEvent.layerY, 1 / delta, "Touch");
+                });
+            });
+
+            return gestures;
+        }
+
+        function createTouchPanSubjectWin8(vc) {
+            var gestureStart = vc.toObservable("MSGestureStart");
+            var gestureChange = vc.toObservable("MSGestureChange");
+            var gestureEnd = vc.toObservable("MSGestureEnd");
+
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd).Skip(1).Zip(gestureChange, function (left, right) {
+                    return { "left": left.originalEvent, "right": right.originalEvent };
+                }).Where(function (g) {
+                    return g.left.scale === g.right.scale && g.left.detail != g.left.MSGESTURE_FLAG_INERTIA && g.right.detail != g.right.MSGESTURE_FLAG_INERTIA;
+                }).Select(function (g) {
+                    return new PanGesture(g.left.offsetX - g.right.offsetX, g.left.offsetY - g.right.offsetY, "Touch");
+                });
+            });
+
+            return gestures;
+        }
+
+        function createTouchPinSubjectWin8(vc) {
+            var pointerDown = vc.toObservable("MSPointerDown");
+
+            return pointerDown.Select(function (gt) {
+                return new PinGesture("Touch");
+            });
+        }
+
+        function createTouchZoomSubjectWin8(vc) {
+            var gestureStart = vc.toObservable("MSGestureStart");
+            var gestureChange = vc.toObservable("MSGestureChange");
+            var gestureEnd = vc.toObservable("MSGestureEnd");
+
+            var gestures = gestureStart.SelectMany(function (o) {
+                return gestureChange.TakeUntil(gestureEnd).Where(function (g) {
+                    return g.originalEvent.scale !== 0 && g.originalEvent.detail != g.originalEvent.MSGESTURE_FLAG_INERTIA;
+                }).Select(function (g) {
+                    return new ZoomGesture(o.originalEvent.offsetX, o.originalEvent.offsetY, 1 / g.originalEvent.scale, "Touch");
+                });
+            });
+
+            return gestures;
+        }
+
+        var gesturesDictionary = [];
+        function addMSGestureSource(dom) {
+            gesturesDictionary.forEach(function (child) {
+                if (child === dom) {
+                    return;
+                }
+            });
+
+            gesturesDictionary.push(dom);
+
+            dom.addEventListener("MSPointerDown", function (e) {
+                if (dom.gesture === undefined) {
+                    var newGesture = new MSGesture();
+                    newGesture.target = dom;
+                    dom.gesture = newGesture;
+                }
+
+                dom.gesture.addPointer(e.pointerId);
+            }, false);
+        }
+        ;
+
+        function getGesturesStream(source) {
+            var panController;
+            var zoomController;
+            var pinController;
+
+            if (window.navigator.msPointerEnabled && window.MSGesture) {
+                addMSGestureSource(source[0]);
+
+                panController = createTouchPanSubjectWin8(source);
+                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
+                var zoomControllerMouse = createZoomSubject(source);
+                zoomController = zoomControllerTouch.Merge(zoomControllerMouse);
+                pinController = createTouchPinSubjectWin8(source);
+            } else if ('ontouchstart' in document.documentElement) {
+                panController = createTouchPanSubject(source);
+                zoomController = createTouchZoomSubject(source);
+                pinController = createTouchPinSubject(source);
+            } else {
+                panController = createPanSubject(source);
+                zoomController = createZoomSubject(source);
+                pinController = createPinSubject(source);
+            }
+
+            return pinController.Merge(panController.Merge(zoomController));
+        }
+        Gestures.getGesturesStream = getGesturesStream;
+
+        function getPanPinGesturesStream(source) {
+            var panController;
+            var pinController;
+
+            if (window.navigator.msPointerEnabled && window.MSGesture) {
+                addMSGestureSource(source[0]);
+
+                panController = createTouchPanSubjectWin8(source);
+                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
+                var zoomControllerMouse = createZoomSubject(source);
+                pinController = createTouchPinSubjectWin8(source);
+            } else if ('ontouchstart' in document.documentElement) {
+                panController = createTouchPanSubject(source);
+                pinController = createTouchPinSubject(source);
+            } else {
+                panController = createPanSubject(source);
+                pinController = createPinSubject(source);
+            }
+
+            return pinController.Merge(panController.Select(function (el) {
+                el.yOffset = 0;
+                return el;
+            }));
+        }
+        Gestures.getPanPinGesturesStream = getPanPinGesturesStream;
+
+        function applyAxisBehavior(gestureSequence) {
+            return gestureSequence.Where(function (el) {
+                return el.Type != "Zoom";
+            }).Select(function (el) {
+                if (el.Type == "Pan")
+                    el.yOffset = 0;
+                return el;
+            });
+        }
+        Gestures.applyAxisBehavior = applyAxisBehavior;
+    })(CZ.Gestures || (CZ.Gestures = {}));
+    var Gestures = CZ.Gestures;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (VirtualCanvas) {
+        function initialize() {
+            $.widget("ui.virtualCanvas", {
+                _layersContent: undefined,
+                _layers: [],
+                _create: function () {
+                    var self = this;
+                    self.element.addClass("virtualCanvas");
+                    var size = self._getClientSize();
+
+                    this.lastEvent = null;
+
+                    this.canvasWidth = null;
+                    this.canvasHeight = null;
+
+                    this.requestNewFrame = false;
+
+                    self.cursorPositionChangedEvent = new $.Event("cursorPositionChanged");
+                    self.breadCrumbsChangedEvent = $.Event("breadCrumbsChanged");
+                    self.innerZoomConstraintChangedEvent = $.Event("innerZoomConstraintChanged");
+                    self.currentlyHoveredInfodot = undefined;
+                    self.breadCrumbs = [];
+                    self.recentBreadCrumb = { vcElement: { title: "initObject" } };
+
+                    self.cursorPosition = 0.0;
+
+                    this.topCloak = $(".root-cloak-top");
+                    this.rightCloak = $(".root-cloak-right");
+                    this.bottomCloak = $(".root-cloak-bottom");
+                    this.leftCloak = $(".root-cloak-left");
+
+                    this.showCloak = false;
+
+                    var layerDivs = self.element.children("div");
+                    layerDivs.each(function (index) {
+                        $(this).addClass("virtualCanvasLayerDiv unselectable").zIndex(index * 3);
+
+                        var layerCanvasJq = $("<canvas></canvas>").appendTo($(this)).addClass("virtualCanvasLayerCanvas").zIndex(index * 3 + 1);
+                        self._layers.push($(this));
+                    });
+
+                    this._layersContent = new CZ.VCContent.CanvasRootElement(self, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
+
+                    this.options.visible = new CZ.Viewport.VisibleRegion2d(0, 0, 1);
+                    this.updateViewport();
+
+                    self.element.bind('mousemove.' + this.widgetName, function (e) {
+                        self.mouseMove(e);
+                    });
+                    self.element.bind('mousedown.' + this.widgetName, function (e) {
+                        switch (e.which) {
+                            case 1:
+                                self._mouseDown(e);
+                                break;
+                        }
+                    });
+                    self.element.bind('mouseup.' + this.widgetName, function (e) {
+                        switch (e.which) {
+                            case 1:
+                                self._mouseUp(e);
+                        }
+                    });
+                    self.element.bind('mouseleave.' + this.widgetName, function (e) {
+                        self._mouseLeave(e);
+                    });
+                },
+                destroy: function () {
+                    this._destroy();
+                },
+                _mouseDown: function (e) {
+                    var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
+                    this.lastClickPosition = {
+                        x: origin.x,
+                        y: origin.y
+                    };
+
+                    $("iframe").css("pointer-events", "none");
+
+                    $('#iframe_layer').css("display", "block").css("z-index", "99999");
+                },
+                _mouseUp: function (e) {
+                    var viewport = this.getViewport();
+                    var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
+                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
+
+                    if (this.lastClickPosition && this.lastClickPosition.x == origin.x && this.lastClickPosition.y == origin.y)
+                        this._mouseClick(e);
+
+                    $("iframe").css("pointer-events", "auto");
+
+                    $('#iframe_layer').css("display", "none");
+                },
+                _mouseLeave: function (e) {
+                    if (this.currentlyHoveredContentItem != null && this.currentlyHoveredContentItem.onmouseleave != null)
+                        this.currentlyHoveredContentItem.onmouseleave(e);
+                    if (this.currentlyHoveredInfodot != null && this.currentlyHoveredInfodot.onmouseleave != null)
+                        this.currentlyHoveredInfodot.onmouseleave(e);
+                    if (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.onmouseunhover != null)
+                        this.currentlyHoveredTimeline.onmouseunhover(null, e);
+
+                    CZ.Common.stopAnimationTooltip();
+
+                    this.lastEvent = null;
+                },
+                _mouseClick: function (e) {
+                    var viewport = this.getViewport();
+                    var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
+                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
+
+                    var _mouseClickNode = function (contentItem, pv) {
+                        var inside = contentItem.isInside(pv);
+                        if (!inside)
+                            return false;
+
+                        for (var i = 0; i < contentItem.children.length; i++) {
+                            var child = contentItem.children[i];
+                            if (_mouseClickNode(child, posv))
+                                return true;
+                        }
+
+                        if (contentItem.reactsOnMouse && contentItem.onmouseclick) {
+                            return contentItem.onmouseclick(pv, e);
+                        }
+                        return false;
+                    };
+
+                    _mouseClickNode(this._layersContent, posv);
+                },
+                getHoveredTimeline: function () {
+                    return this.currentlyHoveredTimeline;
+                },
+                getHoveredInfodot: function () {
+                    return this.currentlyHoveredInfodot;
+                },
+                getCursorPosition: function () {
+                    return this.cursorPosition;
+                },
+                _setConstraintsByInfodotHover: function (e) {
+                    var val;
+                    if (e) {
+                        var recentVp = this.getViewport();
+                        val = e.outerRad * CZ.Settings.infoDotZoomConstraint / recentVp.width;
+                    } else
+                        val = undefined;
+                    this.RaiseInnerZoomConstraintChanged(val);
+                },
+                RaiseInnerZoomConstraintChanged: function (e) {
+                    this.innerZoomConstraintChangedEvent.zoomValue = e;
+                    this.element.trigger(this.innerZoomConstraintChangedEvent);
+                },
+                RaiseCursorChanged: function () {
+                    this.cursorPositionChangedEvent.Time = this.cursorPosition;
+                    this.element.trigger(this.cursorPositionChangedEvent);
+                },
+                updateTooltipPosition: function (posv) {
+                    var scrPoint = this.viewport.pointVirtualToScreen(posv.x, posv.y);
+
+                    var heigthOffset = 17;
+
+                    var length, height;
+
+                    var obj = null;
+
+                    if (CZ.Common.tooltipMode == 'infodot')
+                        obj = this.currentlyHoveredInfodot;
+                    else if (CZ.Common.tooltipMode == 'timeline')
+                        obj = this.currentlyHoveredTimeline;
+
+                    if (obj == null)
+                        return;
+
+                    length = parseInt(scrPoint.x) + obj.panelWidth;
+                    height = parseInt(scrPoint.y) + obj.panelHeight + heigthOffset;
+
+                    if (length > this.canvasWidth)
+                        scrPoint.x = this.canvasWidth - obj.panelWidth;
+
+                    if (height > this.canvasHeight)
+                        scrPoint.y = this.canvasHeight - obj.panelHeight - heigthOffset + 1;
+
+                    $('.bubbleInfo').css({
+                        position: "absolute",
+                        top: scrPoint.y,
+                        left: scrPoint.x
+                    });
+                },
+                mouseMove: function (e) {
+                    var viewport = this.getViewport();
+                    var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
+                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
+
+                    if (!this.currentlyHoveredInfodot) {
+                        this.cursorPosition = posv.x;
+                        this.RaiseCursorChanged();
+                    }
+
+                    if (!this.currentlyHoveredTimeline) {
+                        this.cursorPosition = posv.x;
+                        this.RaiseCursorChanged();
+                    }
+
+                    var mouseInStack = [];
+
+                    var _mouseMoveNode = function (contentItem, forceOutside, pv) {
+                        if (forceOutside) {
+                            if (contentItem.reactsOnMouse && contentItem.isMouseIn && contentItem.onmouseleave) {
+                                contentItem.onmouseleave(pv, e);
+                                contentItem.isMouseIn = false;
+                            }
+                        } else {
+                            var inside = contentItem.isInside(pv);
+                            forceOutside = !inside;
+
+                            if (contentItem.reactsOnMouse) {
+                                if (inside) {
+                                    if (contentItem.isMouseIn) {
+                                        if (contentItem.onmousemove)
+                                            contentItem.onmousemove(pv, e);
+                                        if (contentItem.onmousehover)
+                                            mouseInStack.push(contentItem);
+                                    } else {
+                                        contentItem.isMouseIn = true;
+                                        if (contentItem.onmouseenter)
+                                            contentItem.onmouseenter(pv, e);
+                                    }
+                                } else {
+                                    if (contentItem.isMouseIn) {
+                                        contentItem.isMouseIn = false;
+                                        if (contentItem.onmouseleave)
+                                            contentItem.onmouseleave(pv, e);
+                                    } else {
+                                        if (contentItem.onmousemove)
+                                            contentItem.onmousemove(pv, e);
+                                    }
+                                }
+                            }
+                            contentItem.isMouseIn = inside;
+                        }
+
+                        for (var i = 0; i < contentItem.children.length; i++) {
+                            var child = contentItem.children[i];
+                            if (!forceOutside || child.isMouseIn)
+                                _mouseMoveNode(child, forceOutside, pv);
+                        }
+                    };
+
+                    _mouseMoveNode(this._layersContent, false, posv);
+
+                    if (mouseInStack.length == 0) {
+                        if (this.hovered && this.hovered.onmouseunhover) {
+                            this.hovered.onmouseunhover(posv, e);
+                            this.hovered = null;
+                        }
+                    }
+                    for (var n = mouseInStack.length; --n >= 0;) {
+                        if (mouseInStack[n].onmousehover) {
+                            mouseInStack[n].onmousehover(posv, e);
+                            if (this.hovered && this.hovered != mouseInStack[n] && this.hovered.onmouseunhover)
+                                if (!this.currentlyHoveredInfodot || (this.currentlyHoveredInfodot && this.currentlyHoveredInfodot.parent && this.currentlyHoveredInfodot.parent != this.hovered))
+                                    this.hovered.onmouseunhover(posv, e);
+                            if (this.currentlyHoveredContentItem)
+                                this.hovered = this.currentlyHoveredContentItem;
+                            else
+                                this.hovered = mouseInStack[n];
+                            break;
+                        }
+                    }
+
+                    if ((this.currentlyHoveredInfodot != null && this.currentlyHoveredInfodot.tooltipEnabled == true) || (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.tooltipEnabled == true && CZ.Common.tooltipMode != "infodot")) {
+                        var obj = null;
+
+                        if (CZ.Common.tooltipMode == 'infodot')
+                            obj = this.currentlyHoveredInfodot;
+                        else if (CZ.Common.tooltipMode == 'timeline')
+                            obj = this.currentlyHoveredTimeline;
+
+                        if (obj != null) {
+                            if (obj.tooltipIsShown == false) {
+                                obj.tooltipIsShown = true;
+                                CZ.Common.animationTooltipRunning = $('.bubbleInfo').fadeIn();
+                            }
+                        }
+
+                        this.updateTooltipPosition(posv);
+                    }
+
+                    this.lastEvent = e;
+                },
+                getLastEvent: function () {
+                    return this.lastEvent;
+                },
+                getLayerContent: function () {
+                    return this._layersContent;
+                },
+                findElement: function (id) {
+                    var rfind = function (el, id) {
+                        if (el.id === id)
+                            return el;
+                        if (!el.children)
+                            return null;
+                        var n = el.children.length;
+                        for (var i = 0; i < n; i++) {
+                            var child = el.children[i];
+                            if (child.id === id)
+                                return child;
+                        }
+                        for (var i = 0; i < n; i++) {
+                            var child = el.children[i];
+                            var res = rfind(child, id);
+                            if (res)
+                                return res;
+                        }
+                        return null;
+                    };
+
+                    return rfind(this._layersContent, id);
+                },
+                forEachElement: function (callback) {
+                    var rfind = function (el, callback) {
+                        callback(el);
+                        if (!el.children)
+                            return;
+                        for (var i = 0; i < el.children.length; i++) {
+                            var child = el.children[i];
+                            var res = rfind(child, callback);
+                        }
+                    };
+
+                    return rfind(this._layersContent, callback);
+                },
+                _destroy: function () {
+                    this.element.removeClass("virtualCanvas");
+                    this.element.children(".virtualCanvasLayerDiv").each(function (index) {
+                        $(this).removeClass("virtualCanvasLayerDiv").removeClass("unselectable");
+                        $(this).remove(".virtualCanvasLayerCanvas");
+                    });
+                    this.element.unbind('.' + this.widgetName);
+                    this._layers = undefined;
+                    this._layersContent = undefined;
+                    return this;
+                },
+                _visibleToViewBox: function (visible) {
+                    var view = this.getViewport();
+                    var w = view.widthScreenToVirtual(view.width);
+                    var h = view.heightScreenToVirtual(view.height);
+                    var x = visible.centerX - w / 2;
+                    var y = visible.centerY - h / 2;
+                    return { Left: x, Right: x + w, Top: y, Bottom: y + h };
+                },
+                setVisible: function (newVisible, isInAnimation) {
+                    delete this.viewport;
+                    this.options.visible = newVisible;
+                    this.isInAnimation = isInAnimation && isInAnimation.isActive;
+
+                    var viewbox_v = this._visibleToViewBox(newVisible);
+
+                    var viewport = this.getViewport();
+                    this._renderCanvas(this._layersContent, viewbox_v, viewport);
+                },
+                updateViewport: function () {
+                    var size = this._getClientSize();
+                    var n = this._layers.length;
+                    for (var i = 0; i < n; i++) {
+                        var layer = this._layers[i];
+                        layer.width(size.width).height(size.height);
+                        var canvas = layer.children(".virtualCanvasLayerCanvas").first()[0];
+                        if (canvas) {
+                            canvas.width = size.width;
+                            canvas.height = size.height;
+                        }
+                    }
+
+                    this.canvasWidth = CZ.Common.vc.width();
+                    this.canvasHeight = CZ.Common.vc.height();
+
+                    this.setVisible(this.options.visible);
+                },
+                _getClientSize: function () {
+                    return {
+                        width: this.element[0].clientWidth,
+                        height: this.element[0].clientHeight
+                    };
+                },
+                getViewport: function () {
+                    if (!this.viewport) {
+                        var size = this._getClientSize();
+                        var o = this.options;
+                        this.viewport = new CZ.Viewport.Viewport2d(o.aspectRatio, size.width, size.height, o.visible);
+                    }
+                    return this.viewport;
+                },
+                _renderCanvas: function (elementsRoot, visibleBox_v, viewport) {
+                    var n = this._layers.length;
+                    if (n == 0)
+                        return;
+
+                    var contexts = {};
+                    for (var i = 0; i < n; i++) {
+                        var layer = this._layers[i];
+                        var canvas = layer.children(".virtualCanvasLayerCanvas").first()[0];
+                        var ctx = canvas.getContext("2d");
+                        ctx.clearRect(0, 0, viewport.width, viewport.height);
+                        var layerid = layer[0].id;
+                        contexts[layerid] = ctx;
+                    }
+
+                    elementsRoot.render(contexts, visibleBox_v, viewport);
+
+                    this.updateCloakPosition(viewport);
+                },
+                invalidate: function () {
+                    var viewbox_v = this._visibleToViewBox(this.options.visible);
+                    var viewport = this.getViewport();
+
+                    this._renderCanvas(this._layersContent, viewbox_v, viewport);
+                },
+                breadCrumbsChanged: function () {
+                    this.breadCrumbsChangedEvent.breadCrumbs = this.breadCrumbs;
+                    this.element.trigger(this.breadCrumbsChangedEvent);
+                },
+                requestInvalidate: function () {
+                    this.requestNewFrame = false;
+
+                    if (CZ.Layout.animatingElements.length != 0) {
+                        for (var id in CZ.Layout.animatingElements)
+                            if (CZ.Layout.animatingElements[id].animation && CZ.Layout.animatingElements[id].animation.isAnimating) {
+                                CZ.Layout.animatingElements[id].calculateNewFrame();
+                                this.requestNewFrame = true;
+                            }
+                    }
+
+                    if (this.isInAnimation)
+                        return;
+
+                    this.isInAnimation = true;
+                    var self = this;
+                    setTimeout(function () {
+                        self.isInAnimation = false;
+                        self.invalidate();
+
+                        if (self.requestNewFrame)
+                            self.requestInvalidate();
+                    }, 1000.0 / CZ.Settings.targetFps);
+                },
+                _findLca: function (tl, wnd) {
+                    for (var i = 0; i < tl.children.length; i++) {
+                        if (tl.children[i].type === 'timeline' && tl.children[i].contains(wnd)) {
+                            return this._findLca(tl.children[i], wnd);
+                        }
+                    }
+                    return tl;
+                },
+                findLca: function (wnd) {
+                    var cosmosTimeline = this._layersContent.children[0];
+
+                    var eps = 1;
+                    var cosmosLeft = cosmosTimeline.x + eps;
+                    var cosmosRight = cosmosTimeline.x + cosmosTimeline.width - eps;
+                    var cosmosTop = cosmosTimeline.y + eps;
+                    var cosmosBottom = cosmosTimeline.y + cosmosTimeline.height - eps;
+
+                    wnd.left = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x));
+                    wnd.right = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x + wnd.width));
+                    wnd.top = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y));
+                    wnd.bottom = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y + wnd.height));
+
+                    wnd.x = wnd.left;
+                    wnd.y = wnd.top;
+                    wnd.width = Math.max(0, wnd.right - wnd.left);
+                    wnd.height = Math.max(0, wnd.bottom - wnd.top);
+
+                    return this._findLca(cosmosTimeline, wnd);
+                },
+                _inBuffer: function (tl, wnd, scale) {
+                    if (tl.intersects(wnd) && tl.isVisibleOnScreen(scale)) {
+                        if (!tl.isBuffered) {
+                            return false;
+                        } else {
+                            var b = true;
+                            for (var i = 0; i < tl.children.length; i++) {
+                                if (tl.children[i].type === 'timeline')
+                                    b = b && this._inBuffer(tl.children[i], wnd, scale);
+                            }
+                            return b;
+                        }
+                    }
+                    return true;
+                },
+                inBuffer: function (wnd, scale) {
+                    var cosmosTimeline = this._layersContent.children[0];
+
+                    var cosmosLeft = cosmosTimeline.x;
+                    var cosmosRight = cosmosTimeline.x + cosmosTimeline.width;
+                    var cosmosTop = cosmosTimeline.y;
+                    var cosmosBottom = cosmosTimeline.y + cosmosTimeline.height;
+
+                    wnd.left = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x));
+                    wnd.right = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x + wnd.width));
+                    wnd.top = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y));
+                    wnd.bottom = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y + wnd.height));
+
+                    wnd.x = wnd.left;
+                    wnd.y = wnd.top;
+                    wnd.width = Math.max(0, wnd.right - wnd.left);
+                    wnd.height = Math.max(0, wnd.bottom - wnd.top);
+
+                    return this._inBuffer(cosmosTimeline, wnd, scale);
+                },
+                options: {
+                    aspectRatio: 1,
+                    visible: { centerX: 0, centerY: 0, scale: 1 }
+                },
+                cloakNonRootVirtualSpace: function () {
+                    this.showCloak = true;
+                    var viewport = this.getViewport();
+
+                    this.updateCloakPosition(viewport);
+
+                    this.topCloak.addClass("visible");
+                    this.rightCloak.addClass("visible");
+                    this.bottomCloak.addClass("visible");
+                    this.leftCloak.addClass("visible");
+                },
+                showNonRootVirtualSpace: function () {
+                    this.showCloak = false;
+
+                    this.topCloak.removeClass("visible");
+                    this.rightCloak.removeClass("visible");
+                    this.bottomCloak.removeClass("visible");
+                    this.leftCloak.removeClass("visible");
+                },
+                updateCloakPosition: function (viewport) {
+                    if (!this.showCloak)
+                        return;
+
+                    var rootTimeline = this._layersContent.children[0];
+
+                    var top = rootTimeline.y;
+                    var right = rootTimeline.x + rootTimeline.width;
+                    var bottom = rootTimeline.y + rootTimeline.height;
+                    var left = rootTimeline.x;
+
+                    top = Math.max(0, viewport.pointVirtualToScreen(0, top).y);
+                    right = Math.max(0, viewport.pointVirtualToScreen(right, 0).x);
+                    bottom = Math.max(0, viewport.pointVirtualToScreen(0, bottom).y);
+                    left = Math.max(0, viewport.pointVirtualToScreen(left, 0).x);
+
+                    this.rightCloak.css("width", Math.max(0, viewport.width - right) + "px");
+                    this.leftCloak.css("width", left + "px");
+
+                    this.bottomCloak.css("height", Math.max(0, viewport.height - bottom) + "px");
+                    this.topCloak.css("height", top + "px");
+
+                    this.topCloak.css("left", left + "px");
+                    this.topCloak.css("right", Math.max(0, viewport.width - right) + "px");
+                    this.bottomCloak.css("left", left + "px");
+                    this.bottomCloak.css("right", Math.max(0, viewport.width - right) + "px");
+                }
+            });
+        }
+        VirtualCanvas.initialize = initialize;
+    })(CZ.VirtualCanvas || (CZ.VirtualCanvas = {}));
+    var VirtualCanvas = CZ.VirtualCanvas;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UILoader) {
+        function loadHtml(selector, filepath) {
+            var container = $(selector);
+            var promise = $.Deferred();
+
+            if (!filepath) {
+                promise.resolve(container);
+                return promise;
+            }
+
+            if (!selector || !container.length) {
+                throw "Unable to load " + filepath + " " + selector;
+            }
+
+            container.load(filepath, function () {
+                promise.resolve(container);
+            });
+
+            return promise;
+        }
+        UILoader.loadHtml = loadHtml;
+
+        function loadAll(uiMap) {
+            var promises = [];
+
+            for (var selector in uiMap) {
+                if (uiMap.hasOwnProperty(selector)) {
+                    promises.push(loadHtml(selector, uiMap[selector]));
+                }
+            }
+
+            return $.when.apply($, promises);
+        }
+        UILoader.loadAll = loadAll;
+    })(CZ.UILoader || (CZ.UILoader = {}));
+    var UILoader = CZ.UILoader;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Media) {
+        var BingMediaPicker = (function () {
+            function BingMediaPicker(container, context, formHost) {
+                this.container = container;
+                this.contentItem = context;
+
+                this.editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+                this.searchTextbox = this.container.find(".cz-bing-search-input");
+                this.mediaTypeRadioButtons = this.container.find(":radio");
+                this.progressBar = this.container.find(".cz-form-progress-bar");
+                this.searchResultsBox = this.container.find(".cz-bing-search-results");
+                this.searchButton = this.container.find(".cz-bing-search-button");
+
+                this.initialize();
+            }
+            BingMediaPicker.setup = function (context, formHost) {
+                var mediaPickerContainer = CZ.Media.mediaPickersViews["bing"];
+                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context, formHost);
+                var formContainer = $(".cz-form-bing-mediapicker");
+
+                if (formContainer.length === 0) {
+                    formContainer = $("#mediapicker-form").clone().removeAttr("id").addClass("cz-form-bing-mediapicker").appendTo($("#content"));
+                }
+
+                var form = new CZ.UI.FormMediaPicker(formContainer, mediaPickerContainer, "Import from Bing", {
+                    activationSource: $(),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    contentContainer: ".cz-form-content"
+                });
+
+                $(form).on("showcompleted", function (event) {
+                    mediaPicker.searchTextbox.focus();
+                });
+
+                $(mediaPicker).on("resultclick", function (event) {
+                    form.close();
+                });
+
+                var onWindowResize = function () {
+                    return mediaPicker.onWindowResize();
+                };
+
+                $(window).on("resize", onWindowResize);
+
+                $(form).on("closecompleted", function (event) {
+                    $(window).off("resize", onWindowResize);
+                });
+
+                form.show();
+            };
+
+            BingMediaPicker.prototype.initialize = function () {
+                var _this = this;
+                this.progressBar.css("opacity", 0);
+                this.searchTextbox.off();
+                this.searchButton.off();
+                $(this).off();
+
+                this.searchTextbox.keypress(function (event) {
+                    var code = event.which || event.keyCode;
+
+                    if (code === 13) {
+                        event.preventDefault();
+                        _this.search();
+                    }
+                });
+
+                this.searchButton.click(function (event) {
+                    _this.search();
+                });
+
+                $(this).on("resultclick", function (event, mediaInfo) {
+                    _this.onSearchResultClick(mediaInfo);
+                });
+            };
+
+            BingMediaPicker.prototype.onSearchResultClick = function (mediaInfo) {
+                $.extend(this.contentItem, mediaInfo);
+                this.editContentItemForm.updateMediaInfo();
+            };
+
+            BingMediaPicker.prototype.getMediaType = function () {
+                return this.mediaTypeRadioButtons.filter(":checked").val();
+            };
+
+            BingMediaPicker.prototype.convertResultToMediaInfo = function (result, mediaType) {
+                var mediaInfoMap = {
+                    image: {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.SourceUrl,
+                        attribution: result.SourceUrl
+                    },
+                    video: {
+                        uri: result.MediaUrl,
+                        mediaType: mediaType,
+                        mediaSource: result.MediaUrl,
+                        attribution: result.MediaUrl
+                    },
+                    pdf: {
+                        uri: result.Url,
+                        mediaType: mediaType,
+                        mediaSource: result.Url,
+                        attribution: result.Url
+                    }
+                };
+
+                return mediaInfoMap[mediaType];
+            };
+
+            BingMediaPicker.prototype.search = function () {
+                var query = this.searchTextbox.val();
+                var mediaType = this.getMediaType();
+
+                if (query.trim() === "") {
+                    return;
+                }
+
+                this.searchResultsBox.empty();
+                this.showProgressBar();
+
+                switch (mediaType) {
+                    case "image":
+                        this.searchImages(query);
+                        break;
+                    case "video":
+                        this.searchVideos(query);
+                        break;
+                    case "document":
+                        this.searchDocuments(query);
+                        break;
+                }
+            };
+
+            BingMediaPicker.prototype.searchImages = function (query) {
+                var _this = this;
+                CZ.Service.getBingImages(query).done(function (response) {
+                    _this.hideProgressBar();
+
+                    if (response.d.length === 0) {
+                        _this.showNoResults();
+                        return;
+                    }
+
+                    for (var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = _this.createImageResult(result);
+                        _this.searchResultsBox.append(resultContainer);
+                        _this.alignThumbnails();
+                    }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
+                });
+            };
+
+            BingMediaPicker.prototype.searchVideos = function (query) {
+                var _this = this;
+                query += " (+site:youtube.com OR +site:vimeo.com)";
+                CZ.Service.getBingVideos(query).done(function (response) {
+                    _this.hideProgressBar();
+
+                    if (response.d.length === 0) {
+                        _this.showNoResults();
+                        return;
+                    }
+
+                    for (var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = _this.createVideoResult(result);
+                        _this.searchResultsBox.append(resultContainer);
+                        _this.alignThumbnails();
+                    }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
+                });
+            };
+
+            BingMediaPicker.prototype.searchDocuments = function (query) {
+                var _this = this;
+                CZ.Service.getBingDocuments(query, "pdf").done(function (response) {
+                    _this.hideProgressBar();
+
+                    if (response.d.length === 0) {
+                        _this.showNoResults();
+                        return;
+                    }
+
+                    for (var i = 0, len = response.d.length; i < len; ++i) {
+                        var result = response.d[i];
+                        var resultContainer = _this.createDocumentResult(result);
+                        _this.searchResultsBox.append(resultContainer);
+                    }
+                }).fail(function (error) {
+                    _this.hideProgressBar();
+                    _this.showErrorMessage(error);
+                });
+            };
+
+            BingMediaPicker.prototype.createImageResult = function (result) {
+                var _this = this;
+                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerImageThumbnailMaxWidth, CZ.Settings.mediapickerImageThumbnailMaxHeight);
+
+                var imageOffset = (CZ.Settings.mediapickerImageThumbnailMaxHeight - rectangle.height) / 2;
+
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: rectangle.width,
+                    "data-actual-width": rectangle.width
+                });
+
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title,
+                    title: result.Title
+                });
+
+                var size = $("<div></div>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.Width + "x" + result.Height + " - " + Math.round(result.FileSize / 8 / 1024) + " KB"
+                });
+
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.DisplayUrl,
+                    href: result.MediaUrl,
+                    title: result.DisplayUrl,
+                    "media-source": result.SourceUrl,
+                    target: "_blank"
+                });
+
+                var thumbnailContainer = $("<div></div>", {
+                    width: "100%",
+                    height: CZ.Settings.mediapickerImageThumbnailMaxHeight
+                });
+
+                var thumbnail = $("<img></img>", {
+                    class: "cz-bing-result-thumbnail",
+                    src: result.Thumbnail.MediaUrl,
+                    height: rectangle.height,
+                    width: "100%"
+                });
+                thumbnail.css("padding-top", imageOffset + "px");
+
+                thumbnailContainer.add(title).add(size).click(function (event) {
+                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "image"));
+                });
+
+                thumbnailContainer.append(thumbnail);
+
+                return container.append(thumbnailContainer).append(title).append(size).append(url);
+            };
+
+            BingMediaPicker.prototype.createVideoResult = function (result) {
+                var _this = this;
+                result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
+
+                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerVideoThumbnailMaxWidth, CZ.Settings.mediapickerVideoThumbnailMaxHeight);
+
+                var imageOffset = (CZ.Settings.mediapickerVideoThumbnailMaxHeight - rectangle.height) / 2;
+
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: rectangle.width,
+                    "data-actual-width": rectangle.width
+                });
+
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title,
+                    title: result.Title
+                });
+
+                var size = $("<div></div>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: "Duration - " + (result.RunTime / 1000) + " seconds"
+                });
+
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.MediaUrl,
+                    href: result.MediaUrl,
+                    title: result.MediaUrl,
+                    target: "_blank"
+                });
+
+                var thumbnailContainer = $("<div></div>", {
+                    width: "100%",
+                    height: CZ.Settings.mediapickerVideoThumbnailMaxHeight
+                });
+
+                var thumbnail = $("<img></img>", {
+                    class: "cz-bing-result-thumbnail",
+                    src: result.Thumbnail.MediaUrl,
+                    height: rectangle.height,
+                    width: "100%"
+                });
+                thumbnail.css("padding-top", imageOffset + "px");
+
+                thumbnailContainer.add(title).add(size).click(function (event) {
+                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "video"));
+                });
+
+                thumbnailContainer.append(thumbnail);
+
+                return container.append(thumbnailContainer).append(title).append(size).append(url);
+            };
+
+            BingMediaPicker.prototype.createDocumentResult = function (result) {
+                var _this = this;
+                var container = $("<div></div>", {
+                    class: "cz-bing-result-container",
+                    width: 300
+                });
+
+                var title = $("<div></div>", {
+                    class: "cz-bing-result-title cz-darkgray",
+                    text: result.Title,
+                    title: result.Title
+                });
+
+                var descr = $("<div></div>", {
+                    class: "cz-bing-result-doc-description cz-lightgray",
+                    height: 100,
+                    text: result.Description
+                });
+
+                var url = $("<a></a>", {
+                    class: "cz-bing-result-description cz-lightgray",
+                    text: result.DisplayUrl,
+                    href: result.Url,
+                    title: result.DisplayUrl,
+                    target: "_blank"
+                });
+
+                title.add(descr).click(function (event) {
+                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "pdf"));
+                });
+
+                return container.append(title).append(descr).append(url);
+            };
+
+            BingMediaPicker.prototype.showProgressBar = function () {
+                this.progressBar.animate({
+                    opacity: 1
+                });
+            };
+
+            BingMediaPicker.prototype.hideProgressBar = function () {
+                this.progressBar.animate({
+                    opacity: 0
+                });
+            };
+
+            BingMediaPicker.prototype.showNoResults = function () {
+                this.searchResultsBox.text("No results.");
+            };
+
+            BingMediaPicker.prototype.createDefaultThumbnail = function () {
+                return {
+                    ContentType: "image/png",
+                    FileSize: 4638,
+                    Width: 500,
+                    Height: 500,
+                    MediaUrl: "/images/Temp-Thumbnail2.png"
+                };
+            };
+
+            BingMediaPicker.prototype.showErrorMessage = function (error) {
+                var errorMessagesByStatus = {
+                    "400": "The search request is formed badly. Please contact developers about the error.",
+                    "403": "Please sign in to ChronoZoom to use Bing search.",
+                    "500": "We are sorry, but something went wrong. Please try again later."
+                };
+
+                var errorMessage = $("<span></span>", {
+                    class: "cz-red",
+                    text: errorMessagesByStatus[error.status]
+                });
+
+                this.searchResultsBox.append(errorMessage);
+            };
+
+            BingMediaPicker.prototype.onWindowResize = function () {
+                this.alignThumbnails();
+            };
+
+            BingMediaPicker.prototype.alignThumbnails = function () {
+                var container = this.searchResultsBox;
+                var elements = container.children();
+
+                if (elements.length === 0) {
+                    return;
+                }
+
+                var rowWidth = container.width();
+                var currentRow = {
+                    elements: [],
+                    width: 0
+                };
+
+                for (var i = 0, len = elements.length; i < len; i++) {
+                    var curElement = $(elements[i]);
+                    var curElementActualWidth = +curElement.attr("data-actual-width");
+                    var curElementOuterWidth = curElement.outerWidth(true);
+                    var curElementInnerWidth = curElement.innerWidth();
+
+                    if (rowWidth < currentRow.width + curElementActualWidth) {
+                        var delta = rowWidth - currentRow.width;
+                        for (var j = 0, rowLen = currentRow.elements.length; j < rowLen; j++) {
+                            var rowElement = currentRow.elements[j];
+                            var rowElementActualWidth = +rowElement.attr("data-actual-width");
+                            rowElement.width(rowElementActualWidth + delta / rowLen);
+                        }
+                        currentRow.elements = [];
+                        currentRow.elements.push(curElement);
+
+                        currentRow.width = Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                    } else {
+                        currentRow.elements.push(curElement);
+
+                        currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                    }
+                }
+            };
+
+            BingMediaPicker.prototype.fitThumbnailToContainer = function (aspectRatio, maxWidth, maxHeight) {
+                var maxAspectRatio = maxWidth / maxHeight;
+                var output = {
+                    width: maxHeight * aspectRatio,
+                    height: maxHeight
+                };
+
+                if (aspectRatio > maxAspectRatio) {
+                    output.width = maxWidth;
+                    output.height = maxWidth / aspectRatio;
+                }
+
+                return output;
+            };
+            return BingMediaPicker;
+        })();
+        Media.BingMediaPicker = BingMediaPicker;
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Media) {
+        (function (SkyDriveMediaPicker) {
+            var editContentItemForm;
+            var contentItem;
+            SkyDriveMediaPicker.filePicker;
+            SkyDriveMediaPicker.filePickerIframe;
+            SkyDriveMediaPicker.logoutButton;
+            SkyDriveMediaPicker.isEnabled;
+            SkyDriveMediaPicker.helperText;
+            var mediaType;
+            var tempSource;
+
+            function setup(context, formHost) {
+                contentItem = context;
+                editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+
+                SkyDriveMediaPicker.logoutButton = $("<button></button>", {
+                    text: "Logout",
+                    class: "cz-skydrive-logout-button",
+                    click: onLogout
+                });
+
+                SkyDriveMediaPicker.helperText = $("<label></label>", {
+                    text: "Selected items will be automatically shared",
+                    class: "cz-skydrive-help-text"
+                });
+
+                SkyDriveMediaPicker.filePicker = showFilePicker().then(onFilePick, onError);
+            }
+            SkyDriveMediaPicker.setup = setup;
+
+            function showFilePicker() {
+                watchFilePicker(onFilePickerLoad);
+                return WL.fileDialog({
+                    mode: "open",
+                    select: "single"
+                });
+            }
+
+            function onFilePick(response) {
+                onFilePickerClose();
+                getEmbed(response).then(onContentReceive, onError);
+            }
+
+            function getEmbed(response) {
+                switch (response.data.files[0].type) {
+                    case "photo":
+                        mediaType = "skydrive-image";
+                        break;
+                    default:
+                        mediaType = "skydrive-document";
+                        break;
+                }
+
+                tempSource = response.data.files[0].source;
+                return WL.api({
+                    path: response.data.files[0].id + "/embed",
+                    method: "GET"
+                });
+            }
+
+            function onContentReceive(response) {
+                var src = response.embed_html.match(/src=\"(.*?)\"/i)[1];
+
+                var uri = src;
+
+                if (mediaType === "skydrive-image") {
+                    var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    uri += ' ' + width + ' ' + height;
+                }
+
+                var mediaInfo = {
+                    uri: uri,
+                    mediaType: mediaType,
+                    mediaSource: src,
+                    attribution: src,
+                    tempSource: tempSource
+                };
+
+                $.extend(contentItem, mediaInfo);
+                editContentItemForm.updateMediaInfo();
+            }
+
+            function onError(response) {
+                var error = response.error;
+                if (error.code === "user_canceled" || error.code === "request_canceled") {
+                    onFilePickerClose();
+                } else {
+                    console.log(error.message);
+                }
+            }
+
+            function onLogout() {
+                if (window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
+                    SkyDriveMediaPicker.logoutButton.hide();
+                    SkyDriveMediaPicker.helperText.hide();
+                    SkyDriveMediaPicker.filePicker.cancel();
+                    WL.logout();
+
+                    window.location.assign("https://login.live.com/oauth20_logout.srf?client_id=" + CZ.Settings.WLAPIClientID + "&redirect_uri=" + window.location.toString());
+                }
+            }
+
+            function watchFilePicker(callback) {
+                SkyDriveMediaPicker.filePickerIframe = $("iframe[sutra=picker]");
+                if (SkyDriveMediaPicker.filePickerIframe.length > 0) {
+                    callback();
+                } else {
+                    setTimeout(watchFilePicker, 50, callback);
+                }
+            }
+
+            function onFilePickerLoad() {
+                SkyDriveMediaPicker.logoutButton.appendTo("body");
+
+                SkyDriveMediaPicker.helperText.appendTo("body");
+
+                $(window).on("resize", onWindowResize);
+
+                SkyDriveMediaPicker.filePickerIframe.load(function () {
+                    onWindowResize();
+                    SkyDriveMediaPicker.filePickerIframe.animate({
+                        opacity: 1
+                    });
+                    SkyDriveMediaPicker.logoutButton.animate({
+                        opacity: 1
+                    });
+                    SkyDriveMediaPicker.helperText.animate({
+                        opacity: 1
+                    });
+                });
+            }
+
+            function onFilePickerClose() {
+                SkyDriveMediaPicker.logoutButton.remove();
+                SkyDriveMediaPicker.helperText.remove();
+                $(window).off("resize", onWindowResize);
+            }
+
+            function onWindowResize() {
+                var skyDriveFooterHeight = 56;
+                var iframeOffset = SkyDriveMediaPicker.filePickerIframe.offset();
+                var iframeHeight = SkyDriveMediaPicker.filePickerIframe.outerHeight(true);
+                var buttonLeftMargin = parseInt(SkyDriveMediaPicker.logoutButton.css("margin-left"), 10);
+                var buttonTopMargin = parseInt(SkyDriveMediaPicker.logoutButton.css("margin-top"), 10);
+
+                SkyDriveMediaPicker.logoutButton.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin,
+                    left: iframeOffset.left + buttonLeftMargin
+                });
+                SkyDriveMediaPicker.helperText.offset({
+                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin + 1,
+                    left: iframeOffset.left + buttonLeftMargin + 90
+                });
+            }
+        })(Media.SkyDriveMediaPicker || (Media.SkyDriveMediaPicker = {}));
+        var SkyDriveMediaPicker = Media.SkyDriveMediaPicker;
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Media) {
+        var _mediaPickers = {};
+        var _mediaPickersViews = {};
+
+        Object.defineProperties(CZ.Media, {
+            mediaPickers: {
+                get: function () {
+                    return _mediaPickers;
+                }
+            },
+            mediaPickersViews: {
+                get: function () {
+                    return _mediaPickersViews;
+                }
+            }
+        });
+
+        function initialize() {
+            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
+
+            if (CZ.Media.SkyDriveMediaPicker.isEnabled) {
+                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x150.png", CZ.Media.SkyDriveMediaPicker).done(function () {
+                    WL.init({
+                        client_id: CZ.Settings.WLAPIClientID,
+                        redirect_uri: CZ.Settings.WLAPIRedirectUrl,
+                        response_type: "token",
+                        scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
+                    });
+                });
+            }
+        }
+        Media.initialize = initialize;
+
+        function registerMediaPicker(title, iconUrl, type, viewUrl, selector) {
+            var order = Object.keys(_mediaPickers).length;
+            var setup = type.setup;
+            selector = selector || "$('<div></div>')";
+            _mediaPickers[title] = {};
+
+            return CZ.UILoader.loadHtml(selector, viewUrl).always(function (view) {
+                _mediaPickersViews[title] = view;
+                _mediaPickers[title] = {
+                    title: title,
+                    iconUrl: iconUrl,
+                    order: order,
+                    setup: setup
+                };
+            });
+        }
+        Media.registerMediaPicker = registerMediaPicker;
+    })(CZ.Media || (CZ.Media = {}));
+    var Media = CZ.Media;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var DatePicker = (function () {
+            function DatePicker(datePicker) {
+                this.datePicker = datePicker;
+                this.INFINITY_VALUE = 9999;
+                this.WRONG_YEAR_INPUT = "Year should be a number.";
+                if (!(datePicker instanceof jQuery && datePicker.is("div")))
+                    throw "DatePicker parameter is invalid! It should be jQuery instance of DIV.";
+
+                this.coordinate = 0;
+
+                this.initialize();
+            }
+            DatePicker.prototype.initialize = function () {
+                var _this = this;
+                this.datePicker.addClass("cz-datepicker");
+
+                this.modeSelector = $("<select class='cz-datepicker-mode cz-input'></select>");
+
+                var optionYear = $("<option value='year'>Year</option>");
+                var optionDate = $("<option value='date'>Date</option>");
+
+                this.modeSelector.change(function (event) {
+                    var mode = _this.modeSelector.find(":selected").val();
+                    _this.errorMsg.text("");
+                    switch (mode) {
+                        case "year":
+                            _this.editModeYear();
+                            _this.setDate_YearMode(_this.coordinate, false);
+                            break;
+                        case "date":
+                            _this.editModeDate();
+                            _this.setDate_DateMode(_this.coordinate);
+                            break;
+
+                        case "infinite":
+                            _this.editModeInfinite();
+                            break;
+                    }
+                });
+
+                this.modeSelector.append(optionYear);
+                this.modeSelector.append(optionDate);
+
+                this.dateContainer = $("<div class='cz-datepicker-container'></div>");
+                this.errorMsg = $("<div class='cz-datepicker-errormsg'></div>");
+                this.datePicker.append(this.modeSelector);
+                this.datePicker.append(this.dateContainer);
+                this.datePicker.append(this.errorMsg);
+
+                this.editModeYear();
+                this.setDate(this.coordinate, true);
+            };
+
+            DatePicker.prototype.remove = function () {
+                this.datePicker.empty();
+
+                this.datePicker.removeClass("cz-datepicker");
+            };
+
+            DatePicker.prototype.addEditMode_Infinite = function () {
+                var optionIntinite = $("<option value='infinite'>Infinite</option>");
+                this.modeSelector.append(optionIntinite);
+            };
+
+            DatePicker.prototype.setDate = function (coordinate, ZeroYearConversation) {
+                if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
+                if (!this.validateNumber(coordinate)) {
+                    return false;
+                }
+
+                coordinate = Number(coordinate);
+                this.coordinate = coordinate;
+                var regime = CZ.Dates.convertCoordinateToYear(this.coordinate).regime;
+
+                if (this.coordinate === this.INFINITY_VALUE) {
+                    this.modeSelector.find(":selected").attr("selected", "false");
+                    this.modeSelector.find("option").each(function () {
+                        if ($(this).val() === "infinite") {
+                            $(this).attr("selected", "selected");
+                            return;
+                        }
+                    });
+                    this.editModeInfinite();
+                    return;
+                }
+
+                switch (regime.toLowerCase()) {
+                    case "ga":
+                    case "ma":
+                    case "ka":
+                        this.modeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if ($(this).val() === "year") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        });
+                        this.editModeYear();
+                        this.setDate_YearMode(coordinate, ZeroYearConversation);
+                        break;
+                    case "bce":
+                    case "ce":
+                        this.modeSelector.find(":selected").attr("selected", "false");
+                        this.modeSelector.find("option").each(function () {
+                            if ($(this).val() === "date") {
+                                $(this).attr("selected", "selected");
+                                return;
+                            }
+                        });
+                        this.editModeDate();
+                        this.setDate_DateMode(coordinate);
+                        break;
+                }
+            };
+
+            DatePicker.prototype.getDate = function () {
+                var mode = this.modeSelector.find(":selected").val();
+                switch (mode) {
+                    case "year":
+                        return this.getDate_YearMode();
+                        break;
+                    case "date":
+                        return this.getDate_DateMode();
+                        break;
+
+                    case "infinite":
+                        return this.INFINITY_VALUE;
+                        break;
+                }
+            };
+
+            DatePicker.prototype.editModeYear = function () {
+                var _this = this;
+                this.dateContainer.empty();
+
+                this.yearSelector = $("<input type='text' class='cz-datepicker-year-year cz-input'></input>");
+                this.regimeSelector = $("<select class='cz-datepicker-regime cz-input'></select>");
+
+                this.yearSelector.focus(function (event) {
+                    _this.errorMsg.text("");
+                });
+
+                this.regimeSelector.change(function (event) {
+                    _this.checkAndRemoveNonIntegerPart();
+                });
+
+                this.yearSelector.blur(function (event) {
+                    if (!_this.validateNumber(_this.yearSelector.val())) {
+                        _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
+                    }
+
+                    _this.checkAndRemoveNonIntegerPart();
+                });
+                var optionGa = $("<option value='ga'>Ga</option>");
+                var optionMa = $("<option value='ma'>Ma</option>");
+                var optionKa = $("<option value='ka'>Ka</option>");
+                var optionBCE = $("<option value='bce'>BCE</option>");
+                var optionCE = $("<option value='ce'>CE</option>");
+
+                this.regimeSelector.append(optionGa).append(optionMa).append(optionKa).append(optionBCE).append(optionCE);
+
+                this.dateContainer.append(this.yearSelector);
+                this.dateContainer.append(this.regimeSelector);
+            };
+
+            DatePicker.prototype.editModeDate = function () {
+                var _this = this;
+                this.dateContainer.empty();
+
+                this.daySelector = $("<select class='cz-datepicker-day-selector cz-input'></select>");
+                this.monthSelector = $("<select class='cz-datepicker-month-selector cz-input'></select>");
+                this.yearSelector = $("<input type='text' class='cz-datepicker-year-date cz-input'></input>");
+
+                this.yearSelector.focus(function (event) {
+                    _this.errorMsg.text("");
+                });
+
+                this.yearSelector.blur(function (event) {
+                    if (!_this.validateNumber(_this.yearSelector.val()))
+                        _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
+
+                    _this.checkAndRemoveNonIntegerPart();
+                });
+
+                var self = this;
+                this.monthSelector.change(function (event) {
+                    self.daySelector.empty();
+
+                    var selectedIndex = self.monthSelector[0].selectedIndex;
+                    for (var i = 0; i < CZ.Dates.daysInMonth[selectedIndex]; i++) {
+                        var dayOption = $("<option value='" + (i + 1) + "'>" + (i + 1) + "</option>");
+                        self.daySelector.append(dayOption);
+                    }
+                });
+
+                for (var i = 0; i < CZ.Dates.months.length; i++) {
+                    var monthOption = $("<option value='" + CZ.Dates.months[i] + "'>" + CZ.Dates.months[i] + "</option>");
+                    this.monthSelector.append(monthOption);
+                }
+
+                self.monthSelector.trigger("change");
+
+                this.dateContainer.append(this.monthSelector);
+                this.dateContainer.append(this.daySelector);
+                this.dateContainer.append(this.yearSelector);
+            };
+
+            DatePicker.prototype.editModeInfinite = function () {
+                this.dateContainer.empty();
+            };
+
+            DatePicker.prototype.checkAndRemoveNonIntegerPart = function () {
+                var regime = this.regimeSelector.find(":selected").val().toLowerCase();
+                var mode = this.modeSelector.find(":selected").val().toLowerCase();
+
+                if (regime === 'ce' || regime === 'bce' || mode === 'date') {
+                    this.yearSelector.val(parseFloat(this.yearSelector.val()).toFixed());
+                }
+            };
+
+            DatePicker.prototype.setDate_YearMode = function (coordinate, ZeroYearConversation) {
+                var date = CZ.Dates.convertCoordinateToYear(coordinate);
+                if ((date.regime.toLowerCase() == "bce") && (ZeroYearConversation))
+                    date.year--;
+                this.yearSelector.val(date.year.toString());
+
+                this.regimeSelector.find(":selected").attr("selected", "false");
+
+                this.regimeSelector.find("option").each(function () {
+                    if (this.value === date.regime.toLowerCase()) {
+                        $(this).attr("selected", "selected");
+                    }
+                });
+            };
+
+            DatePicker.prototype.setDate_DateMode = function (coordinate) {
+                var date = CZ.Dates.getYMDFromCoordinate(coordinate);
+
+                this.yearSelector.val(date.year.toString());
+                var self = this;
+
+                this.monthSelector.find("option").each(function (index) {
+                    if (this.value === CZ.Dates.months[date.month]) {
+                        $(this).attr("selected", "selected");
+
+                        $.when(self.monthSelector.trigger("change")).done(function () {
+                            self.daySelector.find("option").each(function () {
+                                if (parseInt(this.value) === date.day) {
+                                    $(this).attr("selected", "selected");
+                                }
+                            });
+                        });
+                    }
+                });
+            };
+
+            DatePicker.prototype.getDate_YearMode = function () {
+                var year = this.yearSelector.val();
+                if (!this.validateNumber(year))
+                    return false;
+                var regime = this.regimeSelector.find(":selected").val();
+
+                return CZ.Dates.convertYearToCoordinate(year, regime);
+            };
+
+            DatePicker.prototype.getDate_DateMode = function () {
+                var year = this.yearSelector.val();
+                if (!this.validateNumber(year))
+                    return false;
+                year = parseInt(year);
+
+                var month = this.monthSelector.find(":selected").val();
+                month = CZ.Dates.months.indexOf(month);
+                var day = parseInt(this.daySelector.find(":selected").val());
+
+                return CZ.Dates.getCoordinateFromYMD(year, month, day);
+            };
+
+            DatePicker.prototype.validateNumber = function (year) {
+                return !isNaN(Number(year)) && isFinite(Number(year)) && !isNaN(parseFloat(year));
+            };
+            return DatePicker;
+        })();
+        UI.DatePicker = DatePicker;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var MediaList = (function () {
+            function MediaList(container, mediaPickers, context, form) {
+                this.container = container;
+                this.mediaPickers = mediaPickers;
+                this.context = context;
+                this.form = form;
+
+                this.container.addClass("cz-medialist");
+                this.fillListOfLinks();
+            }
+            MediaList.prototype.fillListOfLinks = function () {
+                var _this = this;
+                var sortedMediaPickersKeys = Object.keys(this.mediaPickers).sort(function (key1, key2) {
+                    return _this.mediaPickers[key1].order - _this.mediaPickers[key2].order;
+                });
+
+                sortedMediaPickersKeys.forEach(function (key) {
+                    if (_this.mediaPickers.hasOwnProperty(key)) {
+                        var mp = _this.mediaPickers[key];
+                        var link = _this.createMediaPickerLink(mp);
+                        _this.container.append(link);
+                    }
+                });
+            };
+
+            MediaList.prototype.createMediaPickerLink = function (mp) {
+                var _this = this;
+                var container = $("<div></div>", {
+                    class: "cz-medialist-item",
+                    title: mp.title,
+                    "media-picker": mp.title
+                });
+
+                var icon = $("<img></img>", {
+                    class: "cz-medialist-item-icon",
+                    src: mp.iconUrl
+                });
+
+                container.click(function (event) {
+                    mp.setup(_this.context, _this.form);
+                });
+
+                container.append(icon);
+                return container;
+            };
+
+            MediaList.prototype.remove = function () {
+                this.container.empty();
+                this.container.removeClass("cz-medialist");
+            };
+            return MediaList;
+        })();
+        UI.MediaList = MediaList;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormEditTimeline = (function (_super) {
+            __extends(FormEditTimeline, _super);
+            function FormEditTimeline(container, formInfo) {
+                var _this = this;
+                _super.call(this, container, formInfo);
+
+                this.saveButton = container.find(formInfo.saveButton);
+                this.deleteButton = container.find(formInfo.deleteButton);
+                this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
+                this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
+                this.titleInput = container.find(formInfo.titleInput);
+                this.errorMessage = container.find(formInfo.errorMessage);
+
+                this.timeline = formInfo.context;
+
+                this.saveButton.off();
+                this.deleteButton.off();
+
+                this.titleInput.focus(function () {
+                    _this.titleInput.hideError();
+                });
+
+                this.initialize();
+            }
+            FormEditTimeline.prototype.initialize = function () {
+                var _this = this;
+                this.saveButton.prop('disabled', false);
+                if (CZ.Authoring.mode === "createTimeline") {
+                    this.deleteButton.hide();
+                    this.titleTextblock.text("Create Timeline");
+                    this.saveButton.text("create timeline");
+                } else if (CZ.Authoring.mode === "editTimeline") {
+                    this.deleteButton.show();
+                    this.titleTextblock.text("Edit Timeline");
+                    this.saveButton.text("update timeline");
+                } else if (CZ.Authoring.mode === "createRootTimeline") {
+                    this.deleteButton.hide();
+                    this.closeButton.hide();
+                    this.titleTextblock.text("Create Root Timeline");
+                    this.saveButton.text("create timeline");
+                } else {
+                    console.log("Unexpected authoring mode in timeline form.");
+                    this.close();
+                }
+
+                this.isCancel = true;
+                this.endDate.addEditMode_Infinite();
+
+                this.titleInput.val(this.timeline.title);
+                this.startDate.setDate(this.timeline.x, true);
+
+                if (this.timeline.endDate === 9999) {
+                    this.endDate.setDate(this.timeline.endDate, true);
+                } else {
+                    this.endDate.setDate(this.timeline.x + this.timeline.width, true);
+                }
+                this.saveButton.click(function (event) {
+                    _this.errorMessage.empty();
+                    var isDataValid = false;
+                    isDataValid = CZ.Authoring.validateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
+
+                    if (!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
+                        _this.titleInput.showError("Title can't be empty");
+                    }
+
+                    if (!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
+                        _this.errorMessage.text('Time interval should no less than one day');
+                    }
+
+                    if (!isDataValid) {
+                        return;
+                    } else {
+                        _this.errorMessage.empty();
+                        var self = _this;
+
+                        _this.saveButton.prop('disabled', true);
+                        CZ.Authoring.updateTimeline(_this.timeline, {
+                            title: _this.titleInput.val(),
+                            start: _this.startDate.getDate(),
+                            end: _this.endDate.getDate()
+                        }).then(function (success) {
+                            self.isCancel = false;
+                            self.close();
+
+                            self.timeline.onmouseclick();
+                        }, function (error) {
+                            if (error !== undefined && error !== null) {
+                                self.errorMessage.text(error).show().delay(7000).fadeOut();
+                            } else {
+                                self.errorMessage.text("Sorry, internal server error :(").show().delay(7000).fadeOut();
+                            }
+                            console.log(error);
+                        }).always(function () {
+                            _this.saveButton.prop('disabled', false);
+                        });
+                    }
+                });
+
+                this.deleteButton.click(function (event) {
+                    if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
+                        var isDataValid = true;
+                        CZ.Authoring.removeTimeline(_this.timeline);
+                        _this.close();
+                    }
+                });
+            };
+
+            FormEditTimeline.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+
+                this.activationSource.addClass("active");
+            };
+
+            FormEditTimeline.prototype.close = function () {
+                var _this = this;
+                this.errorMessage.empty();
+
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.endDate.remove();
+                        _this.startDate.remove();
+                        _this.titleInput.hideError();
+                    }
+                });
+
+                if (this.isCancel && CZ.Authoring.mode === "createTimeline") {
+                    CZ.VCContent.removeChild(this.timeline.parent, this.timeline.id);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                }
+
+                CZ.Authoring.isActive = false;
+
+                this.activationSource.removeClass("active");
+
+                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
+            };
+            return FormEditTimeline;
+        })(CZ.UI.FormUpdateEntity);
+        UI.FormEditTimeline = FormEditTimeline;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        
+
+        
+
+        
+
+        var ListBoxBase = (function () {
+            function ListBoxBase(container, listBoxInfo, listItemsInfo, getType) {
+                if (typeof getType === "undefined") { getType = function (context) {
+                    return "default";
+                }; }
+                if (!(container instanceof jQuery)) {
+                    throw "Container parameter is invalid! It should be jQuery instance.";
+                }
+
+                this.container = container;
+                this.listItemsInfo = listItemsInfo;
+                this.getType = getType;
+                this.items = [];
+
+                if (this.listItemsInfo.default) {
+                    this.listItemsInfo.default.ctor = this.listItemsInfo.default.ctor || ListItemBase;
+                }
+
+                for (var i = 0, context = listBoxInfo.context, len = context.length; i < len; ++i) {
+                    this.add(context[i]);
+                }
+
+                this.itemDblClickHandler = function (item, idx) {
+                };
+                this.itemRemoveHandler = function (item, idx) {
+                };
+                this.itemMoveHandler = function (item, idx1, idx2) {
+                };
+
+                var self = this;
+                if (listBoxInfo.sortableSettings) {
+                    var origStart = listBoxInfo.sortableSettings.start;
+                    var origStop = listBoxInfo.sortableSettings.stop;
+                    $.extend(listBoxInfo.sortableSettings, {
+                        start: function (event, ui) {
+                            ui.item.startPos = ui.item.index();
+                            if (origStart)
+                                origStart(event, ui);
+                        },
+                        stop: function (event, ui) {
+                            ui.item.stopPos = ui.item.index();
+                            var item = self.items.splice(ui.item.startPos, 1)[0];
+                            self.items.splice(ui.item.stopPos, 0, item);
+                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
+                            if (origStop)
+                                origStop(event, ui);
+                        }
+                    });
+                    this.container.sortable(listBoxInfo.sortableSettings);
+                }
+            }
+            ListBoxBase.prototype.add = function (context) {
+                var type = this.getType(context);
+                var typeInfo = this.listItemsInfo[type];
+
+                var container = typeInfo.container.clone();
+                var uiMap = typeInfo.uiMap;
+                var ctor = typeInfo.ctor;
+
+                var item = new ctor(this, container, uiMap, context);
+                this.items.push(item);
+
+                return item;
+            };
+
+            ListBoxBase.prototype.remove = function (item) {
+                var i = this.items.indexOf(item);
+
+                if (i !== -1) {
+                    item.container.remove();
+                    this.items.splice(i, 1);
+                    this.itemRemoveHandler(item, i);
+                }
+            };
+
+            ListBoxBase.prototype.clear = function () {
+                for (var i = 0, len = this.items.length; i < len; ++i) {
+                    var item = this.items[i];
+                    item.container.remove();
+                }
+                this.items.length = 0;
+            };
+
+            ListBoxBase.prototype.selectItem = function (item) {
+                var i = this.items.indexOf(item);
+
+                if (i !== -1) {
+                    this.itemDblClickHandler(item, i);
+                }
+            };
+
+            ListBoxBase.prototype.itemDblClick = function (handler) {
+                this.itemDblClickHandler = handler;
+            };
+
+            ListBoxBase.prototype.itemRemove = function (handler) {
+                this.itemRemoveHandler = handler;
+            };
+
+            ListBoxBase.prototype.itemMove = function (handler) {
+                this.itemMoveHandler = handler;
+            };
+            return ListBoxBase;
+        })();
+        UI.ListBoxBase = ListBoxBase;
+
+        var ListItemBase = (function () {
+            function ListItemBase(parent, container, uiMap, context) {
+                var _this = this;
+                if (!(container instanceof jQuery)) {
+                    throw "Container parameter is invalid! It should be jQuery instance.";
+                }
+
+                this.parent = parent;
+                this.container = container;
+                this.data = context;
+
+                this.container.dblclick(function (_) {
+                    return _this.parent.selectItem(_this);
+                });
+
+                this.closeButton = this.container.find(uiMap.closeButton);
+
+                if (this.closeButton.length) {
+                    this.closeButton.click(function (event) {
+                        return _this.close();
+                    });
+                }
+
+                this.parent.container.append(this.container);
+            }
+            ListItemBase.prototype.close = function () {
+                this.parent.remove(this);
+            };
+            return ListItemBase;
+        })();
+        UI.ListItemBase = ListItemBase;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var ContentItemListBox = (function (_super) {
+            __extends(ContentItemListBox, _super);
+            function ContentItemListBox(container, listItemContainer, contentItems) {
+                var self = this;
+                var listBoxInfo = {
+                    context: contentItems,
+                    sortableSettings: {
+                        forcePlaceholderSize: true,
+                        cursor: "move",
+                        placeholder: "cz-listbox-placeholder",
+                        revert: 100,
+                        opacity: 0.75,
+                        tolerance: "pointer",
+                        scroll: false,
+                        start: function (event, ui) {
+                            ui.placeholder.height(ui.item.height());
+                        },
+                        stop: function (event, ui) {
+                            for (var i = 0; i < self.items.length; i++)
+                                if (self.items[i].data)
+                                    self.items[i].data.order = i;
+                        }
+                    }
+                };
+
+                var listItemsInfo = {
+                    default: {
+                        container: listItemContainer,
+                        uiMap: {
+                            closeButton: ".cz-listitem-close-btn",
+                            iconImg: ".cz-contentitem-listitem-icon > img",
+                            titleTextblock: ".cz-contentitem-listitem-title",
+                            descrTextblock: ".cz-contentitem-listitem-descr"
+                        }
+                    }
+                };
+
+                listItemsInfo.default.ctor = ContentItemListItem;
+                _super.call(this, container, listBoxInfo, listItemsInfo);
+            }
+            ContentItemListBox.prototype.remove = function (item) {
+                for (var i = this.items.indexOf(item) + 1; i < this.items.length; i++)
+                    if (this.items[i].data && this.items[i].data.order)
+                        this.items[i].data.order--;
+
+                _super.prototype.remove.call(this, item);
+            };
+            return ContentItemListBox;
+        })(CZ.UI.ListBoxBase);
+        UI.ContentItemListBox = ContentItemListBox;
+
+        var ContentItemListItem = (function (_super) {
+            __extends(ContentItemListItem, _super);
+            function ContentItemListItem(parent, container, uiMap, context) {
+                var _this = this;
+                _super.call(this, parent, container, uiMap, context);
+
+                this.iconImg = this.container.find(uiMap.iconImg);
+                this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.descrTextblock = this.container.find(uiMap.descrTextblock);
+
+                this.iconImg.attr("onerror", "this.src='/images/Temp-Thumbnail2.png';");
+                this.iconImg.attr("src", this.data.uri);
+                this.titleTextblock.text(this.data.title);
+                this.descrTextblock.text(this.data.description);
+
+                this.closeButton.off();
+                this.closeButton.click(function () {
+                    if (CZ.Authoring.mode === "createExhibit") {
+                        _super.prototype.close.call(_this);
+                    } else if (CZ.Authoring.mode === "editExhibit") {
+                        if (_this.parent.items.length > 1) {
+                            _super.prototype.close.call(_this);
+                        }
+                    }
+                });
+            }
+            return ContentItemListItem;
+        })(CZ.UI.ListItemBase);
+        UI.ContentItemListItem = ContentItemListItem;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormEditExhibit = (function (_super) {
+            __extends(FormEditExhibit, _super);
+            function FormEditExhibit(container, formInfo) {
+                var _this = this;
+                _super.call(this, container, formInfo);
+
+                this.titleTextblock = container.find(formInfo.titleTextblock);
+                this.titleInput = container.find(formInfo.titleInput);
+                this.datePicker = new CZ.UI.DatePicker(container.find(formInfo.datePicker));
+                this.createArtifactButton = container.find(formInfo.createArtifactButton);
+                this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), formInfo.contentItemsTemplate, formInfo.context.contentItems);
+                this.errorMessage = container.find(formInfo.errorMessage);
+                this.saveButton = container.find(formInfo.saveButton);
+                this.deleteButton = container.find(formInfo.deleteButton);
+
+                this.titleInput.focus(function () {
+                    _this.titleInput.hideError();
+                });
+
+                this.contentItemsTemplate = formInfo.contentItemsTemplate;
+
+                this.exhibit = formInfo.context;
+                this.exhibitCopy = $.extend({}, formInfo.context, { children: null });
+                this.exhibitCopy = $.extend(true, {}, this.exhibitCopy);
+                delete this.exhibitCopy.children;
+
+                this.mode = CZ.Authoring.mode;
+                this.isCancel = true;
+                this.isModified = false;
+                this.initUI();
+            }
+            FormEditExhibit.prototype.initUI = function () {
+                var _this = this;
+                this.saveButton.prop('disabled', false);
+
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.datePicker.datePicker.change(function () {
+                    _this.isModified = true;
+                });
+
+                if (this.mode === "createExhibit") {
+                    this.titleTextblock.text("Create Exhibit");
+                    this.saveButton.text("create exhibit");
+
+                    this.titleInput.val(this.exhibit.title || "");
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
+                    this.closeButton.show();
+                    this.createArtifactButton.show();
+                    this.saveButton.show();
+                    this.deleteButton.hide();
+
+                    this.createArtifactButton.off();
+                    this.createArtifactButton.click(function () {
+                        return _this.onCreateArtifact();
+                    });
+                    this.saveButton.off();
+                    this.saveButton.click(function () {
+                        return _this.onSave();
+                    });
+
+                    this.contentItemsListBox.itemDblClick(function (item, index) {
+                        return _this.onContentItemDblClick(item, index);
+                    });
+                    this.contentItemsListBox.itemRemove(function (item, index) {
+                        return _this.onContentItemRemoved(item, index);
+                    });
+                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
+                        return _this.onContentItemMove(item, indexStart, indexStop);
+                    });
+                } else if (this.mode === "editExhibit") {
+                    this.titleTextblock.text("Edit Exhibit");
+                    this.saveButton.text("update exhibit");
+
+                    this.titleInput.val(this.exhibit.title || "");
+                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
+
+                    this.closeButton.show();
+                    this.createArtifactButton.show();
+                    this.saveButton.show();
+                    this.deleteButton.show();
+
+                    this.createArtifactButton.off();
+                    this.createArtifactButton.click(function () {
+                        return _this.onCreateArtifact();
+                    });
+                    this.saveButton.off();
+                    this.saveButton.click(function () {
+                        return _this.onSave();
+                    });
+                    this.deleteButton.off();
+                    this.deleteButton.click(function () {
+                        return _this.onDelete();
+                    });
+
+                    this.contentItemsListBox.itemDblClick(function (item, index) {
+                        return _this.onContentItemDblClick(item, index);
+                    });
+                    this.contentItemsListBox.itemRemove(function (item, index) {
+                        return _this.onContentItemRemoved(item, index);
+                    });
+                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
+                        return _this.onContentItemMove(item, indexStart, indexStop);
+                    });
+                } else {
+                    console.log("Unexpected authoring mode in exhibit form.");
+                }
+            };
+
+            FormEditExhibit.prototype.onCreateArtifact = function () {
+                this.isModified = true;
+                if (this.exhibit.contentItems.length < CZ.Settings.infodotMaxContentItemsCount) {
+                    this.exhibit.title = this.titleInput.val() || "";
+                    this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
+                    this.exhibit.infodotDescription = { date: this.datePicker.getDate() };
+                    var newContentItem = {
+                        title: "",
+                        uri: "",
+                        mediaSource: "",
+                        mediaType: "",
+                        attribution: "",
+                        description: "",
+                        order: this.exhibit.contentItems.length
+                    };
+                    this.exhibit.contentItems.push(newContentItem);
+                    this.hide(true);
+                    CZ.Authoring.contentItemMode = "createContentItem";
+                    CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
+                } else {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Sorry, only 10 artifacts are allowed in one exhibit").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
+                }
+            };
+
+            FormEditExhibit.prototype.onSave = function () {
+                var _this = this;
+                var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
+                var exhibit_y = this.exhibit.y;
+
+                if (exhibit_x + this.exhibit.width >= this.exhibit.parent.x + this.exhibit.parent.width) {
+                    exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
+                }
+                if (exhibit_x <= this.exhibit.parent.x) {
+                    exhibit_x = this.exhibit.parent.x;
+                }
+
+                if (exhibit_y + this.exhibit.height >= this.exhibit.parent.y + this.exhibit.parent.height) {
+                    exhibit_y = this.exhibit.parent.y + this.exhibit.parent.height - this.exhibit.height;
+                }
+                if (exhibit_y <= this.exhibit.parent.y) {
+                    exhibit_y = this.exhibit.parent.y;
+                }
+
+                var newExhibit = {
+                    title: this.titleInput.val() || "",
+                    x: exhibit_x,
+                    y: exhibit_y,
+                    height: this.exhibit.height,
+                    width: this.exhibit.width,
+                    infodotDescription: { date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()) },
+                    contentItems: this.exhibit.contentItems || [],
+                    type: "infodot"
+                };
+
+                if (!CZ.Authoring.isNotEmpty(this.titleInput.val())) {
+                    this.titleInput.showError("Title can't be empty");
+                }
+
+                if (CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true)) {
+                    this.errorMessage.text("Exhibit intersects other elemenets");
+                }
+
+                if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                    this.saveButton.prop('disabled', true);
+                    CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
+                        _this.isCancel = false;
+                        _this.isModified = false;
+                        _this.close();
+
+                        _this.exhibit.id = arguments[0].id;
+
+                        _this.exhibit.onmouseclick();
+                    }, function (error) {
+                        var errorMessage = JSON.parse(error.responseText).errorMessage;
+                        if (errorMessage !== "") {
+                            _this.errorMessage.text(errorMessage);
+                            var that = _this;
+                            var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
+                            errCI.forEach(function (contentItemIndex) {
+                                var item = that.contentItemsListBox.items[contentItemIndex];
+                                item.container.find(".cz-listitem").css("border-color", "red");
+                            });
+                            errorMessage = "(1/" + errCI.length + ") " + JSON.parse(error.responseText).errorMessage;
+                            ;
+                            _this.errorMessage.text(errorMessage);
+                        } else {
+                            _this.errorMessage.text("Sorry, internal server error :(");
+                        }
+
+                        _this.errorMessage.show().delay(7000).fadeOut();
+                    }).always(function () {
+                        _this.saveButton.prop('disabled', false);
+                    });
+                } else if (this.exhibit.contentItems.length === 0) {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Cannot create exhibit without artifacts.").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
+                } else {
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
+                }
+            };
+
+            FormEditExhibit.prototype.onDelete = function () {
+                if (confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
+                    CZ.Authoring.removeExhibit(this.exhibit);
+                    this.isCancel = false;
+                    this.isModified = false;
+                    this.close();
+                }
+            };
+
+            FormEditExhibit.prototype.onContentItemDblClick = function (item, _) {
+                var idx;
+                if (typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
+                    idx = item.data.order;
+                } else if (typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
+                    idx = this.exhibit.contentItems.map(function (ci) {
+                        return ci.guid;
+                    }).indexOf(item.data.guid);
+                } else {
+                    idx = -1;
+                }
+
+                var item = this.contentItemsListBox.items[idx];
+                item.container.find(".cz-listitem").css("border-color", "#c7c7c7");
+
+                if (idx >= 0) {
+                    this.clickedListItem = item;
+                    this.exhibit.title = this.titleInput.val() || "";
+                    this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
+                    this.exhibit.infodotDescription = { date: this.datePicker.getDate() };
+                    this.hide(true);
+                    CZ.Authoring.contentItemMode = "editContentItem";
+                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[idx], this.exhibit, this, true);
+                }
+            };
+
+            FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
+                var idx;
+                this.isModified = true;
+                if (typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
+                    idx = item.data.order;
+                } else if (typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
+                    idx = this.exhibit.contentItems.map(function (ci) {
+                        return ci.guid;
+                    }).indexOf(item.data.guid);
+                } else {
+                    idx = -1;
+                }
+
+                if (idx >= 0) {
+                    this.exhibit.contentItems.splice(idx, 1);
+                    for (var i = 0; i < this.exhibit.contentItems.length; i++)
+                        this.exhibit.contentItems[i].order = i;
+                    this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                }
+            };
+
+            FormEditExhibit.prototype.onContentItemMove = function (item, indexStart, indexStop) {
+                this.isModified = true;
+                var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
+                this.exhibit.contentItems.splice(indexStop, 0, ci);
+                for (var i = 0; i < this.exhibit.contentItems.length; i++)
+                    this.exhibit.contentItems[i].order = i;
+                this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                CZ.Common.vc.virtualCanvas("requestInvalidate");
+            };
+
+            FormEditExhibit.prototype.show = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
+                CZ.Authoring.isActive = true;
+                this.activationSource.addClass("active");
+                this.errorMessage.hide();
+                _super.prototype.show.call(this, noAnimation ? undefined : {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+            };
+
+            FormEditExhibit.prototype.hide = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
+                _super.prototype.close.call(this, noAnimation ? undefined : {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+
+            FormEditExhibit.prototype.close = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
+                if (this.isModified) {
+                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    } else {
+                        return;
+                    }
+                }
+
+                _super.prototype.close.call(this, noAnimation ? undefined : {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.datePicker.remove();
+                        _this.contentItemsListBox.clear();
+                        _this.titleInput.hideError();
+                    }
+                });
+                if (this.isCancel) {
+                    if (this.mode === "createExhibit") {
+                        CZ.VCContent.removeChild(this.exhibit.parent, this.exhibit.id);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    } else if (this.mode === "editExhibit") {
+                        delete this.exhibit.contentItems;
+                        $.extend(this.exhibit, this.exhibitCopy);
+                        this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+                }
+                this.activationSource.removeClass("active");
+                CZ.Authoring.isActive = false;
+
+                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
+            };
+            return FormEditExhibit;
+        })(CZ.UI.FormUpdateEntity);
+        UI.FormEditExhibit = FormEditExhibit;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormEditCI = (function (_super) {
+            __extends(FormEditCI, _super);
+            function FormEditCI(container, formInfo) {
+                var _this = this;
+                _super.call(this, container, formInfo);
+
+                this.titleTextblock = container.find(formInfo.titleTextblock);
+                this.titleInput = container.find(formInfo.titleInput);
+                this.mediaInput = container.find(formInfo.mediaInput);
+                this.mediaSourceInput = container.find(formInfo.mediaSourceInput);
+                this.mediaTypeInput = container.find(formInfo.mediaTypeInput);
+                this.attributionInput = container.find(formInfo.attributionInput);
+                this.descriptionInput = container.find(formInfo.descriptionInput);
+                this.errorMessage = container.find(formInfo.errorMessage);
+                this.saveButton = container.find(formInfo.saveButton);
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
+
+                this.titleInput.focus(function () {
+                    _this.titleInput.hideError();
+                });
+
+                this.mediaInput.focus(function () {
+                    _this.mediaInput.hideError();
+                });
+
+                this.mediaSourceInput.focus(function () {
+                    _this.mediaSourceInput.hideError();
+                });
+
+                this.prevForm = formInfo.prevForm;
+
+                this.exhibit = formInfo.context.exhibit;
+                this.contentItem = formInfo.context.contentItem;
+
+                this.mode = CZ.Authoring.mode;
+                this.isCancel = true;
+                this.isModified = false;
+                this.initUI();
+            }
+            FormEditCI.prototype.initUI = function () {
+                var _this = this;
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
+                var that = this;
+                this.saveButton.prop('disabled', false);
+
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaSourceInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.mediaTypeInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.attributionInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.descriptionInput.change(function () {
+                    _this.isModified = true;
+                });
+
+                this.descriptionInput.on('keyup', function (e) {
+                    if (e.which == 13) {
+                        that.saveButton.click(function () {
+                            return that.onSave();
+                        });
+                    }
+                });
+                this.descriptionInput.on('keydown', function (e) {
+                    if (e.which == 13) {
+                        that.saveButton.off();
+                    }
+                });
+
+                if (CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
+                    $("<option></option>", {
+                        value: "skydrive-image",
+                        text: " Skydrive Image "
+                    }).appendTo(this.mediaTypeInput);
+                    $("<option></option>", {
+                        value: "skydrive-document",
+                        text: " Skydrive Document "
+                    }).appendTo(this.mediaTypeInput);
+                }
+
+                this.titleInput.val(this.contentItem.title || "");
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
+                this.descriptionInput.val(this.contentItem.description || "");
+                this.saveButton.off();
+                this.saveButton.click(function () {
+                    return _this.onSave();
+                });
+
+                if (CZ.Authoring.contentItemMode === "createContentItem") {
+                    this.titleTextblock.text("Create New");
+                    this.saveButton.text("create artifiact");
+
+                    this.closeButton.hide();
+                } else if (CZ.Authoring.contentItemMode === "editContentItem") {
+                    this.titleTextblock.text("Edit");
+                    this.saveButton.text("update artifact");
+
+                    if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit)
+                        this.closeButton.hide();
+                    else
+                        this.closeButton.show();
+                } else {
+                    console.log("Unexpected authoring mode in content item form.");
+                    this.close();
+                }
+
+                this.saveButton.show();
+            };
+
+            FormEditCI.prototype.onSave = function () {
+                var _this = this;
+                var newContentItem = {
+                    title: this.titleInput.val() || "",
+                    uri: this.mediaInput.val() || "",
+                    mediaSource: this.mediaSourceInput.val() || "",
+                    mediaType: this.mediaTypeInput.val() || "",
+                    attribution: this.attributionInput.val() || "",
+                    description: this.descriptionInput.val() || "",
+                    order: this.contentItem.order
+                };
+
+                if (!CZ.Authoring.isNotEmpty(newContentItem.title)) {
+                    this.titleInput.showError("Title can't be empty");
+                }
+
+                if (!CZ.Authoring.isNotEmpty(newContentItem.uri)) {
+                    this.mediaInput.showError("URL can't be empty");
+                }
+                if (!CZ.Authoring.isValidURL(newContentItem.uri)) {
+                    this.mediaInput.showError("URL is wrong");
+                }
+
+                if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
+                    if (CZ.Authoring.contentItemMode === "createContentItem") {
+                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
+                            this.isCancel = false;
+                            this.prevForm.contentItemsListBox.add(newContentItem);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
+                            this.prevForm.exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                            CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
+                            this.back();
+                        }
+                    } else if (CZ.Authoring.contentItemMode === "editContentItem") {
+                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
+                            this.isCancel = false;
+                            var clickedListItem = this.prevForm.clickedListItem;
+                            clickedListItem.iconImg.attr("src", newContentItem.uri);
+                            clickedListItem.titleTextblock.text(newContentItem.title);
+                            clickedListItem.descrTextblock.text(newContentItem.description);
+                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
+                            this.prevForm.exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
+                            this.prevForm.isModified = true;
+                            CZ.Common.vc.virtualCanvas("requestInvalidate");
+                            this.isModified = false;
+                            this.back();
+                        } else {
+                            this.saveButton.prop('disabled', true);
+                            CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
+                                _this.isCancel = false;
+                                _this.isModified = false;
+                                _this.close();
+                            }, function (error) {
+                                var errorMessage = error.statusText;
+
+                                if (errorMessage.match(/Media Source/)) {
+                                    _this.errorMessage.text("One or more fields filled wrong");
+                                    _this.mediaSourceInput.showError("Media Source URL is not a valid URL");
+                                } else {
+                                    _this.errorMessage.text("Sorry, internal server error :(");
+                                }
+
+                                _this.errorMessage.show().delay(7000).fadeOut();
+                            }).always(function () {
+                                _this.saveButton.prop('disabled', false);
+                            });
+                        }
+                    }
+                } else {
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
+                }
+            };
+
+            FormEditCI.prototype.updateMediaInfo = function () {
+                this.mediaInput.val(this.contentItem.uri || "");
+                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
+                this.mediaTypeInput.val(this.contentItem.mediaType || "");
+                this.attributionInput.val(this.contentItem.attribution || "");
+            };
+
+            FormEditCI.prototype.show = function (noAnimation) {
+                CZ.Authoring.isActive = true;
+                this.activationSource.addClass("active");
+                this.errorMessage.hide();
+                _super.prototype.show.call(this, noAnimation ? undefined : {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+            };
+
+            FormEditCI.prototype.close = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
+                if (this.isModified) {
+                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
+                        this.isModified = false;
+                    } else {
+                        return;
+                    }
+                }
+
+                _super.prototype.close.call(this, noAnimation ? undefined : {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.mediaList.remove();
+                        _this.mediaInput.hideError();
+                        _this.titleInput.hideError();
+                        _this.mediaSourceInput.hideError();
+                    }
+                });
+                if (this.isCancel) {
+                    if (CZ.Authoring.contentItemMode === "createContentItem") {
+                        this.exhibit.contentItems.pop();
+                    }
+                }
+                this.activationSource.removeClass("active");
+                CZ.Authoring.isActive = false;
+            };
+            return FormEditCI;
+        })(CZ.UI.FormUpdateEntity);
+        UI.FormEditCI = FormEditCI;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var TourStopListBox = (function (_super) {
+            __extends(TourStopListBox, _super);
+            function TourStopListBox(container, listItemContainer, contentItems) {
+                var listBoxInfo = {
+                    context: contentItems,
+                    sortableSettings: {
+                        forcePlaceholderSize: true,
+                        cursor: "move",
+                        placeholder: "cz-listbox-placeholder",
+                        revert: 100,
+                        opacity: 0.75,
+                        tolerance: "pointer",
+                        scroll: false,
+                        start: function (event, ui) {
+                            ui.placeholder.height(ui.item.height());
+                        }
+                    }
+                };
+
+                var listItemsInfo = {
+                    default: {
+                        container: listItemContainer,
+                        uiMap: {
+                            closeButton: ".cz-listitem-close-btn",
+                            iconImg: ".cz-form-tour-contentitem-listitem-icon > img",
+                            titleTextblock: ".cz-contentitem-listitem-title",
+                            typeTextblock: ".cz-contentitem-listitem-highlighted"
+                        }
+                    }
+                };
+
+                listItemsInfo.default.ctor = TourStopListItem;
+                _super.call(this, container, listBoxInfo, listItemsInfo);
+            }
+            return TourStopListBox;
+        })(CZ.UI.ListBoxBase);
+        UI.TourStopListBox = TourStopListBox;
+
+        var TourStopListItem = (function (_super) {
+            __extends(TourStopListItem, _super);
+            function TourStopListItem(parent, container, uiMap, context) {
+                _super.call(this, parent, container, uiMap, context);
+
+                this.iconImg = this.container.find(uiMap.iconImg);
+                this.titleTextblock = this.container.find(uiMap.titleTextblock);
+                this.typeTextblock = this.container.find(uiMap.typeTextblock);
+
+                var self = this;
+                var descr = this.container.find(".cz-tourstop-description");
+                descr.text(self.data.Description);
+                descr.change(function (ev) {
+                    self.data.Description = self.Description;
+                });
+
+                var thumbUrl = this.data.ThumbnailUrl;
+                var img = new Image();
+                img.onload = function () {
+                    self.iconImg.replaceWith(img);
+                };
+                img.onerror = function () {
+                    if (console && console.warn)
+                        console.warn("Could not load a thumbnail image " + thumbUrl);
+                };
+                img.src = thumbUrl;
+
+                this.titleTextblock.text(this.data.Title);
+                this.typeTextblock.text(this.data.Type);
+
+                this.Activate();
+                this.container.click(function (e) {
+                    self.Activate();
+                });
+
+                this.container.dblclick(function (e) {
+                    if (typeof context.Target.vc == "undefined")
+                        return;
+                    var vp = context.Target.vc.getViewport();
+                    var visible = CZ.VCContent.getVisibleForElement(context.Target, 1.0, vp, true);
+                    var target = {
+                        newvisible: visible,
+                        element: context.Target
+                    };
+                    CZ.Search.navigateToElement(target);
+                });
+            }
+            Object.defineProperty(TourStopListItem.prototype, "Description", {
+                get: function () {
+                    var descr = this.container.find(".cz-tourstop-description");
+                    return descr.val();
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            TourStopListItem.prototype.Activate = function () {
+                var myDescr = this.container.find(".cz-tourstop-description");
+                this.parent.container.find(".cz-tourstop-description").not(myDescr).hide();
+                myDescr.show(500);
+            };
+            return TourStopListItem;
+        })(CZ.UI.ListItemBase);
+        UI.TourStopListItem = TourStopListItem;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var TourStop = (function () {
+            function TourStop(target, title) {
+                if (target == undefined || target == null)
+                    throw "target element of a tour stop is null or undefined";
+                if (typeof target.type == "undefined")
+                    throw "type of the tour stop target element is undefined";
+                this.targetElement = target;
+                if (target.type === "Unknown") {
+                    this.type = target.type;
+                    this.title = title;
+                } else if (target.type === "contentItem") {
+                    this.type = "Content Item";
+                    this.title = title ? title : target.contentItem.title;
+                } else {
+                    this.type = target.type === "timeline" ? "Timeline" : "Event";
+                    this.title = title ? title : target.title;
+                }
+            }
+            Object.defineProperty(TourStop.prototype, "Target", {
+                get: function () {
+                    return this.targetElement;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(TourStop.prototype, "Title", {
+                get: function () {
+                    return this.title;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(TourStop.prototype, "Description", {
+                get: function () {
+                    return this.description;
+                },
+                set: function (d) {
+                    this.description = d;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+
+            Object.defineProperty(TourStop.prototype, "LapseTime", {
+                get: function () {
+                    return this.lapseTime;
+                },
+                set: function (value) {
+                    this.lapseTime = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(TourStop.prototype, "Type", {
+                get: function () {
+                    return this.type;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(TourStop.prototype, "NavigationUrl", {
+                get: function () {
+                    return CZ.UrlNav.vcelementToNavString(this.targetElement);
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(TourStop.prototype, "ThumbnailUrl", {
+                get: function () {
+                    if (!this.thumbUrl)
+                        this.thumbUrl = this.GetThumbnail(this.targetElement);
+                    return this.thumbUrl;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            TourStop.prototype.GetThumbnail = function (element) {
+                var defaultThumb = "/images/Temp-Thumbnail2.png";
+                try  {
+                    if (!element)
+                        return defaultThumb;
+                    if (element.type === "contentItem") {
+                        var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + element.id + '.png';
+                        return thumbnailUri;
+                    }
+                    if (element.type === "infodot") {
+                        if (element.contentItems && element.contentItems.length > 0) {
+                            var child = element.contentItems[0];
+                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + child.id + '.png';
+                            return thumbnailUri;
+                        }
+                    } else if (element.type === "timeline") {
+                        for (var n = element.children.length, i = 0; i < n; i++) {
+                            var child = element.children[i];
+                            if (child.type === "infodot" || child.type === "timeline") {
+                                var thumb = this.GetThumbnail(child);
+                                if (thumb && thumb !== defaultThumb)
+                                    return thumb;
+                            }
+                        }
+                    }
+                } catch (exc) {
+                    if (console && console.error)
+                        console.error("Failed to get a thumbnail url: " + exc);
+                }
+                return defaultThumb;
+            };
+            return TourStop;
+        })();
+        UI.TourStop = TourStop;
+
+        var Tour = (function () {
+            function Tour(id, title, description, category, sequence, stops) {
+                this.id = id;
+                this.title = title;
+                this.description = description;
+                this.sequence = sequence;
+                this.stops = stops;
+                this.category = category;
+            }
+            Object.defineProperty(Tour.prototype, "Id", {
+                get: function () {
+                    return this.id;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(Tour.prototype, "Title", {
+                get: function () {
+                    return this.title;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(Tour.prototype, "Category", {
+                get: function () {
+                    return this.category;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(Tour.prototype, "Sequence", {
+                get: function () {
+                    return this.sequence;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(Tour.prototype, "Description", {
+                get: function () {
+                    return this.description;
+                },
+                set: function (val) {
+                    this.description = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+
+            Object.defineProperty(Tour.prototype, "Stops", {
+                get: function () {
+                    return this.stops;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return Tour;
+        })();
+        UI.Tour = Tour;
+
+        var FormEditTour = (function (_super) {
+            __extends(FormEditTour, _super);
+            function FormEditTour(container, formInfo) {
+                _super.call(this, container, formInfo);
+
+                this.saveButton = container.find(formInfo.saveButton);
+                this.deleteButton = container.find(formInfo.deleteButton);
+                this.addStopButton = container.find(formInfo.addStopButton);
+                this.titleInput = container.find(formInfo.titleInput);
+
+                this.tourTitleInput = this.container.find(".cz-form-tour-title");
+                this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
+                this.clean();
+
+                this.saveButton.off();
+                this.deleteButton.off();
+
+                this.tour = formInfo.context;
+                var stops = [];
+                var self = this;
+                if (this.tour) {
+                    this.tourTitleInput.val(this.tour.title);
+                    this.tourDescriptionInput.val(this.tour.description);
+                    for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
+                        var bookmark = this.tour.bookmarks[i];
+                        var stop = FormEditTour.bookmarkToTourstop(bookmark);
+                        stops.push(stop);
+                    }
+                } else {
+                    this.tourTitleInput.val("");
+                    this.tourDescriptionInput.val("");
+                }
+                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops);
+                this.tourStopsListBox.itemMove(function (item, startPos, endPos) {
+                    return self.onStopsReordered.apply(self, [item, startPos, endPos]);
+                });
+                this.tourStopsListBox.itemRemove(function (item, index) {
+                    return self.onStopRemoved.apply(self, [item, index]);
+                });
+                this.initialize();
+            }
+            FormEditTour.bookmarkToTourstop = function (bookmark) {
+                var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
+                if (target == null) {
+                    target = {
+                        type: "Unknown"
+                    };
+                }
+                var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
+                stop.Description = bookmark.text;
+                stop.LapseTime = bookmark.lapseTime;
+                return stop;
+            };
+
+            FormEditTour.tourstopToBookmark = function (tourstop, index) {
+                var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
+                var title = tourstop.Title;
+                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, tourstop.Description);
+                bookmark.number = index + 1;
+                return bookmark;
+            };
+
+            FormEditTour.prototype.deleteTourAsync = function () {
+                return CZ.Service.deleteTour(this.tour.id);
+            };
+
+            FormEditTour.prototype.putTourAsync = function (sequenceNum) {
+                var deferred = $.Deferred();
+                var self = this;
+                var stops = this.getStops();
+
+                var name = this.tourTitleInput.val();
+                var descr = this.tourDescriptionInput.val();
+                var category = "tours";
+                var n = stops.length;
+                var tourId = undefined;
+                if (this.tour) {
+                    category = this.tour.category;
+                    tourId = this.tour.id;
+                }
+
+                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, category, n, stops));
+
+                request.done(function (q) {
+                    var tourBookmarks = new Array();
+                    for (var j = 0; j < n; j++) {
+                        var tourstop = stops[j];
+                        var bookmark = FormEditTour.tourstopToBookmark(tourstop, j);
+                        tourBookmarks.push(bookmark);
+                    }
+
+                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", sequenceNum, descr);
+                    deferred.resolve(tour);
+                }).fail(function (q) {
+                    deferred.reject(q);
+                });
+                return deferred.promise();
+            };
+
+            FormEditTour.prototype.initializeAsEdit = function () {
+                this.deleteButton.show();
+                this.titleTextblock.text("Edit Tour");
+                this.saveButton.text("update tour");
+            };
+
+            FormEditTour.prototype.initialize = function () {
+                var _this = this;
+                this.saveButton.prop('disabled', false);
+                if (this.tour == null) {
+                    this.deleteButton.hide();
+                    this.titleTextblock.text("Create Tour");
+                    this.saveButton.text("create tour");
+                } else {
+                    this.initializeAsEdit();
+                }
+
+                var self = this;
+                this.addStopButton.click(function (event) {
+                    CZ.Authoring.isActive = true;
+                    CZ.Authoring.mode = "editTour-selectTarget";
+                    CZ.Authoring.callback = function (arg) {
+                        return self.onTargetElementSelected(arg);
+                    };
+                    self.hide();
+                    setTimeout(function () {
+                        if (CZ.Authoring.mode == "editTour-selectTarget") {
+                            CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
+                                if (CZ.Authoring.mode == "editTour-selectTarget")
+                                    self.onTargetElementSelected(null);
+                            });
+                        }
+                    }, 500);
+                });
+                this.saveButton.click(function (event) {
+                    var message;
+                    if (!_this.tourTitleInput.val())
+                        message = "Please enter the title.";
+                    else if (_this.tourStopsListBox.items.length == 0)
+                        message = "Please add a tour stop to the tour.";
+                    if (message) {
+                        alert(message);
+                        return;
+                    }
+
+                    var self = _this;
+
+                    _this.saveButton.prop('disabled', true);
+
+                    if (_this.tour == null) {
+                        _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
+                            self.tour = tour;
+                            CZ.Tours.tours.push(tour);
+                            _this.hide();
+                        }).fail(function (f) {
+                            if (console && console.error) {
+                                console.error("Failed to create a tour: " + f.status + " " + f.statusText);
+                            }
+                            alert("Failed to create a tour");
+                        }).done(function () {
+                            _this.saveButton.prop('disabled', false);
+                        });
+                    } else {
+                        for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                            if (CZ.Tours.tours[i] === _this.tour) {
+                                _this.putTourAsync(i).done(function (tour) {
+                                    _this.tour = CZ.Tours.tours[i] = tour;
+                                    _this.hide();
+                                }).fail(function (f) {
+                                    if (console && console.error) {
+                                        console.error("Failed to update a tour: " + f.status + " " + f.statusText);
+                                    }
+                                    alert("Failed to update a tour");
+                                }).always(function () {
+                                    _this.saveButton.prop('disabled', false);
+                                });
+                                break;
+                            }
+                        }
+                    }
+                });
+                this.deleteButton.click(function (event) {
+                    if (_this.tour == null)
+                        return;
+                    _this.deleteTourAsync().done(function (q) {
+                        for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
+                            if (CZ.Tours.tours[i] === _this.tour) {
+                                _this.tour = null;
+                                CZ.Tours.tours.splice(i, 1);
+                                _this.close();
+                                break;
+                            }
+                        }
+                    }).fail(function (f) {
+                        if (console && console.error) {
+                            console.error("Failed to delete a tour: " + f.status + " " + f.statusText);
+                        }
+                        alert("Failed to delete a tour");
+                    });
+                });
+            };
+
+            FormEditTour.prototype.getStops = function () {
+                var n = this.tourStopsListBox.items.length;
+                var stops = new Array(n);
+                for (; --n >= 0;) {
+                    stops[n] = this.tourStopsListBox.items[n].data;
+                }
+                return stops;
+            };
+
+            FormEditTour.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+
+                this.activationSource.addClass("active");
+            };
+
+            FormEditTour.prototype.hide = function (noAnimation) {
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
+                _super.prototype.close.call(this, noAnimation ? undefined : {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+
+            FormEditTour.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                    }
+                });
+
+                CZ.Authoring.isActive = false;
+                this.clean();
+            };
+
+            FormEditTour.prototype.clean = function () {
+                this.activationSource.removeClass("active");
+                this.container.find(".cz-form-errormsg").hide();
+                this.container.find(".cz-listbox").empty();
+                this.tourTitleInput.val("");
+                this.tourDescriptionInput.val("");
+            };
+
+            FormEditTour.prototype.onStopsReordered = function () {
+                this.updateSequence();
+            };
+
+            FormEditTour.prototype.onStopRemoved = function () {
+                this.updateSequence();
+            };
+
+            FormEditTour.prototype.updateSequence = function () {
+                var stops = this.getStops();
+                var n = stops.length;
+                var lapseTime = 0;
+                for (var i = 0; i < n; i++) {
+                    var stop = stops[i];
+                    stop.LapseTime = lapseTime;
+                    lapseTime += CZ.Settings.tourDefaultTransitionTime;
+                }
+            };
+
+            FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
+                CZ.Authoring.mode = "editTour";
+                CZ.Authoring.hideMessageWindow();
+                CZ.Authoring.isActive = false;
+                CZ.Authoring.callback = null;
+
+                if (targetElement) {
+                    var n = this.tourStopsListBox.items.length;
+                    var stop = new TourStop(targetElement);
+                    stop.LapseTime = n == 0 ? 0 : this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1].data.LapseTime + CZ.Settings.tourDefaultTransitionTime;
+                    this.tourStopsListBox.add(stop);
+                }
+                this.show();
+            };
+            return FormEditTour;
+        })(CZ.UI.FormBase);
+        UI.FormEditTour = FormEditTour;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormEditCollection = (function (_super) {
+            __extends(FormEditCollection, _super);
+            function FormEditCollection(container, formInfo) {
+                var _this = this;
+                _super.call(this, container, formInfo);
+                this.contentItem = {};
+
+                this.saveButton = container.find(formInfo.saveButton);
+                this.backgroundInput = container.find(formInfo.backgroundInput);
+                this.collectionTheme = formInfo.collectionTheme;
+                this.activeCollectionTheme = jQuery.extend(true, {}, formInfo.collectionTheme);
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
+                this.kioskmodeInput = formInfo.kioskmodeInput;
+
+                this.timelineBackgroundColorInput = formInfo.timelineBackgroundColorInput;
+                this.timelineBackgroundOpacityInput = formInfo.timelineBackgroundOpacityInput;
+                this.timelineBorderColorInput = formInfo.timelineBorderColorInput;
+                this.exhibitBackgroundColorInput = formInfo.exhibitBackgroundColorInput;
+                this.exhibitBackgroundOpacityInput = formInfo.exhibitBackgroundOpacityInput;
+                this.exhibitBorderColorInput = formInfo.exhibitBorderColorInput;
+
+                this.backgroundInput.on('input', function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.kioskmodeInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.timelineBackgroundColorInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.timelineBackgroundOpacityInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.timelineBorderColorInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.exhibitBackgroundColorInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.exhibitBackgroundOpacityInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.exhibitBorderColorInput.change(function () {
+                    _this.updateCollectionTheme(true);
+                });
+
+                this.saveButton.off();
+
+                this.backgroundInput.focus(function () {
+                    _this.backgroundInput.hideError();
+                });
+
+                try  {
+                    this.initialize();
+                } catch (e) {
+                    console.log("Error initializing collection form attributes");
+                }
+
+                this.saveButton.click(function (event) {
+                    _this.updateCollectionTheme(true);
+                    _this.activeCollectionTheme = _this.collectionTheme;
+
+                    var themeData = {
+                        theme: JSON.stringify(_this.collectionTheme)
+                    };
+
+                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, themeData).always(function () {
+                        _this.saveButton.prop('disabled', false);
+                        _this.close();
+                    });
+                });
+            }
+            FormEditCollection.prototype.initialize = function () {
+                this.saveButton.prop('disabled', false);
+
+                this.backgroundInput.val(this.collectionTheme.backgroundUrl);
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
+                this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode.toString());
+
+                if (!this.collectionTheme.timelineColor)
+                    this.collectionTheme.timelineColor = CZ.Settings.timelineColorOverride;
+                this.timelineBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineColor));
+                this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor).toString());
+                this.timelineBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineStrokeStyle));
+
+                this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
+                this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
+                this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
+            };
+
+            FormEditCollection.prototype.colorIsRgba = function (color) {
+                return color ? color.substr(0, 5) === "rgba(" : false;
+            };
+
+            FormEditCollection.prototype.colorIsRgb = function (color) {
+                return color ? color.substr(0, 4) === "rgb(" : false;
+            };
+
+            FormEditCollection.prototype.colorIsHex = function (color) {
+                return color ? color.substr(0, 1) === "#" && color.length >= 7 : false;
+            };
+
+            FormEditCollection.prototype.rgbaFromColor = function (color, alpha) {
+                if (!color)
+                    return color;
+
+                if (this.colorIsRgba(color)) {
+                    var parts = color.substr(5, color.length - 5 - 1).split(",");
+                    if (parts.length > 3)
+                        parts[parts.length - 1] = alpha.toString();
+                    else
+                        parts.push(alpha.toString());
+                    return "rgba(" + parts.join(",") + ")";
+                }
+
+                var red = parseInt("0x" + color.substr(1, 2));
+                var green = parseInt("0x" + color.substr(3, 2));
+                var blue = parseInt("0x" + color.substr(5, 2));
+
+                return "rgba(" + red + "," + green + "," + blue + "," + alpha + ")";
+            };
+
+            FormEditCollection.prototype.getOpacityFromRGBA = function (rgba) {
+                if (!rgba)
+                    return null;
+                if (!this.colorIsRgba(rgba))
+                    return 1.0;
+
+                var parts = rgba.split(",");
+                var lastPart = parts[parts.length - 1].split(")")[0];
+                return parseFloat(lastPart);
+            };
+
+            FormEditCollection.prototype.getHexColorFromColor = function (color) {
+                if (this.colorIsHex(color))
+                    return color;
+
+                if (!this.colorIsRgb(color) && !this.colorIsRgba(color))
+                    return null;
+
+                var offset = this.colorIsRgb(color) ? 4 : 5;
+                var parts = color.substr(offset, color.length - offset - 1).split(",");
+                var lastPart = parts[parts.length - 1].split(")")[0];
+                return "#" + this.colorHexFromInt(parts[0]) + this.colorHexFromInt(parts[1]) + this.colorHexFromInt(parts[2]);
+            };
+
+            FormEditCollection.prototype.colorHexFromInt = function (colorpart) {
+                var hex = Number(colorpart).toString(16);
+                if (hex.length === 1)
+                    return "0" + hex;
+
+                return hex;
+            };
+
+            FormEditCollection.prototype.updateCollectionTheme = function (clearError) {
+                this.collectionTheme = {
+                    backgroundUrl: this.backgroundInput.val(),
+                    backgroundColor: "#232323",
+                    timelineColor: this.rgbaFromColor(this.timelineBackgroundColorInput.val(), this.timelineBackgroundOpacityInput.val()),
+                    timelineStrokeStyle: this.timelineBorderColorInput.val(),
+                    infoDotFillColor: this.rgbaFromColor(this.exhibitBackgroundColorInput.val(), this.exhibitBackgroundOpacityInput.val()),
+                    infoDotBorderColor: this.exhibitBorderColorInput.val(),
+                    kioskMode: this.kioskmodeInput.prop("checked")
+                };
+
+                if (this.colorIsRgb(this.timelineBackgroundColorInput.val())) {
+                    this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
+                    this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
+                }
+
+                if (clearError)
+                    this.backgroundInput.hideError();
+
+                this.updateCollectionThemeFromTheme(this.collectionTheme);
+            };
+
+            FormEditCollection.prototype.updateCollectionThemeFromTheme = function (theme) {
+                CZ.Settings.applyTheme(theme, false);
+
+                CZ.Common.vc.virtualCanvas("forEachElement", function (element) {
+                    if (element.type === "timeline") {
+                        element.settings.fillStyle = theme.timelineColor;
+                        element.settings.strokeStyle = theme.timelineStrokeStyle;
+                        element.settings.gradientFillStyle = theme.timelineStrokeStyle;
+                    } else if (element.type === "infodot") {
+                        element.settings.fillStyle = theme.infoDotFillColor;
+                        element.settings.strokeStyle = theme.infoDotBorderColor;
+                    }
+                });
+
+                CZ.Common.vc.virtualCanvas("requestInvalidate");
+            };
+
+            FormEditCollection.prototype.updateMediaInfo = function () {
+                var clearError = true;
+
+                if (this.contentItem.mediaType == "skydrive-image") {
+                    this.backgroundInput.val(this.contentItem.tempSource || "");
+                    clearError = false;
+                    this.backgroundInput.showError("SkyDrive static links are not permanent. Consider hosting it as a public image instead.");
+                } else {
+                    this.backgroundInput.val(this.contentItem.uri || "");
+                }
+
+                this.updateCollectionTheme(clearError);
+            };
+
+            FormEditCollection.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+
+                this.activationSource.addClass("active");
+            };
+
+            FormEditCollection.prototype.close = function () {
+                var _this = this;
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.backgroundInput.hideError();
+                        _this.mediaList.remove();
+                    }
+                });
+
+                this.backgroundInput.hideError();
+                this.updateCollectionThemeFromTheme(this.activeCollectionTheme);
+            };
+            return FormEditCollection;
+        })(CZ.UI.FormUpdateEntity);
+        UI.FormEditCollection = FormEditCollection;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormHeaderEdit = (function (_super) {
+            __extends(FormHeaderEdit, _super);
+            function FormHeaderEdit(container, formInfo) {
+                _super.call(this, container, formInfo);
+
+                this.createTimelineBtn = this.container.find(formInfo.createTimeline);
+                this.createExhibitBtn = this.container.find(formInfo.createExhibit);
+                this.createTourBtn = this.container.find(formInfo.createTour);
+
+                this.initialize();
+            }
+            FormHeaderEdit.prototype.initialize = function () {
+                var _this = this;
+                this.createTimelineBtn.off();
+                this.createExhibitBtn.off();
+                this.createTourBtn.off();
+
+                this.createTimelineBtn.click(function (event) {
+                    CZ.Authoring.UI.createTimeline();
+                    _this.close();
+                });
+
+                this.createExhibitBtn.click(function (event) {
+                    CZ.Authoring.UI.createExhibit();
+                    _this.close();
+                });
+
+                this.createTourBtn.click(function (event) {
+                    CZ.Authoring.UI.createTour();
+                    _this.close();
+                });
+            };
+
+            FormHeaderEdit.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+                this.activationSource.addClass("active");
+            };
+
+            FormHeaderEdit.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            return FormHeaderEdit;
+        })(CZ.UI.FormBase);
+        UI.FormHeaderEdit = FormHeaderEdit;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormEditProfile = (function (_super) {
+            __extends(FormEditProfile, _super);
+            function FormEditProfile(container, formInfo) {
+                _super.call(this, container, formInfo);
+                this.saveButton = container.find(formInfo.saveButton);
+                this.logoutButton = container.find(formInfo.logoutButton);
+                this.usernameInput = container.find(formInfo.usernameInput);
+                this.emailInput = container.find(formInfo.emailInput);
+                this.agreeInput = container.find(formInfo.agreeInput);
+                this.loginPanel = $(document.body).find(formInfo.loginPanel).first();
+                this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
+                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
+                this.allowRedirect = formInfo.allowRedirect;
+
+                this.usernameInput.off("keypress");
+                this.emailInput.off("keypress");
+
+                this.initialize();
+            }
+            FormEditProfile.prototype.validEmail = function (e) {
+                if (String(e).length > 254)
+                    return false;
+                var filter = /^([\w^_]+((?:([-_.\+][\w^_]+)|))+|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
+                return String(e).search(filter) != -1;
+            };
+
+            FormEditProfile.prototype.validUsername = function (e) {
+                var filter = /^[a-z0-9\-_]{4,20}$/i;
+                return String(e).search(filter) != -1;
+            };
+
+            FormEditProfile.prototype.initialize = function () {
+                var _this = this;
+                var profile = CZ.Service.getProfile();
+
+                profile.done(function (data) {
+                    if (data.DisplayName != null) {
+                        _this.usernameInput.val(data.DisplayName);
+                        if (data.DisplayName != "") {
+                            _this.usernameInput.prop('disabled', true);
+                        }
+                        _this.emailInput.val(data.Email);
+                        if (data.Email !== undefined && data.Email !== '' && data.Email != null) {
+                            _this.agreeInput.attr('checked', 'true');
+                            _this.agreeInput.prop('disabled', true);
+                        }
+                    }
+                });
+
+                this.saveButton.click(function (event) {
+                    var isValid = _this.validUsername(_this.usernameInput.val());
+                    if (!isValid) {
+                        alert("Provided incorrect username, \n'a-z', '0-9', '-', '_' - characters allowed only. ");
+                        return;
+                    }
+
+                    var emailAddress = "";
+                    if (_this.emailInput.val()) {
+                        var emailIsValid = _this.validEmail(_this.emailInput.val());
+                        if (!emailIsValid) {
+                            alert("Provided incorrect email address");
+                            return;
+                        }
+
+                        var agreeTerms = _this.agreeInput.prop("checked");
+                        if (!agreeTerms) {
+                            alert("Please agree with provided terms");
+                            return;
+                        }
+
+                        emailAddress = _this.emailInput.val();
+                    }
+
+                    CZ.Service.getProfile().done(function (curUser) {
+                        CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
+                            if (curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
+                                alert("Sorry, this username is already in use. Please try again.");
+                                return;
+                            }
+                            CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
+                                if (_this.allowRedirect) {
+                                    window.location.assign("/" + success);
+                                } else {
+                                    _this.close();
+                                }
+                            }, function (error) {
+                                alert("Unable to save changes. Please try again later.");
+                                console.log(error);
+                            });
+                        });
+                    });
+                });
+
+                this.logoutButton.click(function (event) {
+                    WL.logout();
+                    window.location.assign("/pages/logoff.aspx");
+                });
+
+                var preventEnterKeyPress = function (event) {
+                    if (event.which == 13) {
+                        event.preventDefault();
+                    }
+                };
+                this.usernameInput.keypress(preventEnterKeyPress);
+                this.emailInput.keypress(preventEnterKeyPress);
+            };
+
+            FormEditProfile.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+
+                this.activationSource.addClass("active");
+            };
+
+            FormEditProfile.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+
+                this.activationSource.removeClass("active");
+            };
+            return FormEditProfile;
+        })(CZ.UI.FormUpdateEntity);
+        UI.FormEditProfile = FormEditProfile;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormLogin = (function (_super) {
+            __extends(FormLogin, _super);
+            function FormLogin(container, formInfo) {
+                _super.call(this, container, formInfo);
+            }
+            FormLogin.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+                this.activationSource.addClass("active");
+            };
+
+            FormLogin.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            return FormLogin;
+        })(CZ.UI.FormBase);
+        UI.FormLogin = FormLogin;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Service) {
+        var Map;
+        (function (Map) {
+            function bookmark(ts) {
+                return {
+                    name: ts.Title,
+                    url: ts.NavigationUrl,
+                    lapseTime: ts.LapseTime,
+                    description: ts.Description
+                };
+            }
+
+            function tour(t) {
+                var bookmarks = new Array(t.Stops.length);
+                for (var i = 0, n = t.Stops.length; i < n; i++) {
+                    bookmarks[i] = bookmark(t.Stops[i]);
+                }
+
+                var tourRequest = {
+                    id: t.Id,
+                    name: t.Title,
+                    description: t.Description,
+                    audio: "",
+                    category: t.Category,
+                    sequence: t.Sequence,
+                    bookmarks: bookmarks
+                };
+
+                return tourRequest;
+            }
+            Map.tour = tour;
+
+            function timeline(t) {
+                return {
+                    id: t.guid,
+                    ParentTimelineId: t.parent.guid,
+                    start: CZ.Dates.getDecimalYearFromCoordinate(t.x),
+                    end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
+                    title: t.title,
+                    Regime: t.regime
+                };
+            }
+            Map.timeline = timeline;
+
+            function exhibit(e) {
+                return {
+                    id: e.guid,
+                    ParentTimelineId: e.parent.guid,
+                    time: e.infodotDescription.date,
+                    title: e.title,
+                    description: undefined,
+                    contentItems: undefined
+                };
+            }
+            Map.exhibit = exhibit;
+
+            function exhibitWithContentItems(e) {
+                var mappedContentItems = [];
+                $(e.contentItems).each(function (contentItemIndex, contentItem) {
+                    mappedContentItems.push(Map.contentItem(contentItem));
+                });
+
+                return {
+                    id: e.guid,
+                    ParentTimelineId: e.parent.guid,
+                    time: e.infodotDescription.date,
+                    title: e.title,
+                    description: undefined,
+                    contentItems: mappedContentItems
+                };
+            }
+            Map.exhibitWithContentItems = exhibitWithContentItems;
+
+            function contentItem(ci) {
+                return {
+                    id: ci.guid,
+                    ParentExhibitId: ci.contentItem ? ci.contentItem.ParentExhibitId : ci.ParentExhibitId,
+                    title: ci.contentItem ? ci.contentItem.title : ci.title,
+                    description: ci.contentItem ? ci.contentItem.description : ci.description,
+                    uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
+                    mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType,
+                    attribution: ci.contentItem ? ci.contentItem.attribution : ci.attribution,
+                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource,
+                    order: ci.contentItem ? ci.contentItem.order : ci.order
+                };
+            }
+            Map.contentItem = contentItem;
+        })(Map || (Map = {}));
+
+        var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
+
+        var _isLocalHost = constants.environment === "Localhost";
+        var _dumpTweetsUrl = "/dumps/home/tweets.json";
+        var _dumpTimelinesUrl = "/dumps/home/timelines.json";
+        var _testLogin = false;
+
+        function Request(urlBase) {
+            var _url = urlBase;
+            var _hasParameters = false;
+
+            Object.defineProperty(this, "url", {
+                configurable: false,
+                get: function () {
+                    return _url;
+                }
+            });
+
+            this.addToPath = function (item) {
+                if (item) {
+                    _url += _url.match(/\/$/) ? item : "/" + item;
+                }
+            };
+
+            this.addParameter = function (name, value) {
+                if (value !== undefined && value !== null) {
+                    _url += _hasParameters ? "&" : "?";
+                    _url += name + "=" + value;
+                    _hasParameters = true;
+                }
+            };
+
+            this.addParameters = function (params) {
+                for (var p in params) {
+                    if (params.hasOwnProperty(p)) {
+                        this.addParameter(p, params[p]);
+                    }
+                }
+            };
+        }
+        Service.Request = Request;
+        ;
+
+        Service.collectionName = "";
+        Service.superCollectionName = "";
+
+        function getTimelines(r, sc, c) {
+            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
+            if (typeof c === "undefined") { c = Service.collectionName; }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath("gettimelines");
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
+            request.addParameters(r);
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getTimelines = getTimelines;
+
+        function getCollections(superCollectionName) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath("collections");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getCollections = getCollections;
+
+        function getStructure(r) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("structure");
+            request.addParameters(r);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getStructure = getStructure;
+
+        function postData(r) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("data");
+
+            return $.ajax({
+                type: "POST",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(r)
+            });
+        }
+        Service.postData = postData;
+
+        function putCollection(superCollectionName, collectionName, c) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(c)
+            });
+        }
+        Service.putCollection = putCollection;
+
+        function deleteCollection(c) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(c.name);
+
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(c)
+            });
+        }
+        Service.deleteCollection = deleteCollection;
+
+        function putTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("timeline");
+
+            console.log("[PUT] " + request.url);
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.timeline(t))
+            });
+        }
+        Service.putTimeline = putTimeline;
+
+        function deleteTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("timeline");
+
+            console.log("[DELETE] " + request.url);
+
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(Map.timeline(t))
+            });
+        }
+        Service.deleteTimeline = deleteTimeline;
+
+        function putExhibit(e) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("exhibit");
+
+            console.log("[PUT] " + request.url);
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.exhibitWithContentItems(e))
+            });
+        }
+        Service.putExhibit = putExhibit;
+
+        function deleteExhibit(e) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("exhibit");
+
+            console.log("[DELETE] " + request.url);
+
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(Map.exhibit(e))
+            });
+        }
+        Service.deleteExhibit = deleteExhibit;
+
+        function putContentItem(ci) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("contentitem");
+
+            console.log("[PUT] " + request.url);
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.contentItem(ci))
+            });
+        }
+        Service.putContentItem = putContentItem;
+
+        function deleteContentItem(ci) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("contentitem");
+
+            console.log("[DELETE] " + request.url);
+
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(Map.contentItem(ci))
+            });
+        }
+        Service.deleteContentItem = deleteContentItem;
+
+        function putTour2(t) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour2");
+
+            console.log("[PUT] " + request.url);
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(Map.tour(t))
+            });
+        }
+        Service.putTour2 = putTour2;
+
+        function deleteTour(tourId) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tour");
+
+            console.log("[DELETE] " + request.url);
+
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify({ id: tourId })
+            });
+        }
+        Service.deleteTour = deleteTour;
+
+        function getTours() {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("tours");
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getTours = getTours;
+
+        function getSearch(query) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("Search");
+
+            var data = {
+                searchTerm: query,
+                supercollection: CZ.Service.superCollectionName,
+                collection: CZ.Service.collectionName
+            };
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data
+            });
+        }
+        Service.getSearch = getSearch;
+
+        function getBingImages(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getImages");
+
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingImages = getBingImages;
+
+        function getBingVideos(query, top, skip) {
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getVideos");
+
+            var data = {
+                query: query,
+                top: top,
+                skip: skip
+            };
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingVideos = getBingVideos;
+
+        function getBingDocuments(query, doctype, top, skip) {
+            if (typeof doctype === "undefined") { doctype = undefined; }
+            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
+            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("bing/getDocuments");
+
+            var data = {
+                query: query,
+                doctype: doctype,
+                top: top,
+                skip: skip
+            };
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: data,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getBingDocuments = getBingDocuments;
+
+        function getRecentTweets() {
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("twitter/getRecentTweets");
+
+            console.log("[GET] " + request.url);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: _isLocalHost ? _dumpTweetsUrl : request.url,
+                success: function (response) {
+                }
+            });
+        }
+        Service.getRecentTweets = getRecentTweets;
+
+        function getServiceInformation() {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath("info");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getServiceInformation = getServiceInformation;
+
+        function getContentPath(reference) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath(reference);
+            request.addToPath("contentpath");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getContentPath = getContentPath;
+
+        function putExhibitContent(e, oldContentItems) {
+            CZ.Authoring.resetSessionTimer();
+            var newGuids = e.contentItems.map(function (ci) {
+                return ci.guid;
+            });
+
+            var promises = e.contentItems.map(function (ci) {
+                return putContentItem(ci).then(function (response) {
+                    ci.id = ci.guid = response;
+                });
+            }).concat(oldContentItems.filter(function (ci) {
+                return (ci.guid && newGuids.indexOf(ci.guid) === -1);
+            }).map(function (ci) {
+                return deleteContentItem(ci);
+            }));
+
+            return $.when.apply($, promises);
+        }
+        Service.putExhibitContent = putExhibitContent;
+
+        function putProfile(displayName, email) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("user");
+            var user = {
+                "DisplayName": displayName,
+                "Email": email
+            };
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(user)
+            });
+        }
+        Service.putProfile = putProfile;
+
+        function deleteProfile(displayName) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("user");
+            var user = {
+                "DisplayName": displayName
+            };
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify(user)
+            });
+        }
+        Service.deleteProfile = deleteProfile;
+
+        function getProfile(displayName) {
+            if (typeof displayName === "undefined") { displayName = _testLogin ? "anonymous" : ""; }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("user");
+            if (displayName != "") {
+                request.addParameter("name", displayName);
+            }
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            }).done(function (profile) {
+                if (!profile.id)
+                    return null;
+
+                return profile;
+            });
+        }
+        Service.getProfile = getProfile;
+
+        function getMimeTypeByUrl(url) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("mimetypebyurl");
+            if (url == "")
+                return result;
+            request.addParameter("url", url);
+            $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                async: false
+            }).done(function (mime) {
+                if (mime)
+                    result = mime;
+            });
+            return result;
+        }
+        Service.getMimeTypeByUrl = getMimeTypeByUrl;
+
+        function getUserTimelines(sc, c) {
+            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
+            if (typeof c === "undefined") { c = Service.collectionName; }
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("usertimelines");
+            request.addParameter("superCollection", sc);
+            request.addParameter("Collection", c);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
+            });
+        }
+        Service.getUserTimelines = getUserTimelines;
+
+        function getUserFavorites() {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfavorites");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
+            });
+        }
+        Service.getUserFavorites = getUserFavorites;
+        function deleteUserFavorite(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfavorites");
+            if (guid == "")
+                return null;
+            request.addToPath(guid);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.deleteUserFavorite = deleteUserFavorite;
+
+        function putUserFavorite(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfavorites");
+            if (guid == "")
+                return null;
+            request.addToPath(guid);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.putUserFavorite = putUserFavorite;
+
+        function getUserFeatured(guid) {
+            if (typeof guid === "undefined") { guid = "default"; }
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfeatured");
+            request.addToPath(guid);
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: _isLocalHost ? _dumpTimelinesUrl : request.url
+            });
+        }
+        Service.getUserFeatured = getUserFeatured;
+
+        function deleteUserFeatured(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfeatured");
+            if (guid == "")
+                return null;
+            request.addToPath(guid);
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.deleteUserFeatured = deleteUserFeatured;
+
+        function putUserFeatured(guid) {
+            var result = "";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("userfeatured");
+            if (guid == "")
+                return null;
+            request.addToPath(guid);
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.putUserFeatured = putUserFeatured;
+
+        function putTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify({
+                    Subject: subject,
+                    Predicate: predicate,
+                    Object: object
+                })
+            });
+        }
+        Service.putTriplet = putTriplet;
+
+        function getTriplets(subject, predicate, object) {
+            if (typeof predicate === "undefined") { predicate = null; }
+            if (typeof object === "undefined") { object = null; }
+            if (subject == null && predicate == null && object == null)
+                throw "Arguments error: all three criteria cannot be null at the same time";
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            if (subject != null)
+                request.addParameter("subject", encodeURIComponent(subject));
+            if (predicate != null)
+                request.addParameter("predicate", encodeURIComponent(predicate));
+            if (object != null)
+                request.addParameter("object", encodeURIComponent(object));
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getTriplets = getTriplets;
+
+        function deleteTriplet(subject, predicate, object) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            return $.ajax({
+                type: "DELETE",
+                cache: false,
+                contentType: "application/json",
+                url: request.url,
+                data: JSON.stringify({
+                    Subject: subject,
+                    Predicate: predicate,
+                    Object: object
+                })
+            });
+        }
+        Service.deleteTriplet = deleteTriplet;
+
+        function getPrefixes() {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("triples");
+            request.addToPath("prefixes");
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                contentType: "application/json",
+                url: request.url
+            });
+        }
+        Service.getPrefixes = getPrefixes;
+    })(CZ.Service || (CZ.Service = {}));
+    var Service = CZ.Service;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Search) {
+        Search.isSearchWindowVisible = false;
+        var delayedSearchRequest = null;
+
+        function onSearchClicked() {
+            if (CZ.Tours.isTourWindowVisible && CZ.Tours.onTourClicked)
+                CZ.Tours.onTourClicked();
+
+            if (Search.isSearchWindowVisible) {
+                $(".search-icon").removeClass("active");
+                $("#search").hide('slide', {}, 'slow');
+            } else {
+                $(".search-icon").addClass("active");
+                $("#search").show('slide', {}, 'slow', function () {
+                    $("#searchTextBox").focus();
+                });
+            }
+            Search.isSearchWindowVisible = !Search.isSearchWindowVisible;
+        }
+        Search.onSearchClicked = onSearchClicked;
+
+        function initializeSearch() {
+            $("#searchTextBox").focus(function () {
+                if ($(this).hasClass('emptyTextBox')) {
+                    this.value = '';
+                    $(this).removeClass('emptyTextBox');
+                }
+            }).blur(function () {
+                if ($(this).hasClass('emptyTextBox')) {
+                    if (this.value != '') {
+                        $(this).removeClass('emptyTextBox');
+                    }
+                } else {
+                    if (this.value == '') {
+                        this.value = 'type here...';
+                        $(this).addClass('emptyTextBox');
+                    }
+                }
+            }).keyup(function () {
+                if (delayedSearchRequest) {
+                    clearTimeout(delayedSearchRequest);
+                    delayedSearchRequest = null;
+                }
+
+                delayedSearchRequest = setTimeout(function () {
+                    if ($('#searchTextBox').val() != "") {
+                        $("#loadingImage").fadeIn('slow');
+                    }
+                    search(escapeSearchString($("#searchTextBox")[0].value.substr(0, 700)));
+                }, 300);
+            });
+
+            $("#search").hide();
+        }
+        Search.initializeSearch = initializeSearch;
+
+        function navigateToElement(e) {
+            if (!CZ.Authoring.isActive) {
+                var animId = CZ.Common.setVisibleByUserDirectly(e.newvisible);
+                if (animId) {
+                    CZ.Common.setNavigationStringTo = { element: e.element, id: animId };
+                }
+            }
+        }
+        Search.navigateToElement = navigateToElement;
+
+        function navigateToBookmark(bookmark) {
+            if (bookmark && !CZ.Authoring.isActive) {
+                var visible = CZ.UrlNav.navStringToVisible(bookmark, CZ.Common.vc);
+                if (visible) {
+                    var animId = CZ.Common.setVisibleByUserDirectly(visible);
+                    if (animId) {
+                        CZ.Common.setNavigationStringTo = { bookmark: bookmark, id: animId };
+                    }
+                }
+            }
+        }
+        Search.navigateToBookmark = navigateToBookmark;
+
+        function goToSearchResult(resultId, elementType) {
+            var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
+            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
+            CZ.StartPage.hide();
+            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
+            CZ.Common.controller.moveToVisible(visible);
+        }
+        Search.goToSearchResult = goToSearchResult;
+
+        function findVCElement(root, id, elementType) {
+            var lookingForCI = elementType === "contentItem";
+
+            var rfind = function (el, id) {
+                if (el.id === id)
+                    return el;
+                if (!el.children)
+                    return null;
+                var n = el.children.length;
+                for (var i = 0; i < n; i++) {
+                    var child = el.children[i];
+                    if (child.id === id)
+                        return child;
+                }
+                for (var i = 0; i < n; i++) {
+                    var child = el.children[i];
+                    var res = rfind(child, id);
+                    if (res)
+                        return res;
+                }
+                if (lookingForCI && el.type === 'infodot') {
+                    var ci = CZ.VCContent.getContentItem(el, id);
+                    if (ci != null) {
+                        return ci;
+                    }
+                }
+
+                return null;
+            };
+
+            return rfind(root, id);
+        }
+
+        function onSearchResults(searchString, results) {
+            if (escapeSearchString($("#searchTextBox")[0].value).indexOf(searchString) === 0 || searchString === '') {
+                var height;
+                var output = $("#search .searchResults").empty();
+                if (results == null) {
+                } else if (results.length == 0) {
+                    $("<div></div>", {
+                        class: "searchNoResult",
+                        text: "No results"
+                    }).appendTo(output);
+                } else {
+                    var addResults = function (objectType, sectionTitle) {
+                        var first = true;
+                        for (var i = 0; i < results.length; i++) {
+                            var item = results[i];
+                            if (item.objectType != objectType)
+                                continue;
+                            var resultId;
+                            var elementType;
+
+                            switch (item.objectType) {
+                                case 0:
+                                    resultId = 'e' + item.id;
+                                    elementType = "exhibit";
+                                    break;
+                                case 1:
+                                    resultId = 't' + item.id;
+                                    elementType = "timeline";
+                                    break;
+                                case 2:
+                                    resultId = item.id;
+                                    elementType = "contentItem";
+                                    break;
+                                default:
+                                    continue;
+                            }
+                            if (first) {
+                                $("<div></div>", {
+                                    class: "searchResultSection",
+                                    text: sectionTitle
+                                }).appendTo(output);
+
+                                first = false;
+                            }
+                            $("<div></div>", {
+                                class: "searchResult",
+                                resultId: resultId,
+                                text: results[i].title,
+                                click: function () {
+                                    goToSearchResult(this.getAttribute("resultId"), this.getAttribute("data-element-type"));
+                                }
+                            }).attr("data-element-type", elementType).appendTo(output);
+                        }
+                    };
+                    addResults(1, "Timelines");
+                    addResults(0, "Exhibits");
+                    addResults(2, "Artifacts");
+                }
+            }
+
+            if (isSearching) {
+                isSearching = false;
+            }
+            if (pendingSearch != null) {
+                var q = pendingSearch;
+                pendingSearch = null;
+                search(q);
+            }
+
+            $("#loadingImage").fadeOut('slow');
+        }
+
+        var pendingSearch = null;
+        var isSearching = false;
+        function search(searchString) {
+            if (isSearching) {
+                pendingSearch = searchString;
+                return;
+            }
+
+            isSearching = true;
+
+            if (!searchString || searchString === '') {
+                setTimeout(function () {
+                    onSearchResults(searchString);
+                }, 1);
+                return;
+            }
+
+            var url;
+            switch (CZ.Settings.czDataSource) {
+                case 'db':
+                    url = "/api/Search";
+                    break;
+                default:
+                    url = "/api/Search";
+                    break;
+            }
+            $.ajax({
+                cache: false,
+                type: "GET",
+                async: true,
+                dataType: "json",
+                data: { searchTerm: searchString, supercollection: CZ.Service.superCollectionName, collection: CZ.Service.collectionName },
+                url: url,
+                success: function (result) {
+                    onSearchResults(searchString, result.d);
+                },
+                error: function (xhr) {
+                    console.log("Error connecting to service: " + xhr.responseText);
+                }
+            });
+        }
+
+        function escapeSearchString(searchString) {
+            if (searchString === null)
+                return '';
+            if (searchString) {
+                searchString = searchString.replace(new RegExp('"', "g"), '');
+            }
+            return searchString;
+        }
+    })(CZ.Search || (CZ.Search = {}));
+    var Search = CZ.Search;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormHeaderSearch = (function (_super) {
+            __extends(FormHeaderSearch, _super);
+            function FormHeaderSearch(container, formInfo) {
+                _super.call(this, container, formInfo);
+
+                this.searchTextbox = container.find(formInfo.searchTextbox);
+                this.searchResultsBox = container.find(formInfo.searchResultsBox);
+                this.progressBar = container.find(formInfo.progressBar);
+                this.resultSections = container.find(formInfo.resultSections);
+                this.resultsCountTextblock = container.find(formInfo.resultsCountTextblock);
+
+                this.initialize();
+            }
+            FormHeaderSearch.prototype.initialize = function () {
+                var _this = this;
+                this.fillFormWithSearchResults();
+
+                this.searchResults = [];
+                this.progressBar.css("opacity", 0);
+                this.hideResultsCount();
+                this.clearResultSections();
+                this.hideSearchResults();
+                this.searchTextbox.off();
+
+                var onSearchQueryChanged = function (event) {
+                    clearTimeout(_this.delayedSearchRequest);
+
+                    _this.delayedSearchRequest = setTimeout(function () {
+                        var query = _this.searchTextbox.val();
+                        query = _this.escapeSearchQuery(query);
+                        _this.showProgressBar();
+                        _this.sendSearchQuery(query).then(function (response) {
+                            _this.hideProgressBar();
+                            _this.searchResults = response ? response.d : response;
+                            _this.updateSearchResults();
+                        }, function (error) {
+                            console.log("Error connecting to service: search.\n" + error.responseText);
+                        });
+                    }, 300);
+                };
+
+                this.searchTextbox.on("input search", onSearchQueryChanged);
+
+                var isIE9 = (CZ.Settings.ie === 9);
+                if (isIE9) {
+                    this.searchTextbox.on("keyup", function (event) {
+                        switch (event.which) {
+                            case 8:
+                            case 46:
+                                onSearchQueryChanged(event);
+                                break;
+                        }
+                    });
+                    this.searchTextbox.on("cut", onSearchQueryChanged);
+                }
+            };
+
+            FormHeaderSearch.prototype.sendSearchQuery = function (query) {
+                return (query === "") ? $.Deferred().resolve(null).promise() : CZ.Service.getSearch(query);
+            };
+
+            FormHeaderSearch.prototype.updateSearchResults = function () {
+                var _this = this;
+                this.clearResultSections();
+
+                if (this.searchResults === null) {
+                    this.hideSearchResults();
+                    return;
+                }
+
+                if (this.searchResults.length === 0) {
+                    this.showNoResults();
+                    return;
+                }
+
+                var resultTypes = {
+                    0: "exhibit",
+                    1: "timeline",
+                    2: "contentItem"
+                };
+
+                var sections = {
+                    exhibit: $(this.resultSections[1]),
+                    timeline: $(this.resultSections[0]),
+                    contentItem: $(this.resultSections[2])
+                };
+
+                var idPrefixes = {
+                    exhibit: "e",
+                    timeline: "t",
+                    contentItem: ""
+                };
+
+                this.searchResults.forEach(function (item) {
+                    var form = _this;
+                    var resultType = resultTypes[item.objectType];
+                    var resultId = idPrefixes[resultType] + item.id;
+                    var resultTitle = item.title;
+
+                    sections[resultType].append($("<div></div>", {
+                        class: "cz-form-search-result",
+                        text: resultTitle,
+                        "result-id": resultId,
+                        "result-type": resultType,
+                        click: function () {
+                            var self = $(this);
+                            CZ.Search.goToSearchResult(self.attr("result-id"), self.attr("result-type"));
+                            form.close();
+                        }
+                    }));
+                });
+
+                this.showResultsCount();
+                this.showNonEmptySections();
+            };
+
+            FormHeaderSearch.prototype.fillFormWithSearchResults = function () {
+                this.container.show();
+                this.searchResultsBox.css("height", "calc(100% - 150px)");
+                this.searchResultsBox.css("height", "-moz-calc(100% - 150px)");
+                this.searchResultsBox.css("height", "-webkit-calc(100% - 150px)");
+                this.searchResultsBox.css("height", "-o-calc(100% - 150px)");
+                this.container.hide();
+            };
+
+            FormHeaderSearch.prototype.clearResultSections = function () {
+                this.resultSections.find("div").remove();
+            };
+
+            FormHeaderSearch.prototype.escapeSearchQuery = function (query) {
+                return query ? query.replace(/"/g, "") : "";
+            };
+
+            FormHeaderSearch.prototype.getResultsCountString = function () {
+                var count = this.searchResults.length;
+                return count + ((count === 1) ? " result" : " results");
+            };
+
+            FormHeaderSearch.prototype.showProgressBar = function () {
+                this.progressBar.animate({
+                    opacity: 1
+                });
+            };
+
+            FormHeaderSearch.prototype.hideProgressBar = function () {
+                this.progressBar.animate({
+                    opacity: 0
+                });
+            };
+
+            FormHeaderSearch.prototype.showNonEmptySections = function () {
+                this.searchResultsBox.show();
+                this.resultSections.show();
+                this.resultSections.each(function (i, item) {
+                    var results = $(item).find("div");
+                    if (results.length === 0) {
+                        $(item).hide();
+                    }
+                });
+            };
+
+            FormHeaderSearch.prototype.showNoResults = function () {
+                this.searchResultsBox.show();
+                this.resultSections.hide();
+                this.resultsCountTextblock.show();
+                this.resultsCountTextblock.text("No results");
+            };
+
+            FormHeaderSearch.prototype.showResultsCount = function () {
+                this.searchResultsBox.show();
+                this.resultsCountTextblock.show();
+                this.resultsCountTextblock.text(this.getResultsCountString());
+            };
+
+            FormHeaderSearch.prototype.hideResultsCount = function () {
+                this.resultsCountTextblock.hide();
+            };
+
+            FormHeaderSearch.prototype.hideSearchResults = function () {
+                this.hideResultsCount();
+                this.searchResultsBox.hide();
+            };
+
+            FormHeaderSearch.prototype.show = function () {
+                var _this = this;
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.searchTextbox.focus();
+                    }
+                });
+
+                this.activationSource.addClass("active");
+            };
+
+            FormHeaderSearch.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+
+                this.activationSource.removeClass("active");
+            };
+            return FormHeaderSearch;
+        })(CZ.UI.FormBase);
+        UI.FormHeaderSearch = FormHeaderSearch;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (Data) {
+        function getTimelines(r) {
+            if (r === undefined || r === null) {
+                r = {
+                    start: -50000000000,
+                    end: 9999,
+                    maxElements: null,
+                    minspan: null
+                };
+            }
+
+            return CZ.Service.getTimelines(r).then(function (response) {
+            }, function (error) {
+            });
+        }
+        Data.getTimelines = getTimelines;
+
+        var DataSet = (function () {
+            function DataSet() {
+            }
+            DataSet.prototype.getVerticalPadding = function () {
+                var padding = 0;
+                this.series.forEach(function (seria) {
+                    if (seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > padding) {
+                        padding = seria.appearanceSettings.thickness;
+                    }
+                });
+                return padding;
+            };
+            return DataSet;
+        })();
+        Data.DataSet = DataSet;
+
+        var Series = (function () {
+            function Series() {
+                this.values = new Array();
+            }
+            return Series;
+        })();
+        Data.Series = Series;
+
+        function generateSampleData() {
+            var rolandData;
+            $.ajax({
+                cache: false,
+                type: "GET",
+                async: false,
+                dataType: "text",
+                url: '/dumps/beta-timeseries.csv',
+                success: function (result) {
+                    rolandData = result;
+                },
+                error: function (xhr) {
+                    alert("Error fetching timeSeries Data: " + xhr.responseText);
+                }
+            });
+
+            return csvToDataSet(rolandData, ",", "sampleData");
+        }
+        Data.generateSampleData = generateSampleData;
+
+        function csvToDataSet(csvText, delimiter, name) {
+            var dataText = csvText;
+
+            var csvArr = dataText.csvToArray({ trim: true, fSep: delimiter, quot: "'" });
+
+            if (csvArr === undefined)
+                throw "Error parsing input file: file has incorrect format";
+
+            var dataLength = csvArr.length - 1;
+
+            if (dataLength < 2)
+                throw "Error parsing input file: Input should be csv/text file with header and at least one data row";
+
+            var seriesLength = csvArr[0].length - 1;
+
+            if (seriesLength < 1)
+                throw "Error parsing input file: table should contain one column with X-axis data and at least one column for Y-axis data";
+
+            var result = new DataSet();
+            result.name = name;
+            result.time = new Array();
+            result.series = new Array();
+
+            for (var i = 1; i <= seriesLength; i++) {
+                var seria = new Series();
+                seria.values = new Array();
+                seria.appearanceSettings = { thickness: 1, stroke: 'blue' };
+
+                var seriaHeader = csvArr[0][i];
+                var appearanceRegex = new RegExp("{(.*)}");
+                var loadedAppearence = appearanceRegex.exec(seriaHeader);
+                if (loadedAppearence !== null) {
+                    loadedAppearence = parseStyleString(loadedAppearence[1]);
+                    for (var prop in loadedAppearence) {
+                        seria.appearanceSettings[prop] = loadedAppearence[prop];
+                    }
+                }
+                var headerRegex = new RegExp("(.*){");
+                var header = headerRegex.exec(seriaHeader);
+                if (header !== null) {
+                    seria.appearanceSettings.name = header[1];
+                } else {
+                    seria.appearanceSettings.name = seriaHeader;
+                }
+
+                seria.appearanceSettings.yMin = parseFloat(csvArr[1][i]);
+                seria.appearanceSettings.yMax = parseFloat(csvArr[1][i]);
+
+                result.series.push(seria);
+            }
+
+            for (var i = 0; i < dataLength; i++) {
+                if (csvArr[i + 1].length !== (seriesLength + 1))
+                    throw "Error parsing input file: incompatible data row " + (i + 1);
+
+                result.time.push(parseFloat(csvArr[i + 1][0]));
+                for (var j = 1; j <= seriesLength; j++) {
+                    var value = parseFloat(csvArr[i + 1][j]);
+                    var seria = result.series[j - 1];
+                    if (seria.appearanceSettings.yMin > value)
+                        seria.appearanceSettings.yMin = value;
+                    if (seria.appearanceSettings.yMax < value)
+                        seria.appearanceSettings.yMax = value;
+                    seria.values.push(value);
+                }
+            }
+
+            return result;
+        }
+        Data.csvToDataSet = csvToDataSet;
+
+        function parseStyleString(styleString) {
+            var result = {};
+            var items = styleString.split(";");
+            var n = items.length;
+            for (var i = 0; i < n; i++) {
+                var pair = items[i].split(':', 2);
+                if (pair && pair.length === 2) {
+                    var name = pair[0].trim();
+                    var val = pair[1].trim();
+                    if (/^\d+$/.test(val)) {
+                        val = parseFloat(val);
+                    }
+                    result[name] = val;
+                }
+            }
+            return result;
+        }
+        Data.parseStyleString = parseStyleString;
+    })(CZ.Data || (CZ.Data = {}));
+    var Data = CZ.Data;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var LineChart = (function () {
+            function LineChart(container) {
+                this.container = container;
+
+                this.canvas = document.createElement("canvas");
+                $(this.canvas).prependTo($("#timeSeries"));
+
+                this.canvas.width = container.width();
+                this.canvas.height = container.height();
+
+                this.context = this.canvas.getContext("2d");
+
+                $("#closeTimeChartBtn").click(function () {
+                    CZ.HomePageViewModel.hideTimeSeriesChart();
+                });
+            }
+            LineChart.prototype.calculateTicks = function (ymin, ymax, labelCount) {
+                var delta = (ymax - ymin) / labelCount;
+                var h = Math.round(Math.log(delta) / Math.LN10);
+                var h10 = Math.pow(10, h);
+                var k = delta / h10;
+                if (k < 1.5)
+                    k = 1;
+                else if (k < 3.5)
+                    k = 2;
+                else
+                    k = 5;
+
+                var imin = Math.ceil(ymin / (k * h10));
+                var imax = Math.floor(ymax / (k * h10));
+                var actualLabelCount = imax - imin + 1;
+
+                if (actualLabelCount < labelCount) {
+                    while (true) {
+                        var k1 = k;
+                        var h1 = h;
+                        if (k1 == 5)
+                            k1 = 2;
+                        else if (k1 == 2)
+                            k1 = 1;
+                        else {
+                            h1--;
+                            k1 = 5;
+                        }
+                        var imin1 = Math.ceil(ymin / (k1 * Math.pow(10, h1)));
+                        var imax1 = Math.floor(ymax / (k1 * Math.pow(10, h1)));
+                        var actualLabelCount1 = imax1 - imin1 + 1;
+                        if (Math.abs(labelCount - actualLabelCount) > Math.abs(labelCount - actualLabelCount1)) {
+                            imin = imin1;
+                            imax = imax1;
+                            k = k1;
+                            h = h1;
+                            h10 = Math.pow(10, h1);
+                        } else
+                            break;
+                    }
+                } else if (actualLabelCount > labelCount) {
+                    while (true) {
+                        var k1 = k;
+                        var h1 = h;
+                        if (k1 == 5) {
+                            k1 = 1;
+                            h1++;
+                        } else if (k1 == 2)
+                            k1 = 5;
+                        else
+                            k1 = 2;
+                        var imin1 = Math.ceil(ymin / (k1 * Math.pow(10, h1)));
+                        var imax1 = Math.floor(ymax / (k1 * Math.pow(10, h1)));
+                        var actualLabelCount1 = imax1 - imin1 + 1;
+                        if (Math.abs(labelCount - actualLabelCount) > Math.abs(labelCount - actualLabelCount1) && actualLabelCount1 > 0) {
+                            imin = imin1;
+                            imax = imax1;
+                            k = k1;
+                            h = h1;
+                            h10 = Math.pow(10, h1);
+                        } else
+                            break;
+                    }
+                }
+
+                var ticks = [];
+                for (var i = imin; i <= imax; i++) {
+                    var newTick = i * k * h10;
+                    if (h < 0) {
+                        newTick = newTick.toPrecision(-h);
+                    }
+
+                    ticks.push(newTick);
+                }
+
+                var result = {};
+                result.ticks = ticks;
+                result.h = h;
+                result.h10 = h10;
+
+                return result;
+            };
+
+            LineChart.prototype.clear = function (screenLeft, screenRight) {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.context.fillStyle = "white";
+                this.context.fillRect(screenLeft, 0, screenRight - screenLeft, this.canvas.height);
+
+                var maxLegendWidth = Math.max(24, (screenRight - screenLeft) / 2 - 60);
+
+                $("#rightLegend").css("right", $("#timeSeries").width() - screenRight + 30);
+                $("#rightLegend").css("max-width", maxLegendWidth + "px");
+
+                $("#leftLegend").css("left", screenLeft + 30);
+                $("#leftLegend").css("max-width", maxLegendWidth + "px");
+
+                $("#timeSeriesChartHeader").text("TimeSeries Chart");
+            };
+
+            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight, plotTop, plotBottom) {
+                var that = this;
+                dataSet.series.forEach(function (seria) {
+                    if (seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > verticalPadding) {
+                        verticalPadding = seria.appearanceSettings.thickness;
+                    }
+                });
+
+                var screenHeight = this.canvas.height - 2 * verticalPadding;
+
+                var dataToScreenX = function (x) {
+                    return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
+                };
+                var dataToScreenY = function (y) {
+                    return verticalPadding + screenHeight * (plotTop - y) / (plotTop - plotBottom);
+                };
+
+                var x = dataSet.time;
+                var n = x.length;
+
+                var context = this.context;
+
+                var xmin = screenLeft, xmax = screenRight;
+                var ymin = 0, ymax = this.canvas.height;
+
+                dataSet.series.forEach(function (seria) {
+                    context.strokeStyle = seria.appearanceSettings.stroke;
+                    context.lineWidth = seria.appearanceSettings.thickness;
+
+                    var y = seria.values;
+
+                    context.beginPath();
+                    var x1, x2, y1, y2;
+                    var i = 0;
+
+                    var nextValuePoint = function () {
+                        for (; i < n; i++) {
+                            if (isNaN(x[i]) || isNaN(y[i]))
+                                continue;
+                            x1 = dataToScreenX(x[i]);
+                            y1 = dataToScreenY(y[i]);
+                            c1 = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                            break;
+                        }
+                        if (c1 == 0)
+                            context.moveTo(x1, y1);
+                    };
+                    nextValuePoint();
+
+                    var c1, c2, c1_, c2_;
+                    var dx, dy;
+                    var x2_, y2_;
+                    var m = 1;
+                    for (i++; i < n; i++) {
+                        if (isNaN(x[i]) || isNaN(y[i])) {
+                            if (m == 1) {
+                                context.stroke();
+                                var c = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                                if (c == 0) {
+                                    context.beginPath();
+                                    context.arc(x1, y1, seria.appearanceSettings.thickness / 2, 0, 2 * Math.PI);
+                                    context.fill();
+                                }
+                            } else {
+                                context.stroke();
+                            }
+                            context.beginPath();
+                            i++;
+                            nextValuePoint();
+                            m = 1;
+                            continue;
+                        }
+
+                        x2_ = x2 = dataToScreenX(x[i]);
+                        y2_ = y2 = dataToScreenY(y[i]);
+                        if (Math.abs(x1 - x2) < 1 && Math.abs(y1 - y2) < 1)
+                            continue;
+
+                        c1_ = c1;
+                        c2_ = c2 = that.code(x2, y2, xmin, xmax, ymin, ymax);
+
+                        while (c1 | c2) {
+                            if (c1 & c2)
+                                break;
+                            dx = x2 - x1;
+                            dy = y2 - y1;
+                            if (c1) {
+                                if (x1 < xmin) {
+                                    y1 += dy * (xmin - x1) / dx;
+                                    x1 = xmin;
+                                } else if (x1 > xmax) {
+                                    y1 += dy * (xmax - x1) / dx;
+                                    x1 = xmax;
+                                } else if (y1 < ymin) {
+                                    x1 += dx * (ymin - y1) / dy;
+                                    y1 = ymin;
+                                } else if (y1 > ymax) {
+                                    x1 += dx * (ymax - y1) / dy;
+                                    y1 = ymax;
+                                }
+                                c1 = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                            } else {
+                                if (x2 < xmin) {
+                                    y2 += dy * (xmin - x2) / dx;
+                                    x2 = xmin;
+                                } else if (x2 > xmax) {
+                                    y2 += dy * (xmax - x2) / dx;
+                                    x2 = xmax;
+                                } else if (y2 < ymin) {
+                                    x2 += dx * (ymin - y2) / dy;
+                                    y2 = ymin;
+                                } else if (y2 > ymax) {
+                                    x2 += dx * (ymax - y2) / dy;
+                                    y2 = ymax;
+                                }
+                                c2 = that.code(x2, y2, xmin, xmax, ymin, ymax);
+                            }
+                        }
+                        if (!(c1 & c2)) {
+                            if (c1_ != 0)
+                                context.moveTo(x1, y1);
+                            context.lineTo(x2, y2);
+                            m++;
+                        }
+
+                        x1 = x2_;
+                        y1 = y2_;
+                        c1 = c2_;
+                    }
+
+                    if (m == 1) {
+                        context.stroke();
+                        var c = that.code(x1, y1, xmin, xmax, ymin, ymax);
+                        if (c == 0) {
+                            context.beginPath();
+                            context.arc(x1, y1, seria.appearanceSettings.thickness / 2, 0, 2 * Math.PI);
+                            context.fill();
+                        }
+                    } else {
+                        context.stroke();
+                    }
+                });
+            };
+
+            LineChart.prototype.code = function (x, y, xmin, xmax, ymin, ymax) {
+                var a = x < xmin ? 1 : 0;
+                var b = x > xmax ? 1 : 0;
+                var c = y < ymin ? 1 : 0;
+                var d = y > ymax ? 1 : 0;
+                return a << 3 | b << 2 | c << 1 | d;
+            };
+
+            LineChart.prototype.generateAxisParameters = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
+                var that = this;
+                var ticksForDraw = [];
+                var verticalPadding = appearence.verticalPadding ? appearence.verticalPadding : 0;
+                var screenHeight = this.canvas.height - 2 * verticalPadding;
+
+                var dataToScreenY = function (y) {
+                    return verticalPadding + screenHeight * (ymax - y) / (ymax - ymin);
+                };
+                var plotToScreenY = function (top) {
+                    return (ymax - ymin) * (1 - ((top - verticalPadding) / screenHeight)) + ymin;
+                };
+
+                var ticks = this.calculateTicks(plotToScreenY(this.canvas.height), plotToScreenY(0), appearence.labelCount).ticks;
+
+                var ctx = this.context;
+                ctx.font = appearence.font;
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = appearence.stroke;
+                ctx.fillStyle = appearence.stroke;
+                ctx.lineWidth = appearence.majorTickThickness;
+                var ticklength = appearence.tickLength;
+                var textOffset = 2;
+
+                if (appearence.axisLocation == "right") {
+                    ticklength = -ticklength;
+                    textOffset = -textOffset;
+                }
+
+                ctx.textAlign = appearence.axisLocation;
+
+                ticks.forEach(function (tick) {
+                    var tickForDraw = {};
+                    tickForDraw.tick = tick;
+
+                    var y = dataToScreenY(tick);
+                    tickForDraw.y = y;
+                    tickForDraw.xLineStart = tickOrigin;
+                    tickForDraw.xLineEnd = tickOrigin + ticklength;
+                    tickForDraw.xText = tickOrigin + ticklength + textOffset;
+
+                    var textWidth = ctx.measureText(tick).width;
+                    if (appearence.axisLocation == "right") {
+                        textWidth = -textWidth;
+                    }
+                    var offset = ticklength + textWidth + 2 * textOffset;
+
+                    tickForDraw.isGridLineVisible = offset > 0 && (tickOrigin + offset) <= secondScreenBorder || offset < 0 && (tickOrigin + offset) >= secondScreenBorder;
+                    tickForDraw.xGridLineStart = tickOrigin + offset;
+                    tickForDraw.xGridLineEnd = secondScreenBorder;
+
+                    ticksForDraw.push(tickForDraw);
+                });
+
+                return ticksForDraw;
+            };
+
+            LineChart.prototype.drawAxis = function (ticksForDraw, appearence) {
+                var that = this;
+                var ctx = this.context;
+                ctx.font = appearence.font;
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = appearence.stroke;
+                ctx.fillStyle = appearence.stroke;
+                ctx.lineWidth = appearence.majorTickThickness;
+                ctx.textAlign = appearence.axisLocation;
+
+                ticksForDraw.forEach(function (tick) {
+                    ctx.strokeStyle = appearence.stroke;
+                    ctx.beginPath();
+                    ctx.moveTo(tick.xLineStart, tick.y);
+                    ctx.lineTo(tick.xLineEnd, tick.y);
+                    ctx.stroke();
+
+                    var minTextOffset = 8;
+                    ctx.fillText(tick.tick, tick.xText, Math.max(minTextOffset, Math.min(that.canvas.height - minTextOffset, tick.y)));
+                });
+            };
+
+            LineChart.prototype.drawHorizontalGridLines = function (ticksForDraw, appearence) {
+                var that = this;
+                var ctx = this.context;
+                ctx.strokeStyle = 'lightgray';
+                ctx.lineWidth = appearence.majorTickThickness;
+
+                ticksForDraw.forEach(function (tick) {
+                    if (tick.isGridLineVisible) {
+                        ctx.beginPath();
+                        ctx.moveTo(tick.xGridLineStart, tick.y);
+                        ctx.lineTo(tick.xGridLineEnd, tick.y);
+                        ctx.stroke();
+                    }
+                });
+            };
+
+            LineChart.prototype.drawVerticalGridLines = function (screenLeft, screenRight, plotLeft, plotRight) {
+                var ctx = this.context;
+                var verticalTicks = CZ.Common.axis.ticksInfo;
+                var height = this.canvas.height;
+                ctx.strokeStyle = 'lightgray';
+                verticalTicks.forEach(function (tick) {
+                    var coord = tick.position;
+                    ctx.beginPath();
+                    ctx.moveTo(coord, 0);
+                    ctx.lineTo(coord, height);
+                    ctx.stroke();
+                });
+            };
+
+            LineChart.prototype.updateCanvasHeight = function () {
+                $("#timeSeries").height($("#timeSeriesContainer").height() - 36);
+                this.canvas.height = $("#timeSeries").height();
+                this.canvas.width = $("#timeSeries").width();
+            };
+
+            LineChart.prototype.clearLegend = function (location) {
+                var legendCnt = location === "left" ? $("#leftLegend") : $("#rightLegend");
+                var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
+                legend.empty();
+                legendCnt.hide();
+            };
+
+            LineChart.prototype.addLegendRecord = function (location, stroke, description) {
+                var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
+                var legendCont = location === "left" ? $("#leftLegend") : $("#rightLegend");
+
+                legendCont.show();
+                var cont = $('<li></li>');
+                var strokeIndicatior = $('<div></div>').addClass("tsc-legend-indicator");
+                strokeIndicatior.css("background-color", stroke);
+
+                var descriptionDiv = $('<div></div>').addClass("tsc-legend-description");
+                descriptionDiv.css("max-width", parseFloat(legendCont.css("max-width")) - 24);
+                descriptionDiv.text(description);
+
+                strokeIndicatior.appendTo(cont);
+                descriptionDiv.appendTo(cont);
+                cont.height(24).appendTo(legend);
+            };
+
+            LineChart.prototype.checkLegendVisibility = function (screenWidth) {
+                var baseIndicatorSize = 24;
+                var horOffset = 30;
+                var topOffset = 10;
+                return screenWidth >= baseIndicatorSize + horOffset && this.canvas.height >= baseIndicatorSize + topOffset;
+            };
+            return LineChart;
+        })();
+        UI.LineChart = LineChart;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var TimeSeriesDataForm = (function (_super) {
+            __extends(TimeSeriesDataForm, _super);
+            function TimeSeriesDataForm(container, formInfo) {
+                _super.call(this, container, formInfo);
+
+                var existingTimSeriesList = $("#existingTimeSeries");
+
+                if (existingTimSeriesList.children().length == 0) {
+                    var preloadedlist;
+                    $.ajax({
+                        cache: false,
+                        type: "GET",
+                        async: false,
+                        dataType: "JSON",
+                        url: '/dumps/timeseries-preloaded.txt',
+                        success: function (result) {
+                            preloadedlist = result.d;
+                        },
+                        error: function (xhr) {
+                            alert("Error fetching pre-loaded timeseries list: " + xhr.responseText);
+                        }
+                    });
+
+                    preloadedlist.forEach(function (preloaded) {
+                        var li = $('<li></li>').css("margin-left", 10).css("margin-bottom", "3px").height(22).appendTo(existingTimSeriesList);
+
+                        var link = $('<a></a>').addClass("cz-form-preloadedrecord").appendTo(li);
+                        link.css("color", "#0464a2");
+                        link.css("font-size", "16px");
+                        link.css("float", "left");
+                        link.css("width", "140px");
+                        link.css("cursor", "pointer");
+                        link.text(preloaded.name);
+
+                        var div = $("<span></span>").addClass("cz-form-preloadedrecord").appendTo(li);
+                        div.text("Source:");
+
+                        var sourceDiv = $("<a></a>").addClass("cz-form-preloadedrecord").appendTo(li);
+                        sourceDiv.css("color", "#0464a2");
+                        sourceDiv.css("cursor", "pointer");
+                        sourceDiv.text(preloaded.source);
+                        sourceDiv.prop("href", preloaded.link);
+
+                        link.click(function (e) {
+                            var data;
+                            $.ajax({
+                                cache: false,
+                                type: "GET",
+                                async: false,
+                                dataType: "text",
+                                url: preloaded.file,
+                                success: function (result) {
+                                    data = result;
+                                },
+                                error: function (xhr) {
+                                    alert("Error fetching timeSeries Data: " + xhr.responseText);
+                                }
+                            });
+
+                            var dataSet = undefined;
+
+                            try  {
+                                dataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.source);
+                            } catch (err) {
+                                alert(err);
+                                return;
+                            }
+
+                            CZ.HomePageViewModel.showTimeSeriesChart();
+                            CZ.rightDataSet = dataSet;
+                            var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                            CZ.HomePageViewModel.updateTimeSeriesChart(vp);
+                        });
+                    });
+                }
+
+                this.input = $("#fileLoader");
+                var that = this;
+
+                $("#fileLoader").change(function () {
+                    var fl = $("#fileLoader");
+                    $("#selectedFile").text(fl[0].files[0].name);
+                });
+
+                if (this.checkFileLoadCompatibility()) {
+                    $("#loadDataBtn").click(function () {
+                        var fr = that.openFile({
+                            "onload": function (e) {
+                                that.updateUserData(fr.result);
+                            }
+                        });
+                    });
+                } else {
+                    $("#uploadDataCnt").hide();
+                }
+            }
+            TimeSeriesDataForm.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+
+                this.activationSource.addClass("active");
+            };
+
+            TimeSeriesDataForm.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "right",
+                    duration: 500
+                });
+
+                this.activationSource.removeClass("active");
+            };
+
+            TimeSeriesDataForm.prototype.checkFileLoadCompatibility = function () {
+                return window['File'] && window['FileReader'] && window['FileList'] && window['Blob'];
+            };
+
+            TimeSeriesDataForm.prototype.openFile = function (callbacks) {
+                var file = this.input[0].files[0];
+                var fileReader = new FileReader();
+
+                fileReader.onloadstart = callbacks["onloadstart"];
+                fileReader.onerror = callbacks["onerror"];
+                fileReader.onabort = callbacks["onabort"];
+                fileReader.onload = callbacks["onload"];
+                fileReader.onloadend = callbacks["onloadend"];
+
+                fileReader.readAsText(file);
+
+                return fileReader;
+            };
+
+            TimeSeriesDataForm.prototype.updateUserData = function (csvString) {
+                var dataSet = undefined;
+
+                var delimValue = $("#delim").prop("value");
+                if (delimValue === "tab")
+                    delimValue = "\t";
+                else if (delimValue === "space")
+                    delimValue = " ";
+
+                try  {
+                    dataSet = CZ.Data.csvToDataSet(csvString, delimValue, this.input[0].files[0].name);
+                } catch (err) {
+                    alert(err);
+                    return;
+                }
+
+                CZ.HomePageViewModel.showTimeSeriesChart();
+                CZ.leftDataSet = dataSet;
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                CZ.HomePageViewModel.updateTimeSeriesChart(vp);
+            };
+            return TimeSeriesDataForm;
+        })(CZ.UI.FormBase);
+        UI.TimeSeriesDataForm = TimeSeriesDataForm;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var TourPlayer = (function () {
+            function TourPlayer(container, playerInfo) {
+                this.container = container;
+                this.tour = playerInfo.context;
+
+                this.playPauseButton = this.container.find(playerInfo.playPauseButton);
+                this.nextButton = this.container.find(playerInfo.nextButton);
+                this.prevButton = this.container.find(playerInfo.prevButton);
+                this.volButton = this.container.find(playerInfo.volButton);
+
+                this.playPauseButton.off();
+                this.nextButton.off();
+                this.prevButton.off();
+                this.volButton.off();
+
+                this.initialize();
+            }
+            TourPlayer.prototype.initialize = function () {
+                var _this = this;
+                this.playPauseButton.attr("state", "pause");
+                this.volButton.attr("state", "on");
+
+                this.playPauseButton.click(function (event) {
+                    var state = _this.playPauseButton.attr("state");
+
+                    var stateHandlers = {
+                        play: function () {
+                            _this.play();
+                        },
+                        pause: function () {
+                            _this.pause();
+                        }
+                    };
+
+                    stateHandlers[state]();
+                });
+
+                this.nextButton.click(function (event) {
+                    _this.next();
+                });
+
+                this.prevButton.click(function (event) {
+                    _this.prev();
+                });
+
+                this.volButton.click(function (event) {
+                    var state = _this.volButton.attr("state");
+
+                    var stateHandlers = {
+                        on: function () {
+                            _this.volumeOff();
+                        },
+                        off: function () {
+                            _this.volumeOn();
+                        }
+                    };
+
+                    stateHandlers[state]();
+                });
+            };
+
+            TourPlayer.prototype.play = function () {
+                this.playPauseButton.attr("state", "pause");
+                CZ.Tours.tourResume();
+            };
+
+            TourPlayer.prototype.pause = function () {
+                this.playPauseButton.attr("state", "play");
+                CZ.Tours.tourPause();
+            };
+
+            TourPlayer.prototype.next = function () {
+                CZ.Tours.tourNext();
+            };
+
+            TourPlayer.prototype.prev = function () {
+                CZ.Tours.tourPrev();
+            };
+
+            TourPlayer.prototype.exit = function () {
+                CZ.Tours.tourAbort();
+            };
+
+            TourPlayer.prototype.volumeOn = function () {
+                this.volButton.attr("state", "on");
+                CZ.Tours.isNarrationOn = true;
+                this.tour.audioElement.volume = 1;
+            };
+
+            TourPlayer.prototype.volumeOff = function () {
+                this.volButton.attr("state", "off");
+                CZ.Tours.isNarrationOn = false;
+                this.tour.audioElement.volume = 0;
+            };
+            return TourPlayer;
+        })();
+        UI.TourPlayer = TourPlayer;
+
+        var FormTourCaption = (function (_super) {
+            __extends(FormTourCaption, _super);
+            function FormTourCaption(container, formInfo) {
+                _super.call(this, container, formInfo);
+
+                this.minButton = this.container.find(formInfo.minButton);
+                this.captionTextarea = this.container.find(formInfo.captionTextarea);
+                this.tourPlayerContainer = this.container.find(formInfo.tourPlayerContainer);
+                this.bookmarksCount = this.container.find(formInfo.bookmarksCount);
+                this.tour = formInfo.context;
+                this.tourPlayer = new CZ.UI.TourPlayer(this.tourPlayerContainer, {
+                    playPauseButton: "div:nth-child(2)",
+                    nextButton: "div:nth-child(3)",
+                    prevButton: "div:nth-child(1)",
+                    volButton: "div:nth-child(4)",
+                    context: this.tour
+                });
+
+                this.minButton.off();
+
+                this.initialize();
+            }
+            FormTourCaption.prototype.initialize = function () {
+                var _this = this;
+                this.titleTextblock.text(this.tour.title);
+                this.bookmarksCount.text("Slide 1 of " + this.tour.bookmarks.length);
+                this.captionTextarea.css("opacity", 0);
+                this.isMinimized = false;
+
+                this.minButton.click(function (event) {
+                    _this.minimize();
+                });
+            };
+
+            FormTourCaption.prototype.hideBookmark = function () {
+                this.captionTextarea.css("opacity", 0);
+            };
+
+            FormTourCaption.prototype.showBookmark = function (bookmark) {
+                this.captionTextarea.text(bookmark.text);
+                this.bookmarksCount.text("Slide " + bookmark.number + " of " + this.tour.bookmarks.length);
+                this.captionTextarea.stop();
+                this.captionTextarea.animate({
+                    opacity: 1
+                });
+            };
+
+            FormTourCaption.prototype.showTourEndMessage = function () {
+                this.captionTextarea.text(CZ.Tours.TourEndMessage);
+                this.bookmarksCount.text("Start a tour");
+            };
+
+            FormTourCaption.prototype.setPlayPauseButtonState = function (state) {
+                this.tourPlayer.playPauseButton.attr("state", state);
+            };
+
+            FormTourCaption.prototype.show = function () {
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+
+                this.activationSource.addClass("active");
+            };
+
+            FormTourCaption.prototype.close = function () {
+                var _this = this;
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        _this.tourPlayer.exit();
+
+                        CZ.Common.hashHandle = true;
+                    }
+                });
+
+                this.activationSource.removeClass("active");
+            };
+
+            FormTourCaption.prototype.minimize = function () {
+                if (this.isMinimized) {
+                    this.contentContainer.show({
+                        effect: "slide",
+                        direction: "up",
+                        duration: 500
+                    });
+                } else {
+                    this.contentContainer.hide({
+                        effect: "slide",
+                        direction: "up",
+                        duration: 500
+                    });
+                }
+
+                this.isMinimized = !this.isMinimized;
+            };
+            return FormTourCaption;
+        })(CZ.UI.FormBase);
+        UI.FormTourCaption = FormTourCaption;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var MessageWindow = (function (_super) {
+            __extends(MessageWindow, _super);
+            function MessageWindow(container, message, title) {
+                _super.call(this, container, {
+                    activationSource: null,
+                    prevForm: null,
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    contentContainer: ".cz-form-content"
+                });
+
+                this.tourTitleInput = this.container.find(".cz-form-label");
+                this.titleTextblock.text(title || "ChronoZoom");
+                this.tourTitleInput.text(message);
+                this.setHeight();
+            }
+            MessageWindow.prototype.show = function () {
+                var _this = this;
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 300,
+                    complete: function () {
+                        $(document).on("keyup", _this.onDocumentKeyPress);
+                    }
+                });
+            };
+
+            MessageWindow.prototype.close = function () {
+                var _this = this;
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 300,
+                    complete: function () {
+                        $(document).off("keyup", _this.onDocumentKeyPress);
+                    }
+                });
+            };
+
+            MessageWindow.prototype.onDocumentKeyPress = function (e) {
+                var self = e.data;
+                if (e.which == 27 && self.isFormVisible) {
+                    self.closeButton.click();
+                }
+            };
+
+            MessageWindow.prototype.setHeight = function () {
+                this.container.show();
+                var messageHeight = this.tourTitleInput.outerHeight(true);
+                this.contentContainer.height(messageHeight);
+                this.container.hide();
+            };
+            return MessageWindow;
+        })(CZ.UI.FormBase);
+        UI.MessageWindow = MessageWindow;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormHeaderSessionExpired = (function (_super) {
+            __extends(FormHeaderSessionExpired, _super);
+            function FormHeaderSessionExpired(container, formInfo) {
+                _super.call(this, container, formInfo);
+                this.time = 60;
+                this.sessionTimeSpan = container.find(formInfo.sessionTimeSpan);
+                this.sessionButton = container.find(formInfo.sessionButton);
+
+                this.initialize();
+            }
+            FormHeaderSessionExpired.prototype.initialize = function () {
+                var _this = this;
+                this.sessionButton.click(function () {
+                    CZ.Service.getProfile();
+                    clearTimeout(_this.timer);
+                    _this.time = 60;
+                    _this.close();
+                    _this.sessionTimeSpan.html(_this.time.toString());
+                    CZ.Authoring.resetSessionTimer();
+                    return false;
+                });
+            };
+
+            FormHeaderSessionExpired.prototype.onTimer = function () {
+                var _this = this;
+                if (this.time > 0) {
+                    this.time--;
+                    this.sessionTimeSpan.html(this.time.toString());
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(function () {
+                        _this.onTimer();
+                    }, 1000);
+                } else {
+                    clearTimeout(this.timer);
+
+                    this.close();
+                    document.location.href = "/account/logout";
+                }
+            };
+            FormHeaderSessionExpired.prototype.show = function () {
+                var _this = this;
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                    }
+                });
+
+                this.timer = setTimeout(function () {
+                    _this.onTimer();
+                }, 1000);
+                this.activationSource.addClass("active");
+            };
+
+            FormHeaderSessionExpired.prototype.close = function () {
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500
+                });
+                this.activationSource.removeClass("active");
+            };
+            return FormHeaderSessionExpired;
+        })(CZ.UI.FormBase);
+        UI.FormHeaderSessionExpired = FormHeaderSessionExpired;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormMediaPicker = (function (_super) {
+            __extends(FormMediaPicker, _super);
+            function FormMediaPicker(container, mediaPickerContainer, title, formInfo) {
+                _super.call(this, container, formInfo);
+
+                this.titleTextblock.text(title);
+                this.contentContainer.append(mediaPickerContainer);
+                $(this).off();
+            }
+            FormMediaPicker.prototype.show = function () {
+                var _this = this;
+                _super.prototype.show.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        $(_this).trigger("showcompleted");
+                    }
+                });
+
+                this.activationSource.addClass("active");
+            };
+
+            FormMediaPicker.prototype.close = function () {
+                var _this = this;
+                _super.prototype.close.call(this, {
+                    effect: "slide",
+                    direction: "left",
+                    duration: 500,
+                    complete: function () {
+                        $(_this).trigger("closecompleted");
+                    }
+                });
+
+                this.activationSource.removeClass("active");
+            };
+            return FormMediaPicker;
+        })(CZ.UI.FormBase);
+        UI.FormMediaPicker = FormMediaPicker;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -816,6 +9305,1798 @@ var CZ;
         }
     })(CZ.Extensions || (CZ.Extensions = {}));
     var Extensions = CZ.Extensions;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (StartPage) {
+        var _isRegimesVisible;
+
+        StartPage.tileData = [
+            {
+                "Idx": 0,
+                "Title": "Big History is my favorite course ever",
+                "Thumbnail": "../images/dummy/tile_bighistory.jpg",
+                "Author": "Some Author",
+                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999998954347&y=-0.46459331778482354&w=3.841695822797034e-12&h=3.7430627449314544e-12"
+            },
+            {
+                "Idx": 1,
+                "Title": "CERN is my favorite course ever",
+                "Thumbnail": "../images/dummy/tile_cern.jpg",
+                "Author": "Some Author",
+                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999192440875&y=-0.4645933209201501&w=3.729306137185042e-11&h=3.633558592459924e-11"
+            },
+            {
+                "Idx": 2,
+                "Title": "Earth Science is my favorite course ever",
+                "Thumbnail": "../images/dummy/tile_earthscience.jpg",
+                "Author": "Some Author",
+                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999988061194&y=-0.46459331795948755&w=4.546120315559252e-12&h=4.4294015903520115e-12"
+            },
+            {
+                "Idx": 3,
+                "Title": "King Tut is my favorite course ever",
+                "Thumbnail": "../images/dummy/tile_kingtut.jpg",
+                "Author": "Some Author",
+                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999967062717304&y=-0.4645931999741229&w=3.5221148563086766e-10&h=3.4316868149181225e-10"
+            },
+            {
+                "Idx": 4,
+                "Title": "Napoleon is my favorite course ever",
+                "Thumbnail": "../images/dummy/tile_napoleon.jpg",
+                "Author": "Some Author",
+                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999840411981&y=-0.46459346560505227&w=5.935054278147061e-10&h=5.782675563705605e-10"
+            },
+            {
+                "Idx": 5,
+                "Title": "World War I is my favorite course ever",
+                "Thumbnail": "../images/dummy/tile_ww1.jpg",
+                "Author": "Some Author",
+                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999485392826&y=-0.4645933221621095&w=3.314938789411939e-12&h=3.229829860746773e-12"
+            },
+            {
+                "Idx": 6,
+                "Title": "Coluseum is my favorite course ever",
+                "Thumbnail": "../images/dummy/tile_colosseum.jpg",
+                "Author": "Some Author",
+                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999988732590944&y=-0.4645934478931077&w=1.0069124184819225e-9&h=9.810605875309654e-10"
+            },
+            {
+                "Idx": 7,
+                "Title": "Justin Morrill is my favorite course ever",
+                "Thumbnail": "../images/dummy/tile_justin_morrill.jpg",
+                "Author": "Some Author",
+                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999897945675&y=-0.46459338150077905&w=1.9362194151655837e-10&h=1.8865082227261387e-10"
+            },
+            {
+                "Idx": 8,
+                "Title": "Big History 2 is my favorite course ever",
+                "Thumbnail": "../images/dummy/tile_bighistory.jpg",
+                "Author": "Some Author",
+                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4996898109169686&y=-0.46442779133805834&w=0.0007080832576286593&h=0.0006899036738441856"
+            }
+        ];
+
+        StartPage.tileLayout = [
+            {
+                "Name": "#combo0-icons",
+                "Visibility": [
+                    "box",
+                    "box",
+                    "box ex3",
+                    "box ex3 ex4",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
+                ]
+            },
+            {
+                "Name": "#FeaturedTimelinesBlock-tiles",
+                "Visibility": [
+                    "box",
+                    "box",
+                    "box ex3",
+                    "box ex3 ex4",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
+                ]
+            },
+            {
+                "Name": "#TwitterBlock-tiles",
+                "Visibility": [
+                    "box",
+                    "box",
+                    "box ex3",
+                    "box ex3 ex4",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
+                ]
+            },
+            {
+                "Name": "#FavoriteTimelinesBlock-tiles",
+                "Visibility": [
+                    "box",
+                    "box",
+                    "box ex3",
+                    "box ex3 ex4",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6"
+                ]
+            },
+            {
+                "Name": "#MyTimelinesBlock-tiles",
+                "Visibility": [
+                    "box",
+                    "box",
+                    "box ex3",
+                    "box ex3 ex4",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
+                ]
+            }
+        ];
+
+        function resizeCrop($image, imageProps, isListView) {
+            var $startPage = $("#start-page");
+
+            var width = $image.parent().width();
+            var height = $image.parent().height();
+
+            if (isListView) {
+                width = $image.width();
+                height = $image.height();
+            }
+
+            if (!$startPage.is(":visible")) {
+                $startPage.show();
+                width = $image.width();
+                height = $image.height();
+                $startPage.hide();
+            }
+
+            var naturalHeight = imageProps.naturalHeight;
+            var naturalWidth = imageProps.naturalWidth;
+            var ratio = naturalWidth / naturalHeight;
+            var marginTop = 0;
+            var marginLeft = 0;
+
+            if (naturalWidth > naturalHeight) {
+                $image.height(height);
+                $image.width(height * ratio);
+                marginLeft = ($image.width() - width) / 2;
+            } else if (naturalWidth < naturalHeight) {
+                $image.width(width);
+                $image.height(width / ratio);
+                marginTop = ($image.height() - height) / 2;
+            } else {
+                $image.width(width);
+                $image.height(height);
+            }
+
+            $image.css({
+                "margin-top": -marginTop + "px",
+                "margin-left": -marginLeft + "px"
+            });
+        }
+
+        function cloneTileTemplate(template, target, idx) {
+            for (var i = 0; i < target[idx].Visibility.length; i++) {
+                var o = $(template).clone(true, true).appendTo(target[idx].Name);
+                o.attr("class", target[idx].Visibility[i]);
+                o.attr("id", "t" + idx + "i" + i);
+                $("#t" + idx + "i" + i + " .boxInner .tile-photo img").attr("src", StartPage.tileData[i].Thumbnail).attr("alt", StartPage.tileData[i].Title);
+                $("#t" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-title").text(StartPage.tileData[i].Title);
+                $("#t" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-author").text(StartPage.tileData[i].Author);
+            }
+        }
+        StartPage.cloneTileTemplate = cloneTileTemplate;
+
+        function cloneListTemplate(template, target, idx) {
+            for (var i = 0; i < StartPage.tileData.length; i++) {
+                var o = $(template).clone(true, true).appendTo(target);
+                o.attr("id", "l" + idx + "i" + i);
+                $("#l" + idx + "i" + i + " .li-title a").attr("href", StartPage.tileData[i].URL);
+                $("#l" + idx + "i" + i + " .li-title a").text(StartPage.tileData[i].Title);
+                $("#l" + idx + "i" + i + " .li-author").text(StartPage.tileData[i].Author);
+                $("#l" + idx + "i" + i + " .li-icon").text(StartPage.tileData[i].Thumbnail);
+            }
+        }
+        StartPage.cloneListTemplate = cloneListTemplate;
+
+        function cloneTweetTemplate(template, target, idx) {
+            for (var i = 0; i < target[idx].Visibility.length; i++) {
+                var o = $(template).clone(true, true).appendTo(target[idx].Name);
+                o.attr("class", target[idx].Visibility[i]);
+                o.attr("id", "m" + idx + "i" + i);
+            }
+        }
+        StartPage.cloneTweetTemplate = cloneTweetTemplate;
+
+        function PlayIntroTour() {
+            var introTour = CZ.Tours.tours[0];
+
+            if (typeof introTour === "undefined") {
+                return false;
+            }
+
+            CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
+                activationSource: $(".tour-icon"),
+                navButton: ".cz-form-nav",
+                closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
+                titleTextblock: ".cz-tour-form-title",
+                contentContainer: ".cz-form-content",
+                minButton: ".cz-tour-form-min-btn > .cz-form-btn",
+                captionTextarea: ".cz-form-tour-caption",
+                tourPlayerContainer: ".cz-form-tour-player",
+                bookmarksCount: ".cz-form-tour-bookmarks-count",
+                narrationToggle: ".cz-toggle-narration",
+                context: introTour
+            });
+
+            CZ.Tours.tourCaptionForm.show();
+            CZ.Tours.activateTour(introTour, undefined);
+        }
+        StartPage.PlayIntroTour = PlayIntroTour;
+
+        function listFlip(name) {
+            if ('block' != document.getElementById(name + '-list').style.display) {
+                document.getElementById(name + '-list').style.display = 'block';
+                document.getElementById(name + '-tiles').style.display = 'none';
+                $("#" + name).find(".list-view-icon").addClass("active");
+            } else {
+                document.getElementById(name + '-list').style.display = 'none';
+                document.getElementById(name + '-tiles').style.display = 'block';
+                $("#" + name).find(".list-view-icon").removeClass("active");
+                $(window).resize();
+            }
+        }
+        StartPage.listFlip = listFlip;
+
+        function fillFeaturedTimelines(timelines) {
+            var $template = $("#template-tile .box");
+            var layout = CZ.StartPage.tileLayout[1];
+
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+                var $startPage = $("#start-page");
+                var $tile = $template.clone(true, true);
+                var $tileImage = $tile.find(".boxInner .tile-photo img");
+                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
+                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
+
+                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                }).invisible();
+
+                $tileImage.load($tile, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    resizeCrop($this, imageProps);
+
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
+                    });
+
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
+                $tileAuthor.text(timeline.Author);
+            }
+        }
+        StartPage.fillFeaturedTimelines = fillFeaturedTimelines;
+
+        function fillFeaturedTimelinesList(timelines) {
+            var template = "#template-timeline-list .timeline-list-item";
+            var target = "#FeaturedTimelinesBlock-list";
+
+            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+
+                var $timelineListItem = $(template).clone(true, true).appendTo(target);
+                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
+
+                var Name = "featured-list-elem" + i;
+                var idx = 1;
+
+                $timelineListItem.attr("id", "l" + idx + "i" + i);
+                $timelineListItem.click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                });
+
+                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
+                $timelineListItem.attr("data-author", timeline.Author);
+
+                $timelineListItemImage.load($timelineListItemImage, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    resizeCrop($this, imageProps, true);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+            }
+        }
+        StartPage.fillFeaturedTimelinesList = fillFeaturedTimelinesList;
+
+        function fillFavoriteTimelines(timelines) {
+            var $template = $("#template-tile .box");
+            var layout = CZ.StartPage.tileLayout[3];
+
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+                var $startPage = $("#start-page");
+                var $tile = $template.clone(true, true);
+                var $tileImage = $tile.find(".boxInner .tile-photo img");
+                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
+                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
+
+                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "favorite" + i).click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                }).invisible();
+
+                $tileImage.load($tile, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    resizeCrop($this, imageProps);
+
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
+                    });
+
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
+                $tileAuthor.text(timeline.Author);
+            }
+        }
+        StartPage.fillFavoriteTimelines = fillFavoriteTimelines;
+
+        function fillFavoriteTimelinesList(timelines) {
+            var template = "#template-timeline-list .timeline-list-item";
+            var target = "#FavoriteTimelinesBlock-list";
+
+            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+
+                var $timelineListItem = $(template).clone(true, true).appendTo(target);
+                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
+
+                var Name = "favorite-list-elem" + i;
+                var idx = 1;
+
+                $timelineListItem.attr("id", "lfav" + idx + "i" + i);
+                $timelineListItem.click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                });
+
+                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
+                $timelineListItem.attr("data-author", timeline.Author);
+
+                $timelineListItemImage.load($timelineListItemImage, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    resizeCrop($this, imageProps, true);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+            }
+        }
+        StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
+
+        function fillMyTimelines(timelines) {
+            var $template = $("#template-tile .box");
+            var layout = CZ.StartPage.tileLayout[4];
+            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+                var $startPage = $("#start-page");
+                var $tile = $template.clone(true, true);
+                var $tileImage = $tile.find(".boxInner .tile-photo img");
+                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
+                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
+
+                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "my" + i).click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                }).invisible();
+
+                $tileImage.load($tile, function (event) {
+                    var $this = $(this);
+                    $tileImage.show();
+                    var imageProps = event.target || event.srcElement;
+                    $tileImage.hide();
+
+                    resizeCrop($this, imageProps);
+                    $tileImage.show();
+
+                    $(window).resize({
+                        $image: $this,
+                        imageProps: imageProps
+                    }, function (event) {
+                        resizeCrop(event.data.$image, event.data.imageProps);
+                    });
+
+                    setTimeout(function () {
+                        event.data.visible();
+                    }, 0);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+
+                $tileTitle.text(timeline.Title.trim() || "No title :(");
+                $tileAuthor.text(timeline.Author);
+            }
+        }
+        StartPage.fillMyTimelines = fillMyTimelines;
+
+        function fillMyTimelinesList(timelines) {
+            var template = "#template-timeline-list .timeline-list-item";
+            var target = "#MyTimelinesBlock-list";
+
+            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
+                var timeline = timelines[i];
+                var timelineUrl = timeline.TimelineUrl;
+
+                var $timelineListItem = $(template).clone(true, true).appendTo(target);
+                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
+
+                var Name = "favorite-list-elem" + i;
+                var idx = 1;
+
+                $timelineListItem.attr("id", "lmy" + idx + "i" + i);
+                $timelineListItem.click(timelineUrl, function (event) {
+                    window.location.href = event.data;
+                    hide();
+                });
+
+                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
+                $timelineListItem.attr("data-author", timeline.Author);
+
+                $timelineListItemImage.load($timelineListItemImage, function (event) {
+                    var $this = $(this);
+                    var imageProps = event.target || event.srcElement;
+
+                    resizeCrop($this, imageProps, true);
+                }).attr({
+                    src: timeline.ImageUrl,
+                    alt: timeline.Title
+                });
+            }
+        }
+        StartPage.fillMyTimelinesList = fillMyTimelinesList;
+
+        function TwitterLayout(target, idx) {
+            var ListTemplate = "#template-tweet-list .tweet-list-item";
+            var ListElem = "#TwitterBlock-list";
+
+            CZ.Service.getRecentTweets().done(function (response) {
+                for (var i = 0, len = response.d.length; i < len; ++i) {
+                    var tweet = response.d[i];
+                    var text = tweet.Text;
+                    var fullname = tweet.User.Name;
+                    var username = tweet.User.ScreenName;
+                    var photo = tweet.User.ProfileImageUrl;
+                    var time = tweet.CreatedDate;
+                    var myDate = new Date(time.match(/\d+/)[0] * 1);
+                    var convertedDate = myDate.getDate() + "." + myDate.getMonth() + "." + myDate.getFullYear();
+
+                    var tweetUsernameLink = "https://twitter.com/" + username;
+                    var tweetLink = "https://twitter.com/" + username + "/statuses/" + tweet.IdStr;
+
+                    var $tweetTile = $("#m" + idx + "i" + i);
+                    var $tweetTileMeta = $tweetTile.find(".boxInner .tweet-meta");
+                    var $tileMessage = $tweetTileMeta.find(".tweet-meta-text");
+                    var $tileFullname = $tweetTileMeta.find(".tweet-meta-title");
+                    var $tileUsername = $tweetTileMeta.find(".tweet-meta-author");
+                    var $tileAvatar = $tweetTileMeta.find(".tweet-avatar-icon");
+                    var $tileDate = $tweetTileMeta.find(".tile-meta-time");
+
+                    $tweetTileMeta.invisible(true);
+                    $tileAvatar.load($tweetTileMeta, function (event) {
+                        event.data.visible();
+                    });
+
+                    text = text.replace(/(@([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
+                        href='https://twitter.com/$2'>$1</a>");
+
+                    text = text.replace(/(#([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
+                        href='https://twitter.com/search?q=$2&f=realtime'>$1</a>");
+
+                    $tileMessage.html(text).attr("href", tweetLink);
+                    $tileUsername.text("@" + username).attr("href", tweetUsernameLink);
+                    $tileFullname.text(fullname);
+                    $tileDate.text(convertedDate);
+
+                    $tileAvatar.attr("src", photo);
+
+                    var $tweetListItem = $(ListTemplate).clone(true, true).appendTo(ListElem);
+                    var $listItemMessage = $tweetListItem.find(".tweet-li-message");
+                    var $listItemUsername = $tweetListItem.find(".tweet-li-header .tweet-li-username");
+                    var $listItemFullname = $tweetListItem.find(".tweet-li-header .tweet-li-fullname");
+                    var $listItemAvatar = $tweetListItem.find(".tweet-li-header .tweet-li-avatar");
+                    var $listItemDate = $tweetListItem.find(".tweet-li-footer .tweet-li-date");
+
+                    $tweetListItem.attr("id", "l" + idx + "i" + i);
+                    $listItemMessage.html(text).attr("href", tweetLink);
+                    $listItemUsername.text("@" + username).attr("href", tweetUsernameLink);
+                    $listItemFullname.text(fullname);
+                    $listItemDate.text(convertedDate);
+                    $listItemAvatar.attr("src", photo);
+
+                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
+                        watch: "window"
+                    });
+                }
+            });
+        }
+        StartPage.TwitterLayout = TwitterLayout;
+
+        function show() {
+            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
+            $(".home-icon").addClass("active");
+
+            $disabledButtons.attr("disabled", "disabled").each(function (i, el) {
+                var events = $(el).data("events");
+                $(el).data("onclick", events && events.click && events.click[0]);
+            }).off();
+
+            $(".header-regimes").invisible();
+
+            $(".header-breadcrumbs").invisible();
+
+            CZ.HomePageViewModel.closeAllForms();
+
+            $("#start-page").fadeIn();
+        }
+        StartPage.show = show;
+
+        function compareTimelineTitles(first, second) {
+            if (first.Title.charAt(0) < second.Title.charAt(0))
+                return -1;
+            else if (first.Title.charAt(0) > second.Title.charAt(0))
+                return 1;
+            else
+                return 0;
+        }
+
+        function hide() {
+            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
+            $(".home-icon").removeClass("active");
+
+            $disabledButtons.removeAttr("disabled").each(function (i, el) {
+                $(el).click($(el).data("onclick"));
+            });
+
+            if (_isRegimesVisible) {
+                $(".header-regimes").visible();
+            }
+
+            $(".header-breadcrumbs").visible();
+
+            $("#start-page").fadeOut();
+        }
+        StartPage.hide = hide;
+
+        function initialize() {
+            _isRegimesVisible = $(".header-regimes").is(":visible");
+
+            $(".home-icon").click(function () {
+                if ($("#start-page").is(":visible")) {
+                    hide();
+                } else {
+                    show();
+                }
+            });
+
+            CZ.Service.getUserFeatured().done(function (response) {
+                var timelines = response ? response.reverse() : [];
+
+                timelines.sort(compareTimelineTitles);
+
+                fillFeaturedTimelines(timelines);
+                fillFeaturedTimelinesList(timelines);
+            });
+
+            CZ.Service.getUserFavorites().then(function (response) {
+                var timelines = response ? response.reverse() : [];
+
+                timelines.sort(compareTimelineTitles);
+
+                timelines.forEach(function (timeline) {
+                    CZ.Settings.favoriteTimelines.push(timeline.TimelineUrl.split("/").pop().slice(1));
+                });
+
+                if (timelines.length === 0) {
+                    $("#FavoriteTimelinesBlock .list-view-icon").hide();
+                    $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." + " Click star icon of the timeline you like to save it as favorite.");
+                } else {
+                    fillFavoriteTimelines(timelines);
+                    fillFavoriteTimelinesList(timelines);
+                }
+            }, function (error) {
+                console.log("[ERROR] getUserFavorites");
+            });
+
+            CZ.Service.getProfile().done(function (data) {
+                if ((data !== "") && (data.DisplayName !== null)) {
+                    CZ.Settings.userSuperCollectionName = data.DisplayName;
+                    CZ.Settings.userCollectionName = data.DisplayName;
+                }
+                CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(function (response) {
+                    var timelines = response ? response.reverse() : [];
+                    fillMyTimelines(timelines);
+                    fillMyTimelinesList(timelines);
+                }, function (error) {
+                    console.log("[ERROR] getUserTimelines");
+                });
+            });
+
+            CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
+            CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
+
+            var hash = CZ.UrlNav.getURL().hash;
+            if ((!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) && !CZ.Service.superCollectionName) {
+                show();
+            }
+        }
+        StartPage.initialize = initialize;
+    })(CZ.StartPage || (CZ.StartPage = {}));
+    var StartPage = CZ.StartPage;
+})(CZ || (CZ = {}));
+(function ($) {
+    $.fn.showError = function (msg, className, props) {
+        className = className || "error";
+        props = props || {};
+
+        $.extend(true, props, {
+            class: className,
+            text: msg
+        });
+
+        var $errorTemplate = $("<div></div>", props).attr("error", true);
+        var $allErrors = $();
+        var $errorElems = $();
+
+        var result = this.each(function () {
+            var $this = $(this);
+            var isDiv;
+            var $div;
+            var $error;
+
+            if (!$this.data("error")) {
+                isDiv = $this.is("div");
+                $div = isDiv ? $this : $this.closest("div");
+                $error = $errorTemplate.clone();
+
+                $allErrors = $allErrors.add($error);
+
+                $errorElems = $errorElems.add($this);
+                $errorElems = $errorElems.add($div);
+                $errorElems = $errorElems.add($div.children());
+                $this.data("error", $error);
+
+                if (isDiv) {
+                    $div.append($error);
+                } else {
+                    $this.after($error);
+                }
+            }
+        });
+
+        if ($allErrors.length > 0) {
+            $errorElems.addClass(className);
+            $allErrors.slideDown(CZ.Settings.errorMessageSlideDuration);
+        }
+
+        return result;
+    };
+
+    $.fn.hideError = function () {
+        var $allErrors = $();
+        var $errorElems = $();
+        var classes = "";
+
+        var result = this.each(function () {
+            var $this = $(this);
+            var $error = $this.data("error");
+            var $div;
+            var className;
+
+            if ($error) {
+                $div = $this.is("div") ? $this : $this.closest("div");
+                className = $error.attr("class");
+
+                if (classes.split(" ").indexOf(className) === -1) {
+                    classes += " " + className;
+                }
+
+                $allErrors = $allErrors.add($error);
+
+                $errorElems = $errorElems.add($this);
+                $errorElems = $errorElems.add($div);
+                $errorElems = $errorElems.add($div.children());
+            }
+        });
+
+        if ($allErrors.length > 0) {
+            $allErrors.slideUp(CZ.Settings.errorMessageSlideDuration).promise().done(function () {
+                $allErrors.remove();
+                $errorElems.removeData("error");
+                $errorElems.removeClass(classes);
+            });
+        }
+
+        return result;
+    };
+})(jQuery);
+(function ($) {
+    $.fn.visible = function (noTransition) {
+        return this.each(function () {
+            var $this = $(this);
+            if (noTransition) {
+                $this.addClass("no-transition");
+            } else {
+                $this.removeClass("no-transition");
+            }
+            $this.css({
+                opacity: 1,
+                visibility: "visible"
+            });
+        });
+    };
+
+    $.fn.invisible = function (noTransition) {
+        return this.each(function () {
+            var $this = $(this);
+            if (noTransition) {
+                $this.addClass("no-transition");
+            } else {
+                $this.removeClass("no-transition");
+            }
+            $this.css({
+                opacity: 0,
+                visibility: "hidden"
+            });
+        });
+    };
+})(jQuery);
+var constants;
+
+var CZ;
+(function (CZ) {
+    CZ.timeSeriesChart;
+    CZ.leftDataSet;
+    CZ.rightDataSet;
+
+    (function (HomePageViewModel) {
+        var _uiMap = {
+            "#header-edit-form": "/ui/header-edit-form.html",
+            "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
+            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
+            "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
+            "$('<div></div>')": "/ui/contentitem-listbox.html",
+            "#profile-form": "/ui/header-edit-profile-form.html",
+            "#login-form": "/ui/header-login-form.html",
+            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
+            "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
+            "#toursList": "/ui/tourslist-form.html",
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
+            "#message-window": "/ui/message-window.html",
+            "#header-search-form": "/ui/header-search-form.html",
+            "#header-session-expired-form": "/ui/header-session-expired-form.html",
+            "#tour-caption-form": "/ui/tour-caption-form.html",
+            "#mediapicker-form": "/ui/mediapicker-form.html",
+            "#start-page": "/ui/start-page.html",
+            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html"
+        };
+
+        (function (FeatureActivation) {
+            FeatureActivation[FeatureActivation["Enabled"] = 0] = "Enabled";
+            FeatureActivation[FeatureActivation["Disabled"] = 1] = "Disabled";
+            FeatureActivation[FeatureActivation["RootCollection"] = 2] = "RootCollection";
+            FeatureActivation[FeatureActivation["NotRootCollection"] = 3] = "NotRootCollection";
+            FeatureActivation[FeatureActivation["NotProduction"] = 4] = "NotProduction";
+        })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
+        var FeatureActivation = HomePageViewModel.FeatureActivation;
+
+        HomePageViewModel.sessionForm;
+
+        var _featureMap = [
+            {
+                Name: "Login",
+                Activation: 0 /* Enabled */,
+                JQueryReference: "#login-panel"
+            },
+            {
+                Name: "Search",
+                Activation: 0 /* Enabled */,
+                JQueryReference: "#search-button"
+            },
+            {
+                Name: "Tours",
+                Activation: 0 /* Enabled */,
+                JQueryReference: "#tours-index"
+            },
+            {
+                Name: "Authoring",
+                Activation: 0 /* Enabled */,
+                JQueryReference: ".header-icon.edit-icon"
+            },
+            {
+                Name: "TourAuthoring",
+                Activation: 0 /* Enabled */,
+                JQueryReference: ".cz-form-create-tour"
+            },
+            {
+                Name: "WelcomeScreen",
+                Activation: 2 /* RootCollection */,
+                JQueryReference: "#welcomeScreenBack"
+            },
+            {
+                Name: "Regimes",
+                Activation: 2 /* RootCollection */,
+                JQueryReference: ".header-regimes"
+            },
+            {
+                Name: "TimeSeries",
+                Activation: 0 /* Enabled */
+            },
+            {
+                Name: "ManageCollections",
+                Activation: 1 /* Disabled */,
+                JQueryReference: "#collections_button"
+            },
+            {
+                Name: "BreadCrumbs",
+                Activation: 0 /* Enabled */,
+                JQueryReference: ".header-breadcrumbs"
+            },
+            {
+                Name: "Skydrive",
+                Activation: 0 /* Enabled */
+            },
+            {
+                Name: "StartPage",
+                Activation: 0 /* Enabled */,
+                JQueryReference: ".header-icon.home-icon"
+            },
+            {
+                Name: "CollectionsAuthoring",
+                Activation: 0 /* Enabled */
+            }
+        ];
+
+        HomePageViewModel.rootCollection;
+
+        function UserCanEditCollection(profile) {
+            if (!constants || !constants.environment || constants.environment === "localhost") {
+                return true;
+            }
+
+            if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
+                return true;
+            }
+
+            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function InitializeToursUI(profile, forms) {
+            CZ.Tours.tourCaptionFormContainer = forms[16];
+            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+
+            var onTakeTour = function (tour) {
+                CZ.HomePageViewModel.closeAllForms();
+                CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
+                    activationSource: $(".tour-icon"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-tour-form-title",
+                    contentContainer: ".cz-form-content",
+                    minButton: ".cz-tour-form-min-btn > .cz-form-btn",
+                    captionTextarea: ".cz-form-tour-caption",
+                    tourPlayerContainer: ".cz-form-tour-player",
+                    bookmarksCount: ".cz-form-tour-bookmarks-count",
+                    narrationToggle: ".cz-toggle-narration",
+                    context: tour
+                });
+                CZ.Tours.tourCaptionForm.show();
+
+                CZ.Tours.removeActiveTour();
+                CZ.Tours.activateTour(tour, undefined);
+            };
+
+            var onToursInitialized = function () {
+                $("#tours_index").click(function () {
+                    var toursListForm = getFormById("#toursList");
+                    console.log("toursListForm", toursListForm);
+                    if (toursListForm.isFormVisible) {
+                        toursListForm.close();
+                    } else {
+                        if (!$("#start-page").is(":visible")) {
+                            closeAllForms();
+                            var form = new CZ.UI.FormToursList(forms[9], {
+                                activationSource: $(this),
+                                navButton: ".cz-form-nav",
+                                closeButton: ".cz-form-close-btn > .cz-form-btn",
+                                titleTextblock: ".cz-form-title",
+                                tourTemplate: forms[10],
+                                tours: CZ.Tours.tours,
+                                takeTour: onTakeTour,
+                                editTour: allowEditing ? function (tour) {
+                                    if (CZ.Authoring.showEditTourForm)
+                                        CZ.Authoring.showEditTourForm(tour);
+                                } : null,
+                                createTour: ".cz-form-create-tour"
+                            });
+                            form.show();
+                        }
+                    }
+                });
+            };
+            if (CZ.Tours.tours)
+                onToursInitialized();
+            else
+                $("body").bind("toursInitialized", onToursInitialized);
+        }
+
+        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
+
+        $(document).ready(function () {
+            window.console = window.console || (function () {
+                var c = {};
+                c.log = c.warn = c.debug = c.info = c.log = c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () {
+                };
+                return c;
+            })();
+
+            $('.bubbleInfo').hide();
+
+            var url = CZ.UrlNav.getURL();
+            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
+            CZ.Service.superCollectionName = url.superCollectionName;
+            CZ.Service.collectionName = url.collectionName;
+            CZ.Common.initialContent = url.content;
+
+            ApplyFeatureActivation();
+
+            CZ.Extensions.registerExtensions();
+
+            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
+            CZ.Media.initialize();
+
+            CZ.Common.initialize();
+            CZ.UILoader.loadAll(_uiMap).done(function () {
+                var forms = arguments;
+
+                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
+
+                $('#timeSeries_button').click(function () {
+                    var tsForm = getFormById('#timeSeriesDataForm');
+                    if (tsForm === false) {
+                        closeAllForms();
+
+                        var timSeriesDataFormDiv = forms[12];
+                        var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
+                            activationSource: $("#timeSeries_button"),
+                            closeButton: ".cz-form-close-btn > .cz-form-btn"
+                        });
+                        timSeriesDataForm.show();
+                    } else {
+                        if (tsForm.isFormVisible) {
+                            tsForm.close();
+                        } else {
+                            closeAllForms();
+                            tsForm.show();
+                        }
+                    }
+                });
+
+                $(".header-icon.edit-icon").click(function () {
+                    var editForm = getFormById("#header-edit-form");
+                    if (editForm === false) {
+                        closeAllForms();
+                        var form = new CZ.UI.FormHeaderEdit(forms[0], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            createTimeline: ".cz-form-create-timeline",
+                            createExhibit: ".cz-form-create-exhibit",
+                            createTour: ".cz-form-create-tour"
+                        });
+                        form.show();
+                        ApplyFeatureActivation();
+                    } else {
+                        if (editForm.isFormVisible) {
+                            editForm.close();
+                        } else {
+                            closeAllForms();
+                            editForm.show();
+                        }
+                    }
+                });
+
+                $(".header-icon.search-icon").click(function () {
+                    var searchForm = getFormById("#header-search-form");
+                    if (searchForm === false) {
+                        closeAllForms();
+                        var form = new CZ.UI.FormHeaderSearch(forms[14], {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            searchTextbox: ".cz-form-search-input",
+                            searchResultsBox: ".cz-form-search-results",
+                            progressBar: ".cz-form-progress-bar",
+                            resultSections: ".cz-form-search-results > .cz-form-search-section",
+                            resultsCountTextblock: ".cz-form-search-results-count"
+                        });
+                        form.show();
+                    } else {
+                        if (searchForm.isFormVisible) {
+                            searchForm.close();
+                        } else {
+                            closeAllForms();
+                            searchForm.show();
+                        }
+                    }
+                });
+
+                $("#editCollectionButton").click(function () {
+                    closeAllForms();
+                    var form = new CZ.UI.FormEditCollection(forms[19], {
+                        activationSource: $(".header-icon.edit-icon"),
+                        navButton: ".cz-form-nav",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        titleTextblock: ".cz-form-title",
+                        saveButton: ".cz-form-save",
+                        collectionTheme: CZ.Settings.theme,
+                        backgroundInput: $(".cz-form-collection-background"),
+                        kioskmodeInput: $(".cz-form-collection-kioskmode"),
+                        mediaListContainer: ".cz-form-medialist",
+                        timelineBackgroundColorInput: $(".cz-form-timeline-background"),
+                        timelineBackgroundOpacityInput: $(".cz-form-timeline-background-opacity"),
+                        timelineBorderColorInput: $(".cz-form-timeline-border"),
+                        exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
+                        exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
+                        exhibitBorderColorInput: $(".cz-form-exhibit-border")
+                    });
+                    form.show();
+                });
+
+                CZ.Authoring.initialize(CZ.Common.vc, {
+                    showMessageWindow: function (message, title, onClose) {
+                        var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
+                        if (onClose)
+                            wnd.container.bind("close", function () {
+                                wnd.container.unbind("close", onClose);
+                                onClose();
+                            });
+                        wnd.show();
+                    },
+                    hideMessageWindow: function () {
+                        var wnd = forms[13].data("form");
+                        if (wnd)
+                            wnd.close();
+                    },
+                    showEditTourForm: function (tour) {
+                        CZ.Tours.removeActiveTour();
+                        var form = new CZ.UI.FormEditTour(forms[7], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            addStopButton: ".cz-form-tour-addstop",
+                            titleInput: ".cz-form-title",
+                            tourStopsListBox: "#stopsList",
+                            tourStopsTemplate: forms[8],
+                            context: tour
+                        });
+                        form.show();
+                    },
+                    showCreateTimelineForm: function (timeline) {
+                        CZ.Authoring.hideMessageWindow();
+                        CZ.Authoring.mode = "createTimeline";
+                        var form = new CZ.UI.FormEditTimeline(forms[1], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            startDate: ".cz-form-time-start",
+                            endDate: ".cz-form-time-end",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
+                            context: timeline
+                        });
+                        form.show();
+                    },
+                    showCreateRootTimelineForm: function (timeline) {
+                        CZ.Authoring.mode = "createRootTimeline";
+                        var form = new CZ.UI.FormEditTimeline(forms[1], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            startDate: ".cz-form-time-start",
+                            endDate: ".cz-form-time-end",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
+                            context: timeline
+                        });
+                        form.show();
+                    },
+                    showEditTimelineForm: function (timeline) {
+                        var form = new CZ.UI.FormEditTimeline(forms[1], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            startDate: ".cz-form-time-start",
+                            endDate: ".cz-form-time-end",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            titleInput: ".cz-form-item-title",
+                            errorMessage: "#error-edit-timeline",
+                            context: timeline
+                        });
+                        form.show();
+                    },
+                    showCreateExhibitForm: function (exhibit) {
+                        CZ.Authoring.hideMessageWindow();
+                        var form = new CZ.UI.FormEditExhibit(forms[2], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            titleInput: ".cz-form-item-title",
+                            datePicker: ".cz-form-time",
+                            createArtifactButton: ".cz-form-create-artifact",
+                            contentItemsListBox: ".cz-listbox",
+                            errorMessage: ".cz-form-errormsg",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            contentItemsTemplate: forms[4],
+                            context: exhibit
+                        });
+                        form.show();
+                    },
+                    showEditExhibitForm: function (exhibit) {
+                        var form = new CZ.UI.FormEditExhibit(forms[2], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            titleInput: ".cz-form-item-title",
+                            datePicker: ".cz-form-time",
+                            createArtifactButton: ".cz-form-create-artifact",
+                            contentItemsListBox: ".cz-listbox",
+                            errorMessage: ".cz-form-errormsg",
+                            saveButton: ".cz-form-save",
+                            deleteButton: ".cz-form-delete",
+                            contentItemsTemplate: forms[4],
+                            context: exhibit
+                        });
+                        form.show();
+                    },
+                    showEditContentItemForm: function (ci, e, prevForm, noAnimation) {
+                        var form = new CZ.UI.FormEditCI(forms[3], {
+                            activationSource: $(".header-icon.edit-icon"),
+                            prevForm: prevForm,
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            errorMessage: ".cz-form-errormsg",
+                            saveButton: ".cz-form-save",
+                            titleInput: ".cz-form-item-title",
+                            mediaSourceInput: ".cz-form-item-mediasource",
+                            mediaInput: ".cz-form-item-mediaurl",
+                            descriptionInput: ".cz-form-item-descr",
+                            attributionInput: ".cz-form-item-attribution",
+                            mediaTypeInput: ".cz-form-item-media-type",
+                            mediaListContainer: ".cz-form-medialist",
+                            context: {
+                                exhibit: e,
+                                contentItem: ci
+                            }
+                        });
+                        form.show(noAnimation);
+                    }
+                });
+
+                HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
+                    activationSource: $("#header-session-expired-form"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: "",
+                    sessionTimeSpan: "#session-time",
+                    sessionButton: "#session-button"
+                });
+
+                CZ.Service.getProfile().done(function (data) {
+                    if (data != "") {
+                        CZ.Settings.isAuthorized = true;
+                        CZ.Authoring.timer = setTimeout(function () {
+                            CZ.Authoring.showSessionForm();
+                        }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+
+                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
+                }).fail(function (error) {
+                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
+                }).always(function () {
+                    if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
+                        $(".edit-icon").hide();
+                        $("#WelcomeBlock").attr("data-toggle", "show");
+                        $("#TwitterBlock").attr("data-toggle", "show");
+                    } else {
+                        $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
+                        $("#MyTimelinesBlock").attr("data-toggle", "show");
+                    }
+
+                    if (CZ.Authoring.isEnabled && IsFeatureEnabled(_featureMap, "CollectionsAuthoring")) {
+                        $("#editCollectionButton").show();
+                    }
+
+                    CZ.Common.loadData().then(function (response) {
+                        if (!response) {
+                            if (CZ.Authoring.isEnabled) {
+                                if (CZ.Authoring.showCreateRootTimelineForm) {
+                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
+                                }
+                            } else {
+                                CZ.Authoring.showMessageWindow("Looks like this collection is empty. Come back later when author will fill it with content.", "Collection is empty :(");
+                            }
+                        }
+                    });
+                });
+
+                var profileForm = new CZ.UI.FormEditProfile(forms[5], {
+                    activationSource: $("#login-panel"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    saveButton: "#cz-form-save",
+                    logoutButton: "#cz-form-logout",
+                    titleInput: ".cz-form-item-title",
+                    usernameInput: ".cz-form-username",
+                    emailInput: ".cz-form-email",
+                    agreeInput: ".cz-form-agree",
+                    loginPanel: "#login-panel",
+                    profilePanel: "#profile-panel",
+                    loginPanelLogin: "#profile-panel.auth-panel-login",
+                    context: "",
+                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
+                });
+
+                var loginForm = new CZ.UI.FormLogin(forms[6], {
+                    activationSource: $("#login-panel"),
+                    navButton: ".cz-form-nav",
+                    closeButton: ".cz-form-close-btn > .cz-form-btn",
+                    titleTextblock: ".cz-form-title",
+                    titleInput: ".cz-form-item-title",
+                    context: ""
+                });
+
+                $("#profile-panel").click(function (event) {
+                    event.preventDefault();
+                    if (!profileForm.isFormVisible) {
+                        closeAllForms();
+                        profileForm.show();
+                    } else {
+                        profileForm.close();
+                    }
+                });
+
+                if (IsFeatureEnabled(_featureMap, "Login")) {
+                    CZ.Service.getProfile().done(function (data) {
+                        if (data == "") {
+                            $("#login-panel").show();
+                        } else if (data != "" && data.DisplayName == null) {
+                            $("#login-panel").hide();
+                            $("#profile-panel").show();
+                            $("#profile-panel input#username").focus();
+
+                            if (!profileForm.isFormVisible) {
+                                closeAllForms();
+                                profileForm.show();
+                            } else {
+                                profileForm.close();
+                            }
+                        } else {
+                            CZ.Settings.userSuperCollectionName = data.DisplayName;
+                            CZ.Settings.userCollectionName = data.DisplayName;
+                            $("#login-panel").hide();
+                            $("#profile-panel").show();
+                            $(".auth-panel-login").html(data.DisplayName);
+                        }
+
+                        InitializeToursUI(data, forms);
+                    }).fail(function (error) {
+                        $("#login-panel").show();
+
+                        InitializeToursUI(null, forms);
+                    });
+                }
+
+                $("#login-panel").click(function (event) {
+                    event.preventDefault();
+                    if (!loginForm.isFormVisible) {
+                        closeAllForms();
+                        loginForm.show();
+                    } else {
+                        loginForm.close();
+                    }
+                });
+                if (IsFeatureEnabled(_featureMap, "StartPage")) {
+                    CZ.StartPage.initialize();
+                }
+            });
+
+            CZ.Service.getServiceInformation().then(function (response) {
+                CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;
+                CZ.Settings.signinUrlMicrosoft = response.signinUrlMicrosoft;
+                CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
+                CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
+            });
+
+            CZ.Settings.applyTheme(null, CZ.Service.superCollectionName != null);
+
+            if (CZ.Service.superCollectionName) {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+                    $(response).each(function (index) {
+                        if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                            var themeData = null;
+                            try  {
+                                themeData = JSON.parse(response[index].theme);
+                            } catch (e) {
+                            }
+
+                            CZ.Settings.applyTheme(themeData, false);
+                        }
+                    });
+                });
+            }
+
+            $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
+            $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
+
+            $('#biblCloseButton').mouseout(function () {
+                CZ.Common.toggleOffImage('biblCloseButton', 'png');
+            }).mouseover(function () {
+                CZ.Common.toggleOnImage('biblCloseButton', 'png');
+            });
+
+            if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
+                document.addEventListener('touchmove', function (e) {
+                    e.preventDefault();
+                });
+            }
+
+            if (navigator.userAgent.indexOf('Mac') != -1) {
+                var body = document.getElementsByTagName('body')[0];
+                body.style.overflow = "hidden";
+            }
+
+            Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
+
+            if (window.location.hash)
+                CZ.Common.startHash = window.location.hash;
+
+            CZ.Search.initializeSearch();
+            CZ.Bibliography.initializeBibliography();
+
+            var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
+            var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
+            var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
+            var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
+
+            CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                var markerPos = CZ.Common.axis.markerPosition;
+                var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
+
+                CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
+                CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
+                vp = CZ.Common.vc.virtualCanvas("getViewport");
+                if (CZ.Tours.pauseTourAtAnyAnimation) {
+                    CZ.Tours.tourPause();
+                    CZ.Tours.pauseTourAtAnyAnimation = false;
+                }
+
+                var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
+                var actAni = CZ.Common.controller.activeAnimation != undefined;
+
+                if (actAni) {
+                    var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
+                    CZ.Common.updateMarker();
+                }
+
+                updateTimeSeriesChart(vp);
+            }, function () {
+                return CZ.Common.vc.virtualCanvas("getViewport");
+            }, jointGesturesStream);
+
+            var hashChangeFromOutside = true;
+
+            CZ.Common.controller.onAnimationComplete.push(function (id) {
+                hashChangeFromOutside = false;
+                if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) {
+                    CZ.UrlNav.navigationAnchor = CZ.UrlNav.navStringTovcElement(CZ.Common.setNavigationStringTo.bookmark, CZ.Common.vc.virtualCanvas("getLayerContent"));
+                    window.location.hash = CZ.Common.setNavigationStringTo.bookmark;
+                } else {
+                    if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id)
+                        CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
+
+                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                    window.location.hash = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, vp);
+                }
+                CZ.Common.setNavigationStringTo = null;
+            });
+
+            window.addEventListener("hashchange", function () {
+                if (window.location.hash && hashChangeFromOutside && CZ.Common.hashHandle) {
+                    var hash = window.location.hash;
+                    var visReg = CZ.UrlNav.navStringToVisible(window.location.hash.substring(1), CZ.Common.vc);
+                    if (visReg) {
+                        CZ.Common.isAxisFreezed = true;
+                        CZ.Common.controller.moveToVisible(visReg, true);
+
+                        if (window.location.hash != hash) {
+                            hashChangeFromOutside = false;
+                            window.location.hash = hash;
+                        }
+                    }
+                    CZ.Common.hashHandle = true;
+                } else
+                    hashChangeFromOutside = true;
+            });
+
+            CZ.Common.controller.onAnimationComplete.push(function () {
+            });
+
+            CZ.Common.controller.onAnimationStarted.push(function () {
+            });
+
+            CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
+                if (oldId != undefined && newId == undefined) {
+                    setTimeout(function () {
+                    }, 500);
+                }
+            });
+
+            CZ.Common.controller.onAnimationComplete.push(function (id) {
+                if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
+                    CZ.Tours.tourBookmarkTransitionCompleted(id);
+                if (CZ.Tours.tour != undefined && CZ.Tours.tour.state != "finished")
+                    CZ.Tours.pauseTourAtAnyAnimation = true;
+            });
+
+            CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
+                if (CZ.Tours.tour != undefined) {
+                    if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) {
+                        var prevState = CZ.Tours.tour.state;
+                        CZ.Tours.tourBookmarkTransitionInterrupted(oldId);
+                        var alteredState = CZ.Tours.tour.state;
+
+                        if (prevState == "play" && alteredState == "pause")
+                            CZ.Tours.tourPause();
+
+                        CZ.Common.setNavigationStringTo = null;
+                    }
+                }
+            });
+
+            CZ.Common.updateLayout();
+
+            CZ.Common.vc.bind("elementclick", function (e) {
+                CZ.Search.navigateToElement(e);
+            });
+
+            CZ.Common.vc.bind('cursorPositionChanged', function (cursorPositionChangedEvent) {
+                CZ.Common.updateMarker();
+            });
+
+            CZ.Common.ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
+                var bookmark = CZ.UrlNav.navStringToVisible(thresholdBookmark.Bookmark, CZ.Common.vc);
+                if (bookmark != undefined) {
+                    CZ.Common.controller.moveToVisible(bookmark, false);
+                }
+            });
+
+            CZ.Common.vc.bind("innerZoomConstraintChanged", function (constraint) {
+                CZ.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue;
+                CZ.Common.axis.allowMarkerMovesOnHover = !constraint.zoomValue;
+            });
+
+            CZ.Common.vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) {
+                CZ.BreadCrumbs.updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);
+            });
+
+            $(window).bind('resize', function () {
+                if (CZ.timeSeriesChart) {
+                    CZ.timeSeriesChart.updateCanvasHeight();
+                }
+
+                CZ.Common.updateLayout();
+
+                var vp = CZ.Common.vc.virtualCanvas("getViewport");
+                updateTimeSeriesChart(vp);
+            });
+
+            var vp = CZ.Common.vc.virtualCanvas("getViewport");
+            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({
+                x: -13700000000,
+                y: 0,
+                width: 13700000000,
+                height: 5535444444.444445
+            }, 1.0, vp, false), true);
+            CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
+
+            var bid = window.location.hash.match("b=([a-z0-9_]+)");
+            if (bid) {
+                $("#bibliography .sources").empty();
+                $("#bibliography .title").append($("<span></span>", {
+                    text: "Loading..."
+                }));
+                $("#bibliographyBack").css("display", "block");
+            }
+        });
+
+        function IsFeatureEnabled(featureMap, featureName) {
+            var feature = $.grep(featureMap, function (e) {
+                return e.Name === featureName;
+            });
+            return feature[0].IsEnabled;
+        }
+        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
+
+        function closeAllForms() {
+            $('.cz-major-form').each(function (i, f) {
+                var form = $(f).data('form');
+                if (form && form.isFormVisible === true) {
+                    form.close();
+                }
+            });
+        }
+        HomePageViewModel.closeAllForms = closeAllForms;
+
+        function getFormById(name) {
+            var form = $(name).data("form");
+            if (form)
+                return form;
+            else
+                return false;
+        }
+        HomePageViewModel.getFormById = getFormById;
+
+        function showTimeSeriesChart() {
+            $('#timeSeriesContainer').height('30%');
+            $('#timeSeriesContainer').show();
+            $('#vc').height('70%');
+            CZ.timeSeriesChart.updateCanvasHeight();
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.showTimeSeriesChart = showTimeSeriesChart;
+
+        function hideTimeSeriesChart() {
+            CZ.leftDataSet = undefined;
+            CZ.rightDataSet = undefined;
+            $('#timeSeriesContainer').height(0);
+            $('#timeSeriesContainer').hide();
+            $('#vc').height('100%');
+            CZ.Common.updateLayout();
+        }
+        HomePageViewModel.hideTimeSeriesChart = hideTimeSeriesChart;
+
+        function updateTimeSeriesChart(vp) {
+            var left = vp.pointScreenToVirtual(0, 0).x;
+            if (left < CZ.Settings.maxPermitedTimeRange.left)
+                left = CZ.Settings.maxPermitedTimeRange.left;
+            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
+            if (right > CZ.Settings.maxPermitedTimeRange.right)
+                right = CZ.Settings.maxPermitedTimeRange.right;
+
+            if (CZ.timeSeriesChart !== undefined) {
+                var leftCSS = vp.pointVirtualToScreen(left, 0).x;
+                var rightCSS = vp.pointVirtualToScreen(right, 0).x;
+                var leftPlot = CZ.Dates.getYMDFromCoordinate(left).year;
+                var rightPlot = CZ.Dates.getYMDFromCoordinate(right).year;
+
+                CZ.timeSeriesChart.clear(leftCSS, rightCSS);
+                CZ.timeSeriesChart.clearLegend("left");
+                CZ.timeSeriesChart.clearLegend("right");
+
+                var chartHeader = "TimeSeries Chart";
+
+                if (CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
+                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
+                }
+
+                var screenWidthForLegend = rightCSS - leftCSS;
+                if (CZ.rightDataSet !== undefined && CZ.leftDataSet !== undefined) {
+                    screenWidthForLegend /= 2;
+                }
+                var isLegendVisible = CZ.timeSeriesChart.checkLegendVisibility(screenWidthForLegend);
+
+                if (CZ.leftDataSet !== undefined) {
+                    var padding = CZ.leftDataSet.getVerticalPadding() + 10;
+
+                    var plotBottom = Number.MAX_VALUE;
+                    var plotTop = Number.MIN_VALUE;
+
+                    CZ.leftDataSet.series.forEach(function (seria) {
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+
+                    if ((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+
+                    var axisAppearence = { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri', verticalPadding: padding };
+                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(leftCSS, rightCSS, plotBottom, plotTop, axisAppearence);
+                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+
+                    if (isLegendVisible) {
+                        for (var i = 0; i < CZ.leftDataSet.series.length; i++) {
+                            CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
+                        }
+                    }
+
+                    chartHeader += " (" + CZ.leftDataSet.name;
+                }
+
+                if (CZ.rightDataSet !== undefined) {
+                    var padding = CZ.rightDataSet.getVerticalPadding() + 10;
+
+                    var plotBottom = Number.MAX_VALUE;
+                    var plotTop = Number.MIN_VALUE;
+
+                    CZ.rightDataSet.series.forEach(function (seria) {
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
+                            plotBottom = seria.appearanceSettings.yMin;
+                        }
+
+                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
+                            plotTop = seria.appearanceSettings.yMax;
+                        }
+                    });
+
+                    if ((plotTop - plotBottom) === 0) {
+                        var absY = Math.max(0.1, Math.abs(plotBottom));
+                        var offsetConstant = 0.01;
+                        plotTop += absY * offsetConstant;
+                        plotBottom -= absY * offsetConstant;
+                    }
+
+                    var axisAppearence = { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'right', font: '16px Calibri', verticalPadding: padding };
+                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(rightCSS, leftCSS, plotBottom, plotTop, axisAppearence);
+                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
+                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
+                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
+
+                    if (isLegendVisible) {
+                        for (var i = 0; i < CZ.rightDataSet.series.length; i++) {
+                            CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
+                        }
+                    }
+
+                    var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
+                    chartHeader += str + CZ.rightDataSet.name + ")";
+                } else {
+                    chartHeader += ")";
+                }
+
+                $("#timeSeriesChartHeader").text(chartHeader);
+            }
+        }
+        HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
+
+        function ApplyFeatureActivation() {
+            for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
+                var feature = _featureMap[idxFeature];
+
+                if (feature.IsEnabled === undefined) {
+                    var enabled = true;
+                    if (feature.Activation === 1 /* Disabled */) {
+                        enabled = false;
+                    }
+
+                    if (feature.Activation === 3 /* NotRootCollection */ && HomePageViewModel.rootCollection) {
+                        enabled = false;
+                    }
+
+                    if (feature.Activation === 2 /* RootCollection */ && !HomePageViewModel.rootCollection) {
+                        enabled = false;
+                    }
+
+                    if (feature.Activation === 4 /* NotProduction */ && (constants && constants.environment && constants.environment === "Production")) {
+                        enabled = false;
+                    }
+
+                    _featureMap[idxFeature].IsEnabled = enabled;
+                }
+
+                if (feature.JQueryReference) {
+                    if (!_featureMap[idxFeature].IsEnabled) {
+                        $(feature.JQueryReference).css("display", "none");
+                    } else if (!_featureMap[idxFeature].HasBeenActivated) {
+                        _featureMap[idxFeature].HasBeenActivated = true;
+                        $(feature.JQueryReference).css("display", "block");
+                    }
+                }
+            }
+        }
+    })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
+    var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));
 
 var CZ;
@@ -2952,1775 +13233,6 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
-    (function (UI) {
-        
-
-        
-
-        
-
-        var ListBoxBase = (function () {
-            function ListBoxBase(container, listBoxInfo, listItemsInfo, getType) {
-                if (typeof getType === "undefined") { getType = function (context) {
-                    return "default";
-                }; }
-                if (!(container instanceof jQuery)) {
-                    throw "Container parameter is invalid! It should be jQuery instance.";
-                }
-
-                this.container = container;
-                this.listItemsInfo = listItemsInfo;
-                this.getType = getType;
-                this.items = [];
-
-                if (this.listItemsInfo.default) {
-                    this.listItemsInfo.default.ctor = this.listItemsInfo.default.ctor || ListItemBase;
-                }
-
-                for (var i = 0, context = listBoxInfo.context, len = context.length; i < len; ++i) {
-                    this.add(context[i]);
-                }
-
-                this.itemDblClickHandler = function (item, idx) {
-                };
-                this.itemRemoveHandler = function (item, idx) {
-                };
-                this.itemMoveHandler = function (item, idx1, idx2) {
-                };
-
-                var self = this;
-                if (listBoxInfo.sortableSettings) {
-                    var origStart = listBoxInfo.sortableSettings.start;
-                    var origStop = listBoxInfo.sortableSettings.stop;
-                    $.extend(listBoxInfo.sortableSettings, {
-                        start: function (event, ui) {
-                            ui.item.startPos = ui.item.index();
-                            if (origStart)
-                                origStart(event, ui);
-                        },
-                        stop: function (event, ui) {
-                            ui.item.stopPos = ui.item.index();
-                            var item = self.items.splice(ui.item.startPos, 1)[0];
-                            self.items.splice(ui.item.stopPos, 0, item);
-                            self.itemMoveHandler(ui.item, ui.item.startPos, ui.item.stopPos);
-                            if (origStop)
-                                origStop(event, ui);
-                        }
-                    });
-                    this.container.sortable(listBoxInfo.sortableSettings);
-                }
-            }
-            ListBoxBase.prototype.add = function (context) {
-                var type = this.getType(context);
-                var typeInfo = this.listItemsInfo[type];
-
-                var container = typeInfo.container.clone();
-                var uiMap = typeInfo.uiMap;
-                var ctor = typeInfo.ctor;
-
-                var item = new ctor(this, container, uiMap, context);
-                this.items.push(item);
-
-                return item;
-            };
-
-            ListBoxBase.prototype.remove = function (item) {
-                var i = this.items.indexOf(item);
-
-                if (i !== -1) {
-                    item.container.remove();
-                    this.items.splice(i, 1);
-                    this.itemRemoveHandler(item, i);
-                }
-            };
-
-            ListBoxBase.prototype.clear = function () {
-                for (var i = 0, len = this.items.length; i < len; ++i) {
-                    var item = this.items[i];
-                    item.container.remove();
-                }
-                this.items.length = 0;
-            };
-
-            ListBoxBase.prototype.selectItem = function (item) {
-                var i = this.items.indexOf(item);
-
-                if (i !== -1) {
-                    this.itemDblClickHandler(item, i);
-                }
-            };
-
-            ListBoxBase.prototype.itemDblClick = function (handler) {
-                this.itemDblClickHandler = handler;
-            };
-
-            ListBoxBase.prototype.itemRemove = function (handler) {
-                this.itemRemoveHandler = handler;
-            };
-
-            ListBoxBase.prototype.itemMove = function (handler) {
-                this.itemMoveHandler = handler;
-            };
-            return ListBoxBase;
-        })();
-        UI.ListBoxBase = ListBoxBase;
-
-        var ListItemBase = (function () {
-            function ListItemBase(parent, container, uiMap, context) {
-                var _this = this;
-                if (!(container instanceof jQuery)) {
-                    throw "Container parameter is invalid! It should be jQuery instance.";
-                }
-
-                this.parent = parent;
-                this.container = container;
-                this.data = context;
-
-                this.container.dblclick(function (_) {
-                    return _this.parent.selectItem(_this);
-                });
-
-                this.closeButton = this.container.find(uiMap.closeButton);
-
-                if (this.closeButton.length) {
-                    this.closeButton.click(function (event) {
-                        return _this.close();
-                    });
-                }
-
-                this.parent.container.append(this.container);
-            }
-            ListItemBase.prototype.close = function () {
-                this.parent.remove(this);
-            };
-            return ListItemBase;
-        })();
-        UI.ListItemBase = ListItemBase;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var TourStopListBox = (function (_super) {
-            __extends(TourStopListBox, _super);
-            function TourStopListBox(container, listItemContainer, contentItems) {
-                var listBoxInfo = {
-                    context: contentItems,
-                    sortableSettings: {
-                        forcePlaceholderSize: true,
-                        cursor: "move",
-                        placeholder: "cz-listbox-placeholder",
-                        revert: 100,
-                        opacity: 0.75,
-                        tolerance: "pointer",
-                        scroll: false,
-                        start: function (event, ui) {
-                            ui.placeholder.height(ui.item.height());
-                        }
-                    }
-                };
-
-                var listItemsInfo = {
-                    default: {
-                        container: listItemContainer,
-                        uiMap: {
-                            closeButton: ".cz-listitem-close-btn",
-                            iconImg: ".cz-form-tour-contentitem-listitem-icon > img",
-                            titleTextblock: ".cz-contentitem-listitem-title",
-                            typeTextblock: ".cz-contentitem-listitem-highlighted"
-                        }
-                    }
-                };
-
-                listItemsInfo.default.ctor = TourStopListItem;
-                _super.call(this, container, listBoxInfo, listItemsInfo);
-            }
-            return TourStopListBox;
-        })(CZ.UI.ListBoxBase);
-        UI.TourStopListBox = TourStopListBox;
-
-        var TourStopListItem = (function (_super) {
-            __extends(TourStopListItem, _super);
-            function TourStopListItem(parent, container, uiMap, context) {
-                _super.call(this, parent, container, uiMap, context);
-
-                this.iconImg = this.container.find(uiMap.iconImg);
-                this.titleTextblock = this.container.find(uiMap.titleTextblock);
-                this.typeTextblock = this.container.find(uiMap.typeTextblock);
-
-                var self = this;
-                var descr = this.container.find(".cz-tourstop-description");
-                descr.text(self.data.Description);
-                descr.change(function (ev) {
-                    self.data.Description = self.Description;
-                });
-
-                var thumbUrl = this.data.ThumbnailUrl;
-                var img = new Image();
-                img.onload = function () {
-                    self.iconImg.replaceWith(img);
-                };
-                img.onerror = function () {
-                    if (console && console.warn)
-                        console.warn("Could not load a thumbnail image " + thumbUrl);
-                };
-                img.src = thumbUrl;
-
-                this.titleTextblock.text(this.data.Title);
-                this.typeTextblock.text(this.data.Type);
-
-                this.Activate();
-                this.container.click(function (e) {
-                    self.Activate();
-                });
-
-                this.container.dblclick(function (e) {
-                    if (typeof context.Target.vc == "undefined")
-                        return;
-                    var vp = context.Target.vc.getViewport();
-                    var visible = CZ.VCContent.getVisibleForElement(context.Target, 1.0, vp, true);
-                    var target = {
-                        newvisible: visible,
-                        element: context.Target
-                    };
-                    CZ.Search.navigateToElement(target);
-                });
-            }
-            Object.defineProperty(TourStopListItem.prototype, "Description", {
-                get: function () {
-                    var descr = this.container.find(".cz-tourstop-description");
-                    return descr.val();
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            TourStopListItem.prototype.Activate = function () {
-                var myDescr = this.container.find(".cz-tourstop-description");
-                this.parent.container.find(".cz-tourstop-description").not(myDescr).hide();
-                myDescr.show(500);
-            };
-            return TourStopListItem;
-        })(CZ.UI.ListItemBase);
-        UI.TourStopListItem = TourStopListItem;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var TourStop = (function () {
-            function TourStop(target, title) {
-                if (target == undefined || target == null)
-                    throw "target element of a tour stop is null or undefined";
-                if (typeof target.type == "undefined")
-                    throw "type of the tour stop target element is undefined";
-                this.targetElement = target;
-                if (target.type === "Unknown") {
-                    this.type = target.type;
-                    this.title = title;
-                } else if (target.type === "contentItem") {
-                    this.type = "Content Item";
-                    this.title = title ? title : target.contentItem.title;
-                } else {
-                    this.type = target.type === "timeline" ? "Timeline" : "Event";
-                    this.title = title ? title : target.title;
-                }
-            }
-            Object.defineProperty(TourStop.prototype, "Target", {
-                get: function () {
-                    return this.targetElement;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(TourStop.prototype, "Title", {
-                get: function () {
-                    return this.title;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(TourStop.prototype, "Description", {
-                get: function () {
-                    return this.description;
-                },
-                set: function (d) {
-                    this.description = d;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-
-            Object.defineProperty(TourStop.prototype, "LapseTime", {
-                get: function () {
-                    return this.lapseTime;
-                },
-                set: function (value) {
-                    this.lapseTime = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(TourStop.prototype, "Type", {
-                get: function () {
-                    return this.type;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(TourStop.prototype, "NavigationUrl", {
-                get: function () {
-                    return CZ.UrlNav.vcelementToNavString(this.targetElement);
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(TourStop.prototype, "ThumbnailUrl", {
-                get: function () {
-                    if (!this.thumbUrl)
-                        this.thumbUrl = this.GetThumbnail(this.targetElement);
-                    return this.thumbUrl;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            TourStop.prototype.GetThumbnail = function (element) {
-                var defaultThumb = "/images/Temp-Thumbnail2.png";
-                try  {
-                    if (!element)
-                        return defaultThumb;
-                    if (element.type === "contentItem") {
-                        var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + element.id + '.png';
-                        return thumbnailUri;
-                    }
-                    if (element.type === "infodot") {
-                        if (element.contentItems && element.contentItems.length > 0) {
-                            var child = element.contentItems[0];
-                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + child.id + '.png';
-                            return thumbnailUri;
-                        }
-                    } else if (element.type === "timeline") {
-                        for (var n = element.children.length, i = 0; i < n; i++) {
-                            var child = element.children[i];
-                            if (child.type === "infodot" || child.type === "timeline") {
-                                var thumb = this.GetThumbnail(child);
-                                if (thumb && thumb !== defaultThumb)
-                                    return thumb;
-                            }
-                        }
-                    }
-                } catch (exc) {
-                    if (console && console.error)
-                        console.error("Failed to get a thumbnail url: " + exc);
-                }
-                return defaultThumb;
-            };
-            return TourStop;
-        })();
-        UI.TourStop = TourStop;
-
-        var Tour = (function () {
-            function Tour(id, title, description, category, sequence, stops) {
-                this.id = id;
-                this.title = title;
-                this.description = description;
-                this.sequence = sequence;
-                this.stops = stops;
-                this.category = category;
-            }
-            Object.defineProperty(Tour.prototype, "Id", {
-                get: function () {
-                    return this.id;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(Tour.prototype, "Title", {
-                get: function () {
-                    return this.title;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(Tour.prototype, "Category", {
-                get: function () {
-                    return this.category;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(Tour.prototype, "Sequence", {
-                get: function () {
-                    return this.sequence;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(Tour.prototype, "Description", {
-                get: function () {
-                    return this.description;
-                },
-                set: function (val) {
-                    this.description = val;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-
-            Object.defineProperty(Tour.prototype, "Stops", {
-                get: function () {
-                    return this.stops;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return Tour;
-        })();
-        UI.Tour = Tour;
-
-        var FormEditTour = (function (_super) {
-            __extends(FormEditTour, _super);
-            function FormEditTour(container, formInfo) {
-                _super.call(this, container, formInfo);
-
-                this.saveButton = container.find(formInfo.saveButton);
-                this.deleteButton = container.find(formInfo.deleteButton);
-                this.addStopButton = container.find(formInfo.addStopButton);
-                this.titleInput = container.find(formInfo.titleInput);
-
-                this.tourTitleInput = this.container.find(".cz-form-tour-title");
-                this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
-                this.clean();
-
-                this.saveButton.off();
-                this.deleteButton.off();
-
-                this.tour = formInfo.context;
-                var stops = [];
-                var self = this;
-                if (this.tour) {
-                    this.tourTitleInput.val(this.tour.title);
-                    this.tourDescriptionInput.val(this.tour.description);
-                    for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
-                        var bookmark = this.tour.bookmarks[i];
-                        var stop = FormEditTour.bookmarkToTourstop(bookmark);
-                        stops.push(stop);
-                    }
-                } else {
-                    this.tourTitleInput.val("");
-                    this.tourDescriptionInput.val("");
-                }
-                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops);
-                this.tourStopsListBox.itemMove(function (item, startPos, endPos) {
-                    return self.onStopsReordered.apply(self, [item, startPos, endPos]);
-                });
-                this.tourStopsListBox.itemRemove(function (item, index) {
-                    return self.onStopRemoved.apply(self, [item, index]);
-                });
-                this.initialize();
-            }
-            FormEditTour.bookmarkToTourstop = function (bookmark) {
-                var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
-                if (target == null) {
-                    target = {
-                        type: "Unknown"
-                    };
-                }
-                var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
-                stop.Description = bookmark.text;
-                stop.LapseTime = bookmark.lapseTime;
-                return stop;
-            };
-
-            FormEditTour.tourstopToBookmark = function (tourstop, index) {
-                var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
-                var title = tourstop.Title;
-                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, tourstop.Description);
-                bookmark.number = index + 1;
-                return bookmark;
-            };
-
-            FormEditTour.prototype.deleteTourAsync = function () {
-                return CZ.Service.deleteTour(this.tour.id);
-            };
-
-            FormEditTour.prototype.putTourAsync = function (sequenceNum) {
-                var deferred = $.Deferred();
-                var self = this;
-                var stops = this.getStops();
-
-                var name = this.tourTitleInput.val();
-                var descr = this.tourDescriptionInput.val();
-                var category = "tours";
-                var n = stops.length;
-                var tourId = undefined;
-                if (this.tour) {
-                    category = this.tour.category;
-                    tourId = this.tour.id;
-                }
-
-                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, category, n, stops));
-
-                request.done(function (q) {
-                    var tourBookmarks = new Array();
-                    for (var j = 0; j < n; j++) {
-                        var tourstop = stops[j];
-                        var bookmark = FormEditTour.tourstopToBookmark(tourstop, j);
-                        tourBookmarks.push(bookmark);
-                    }
-
-                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", sequenceNum, descr);
-                    deferred.resolve(tour);
-                }).fail(function (q) {
-                    deferred.reject(q);
-                });
-                return deferred.promise();
-            };
-
-            FormEditTour.prototype.initializeAsEdit = function () {
-                this.deleteButton.show();
-                this.titleTextblock.text("Edit Tour");
-                this.saveButton.text("update tour");
-            };
-
-            FormEditTour.prototype.initialize = function () {
-                var _this = this;
-                this.saveButton.prop('disabled', false);
-                if (this.tour == null) {
-                    this.deleteButton.hide();
-                    this.titleTextblock.text("Create Tour");
-                    this.saveButton.text("create tour");
-                } else {
-                    this.initializeAsEdit();
-                }
-
-                var self = this;
-                this.addStopButton.click(function (event) {
-                    CZ.Authoring.isActive = true;
-                    CZ.Authoring.mode = "editTour-selectTarget";
-                    CZ.Authoring.callback = function (arg) {
-                        return self.onTargetElementSelected(arg);
-                    };
-                    self.hide();
-                    setTimeout(function () {
-                        if (CZ.Authoring.mode == "editTour-selectTarget") {
-                            CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
-                                if (CZ.Authoring.mode == "editTour-selectTarget")
-                                    self.onTargetElementSelected(null);
-                            });
-                        }
-                    }, 500);
-                });
-                this.saveButton.click(function (event) {
-                    var message;
-                    if (!_this.tourTitleInput.val())
-                        message = "Please enter the title.";
-                    else if (_this.tourStopsListBox.items.length == 0)
-                        message = "Please add a tour stop to the tour.";
-                    if (message) {
-                        alert(message);
-                        return;
-                    }
-
-                    var self = _this;
-
-                    _this.saveButton.prop('disabled', true);
-
-                    if (_this.tour == null) {
-                        _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
-                            self.tour = tour;
-                            CZ.Tours.tours.push(tour);
-                            _this.hide();
-                        }).fail(function (f) {
-                            if (console && console.error) {
-                                console.error("Failed to create a tour: " + f.status + " " + f.statusText);
-                            }
-                            alert("Failed to create a tour");
-                        }).done(function () {
-                            _this.saveButton.prop('disabled', false);
-                        });
-                    } else {
-                        for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
-                            if (CZ.Tours.tours[i] === _this.tour) {
-                                _this.putTourAsync(i).done(function (tour) {
-                                    _this.tour = CZ.Tours.tours[i] = tour;
-                                    _this.hide();
-                                }).fail(function (f) {
-                                    if (console && console.error) {
-                                        console.error("Failed to update a tour: " + f.status + " " + f.statusText);
-                                    }
-                                    alert("Failed to update a tour");
-                                }).always(function () {
-                                    _this.saveButton.prop('disabled', false);
-                                });
-                                break;
-                            }
-                        }
-                    }
-                });
-                this.deleteButton.click(function (event) {
-                    if (_this.tour == null)
-                        return;
-                    _this.deleteTourAsync().done(function (q) {
-                        for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
-                            if (CZ.Tours.tours[i] === _this.tour) {
-                                _this.tour = null;
-                                CZ.Tours.tours.splice(i, 1);
-                                _this.close();
-                                break;
-                            }
-                        }
-                    }).fail(function (f) {
-                        if (console && console.error) {
-                            console.error("Failed to delete a tour: " + f.status + " " + f.statusText);
-                        }
-                        alert("Failed to delete a tour");
-                    });
-                });
-            };
-
-            FormEditTour.prototype.getStops = function () {
-                var n = this.tourStopsListBox.items.length;
-                var stops = new Array(n);
-                for (; --n >= 0;) {
-                    stops[n] = this.tourStopsListBox.items[n].data;
-                }
-                return stops;
-            };
-
-            FormEditTour.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormEditTour.prototype.hide = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                _super.prototype.close.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-                this.activationSource.removeClass("active");
-            };
-
-            FormEditTour.prototype.close = function () {
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                    }
-                });
-
-                CZ.Authoring.isActive = false;
-                this.clean();
-            };
-
-            FormEditTour.prototype.clean = function () {
-                this.activationSource.removeClass("active");
-                this.container.find(".cz-form-errormsg").hide();
-                this.container.find(".cz-listbox").empty();
-                this.tourTitleInput.val("");
-                this.tourDescriptionInput.val("");
-            };
-
-            FormEditTour.prototype.onStopsReordered = function () {
-                this.updateSequence();
-            };
-
-            FormEditTour.prototype.onStopRemoved = function () {
-                this.updateSequence();
-            };
-
-            FormEditTour.prototype.updateSequence = function () {
-                var stops = this.getStops();
-                var n = stops.length;
-                var lapseTime = 0;
-                for (var i = 0; i < n; i++) {
-                    var stop = stops[i];
-                    stop.LapseTime = lapseTime;
-                    lapseTime += CZ.Settings.tourDefaultTransitionTime;
-                }
-            };
-
-            FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
-                CZ.Authoring.mode = "editTour";
-                CZ.Authoring.hideMessageWindow();
-                CZ.Authoring.isActive = false;
-                CZ.Authoring.callback = null;
-
-                if (targetElement) {
-                    var n = this.tourStopsListBox.items.length;
-                    var stop = new TourStop(targetElement);
-                    stop.LapseTime = n == 0 ? 0 : this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1].data.LapseTime + CZ.Settings.tourDefaultTransitionTime;
-                    this.tourStopsListBox.add(stop);
-                }
-                this.show();
-            };
-            return FormEditTour;
-        })(CZ.UI.FormBase);
-        UI.FormEditTour = FormEditTour;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Service) {
-        var Map;
-        (function (Map) {
-            function bookmark(ts) {
-                return {
-                    name: ts.Title,
-                    url: ts.NavigationUrl,
-                    lapseTime: ts.LapseTime,
-                    description: ts.Description
-                };
-            }
-
-            function tour(t) {
-                var bookmarks = new Array(t.Stops.length);
-                for (var i = 0, n = t.Stops.length; i < n; i++) {
-                    bookmarks[i] = bookmark(t.Stops[i]);
-                }
-
-                var tourRequest = {
-                    id: t.Id,
-                    name: t.Title,
-                    description: t.Description,
-                    audio: "",
-                    category: t.Category,
-                    sequence: t.Sequence,
-                    bookmarks: bookmarks
-                };
-
-                return tourRequest;
-            }
-            Map.tour = tour;
-
-            function timeline(t) {
-                return {
-                    id: t.guid,
-                    ParentTimelineId: t.parent.guid,
-                    start: CZ.Dates.getDecimalYearFromCoordinate(t.x),
-                    end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
-                    title: t.title,
-                    Regime: t.regime
-                };
-            }
-            Map.timeline = timeline;
-
-            function exhibit(e) {
-                return {
-                    id: e.guid,
-                    ParentTimelineId: e.parent.guid,
-                    time: e.infodotDescription.date,
-                    title: e.title,
-                    description: undefined,
-                    contentItems: undefined
-                };
-            }
-            Map.exhibit = exhibit;
-
-            function exhibitWithContentItems(e) {
-                var mappedContentItems = [];
-                $(e.contentItems).each(function (contentItemIndex, contentItem) {
-                    mappedContentItems.push(Map.contentItem(contentItem));
-                });
-
-                return {
-                    id: e.guid,
-                    ParentTimelineId: e.parent.guid,
-                    time: e.infodotDescription.date,
-                    title: e.title,
-                    description: undefined,
-                    contentItems: mappedContentItems
-                };
-            }
-            Map.exhibitWithContentItems = exhibitWithContentItems;
-
-            function contentItem(ci) {
-                return {
-                    id: ci.guid,
-                    ParentExhibitId: ci.contentItem ? ci.contentItem.ParentExhibitId : ci.ParentExhibitId,
-                    title: ci.contentItem ? ci.contentItem.title : ci.title,
-                    description: ci.contentItem ? ci.contentItem.description : ci.description,
-                    uri: ci.contentItem ? ci.contentItem.uri : ci.uri,
-                    mediaType: ci.contentItem ? ci.contentItem.mediaType : ci.mediaType,
-                    attribution: ci.contentItem ? ci.contentItem.attribution : ci.attribution,
-                    mediaSource: ci.contentItem ? ci.contentItem.mediaSource : ci.mediaSource,
-                    order: ci.contentItem ? ci.contentItem.order : ci.order
-                };
-            }
-            Map.contentItem = contentItem;
-        })(Map || (Map = {}));
-
-        var _serviceUrl = CZ.Settings.serverUrlHost + "/api/";
-
-        var _isLocalHost = constants.environment === "Localhost";
-        var _dumpTweetsUrl = "/dumps/home/tweets.json";
-        var _dumpTimelinesUrl = "/dumps/home/timelines.json";
-        var _testLogin = false;
-
-        function Request(urlBase) {
-            var _url = urlBase;
-            var _hasParameters = false;
-
-            Object.defineProperty(this, "url", {
-                configurable: false,
-                get: function () {
-                    return _url;
-                }
-            });
-
-            this.addToPath = function (item) {
-                if (item) {
-                    _url += _url.match(/\/$/) ? item : "/" + item;
-                }
-            };
-
-            this.addParameter = function (name, value) {
-                if (value !== undefined && value !== null) {
-                    _url += _hasParameters ? "&" : "?";
-                    _url += name + "=" + value;
-                    _hasParameters = true;
-                }
-            };
-
-            this.addParameters = function (params) {
-                for (var p in params) {
-                    if (params.hasOwnProperty(p)) {
-                        this.addParameter(p, params[p]);
-                    }
-                }
-            };
-        }
-        Service.Request = Request;
-        ;
-
-        Service.collectionName = "";
-        Service.superCollectionName = "";
-
-        function getTimelines(r, sc, c) {
-            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
-            if (typeof c === "undefined") { c = Service.collectionName; }
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath("gettimelines");
-            request.addParameter("supercollection", sc);
-            request.addParameter("collection", c);
-            request.addParameters(r);
-
-            console.log("[GET] " + request.url);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
-            });
-        }
-        Service.getTimelines = getTimelines;
-
-        function getCollections(superCollectionName) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(superCollectionName);
-            request.addToPath("collections");
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
-            });
-        }
-        Service.getCollections = getCollections;
-
-        function getStructure(r) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("structure");
-            request.addParameters(r);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
-            });
-        }
-        Service.getStructure = getStructure;
-
-        function postData(r) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("data");
-
-            return $.ajax({
-                type: "POST",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(r)
-            });
-        }
-        Service.postData = postData;
-
-        function putCollection(superCollectionName, collectionName, c) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(superCollectionName);
-            request.addToPath(collectionName);
-
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(c)
-            });
-        }
-        Service.putCollection = putCollection;
-
-        function deleteCollection(c) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(c.name);
-
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url,
-                data: JSON.stringify(c)
-            });
-        }
-        Service.deleteCollection = deleteCollection;
-
-        function putTimeline(t) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("timeline");
-
-            console.log("[PUT] " + request.url);
-
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(Map.timeline(t))
-            });
-        }
-        Service.putTimeline = putTimeline;
-
-        function deleteTimeline(t) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("timeline");
-
-            console.log("[DELETE] " + request.url);
-
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url,
-                data: JSON.stringify(Map.timeline(t))
-            });
-        }
-        Service.deleteTimeline = deleteTimeline;
-
-        function putExhibit(e) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("exhibit");
-
-            console.log("[PUT] " + request.url);
-
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(Map.exhibitWithContentItems(e))
-            });
-        }
-        Service.putExhibit = putExhibit;
-
-        function deleteExhibit(e) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("exhibit");
-
-            console.log("[DELETE] " + request.url);
-
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url,
-                data: JSON.stringify(Map.exhibit(e))
-            });
-        }
-        Service.deleteExhibit = deleteExhibit;
-
-        function putContentItem(ci) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("contentitem");
-
-            console.log("[PUT] " + request.url);
-
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(Map.contentItem(ci))
-            });
-        }
-        Service.putContentItem = putContentItem;
-
-        function deleteContentItem(ci) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("contentitem");
-
-            console.log("[DELETE] " + request.url);
-
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url,
-                data: JSON.stringify(Map.contentItem(ci))
-            });
-        }
-        Service.deleteContentItem = deleteContentItem;
-
-        function putTour2(t) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("tour2");
-
-            console.log("[PUT] " + request.url);
-
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify(Map.tour(t))
-            });
-        }
-        Service.putTour2 = putTour2;
-
-        function deleteTour(tourId) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("tour");
-
-            console.log("[DELETE] " + request.url);
-
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: JSON.stringify({ id: tourId })
-            });
-        }
-        Service.deleteTour = deleteTour;
-
-        function getTours() {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath("tours");
-
-            console.log("[GET] " + request.url);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
-            });
-        }
-        Service.getTours = getTours;
-
-        function getSearch(query) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("Search");
-
-            var data = {
-                searchTerm: query,
-                supercollection: CZ.Service.superCollectionName,
-                collection: CZ.Service.collectionName
-            };
-
-            console.log("[GET] " + request.url);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: data
-            });
-        }
-        Service.getSearch = getSearch;
-
-        function getBingImages(query, top, skip) {
-            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
-            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("bing/getImages");
-
-            var data = {
-                query: query,
-                top: top,
-                skip: skip
-            };
-
-            console.log("[GET] " + request.url);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: data,
-                success: function (response) {
-                }
-            });
-        }
-        Service.getBingImages = getBingImages;
-
-        function getBingVideos(query, top, skip) {
-            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
-            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("bing/getVideos");
-
-            var data = {
-                query: query,
-                top: top,
-                skip: skip
-            };
-
-            console.log("[GET] " + request.url);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: data,
-                success: function (response) {
-                }
-            });
-        }
-        Service.getBingVideos = getBingVideos;
-
-        function getBingDocuments(query, doctype, top, skip) {
-            if (typeof doctype === "undefined") { doctype = undefined; }
-            if (typeof top === "undefined") { top = CZ.Settings.defaultBingSearchTop; }
-            if (typeof skip === "undefined") { skip = CZ.Settings.defaultBingSearchSkip; }
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("bing/getDocuments");
-
-            var data = {
-                query: query,
-                doctype: doctype,
-                top: top,
-                skip: skip
-            };
-
-            console.log("[GET] " + request.url);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: data,
-                success: function (response) {
-                }
-            });
-        }
-        Service.getBingDocuments = getBingDocuments;
-
-        function getRecentTweets() {
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("twitter/getRecentTweets");
-
-            console.log("[GET] " + request.url);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: _isLocalHost ? _dumpTweetsUrl : request.url,
-                success: function (response) {
-                }
-            });
-        }
-        Service.getRecentTweets = getRecentTweets;
-
-        function getServiceInformation() {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath("info");
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
-            });
-        }
-        Service.getServiceInformation = getServiceInformation;
-
-        function getContentPath(reference) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
-            request.addToPath(reference);
-            request.addToPath("contentpath");
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
-            });
-        }
-        Service.getContentPath = getContentPath;
-
-        function putExhibitContent(e, oldContentItems) {
-            CZ.Authoring.resetSessionTimer();
-            var newGuids = e.contentItems.map(function (ci) {
-                return ci.guid;
-            });
-
-            var promises = e.contentItems.map(function (ci) {
-                return putContentItem(ci).then(function (response) {
-                    ci.id = ci.guid = response;
-                });
-            }).concat(oldContentItems.filter(function (ci) {
-                return (ci.guid && newGuids.indexOf(ci.guid) === -1);
-            }).map(function (ci) {
-                return deleteContentItem(ci);
-            }));
-
-            return $.when.apply($, promises);
-        }
-        Service.putExhibitContent = putExhibitContent;
-
-        function putProfile(displayName, email) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("user");
-            var user = {
-                "DisplayName": displayName,
-                "Email": email
-            };
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                url: request.url,
-                data: JSON.stringify(user)
-            });
-        }
-        Service.putProfile = putProfile;
-
-        function deleteProfile(displayName) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("user");
-            var user = {
-                "DisplayName": displayName
-            };
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url,
-                data: JSON.stringify(user)
-            });
-        }
-        Service.deleteProfile = deleteProfile;
-
-        function getProfile(displayName) {
-            if (typeof displayName === "undefined") { displayName = _testLogin ? "anonymous" : ""; }
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("user");
-            if (displayName != "") {
-                request.addParameter("name", displayName);
-            }
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            }).done(function (profile) {
-                if (!profile.id)
-                    return null;
-
-                return profile;
-            });
-        }
-        Service.getProfile = getProfile;
-
-        function getMimeTypeByUrl(url) {
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("mimetypebyurl");
-            if (url == "")
-                return result;
-            request.addParameter("url", url);
-            $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                url: request.url,
-                async: false
-            }).done(function (mime) {
-                if (mime)
-                    result = mime;
-            });
-            return result;
-        }
-        Service.getMimeTypeByUrl = getMimeTypeByUrl;
-
-        function getUserTimelines(sc, c) {
-            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
-            if (typeof c === "undefined") { c = Service.collectionName; }
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("usertimelines");
-            request.addParameter("superCollection", sc);
-            request.addParameter("Collection", c);
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: _isLocalHost ? _dumpTimelinesUrl : request.url
-            });
-        }
-        Service.getUserTimelines = getUserTimelines;
-
-        function getUserFavorites() {
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfavorites");
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: _isLocalHost ? _dumpTimelinesUrl : request.url
-            });
-        }
-        Service.getUserFavorites = getUserFavorites;
-        function deleteUserFavorite(guid) {
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfavorites");
-            if (guid == "")
-                return null;
-            request.addToPath(guid);
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.deleteUserFavorite = deleteUserFavorite;
-
-        function putUserFavorite(guid) {
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfavorites");
-            if (guid == "")
-                return null;
-            request.addToPath(guid);
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.putUserFavorite = putUserFavorite;
-
-        function getUserFeatured(guid) {
-            if (typeof guid === "undefined") { guid = "default"; }
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfeatured");
-            request.addToPath(guid);
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: _isLocalHost ? _dumpTimelinesUrl : request.url
-            });
-        }
-        Service.getUserFeatured = getUserFeatured;
-
-        function deleteUserFeatured(guid) {
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfeatured");
-            if (guid == "")
-                return null;
-            request.addToPath(guid);
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.deleteUserFeatured = deleteUserFeatured;
-
-        function putUserFeatured(guid) {
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfeatured");
-            if (guid == "")
-                return null;
-            request.addToPath(guid);
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.putUserFeatured = putUserFeatured;
-
-        function putTriplet(subject, predicate, object) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("triples");
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                url: request.url,
-                data: JSON.stringify({
-                    Subject: subject,
-                    Predicate: predicate,
-                    Object: object
-                })
-            });
-        }
-        Service.putTriplet = putTriplet;
-
-        function getTriplets(subject, predicate, object) {
-            if (typeof predicate === "undefined") { predicate = null; }
-            if (typeof object === "undefined") { object = null; }
-            if (subject == null && predicate == null && object == null)
-                throw "Arguments error: all three criteria cannot be null at the same time";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("triples");
-            if (subject != null)
-                request.addParameter("subject", encodeURIComponent(subject));
-            if (predicate != null)
-                request.addParameter("predicate", encodeURIComponent(predicate));
-            if (object != null)
-                request.addParameter("object", encodeURIComponent(object));
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.getTriplets = getTriplets;
-
-        function deleteTriplet(subject, predicate, object) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("triples");
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url,
-                data: JSON.stringify({
-                    Subject: subject,
-                    Predicate: predicate,
-                    Object: object
-                })
-            });
-        }
-        Service.deleteTriplet = deleteTriplet;
-
-        function getPrefixes() {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("triples");
-            request.addToPath("prefixes");
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.getPrefixes = getPrefixes;
-    })(CZ.Service || (CZ.Service = {}));
-    var Service = CZ.Service;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Dates) {
-        Dates.months = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December'];
-
-        Dates.daysInMonth = [
-            31,
-            28,
-            31,
-            30,
-            31,
-            30,
-            31,
-            31,
-            30,
-            31,
-            30,
-            31];
-
-        function getCoordinateFromYMD(year, month, day) {
-            var sign = (year === -1) ? 1 : year / Math.abs(year), isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, coord = (year > -1) ? year : year + 1;
-
-            var sumDaysOfMonths = function (s, d, i) {
-                return s + +(i < month) * d;
-            };
-            var days = Dates.daysInMonth.reduce(sumDaysOfMonths, +(isLeap && month > 1)) + day;
-
-            coord += (days - 1) / daysInYear;
-
-            coord = roundDecimal(coord, CZ.Settings.allowedMathImprecisionDecimals);
-
-            return coord;
-        }
-        Dates.getCoordinateFromYMD = getCoordinateFromYMD;
-
-        function getYMDFromCoordinate(coord, MarkerCorrection) {
-            if (typeof MarkerCorrection === "undefined") { MarkerCorrection = false; }
-            var absCoord = Math.abs(coord), floorCoord = Math.floor(coord), sign = (coord === 0) ? 1 : coord / absCoord, day = 0, month = 0, year = (coord >= 1) ? floorCoord : floorCoord - 1, isLeap = isLeapYear(year), daysInYear = isLeap ? 366 : 365, daysFraction = sign * (absCoord - Math.abs(floorCoord));
-
-            day = Math.round(daysFraction * daysInYear);
-            if (MarkerCorrection)
-                day = Math.floor(daysFraction * daysInYear);
-            day += +(day < daysInYear);
-
-            while (day > Dates.daysInMonth[month] + (+(isLeap && month === 1))) {
-                day -= Dates.daysInMonth[month];
-                if (isLeap && month === 1) {
-                    day--;
-                }
-                month++;
-            }
-
-            return {
-                year: year,
-                month: month,
-                day: day
-            };
-        }
-        Dates.getYMDFromCoordinate = getYMDFromCoordinate;
-
-        function getCoordinateFromDecimalYear(decimalYear) {
-            var localPresent = getPresent();
-            var presentDate = getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-
-            return decimalYear === 9999 ? presentDate : (decimalYear < 0 ? decimalYear + 1 : decimalYear);
-        }
-        Dates.getCoordinateFromDecimalYear = getCoordinateFromDecimalYear;
-
-        function getDecimalYearFromCoordinate(coordinate) {
-            return coordinate < 1 ? --coordinate : coordinate;
-        }
-        Dates.getDecimalYearFromCoordinate = getDecimalYearFromCoordinate;
-
-        function convertCoordinateToYear(coordinate) {
-            var year = {
-                year: coordinate,
-                regime: "CE"
-            };
-            var eps_const = 100000;
-            if (coordinate <= -999999999) {
-                year.year = (year.year - 1) / (-1000000000);
-                year.year = Math.round(year.year * eps_const) / eps_const;
-                year.regime = 'Ga';
-            } else if (coordinate <= -999999) {
-                year.year = (year.year - 1) / (-1000000);
-                year.year = Math.round(year.year * eps_const) / eps_const;
-                year.regime = 'Ma';
-            } else if (coordinate <= -9999) {
-                year.year = (year.year - 1) / (-1000);
-                year.year = Math.round(year.year * eps_const) / eps_const;
-                year.regime = 'Ka';
-            } else if (coordinate < 1) {
-                year.year = (year.year - 1) / (-1);
-
-                year.year = Math.ceil(year.year);
-                year.regime = 'BCE';
-            } else {
-                year.year = Math.floor(year.year);
-            }
-
-            return year;
-        }
-        Dates.convertCoordinateToYear = convertCoordinateToYear;
-
-        function convertYearToCoordinate(year, regime) {
-            var coordinate = year;
-
-            switch (regime.toLowerCase()) {
-                case "ga":
-                    coordinate = year * (-1000000000) + 1;
-                    break;
-                case "ma":
-                    coordinate = year * (-1000000) + 1;
-                    break;
-                case "ka":
-                    coordinate = year * (-1000) + 1;
-                    break;
-                case "bce":
-                    coordinate = year * (-1) + 1;
-
-                    break;
-            }
-
-            return coordinate;
-        }
-        Dates.convertYearToCoordinate = convertYearToCoordinate;
-
-        var present = undefined;
-        function getPresent() {
-            if (!present) {
-                present = new Date();
-
-                present.presentDay = present.getUTCDate();
-                present.presentMonth = present.getUTCMonth();
-                present.presentYear = present.getUTCFullYear();
-            }
-            return present;
-        }
-        Dates.getPresent = getPresent;
-
-        function isLeapYear(year) {
-            return (year >= 1582 && (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)));
-        }
-        Dates.isLeapYear = isLeapYear;
-
-        function numberofLeap(year) {
-            var startLeap = 1582;
-            if (year < startLeap)
-                return 0;
-            var years1 = Math.floor(year / 4) - Math.floor(startLeap / 4);
-            years1 -= Math.floor(year / 100) - Math.floor(startLeap / 100);
-            years1 += Math.floor(year / 400) - Math.floor(startLeap / 400);
-            if (isLeapYear(year))
-                years1--;
-            return years1;
-        }
-        Dates.numberofLeap = numberofLeap;
-
-        function roundDecimal(decimal, precision) {
-            return Math.round(decimal * Math.pow(10, precision)) / Math.pow(10, precision);
-        }
-    })(CZ.Dates || (CZ.Dates = {}));
-    var Dates = CZ.Dates;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
     (function (Authoring) {
         var _vcwidget;
 
@@ -5605,212 +14117,6 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
-    (function (UI) {
-        var TourPlayer = (function () {
-            function TourPlayer(container, playerInfo) {
-                this.container = container;
-                this.tour = playerInfo.context;
-
-                this.playPauseButton = this.container.find(playerInfo.playPauseButton);
-                this.nextButton = this.container.find(playerInfo.nextButton);
-                this.prevButton = this.container.find(playerInfo.prevButton);
-                this.volButton = this.container.find(playerInfo.volButton);
-
-                this.playPauseButton.off();
-                this.nextButton.off();
-                this.prevButton.off();
-                this.volButton.off();
-
-                this.initialize();
-            }
-            TourPlayer.prototype.initialize = function () {
-                var _this = this;
-                this.playPauseButton.attr("state", "pause");
-                this.volButton.attr("state", "on");
-
-                this.playPauseButton.click(function (event) {
-                    var state = _this.playPauseButton.attr("state");
-
-                    var stateHandlers = {
-                        play: function () {
-                            _this.play();
-                        },
-                        pause: function () {
-                            _this.pause();
-                        }
-                    };
-
-                    stateHandlers[state]();
-                });
-
-                this.nextButton.click(function (event) {
-                    _this.next();
-                });
-
-                this.prevButton.click(function (event) {
-                    _this.prev();
-                });
-
-                this.volButton.click(function (event) {
-                    var state = _this.volButton.attr("state");
-
-                    var stateHandlers = {
-                        on: function () {
-                            _this.volumeOff();
-                        },
-                        off: function () {
-                            _this.volumeOn();
-                        }
-                    };
-
-                    stateHandlers[state]();
-                });
-            };
-
-            TourPlayer.prototype.play = function () {
-                this.playPauseButton.attr("state", "pause");
-                CZ.Tours.tourResume();
-            };
-
-            TourPlayer.prototype.pause = function () {
-                this.playPauseButton.attr("state", "play");
-                CZ.Tours.tourPause();
-            };
-
-            TourPlayer.prototype.next = function () {
-                CZ.Tours.tourNext();
-            };
-
-            TourPlayer.prototype.prev = function () {
-                CZ.Tours.tourPrev();
-            };
-
-            TourPlayer.prototype.exit = function () {
-                CZ.Tours.tourAbort();
-            };
-
-            TourPlayer.prototype.volumeOn = function () {
-                this.volButton.attr("state", "on");
-                CZ.Tours.isNarrationOn = true;
-                this.tour.audioElement.volume = 1;
-            };
-
-            TourPlayer.prototype.volumeOff = function () {
-                this.volButton.attr("state", "off");
-                CZ.Tours.isNarrationOn = false;
-                this.tour.audioElement.volume = 0;
-            };
-            return TourPlayer;
-        })();
-        UI.TourPlayer = TourPlayer;
-
-        var FormTourCaption = (function (_super) {
-            __extends(FormTourCaption, _super);
-            function FormTourCaption(container, formInfo) {
-                _super.call(this, container, formInfo);
-
-                this.minButton = this.container.find(formInfo.minButton);
-                this.captionTextarea = this.container.find(formInfo.captionTextarea);
-                this.tourPlayerContainer = this.container.find(formInfo.tourPlayerContainer);
-                this.bookmarksCount = this.container.find(formInfo.bookmarksCount);
-                this.tour = formInfo.context;
-                this.tourPlayer = new CZ.UI.TourPlayer(this.tourPlayerContainer, {
-                    playPauseButton: "div:nth-child(2)",
-                    nextButton: "div:nth-child(3)",
-                    prevButton: "div:nth-child(1)",
-                    volButton: "div:nth-child(4)",
-                    context: this.tour
-                });
-
-                this.minButton.off();
-
-                this.initialize();
-            }
-            FormTourCaption.prototype.initialize = function () {
-                var _this = this;
-                this.titleTextblock.text(this.tour.title);
-                this.bookmarksCount.text("Slide 1 of " + this.tour.bookmarks.length);
-                this.captionTextarea.css("opacity", 0);
-                this.isMinimized = false;
-
-                this.minButton.click(function (event) {
-                    _this.minimize();
-                });
-            };
-
-            FormTourCaption.prototype.hideBookmark = function () {
-                this.captionTextarea.css("opacity", 0);
-            };
-
-            FormTourCaption.prototype.showBookmark = function (bookmark) {
-                this.captionTextarea.text(bookmark.text);
-                this.bookmarksCount.text("Slide " + bookmark.number + " of " + this.tour.bookmarks.length);
-                this.captionTextarea.stop();
-                this.captionTextarea.animate({
-                    opacity: 1
-                });
-            };
-
-            FormTourCaption.prototype.showTourEndMessage = function () {
-                this.captionTextarea.text(CZ.Tours.TourEndMessage);
-                this.bookmarksCount.text("Start a tour");
-            };
-
-            FormTourCaption.prototype.setPlayPauseButtonState = function (state) {
-                this.tourPlayer.playPauseButton.attr("state", state);
-            };
-
-            FormTourCaption.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormTourCaption.prototype.close = function () {
-                var _this = this;
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        _this.tourPlayer.exit();
-
-                        CZ.Common.hashHandle = true;
-                    }
-                });
-
-                this.activationSource.removeClass("active");
-            };
-
-            FormTourCaption.prototype.minimize = function () {
-                if (this.isMinimized) {
-                    this.contentContainer.show({
-                        effect: "slide",
-                        direction: "up",
-                        duration: 500
-                    });
-                } else {
-                    this.contentContainer.hide({
-                        effect: "slide",
-                        direction: "up",
-                        duration: 500
-                    });
-                }
-
-                this.isMinimized = !this.isMinimized;
-            };
-            return FormTourCaption;
-        })(CZ.UI.FormBase);
-        UI.FormTourCaption = FormTourCaption;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
     (function (Tours) {
         Tours.isTourWindowVisible = false;
         var isBookmarksWindowVisible = false;
@@ -6532,254 +14838,6 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
-    (function (Search) {
-        Search.isSearchWindowVisible = false;
-        var delayedSearchRequest = null;
-
-        function onSearchClicked() {
-            if (CZ.Tours.isTourWindowVisible && CZ.Tours.onTourClicked)
-                CZ.Tours.onTourClicked();
-
-            if (Search.isSearchWindowVisible) {
-                $(".search-icon").removeClass("active");
-                $("#search").hide('slide', {}, 'slow');
-            } else {
-                $(".search-icon").addClass("active");
-                $("#search").show('slide', {}, 'slow', function () {
-                    $("#searchTextBox").focus();
-                });
-            }
-            Search.isSearchWindowVisible = !Search.isSearchWindowVisible;
-        }
-        Search.onSearchClicked = onSearchClicked;
-
-        function initializeSearch() {
-            $("#searchTextBox").focus(function () {
-                if ($(this).hasClass('emptyTextBox')) {
-                    this.value = '';
-                    $(this).removeClass('emptyTextBox');
-                }
-            }).blur(function () {
-                if ($(this).hasClass('emptyTextBox')) {
-                    if (this.value != '') {
-                        $(this).removeClass('emptyTextBox');
-                    }
-                } else {
-                    if (this.value == '') {
-                        this.value = 'type here...';
-                        $(this).addClass('emptyTextBox');
-                    }
-                }
-            }).keyup(function () {
-                if (delayedSearchRequest) {
-                    clearTimeout(delayedSearchRequest);
-                    delayedSearchRequest = null;
-                }
-
-                delayedSearchRequest = setTimeout(function () {
-                    if ($('#searchTextBox').val() != "") {
-                        $("#loadingImage").fadeIn('slow');
-                    }
-                    search(escapeSearchString($("#searchTextBox")[0].value.substr(0, 700)));
-                }, 300);
-            });
-
-            $("#search").hide();
-        }
-        Search.initializeSearch = initializeSearch;
-
-        function navigateToElement(e) {
-            if (!CZ.Authoring.isActive) {
-                var animId = CZ.Common.setVisibleByUserDirectly(e.newvisible);
-                if (animId) {
-                    CZ.Common.setNavigationStringTo = { element: e.element, id: animId };
-                }
-            }
-        }
-        Search.navigateToElement = navigateToElement;
-
-        function navigateToBookmark(bookmark) {
-            if (bookmark && !CZ.Authoring.isActive) {
-                var visible = CZ.UrlNav.navStringToVisible(bookmark, CZ.Common.vc);
-                if (visible) {
-                    var animId = CZ.Common.setVisibleByUserDirectly(visible);
-                    if (animId) {
-                        CZ.Common.setNavigationStringTo = { bookmark: bookmark, id: animId };
-                    }
-                }
-            }
-        }
-        Search.navigateToBookmark = navigateToBookmark;
-
-        function goToSearchResult(resultId, elementType) {
-            var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
-            var navStringElement = CZ.UrlNav.vcelementToNavString(element);
-            CZ.StartPage.hide();
-            var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
-            CZ.Common.controller.moveToVisible(visible);
-        }
-        Search.goToSearchResult = goToSearchResult;
-
-        function findVCElement(root, id, elementType) {
-            var lookingForCI = elementType === "contentItem";
-
-            var rfind = function (el, id) {
-                if (el.id === id)
-                    return el;
-                if (!el.children)
-                    return null;
-                var n = el.children.length;
-                for (var i = 0; i < n; i++) {
-                    var child = el.children[i];
-                    if (child.id === id)
-                        return child;
-                }
-                for (var i = 0; i < n; i++) {
-                    var child = el.children[i];
-                    var res = rfind(child, id);
-                    if (res)
-                        return res;
-                }
-                if (lookingForCI && el.type === 'infodot') {
-                    var ci = CZ.VCContent.getContentItem(el, id);
-                    if (ci != null) {
-                        return ci;
-                    }
-                }
-
-                return null;
-            };
-
-            return rfind(root, id);
-        }
-
-        function onSearchResults(searchString, results) {
-            if (escapeSearchString($("#searchTextBox")[0].value).indexOf(searchString) === 0 || searchString === '') {
-                var height;
-                var output = $("#search .searchResults").empty();
-                if (results == null) {
-                } else if (results.length == 0) {
-                    $("<div></div>", {
-                        class: "searchNoResult",
-                        text: "No results"
-                    }).appendTo(output);
-                } else {
-                    var addResults = function (objectType, sectionTitle) {
-                        var first = true;
-                        for (var i = 0; i < results.length; i++) {
-                            var item = results[i];
-                            if (item.objectType != objectType)
-                                continue;
-                            var resultId;
-                            var elementType;
-
-                            switch (item.objectType) {
-                                case 0:
-                                    resultId = 'e' + item.id;
-                                    elementType = "exhibit";
-                                    break;
-                                case 1:
-                                    resultId = 't' + item.id;
-                                    elementType = "timeline";
-                                    break;
-                                case 2:
-                                    resultId = item.id;
-                                    elementType = "contentItem";
-                                    break;
-                                default:
-                                    continue;
-                            }
-                            if (first) {
-                                $("<div></div>", {
-                                    class: "searchResultSection",
-                                    text: sectionTitle
-                                }).appendTo(output);
-
-                                first = false;
-                            }
-                            $("<div></div>", {
-                                class: "searchResult",
-                                resultId: resultId,
-                                text: results[i].title,
-                                click: function () {
-                                    goToSearchResult(this.getAttribute("resultId"), this.getAttribute("data-element-type"));
-                                }
-                            }).attr("data-element-type", elementType).appendTo(output);
-                        }
-                    };
-                    addResults(1, "Timelines");
-                    addResults(0, "Exhibits");
-                    addResults(2, "Artifacts");
-                }
-            }
-
-            if (isSearching) {
-                isSearching = false;
-            }
-            if (pendingSearch != null) {
-                var q = pendingSearch;
-                pendingSearch = null;
-                search(q);
-            }
-
-            $("#loadingImage").fadeOut('slow');
-        }
-
-        var pendingSearch = null;
-        var isSearching = false;
-        function search(searchString) {
-            if (isSearching) {
-                pendingSearch = searchString;
-                return;
-            }
-
-            isSearching = true;
-
-            if (!searchString || searchString === '') {
-                setTimeout(function () {
-                    onSearchResults(searchString);
-                }, 1);
-                return;
-            }
-
-            var url;
-            switch (CZ.Settings.czDataSource) {
-                case 'db':
-                    url = "/api/Search";
-                    break;
-                default:
-                    url = "/api/Search";
-                    break;
-            }
-            $.ajax({
-                cache: false,
-                type: "GET",
-                async: true,
-                dataType: "json",
-                data: { searchTerm: searchString, supercollection: CZ.Service.superCollectionName, collection: CZ.Service.collectionName },
-                url: url,
-                success: function (result) {
-                    onSearchResults(searchString, result.d);
-                },
-                error: function (xhr) {
-                    console.log("Error connecting to service: " + xhr.responseText);
-                }
-            });
-        }
-
-        function escapeSearchString(searchString) {
-            if (searchString === null)
-                return '';
-            if (searchString) {
-                searchString = searchString.replace(new RegExp('"', "g"), '');
-            }
-            return searchString;
-        }
-    })(CZ.Search || (CZ.Search = {}));
-    var Search = CZ.Search;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
     (function (BreadCrumbs) {
         var hiddenFromLeft = [];
         var hiddenFromRight = [];
@@ -7092,328 +15150,6 @@ var CZ;
         }
     })(CZ.BreadCrumbs || (CZ.BreadCrumbs = {}));
     var BreadCrumbs = CZ.BreadCrumbs;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Viewport) {
-        function VisibleRegion2d(centerX, centerY, scale) {
-            this.centerX = centerX;
-            this.centerY = centerY;
-            this.scale = scale;
-        }
-        Viewport.VisibleRegion2d = VisibleRegion2d;
-
-        function Viewport2d(aspectRatio, width, height, visible) {
-            this.aspectRatio = aspectRatio;
-            this.visible = visible;
-            this.width = width;
-            this.height = height;
-
-            this.widthScreenToVirtual = function (wp) {
-                return this.visible.scale * wp;
-            };
-
-            this.heightScreenToVirtual = function (hp) {
-                return this.aspectRatio * this.visible.scale * hp;
-            };
-
-            this.widthVirtualToScreen = function (wv) {
-                return wv / this.visible.scale;
-            };
-
-            this.heightVirtualToScreen = function (hv) {
-                return hv / (this.aspectRatio * this.visible.scale);
-            };
-
-            this.vectorVirtualToScreen = function (vx, vy) {
-                return {
-                    x: vx / this.visible.scale,
-                    y: vy / (this.aspectRatio * this.visible.scale)
-                };
-            };
-
-            this.pointVirtualToScreen = function (px, py) {
-                return {
-                    x: (px - this.visible.centerX) / this.visible.scale + this.width / 2.0,
-                    y: (py - this.visible.centerY) / (this.aspectRatio * this.visible.scale) + this.height / 2.0
-                };
-            };
-
-            this.pointScreenToVirtual = function (px, py) {
-                return {
-                    x: (px - this.width / 2.0) * this.visible.scale + this.visible.centerX,
-                    y: this.visible.centerY - (this.height / 2.0 - py) * (this.aspectRatio * this.visible.scale)
-                };
-            };
-
-            this.vectorScreenToVirtual = function (px, py) {
-                return {
-                    x: px * this.visible.scale,
-                    y: this.aspectRatio * this.visible.scale * py
-                };
-            };
-        }
-        Viewport.Viewport2d = Viewport2d;
-    })(CZ.Viewport || (CZ.Viewport = {}));
-    var Viewport = CZ.Viewport;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (ViewportAnimation) {
-        var globalAnimationID = 1;
-
-        function PanZoomAnimation(startViewport) {
-            this.isForciblyStoped = false;
-            this.ID = globalAnimationID++;
-            var startVisible = startViewport.visible;
-
-            this.velocity = 0.001;
-
-            this.isActive = true;
-            this.type = "PanZoom";
-
-            this.startViewport = new CZ.Viewport.Viewport2d(startViewport.aspectRatio, startViewport.width, startViewport.height, new CZ.Viewport.VisibleRegion2d(startVisible.centerX, startVisible.centerY, startVisible.scale));
-            this.estimatedEndViewport;
-
-            this.endCenterInSC;
-            this.startCenterInSC = this.startViewport.pointVirtualToScreen(startVisible.centerX, startVisible.centerY);
-
-            this.previousFrameCenterInSC = this.startCenterInSC;
-            this.previousFrameViewport = this.startViewport;
-            this.prevFrameTime = new Date();
-
-            this.direction;
-            this.pathLeng;
-
-            this.setTargetViewport = function (estimatedEndViewport) {
-                this.estimatedEndViewport = estimatedEndViewport;
-
-                var prevVis = this.previousFrameViewport.visible;
-
-                this.startViewport = new CZ.Viewport.Viewport2d(this.previousFrameViewport.aspectRatio, this.previousFrameViewport.width, this.previousFrameViewport.height, new CZ.Viewport.VisibleRegion2d(prevVis.centerX, prevVis.centerY, prevVis.scale));
-
-                this.startCenterInSC = this.startViewport.pointVirtualToScreen(prevVis.centerX, prevVis.centerY);
-                this.previousFrameCenterInSC = {
-                    x: this.startCenterInSC.x,
-                    y: this.startCenterInSC.y
-                };
-                var estimatedVisible = this.estimatedEndViewport.visible;
-                this.endCenterInSC = this.startViewport.pointVirtualToScreen(estimatedVisible.centerX, estimatedVisible.centerY);
-
-                this.direction = {
-                    X: this.endCenterInSC.x - this.startCenterInSC.x,
-                    Y: this.endCenterInSC.y - this.startCenterInSC.y
-                };
-
-                var dirX = this.direction.X;
-                var dirY = this.direction.Y;
-
-                this.pathLeng = Math.sqrt(dirX * dirX + dirY * dirY);
-
-                if (this.pathLeng < 1e-1) {
-                    this.direction.X = this.direction.Y = 0;
-
-                    if (estimatedVisible.scale == prevVis.scale)
-                        this.isActive = false;
-                } else {
-                    this.direction.X /= this.pathLeng;
-                    this.direction.Y /= this.pathLeng;
-                }
-            };
-
-            this.produceNextVisible = function (currentViewport) {
-                var currentCenterInSC = this.startViewport.pointVirtualToScreen(currentViewport.visible.centerX, currentViewport.visible.centerY);
-                var currScale = currentViewport.visible.scale;
-
-                var startVisible = this.startViewport.visible;
-
-                var curTime = new Date();
-                var timeDiff = curTime.getTime() - this.prevFrameTime.getTime();
-                var k = this.velocity * timeDiff;
-
-                var dx = this.endCenterInSC.x - this.previousFrameCenterInSC.x;
-                var dy = this.endCenterInSC.y - this.previousFrameCenterInSC.y;
-
-                var curDist = Math.max(1.0, Math.sqrt(dx * dx + dy * dy));
-
-                var prevFrameVisible = this.previousFrameViewport.visible;
-                var updatedVisible = new CZ.Viewport.VisibleRegion2d(prevFrameVisible.centerX, prevFrameVisible.centerY, prevFrameVisible.scale);
-                this.previousFrameCenterInSC.x += curDist * k * this.direction.X;
-                this.previousFrameCenterInSC.y += curDist * k * this.direction.Y;
-                updatedVisible.scale += (this.estimatedEndViewport.visible.scale - updatedVisible.scale) * k;
-                this.prevFrameTime = curTime;
-
-                dx = this.previousFrameCenterInSC.x - this.startCenterInSC.x;
-                dy = this.previousFrameCenterInSC.y - this.startCenterInSC.y;
-
-                var distToStart = Math.sqrt(dx * dx + dy * dy);
-                var scaleDistToStart = this.estimatedEndViewport.visible.scale - startVisible.scale;
-                var scaleDistCurrent = updatedVisible.scale - startVisible.scale;
-                if ((distToStart >= this.pathLeng) || Math.abs(scaleDistCurrent) > Math.abs(scaleDistToStart)) {
-                    this.isActive = false;
-                    return this.estimatedEndViewport.visible;
-                }
-                ;
-
-                var virtPoint = this.startViewport.pointScreenToVirtual(this.previousFrameCenterInSC.x, this.previousFrameCenterInSC.y);
-
-                updatedVisible.centerX = virtPoint.x;
-                updatedVisible.centerY = virtPoint.y;
-
-                this.previousFrameViewport.visible = updatedVisible;
-
-                return updatedVisible;
-            };
-        }
-        ViewportAnimation.PanZoomAnimation = PanZoomAnimation;
-
-        function EllipticalZoom(startVisible, endVisible) {
-            this.isForciblyStoped = false;
-            this.ID = globalAnimationID++;
-            this.type = "EllipticalZoom";
-            this.isActive = true;
-            this.targetVisible = new CZ.Viewport.VisibleRegion2d(endVisible.centerX, endVisible.centerY, endVisible.scale);
-            this.startTime = (new Date()).getTime();
-
-            this.imprecision = 0.0001;
-
-            function cosh(x) {
-                return (Math.exp(x) + Math.exp(-x)) / 2;
-            }
-
-            function sinh(x) {
-                return (Math.exp(x) - Math.exp(-x)) / 2;
-            }
-
-            function tanh(x) {
-                return sinh(x) / cosh(x);
-            }
-
-            this.u = function (s) {
-                var val = this.startScale / (this.ro * this.ro) * (this.coshR0 * tanh(this.ro * s + this.r0) - this.sinhR0) + this.u0;
-
-                if (this.uS < this.pathLen) {
-                    val = val * this.uSRatio;
-                }
-
-                return Math.min(val, this.pathLen);
-            };
-
-            this.scale = function (t) {
-                return this.startScale * cosh(this.r0) / cosh(this.ro * (t * this.S) + this.r0);
-            };
-
-            this.x = function (t) {
-                return startPoint.X + (endPoint.X - startPoint.X) / this.pathLen * this.u(t * this.S);
-            };
-
-            this.y = function (t) {
-                return startPoint.Y + (endPoint.Y - startPoint.Y) / this.pathLen * this.u(t * this.S);
-            };
-
-            this.produceNextVisible = function (currentViewport) {
-                var curTime = (new Date()).getTime();
-                var t;
-
-                if (this.duration > 0)
-                    t = Math.min(1.0, (curTime - this.startTime) / this.duration);
-                else
-                    t = 1.0;
-
-                t = animationEase(t);
-
-                if (t == 1.0) {
-                    this.isActive = false;
-                }
-
-                return new CZ.Viewport.VisibleRegion2d(this.x(t), this.y(t), this.scale(t));
-            };
-
-            var startPoint = {
-                X: startVisible.centerX,
-                Y: startVisible.centerY
-            };
-
-            var startScale = startVisible.scale;
-
-            var endPoint = {
-                X: endVisible.centerX,
-                Y: endVisible.centerY
-            };
-            var endScale = endVisible.scale;
-
-            var xDiff = startPoint.X - endPoint.X;
-            var yDiff = startPoint.Y - endPoint.Y;
-            this.pathLen = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-
-            var ro = 0.1 * CZ.Settings.ellipticalZoomZoomoutFactor;
-            this.ro = ro;
-            var u0 = 0;
-            this.u0 = u0;
-            var u1 = this.pathLen;
-            this.startPoint = startPoint;
-            this.startScale = startScale;
-            this.endPoint = endPoint;
-            this.endScale = endScale;
-
-            if (Math.abs(u0 - u1) > this.imprecision) {
-                var uDiff = u0 - u1;
-                var b0 = (endScale * endScale - startScale * startScale + Math.pow(ro, 4) * uDiff * uDiff) / (2 * startScale * ro * ro * (-uDiff));
-                var b1 = (endScale * endScale - startScale * startScale - Math.pow(ro, 4) * uDiff * uDiff) / (2 * endScale * ro * ro * (-uDiff));
-
-                this.r0 = Math.log(-b0 + Math.sqrt(b0 * b0 + 1));
-                if (this.r0 == -Infinity) {
-                    this.r0 = -Math.log(2 * b0);
-                }
-
-                this.r1 = Math.log(-b1 + Math.sqrt(b1 * b1 + 1));
-                if (this.r1 == -Infinity) {
-                    this.r1 = -Math.log(2 * b1);
-                }
-
-                this.S = (this.r1 - this.r0) / ro;
-                this.duration = CZ.Settings.ellipticalZoomDuration / 300 * this.S;
-            } else {
-                var logScaleChange = Math.log(Math.abs(endScale - startScale)) + 10;
-                if (logScaleChange < 0)
-                    this.isActive = false;
-
-                var scaleDiff = 0.5;
-
-                if (endScale !== 0 || startScale !== 0) {
-                    scaleDiff = Math.min(endScale, startScale) / Math.max(endScale, startScale);
-                }
-
-                if (scaleDiff === 1) {
-                    this.isActive = false;
-                }
-
-                this.duration = CZ.Settings.ellipticalZoomDuration * scaleDiff * 0.2;
-
-                this.x = function (s) {
-                    return this.startPoint.X;
-                };
-                this.y = function (s) {
-                    return this.startPoint.Y;
-                };
-                this.scale = function (s) {
-                    return this.startScale + (this.endScale - this.startScale) * s;
-                };
-            }
-
-            this.coshR0 = cosh(this.r0);
-            this.sinhR0 = sinh(this.r0);
-            this.uS = this.u(this.S);
-            this.uSRatio = this.pathLen / this.uS;
-        }
-        ViewportAnimation.EllipticalZoom = EllipticalZoom;
-
-        function animationEase(t) {
-            return -2 * t * t * t + 3 * t * t;
-        }
-        ViewportAnimation.animationEase = animationEase;
-    })(CZ.ViewportAnimation || (CZ.ViewportAnimation = {}));
-    var ViewportAnimation = CZ.ViewportAnimation;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
@@ -8234,2534 +15970,6 @@ var CZ;
 })(CZ || (CZ = {}));
 var CZ;
 (function (CZ) {
-    (function (ViewportController) {
-        function ViewportController2(setVisible, getViewport, gesturesSource) {
-            this.activeAnimation;
-
-            this.FPS;
-
-            this.maximumPermitedScale;
-
-            this.leftPermitedBound;
-            this.rightPermitedBound;
-            this.topPermitedBound;
-            this.bottomPermitedBound;
-
-            this.effectiveExplorationZoomConstraint = undefined;
-
-            if (!window.requestAnimFrame)
-                window.requestAnimFrame = function (callback) {
-                    window.setTimeout(callback, 1000 / CZ.Settings.targetFps);
-                };
-
-            this.viewportWidth;
-            this.viewportHeight;
-
-            this.setVisible = setVisible;
-            this.getViewport = getViewport;
-
-            var self = this;
-
-            this.estimatedViewport = undefined;
-
-            this.recentViewport = undefined;
-
-            this.onAnimationComplete = [];
-
-            this.onAnimationUpdated = [];
-
-            this.onAnimationStarted = [];
-
-            function PanViewport(viewport, panGesture) {
-                var virtualOffset = viewport.vectorScreenToVirtual(panGesture.xOffset, panGesture.yOffset);
-                var oldVisible = viewport.visible;
-                viewport.visible.centerX = oldVisible.centerX - virtualOffset.x;
-                viewport.visible.centerY = oldVisible.centerY - virtualOffset.y;
-            }
-
-            function ZoomViewport(viewport, zoomGesture) {
-                var oldVisible = viewport.visible;
-                var x = zoomGesture.xOrigin + (viewport.width / 2.0 - zoomGesture.xOrigin) * zoomGesture.scaleFactor;
-                var y = zoomGesture.yOrigin + (viewport.height / 2.0 - zoomGesture.yOrigin) * zoomGesture.scaleFactor;
-                var newCenter = viewport.pointScreenToVirtual(x, y);
-                viewport.visible.centerX = newCenter.x;
-                viewport.visible.centerY = newCenter.y;
-                viewport.visible.scale = oldVisible.scale * zoomGesture.scaleFactor;
-            }
-
-            function calculateTargetViewport(latestViewport, gesture, previouslyEstimatedViewport) {
-                var latestVisible = latestViewport.visible;
-                var initialViewport;
-                if (gesture.Type == "Zoom") {
-                    if (gesture.Source == "Touch") {
-                        if (previouslyEstimatedViewport)
-                            initialViewport = previouslyEstimatedViewport;
-                        else {
-                            initialViewport = new CZ.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new CZ.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
-                        }
-                    } else {
-                        initialViewport = new CZ.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new CZ.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
-                    }
-
-                    ZoomViewport(initialViewport, gesture);
-                } else {
-                    if (previouslyEstimatedViewport)
-                        initialViewport = previouslyEstimatedViewport;
-                    else {
-                        initialViewport = new CZ.Viewport.Viewport2d(latestViewport.aspectRatio, latestViewport.width, latestViewport.height, new CZ.Viewport.VisibleRegion2d(latestVisible.centerX, latestVisible.centerY, latestVisible.scale));
-                    }
-
-                    PanViewport(initialViewport, gesture);
-                }
-
-                self.coerceVisible(initialViewport, gesture);
-                return initialViewport;
-            }
-
-            this.saveScreenParameters = function (viewport) {
-                self.viewportWidth = viewport.width;
-                self.viewportHeight = viewport.height;
-            };
-
-            this.coerceVisible = function (vp, gesture) {
-                this.coerceVisibleInnerZoom(vp, gesture);
-                this.coerceVisibleOuterZoom(vp, gesture);
-                this.coerceVisibleHorizontalBound(vp);
-                this.coerceVisibleVerticalBound(vp);
-            };
-
-            this.coerceVisibleOuterZoom = function (vp, gesture) {
-                if (gesture.Type === "Zoom") {
-                    var visible = vp.visible;
-                    if (typeof CZ.Common.maxPermitedScale != 'undefined' && CZ.Common.maxPermitedScale) {
-                        if (visible.scale > CZ.Common.maxPermitedScale) {
-                            gesture.scaleFactor = CZ.Common.maxPermitedScale / visible.scale;
-                            ZoomViewport(vp, gesture);
-                        }
-                    }
-                }
-            };
-
-            this.coerceVisibleHorizontalBound = function (vp) {
-                var visible = vp.visible;
-                if (CZ.Settings.maxPermitedTimeRange) {
-                    if (visible.centerX > CZ.Settings.maxPermitedTimeRange.right)
-                        visible.centerX = CZ.Settings.maxPermitedTimeRange.right;
-                    else if (visible.centerX < CZ.Settings.maxPermitedTimeRange.left)
-                        visible.centerX = CZ.Settings.maxPermitedTimeRange.left;
-                }
-            };
-
-            this.coerceVisibleVerticalBound = function (vp) {
-                var visible = vp.visible;
-                if (CZ.Common.maxPermitedVerticalRange) {
-                    if (visible.centerY > CZ.Common.maxPermitedVerticalRange.bottom)
-                        visible.centerY = CZ.Common.maxPermitedVerticalRange.bottom;
-                    else if (visible.centerY < CZ.Common.maxPermitedVerticalRange.top)
-                        visible.centerY = CZ.Common.maxPermitedVerticalRange.top;
-                }
-            };
-
-            this.coerceVisibleInnerZoom = function (vp, gesture) {
-                var visible = vp.visible;
-                var x = visible.centerX;
-                var scale = visible.scale;
-                var constr = undefined;
-                if (this.effectiveExplorationZoomConstraint)
-                    constr = this.effectiveExplorationZoomConstraint;
-                else
-                    for (var i = 0; i < CZ.Settings.deeperZoomConstraints.length; i++) {
-                        var possibleConstr = CZ.Settings.deeperZoomConstraints[i];
-                        if (possibleConstr.left <= x && possibleConstr.right > x) {
-                            constr = possibleConstr.scale;
-                            break;
-                        }
-                    }
-                if (constr) {
-                    if (scale < constr) {
-                        visible.scale = constr;
-                    }
-                }
-            };
-
-            self.updateRecentViewport = function () {
-                var vp = getViewport();
-                var vis = vp.visible;
-                self.recentViewport = new CZ.Viewport.Viewport2d(vp.aspectRatio, vp.width, vp.height, new CZ.Viewport.VisibleRegion2d(vis.centerX, vis.centerY, vis.scale));
-            };
-
-            var requestTimer = null;
-            this.getMissingData = function (vbox, lca) {
-                if (typeof CZ.Authoring === 'undefined' || CZ.Authoring.isActive === false) {
-                    window.clearTimeout(requestTimer);
-                    requestTimer = window.setTimeout(function () {
-                        getMissingTimelines(vbox, lca);
-                    }, 1000);
-                }
-            };
-
-            function getMissingTimelines(vbox, lca) {
-                CZ.Data.getTimelines({
-                    lca: lca.guid,
-                    start: vbox.left,
-                    end: vbox.right,
-                    minspan: CZ.Settings.minTimelineWidth * vbox.scale
-                }).then(function (response) {
-                    CZ.Layout.Merge(response, lca);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
-            }
-
-            function getMissingExhibits(vbox, lca, exhibitIds) {
-                CZ.Service.postData({
-                    ids: exhibitIds
-                }).then(function (response) {
-                    MergeContentItems(lca, exhibitIds, response.exhibits);
-                }, function (error) {
-                    console.log("Error connecting to service:\n" + error.responseText);
-                });
-            }
-
-            function extractExhibitIds(timeline) {
-                var ids = [];
-                if (timeline.exhibits instanceof Array) {
-                    timeline.exhibits.forEach(function (childExhibit) {
-                        ids.push(childExhibit.id);
-                    });
-                }
-                if (timeline.timelines instanceof Array) {
-                    timeline.timelines.forEach(function (childTimeline) {
-                        ids = ids.concat(extractExhibitIds(childTimeline));
-                    });
-                }
-                return ids;
-            }
-
-            function MergeContentItems(timeline, exhibitIds, exhibits) {
-                timeline.children.forEach(function (child) {
-                    if (child.type === "infodot") {
-                        var idx = exhibitIds.indexOf(child.guid);
-                        if (idx !== -1) {
-                            child.contentItems = exhibits[idx].contentItems;
-                        }
-                    }
-                });
-
-                timeline.children.forEach(function (child) {
-                    if (child.type === "timeline")
-                        MergeContentItems(child, exhibitIds, exhibits);
-                });
-            }
-
-            gesturesSource.Subscribe(function (gesture) {
-                if (typeof gesture != "undefined" && !CZ.Authoring.isActive) {
-                    var isAnimationActive = self.activeAnimation;
-                    var oldId = isAnimationActive ? self.activeAnimation.ID : undefined;
-
-                    self.updateRecentViewport();
-                    var latestViewport = self.recentViewport;
-
-                    if (gesture.Type == "Pin") {
-                        self.stopAnimation();
-                        return;
-                    }
-
-                    if (gesture.Type == "Pan" || gesture.Type == "Zoom") {
-                        var newlyEstimatedViewport = calculateTargetViewport(latestViewport, gesture, self.estimatedViewport);
-
-                        var vbox = CZ.Common.viewportToViewBox(newlyEstimatedViewport);
-                        var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-
-                        if (!self.estimatedViewport) {
-                            self.activeAnimation = new CZ.ViewportAnimation.PanZoomAnimation(latestViewport);
-
-                            self.saveScreenParameters(latestViewport);
-                        }
-
-                        if (gesture.Type == "Pan")
-                            self.activeAnimation.velocity = CZ.Settings.panSpeedFactor * 0.001;
-                        else
-                            self.activeAnimation.velocity = CZ.Settings.zoomSpeedFactor * 0.0025;
-
-                        self.activeAnimation.setTargetViewport(newlyEstimatedViewport);
-                        self.estimatedViewport = newlyEstimatedViewport;
-                    }
-
-                    if (oldId != undefined)
-                        animationUpdated(oldId, self.activeAnimation.ID);
-                    else
-                        AnimationStarted(self.activeAnimation.ID);
-
-                    if (!isAnimationActive)
-                        self.animationStep(self);
-                }
-            });
-
-            self.updateRecentViewport();
-            this.saveScreenParameters(self.recentViewport);
-
-            this.stopAnimation = function () {
-                self.estimatedViewport = undefined;
-                if (self.activeAnimation) {
-                    self.activeAnimation.isForciblyStoped = true;
-                    self.activeAnimation.isActive = false;
-
-                    animationUpdated(self.activeAnimation.ID, undefined);
-                }
-            };
-
-            function animationUpdated(oldId, newId) {
-                for (var i = 0; i < self.onAnimationUpdated.length; i++)
-                    self.onAnimationUpdated[i](oldId, newId);
-            }
-
-            function AnimationStarted(newId) {
-                for (var i = 0; i < self.onAnimationStarted.length; i++)
-                    self.onAnimationStarted[i](newId);
-            }
-
-            this.animationStep = function (self) {
-                if (self.activeAnimation) {
-                    if (self.activeAnimation.isActive)
-                        window.requestAnimFrame(function () {
-                            self.animationStep(self);
-                        });
-                    else {
-                        var stopAnimationID = self.activeAnimation.ID;
-
-                        self.updateRecentViewport();
-                        setVisible(new CZ.Viewport.VisibleRegion2d(self.recentViewport.visible.centerX, self.recentViewport.visible.centerY, self.recentViewport.visible.scale));
-                        if (!self.activeAnimation.isForciblyStoped)
-                            for (var i = 0; i < self.onAnimationComplete.length; i++)
-                                self.onAnimationComplete[i](stopAnimationID);
-                        self.activeAnimation = undefined;
-                        self.estimatedViewport = undefined;
-                        return;
-                    }
-
-                    var vp = self.recentViewport;
-                    if (self.viewportWidth != vp.width || self.viewportHeight != vp.height)
-                        self.stopAnimation();
-
-                    var vis = self.activeAnimation.produceNextVisible(vp);
-                    setVisible(vis);
-                }
-
-                this.frames++;
-                this.oneSecondFrames++;
-
-                var e = CZ.Common.vc.virtualCanvas("getLastEvent");
-                if (e != null) {
-                    CZ.Common.vc.virtualCanvas("mouseMove", e);
-                }
-            };
-
-            this.frames = 0;
-            this.oneSecondFrames = 0;
-            window.setInterval(function () {
-                self.FPS = self.oneSecondFrames;
-                self.oneSecondFrames = 0;
-            }, 1000);
-
-            this.PanViewportAccessor = PanViewport;
-
-            this.moveToVisible = function (visible, noAnimation) {
-                var currentViewport = getViewport();
-                var targetViewport = new CZ.Viewport.Viewport2d(currentViewport.aspectRatio, currentViewport.width, currentViewport.height, visible);
-                var vbox = CZ.Common.viewportToViewBox(targetViewport);
-                var wnd = new CZ.VCContent.CanvasRectangle(null, null, null, vbox.left, vbox.top, vbox.width, vbox.height, null);
-
-                if (noAnimation) {
-                    self.stopAnimation();
-                    self.setVisible(visible);
-                    return;
-                }
-
-                var wasAnimationActive = false;
-                var oldId = undefined;
-                if (this.activeAnimation) {
-                    wasAnimationActive = this.activeAnimation.isActive;
-                    oldId = this.activeAnimation.ID;
-                }
-
-                self.updateRecentViewport();
-                var vp = self.recentViewport;
-                this.estimatedViewport = undefined;
-                this.activeAnimation = new CZ.ViewportAnimation.EllipticalZoom(vp.visible, visible);
-
-                self.viewportWidth = vp.width;
-                self.viewportHeight = vp.height;
-
-                if (!wasAnimationActive) {
-                    if (this.activeAnimation.isActive)
-                        AnimationStarted(this.activeAnimation.ID);
-
-                    setTimeout(function () {
-                        return self.animationStep(self);
-                    }, 0);
-                } else {
-                    animationUpdated(oldId, this.activeAnimation.ID);
-                }
-
-                return (this.activeAnimation) ? this.activeAnimation.ID : undefined;
-            };
-        }
-        ViewportController.ViewportController2 = ViewportController2;
-    })(CZ.ViewportController || (CZ.ViewportController = {}));
-    var ViewportController = CZ.ViewportController;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    function Timescale(container) {
-        if (!container) {
-            throw "Container parameter is undefined!";
-        }
-        if (container.tagName !== undefined && container.tagName.toLowerCase() === "div") {
-            container = $(container);
-        } else if (typeof (container) === "string") {
-            container = $("#" + container);
-            if (container.length === 0 || !container.is("div")) {
-                throw "There is no DIV element with such ID.";
-            }
-        } else if (!(container instanceof jQuery && container.is("div"))) {
-            throw "Container parameter is invalid! It should be DIV, or ID of DIV, or jQuery instance of DIV.";
-        }
-
-        var mouse_clicked = false;
-        var mouse_hovered = false;
-
-        container.mouseup(function (e) {
-            mouse_clicked = false;
-        });
-        container.mousedown(function (e) {
-            mouse_clicked = true;
-        });
-        container.mousemove(function (e) {
-            mouse_hovered = true;
-            mouseMove(e);
-        });
-        container.mouseleave(function (e) {
-            mouse_hovered = false;
-            mouse_clicked = false;
-        });
-
-        var that = this;
-        var _container = container;
-        var _range = { min: 0, max: 1 };
-        var _ticks = [];
-        var _ticksInfo = [];
-        var _mode = "cosmos";
-        var _position = "top";
-        var _deltaRange;
-        var _size;
-        var _width;
-        var _height;
-        var _canvasHeight;
-        var _markerPosition;
-
-        var _tickSources = {
-            "cosmos": new CZ.CosmosTickSource(),
-            "calendar": new CZ.CalendarTickSource(),
-            "date": new CZ.DateTickSource()
-        };
-
-        var isHorizontal = (_position === "bottom" || _position === "top");
-        var canvas = $("<canvas></canvas>");
-        var labelsDiv = $("<div></div>");
-
-        var marker = $("<div id='timescale_marker' class='cz-timescale-marker'></div>");
-        var markerText = $("<div id='marker-text'></div>");
-        var markertriangle = $("<div id='marker-triangle'></div>");
-
-        var canvasSize = CZ.Settings.tickLength + CZ.Settings.timescaleThickness;
-        var text_size;
-        var fontSize;
-        var strokeStyle;
-        var ctx;
-
-        init();
-
-        Object.defineProperties(this, {
-            position: {
-                configurable: false,
-                get: function () {
-                    return _position;
-                },
-                set: function (value) {
-                    _position = value;
-                    isHorizontal = (_position === "bottom" || _position === "top");
-                }
-            },
-            mode: {
-                configurable: false,
-                get: function () {
-                    return _mode;
-                },
-                set: function (value) {
-                    _tickSources[_mode].hideDivs();
-                    _mode = value;
-                }
-            },
-            container: {
-                configurable: false,
-                get: function () {
-                    return _container;
-                }
-            },
-            range: {
-                configurable: false,
-                get: function () {
-                    return _range;
-                }
-            },
-            ticks: {
-                configurable: false,
-                get: function () {
-                    return _ticks;
-                }
-            },
-            ticksInfo: {
-                configurable: false,
-                get: function () {
-                    return _ticksInfo;
-                }
-            },
-            tickSource: {
-                configurable: false,
-                get: function () {
-                    return _tickSources[_mode];
-                }
-            },
-            markerPosition: {
-                configurable: false,
-                get: function () {
-                    return _markerPosition;
-                }
-            }
-        });
-
-        function init() {
-            _container.addClass("cz-timescale");
-            _container.addClass("unselectable");
-            marker.addClass("cz-timescale-marker");
-            markertriangle.addClass("cz-timescale-marker-triangle");
-            labelsDiv.addClass("cz-timescale-labels-container");
-
-            marker[0].appendChild(markerText[0]);
-            marker[0].appendChild(markertriangle[0]);
-            _container[0].appendChild(labelsDiv[0]);
-            _container[0].appendChild(canvas[0]);
-            _container[0].appendChild(marker[0]);
-            canvas[0].height = canvasSize;
-
-            text_size = -1;
-            strokeStyle = _container ? _container.css("color") : "Black";
-            ctx = canvas[0].getContext("2d");
-            fontSize = 45;
-            if (_container.currentStyle) {
-                fontSize = _container.currentStyle["font-size"];
-                ctx.font = fontSize + _container.currentStyle["font-family"];
-            } else if (document.defaultView && document.defaultView.getComputedStyle) {
-                fontSize = document.defaultView.getComputedStyle(_container[0], null).getPropertyValue("font-size");
-                ctx.font = fontSize + document.defaultView.getComputedStyle(_container[0], null).getPropertyValue("font-family");
-            } else if (_container.style) {
-                fontSize = _container.style["font-size"];
-                ctx.font = fontSize + _container.style["font-family"];
-            }
-        }
-
-        function updateSize() {
-            var prevSize = _size;
-
-            _width = _container.outerWidth(true);
-            _height = _container.outerHeight(true);
-            if (isHorizontal) {
-                _size = _width;
-                if (_size != prevSize) {
-                    canvas[0].width = _size;
-                    labelsDiv.css("width", _size);
-                }
-            } else {
-                _size = _height;
-                if (_size != prevSize) {
-                    canvas[0].height = _size;
-                    labelsDiv.css("height", _size);
-                }
-            }
-            _deltaRange = (_size - 1) / (_range.max - _range.min);
-            _canvasHeight = canvas[0].height;
-
-            if (isHorizontal) {
-                text_size = (_ticksInfo[0] && _ticksInfo[0].height !== text_size) ? _ticksInfo[0].height : 0;
-                if (text_size !== 0) {
-                    labelsDiv.css("height", text_size);
-                    canvas[0].height = canvasSize;
-                }
-            } else {
-                text_size = (_ticksInfo[0] && _ticksInfo[0].width !== text_size) ? _ticksInfo[0].width : 0;
-
-                if (text_size !== 0) {
-                    labelsDiv.css("width", text_size);
-                    canvas[0].width = canvasSize;
-                    var textOffset = 0;
-                    _width = text_size + canvasSize + textOffset;
-                    _container.css("width", _width);
-                }
-            }
-        }
-
-        function setMode() {
-            var beta;
-
-            if (_range.min <= -10000) {
-                that.mode = "cosmos";
-            } else {
-                beta = Math.floor(Math.log(_range.max - _range.min) * (1 / Math.log(10)));
-
-                if (beta < 0) {
-                    that.mode = "date";
-                } else {
-                    that.mode = "calendar";
-                }
-            }
-        }
-
-        function getTicksInfo() {
-            var len = _ticks.length;
-            var size;
-            var width;
-            var height;
-            var h = isHorizontal ? _canvasHeight : 0;
-            var tick;
-
-            _ticksInfo = new Array(len);
-
-            for (var i = 0; i < len; i++) {
-                tick = _ticks[i];
-
-                if (tick.label) {
-                    size = tick.label._size;
-                    width = size.width;
-                    height = size.height;
-                    if (!width) {
-                        width = ctx.measureText(tick.position).width * 1.5;
-                    }
-                    if (!height) {
-                        height = (isHorizontal ? h : parseFloat(fontSize)) + 8;
-                    }
-                    _ticksInfo[i] = {
-                        position: that.getCoordinateFromTick(tick.position),
-                        width: width,
-                        height: height,
-                        hasLabel: true
-                    };
-                } else {
-                    _ticksInfo[i] = {
-                        position: that.getCoordinateFromTick(tick.position),
-                        width: 0,
-                        height: 0,
-                        hasLabel: false
-                    };
-                }
-            }
-        }
-
-        function addNewLabels() {
-            var label;
-            var labelDiv;
-
-            for (var i = 0, len = _ticks.length; i < len; i++) {
-                label = _ticks[i].label;
-                if (label && !label.hasClass('cz-timescale-label')) {
-                    labelDiv = label[0];
-                    labelsDiv[0].appendChild(labelDiv);
-                    label.addClass('cz-timescale-label');
-                    label._size = {
-                        width: labelDiv.offsetWidth,
-                        height: labelDiv.offsetHeight
-                    };
-                }
-            }
-        }
-
-        function checkLabelsArrangement() {
-            var delta;
-            var deltaSize;
-            var len = _ticks.length - 1;
-
-            if (len == -1) {
-                return false;
-            }
-
-            for (var i1 = 0, i2 = 1; i2 < len; i1 = i2, i2++) {
-                while (i2 < len + 1 && !_ticksInfo[i2].hasLabel) {
-                    i2++;
-                }
-                if (i2 > len) {
-                    break;
-                }
-                if (_ticksInfo[i1].hasLabel) {
-                    delta = Math.abs(_ticksInfo[i2].position - _ticksInfo[i1].position);
-                    if (delta < CZ.Settings.minTickSpace)
-                        return true;
-                    if (isHorizontal) {
-                        deltaSize = (_ticksInfo[i1].width + _ticksInfo[i2].width) / 2;
-                        if (i1 === 0 && (_ticksInfo[i1].position - _ticksInfo[i1].width / 2 < 0)) {
-                            deltaSize -= _ticksInfo[i1].width / 2;
-                        } else if (i2 == len - 1 && (_ticksInfo[i2].position - _ticksInfo[i2].width / 2 > _size)) {
-                            deltaSize -= _ticksInfo[i2].width / 2;
-                        }
-                    } else {
-                        deltaSize = (_ticksInfo[i1].height + _ticksInfo[i2].height) / 2;
-                        if (i1 === 0 && (_ticksInfo[i1].position - _ticksInfo[i1].height / 2 < 0)) {
-                            deltaSize -= _ticksInfo[i1].height / 2;
-                        } else if (i2 == len - 1 && (_ticksInfo[i2].position - _ticksInfo[i2].height / 2 > _size)) {
-                            deltaSize -= _ticksInfo[i2].height / 2;
-                        }
-                    }
-                    if (delta - deltaSize < CZ.Settings.minLabelSpace) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        function updateMajorTicks() {
-            var i;
-
-            _ticks = _tickSources[_mode].getTicks(_range);
-
-            addNewLabels();
-            getTicksInfo();
-
-            if (checkLabelsArrangement()) {
-                for (i = 0; i < CZ.Settings.maxTickArrangeIterations; ++i) {
-                    _ticks = _tickSources[_mode].decreaseTickCount();
-                    addNewLabels();
-                    getTicksInfo();
-                    if (!checkLabelsArrangement()) {
-                        break;
-                    }
-                }
-            } else {
-                for (i = 0; i < CZ.Settings.maxTickArrangeIterations; ++i) {
-                    _ticks = _tickSources[_mode].increaseTickCount();
-                    addNewLabels();
-                    getTicksInfo();
-
-                    if (checkLabelsArrangement()) {
-                        _ticks = _tickSources[_mode].decreaseTickCount();
-                        getTicksInfo();
-                        addNewLabels();
-                        break;
-                    }
-                }
-            }
-        }
-
-        function renderBaseLine() {
-            if (isHorizontal) {
-                if (_position == "bottom") {
-                    ctx.fillRect(0, 0, _size, CZ.Settings.timescaleThickness);
-                } else {
-                    ctx.fillRect(0, CZ.Settings.tickLength, _size, CZ.Settings.timescaleThickness);
-                }
-            } else {
-                if (_position == "right") {
-                    ctx.fillRect(0, 0, CZ.Settings.timescaleThickness, _size);
-                } else {
-                    ctx.fillRect(CZ.Settings.tickLength, 0, CZ.Settings.timescaleThickness, _size);
-                }
-            }
-        }
-
-        function renderMajorTicks() {
-            var x;
-            var shift;
-
-            ctx.beginPath();
-
-            for (var i = 0, len = _ticks.length; i < len; i++) {
-                x = _ticksInfo[i].position;
-                if (isHorizontal) {
-                    shift = _ticksInfo[i].width / 2;
-                    if (i === 0 && x < shift) {
-                        shift = 0;
-                    } else if (i == len - 1 && x + shift > _size) {
-                        shift *= 2;
-                    }
-
-                    ctx.moveTo(x, 1);
-                    ctx.lineTo(x, 1 + CZ.Settings.tickLength);
-
-                    if (_ticks[i].label) {
-                        _ticks[i].label.css("left", x - shift);
-                    }
-                } else {
-                    x = (_size - 1) - x;
-                    shift = _ticksInfo[i].height / 2;
-                    if (i === 0 && x + shift > _size) {
-                        shift *= 2;
-                    } else if (i == len - 1 && x < shift) {
-                        shift = 0;
-                    }
-
-                    ctx.moveTo(1, x);
-                    ctx.lineTo(1 + CZ.Settings.tickLength, x);
-
-                    if (_ticks[i].label) {
-                        _ticks[i].label.css("top", x - shift);
-                        if (_position == "left") {
-                            _ticks[i].label.css("left", text_size - (this.rotateLabels ? _ticksInfo[i].height : _ticksInfo[i].width));
-                        }
-                    }
-                }
-            }
-
-            ctx.stroke();
-            ctx.closePath();
-        }
-
-        function renderSmallTicks() {
-            var minDelta;
-            var i;
-            var len;
-            var smallTicks = _tickSources[_mode].getSmallTicks(_ticks);
-            var x;
-            ctx.beginPath();
-
-            if (smallTicks && smallTicks.length > 0) {
-                minDelta = Math.abs(that.getCoordinateFromTick(smallTicks[1]) - that.getCoordinateFromTick(smallTicks[0]));
-                len = smallTicks.length;
-
-                for (i = 1; i < len - 1; i++) {
-                    minDelta = Math.min(minDelta, Math.abs(that.getCoordinateFromTick(smallTicks[i + 1]) - that.getCoordinateFromTick(smallTicks[i])));
-                }
-
-                if (minDelta >= CZ.Settings.minSmallTickSpace) {
-                    switch (_position) {
-                        case "bottom":
-                            for (i = 0; i < len; i++) {
-                                x = that.getCoordinateFromTick(smallTicks[i]);
-                                ctx.moveTo(x, 1);
-                                ctx.lineTo(x, 1 + CZ.Settings.smallTickLength);
-                            }
-                            break;
-                        case "top":
-                            for (i = 0; i < len; i++) {
-                                x = that.getCoordinateFromTick(smallTicks[i]);
-                                ctx.moveTo(x, CZ.Settings.tickLength - CZ.Settings.smallTickLength);
-                                ctx.lineTo(x, 1 + CZ.Settings.tickLength);
-                            }
-                            break;
-                        case "left":
-                            for (i = 0; i < len; i++) {
-                                x = that.getCoordinateFromTick(smallTicks[i]);
-                                ctx.moveTo(CZ.Settings.tickLength - CZ.Settings.smallTickLength, _size - x - 1);
-                                ctx.lineTo(CZ.Settings.tickLength, _size - x - 1);
-                            }
-                            break;
-                        case "right":
-                            for (i = 0; i < len; i++) {
-                                x = that.getCoordinateFromTick(smallTicks[i]);
-                                ctx.moveTo(1, _size - x - 1);
-                                ctx.lineTo(1 + CZ.Settings.smallTickLength, _size - x - 1);
-                            }
-                            break;
-                    }
-                }
-            }
-
-            ctx.stroke();
-            ctx.closePath();
-        }
-
-        function mouseMove(e) {
-            var point = CZ.Common.getXBrowserMouseOrigin(container, e);
-            var k = (_range.max - _range.min) / _width;
-            var time = _range.max - k * (_width - point.x);
-            that.setTimeMarker(time);
-        }
-
-        this.setTimeMarker = function (time, vcGesture) {
-            if (typeof vcGesture === "undefined") { vcGesture = false; }
-            if ((!mouse_clicked) && (((!vcGesture) || ((vcGesture) && (!mouse_hovered))))) {
-                if (time > CZ.Settings.maxPermitedTimeRange.right)
-                    time = CZ.Settings.maxPermitedTimeRange.right;
-                if (time < CZ.Settings.maxPermitedTimeRange.left)
-                    time = CZ.Settings.maxPermitedTimeRange.left;
-                var k = (_range.max - _range.min) / _width;
-                var point = (time - _range.max) / k + _width;
-                var text = _tickSources[_mode].getMarkerLabel(_range, time);
-                _markerPosition = point;
-                markerText.text(text);
-                marker.css("left", point - marker.width() / 2);
-            }
-        };
-
-        function render() {
-            setMode();
-
-            updateMajorTicks();
-
-            updateSize();
-
-            ctx.strokeStyle = strokeStyle;
-            ctx.fillStyle = strokeStyle;
-            ctx.lineWidth = CZ.Settings.timescaleThickness;
-            if (isHorizontal) {
-                ctx.clearRect(0, 0, _size, canvasSize);
-            } else {
-                ctx.clearRect(0, 0, canvasSize, _size);
-            }
-
-            renderBaseLine();
-            renderMajorTicks();
-            renderSmallTicks();
-        }
-
-        this.getCoordinateFromTick = function (x) {
-            var delta = _deltaRange;
-            var k = _size / (_range.max - _range.min);
-            var log10 = 1 / Math.log(10);
-            var x1 = k * (x - _range.min);
-            var beta;
-            var firstYear;
-
-            if (_range.min >= -10000) {
-                beta = Math.log(_range.max - _range.min) * log10;
-                firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
-                if (beta >= 0) {
-                    x1 += k * firstYear;
-                }
-            }
-
-            if (isFinite(delta)) {
-                return x1;
-            } else {
-                return _size / 2;
-            }
-        };
-
-        this.update = function (range) {
-            _range = range;
-            render();
-        };
-
-        this.destroy = function () {
-            _container[0].innerHTML = "";
-            _container.removeClass("cz-timescale");
-            _container.removeClass("unselectable");
-        };
-
-        this.remove = function () {
-            var parent = _container[0].parentElement;
-            if (parent) {
-                parent.removeChild(_container[0]);
-            }
-            this.destroy();
-        };
-    }
-    CZ.Timescale = Timescale;
-    ;
-
-    function TickSource() {
-        this.delta, this.beta;
-        this.range = { min: -1, max: 0 };
-        this.log10 = 1 / Math.log(10);
-        this.startDate = null, this.endDate = null, this.firstYear = null;
-        this.regime = "";
-        this.level = 1;
-        this.present;
-
-        var divPool = [];
-        var isUsedPool = [];
-        var inners = [];
-        var styles = [];
-        var len = 0;
-
-        this.start;
-        this.finish;
-        this.width = 900;
-
-        this.getDiv = function (x) {
-            var inner = this.getLabel(x);
-            var i = inners.indexOf(inner);
-            if (i != -1) {
-                isUsedPool[i] = true;
-                styles[i].display = "block";
-                return divPool[i];
-            } else {
-                var i = isUsedPool.indexOf(false);
-                if (i != -1) {
-                    isUsedPool[i] = true;
-                    styles[i].display = "block";
-                    inners[i] = inner;
-                    var div = divPool[i][0];
-                    div.innerHTML = inner;
-                    divPool[i]._size = { width: div.offsetWidth, height: div.offsetHeight };
-                    return divPool[i];
-                } else {
-                    var div = $("<div>" + inner + "</div>");
-                    isUsedPool[len] = true;
-                    divPool[len] = div;
-                    inners[len] = inner;
-                    styles[len] = div[0].style;
-                    div._size = undefined;
-                    len++;
-                    return div;
-                }
-            }
-        };
-
-        this.refreshDivs = function () {
-            for (var i = 0; i < len; i++) {
-                if (isUsedPool[i])
-                    isUsedPool[i] = false;
-                else
-                    styles[i].display = "none";
-            }
-        };
-
-        this.hideDivs = function () {
-            for (var i = 0; i < len; i++) {
-                styles[i].display = "none";
-            }
-        };
-
-        this.getTicks = function (range) {
-            this.getRegime(range.min, range.max);
-            return this.createTicks(range);
-        };
-
-        this.getLabel = function (x) {
-            return x;
-        };
-
-        this.getRegime = function (l, r) {
-        };
-
-        this.createTicks = function (range) {
-        };
-
-        this.getSmallTicks = function (ticks) {
-            if (ticks.length !== 0) {
-                return this.createSmallTicks(ticks);
-            }
-        };
-
-        this.createSmallTicks = function (ticks) {
-        };
-
-        this.decreaseTickCount = function () {
-            if (this.delta == 1) {
-                this.delta = 2;
-            } else if (this.delta == 2) {
-                this.delta = 5;
-            } else if (this.delta == 5) {
-                this.delta = 1;
-                this.beta++;
-            }
-            return this.createTicks(this.range);
-        };
-
-        this.increaseTickCount = function () {
-            if (this.delta == 1) {
-                this.delta = 5;
-                this.beta--;
-            } else if (this.delta == 2) {
-                this.delta = 1;
-            } else if (this.delta == 5) {
-                this.delta = 2;
-            }
-            return this.createTicks(this.range);
-        };
-
-        this.round = function (x, n) {
-            var pow = 1;
-            var i;
-            if (n <= 0) {
-                n = Math.max(0, Math.min(-n, 15));
-                pow = 1;
-                for (i = 0; i > n; i--) {
-                    pow /= 10;
-                }
-                return Math.round(x * pow) / pow;
-            } else {
-                pow = 1;
-                for (i = 0; i < n; i++) {
-                    pow *= 10;
-                }
-                var val = pow * Math.round(x / pow);
-                return val;
-            }
-        };
-
-        this.getMarkerLabel = function (range, time) {
-            return time;
-        };
-    }
-    CZ.TickSource = TickSource;
-    ;
-
-    function CosmosTickSource() {
-        this.base = CZ.TickSource;
-        this.base();
-        var that = this;
-
-        this.getLabel = function (x) {
-            var text;
-
-            var n = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4);
-
-            text = Math.abs(x) / this.level;
-
-            if (n < 0) {
-                text = (new Number(text)).toFixed(-n);
-            }
-
-            text += " " + (x < 0 ? this.regime : String(this.regime).charAt(0));
-            return text;
-        };
-
-        this.getRegime = function (l, r) {
-            if (l < r) {
-                this.range.min = l;
-                this.range.max = r;
-            } else {
-                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
-                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
-            }
-            if (this.range.min < CZ.Settings.maxPermitedTimeRange.left)
-                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
-            if (this.range.max > CZ.Settings.maxPermitedTimeRange.right)
-                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
-
-            var localPresent = CZ.Dates.getPresent();
-            this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
-
-            this.delta = 1;
-            this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
-
-            if (this.range.min <= -10000000000) {
-                this.regime = "Ga";
-                this.level = 1000000000;
-                if (this.beta < 7) {
-                    this.regime = "Ma";
-                    this.level = 1000000;
-                }
-            } else if (this.range.min <= -10000000) {
-                this.regime = "Ma";
-                this.level = 1000000;
-            } else if (this.range.min <= -10000) {
-                this.regime = "ka";
-                this.level = 1000;
-            }
-        };
-
-        this.createTicks = function (range) {
-            var ticks = new Array();
-
-            if (this.regime == "Ga" && this.beta < 7)
-                this.beta = 7;
-            else if (this.regime == "Ma" && this.beta < 2)
-                this.beta = 2;
-            else if (this.regime == "ka" && this.beta < -1)
-                this.beta = -1;
-
-            var dx = this.delta * Math.pow(10, this.beta);
-
-            var min = Math.floor(this.range.min / dx);
-            var max = Math.floor(this.range.max / dx);
-            var count = max - min + 1;
-
-            var num = 0;
-            var x0 = min * dx;
-            if (dx == 2)
-                count++;
-            for (var i = 0; i < count + 1; i++) {
-                var tick_position = this.round(x0 + i * dx, this.beta);
-                if (tick_position >= this.range.min && tick_position <= this.range.max && tick_position != ticks[ticks.length - 1]) {
-                    ticks[num] = { position: tick_position, label: this.getDiv(tick_position) };
-                    num++;
-                }
-            }
-
-            this.refreshDivs();
-            return ticks;
-        };
-
-        this.createSmallTicks = function (ticks) {
-            var minors = new Array();
-
-            var n = 4;
-            var k = this.width / (this.range.max - this.range.min);
-            var nextStep = true;
-            var l = ticks.length > 1 ? ticks[1].position - ticks[0].position : 0;
-            var step = l / (n + 1);
-
-            if (k * step < CZ.Settings.minSmallTickSpace)
-                return null;
-            var tick = ticks[0].position - step;
-
-            while (tick > this.range.min) {
-                minors.push(tick);
-                tick -= step;
-            }
-
-            for (var i = 0; i < ticks.length - 1; i++) {
-                var t = ticks[i].position;
-                for (var k = 1; k <= n; k++) {
-                    tick = t + step * k;
-                    minors.push(tick);
-                }
-            }
-
-            tick = ticks[ticks.length - 1].position + step;
-            while (tick < this.range.max) {
-                minors.push(tick);
-                tick += step;
-            }
-            return minors;
-        };
-
-        this.getMarkerLabel = function (range, time) {
-            var labelText;
-            this.getRegime(range.min, range.max);
-            var numOfDigits = Math.max(Math.floor(Math.log(this.delta * Math.pow(10, this.beta) / this.level) * this.log10), -4) - 1;
-            labelText = (Math.abs(time / this.level)).toFixed(Math.abs(numOfDigits));
-
-            var localPresent = CZ.Dates.getPresent();
-            var presentDate = CZ.Dates.getCoordinateFromYMD(localPresent.presentYear, localPresent.presentMonth, localPresent.presentDay);
-
-            if (time == presentDate) {
-                if (this.regime !== "ka")
-                    labelText = 0;
-                else
-                    labelText = 2;
-            }
-            labelText += " " + (time < 0 ? this.regime : String(this.regime).charAt(0));
-            return labelText;
-        };
-
-        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
-            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
-            var width = viewport.width - margin;
-            if (width < 0)
-                width = viewport.width;
-            var scaleX = scale * element.width / width;
-
-            var height = viewport.height - margin;
-            if (height < 0)
-                height = viewport.height;
-            var scaleY = scale * element.height / height;
-            var vs = {
-                centerX: element.x + element.width / 2.0,
-                centerY: element.y + element.height / 2.0,
-                scale: Math.max(scaleX, scaleY)
-            };
-            return vs;
-        };
-    }
-    CZ.CosmosTickSource = CosmosTickSource;
-    ;
-    CZ.CosmosTickSource.prototype = new CZ.TickSource;
-
-    function CalendarTickSource() {
-        this.base = CZ.TickSource;
-        this.base();
-
-        this.getLabel = function (x) {
-            var text;
-            var DMY = CZ.Dates.getYMDFromCoordinate(x);
-            var year = DMY.year;
-            if (year <= 0)
-                text = -year + " BCE";
-            else
-                text = year + " CE";
-            return text;
-        };
-
-        this.getRegime = function (l, r) {
-            if (l < r) {
-                this.range.min = l;
-                this.range.max = r;
-            } else {
-                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
-                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
-            }
-
-            if (this.range.min < CZ.Settings.maxPermitedTimeRange.left)
-                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
-            if (this.range.max > CZ.Settings.maxPermitedTimeRange.right)
-                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
-
-            var localPresent = CZ.Dates.getPresent();
-            this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
-
-            this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
-            this.range.max -= this.firstYear;
-            this.range.min -= this.firstYear;
-
-            this.startDate = this.present;
-            this.endDate = this.present;
-            if (this.range.min < 0) {
-                this.startDate = CZ.Dates.getYMDFromCoordinate(this.range.min);
-            }
-            if (this.range.max < 0) {
-                this.endDate = CZ.Dates.getYMDFromCoordinate(this.range.max);
-            }
-
-            this.delta = 1;
-            this.beta = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
-
-            this.regime = "BCE/CE";
-            this.level = 1;
-        };
-
-        this.createTicks = function (range) {
-            var ticks = new Array();
-
-            if (this.beta < 0)
-                this.beta = 0;
-
-            var dx = this.delta * Math.pow(10, this.beta);
-
-            var min = Math.floor(this.range.min / dx);
-            var max = Math.floor(this.range.max / dx);
-            var count = max - min + 1;
-
-            var num = 0;
-            var x0 = min * dx;
-            if (dx == 2)
-                count++;
-            for (var i = 0; i < count + 1; i++) {
-                var tick_position = CZ.Dates.getCoordinateFromYMD(x0 + i * dx, 0, 1);
-                if (tick_position === 0 && dx > 1)
-                    tick_position += 1;
-                if (tick_position >= this.range.min && tick_position <= this.range.max && tick_position != ticks[ticks.length - 1]) {
-                    ticks[num] = { position: tick_position, label: this.getDiv(tick_position) };
-                    num++;
-                }
-            }
-            this.refreshDivs();
-            return ticks;
-        };
-
-        this.createSmallTicks = function (ticks) {
-            var minors = new Array();
-
-            var n = 4;
-
-            var beta1 = Math.floor(Math.log(this.range.max - this.range.min) * this.log10);
-            if (beta1 <= 0.3)
-                n = 3;
-
-            var k = this.width / (this.range.max - this.range.min);
-            var nextStep = true;
-            var l = ticks.length > 1 ? ticks[1].position - ticks[0].position : 0;
-            var step = l / (n + 1);
-
-            if (k * step < CZ.Settings.minSmallTickSpace)
-                return null;
-            var tick = ticks[0].position - step;
-
-            while (tick > this.range.min) {
-                minors.push(tick);
-                tick -= step;
-            }
-
-            for (var i = 0; i < ticks.length - 1; i++) {
-                var t = ticks[i].position;
-
-                if (step > 1e-10 + 1 / (n + 1) && Math.abs(t - 1.0) < 1e-10)
-                    t = 0;
-                for (var k = 1; k <= n; k++) {
-                    tick = t + step * k;
-
-                    minors.push(tick);
-                }
-            }
-
-            tick = ticks[ticks.length - 1].position + step;
-            while (tick < this.range.max) {
-                minors.push(tick);
-                tick += step;
-            }
-            return minors;
-        };
-
-        this.getMarkerLabel = function (range, time) {
-            var labelText = "";
-
-            this.getRegime(range.min, range.max);
-            var currentDate = parseFloat(new Number(time - this.firstYear).toFixed(2));
-            currentDate += currentDate > 0 ? -0.5 : -1.5;
-            currentDate = Math.round(currentDate);
-            if (currentDate < 0) {
-                currentDate = -currentDate;
-            } else if (currentDate == 0) {
-                currentDate = 1;
-            }
-
-            labelText = currentDate.toString();
-
-            if (time < this.firstYear + 1) {
-                labelText += " " + "BCE";
-            } else {
-                labelText += " " + "CE";
-            }
-
-            return labelText;
-        };
-
-        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
-            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
-            var width = viewport.width - margin;
-            if (width < 0)
-                width = viewport.width;
-            var scaleX = scale * element.width / width;
-
-            var height = viewport.height - margin;
-            if (height < 0)
-                height = viewport.height;
-            var scaleY = scale * element.height / height;
-            var vs = {
-                centerX: element.x + element.width / 2.0,
-                centerY: element.y + element.height / 2.0,
-                scale: scaleX
-            };
-            return vs;
-        };
-    }
-    CZ.CalendarTickSource = CalendarTickSource;
-    ;
-    CZ.CalendarTickSource.prototype = new CZ.TickSource;
-
-    function DateTickSource() {
-        this.base = CZ.TickSource;
-        this.base();
-
-        var year, month, day;
-
-        var tempDays = 0;
-
-        this.getRegime = function (l, r) {
-            if (l < r) {
-                this.range.min = l;
-                this.range.max = r;
-            } else {
-                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
-                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
-            }
-
-            if (this.range.min < CZ.Settings.maxPermitedTimeRange.left)
-                this.range.min = CZ.Settings.maxPermitedTimeRange.left;
-            if (this.range.max > CZ.Settings.maxPermitedTimeRange.right)
-                this.range.max = CZ.Settings.maxPermitedTimeRange.right;
-
-            var localPresent = CZ.Dates.getPresent();
-            this.present = { year: localPresent.getUTCFullYear(), month: localPresent.getUTCMonth(), day: localPresent.getUTCDate() };
-
-            this.firstYear = CZ.Dates.getCoordinateFromYMD(0, 0, 1);
-
-            this.startDate = CZ.Dates.getYMDFromCoordinate(this.range.min);
-            this.endDate = CZ.Dates.getYMDFromCoordinate(this.range.max);
-
-            this.delta = 1;
-            this.beta = Math.log(this.range.max - this.range.min) * this.log10;
-
-            if (this.beta >= -0.2)
-                this.regime = "Quarters_Month";
-            if (this.beta <= -0.2 && this.beta >= -0.8)
-                this.regime = "Month_Weeks";
-            if (this.beta <= -0.8 && this.beta >= -1.4)
-                this.regime = "Weeks_Days";
-            if (this.beta <= -1.4)
-                this.regime = "Days_Quarters";
-
-            this.level = 1;
-        };
-
-        this.getLabel = function (x) {
-            var text = CZ.Dates.months[month];
-            var year_temp = year;
-            if (year == 0)
-                year_temp--;
-            if (text == "January")
-                text += " " + year_temp;
-            if (tempDays == 1)
-                text = day + " " + CZ.Dates.months[month];
-            if ((this.regime == "Weeks_Days") && (day == 3))
-                text += ", " + year_temp;
-            if ((this.regime == "Days_Quarters") && (day == 1))
-                text += ", " + year_temp;
-            return text;
-        };
-
-        this.getMinTicks = function () {
-            this.getRegime(this.range.min, this.range.max);
-            return this.createTicks(this.range);
-        };
-
-        this.createTicks = function (range) {
-            tempDays = 0;
-            var ticks = new Array();
-            var num = 0;
-
-            var countMonths = 0;
-
-            var countDays = 0;
-
-            var tempYear = this.startDate.year;
-            var tempMonth = this.startDate.month;
-            while (tempYear < this.endDate.year || (tempYear == this.endDate.year && tempMonth <= this.endDate.month)) {
-                countMonths++;
-                tempMonth++;
-                if (tempMonth >= 12) {
-                    tempMonth = 0;
-                    tempYear++;
-                }
-            }
-
-            year = this.startDate.year;
-
-            month = this.startDate.month - 1;
-            var month_step = 1;
-            var date_step = 1;
-            for (var j = 0; j <= countMonths + 2; j += month_step) {
-                month += month_step;
-                if (month >= 12) {
-                    month = 0;
-                    year++;
-                }
-
-                if ((this.regime == "Quarters_Month") || (this.regime == "Month_Weeks")) {
-                    var tick = CZ.Dates.getCoordinateFromYMD(year, month, 1);
-                    if (tick >= this.range.min && tick <= this.range.max) {
-                        if (tempDays != 1) {
-                            if ((month % 3 == 0) || (this.regime == "Month_Weeks")) {
-                                ticks[num] = { position: tick, label: this.getDiv(tick) };
-                                num++;
-                            }
-                        }
-                    }
-                }
-
-                if ((this.regime == "Weeks_Days") || (this.regime == "Days_Quarters")) {
-                    countDays = Math.floor(CZ.Dates.daysInMonth[month]);
-                    if ((month === 1) && (CZ.Dates.isLeapYear(year)))
-                        countDays++;
-                    tempDays = 1;
-                    for (var k = 1; k <= countDays; k += date_step) {
-                        day = k;
-                        tick = CZ.Dates.getCoordinateFromYMD(year, month, day);
-                        if (tick >= this.range.min && tick <= this.range.max) {
-                            if (this.regime == "Weeks_Days") {
-                                if ((k == 3) || (k == 10) || (k == 17) || (k == 24) || (k == 28)) {
-                                    ticks[num] = { position: tick, label: this.getDiv(tick) };
-                                    num++;
-                                }
-                            } else {
-                                ticks[num] = { position: tick, label: this.getDiv(tick) };
-                                num++;
-                            }
-                        }
-                    }
-                }
-            }
-            this.refreshDivs();
-            return ticks;
-        };
-
-        this.createSmallTicks = function (ticks) {
-            var minors = new Array();
-
-            var k = this.width / (this.range.max - this.range.min);
-            var nextStep = true;
-
-            var step;
-
-            var n;
-            var tick = ticks[0].position;
-            var date = CZ.Dates.getYMDFromCoordinate(tick);
-
-            if (this.regime == "Quarters_Month")
-                n = 2;
-            else if (this.regime == "Month_Weeks")
-                n = CZ.Dates.daysInMonth[date.month];
-            else if (this.regime == "Weeks_Days")
-                n = 7;
-            else if (this.regime == "Days_Quarters")
-                n = 4;
-
-            if (this.regime == "Quarters_Month")
-                step = Math.floor(2 * CZ.Dates.daysInMonth[date.month] / n);
-            else if (this.regime == "Month_Weeks")
-                step = 1;
-            else if (this.regime == "Weeks_Days")
-                step = 1;
-            else if (this.regime == "Days_Quarters")
-                step = 0.25;
-
-            if (k * step < CZ.Settings.minSmallTickSpace)
-                return null;
-
-            date.day -= step;
-            tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
-
-            if (this.regime != "Month_Weeks") {
-                while (tick > this.range.min) {
-                    minors.push(tick);
-                    date.day -= step;
-                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
-                }
-            } else {
-                var j = CZ.Dates.daysInMonth[date.month];
-                while (tick > this.range.min) {
-                    if ((j == 2) || (j == 9) || (j == 16) || (j == 23) || (j == 27)) {
-                        minors.push(tick);
-                    }
-                    date.day -= step;
-                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
-                    j--;
-                }
-            }
-
-            for (var i = 0; i < ticks.length - 1; i++) {
-                var tick = ticks[i].position;
-                var date = CZ.Dates.getYMDFromCoordinate(tick);
-                var j_step = 1;
-                for (var j = 1; j <= n; j += j_step) {
-                    date.day += step;
-                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
-                    if (this.regime != "Month_Weeks") {
-                        if (minors.length == 0 || k * (ticks[i + 1].position - tick) > CZ.Settings.minSmallTickSpace)
-                            minors.push(tick);
-                    } else {
-                        if ((j == 2) || (j == 9) || (j == 16) || (j == 23) || (j == 28)) {
-                            if (minors.length == 0 || k * (ticks[i + 1].position - tick) > CZ.Settings.minSmallTickSpace)
-                                minors.push(tick);
-                        }
-                    }
-                }
-            }
-            var tick = ticks[ticks.length - 1].position;
-            var date = CZ.Dates.getYMDFromCoordinate(tick);
-            date.day += step;
-            tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
-
-            if (this.regime != "Month_Weeks") {
-                while (tick < this.range.max) {
-                    minors.push(tick);
-                    date.day += step;
-                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
-                }
-            } else {
-                var j = 0;
-                while (tick < this.range.max) {
-                    if ((j == 2) || (j == 9) || (j == 16) || (j == 23) || (j == 28)) {
-                        minors.push(tick);
-                    }
-                    date.day += step;
-                    tick = CZ.Dates.getCoordinateFromYMD(date.year, date.month, date.day);
-                    j++;
-                }
-            }
-            return minors;
-        };
-
-        this.getMarkerLabel = function (range, time) {
-            this.getRegime(range.min, range.max);
-            var date = CZ.Dates.getYMDFromCoordinate(time, true);
-            var labelText = date.year + "." + (date.month + 1) + "." + date.day;
-            return labelText;
-        };
-
-        this.getVisibleForElement = function (element, scale, viewport, use_margin) {
-            var margin = 2 * (CZ.Settings.contentScaleMargin && use_margin ? CZ.Settings.contentScaleMargin : 0);
-            var width = viewport.width - margin;
-            if (width < 0)
-                width = viewport.width;
-            var scaleX = scale * element.width / width;
-
-            var height = viewport.height - margin;
-            if (height < 0)
-                height = viewport.height;
-            var scaleY = scale * element.height / height;
-            var vs = {
-                centerX: element.x + element.width / 2.0,
-                centerY: element.y + element.height / 2.0,
-                scale: Math.min(scaleX, scaleY)
-            };
-            return vs;
-        };
-    }
-    CZ.DateTickSource = DateTickSource;
-    ;
-    CZ.DateTickSource.prototype = new CZ.TickSource;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (VirtualCanvas) {
-        function initialize() {
-            $.widget("ui.virtualCanvas", {
-                _layersContent: undefined,
-                _layers: [],
-                _create: function () {
-                    var self = this;
-                    self.element.addClass("virtualCanvas");
-                    var size = self._getClientSize();
-
-                    this.lastEvent = null;
-
-                    this.canvasWidth = null;
-                    this.canvasHeight = null;
-
-                    this.requestNewFrame = false;
-
-                    self.cursorPositionChangedEvent = new $.Event("cursorPositionChanged");
-                    self.breadCrumbsChangedEvent = $.Event("breadCrumbsChanged");
-                    self.innerZoomConstraintChangedEvent = $.Event("innerZoomConstraintChanged");
-                    self.currentlyHoveredInfodot = undefined;
-                    self.breadCrumbs = [];
-                    self.recentBreadCrumb = { vcElement: { title: "initObject" } };
-
-                    self.cursorPosition = 0.0;
-
-                    this.topCloak = $(".root-cloak-top");
-                    this.rightCloak = $(".root-cloak-right");
-                    this.bottomCloak = $(".root-cloak-bottom");
-                    this.leftCloak = $(".root-cloak-left");
-
-                    this.showCloak = false;
-
-                    var layerDivs = self.element.children("div");
-                    layerDivs.each(function (index) {
-                        $(this).addClass("virtualCanvasLayerDiv unselectable").zIndex(index * 3);
-
-                        var layerCanvasJq = $("<canvas></canvas>").appendTo($(this)).addClass("virtualCanvasLayerCanvas").zIndex(index * 3 + 1);
-                        self._layers.push($(this));
-                    });
-
-                    this._layersContent = new CZ.VCContent.CanvasRootElement(self, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
-
-                    this.options.visible = new CZ.Viewport.VisibleRegion2d(0, 0, 1);
-                    this.updateViewport();
-
-                    self.element.bind('mousemove.' + this.widgetName, function (e) {
-                        self.mouseMove(e);
-                    });
-                    self.element.bind('mousedown.' + this.widgetName, function (e) {
-                        switch (e.which) {
-                            case 1:
-                                self._mouseDown(e);
-                                break;
-                        }
-                    });
-                    self.element.bind('mouseup.' + this.widgetName, function (e) {
-                        switch (e.which) {
-                            case 1:
-                                self._mouseUp(e);
-                        }
-                    });
-                    self.element.bind('mouseleave.' + this.widgetName, function (e) {
-                        self._mouseLeave(e);
-                    });
-                },
-                destroy: function () {
-                    this._destroy();
-                },
-                _mouseDown: function (e) {
-                    var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
-                    this.lastClickPosition = {
-                        x: origin.x,
-                        y: origin.y
-                    };
-
-                    $("iframe").css("pointer-events", "none");
-
-                    $('#iframe_layer').css("display", "block").css("z-index", "99999");
-                },
-                _mouseUp: function (e) {
-                    var viewport = this.getViewport();
-                    var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
-                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
-
-                    if (this.lastClickPosition && this.lastClickPosition.x == origin.x && this.lastClickPosition.y == origin.y)
-                        this._mouseClick(e);
-
-                    $("iframe").css("pointer-events", "auto");
-
-                    $('#iframe_layer').css("display", "none");
-                },
-                _mouseLeave: function (e) {
-                    if (this.currentlyHoveredContentItem != null && this.currentlyHoveredContentItem.onmouseleave != null)
-                        this.currentlyHoveredContentItem.onmouseleave(e);
-                    if (this.currentlyHoveredInfodot != null && this.currentlyHoveredInfodot.onmouseleave != null)
-                        this.currentlyHoveredInfodot.onmouseleave(e);
-                    if (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.onmouseunhover != null)
-                        this.currentlyHoveredTimeline.onmouseunhover(null, e);
-
-                    CZ.Common.stopAnimationTooltip();
-
-                    this.lastEvent = null;
-                },
-                _mouseClick: function (e) {
-                    var viewport = this.getViewport();
-                    var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
-                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
-
-                    var _mouseClickNode = function (contentItem, pv) {
-                        var inside = contentItem.isInside(pv);
-                        if (!inside)
-                            return false;
-
-                        for (var i = 0; i < contentItem.children.length; i++) {
-                            var child = contentItem.children[i];
-                            if (_mouseClickNode(child, posv))
-                                return true;
-                        }
-
-                        if (contentItem.reactsOnMouse && contentItem.onmouseclick) {
-                            return contentItem.onmouseclick(pv, e);
-                        }
-                        return false;
-                    };
-
-                    _mouseClickNode(this._layersContent, posv);
-                },
-                getHoveredTimeline: function () {
-                    return this.currentlyHoveredTimeline;
-                },
-                getHoveredInfodot: function () {
-                    return this.currentlyHoveredInfodot;
-                },
-                getCursorPosition: function () {
-                    return this.cursorPosition;
-                },
-                _setConstraintsByInfodotHover: function (e) {
-                    var val;
-                    if (e) {
-                        var recentVp = this.getViewport();
-                        val = e.outerRad * CZ.Settings.infoDotZoomConstraint / recentVp.width;
-                    } else
-                        val = undefined;
-                    this.RaiseInnerZoomConstraintChanged(val);
-                },
-                RaiseInnerZoomConstraintChanged: function (e) {
-                    this.innerZoomConstraintChangedEvent.zoomValue = e;
-                    this.element.trigger(this.innerZoomConstraintChangedEvent);
-                },
-                RaiseCursorChanged: function () {
-                    this.cursorPositionChangedEvent.Time = this.cursorPosition;
-                    this.element.trigger(this.cursorPositionChangedEvent);
-                },
-                updateTooltipPosition: function (posv) {
-                    var scrPoint = this.viewport.pointVirtualToScreen(posv.x, posv.y);
-
-                    var heigthOffset = 17;
-
-                    var length, height;
-
-                    var obj = null;
-
-                    if (CZ.Common.tooltipMode == 'infodot')
-                        obj = this.currentlyHoveredInfodot;
-                    else if (CZ.Common.tooltipMode == 'timeline')
-                        obj = this.currentlyHoveredTimeline;
-
-                    if (obj == null)
-                        return;
-
-                    length = parseInt(scrPoint.x) + obj.panelWidth;
-                    height = parseInt(scrPoint.y) + obj.panelHeight + heigthOffset;
-
-                    if (length > this.canvasWidth)
-                        scrPoint.x = this.canvasWidth - obj.panelWidth;
-
-                    if (height > this.canvasHeight)
-                        scrPoint.y = this.canvasHeight - obj.panelHeight - heigthOffset + 1;
-
-                    $('.bubbleInfo').css({
-                        position: "absolute",
-                        top: scrPoint.y,
-                        left: scrPoint.x
-                    });
-                },
-                mouseMove: function (e) {
-                    var viewport = this.getViewport();
-                    var origin = CZ.Common.getXBrowserMouseOrigin(this.element, e);
-                    var posv = viewport.pointScreenToVirtual(origin.x, origin.y);
-
-                    if (!this.currentlyHoveredInfodot) {
-                        this.cursorPosition = posv.x;
-                        this.RaiseCursorChanged();
-                    }
-
-                    if (!this.currentlyHoveredTimeline) {
-                        this.cursorPosition = posv.x;
-                        this.RaiseCursorChanged();
-                    }
-
-                    var mouseInStack = [];
-
-                    var _mouseMoveNode = function (contentItem, forceOutside, pv) {
-                        if (forceOutside) {
-                            if (contentItem.reactsOnMouse && contentItem.isMouseIn && contentItem.onmouseleave) {
-                                contentItem.onmouseleave(pv, e);
-                                contentItem.isMouseIn = false;
-                            }
-                        } else {
-                            var inside = contentItem.isInside(pv);
-                            forceOutside = !inside;
-
-                            if (contentItem.reactsOnMouse) {
-                                if (inside) {
-                                    if (contentItem.isMouseIn) {
-                                        if (contentItem.onmousemove)
-                                            contentItem.onmousemove(pv, e);
-                                        if (contentItem.onmousehover)
-                                            mouseInStack.push(contentItem);
-                                    } else {
-                                        contentItem.isMouseIn = true;
-                                        if (contentItem.onmouseenter)
-                                            contentItem.onmouseenter(pv, e);
-                                    }
-                                } else {
-                                    if (contentItem.isMouseIn) {
-                                        contentItem.isMouseIn = false;
-                                        if (contentItem.onmouseleave)
-                                            contentItem.onmouseleave(pv, e);
-                                    } else {
-                                        if (contentItem.onmousemove)
-                                            contentItem.onmousemove(pv, e);
-                                    }
-                                }
-                            }
-                            contentItem.isMouseIn = inside;
-                        }
-
-                        for (var i = 0; i < contentItem.children.length; i++) {
-                            var child = contentItem.children[i];
-                            if (!forceOutside || child.isMouseIn)
-                                _mouseMoveNode(child, forceOutside, pv);
-                        }
-                    };
-
-                    _mouseMoveNode(this._layersContent, false, posv);
-
-                    if (mouseInStack.length == 0) {
-                        if (this.hovered && this.hovered.onmouseunhover) {
-                            this.hovered.onmouseunhover(posv, e);
-                            this.hovered = null;
-                        }
-                    }
-                    for (var n = mouseInStack.length; --n >= 0;) {
-                        if (mouseInStack[n].onmousehover) {
-                            mouseInStack[n].onmousehover(posv, e);
-                            if (this.hovered && this.hovered != mouseInStack[n] && this.hovered.onmouseunhover)
-                                if (!this.currentlyHoveredInfodot || (this.currentlyHoveredInfodot && this.currentlyHoveredInfodot.parent && this.currentlyHoveredInfodot.parent != this.hovered))
-                                    this.hovered.onmouseunhover(posv, e);
-                            if (this.currentlyHoveredContentItem)
-                                this.hovered = this.currentlyHoveredContentItem;
-                            else
-                                this.hovered = mouseInStack[n];
-                            break;
-                        }
-                    }
-
-                    if ((this.currentlyHoveredInfodot != null && this.currentlyHoveredInfodot.tooltipEnabled == true) || (this.currentlyHoveredTimeline != null && this.currentlyHoveredTimeline.tooltipEnabled == true && CZ.Common.tooltipMode != "infodot")) {
-                        var obj = null;
-
-                        if (CZ.Common.tooltipMode == 'infodot')
-                            obj = this.currentlyHoveredInfodot;
-                        else if (CZ.Common.tooltipMode == 'timeline')
-                            obj = this.currentlyHoveredTimeline;
-
-                        if (obj != null) {
-                            if (obj.tooltipIsShown == false) {
-                                obj.tooltipIsShown = true;
-                                CZ.Common.animationTooltipRunning = $('.bubbleInfo').fadeIn();
-                            }
-                        }
-
-                        this.updateTooltipPosition(posv);
-                    }
-
-                    this.lastEvent = e;
-                },
-                getLastEvent: function () {
-                    return this.lastEvent;
-                },
-                getLayerContent: function () {
-                    return this._layersContent;
-                },
-                findElement: function (id) {
-                    var rfind = function (el, id) {
-                        if (el.id === id)
-                            return el;
-                        if (!el.children)
-                            return null;
-                        var n = el.children.length;
-                        for (var i = 0; i < n; i++) {
-                            var child = el.children[i];
-                            if (child.id === id)
-                                return child;
-                        }
-                        for (var i = 0; i < n; i++) {
-                            var child = el.children[i];
-                            var res = rfind(child, id);
-                            if (res)
-                                return res;
-                        }
-                        return null;
-                    };
-
-                    return rfind(this._layersContent, id);
-                },
-                forEachElement: function (callback) {
-                    var rfind = function (el, callback) {
-                        callback(el);
-                        if (!el.children)
-                            return;
-                        for (var i = 0; i < el.children.length; i++) {
-                            var child = el.children[i];
-                            var res = rfind(child, callback);
-                        }
-                    };
-
-                    return rfind(this._layersContent, callback);
-                },
-                _destroy: function () {
-                    this.element.removeClass("virtualCanvas");
-                    this.element.children(".virtualCanvasLayerDiv").each(function (index) {
-                        $(this).removeClass("virtualCanvasLayerDiv").removeClass("unselectable");
-                        $(this).remove(".virtualCanvasLayerCanvas");
-                    });
-                    this.element.unbind('.' + this.widgetName);
-                    this._layers = undefined;
-                    this._layersContent = undefined;
-                    return this;
-                },
-                _visibleToViewBox: function (visible) {
-                    var view = this.getViewport();
-                    var w = view.widthScreenToVirtual(view.width);
-                    var h = view.heightScreenToVirtual(view.height);
-                    var x = visible.centerX - w / 2;
-                    var y = visible.centerY - h / 2;
-                    return { Left: x, Right: x + w, Top: y, Bottom: y + h };
-                },
-                setVisible: function (newVisible, isInAnimation) {
-                    delete this.viewport;
-                    this.options.visible = newVisible;
-                    this.isInAnimation = isInAnimation && isInAnimation.isActive;
-
-                    var viewbox_v = this._visibleToViewBox(newVisible);
-
-                    var viewport = this.getViewport();
-                    this._renderCanvas(this._layersContent, viewbox_v, viewport);
-                },
-                updateViewport: function () {
-                    var size = this._getClientSize();
-                    var n = this._layers.length;
-                    for (var i = 0; i < n; i++) {
-                        var layer = this._layers[i];
-                        layer.width(size.width).height(size.height);
-                        var canvas = layer.children(".virtualCanvasLayerCanvas").first()[0];
-                        if (canvas) {
-                            canvas.width = size.width;
-                            canvas.height = size.height;
-                        }
-                    }
-
-                    this.canvasWidth = CZ.Common.vc.width();
-                    this.canvasHeight = CZ.Common.vc.height();
-
-                    this.setVisible(this.options.visible);
-                },
-                _getClientSize: function () {
-                    return {
-                        width: this.element[0].clientWidth,
-                        height: this.element[0].clientHeight
-                    };
-                },
-                getViewport: function () {
-                    if (!this.viewport) {
-                        var size = this._getClientSize();
-                        var o = this.options;
-                        this.viewport = new CZ.Viewport.Viewport2d(o.aspectRatio, size.width, size.height, o.visible);
-                    }
-                    return this.viewport;
-                },
-                _renderCanvas: function (elementsRoot, visibleBox_v, viewport) {
-                    var n = this._layers.length;
-                    if (n == 0)
-                        return;
-
-                    var contexts = {};
-                    for (var i = 0; i < n; i++) {
-                        var layer = this._layers[i];
-                        var canvas = layer.children(".virtualCanvasLayerCanvas").first()[0];
-                        var ctx = canvas.getContext("2d");
-                        ctx.clearRect(0, 0, viewport.width, viewport.height);
-                        var layerid = layer[0].id;
-                        contexts[layerid] = ctx;
-                    }
-
-                    elementsRoot.render(contexts, visibleBox_v, viewport);
-
-                    this.updateCloakPosition(viewport);
-                },
-                invalidate: function () {
-                    var viewbox_v = this._visibleToViewBox(this.options.visible);
-                    var viewport = this.getViewport();
-
-                    this._renderCanvas(this._layersContent, viewbox_v, viewport);
-                },
-                breadCrumbsChanged: function () {
-                    this.breadCrumbsChangedEvent.breadCrumbs = this.breadCrumbs;
-                    this.element.trigger(this.breadCrumbsChangedEvent);
-                },
-                requestInvalidate: function () {
-                    this.requestNewFrame = false;
-
-                    if (CZ.Layout.animatingElements.length != 0) {
-                        for (var id in CZ.Layout.animatingElements)
-                            if (CZ.Layout.animatingElements[id].animation && CZ.Layout.animatingElements[id].animation.isAnimating) {
-                                CZ.Layout.animatingElements[id].calculateNewFrame();
-                                this.requestNewFrame = true;
-                            }
-                    }
-
-                    if (this.isInAnimation)
-                        return;
-
-                    this.isInAnimation = true;
-                    var self = this;
-                    setTimeout(function () {
-                        self.isInAnimation = false;
-                        self.invalidate();
-
-                        if (self.requestNewFrame)
-                            self.requestInvalidate();
-                    }, 1000.0 / CZ.Settings.targetFps);
-                },
-                _findLca: function (tl, wnd) {
-                    for (var i = 0; i < tl.children.length; i++) {
-                        if (tl.children[i].type === 'timeline' && tl.children[i].contains(wnd)) {
-                            return this._findLca(tl.children[i], wnd);
-                        }
-                    }
-                    return tl;
-                },
-                findLca: function (wnd) {
-                    var cosmosTimeline = this._layersContent.children[0];
-
-                    var eps = 1;
-                    var cosmosLeft = cosmosTimeline.x + eps;
-                    var cosmosRight = cosmosTimeline.x + cosmosTimeline.width - eps;
-                    var cosmosTop = cosmosTimeline.y + eps;
-                    var cosmosBottom = cosmosTimeline.y + cosmosTimeline.height - eps;
-
-                    wnd.left = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x));
-                    wnd.right = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x + wnd.width));
-                    wnd.top = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y));
-                    wnd.bottom = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y + wnd.height));
-
-                    wnd.x = wnd.left;
-                    wnd.y = wnd.top;
-                    wnd.width = Math.max(0, wnd.right - wnd.left);
-                    wnd.height = Math.max(0, wnd.bottom - wnd.top);
-
-                    return this._findLca(cosmosTimeline, wnd);
-                },
-                _inBuffer: function (tl, wnd, scale) {
-                    if (tl.intersects(wnd) && tl.isVisibleOnScreen(scale)) {
-                        if (!tl.isBuffered) {
-                            return false;
-                        } else {
-                            var b = true;
-                            for (var i = 0; i < tl.children.length; i++) {
-                                if (tl.children[i].type === 'timeline')
-                                    b = b && this._inBuffer(tl.children[i], wnd, scale);
-                            }
-                            return b;
-                        }
-                    }
-                    return true;
-                },
-                inBuffer: function (wnd, scale) {
-                    var cosmosTimeline = this._layersContent.children[0];
-
-                    var cosmosLeft = cosmosTimeline.x;
-                    var cosmosRight = cosmosTimeline.x + cosmosTimeline.width;
-                    var cosmosTop = cosmosTimeline.y;
-                    var cosmosBottom = cosmosTimeline.y + cosmosTimeline.height;
-
-                    wnd.left = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x));
-                    wnd.right = Math.max(cosmosLeft, Math.min(cosmosRight, wnd.x + wnd.width));
-                    wnd.top = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y));
-                    wnd.bottom = Math.max(cosmosTop, Math.min(cosmosBottom, wnd.y + wnd.height));
-
-                    wnd.x = wnd.left;
-                    wnd.y = wnd.top;
-                    wnd.width = Math.max(0, wnd.right - wnd.left);
-                    wnd.height = Math.max(0, wnd.bottom - wnd.top);
-
-                    return this._inBuffer(cosmosTimeline, wnd, scale);
-                },
-                options: {
-                    aspectRatio: 1,
-                    visible: { centerX: 0, centerY: 0, scale: 1 }
-                },
-                cloakNonRootVirtualSpace: function () {
-                    this.showCloak = true;
-                    var viewport = this.getViewport();
-
-                    this.updateCloakPosition(viewport);
-
-                    this.topCloak.addClass("visible");
-                    this.rightCloak.addClass("visible");
-                    this.bottomCloak.addClass("visible");
-                    this.leftCloak.addClass("visible");
-                },
-                showNonRootVirtualSpace: function () {
-                    this.showCloak = false;
-
-                    this.topCloak.removeClass("visible");
-                    this.rightCloak.removeClass("visible");
-                    this.bottomCloak.removeClass("visible");
-                    this.leftCloak.removeClass("visible");
-                },
-                updateCloakPosition: function (viewport) {
-                    if (!this.showCloak)
-                        return;
-
-                    var rootTimeline = this._layersContent.children[0];
-
-                    var top = rootTimeline.y;
-                    var right = rootTimeline.x + rootTimeline.width;
-                    var bottom = rootTimeline.y + rootTimeline.height;
-                    var left = rootTimeline.x;
-
-                    top = Math.max(0, viewport.pointVirtualToScreen(0, top).y);
-                    right = Math.max(0, viewport.pointVirtualToScreen(right, 0).x);
-                    bottom = Math.max(0, viewport.pointVirtualToScreen(0, bottom).y);
-                    left = Math.max(0, viewport.pointVirtualToScreen(left, 0).x);
-
-                    this.rightCloak.css("width", Math.max(0, viewport.width - right) + "px");
-                    this.leftCloak.css("width", left + "px");
-
-                    this.bottomCloak.css("height", Math.max(0, viewport.height - bottom) + "px");
-                    this.topCloak.css("height", top + "px");
-
-                    this.topCloak.css("left", left + "px");
-                    this.topCloak.css("right", Math.max(0, viewport.width - right) + "px");
-                    this.bottomCloak.css("left", left + "px");
-                    this.bottomCloak.css("right", Math.max(0, viewport.width - right) + "px");
-                }
-            });
-        }
-        VirtualCanvas.initialize = initialize;
-    })(CZ.VirtualCanvas || (CZ.VirtualCanvas = {}));
-    var VirtualCanvas = CZ.VirtualCanvas;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var DatePicker = (function () {
-            function DatePicker(datePicker) {
-                this.datePicker = datePicker;
-                this.INFINITY_VALUE = 9999;
-                this.WRONG_YEAR_INPUT = "Year should be a number.";
-                if (!(datePicker instanceof jQuery && datePicker.is("div")))
-                    throw "DatePicker parameter is invalid! It should be jQuery instance of DIV.";
-
-                this.coordinate = 0;
-
-                this.initialize();
-            }
-            DatePicker.prototype.initialize = function () {
-                var _this = this;
-                this.datePicker.addClass("cz-datepicker");
-
-                this.modeSelector = $("<select class='cz-datepicker-mode cz-input'></select>");
-
-                var optionYear = $("<option value='year'>Year</option>");
-                var optionDate = $("<option value='date'>Date</option>");
-
-                this.modeSelector.change(function (event) {
-                    var mode = _this.modeSelector.find(":selected").val();
-                    _this.errorMsg.text("");
-                    switch (mode) {
-                        case "year":
-                            _this.editModeYear();
-                            _this.setDate_YearMode(_this.coordinate, false);
-                            break;
-                        case "date":
-                            _this.editModeDate();
-                            _this.setDate_DateMode(_this.coordinate);
-                            break;
-
-                        case "infinite":
-                            _this.editModeInfinite();
-                            break;
-                    }
-                });
-
-                this.modeSelector.append(optionYear);
-                this.modeSelector.append(optionDate);
-
-                this.dateContainer = $("<div class='cz-datepicker-container'></div>");
-                this.errorMsg = $("<div class='cz-datepicker-errormsg'></div>");
-                this.datePicker.append(this.modeSelector);
-                this.datePicker.append(this.dateContainer);
-                this.datePicker.append(this.errorMsg);
-
-                this.editModeYear();
-                this.setDate(this.coordinate, true);
-            };
-
-            DatePicker.prototype.remove = function () {
-                this.datePicker.empty();
-
-                this.datePicker.removeClass("cz-datepicker");
-            };
-
-            DatePicker.prototype.addEditMode_Infinite = function () {
-                var optionIntinite = $("<option value='infinite'>Infinite</option>");
-                this.modeSelector.append(optionIntinite);
-            };
-
-            DatePicker.prototype.setDate = function (coordinate, ZeroYearConversation) {
-                if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
-                if (!this.validateNumber(coordinate)) {
-                    return false;
-                }
-
-                coordinate = Number(coordinate);
-                this.coordinate = coordinate;
-                var regime = CZ.Dates.convertCoordinateToYear(this.coordinate).regime;
-
-                if (this.coordinate === this.INFINITY_VALUE) {
-                    this.modeSelector.find(":selected").attr("selected", "false");
-                    this.modeSelector.find("option").each(function () {
-                        if ($(this).val() === "infinite") {
-                            $(this).attr("selected", "selected");
-                            return;
-                        }
-                    });
-                    this.editModeInfinite();
-                    return;
-                }
-
-                switch (regime.toLowerCase()) {
-                    case "ga":
-                    case "ma":
-                    case "ka":
-                        this.modeSelector.find(":selected").attr("selected", "false");
-                        this.modeSelector.find("option").each(function () {
-                            if ($(this).val() === "year") {
-                                $(this).attr("selected", "selected");
-                                return;
-                            }
-                        });
-                        this.editModeYear();
-                        this.setDate_YearMode(coordinate, ZeroYearConversation);
-                        break;
-                    case "bce":
-                    case "ce":
-                        this.modeSelector.find(":selected").attr("selected", "false");
-                        this.modeSelector.find("option").each(function () {
-                            if ($(this).val() === "date") {
-                                $(this).attr("selected", "selected");
-                                return;
-                            }
-                        });
-                        this.editModeDate();
-                        this.setDate_DateMode(coordinate);
-                        break;
-                }
-            };
-
-            DatePicker.prototype.getDate = function () {
-                var mode = this.modeSelector.find(":selected").val();
-                switch (mode) {
-                    case "year":
-                        return this.getDate_YearMode();
-                        break;
-                    case "date":
-                        return this.getDate_DateMode();
-                        break;
-
-                    case "infinite":
-                        return this.INFINITY_VALUE;
-                        break;
-                }
-            };
-
-            DatePicker.prototype.editModeYear = function () {
-                var _this = this;
-                this.dateContainer.empty();
-
-                this.yearSelector = $("<input type='text' class='cz-datepicker-year-year cz-input'></input>");
-                this.regimeSelector = $("<select class='cz-datepicker-regime cz-input'></select>");
-
-                this.yearSelector.focus(function (event) {
-                    _this.errorMsg.text("");
-                });
-
-                this.regimeSelector.change(function (event) {
-                    _this.checkAndRemoveNonIntegerPart();
-                });
-
-                this.yearSelector.blur(function (event) {
-                    if (!_this.validateNumber(_this.yearSelector.val())) {
-                        _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
-                    }
-
-                    _this.checkAndRemoveNonIntegerPart();
-                });
-                var optionGa = $("<option value='ga'>Ga</option>");
-                var optionMa = $("<option value='ma'>Ma</option>");
-                var optionKa = $("<option value='ka'>Ka</option>");
-                var optionBCE = $("<option value='bce'>BCE</option>");
-                var optionCE = $("<option value='ce'>CE</option>");
-
-                this.regimeSelector.append(optionGa).append(optionMa).append(optionKa).append(optionBCE).append(optionCE);
-
-                this.dateContainer.append(this.yearSelector);
-                this.dateContainer.append(this.regimeSelector);
-            };
-
-            DatePicker.prototype.editModeDate = function () {
-                var _this = this;
-                this.dateContainer.empty();
-
-                this.daySelector = $("<select class='cz-datepicker-day-selector cz-input'></select>");
-                this.monthSelector = $("<select class='cz-datepicker-month-selector cz-input'></select>");
-                this.yearSelector = $("<input type='text' class='cz-datepicker-year-date cz-input'></input>");
-
-                this.yearSelector.focus(function (event) {
-                    _this.errorMsg.text("");
-                });
-
-                this.yearSelector.blur(function (event) {
-                    if (!_this.validateNumber(_this.yearSelector.val()))
-                        _this.errorMsg.text(_this.WRONG_YEAR_INPUT);
-
-                    _this.checkAndRemoveNonIntegerPart();
-                });
-
-                var self = this;
-                this.monthSelector.change(function (event) {
-                    self.daySelector.empty();
-
-                    var selectedIndex = self.monthSelector[0].selectedIndex;
-                    for (var i = 0; i < CZ.Dates.daysInMonth[selectedIndex]; i++) {
-                        var dayOption = $("<option value='" + (i + 1) + "'>" + (i + 1) + "</option>");
-                        self.daySelector.append(dayOption);
-                    }
-                });
-
-                for (var i = 0; i < CZ.Dates.months.length; i++) {
-                    var monthOption = $("<option value='" + CZ.Dates.months[i] + "'>" + CZ.Dates.months[i] + "</option>");
-                    this.monthSelector.append(monthOption);
-                }
-
-                self.monthSelector.trigger("change");
-
-                this.dateContainer.append(this.monthSelector);
-                this.dateContainer.append(this.daySelector);
-                this.dateContainer.append(this.yearSelector);
-            };
-
-            DatePicker.prototype.editModeInfinite = function () {
-                this.dateContainer.empty();
-            };
-
-            DatePicker.prototype.checkAndRemoveNonIntegerPart = function () {
-                var regime = this.regimeSelector.find(":selected").val().toLowerCase();
-                var mode = this.modeSelector.find(":selected").val().toLowerCase();
-
-                if (regime === 'ce' || regime === 'bce' || mode === 'date') {
-                    this.yearSelector.val(parseFloat(this.yearSelector.val()).toFixed());
-                }
-            };
-
-            DatePicker.prototype.setDate_YearMode = function (coordinate, ZeroYearConversation) {
-                var date = CZ.Dates.convertCoordinateToYear(coordinate);
-                if ((date.regime.toLowerCase() == "bce") && (ZeroYearConversation))
-                    date.year--;
-                this.yearSelector.val(date.year);
-
-                this.regimeSelector.find(":selected").attr("selected", "false");
-
-                this.regimeSelector.find("option").each(function () {
-                    if (this.value === date.regime.toLowerCase()) {
-                        $(this).attr("selected", "selected");
-                    }
-                });
-            };
-
-            DatePicker.prototype.setDate_DateMode = function (coordinate) {
-                var date = CZ.Dates.getYMDFromCoordinate(coordinate);
-
-                this.yearSelector.val(date.year);
-                var self = this;
-
-                this.monthSelector.find("option").each(function (index) {
-                    if (this.value === CZ.Dates.months[date.month]) {
-                        $(this).attr("selected", "selected");
-
-                        $.when(self.monthSelector.trigger("change")).done(function () {
-                            self.daySelector.find("option").each(function () {
-                                if (parseInt(this.value) === date.day) {
-                                    $(this).attr("selected", "selected");
-                                }
-                            });
-                        });
-                    }
-                });
-            };
-
-            DatePicker.prototype.getDate_YearMode = function () {
-                var year = this.yearSelector.val();
-                if (!this.validateNumber(year))
-                    return false;
-                var regime = this.regimeSelector.find(":selected").val();
-
-                return CZ.Dates.convertYearToCoordinate(year, regime);
-            };
-
-            DatePicker.prototype.getDate_DateMode = function () {
-                var year = this.yearSelector.val();
-                if (!this.validateNumber(year))
-                    return false;
-                year = parseInt(year);
-
-                var month = this.monthSelector.find(":selected").val();
-                month = CZ.Dates.months.indexOf(month);
-                var day = parseInt(this.daySelector.find(":selected").val());
-
-                return CZ.Dates.getCoordinateFromYMD(year, month, day);
-            };
-
-            DatePicker.prototype.validateNumber = function (year) {
-                return !isNaN(Number(year)) && isFinite(Number(year)) && !isNaN(parseFloat(year));
-            };
-            return DatePicker;
-        })();
-        UI.DatePicker = DatePicker;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
     (function (Authoring) {
         (function (UI) {
             function createTour() {
@@ -10847,840 +16055,6 @@ var CZ;
         var UI = Authoring.UI;
     })(CZ.Authoring || (CZ.Authoring = {}));
     var Authoring = CZ.Authoring;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Data) {
-        function getTimelines(r) {
-            if (r === undefined || r === null) {
-                r = {
-                    start: -50000000000,
-                    end: 9999,
-                    maxElements: null,
-                    minspan: null
-                };
-            }
-
-            return CZ.Service.getTimelines(r).then(function (response) {
-            }, function (error) {
-            });
-        }
-        Data.getTimelines = getTimelines;
-
-        var DataSet = (function () {
-            function DataSet() {
-            }
-            DataSet.prototype.getVerticalPadding = function () {
-                var padding = 0;
-                this.series.forEach(function (seria) {
-                    if (seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > padding) {
-                        padding = seria.appearanceSettings.thickness;
-                    }
-                });
-                return padding;
-            };
-            return DataSet;
-        })();
-        Data.DataSet = DataSet;
-
-        var Series = (function () {
-            function Series() {
-                this.values = new Array();
-            }
-            return Series;
-        })();
-        Data.Series = Series;
-
-        function generateSampleData() {
-            var rolandData;
-            $.ajax({
-                cache: false,
-                type: "GET",
-                async: false,
-                dataType: "text",
-                url: '/dumps/beta-timeseries.csv',
-                success: function (result) {
-                    rolandData = result;
-                },
-                error: function (xhr) {
-                    alert("Error fetching timeSeries Data: " + xhr.responseText);
-                }
-            });
-
-            return csvToDataSet(rolandData, ",", "sampleData");
-        }
-        Data.generateSampleData = generateSampleData;
-
-        function csvToDataSet(csvText, delimiter, name) {
-            var dataText = csvText;
-
-            var csvArr = dataText.csvToArray({ trim: true, fSep: delimiter, quot: "'" });
-
-            if (csvArr === undefined)
-                throw "Error parsing input file: file has incorrect format";
-
-            var dataLength = csvArr.length - 1;
-
-            if (dataLength < 2)
-                throw "Error parsing input file: Input should be csv/text file with header and at least one data row";
-
-            var seriesLength = csvArr[0].length - 1;
-
-            if (seriesLength < 1)
-                throw "Error parsing input file: table should contain one column with X-axis data and at least one column for Y-axis data";
-
-            var result = new DataSet();
-            result.name = name;
-            result.time = new Array();
-            result.series = new Array();
-
-            for (var i = 1; i <= seriesLength; i++) {
-                var seria = new Series();
-                seria.values = new Array();
-                seria.appearanceSettings = { thickness: 1, stroke: 'blue' };
-
-                var seriaHeader = csvArr[0][i];
-                var appearanceRegex = new RegExp("{(.*)}");
-                var loadedAppearence = appearanceRegex.exec(seriaHeader);
-                if (loadedAppearence !== null) {
-                    loadedAppearence = parseStyleString(loadedAppearence[1]);
-                    for (var prop in loadedAppearence) {
-                        seria.appearanceSettings[prop] = loadedAppearence[prop];
-                    }
-                }
-                var headerRegex = new RegExp("(.*){");
-                var header = headerRegex.exec(seriaHeader);
-                if (header !== null) {
-                    seria.appearanceSettings.name = header[1];
-                } else {
-                    seria.appearanceSettings.name = seriaHeader;
-                }
-
-                seria.appearanceSettings.yMin = parseFloat(csvArr[1][i]);
-                seria.appearanceSettings.yMax = parseFloat(csvArr[1][i]);
-
-                result.series.push(seria);
-            }
-
-            for (var i = 0; i < dataLength; i++) {
-                if (csvArr[i + 1].length !== (seriesLength + 1))
-                    throw "Error parsing input file: incompatible data row " + (i + 1);
-
-                result.time.push(parseFloat(csvArr[i + 1][0]));
-                for (var j = 1; j <= seriesLength; j++) {
-                    var value = parseFloat(csvArr[i + 1][j]);
-                    var seria = result.series[j - 1];
-                    if (seria.appearanceSettings.yMin > value)
-                        seria.appearanceSettings.yMin = value;
-                    if (seria.appearanceSettings.yMax < value)
-                        seria.appearanceSettings.yMax = value;
-                    seria.values.push(value);
-                }
-            }
-
-            return result;
-        }
-        Data.csvToDataSet = csvToDataSet;
-
-        function parseStyleString(styleString) {
-            var result = {};
-            var items = styleString.split(";");
-            var n = items.length;
-            for (var i = 0; i < n; i++) {
-                var pair = items[i].split(':', 2);
-                if (pair && pair.length === 2) {
-                    var name = pair[0].trim();
-                    var val = pair[1].trim();
-                    if (/^\d+$/.test(val)) {
-                        val = parseFloat(val);
-                    }
-                    result[name] = val;
-                }
-            }
-            return result;
-        }
-        Data.parseStyleString = parseStyleString;
-    })(CZ.Data || (CZ.Data = {}));
-    var Data = CZ.Data;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Gestures) {
-        function PanGesture(xOffset, yOffset, src) {
-            this.Type = "Pan";
-            this.Source = src;
-            this.xOffset = xOffset;
-            this.yOffset = yOffset;
-        }
-
-        function ZoomGesture(xOrigin, yOrigin, scaleFactor, src) {
-            this.Type = "Zoom";
-            this.Source = src;
-            this.xOrigin = xOrigin;
-            this.yOrigin = yOrigin;
-            this.scaleFactor = scaleFactor;
-        }
-
-        function PinGesture(src) {
-            this.Type = "Pin";
-            this.Source = src;
-        }
-
-        function createPanSubject(vc) {
-            var _doc = $(document);
-
-            var mouseDown = vc.toObservable("mousedown");
-            var mouseMove = vc.toObservable("mousemove");
-            var mouseUp = _doc.toObservable("mouseup");
-
-            var mouseMoves = mouseMove.Skip(1).Zip(mouseMove, function (left, right) {
-                return new PanGesture(left.clientX - right.clientX, left.clientY - right.clientY, "Mouse");
-            });
-
-            var stopPanning = mouseUp;
-
-            var mouseDrags = mouseDown.SelectMany(function (md) {
-                return mouseMoves.TakeUntil(stopPanning);
-            });
-
-            return mouseDrags;
-        }
-
-        function createPinSubject(vc) {
-            var mouseDown = vc.toObservable("mousedown");
-
-            return mouseDown.Select(function (md) {
-                return new PinGesture("Mouse");
-            });
-        }
-
-        function createZoomSubject(vc) {
-            vc.mousewheel(function (event, delta, deltaX, deltaY) {
-                var xevent = $.Event("xbrowserwheel");
-                xevent.delta = delta;
-                xevent.origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
-                vc.trigger(xevent);
-            });
-
-            var mouseWheel = vc.toObservable("xbrowserwheel");
-
-            var mouseWheels = mouseWheel.Zip(mouseWheel, function (arg) {
-                return new ZoomGesture(arg.origin.x, arg.origin.y, arg.delta > 0 ? 1 / CZ.Settings.zoomLevelFactor : 1 * CZ.Settings.zoomLevelFactor, "Mouse");
-            });
-
-            var mousedblclick = vc.toObservable("dblclick");
-
-            var mousedblclicks = mousedblclick.Zip(mousedblclick, function (event) {
-                var origin = CZ.Common.getXBrowserMouseOrigin(vc, event);
-                return new ZoomGesture(origin.x, origin.y, 1.0 / CZ.Settings.zoomLevelFactor, "Mouse");
-            });
-
-            return mouseWheels;
-        }
-
-        function createTouchPanSubject(vc) {
-            var _doc = $(document);
-
-            var touchStart = vc.toObservable("touchstart");
-            var touchMove = vc.toObservable("touchmove");
-            var touchEnd = _doc.toObservable("touchend");
-            var touchCancel = _doc.toObservable("touchcancel");
-
-            var gestures = touchStart.SelectMany(function (o) {
-                return touchMove.TakeUntil(touchEnd.Merge(touchCancel)).Skip(1).Zip(touchMove, function (left, right) {
-                    return { "left": left.originalEvent, "right": right.originalEvent };
-                }).Where(function (g) {
-                    return g.left.scale === g.right.scale;
-                }).Select(function (g) {
-                    return new PanGesture(g.left.pageX - g.right.pageX, g.left.pageY - g.right.pageY, "Touch");
-                });
-            });
-
-            return gestures;
-        }
-
-        function createTouchPinSubject(vc) {
-            var touchStart = vc.toObservable("touchstart");
-
-            return touchStart.Select(function (ts) {
-                return new PinGesture("Touch");
-            });
-        }
-
-        function createTouchZoomSubject(vc) {
-            var _doc = $(document);
-
-            var gestureStart = vc.toObservable("gesturestart");
-            var gestureChange = vc.toObservable("gesturechange");
-            var gestureEnd = _doc.toObservable("gestureend");
-            var touchCancel = _doc.toObservable("touchcancel");
-
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd.Merge(touchCancel)).Skip(1).Zip(gestureChange, function (left, right) {
-                    return { "left": left.originalEvent, "right": right.originalEvent };
-                }).Where(function (g) {
-                    return g.left.scale !== g.right.scale && g.right.scale !== 0;
-                }).Select(function (g) {
-                    var delta = g.left.scale / g.right.scale;
-                    return new ZoomGesture(o.originalEvent.layerX, o.originalEvent.layerY, 1 / delta, "Touch");
-                });
-            });
-
-            return gestures;
-        }
-
-        function createTouchPanSubjectWin8(vc) {
-            var gestureStart = vc.toObservable("MSGestureStart");
-            var gestureChange = vc.toObservable("MSGestureChange");
-            var gestureEnd = vc.toObservable("MSGestureEnd");
-
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd).Skip(1).Zip(gestureChange, function (left, right) {
-                    return { "left": left.originalEvent, "right": right.originalEvent };
-                }).Where(function (g) {
-                    return g.left.scale === g.right.scale && g.left.detail != g.left.MSGESTURE_FLAG_INERTIA && g.right.detail != g.right.MSGESTURE_FLAG_INERTIA;
-                }).Select(function (g) {
-                    return new PanGesture(g.left.offsetX - g.right.offsetX, g.left.offsetY - g.right.offsetY, "Touch");
-                });
-            });
-
-            return gestures;
-        }
-
-        function createTouchPinSubjectWin8(vc) {
-            var pointerDown = vc.toObservable("MSPointerDown");
-
-            return pointerDown.Select(function (gt) {
-                return new PinGesture("Touch");
-            });
-        }
-
-        function createTouchZoomSubjectWin8(vc) {
-            var gestureStart = vc.toObservable("MSGestureStart");
-            var gestureChange = vc.toObservable("MSGestureChange");
-            var gestureEnd = vc.toObservable("MSGestureEnd");
-
-            var gestures = gestureStart.SelectMany(function (o) {
-                return gestureChange.TakeUntil(gestureEnd).Where(function (g) {
-                    return g.originalEvent.scale !== 0 && g.originalEvent.detail != g.originalEvent.MSGESTURE_FLAG_INERTIA;
-                }).Select(function (g) {
-                    return new ZoomGesture(o.originalEvent.offsetX, o.originalEvent.offsetY, 1 / g.originalEvent.scale, "Touch");
-                });
-            });
-
-            return gestures;
-        }
-
-        var gesturesDictionary = [];
-        function addMSGestureSource(dom) {
-            gesturesDictionary.forEach(function (child) {
-                if (child === dom) {
-                    return;
-                }
-            });
-
-            gesturesDictionary.push(dom);
-
-            dom.addEventListener("MSPointerDown", function (e) {
-                if (dom.gesture === undefined) {
-                    var newGesture = new MSGesture();
-                    newGesture.target = dom;
-                    dom.gesture = newGesture;
-                }
-
-                dom.gesture.addPointer(e.pointerId);
-            }, false);
-        }
-        ;
-
-        function getGesturesStream(source) {
-            var panController;
-            var zoomController;
-            var pinController;
-
-            if (window.navigator.msPointerEnabled && window.MSGesture) {
-                addMSGestureSource(source[0]);
-
-                panController = createTouchPanSubjectWin8(source);
-                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
-                var zoomControllerMouse = createZoomSubject(source);
-                zoomController = zoomControllerTouch.Merge(zoomControllerMouse);
-                pinController = createTouchPinSubjectWin8(source);
-            } else if ('ontouchstart' in document.documentElement) {
-                panController = createTouchPanSubject(source);
-                zoomController = createTouchZoomSubject(source);
-                pinController = createTouchPinSubject(source);
-            } else {
-                panController = createPanSubject(source);
-                zoomController = createZoomSubject(source);
-                pinController = createPinSubject(source);
-            }
-
-            return pinController.Merge(panController.Merge(zoomController));
-        }
-        Gestures.getGesturesStream = getGesturesStream;
-
-        function getPanPinGesturesStream(source) {
-            var panController;
-            var pinController;
-
-            if (window.navigator.msPointerEnabled && window.MSGesture) {
-                addMSGestureSource(source[0]);
-
-                panController = createTouchPanSubjectWin8(source);
-                var zoomControllerTouch = createTouchZoomSubjectWin8(source);
-                var zoomControllerMouse = createZoomSubject(source);
-                pinController = createTouchPinSubjectWin8(source);
-            } else if ('ontouchstart' in document.documentElement) {
-                panController = createTouchPanSubject(source);
-                pinController = createTouchPinSubject(source);
-            } else {
-                panController = createPanSubject(source);
-                pinController = createPinSubject(source);
-            }
-
-            return pinController.Merge(panController.Select(function (el) {
-                el.yOffset = 0;
-                return el;
-            }));
-        }
-        Gestures.getPanPinGesturesStream = getPanPinGesturesStream;
-
-        function applyAxisBehavior(gestureSequence) {
-            return gestureSequence.Where(function (el) {
-                return el.Type != "Zoom";
-            }).Select(function (el) {
-                if (el.Type == "Pan")
-                    el.yOffset = 0;
-                return el;
-            });
-        }
-        Gestures.applyAxisBehavior = applyAxisBehavior;
-    })(CZ.Gestures || (CZ.Gestures = {}));
-    var Gestures = CZ.Gestures;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var LineChart = (function () {
-            function LineChart(container) {
-                this.container = container;
-
-                this.canvas = document.createElement("canvas");
-                $(this.canvas).prependTo($("#timeSeries"));
-
-                this.canvas.width = container.width();
-                this.canvas.height = container.height();
-
-                this.context = this.canvas.getContext("2d");
-
-                $("#closeTimeChartBtn").click(function () {
-                    CZ.HomePageViewModel.hideTimeSeriesChart();
-                });
-            }
-            LineChart.prototype.calculateTicks = function (ymin, ymax, labelCount) {
-                var delta = (ymax - ymin) / labelCount;
-                var h = Math.round(Math.log(delta) / Math.LN10);
-                var h10 = Math.pow(10, h);
-                var k = delta / h10;
-                if (k < 1.5)
-                    k = 1;
-                else if (k < 3.5)
-                    k = 2;
-                else
-                    k = 5;
-
-                var imin = Math.ceil(ymin / (k * h10));
-                var imax = Math.floor(ymax / (k * h10));
-                var actualLabelCount = imax - imin + 1;
-
-                if (actualLabelCount < labelCount) {
-                    while (true) {
-                        var k1 = k;
-                        var h1 = h;
-                        if (k1 == 5)
-                            k1 = 2;
-                        else if (k1 == 2)
-                            k1 = 1;
-                        else {
-                            h1--;
-                            k1 = 5;
-                        }
-                        var imin1 = Math.ceil(ymin / (k1 * Math.pow(10, h1)));
-                        var imax1 = Math.floor(ymax / (k1 * Math.pow(10, h1)));
-                        var actualLabelCount1 = imax1 - imin1 + 1;
-                        if (Math.abs(labelCount - actualLabelCount) > Math.abs(labelCount - actualLabelCount1)) {
-                            imin = imin1;
-                            imax = imax1;
-                            k = k1;
-                            h = h1;
-                            h10 = Math.pow(10, h1);
-                        } else
-                            break;
-                    }
-                } else if (actualLabelCount > labelCount) {
-                    while (true) {
-                        var k1 = k;
-                        var h1 = h;
-                        if (k1 == 5) {
-                            k1 = 1;
-                            h1++;
-                        } else if (k1 == 2)
-                            k1 = 5;
-                        else
-                            k1 = 2;
-                        var imin1 = Math.ceil(ymin / (k1 * Math.pow(10, h1)));
-                        var imax1 = Math.floor(ymax / (k1 * Math.pow(10, h1)));
-                        var actualLabelCount1 = imax1 - imin1 + 1;
-                        if (Math.abs(labelCount - actualLabelCount) > Math.abs(labelCount - actualLabelCount1) && actualLabelCount1 > 0) {
-                            imin = imin1;
-                            imax = imax1;
-                            k = k1;
-                            h = h1;
-                            h10 = Math.pow(10, h1);
-                        } else
-                            break;
-                    }
-                }
-
-                var ticks = [];
-                for (var i = imin; i <= imax; i++) {
-                    var newTick = i * k * h10;
-                    if (h < 0) {
-                        newTick = newTick.toPrecision(-h);
-                    }
-
-                    ticks.push(newTick);
-                }
-
-                var result = {};
-                result.ticks = ticks;
-                result.h = h;
-                result.h10 = h10;
-
-                return result;
-            };
-
-            LineChart.prototype.clear = function (screenLeft, screenRight) {
-                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-                this.context.fillStyle = "white";
-                this.context.fillRect(screenLeft, 0, screenRight - screenLeft, this.canvas.height);
-
-                var maxLegendWidth = Math.max(24, (screenRight - screenLeft) / 2 - 60);
-
-                $("#rightLegend").css("right", $("#timeSeries").width() - screenRight + 30);
-                $("#rightLegend").css("max-width", maxLegendWidth + "px");
-
-                $("#leftLegend").css("left", screenLeft + 30);
-                $("#leftLegend").css("max-width", maxLegendWidth + "px");
-
-                $("#timeSeriesChartHeader").text("TimeSeries Chart");
-            };
-
-            LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight, plotTop, plotBottom) {
-                var that = this;
-                dataSet.series.forEach(function (seria) {
-                    if (seria.appearanceSettings && seria.appearanceSettings.thickness && seria.appearanceSettings.thickness > verticalPadding) {
-                        verticalPadding = seria.appearanceSettings.thickness;
-                    }
-                });
-
-                var screenHeight = this.canvas.height - 2 * verticalPadding;
-
-                var dataToScreenX = function (x) {
-                    return (x - plotLeft) / (plotRight - plotLeft) * (screenRight - screenLeft) + screenLeft;
-                };
-                var dataToScreenY = function (y) {
-                    return verticalPadding + screenHeight * (plotTop - y) / (plotTop - plotBottom);
-                };
-
-                var x = dataSet.time;
-                var n = x.length;
-
-                var context = this.context;
-
-                var xmin = screenLeft, xmax = screenRight;
-                var ymin = 0, ymax = this.canvas.height;
-
-                dataSet.series.forEach(function (seria) {
-                    context.strokeStyle = seria.appearanceSettings.stroke;
-                    context.lineWidth = seria.appearanceSettings.thickness;
-
-                    var y = seria.values;
-
-                    context.beginPath();
-                    var x1, x2, y1, y2;
-                    var i = 0;
-
-                    var nextValuePoint = function () {
-                        for (; i < n; i++) {
-                            if (isNaN(x[i]) || isNaN(y[i]))
-                                continue;
-                            x1 = dataToScreenX(x[i]);
-                            y1 = dataToScreenY(y[i]);
-                            c1 = that.code(x1, y1, xmin, xmax, ymin, ymax);
-                            break;
-                        }
-                        if (c1 == 0)
-                            context.moveTo(x1, y1);
-                    };
-                    nextValuePoint();
-
-                    var c1, c2, c1_, c2_;
-                    var dx, dy;
-                    var x2_, y2_;
-                    var m = 1;
-                    for (i++; i < n; i++) {
-                        if (isNaN(x[i]) || isNaN(y[i])) {
-                            if (m == 1) {
-                                context.stroke();
-                                var c = that.code(x1, y1, xmin, xmax, ymin, ymax);
-                                if (c == 0) {
-                                    context.beginPath();
-                                    context.arc(x1, y1, seria.appearanceSettings.thickness / 2, 0, 2 * Math.PI);
-                                    context.fill();
-                                }
-                            } else {
-                                context.stroke();
-                            }
-                            context.beginPath();
-                            i++;
-                            nextValuePoint();
-                            m = 1;
-                            continue;
-                        }
-
-                        x2_ = x2 = dataToScreenX(x[i]);
-                        y2_ = y2 = dataToScreenY(y[i]);
-                        if (Math.abs(x1 - x2) < 1 && Math.abs(y1 - y2) < 1)
-                            continue;
-
-                        c1_ = c1;
-                        c2_ = c2 = that.code(x2, y2, xmin, xmax, ymin, ymax);
-
-                        while (c1 | c2) {
-                            if (c1 & c2)
-                                break;
-                            dx = x2 - x1;
-                            dy = y2 - y1;
-                            if (c1) {
-                                if (x1 < xmin) {
-                                    y1 += dy * (xmin - x1) / dx;
-                                    x1 = xmin;
-                                } else if (x1 > xmax) {
-                                    y1 += dy * (xmax - x1) / dx;
-                                    x1 = xmax;
-                                } else if (y1 < ymin) {
-                                    x1 += dx * (ymin - y1) / dy;
-                                    y1 = ymin;
-                                } else if (y1 > ymax) {
-                                    x1 += dx * (ymax - y1) / dy;
-                                    y1 = ymax;
-                                }
-                                c1 = that.code(x1, y1, xmin, xmax, ymin, ymax);
-                            } else {
-                                if (x2 < xmin) {
-                                    y2 += dy * (xmin - x2) / dx;
-                                    x2 = xmin;
-                                } else if (x2 > xmax) {
-                                    y2 += dy * (xmax - x2) / dx;
-                                    x2 = xmax;
-                                } else if (y2 < ymin) {
-                                    x2 += dx * (ymin - y2) / dy;
-                                    y2 = ymin;
-                                } else if (y2 > ymax) {
-                                    x2 += dx * (ymax - y2) / dy;
-                                    y2 = ymax;
-                                }
-                                c2 = that.code(x2, y2, xmin, xmax, ymin, ymax);
-                            }
-                        }
-                        if (!(c1 & c2)) {
-                            if (c1_ != 0)
-                                context.moveTo(x1, y1);
-                            context.lineTo(x2, y2);
-                            m++;
-                        }
-
-                        x1 = x2_;
-                        y1 = y2_;
-                        c1 = c2_;
-                    }
-
-                    if (m == 1) {
-                        context.stroke();
-                        var c = that.code(x1, y1, xmin, xmax, ymin, ymax);
-                        if (c == 0) {
-                            context.beginPath();
-                            context.arc(x1, y1, seria.appearanceSettings.thickness / 2, 0, 2 * Math.PI);
-                            context.fill();
-                        }
-                    } else {
-                        context.stroke();
-                    }
-                });
-            };
-
-            LineChart.prototype.code = function (x, y, xmin, xmax, ymin, ymax) {
-                var a = x < xmin ? 1 : 0;
-                var b = x > xmax ? 1 : 0;
-                var c = y < ymin ? 1 : 0;
-                var d = y > ymax ? 1 : 0;
-                return a << 3 | b << 2 | c << 1 | d;
-            };
-
-            LineChart.prototype.generateAxisParameters = function (tickOrigin, secondScreenBorder, ymin, ymax, appearence) {
-                var that = this;
-                var ticksForDraw = [];
-                var verticalPadding = appearence.verticalPadding ? appearence.verticalPadding : 0;
-                var screenHeight = this.canvas.height - 2 * verticalPadding;
-
-                var dataToScreenY = function (y) {
-                    return verticalPadding + screenHeight * (ymax - y) / (ymax - ymin);
-                };
-                var plotToScreenY = function (top) {
-                    return (ymax - ymin) * (1 - ((top - verticalPadding) / screenHeight)) + ymin;
-                };
-
-                var ticks = this.calculateTicks(plotToScreenY(this.canvas.height), plotToScreenY(0), appearence.labelCount).ticks;
-
-                var ctx = this.context;
-                ctx.font = appearence.font;
-                ctx.textBaseline = 'middle';
-                ctx.strokeStyle = appearence.stroke;
-                ctx.fillStyle = appearence.stroke;
-                ctx.lineWidth = appearence.majorTickThickness;
-                var ticklength = appearence.tickLength;
-                var textOffset = 2;
-
-                if (appearence.axisLocation == "right") {
-                    ticklength = -ticklength;
-                    textOffset = -textOffset;
-                }
-
-                ctx.textAlign = appearence.axisLocation;
-
-                ticks.forEach(function (tick) {
-                    var tickForDraw = {};
-                    tickForDraw.tick = tick;
-
-                    var y = dataToScreenY(tick);
-                    tickForDraw.y = y;
-                    tickForDraw.xLineStart = tickOrigin;
-                    tickForDraw.xLineEnd = tickOrigin + ticklength;
-                    tickForDraw.xText = tickOrigin + ticklength + textOffset;
-
-                    var textWidth = ctx.measureText(tick).width;
-                    if (appearence.axisLocation == "right") {
-                        textWidth = -textWidth;
-                    }
-                    var offset = ticklength + textWidth + 2 * textOffset;
-
-                    tickForDraw.isGridLineVisible = offset > 0 && (tickOrigin + offset) <= secondScreenBorder || offset < 0 && (tickOrigin + offset) >= secondScreenBorder;
-                    tickForDraw.xGridLineStart = tickOrigin + offset;
-                    tickForDraw.xGridLineEnd = secondScreenBorder;
-
-                    ticksForDraw.push(tickForDraw);
-                });
-
-                return ticksForDraw;
-            };
-
-            LineChart.prototype.drawAxis = function (ticksForDraw, appearence) {
-                var that = this;
-                var ctx = this.context;
-                ctx.font = appearence.font;
-                ctx.textBaseline = 'middle';
-                ctx.strokeStyle = appearence.stroke;
-                ctx.fillStyle = appearence.stroke;
-                ctx.lineWidth = appearence.majorTickThickness;
-                ctx.textAlign = appearence.axisLocation;
-
-                ticksForDraw.forEach(function (tick) {
-                    ctx.strokeStyle = appearence.stroke;
-                    ctx.beginPath();
-                    ctx.moveTo(tick.xLineStart, tick.y);
-                    ctx.lineTo(tick.xLineEnd, tick.y);
-                    ctx.stroke();
-
-                    var minTextOffset = 8;
-                    ctx.fillText(tick.tick, tick.xText, Math.max(minTextOffset, Math.min(that.canvas.height - minTextOffset, tick.y)));
-                });
-            };
-
-            LineChart.prototype.drawHorizontalGridLines = function (ticksForDraw, appearence) {
-                var that = this;
-                var ctx = this.context;
-                ctx.strokeStyle = 'lightgray';
-                ctx.lineWidth = appearence.majorTickThickness;
-
-                ticksForDraw.forEach(function (tick) {
-                    if (tick.isGridLineVisible) {
-                        ctx.beginPath();
-                        ctx.moveTo(tick.xGridLineStart, tick.y);
-                        ctx.lineTo(tick.xGridLineEnd, tick.y);
-                        ctx.stroke();
-                    }
-                });
-            };
-
-            LineChart.prototype.drawVerticalGridLines = function (screenLeft, screenRight, plotLeft, plotRight) {
-                var ctx = this.context;
-                var verticalTicks = CZ.Common.axis.ticksInfo;
-                var height = this.canvas.height;
-                ctx.strokeStyle = 'lightgray';
-                verticalTicks.forEach(function (tick) {
-                    var coord = tick.position;
-                    ctx.beginPath();
-                    ctx.moveTo(coord, 0);
-                    ctx.lineTo(coord, height);
-                    ctx.stroke();
-                });
-            };
-
-            LineChart.prototype.updateCanvasHeight = function () {
-                $("#timeSeries").height($("#timeSeriesContainer").height() - 36);
-                this.canvas.height = $("#timeSeries").height();
-                this.canvas.width = $("#timeSeries").width();
-            };
-
-            LineChart.prototype.clearLegend = function (location) {
-                var legendCnt = location === "left" ? $("#leftLegend") : $("#rightLegend");
-                var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
-                legend.empty();
-                legendCnt.hide();
-            };
-
-            LineChart.prototype.addLegendRecord = function (location, stroke, description) {
-                var legend = location === "left" ? $("#leftLegendList") : $("#rightLegendList");
-                var legendCont = location === "left" ? $("#leftLegend") : $("#rightLegend");
-
-                legendCont.show();
-                var cont = $('<li></li>');
-                var strokeIndicatior = $('<div></div>').addClass("tsc-legend-indicator");
-                strokeIndicatior.css("background-color", stroke);
-
-                var descriptionDiv = $('<div></div>').addClass("tsc-legend-description");
-                descriptionDiv.css("max-width", parseFloat(legendCont.css("max-width")) - 24);
-                descriptionDiv.text(description);
-
-                strokeIndicatior.appendTo(cont);
-                descriptionDiv.appendTo(cont);
-                cont.height(24).appendTo(legend);
-            };
-
-            LineChart.prototype.checkLegendVisibility = function (screenWidth) {
-                var baseIndicatorSize = 24;
-                var horOffset = 30;
-                var topOffset = 10;
-                return screenWidth >= baseIndicatorSize + horOffset && this.canvas.height >= baseIndicatorSize + topOffset;
-            };
-            return LineChart;
-        })();
-        UI.LineChart = LineChart;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
 })(CZ || (CZ = {}));
 
 var CZ;
@@ -12041,4434 +16415,210 @@ var CZ;
     })(CZ.Common || (CZ.Common = {}));
     var Common = CZ.Common;
 })(CZ || (CZ = {}));
+
 var CZ;
 (function (CZ) {
-    (function (UILoader) {
-        function loadHtml(selector, filepath) {
-            var container = $(selector);
-            var promise = $.Deferred();
-
-            if (!filepath) {
-                promise.resolve(container);
-                return promise;
+    (function (Extensions) {
+        (function (RIN) {
+            function getScript() {
+                return "http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/lib/rin-core-1.0.js";
             }
-
-            if (!selector || !container.length) {
-                throw "Unable to load " + filepath + " " + selector;
-            }
-
-            container.load(filepath, function () {
-                promise.resolve(container);
-            });
-
-            return promise;
-        }
-        UILoader.loadHtml = loadHtml;
-
-        function loadAll(uiMap) {
-            var promises = [];
-
-            for (var selector in uiMap) {
-                if (uiMap.hasOwnProperty(selector)) {
-                    promises.push(loadHtml(selector, uiMap[selector]));
-                }
-            }
-
-            return $.when.apply($, promises);
-        }
-        UILoader.loadAll = loadAll;
-    })(CZ.UILoader || (CZ.UILoader = {}));
-    var UILoader = CZ.UILoader;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Media) {
-        var BingMediaPicker = (function () {
-            function BingMediaPicker(container, context, formHost) {
-                this.container = container;
-                this.contentItem = context;
-
-                this.editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
-                this.searchTextbox = this.container.find(".cz-bing-search-input");
-                this.mediaTypeRadioButtons = this.container.find(":radio");
-                this.progressBar = this.container.find(".cz-form-progress-bar");
-                this.searchResultsBox = this.container.find(".cz-bing-search-results");
-                this.searchButton = this.container.find(".cz-bing-search-button");
-
-                this.initialize();
-            }
-            BingMediaPicker.setup = function (context, formHost) {
-                var mediaPickerContainer = CZ.Media.mediaPickersViews["bing"];
-                var mediaPicker = new BingMediaPicker(mediaPickerContainer, context, formHost);
-                var formContainer = $(".cz-form-bing-mediapicker");
-
-                if (formContainer.length === 0) {
-                    formContainer = $("#mediapicker-form").clone().removeAttr("id").addClass("cz-form-bing-mediapicker").appendTo($("#content"));
-                }
-
-                var form = new CZ.UI.FormMediaPicker(formContainer, mediaPickerContainer, "Import from Bing", {
-                    activationSource: $(),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    contentContainer: ".cz-form-content"
-                });
-
-                $(form).on("showcompleted", function (event) {
-                    mediaPicker.searchTextbox.focus();
-                });
-
-                $(mediaPicker).on("resultclick", function (event) {
-                    form.close();
-                });
-
-                var onWindowResize = function () {
-                    return mediaPicker.onWindowResize();
-                };
-
-                $(window).on("resize", onWindowResize);
-
-                $(form).on("closecompleted", function (event) {
-                    $(window).off("resize", onWindowResize);
-                });
-
-                form.show();
-            };
-
-            BingMediaPicker.prototype.initialize = function () {
-                var _this = this;
-                this.progressBar.css("opacity", 0);
-                this.searchTextbox.off();
-                this.searchButton.off();
-                $(this).off();
-
-                this.searchTextbox.keypress(function (event) {
-                    var code = event.which || event.keyCode;
-
-                    if (code === 13) {
-                        event.preventDefault();
-                        _this.search();
-                    }
-                });
-
-                this.searchButton.click(function (event) {
-                    _this.search();
-                });
-
-                $(this).on("resultclick", function (event, mediaInfo) {
-                    _this.onSearchResultClick(mediaInfo);
-                });
-            };
-
-            BingMediaPicker.prototype.onSearchResultClick = function (mediaInfo) {
-                $.extend(this.contentItem, mediaInfo);
-                this.editContentItemForm.updateMediaInfo();
-            };
-
-            BingMediaPicker.prototype.getMediaType = function () {
-                return this.mediaTypeRadioButtons.filter(":checked").val();
-            };
-
-            BingMediaPicker.prototype.convertResultToMediaInfo = function (result, mediaType) {
-                var mediaInfoMap = {
-                    image: {
-                        uri: result.MediaUrl,
-                        mediaType: mediaType,
-                        mediaSource: result.SourceUrl,
-                        attribution: result.SourceUrl
-                    },
-                    video: {
-                        uri: result.MediaUrl,
-                        mediaType: mediaType,
-                        mediaSource: result.MediaUrl,
-                        attribution: result.MediaUrl
-                    },
-                    pdf: {
-                        uri: result.Url,
-                        mediaType: mediaType,
-                        mediaSource: result.Url,
-                        attribution: result.Url
-                    }
-                };
-
-                return mediaInfoMap[mediaType];
-            };
-
-            BingMediaPicker.prototype.search = function () {
-                var query = this.searchTextbox.val();
-                var mediaType = this.getMediaType();
-
-                if (query.trim() === "") {
-                    return;
-                }
-
-                this.searchResultsBox.empty();
-                this.showProgressBar();
-
-                switch (mediaType) {
-                    case "image":
-                        this.searchImages(query);
-                        break;
-                    case "video":
-                        this.searchVideos(query);
-                        break;
-                    case "document":
-                        this.searchDocuments(query);
-                        break;
-                }
-            };
-
-            BingMediaPicker.prototype.searchImages = function (query) {
-                var _this = this;
-                CZ.Service.getBingImages(query).done(function (response) {
-                    _this.hideProgressBar();
-
-                    if (response.d.length === 0) {
-                        _this.showNoResults();
-                        return;
-                    }
-
-                    for (var i = 0, len = response.d.length; i < len; ++i) {
-                        var result = response.d[i];
-                        var resultContainer = _this.createImageResult(result);
-                        _this.searchResultsBox.append(resultContainer);
-                        _this.alignThumbnails();
-                    }
-                }).fail(function (error) {
-                    _this.hideProgressBar();
-                    _this.showErrorMessage(error);
-                });
-            };
-
-            BingMediaPicker.prototype.searchVideos = function (query) {
-                var _this = this;
-                query += " (+site:youtube.com OR +site:vimeo.com)";
-                CZ.Service.getBingVideos(query).done(function (response) {
-                    _this.hideProgressBar();
-
-                    if (response.d.length === 0) {
-                        _this.showNoResults();
-                        return;
-                    }
-
-                    for (var i = 0, len = response.d.length; i < len; ++i) {
-                        var result = response.d[i];
-                        var resultContainer = _this.createVideoResult(result);
-                        _this.searchResultsBox.append(resultContainer);
-                        _this.alignThumbnails();
-                    }
-                }).fail(function (error) {
-                    _this.hideProgressBar();
-                    _this.showErrorMessage(error);
-                });
-            };
-
-            BingMediaPicker.prototype.searchDocuments = function (query) {
-                var _this = this;
-                CZ.Service.getBingDocuments(query, "pdf").done(function (response) {
-                    _this.hideProgressBar();
-
-                    if (response.d.length === 0) {
-                        _this.showNoResults();
-                        return;
-                    }
-
-                    for (var i = 0, len = response.d.length; i < len; ++i) {
-                        var result = response.d[i];
-                        var resultContainer = _this.createDocumentResult(result);
-                        _this.searchResultsBox.append(resultContainer);
-                    }
-                }).fail(function (error) {
-                    _this.hideProgressBar();
-                    _this.showErrorMessage(error);
-                });
-            };
-
-            BingMediaPicker.prototype.createImageResult = function (result) {
-                var _this = this;
-                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerImageThumbnailMaxWidth, CZ.Settings.mediapickerImageThumbnailMaxHeight);
-
-                var imageOffset = (CZ.Settings.mediapickerImageThumbnailMaxHeight - rectangle.height) / 2;
-
-                var container = $("<div></div>", {
-                    class: "cz-bing-result-container",
-                    width: rectangle.width,
-                    "data-actual-width": rectangle.width
-                });
-
-                var title = $("<div></div>", {
-                    class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title,
-                    title: result.Title
-                });
-
-                var size = $("<div></div>", {
-                    class: "cz-bing-result-description cz-lightgray",
-                    text: result.Width + "x" + result.Height + " - " + Math.round(result.FileSize / 8 / 1024) + " KB"
-                });
-
-                var url = $("<a></a>", {
-                    class: "cz-bing-result-description cz-lightgray",
-                    text: result.DisplayUrl,
-                    href: result.MediaUrl,
-                    title: result.DisplayUrl,
-                    "media-source": result.SourceUrl,
-                    target: "_blank"
-                });
-
-                var thumbnailContainer = $("<div></div>", {
-                    width: "100%",
-                    height: CZ.Settings.mediapickerImageThumbnailMaxHeight
-                });
-
-                var thumbnail = $("<img></img>", {
-                    class: "cz-bing-result-thumbnail",
-                    src: result.Thumbnail.MediaUrl,
-                    height: rectangle.height,
-                    width: "100%"
-                });
-                thumbnail.css("padding-top", imageOffset + "px");
-
-                thumbnailContainer.add(title).add(size).click(function (event) {
-                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "image"));
-                });
-
-                thumbnailContainer.append(thumbnail);
-
-                return container.append(thumbnailContainer).append(title).append(size).append(url);
-            };
-
-            BingMediaPicker.prototype.createVideoResult = function (result) {
-                var _this = this;
-                result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
-
-                var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerVideoThumbnailMaxWidth, CZ.Settings.mediapickerVideoThumbnailMaxHeight);
-
-                var imageOffset = (CZ.Settings.mediapickerVideoThumbnailMaxHeight - rectangle.height) / 2;
-
-                var container = $("<div></div>", {
-                    class: "cz-bing-result-container",
-                    width: rectangle.width,
-                    "data-actual-width": rectangle.width
-                });
-
-                var title = $("<div></div>", {
-                    class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title,
-                    title: result.Title
-                });
-
-                var size = $("<div></div>", {
-                    class: "cz-bing-result-description cz-lightgray",
-                    text: "Duration - " + (result.RunTime / 1000) + " seconds"
-                });
-
-                var url = $("<a></a>", {
-                    class: "cz-bing-result-description cz-lightgray",
-                    text: result.MediaUrl,
-                    href: result.MediaUrl,
-                    title: result.MediaUrl,
-                    target: "_blank"
-                });
-
-                var thumbnailContainer = $("<div></div>", {
-                    width: "100%",
-                    height: CZ.Settings.mediapickerVideoThumbnailMaxHeight
-                });
-
-                var thumbnail = $("<img></img>", {
-                    class: "cz-bing-result-thumbnail",
-                    src: result.Thumbnail.MediaUrl,
-                    height: rectangle.height,
-                    width: "100%"
-                });
-                thumbnail.css("padding-top", imageOffset + "px");
-
-                thumbnailContainer.add(title).add(size).click(function (event) {
-                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "video"));
-                });
-
-                thumbnailContainer.append(thumbnail);
-
-                return container.append(thumbnailContainer).append(title).append(size).append(url);
-            };
-
-            BingMediaPicker.prototype.createDocumentResult = function (result) {
-                var _this = this;
-                var container = $("<div></div>", {
-                    class: "cz-bing-result-container",
-                    width: 300
-                });
-
-                var title = $("<div></div>", {
-                    class: "cz-bing-result-title cz-darkgray",
-                    text: result.Title,
-                    title: result.Title
-                });
-
-                var descr = $("<div></div>", {
-                    class: "cz-bing-result-doc-description cz-lightgray",
-                    height: 100,
-                    text: result.Description
-                });
-
-                var url = $("<a></a>", {
-                    class: "cz-bing-result-description cz-lightgray",
-                    text: result.DisplayUrl,
-                    href: result.Url,
-                    title: result.DisplayUrl,
-                    target: "_blank"
-                });
-
-                title.add(descr).click(function (event) {
-                    $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "pdf"));
-                });
-
-                return container.append(title).append(descr).append(url);
-            };
-
-            BingMediaPicker.prototype.showProgressBar = function () {
-                this.progressBar.animate({
-                    opacity: 1
-                });
-            };
-
-            BingMediaPicker.prototype.hideProgressBar = function () {
-                this.progressBar.animate({
-                    opacity: 0
-                });
-            };
-
-            BingMediaPicker.prototype.showNoResults = function () {
-                this.searchResultsBox.text("No results.");
-            };
-
-            BingMediaPicker.prototype.createDefaultThumbnail = function () {
-                return {
-                    ContentType: "image/png",
-                    FileSize: 4638,
-                    Width: 500,
-                    Height: 500,
-                    MediaUrl: "/images/Temp-Thumbnail2.png"
-                };
-            };
-
-            BingMediaPicker.prototype.showErrorMessage = function (error) {
-                var errorMessagesByStatus = {
-                    "400": "The search request is formed badly. Please contact developers about the error.",
-                    "403": "Please sign in to ChronoZoom to use Bing search.",
-                    "500": "We are sorry, but something went wrong. Please try again later."
-                };
-
-                var errorMessage = $("<span></span>", {
-                    class: "cz-red",
-                    text: errorMessagesByStatus[error.status]
-                });
-
-                this.searchResultsBox.append(errorMessage);
-            };
-
-            BingMediaPicker.prototype.onWindowResize = function () {
-                this.alignThumbnails();
-            };
-
-            BingMediaPicker.prototype.alignThumbnails = function () {
-                var container = this.searchResultsBox;
-                var elements = container.children();
-
-                if (elements.length === 0) {
-                    return;
-                }
-
-                var rowWidth = container.width();
-                var currentRow = {
-                    elements: [],
-                    width: 0
-                };
-
-                for (var i = 0, len = elements.length; i < len; i++) {
-                    var curElement = $(elements[i]);
-                    var curElementActualWidth = +curElement.attr("data-actual-width");
-                    var curElementOuterWidth = curElement.outerWidth(true);
-                    var curElementInnerWidth = curElement.innerWidth();
-
-                    if (rowWidth < currentRow.width + curElementActualWidth) {
-                        var delta = rowWidth - currentRow.width;
-                        for (var j = 0, rowLen = currentRow.elements.length; j < rowLen; j++) {
-                            var rowElement = currentRow.elements[j];
-                            var rowElementActualWidth = +rowElement.attr("data-actual-width");
-                            rowElement.width(rowElementActualWidth + delta / rowLen);
+            RIN.getScript = getScript;
+
+            function getExtension(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload) {
+                var rinDiv;
+                if (!rinDiv) {
+                    rinDiv = document.createElement('div');
+                    rinDiv.setAttribute("id", id);
+                    rinDiv.setAttribute("class", "rinPlayer");
+                    rinDiv.addEventListener("mousemove", CZ.Common.preventbubble, false);
+                    rinDiv.addEventListener("mousedown", CZ.Common.preventbubble, false);
+                    rinDiv.addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
+                    rinDiv.addEventListener("mousewheel", CZ.Common.preventbubble, false);
+
+                    rin.processAll(null, 'http://553d4a03eb844efaaf7915517c979ef4.cloudapp.net/rinjsTag/').then(function () {
+                        var playerElement = document.getElementById(id);
+                        var playerControl = rin.getPlayerControl(rinDiv);
+                        if (playerControl) {
+                            var deepstateUrl = playerControl.resolveDeepstateUrlFromAbsoluteUrl(window.location.href);
+                            playerControl.load(contentSource);
                         }
-                        currentRow.elements = [];
-                        currentRow.elements.push(curElement);
+                    });
+                } else {
+                    rinDiv.isAdded = false;
+                }
+                return new RINPlayer(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload, rinDiv);
+            }
+            RIN.getExtension = getExtension;
 
-                        currentRow.width = Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
-                    } else {
-                        currentRow.elements.push(curElement);
+            function RINPlayer(vc, parent, layerid, id, contentSource, vx, vy, vw, vh, z, onload, rinDiv) {
+                this.base = CZ.VCContent.CanvasDomItem;
+                this.base(vc, layerid, id, vx, vy, vw, vh, z);
+                this.initializeContent(rinDiv);
 
-                        currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
+                this.onRemove = function () {
+                    var rinplayerControl = rin.getPlayerControl(rinDiv);
+                    if (rinplayerControl) {
+                        rinplayerControl.pause();
+                        if (rinplayerControl.unload) {
+                            rinplayerControl.unload();
+                        }
+                        rinplayerControl = null;
                     }
-                }
-            };
-
-            BingMediaPicker.prototype.fitThumbnailToContainer = function (aspectRatio, maxWidth, maxHeight) {
-                var maxAspectRatio = maxWidth / maxHeight;
-                var output = {
-                    width: maxHeight * aspectRatio,
-                    height: maxHeight
+                    this.prototype.onRemove.call(this);
                 };
 
-                if (aspectRatio > maxAspectRatio) {
-                    output.width = maxWidth;
-                    output.height = maxWidth / aspectRatio;
-                }
-
-                return output;
-            };
-            return BingMediaPicker;
-        })();
-        Media.BingMediaPicker = BingMediaPicker;
-    })(CZ.Media || (CZ.Media = {}));
-    var Media = CZ.Media;
+                this.prototype = new CZ.VCContent.CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+            }
+        })(Extensions.RIN || (Extensions.RIN = {}));
+        var RIN = Extensions.RIN;
+    })(CZ.Extensions || (CZ.Extensions = {}));
+    var Extensions = CZ.Extensions;
 })(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Media) {
-        (function (SkyDriveMediaPicker) {
-            var editContentItemForm;
-            var contentItem;
-            SkyDriveMediaPicker.filePicker;
-            SkyDriveMediaPicker.filePickerIframe;
-            SkyDriveMediaPicker.logoutButton;
-            SkyDriveMediaPicker.isEnabled;
-            SkyDriveMediaPicker.helperText;
-            var mediaType;
-            var tempSource;
+var MediaPickerExample = (function () {
+    function MediaPickerExample(container, context) {
+        var _this = this;
+        this.container = container;
+        this.context = context;
+        this.fileInput = this.container.find("#upload-file");
+        this.fileNameTextblock = this.container.find("#filename");
 
-            function setup(context, formHost) {
-                contentItem = context;
-                editContentItemForm = formHost ? formHost : CZ.HomePageViewModel.getFormById("#auth-edit-contentitem-form");
+        this.fileNameTextblock.empty();
 
-                SkyDriveMediaPicker.logoutButton = $("<button></button>", {
-                    text: "Logout",
-                    class: "cz-skydrive-logout-button",
-                    click: onLogout
-                });
+        this.fileInput.off();
 
-                SkyDriveMediaPicker.helperText = $("<label></label>", {
-                    text: "Selected items will be automatically shared",
-                    class: "cz-skydrive-help-text"
-                });
-
-                SkyDriveMediaPicker.filePicker = showFilePicker().then(onFilePick, onError);
-            }
-            SkyDriveMediaPicker.setup = setup;
-
-            function showFilePicker() {
-                watchFilePicker(onFilePickerLoad);
-                return WL.fileDialog({
-                    mode: "open",
-                    select: "single"
-                });
+        this.fileInput.change(function (event) {
+            var files = _this.fileInput[0].files;
+            if (files.length === 0) {
+                return;
             }
 
-            function onFilePick(response) {
-                onFilePickerClose();
-                getEmbed(response).then(onContentReceive, onError);
-            }
-
-            function getEmbed(response) {
-                switch (response.data.files[0].type) {
-                    case "photo":
-                        mediaType = "skydrive-image";
-                        break;
-                    default:
-                        mediaType = "skydrive-document";
-                        break;
-                }
-
-                tempSource = response.data.files[0].source;
-                return WL.api({
-                    path: response.data.files[0].id + "/embed",
-                    method: "GET"
-                });
-            }
-
-            function onContentReceive(response) {
-                var src = response.embed_html.match(/src=\"(.*?)\"/i)[1];
-
-                var uri = src;
-
-                if (mediaType === "skydrive-image") {
-                    var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
-                    var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
-                    uri += ' ' + width + ' ' + height;
-                }
-
-                var mediaInfo = {
-                    uri: uri,
-                    mediaType: mediaType,
-                    mediaSource: src,
-                    attribution: src,
-                    tempSource: tempSource
-                };
-
-                $.extend(contentItem, mediaInfo);
-                editContentItemForm.updateMediaInfo();
-            }
-
-            function onError(response) {
-                var error = response.error;
-                if (error.code === "user_canceled" || error.code === "request_canceled") {
-                    onFilePickerClose();
-                } else {
-                    console.log(error.message);
-                }
-            }
-
-            function onLogout() {
-                if (window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
-                    SkyDriveMediaPicker.logoutButton.hide();
-                    SkyDriveMediaPicker.helperText.hide();
-                    SkyDriveMediaPicker.filePicker.cancel();
-                    WL.logout();
-
-                    window.location.assign("https://login.live.com/oauth20_logout.srf?client_id=" + CZ.Settings.WLAPIClientID + "&redirect_uri=" + window.location.toString());
-                }
-            }
-
-            function watchFilePicker(callback) {
-                SkyDriveMediaPicker.filePickerIframe = $("iframe[sutra=picker]");
-                if (SkyDriveMediaPicker.filePickerIframe.length > 0) {
-                    callback();
-                } else {
-                    setTimeout(watchFilePicker, 50, callback);
-                }
-            }
-
-            function onFilePickerLoad() {
-                SkyDriveMediaPicker.logoutButton.appendTo("body");
-
-                SkyDriveMediaPicker.helperText.appendTo("body");
-
-                $(window).on("resize", onWindowResize);
-
-                SkyDriveMediaPicker.filePickerIframe.load(function () {
-                    onWindowResize();
-                    SkyDriveMediaPicker.filePickerIframe.animate({
-                        opacity: 1
-                    });
-                    SkyDriveMediaPicker.logoutButton.animate({
-                        opacity: 1
-                    });
-                    SkyDriveMediaPicker.helperText.animate({
-                        opacity: 1
-                    });
-                });
-            }
-
-            function onFilePickerClose() {
-                SkyDriveMediaPicker.logoutButton.remove();
-                SkyDriveMediaPicker.helperText.remove();
-                $(window).off("resize", onWindowResize);
-            }
-
-            function onWindowResize() {
-                var skyDriveFooterHeight = 56;
-                var iframeOffset = SkyDriveMediaPicker.filePickerIframe.offset();
-                var iframeHeight = SkyDriveMediaPicker.filePickerIframe.outerHeight(true);
-                var buttonLeftMargin = parseInt(SkyDriveMediaPicker.logoutButton.css("margin-left"), 10);
-                var buttonTopMargin = parseInt(SkyDriveMediaPicker.logoutButton.css("margin-top"), 10);
-
-                SkyDriveMediaPicker.logoutButton.offset({
-                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin,
-                    left: iframeOffset.left + buttonLeftMargin
-                });
-                SkyDriveMediaPicker.helperText.offset({
-                    top: iframeOffset.top + iframeHeight - skyDriveFooterHeight + buttonTopMargin + 1,
-                    left: iframeOffset.left + buttonLeftMargin + 90
-                });
-            }
-        })(Media.SkyDriveMediaPicker || (Media.SkyDriveMediaPicker = {}));
-        var SkyDriveMediaPicker = Media.SkyDriveMediaPicker;
-    })(CZ.Media || (CZ.Media = {}));
-    var Media = CZ.Media;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (Media) {
-        var _mediaPickers = {};
-        var _mediaPickersViews = {};
-
-        Object.defineProperties(CZ.Media, {
-            mediaPickers: {
-                get: function () {
-                    return _mediaPickers;
-                }
-            },
-            mediaPickersViews: {
-                get: function () {
-                    return _mediaPickersViews;
-                }
-            }
+            var file = files[0];
+            _this.fileNameTextblock.text(file.name);
+            _this.context.file = file.name;
+        });
+    }
+    MediaPickerExample.setup = function (context) {
+        var container = CZ.Media.mediaPickersViews["example"];
+        var picker = new MediaPickerExample(container, context);
+        var form = new CZ.UI.FormBase($(".example-form"), {
+            activationSource: undefined,
+            navButton: ".cz-form-nav",
+            closeButton: ".cz-form-close-btn > .cz-form-btn",
+            titleTextblock: ".cz-form-title",
+            contentContainer: ".cz-form-content"
         });
 
-        function initialize() {
-            registerMediaPicker("bing", "/images/media/bing-import-50x150.png", CZ.Media.BingMediaPicker, "/ui/media/bing-mediapicker.html");
+        form.contentContainer.append(container);
 
-            if (CZ.Media.SkyDriveMediaPicker.isEnabled) {
-                registerMediaPicker("skydrive", "/images/media/skydrive-import-50x150.png", CZ.Media.SkyDriveMediaPicker).done(function () {
-                    WL.init({
-                        client_id: CZ.Settings.WLAPIClientID,
-                        redirect_uri: CZ.Settings.WLAPIRedirectUrl,
-                        response_type: "token",
-                        scope: "wl.signin,wl.photos,wl.skydrive,wl.skydrive_update"
-                    });
-                });
-            }
-        }
-        Media.initialize = initialize;
-
-        function registerMediaPicker(title, iconUrl, type, viewUrl, selector) {
-            var order = Object.keys(_mediaPickers).length;
-            var setup = type.setup;
-            selector = selector || "$('<div></div>')";
-            _mediaPickers[title] = {};
-
-            return CZ.UILoader.loadHtml(selector, viewUrl).always(function (view) {
-                _mediaPickersViews[title] = view;
-                _mediaPickers[title] = {
-                    title: title,
-                    iconUrl: iconUrl,
-                    order: order,
-                    setup: setup
-                };
-            });
-        }
-        Media.registerMediaPicker = registerMediaPicker;
-    })(CZ.Media || (CZ.Media = {}));
-    var Media = CZ.Media;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var MediaList = (function () {
-            function MediaList(container, mediaPickers, context, form) {
-                this.container = container;
-                this.mediaPickers = mediaPickers;
-                this.context = context;
-                this.form = form;
-
-                this.container.addClass("cz-medialist");
-                this.fillListOfLinks();
-            }
-            MediaList.prototype.fillListOfLinks = function () {
-                var _this = this;
-                var sortedMediaPickersKeys = Object.keys(this.mediaPickers).sort(function (key1, key2) {
-                    return _this.mediaPickers[key1].order - _this.mediaPickers[key2].order;
-                });
-
-                sortedMediaPickersKeys.forEach(function (key) {
-                    if (_this.mediaPickers.hasOwnProperty(key)) {
-                        var mp = _this.mediaPickers[key];
-                        var link = _this.createMediaPickerLink(mp);
-                        _this.container.append(link);
-                    }
-                });
-            };
-
-            MediaList.prototype.createMediaPickerLink = function (mp) {
-                var _this = this;
-                var container = $("<div></div>", {
-                    class: "cz-medialist-item",
-                    title: mp.title,
-                    "media-picker": mp.title
-                });
-
-                var icon = $("<img></img>", {
-                    class: "cz-medialist-item-icon",
-                    src: mp.iconUrl
-                });
-
-                container.click(function (event) {
-                    mp.setup(_this.context, _this.form);
-                });
-
-                container.append(icon);
-                return container;
-            };
-
-            MediaList.prototype.remove = function () {
-                this.container.empty();
-                this.container.removeClass("cz-medialist");
-            };
-            return MediaList;
-        })();
-        UI.MediaList = MediaList;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormEditTimeline = (function (_super) {
-            __extends(FormEditTimeline, _super);
-            function FormEditTimeline(container, formInfo) {
-                var _this = this;
-                _super.call(this, container, formInfo);
-
-                this.saveButton = container.find(formInfo.saveButton);
-                this.deleteButton = container.find(formInfo.deleteButton);
-                this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
-                this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
-                this.titleInput = container.find(formInfo.titleInput);
-                this.errorMessage = container.find(formInfo.errorMessage);
-
-                this.timeline = formInfo.context;
-
-                this.saveButton.off();
-                this.deleteButton.off();
-
-                this.titleInput.focus(function () {
-                    _this.titleInput.hideError();
-                });
-
-                this.initialize();
-            }
-            FormEditTimeline.prototype.initialize = function () {
-                var _this = this;
-                this.saveButton.prop('disabled', false);
-                if (CZ.Authoring.mode === "createTimeline") {
-                    this.deleteButton.hide();
-                    this.titleTextblock.text("Create Timeline");
-                    this.saveButton.text("create timeline");
-                } else if (CZ.Authoring.mode === "editTimeline") {
-                    this.deleteButton.show();
-                    this.titleTextblock.text("Edit Timeline");
-                    this.saveButton.text("update timeline");
-                } else if (CZ.Authoring.mode === "createRootTimeline") {
-                    this.deleteButton.hide();
-                    this.closeButton.hide();
-                    this.titleTextblock.text("Create Root Timeline");
-                    this.saveButton.text("create timeline");
-                } else {
-                    console.log("Unexpected authoring mode in timeline form.");
-                    this.close();
-                }
-
-                this.isCancel = true;
-                this.endDate.addEditMode_Infinite();
-
-                this.titleInput.val(this.timeline.title);
-                this.startDate.setDate(this.timeline.x, true);
-
-                if (this.timeline.endDate === 9999) {
-                    this.endDate.setDate(this.timeline.endDate, true);
-                } else {
-                    this.endDate.setDate(this.timeline.x + this.timeline.width, true);
-                }
-                this.saveButton.click(function (event) {
-                    _this.errorMessage.empty();
-                    var isDataValid = false;
-                    isDataValid = CZ.Authoring.validateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
-
-                    if (!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
-                        _this.titleInput.showError("Title can't be empty");
-                    }
-
-                    if (!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
-                        _this.errorMessage.text('Time interval should no less than one day');
-                    }
-
-                    if (!isDataValid) {
-                        return;
-                    } else {
-                        _this.errorMessage.empty();
-                        var self = _this;
-
-                        _this.saveButton.prop('disabled', true);
-                        CZ.Authoring.updateTimeline(_this.timeline, {
-                            title: _this.titleInput.val(),
-                            start: _this.startDate.getDate(),
-                            end: _this.endDate.getDate()
-                        }).then(function (success) {
-                            self.isCancel = false;
-                            self.close();
-
-                            self.timeline.onmouseclick();
-                        }, function (error) {
-                            if (error !== undefined && error !== null) {
-                                self.errorMessage.text(error).show().delay(7000).fadeOut();
-                            } else {
-                                self.errorMessage.text("Sorry, internal server error :(").show().delay(7000).fadeOut();
-                            }
-                            console.log(error);
-                        }).always(function () {
-                            _this.saveButton.prop('disabled', false);
-                        });
-                    }
-                });
-
-                this.deleteButton.click(function (event) {
-                    if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
-                        var isDataValid = true;
-                        CZ.Authoring.removeTimeline(_this.timeline);
-                        _this.close();
-                    }
-                });
-            };
-
-            FormEditTimeline.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormEditTimeline.prototype.close = function () {
-                var _this = this;
-                this.errorMessage.empty();
-
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        _this.endDate.remove();
-                        _this.startDate.remove();
-                        _this.titleInput.hideError();
-                    }
-                });
-
-                if (this.isCancel && CZ.Authoring.mode === "createTimeline") {
-                    CZ.VCContent.removeChild(this.timeline.parent, this.timeline.id);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                }
-
-                CZ.Authoring.isActive = false;
-
-                this.activationSource.removeClass("active");
-
-                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
-            };
-            return FormEditTimeline;
-        })(CZ.UI.FormUpdateEntity);
-        UI.FormEditTimeline = FormEditTimeline;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var ContentItemListBox = (function (_super) {
-            __extends(ContentItemListBox, _super);
-            function ContentItemListBox(container, listItemContainer, contentItems) {
-                var self = this;
-                var listBoxInfo = {
-                    context: contentItems,
-                    sortableSettings: {
-                        forcePlaceholderSize: true,
-                        cursor: "move",
-                        placeholder: "cz-listbox-placeholder",
-                        revert: 100,
-                        opacity: 0.75,
-                        tolerance: "pointer",
-                        scroll: false,
-                        start: function (event, ui) {
-                            ui.placeholder.height(ui.item.height());
-                        },
-                        stop: function (event, ui) {
-                            for (var i = 0; i < self.items.length; i++)
-                                if (self.items[i].data)
-                                    self.items[i].data.order = i;
-                        }
-                    }
-                };
-
-                var listItemsInfo = {
-                    default: {
-                        container: listItemContainer,
-                        uiMap: {
-                            closeButton: ".cz-listitem-close-btn",
-                            iconImg: ".cz-contentitem-listitem-icon > img",
-                            titleTextblock: ".cz-contentitem-listitem-title",
-                            descrTextblock: ".cz-contentitem-listitem-descr"
-                        }
-                    }
-                };
-
-                listItemsInfo.default.ctor = ContentItemListItem;
-                _super.call(this, container, listBoxInfo, listItemsInfo);
-            }
-            ContentItemListBox.prototype.remove = function (item) {
-                for (var i = this.items.indexOf(item) + 1; i < this.items.length; i++)
-                    if (this.items[i].data && this.items[i].data.order)
-                        this.items[i].data.order--;
-
-                _super.prototype.remove.call(this, item);
-            };
-            return ContentItemListBox;
-        })(CZ.UI.ListBoxBase);
-        UI.ContentItemListBox = ContentItemListBox;
-
-        var ContentItemListItem = (function (_super) {
-            __extends(ContentItemListItem, _super);
-            function ContentItemListItem(parent, container, uiMap, context) {
-                var _this = this;
-                _super.call(this, parent, container, uiMap, context);
-
-                this.iconImg = this.container.find(uiMap.iconImg);
-                this.titleTextblock = this.container.find(uiMap.titleTextblock);
-                this.descrTextblock = this.container.find(uiMap.descrTextblock);
-
-                this.iconImg.attr("onerror", "this.src='/images/Temp-Thumbnail2.png';");
-                this.iconImg.attr("src", this.data.uri);
-                this.titleTextblock.text(this.data.title);
-                this.descrTextblock.text(this.data.description);
-
-                this.closeButton.off();
-                this.closeButton.click(function () {
-                    if (CZ.Authoring.mode === "createExhibit") {
-                        _super.prototype.close.call(_this);
-                    } else if (CZ.Authoring.mode === "editExhibit") {
-                        if (_this.parent.items.length > 1) {
-                            _super.prototype.close.call(_this);
-                        }
-                    }
-                });
-            }
-            return ContentItemListItem;
-        })(CZ.UI.ListItemBase);
-        UI.ContentItemListItem = ContentItemListItem;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormEditExhibit = (function (_super) {
-            __extends(FormEditExhibit, _super);
-            function FormEditExhibit(container, formInfo) {
-                var _this = this;
-                _super.call(this, container, formInfo);
-
-                this.titleTextblock = container.find(formInfo.titleTextblock);
-                this.titleInput = container.find(formInfo.titleInput);
-                this.datePicker = new CZ.UI.DatePicker(container.find(formInfo.datePicker));
-                this.createArtifactButton = container.find(formInfo.createArtifactButton);
-                this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), formInfo.contentItemsTemplate, formInfo.context.contentItems);
-                this.errorMessage = container.find(formInfo.errorMessage);
-                this.saveButton = container.find(formInfo.saveButton);
-                this.deleteButton = container.find(formInfo.deleteButton);
-
-                this.titleInput.focus(function () {
-                    _this.titleInput.hideError();
-                });
-
-                this.contentItemsTemplate = formInfo.contentItemsTemplate;
-
-                this.exhibit = formInfo.context;
-                this.exhibitCopy = $.extend({}, formInfo.context, { children: null });
-                this.exhibitCopy = $.extend(true, {}, this.exhibitCopy);
-                delete this.exhibitCopy.children;
-
-                this.mode = CZ.Authoring.mode;
-                this.isCancel = true;
-                this.isModified = false;
-                this.initUI();
-            }
-            FormEditExhibit.prototype.initUI = function () {
-                var _this = this;
-                this.saveButton.prop('disabled', false);
-
-                this.titleInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.datePicker.datePicker.change(function () {
-                    _this.isModified = true;
-                });
-
-                if (this.mode === "createExhibit") {
-                    this.titleTextblock.text("Create Exhibit");
-                    this.saveButton.text("create exhibit");
-
-                    this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-                    this.closeButton.show();
-                    this.createArtifactButton.show();
-                    this.saveButton.show();
-                    this.deleteButton.hide();
-
-                    this.createArtifactButton.off();
-                    this.createArtifactButton.click(function () {
-                        return _this.onCreateArtifact();
-                    });
-                    this.saveButton.off();
-                    this.saveButton.click(function () {
-                        return _this.onSave();
-                    });
-
-                    this.contentItemsListBox.itemDblClick(function (item, index) {
-                        return _this.onContentItemDblClick(item, index);
-                    });
-                    this.contentItemsListBox.itemRemove(function (item, index) {
-                        return _this.onContentItemRemoved(item, index);
-                    });
-                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
-                        return _this.onContentItemMove(item, indexStart, indexStop);
-                    });
-                } else if (this.mode === "editExhibit") {
-                    this.titleTextblock.text("Edit Exhibit");
-                    this.saveButton.text("update exhibit");
-
-                    this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-
-                    this.closeButton.show();
-                    this.createArtifactButton.show();
-                    this.saveButton.show();
-                    this.deleteButton.show();
-
-                    this.createArtifactButton.off();
-                    this.createArtifactButton.click(function () {
-                        return _this.onCreateArtifact();
-                    });
-                    this.saveButton.off();
-                    this.saveButton.click(function () {
-                        return _this.onSave();
-                    });
-                    this.deleteButton.off();
-                    this.deleteButton.click(function () {
-                        return _this.onDelete();
-                    });
-
-                    this.contentItemsListBox.itemDblClick(function (item, index) {
-                        return _this.onContentItemDblClick(item, index);
-                    });
-                    this.contentItemsListBox.itemRemove(function (item, index) {
-                        return _this.onContentItemRemoved(item, index);
-                    });
-                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
-                        return _this.onContentItemMove(item, indexStart, indexStop);
-                    });
-                } else {
-                    console.log("Unexpected authoring mode in exhibit form.");
-                }
-            };
-
-            FormEditExhibit.prototype.onCreateArtifact = function () {
-                this.isModified = true;
-                if (this.exhibit.contentItems.length < CZ.Settings.infodotMaxContentItemsCount) {
-                    this.exhibit.title = this.titleInput.val() || "";
-                    this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
-                    this.exhibit.infodotDescription = { date: this.datePicker.getDate() };
-                    var newContentItem = {
-                        title: "",
-                        uri: "",
-                        mediaSource: "",
-                        mediaType: "",
-                        attribution: "",
-                        description: "",
-                        order: this.exhibit.contentItems.length
-                    };
-                    this.exhibit.contentItems.push(newContentItem);
-                    this.hide(true);
-                    CZ.Authoring.contentItemMode = "createContentItem";
-                    CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
-                } else {
-                    var self = this;
-                    var origMsg = this.errorMessage.text();
-                    this.errorMessage.text("Sorry, only 10 artifacts are allowed in one exhibit").show().delay(7000).fadeOut(function () {
-                        return self.errorMessage.text(origMsg);
-                    });
-                }
-            };
-
-            FormEditExhibit.prototype.onSave = function () {
-                var _this = this;
-                var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
-                var exhibit_y = this.exhibit.y;
-
-                if (exhibit_x + this.exhibit.width >= this.exhibit.parent.x + this.exhibit.parent.width) {
-                    exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
-                }
-                if (exhibit_x <= this.exhibit.parent.x) {
-                    exhibit_x = this.exhibit.parent.x;
-                }
-
-                if (exhibit_y + this.exhibit.height >= this.exhibit.parent.y + this.exhibit.parent.height) {
-                    exhibit_y = this.exhibit.parent.y + this.exhibit.parent.height - this.exhibit.height;
-                }
-                if (exhibit_y <= this.exhibit.parent.y) {
-                    exhibit_y = this.exhibit.parent.y;
-                }
-
-                var newExhibit = {
-                    title: this.titleInput.val() || "",
-                    x: exhibit_x,
-                    y: exhibit_y,
-                    height: this.exhibit.height,
-                    width: this.exhibit.width,
-                    infodotDescription: { date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()) },
-                    contentItems: this.exhibit.contentItems || [],
-                    type: "infodot"
-                };
-
-                if (!CZ.Authoring.isNotEmpty(this.titleInput.val())) {
-                    this.titleInput.showError("Title can't be empty");
-                }
-
-                if (CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true)) {
-                    this.errorMessage.text("Exhibit intersects other elemenets");
-                }
-
-                if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
-                    this.saveButton.prop('disabled', true);
-                    CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
-                        _this.isCancel = false;
-                        _this.isModified = false;
-                        _this.close();
-
-                        _this.exhibit.id = arguments[0].id;
-
-                        _this.exhibit.onmouseclick();
-                    }, function (error) {
-                        var errorMessage = JSON.parse(error.responseText).errorMessage;
-                        if (errorMessage !== "") {
-                            _this.errorMessage.text(errorMessage);
-                            var that = _this;
-                            var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
-                            errCI.forEach(function (contentItemIndex) {
-                                var item = that.contentItemsListBox.items[contentItemIndex];
-                                item.container.find(".cz-listitem").css("border-color", "red");
-                            });
-                            errorMessage = "(1/" + errCI.length + ") " + JSON.parse(error.responseText).errorMessage;
-                            ;
-                            _this.errorMessage.text(errorMessage);
-                        } else {
-                            _this.errorMessage.text("Sorry, internal server error :(");
-                        }
-
-                        _this.errorMessage.show().delay(7000).fadeOut();
-                    }).always(function () {
-                        _this.saveButton.prop('disabled', false);
-                    });
-                } else if (this.exhibit.contentItems.length === 0) {
-                    var self = this;
-                    var origMsg = this.errorMessage.text();
-                    this.errorMessage.text("Cannot create exhibit without artifacts.").show().delay(7000).fadeOut(function () {
-                        return self.errorMessage.text(origMsg);
-                    });
-                } else {
-                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
-                }
-            };
-
-            FormEditExhibit.prototype.onDelete = function () {
-                if (confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
-                    CZ.Authoring.removeExhibit(this.exhibit);
-                    this.isCancel = false;
-                    this.isModified = false;
-                    this.close();
-                }
-            };
-
-            FormEditExhibit.prototype.onContentItemDblClick = function (item, _) {
-                var idx;
-                if (typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
-                    idx = item.data.order;
-                } else if (typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
-                    idx = this.exhibit.contentItems.map(function (ci) {
-                        return ci.guid;
-                    }).indexOf(item.data.guid);
-                } else {
-                    idx = -1;
-                }
-
-                var item = this.contentItemsListBox.items[idx];
-                item.container.find(".cz-listitem").css("border-color", "#c7c7c7");
-
-                if (idx >= 0) {
-                    this.clickedListItem = item;
-                    this.exhibit.title = this.titleInput.val() || "";
-                    this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
-                    this.exhibit.infodotDescription = { date: this.datePicker.getDate() };
-                    this.hide(true);
-                    CZ.Authoring.contentItemMode = "editContentItem";
-                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[idx], this.exhibit, this, true);
-                }
-            };
-
-            FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
-                var idx;
-                this.isModified = true;
-                if (typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
-                    idx = item.data.order;
-                } else if (typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
-                    idx = this.exhibit.contentItems.map(function (ci) {
-                        return ci.guid;
-                    }).indexOf(item.data.guid);
-                } else {
-                    idx = -1;
-                }
-
-                if (idx >= 0) {
-                    this.exhibit.contentItems.splice(idx, 1);
-                    for (var i = 0; i < this.exhibit.contentItems.length; i++)
-                        this.exhibit.contentItems[i].order = i;
-                    this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                }
-            };
-
-            FormEditExhibit.prototype.onContentItemMove = function (item, indexStart, indexStop) {
-                this.isModified = true;
-                var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
-                this.exhibit.contentItems.splice(indexStop, 0, ci);
-                for (var i = 0; i < this.exhibit.contentItems.length; i++)
-                    this.exhibit.contentItems[i].order = i;
-                this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                CZ.Common.vc.virtualCanvas("requestInvalidate");
-            };
-
-            FormEditExhibit.prototype.show = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                CZ.Authoring.isActive = true;
-                this.activationSource.addClass("active");
-                this.errorMessage.hide();
-                _super.prototype.show.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-            };
-
-            FormEditExhibit.prototype.hide = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                _super.prototype.close.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-                this.activationSource.removeClass("active");
-            };
-
-            FormEditExhibit.prototype.close = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                var _this = this;
-                if (this.isModified) {
-                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
-                        this.isModified = false;
-                    } else {
-                        return;
-                    }
-                }
-
-                _super.prototype.close.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        _this.datePicker.remove();
-                        _this.contentItemsListBox.clear();
-                        _this.titleInput.hideError();
-                    }
-                });
-                if (this.isCancel) {
-                    if (this.mode === "createExhibit") {
-                        CZ.VCContent.removeChild(this.exhibit.parent, this.exhibit.id);
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    } else if (this.mode === "editExhibit") {
-                        delete this.exhibit.contentItems;
-                        $.extend(this.exhibit, this.exhibitCopy);
-                        this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    }
-                }
-                this.activationSource.removeClass("active");
-                CZ.Authoring.isActive = false;
-
-                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
-            };
-            return FormEditExhibit;
-        })(CZ.UI.FormUpdateEntity);
-        UI.FormEditExhibit = FormEditExhibit;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormEditCI = (function (_super) {
-            __extends(FormEditCI, _super);
-            function FormEditCI(container, formInfo) {
-                var _this = this;
-                _super.call(this, container, formInfo);
-
-                this.titleTextblock = container.find(formInfo.titleTextblock);
-                this.titleInput = container.find(formInfo.titleInput);
-                this.mediaInput = container.find(formInfo.mediaInput);
-                this.mediaSourceInput = container.find(formInfo.mediaSourceInput);
-                this.mediaTypeInput = container.find(formInfo.mediaTypeInput);
-                this.attributionInput = container.find(formInfo.attributionInput);
-                this.descriptionInput = container.find(formInfo.descriptionInput);
-                this.errorMessage = container.find(formInfo.errorMessage);
-                this.saveButton = container.find(formInfo.saveButton);
-                this.mediaListContainer = container.find(formInfo.mediaListContainer);
-
-                this.titleInput.focus(function () {
-                    _this.titleInput.hideError();
-                });
-
-                this.mediaInput.focus(function () {
-                    _this.mediaInput.hideError();
-                });
-
-                this.mediaSourceInput.focus(function () {
-                    _this.mediaSourceInput.hideError();
-                });
-
-                this.prevForm = formInfo.prevForm;
-
-                this.exhibit = formInfo.context.exhibit;
-                this.contentItem = formInfo.context.contentItem;
-
-                this.mode = CZ.Authoring.mode;
-                this.isCancel = true;
-                this.isModified = false;
-                this.initUI();
-            }
-            FormEditCI.prototype.initUI = function () {
-                var _this = this;
-                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
-                var that = this;
-                this.saveButton.prop('disabled', false);
-
-                this.titleInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.mediaInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.mediaSourceInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.mediaTypeInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.attributionInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.descriptionInput.change(function () {
-                    _this.isModified = true;
-                });
-
-                this.descriptionInput.on('keyup', function (e) {
-                    if (e.which == 13) {
-                        that.saveButton.click(function () {
-                            return that.onSave();
-                        });
-                    }
-                });
-                this.descriptionInput.on('keydown', function (e) {
-                    if (e.which == 13) {
-                        that.saveButton.off();
-                    }
-                });
-
-                if (CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
-                    $("<option></option>", {
-                        value: "skydrive-image",
-                        text: " Skydrive Image "
-                    }).appendTo(this.mediaTypeInput);
-                    $("<option></option>", {
-                        value: "skydrive-document",
-                        text: " Skydrive Document "
-                    }).appendTo(this.mediaTypeInput);
-                }
-
-                this.titleInput.val(this.contentItem.title || "");
-                this.mediaInput.val(this.contentItem.uri || "");
-                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                this.attributionInput.val(this.contentItem.attribution || "");
-                this.descriptionInput.val(this.contentItem.description || "");
-                this.saveButton.off();
-                this.saveButton.click(function () {
-                    return _this.onSave();
-                });
-
-                if (CZ.Authoring.contentItemMode === "createContentItem") {
-                    this.titleTextblock.text("Create New");
-                    this.saveButton.text("create artifiact");
-
-                    this.closeButton.hide();
-                } else if (CZ.Authoring.contentItemMode === "editContentItem") {
-                    this.titleTextblock.text("Edit");
-                    this.saveButton.text("update artifact");
-
-                    if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit)
-                        this.closeButton.hide();
-                    else
-                        this.closeButton.show();
-                } else {
-                    console.log("Unexpected authoring mode in content item form.");
-                    this.close();
-                }
-
-                this.saveButton.show();
-            };
-
-            FormEditCI.prototype.onSave = function () {
-                var _this = this;
-                var newContentItem = {
-                    title: this.titleInput.val() || "",
-                    uri: this.mediaInput.val() || "",
-                    mediaSource: this.mediaSourceInput.val() || "",
-                    mediaType: this.mediaTypeInput.val() || "",
-                    attribution: this.attributionInput.val() || "",
-                    description: this.descriptionInput.val() || "",
-                    order: this.contentItem.order
-                };
-
-                if (!CZ.Authoring.isNotEmpty(newContentItem.title)) {
-                    this.titleInput.showError("Title can't be empty");
-                }
-
-                if (!CZ.Authoring.isNotEmpty(newContentItem.uri)) {
-                    this.mediaInput.showError("URL can't be empty");
-                }
-                if (!CZ.Authoring.isValidURL(newContentItem.uri)) {
-                    this.mediaInput.showError("URL is wrong");
-                }
-
-                if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
-                    if (CZ.Authoring.contentItemMode === "createContentItem") {
-                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
-                            this.isCancel = false;
-                            this.prevForm.contentItemsListBox.add(newContentItem);
-                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
-                            this.prevForm.exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                            CZ.Common.vc.virtualCanvas("requestInvalidate");
-                            this.isModified = false;
-                            this.back();
-                        }
-                    } else if (CZ.Authoring.contentItemMode === "editContentItem") {
-                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
-                            this.isCancel = false;
-                            var clickedListItem = this.prevForm.clickedListItem;
-                            clickedListItem.iconImg.attr("src", newContentItem.uri);
-                            clickedListItem.titleTextblock.text(newContentItem.title);
-                            clickedListItem.descrTextblock.text(newContentItem.description);
-                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
-                            this.prevForm.exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                            this.prevForm.isModified = true;
-                            CZ.Common.vc.virtualCanvas("requestInvalidate");
-                            this.isModified = false;
-                            this.back();
-                        } else {
-                            this.saveButton.prop('disabled', true);
-                            CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
-                                _this.isCancel = false;
-                                _this.isModified = false;
-                                _this.close();
-                            }, function (error) {
-                                var errorMessage = error.statusText;
-
-                                if (errorMessage.match(/Media Source/)) {
-                                    _this.errorMessage.text("One or more fields filled wrong");
-                                    _this.mediaSourceInput.showError("Media Source URL is not a valid URL");
-                                } else {
-                                    _this.errorMessage.text("Sorry, internal server error :(");
-                                }
-
-                                _this.errorMessage.show().delay(7000).fadeOut();
-                            }).always(function () {
-                                _this.saveButton.prop('disabled', false);
-                            });
-                        }
-                    }
-                } else {
-                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
-                }
-            };
-
-            FormEditCI.prototype.updateMediaInfo = function () {
-                this.mediaInput.val(this.contentItem.uri || "");
-                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                this.attributionInput.val(this.contentItem.attribution || "");
-            };
-
-            FormEditCI.prototype.show = function (noAnimation) {
-                CZ.Authoring.isActive = true;
-                this.activationSource.addClass("active");
-                this.errorMessage.hide();
-                _super.prototype.show.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-            };
-
-            FormEditCI.prototype.close = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                var _this = this;
-                if (this.isModified) {
-                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
-                        this.isModified = false;
-                    } else {
-                        return;
-                    }
-                }
-
-                _super.prototype.close.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        _this.mediaList.remove();
-                        _this.mediaInput.hideError();
-                        _this.titleInput.hideError();
-                        _this.mediaSourceInput.hideError();
-                    }
-                });
-                if (this.isCancel) {
-                    if (CZ.Authoring.contentItemMode === "createContentItem") {
-                        this.exhibit.contentItems.pop();
-                    }
-                }
-                this.activationSource.removeClass("active");
-                CZ.Authoring.isActive = false;
-            };
-            return FormEditCI;
-        })(CZ.UI.FormUpdateEntity);
-        UI.FormEditCI = FormEditCI;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormEditCollection = (function (_super) {
-            __extends(FormEditCollection, _super);
-            function FormEditCollection(container, formInfo) {
-                var _this = this;
-                _super.call(this, container, formInfo);
-                this.contentItem = {};
-
-                this.saveButton = container.find(formInfo.saveButton);
-                this.backgroundInput = container.find(formInfo.backgroundInput);
-                this.collectionTheme = formInfo.collectionTheme;
-                this.activeCollectionTheme = jQuery.extend(true, {}, formInfo.collectionTheme);
-                this.mediaListContainer = container.find(formInfo.mediaListContainer);
-                this.kioskmodeInput = formInfo.kioskmodeInput;
-
-                this.timelineBackgroundColorInput = formInfo.timelineBackgroundColorInput;
-                this.timelineBackgroundOpacityInput = formInfo.timelineBackgroundOpacityInput;
-                this.timelineBorderColorInput = formInfo.timelineBorderColorInput;
-                this.exhibitBackgroundColorInput = formInfo.exhibitBackgroundColorInput;
-                this.exhibitBackgroundOpacityInput = formInfo.exhibitBackgroundOpacityInput;
-                this.exhibitBorderColorInput = formInfo.exhibitBorderColorInput;
-
-                this.backgroundInput.on('input', function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.kioskmodeInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.timelineBackgroundColorInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.timelineBackgroundOpacityInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.timelineBorderColorInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.exhibitBackgroundColorInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.exhibitBackgroundOpacityInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.exhibitBorderColorInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.saveButton.off();
-
-                this.backgroundInput.focus(function () {
-                    _this.backgroundInput.hideError();
-                });
-
-                try  {
-                    this.initialize();
-                } catch (e) {
-                    console.log("Error initializing collection form attributes");
-                }
-
-                this.saveButton.click(function (event) {
-                    _this.updateCollectionTheme(true);
-                    _this.activeCollectionTheme = _this.collectionTheme;
-
-                    var themeData = {
-                        theme: JSON.stringify(_this.collectionTheme)
-                    };
-
-                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, themeData).always(function () {
-                        _this.saveButton.prop('disabled', false);
-                        _this.close();
-                    });
-                });
-            }
-            FormEditCollection.prototype.initialize = function () {
-                this.saveButton.prop('disabled', false);
-
-                this.backgroundInput.val(this.collectionTheme.backgroundUrl);
-                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
-                this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode);
-
-                if (!this.collectionTheme.timelineColor)
-                    this.collectionTheme.timelineColor = CZ.Settings.timelineColorOverride;
-                this.timelineBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineColor));
-                this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor));
-                this.timelineBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineStrokeStyle));
-
-                this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
-                this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor));
-                this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
-            };
-
-            FormEditCollection.prototype.colorIsRgba = function (color) {
-                return color ? color.substr(0, 5) === "rgba(" : false;
-            };
-
-            FormEditCollection.prototype.colorIsRgb = function (color) {
-                return color ? color.substr(0, 4) === "rgb(" : false;
-            };
-
-            FormEditCollection.prototype.colorIsHex = function (color) {
-                return color ? color.substr(0, 1) === "#" && color.length >= 7 : false;
-            };
-
-            FormEditCollection.prototype.rgbaFromColor = function (color, alpha) {
-                if (!color)
-                    return color;
-
-                if (this.colorIsRgba(color)) {
-                    var parts = color.substr(5, color.length - 5 - 1).split(",");
-                    if (parts.length > 3)
-                        parts[parts.length - 1] = alpha.toString();
-                    else
-                        parts.push(alpha.toString());
-                    return "rgba(" + parts.join(",") + ")";
-                }
-
-                var red = parseInt("0x" + color.substr(1, 2));
-                var green = parseInt("0x" + color.substr(3, 2));
-                var blue = parseInt("0x" + color.substr(5, 2));
-
-                return "rgba(" + red + "," + green + "," + blue + "," + alpha + ")";
-            };
-
-            FormEditCollection.prototype.getOpacityFromRGBA = function (rgba) {
-                if (!rgba)
-                    return null;
-                if (!this.colorIsRgba(rgba))
-                    return 1.0;
-
-                var parts = rgba.split(",");
-                var lastPart = parts[parts.length - 1].split(")")[0];
-                return parseFloat(lastPart);
-            };
-
-            FormEditCollection.prototype.getHexColorFromColor = function (color) {
-                if (this.colorIsHex(color))
-                    return color;
-
-                if (!this.colorIsRgb(color) && !this.colorIsRgba(color))
-                    return null;
-
-                var offset = this.colorIsRgb(color) ? 4 : 5;
-                var parts = color.substr(offset, color.length - offset - 1).split(",");
-                var lastPart = parts[parts.length - 1].split(")")[0];
-                return "#" + this.colorHexFromInt(parts[0]) + this.colorHexFromInt(parts[1]) + this.colorHexFromInt(parts[2]);
-            };
-
-            FormEditCollection.prototype.colorHexFromInt = function (colorpart) {
-                var hex = Number(colorpart).toString(16);
-                if (hex.length === 1)
-                    return "0" + hex;
-
-                return hex;
-            };
-
-            FormEditCollection.prototype.updateCollectionTheme = function (clearError) {
-                this.collectionTheme = {
-                    backgroundUrl: this.backgroundInput.val(),
-                    backgroundColor: "#232323",
-                    timelineColor: this.rgbaFromColor(this.timelineBackgroundColorInput.val(), this.timelineBackgroundOpacityInput.val()),
-                    timelineStrokeStyle: this.timelineBorderColorInput.val(),
-                    infoDotFillColor: this.rgbaFromColor(this.exhibitBackgroundColorInput.val(), this.exhibitBackgroundOpacityInput.val()),
-                    infoDotBorderColor: this.exhibitBorderColorInput.val(),
-                    kioskMode: this.kioskmodeInput.prop("checked")
-                };
-
-                if (this.colorIsRgb(this.timelineBackgroundColorInput.val())) {
-                    this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
-                    this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
-                }
-
-                if (clearError)
-                    this.backgroundInput.hideError();
-
-                this.updateCollectionThemeFromTheme(this.collectionTheme);
-            };
-
-            FormEditCollection.prototype.updateCollectionThemeFromTheme = function (theme) {
-                CZ.Settings.applyTheme(theme, false);
-
-                CZ.Common.vc.virtualCanvas("forEachElement", function (element) {
-                    if (element.type === "timeline") {
-                        element.settings.fillStyle = theme.timelineColor;
-                        element.settings.strokeStyle = theme.timelineStrokeStyle;
-                        element.settings.gradientFillStyle = theme.timelineStrokeStyle;
-                    } else if (element.type === "infodot") {
-                        element.settings.fillStyle = theme.infoDotFillColor;
-                        element.settings.strokeStyle = theme.infoDotBorderColor;
-                    }
-                });
-
-                CZ.Common.vc.virtualCanvas("requestInvalidate");
-            };
-
-            FormEditCollection.prototype.updateMediaInfo = function () {
-                var clearError = true;
-
-                if (this.contentItem.mediaType == "skydrive-image") {
-                    this.backgroundInput.val(this.contentItem.tempSource || "");
-                    clearError = false;
-                    this.backgroundInput.showError("SkyDrive static links are not permanent. Consider hosting it as a public image instead.");
-                } else {
-                    this.backgroundInput.val(this.contentItem.uri || "");
-                }
-
-                this.updateCollectionTheme(clearError);
-            };
-
-            FormEditCollection.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormEditCollection.prototype.close = function () {
-                var _this = this;
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        _this.backgroundInput.hideError();
-                        _this.mediaList.remove();
-                    }
-                });
-
-                this.backgroundInput.hideError();
-                this.updateCollectionThemeFromTheme(this.activeCollectionTheme);
-            };
-            return FormEditCollection;
-        })(CZ.UI.FormUpdateEntity);
-        UI.FormEditCollection = FormEditCollection;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormHeaderEdit = (function (_super) {
-            __extends(FormHeaderEdit, _super);
-            function FormHeaderEdit(container, formInfo) {
-                _super.call(this, container, formInfo);
-
-                this.createTimelineBtn = this.container.find(formInfo.createTimeline);
-                this.createExhibitBtn = this.container.find(formInfo.createExhibit);
-                this.createTourBtn = this.container.find(formInfo.createTour);
-
-                this.initialize();
-            }
-            FormHeaderEdit.prototype.initialize = function () {
-                var _this = this;
-                this.createTimelineBtn.off();
-                this.createExhibitBtn.off();
-                this.createTourBtn.off();
-
-                this.createTimelineBtn.click(function (event) {
-                    CZ.Authoring.UI.createTimeline();
-                    _this.close();
-                });
-
-                this.createExhibitBtn.click(function (event) {
-                    CZ.Authoring.UI.createExhibit();
-                    _this.close();
-                });
-
-                this.createTourBtn.click(function (event) {
-                    CZ.Authoring.UI.createTour();
-                    _this.close();
-                });
-            };
-
-            FormHeaderEdit.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-                this.activationSource.addClass("active");
-            };
-
-            FormHeaderEdit.prototype.close = function () {
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-                this.activationSource.removeClass("active");
-            };
-            return FormHeaderEdit;
-        })(CZ.UI.FormBase);
-        UI.FormHeaderEdit = FormHeaderEdit;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormEditProfile = (function (_super) {
-            __extends(FormEditProfile, _super);
-            function FormEditProfile(container, formInfo) {
-                _super.call(this, container, formInfo);
-                this.saveButton = container.find(formInfo.saveButton);
-                this.logoutButton = container.find(formInfo.logoutButton);
-                this.usernameInput = container.find(formInfo.usernameInput);
-                this.emailInput = container.find(formInfo.emailInput);
-                this.agreeInput = container.find(formInfo.agreeInput);
-                this.loginPanel = $(document.body).find(formInfo.loginPanel).first();
-                this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
-                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
-                this.allowRedirect = formInfo.allowRedirect;
-
-                this.usernameInput.off("keypress");
-                this.emailInput.off("keypress");
-
-                this.initialize();
-            }
-            FormEditProfile.prototype.validEmail = function (e) {
-                if (String(e).length > 254)
-                    return false;
-                var filter = /^([\w^_]+((?:([-_.\+][\w^_]+)|))+|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
-                return String(e).search(filter) != -1;
-            };
-
-            FormEditProfile.prototype.validUsername = function (e) {
-                var filter = /^[a-z0-9\-_]{4,20}$/i;
-                return String(e).search(filter) != -1;
-            };
-
-            FormEditProfile.prototype.initialize = function () {
-                var _this = this;
-                var profile = CZ.Service.getProfile();
-
-                profile.done(function (data) {
-                    if (data.DisplayName != null) {
-                        _this.usernameInput.val(data.DisplayName);
-                        if (data.DisplayName != "") {
-                            _this.usernameInput.prop('disabled', true);
-                        }
-                        _this.emailInput.val(data.Email);
-                        if (data.Email !== undefined && data.Email !== '' && data.Email != null) {
-                            _this.agreeInput.attr('checked', true);
-                            _this.agreeInput.prop('disabled', true);
-                        }
-                    }
-                });
-
-                this.saveButton.click(function (event) {
-                    var isValid = _this.validUsername(_this.usernameInput.val());
-                    if (!isValid) {
-                        alert("Provided incorrect username, \n'a-z', '0-9', '-', '_' - characters allowed only. ");
-                        return;
-                    }
-
-                    var emailAddress = "";
-                    if (_this.emailInput.val()) {
-                        var emailIsValid = _this.validEmail(_this.emailInput.val());
-                        if (!emailIsValid) {
-                            alert("Provided incorrect email address");
-                            return;
-                        }
-
-                        var agreeTerms = _this.agreeInput.prop("checked");
-                        if (!agreeTerms) {
-                            alert("Please agree with provided terms");
-                            return;
-                        }
-
-                        emailAddress = _this.emailInput.val();
-                    }
-
-                    CZ.Service.getProfile().done(function (curUser) {
-                        CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
-                            if (curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
-                                alert("Sorry, this username is already in use. Please try again.");
-                                return;
-                            }
-                            CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
-                                if (_this.allowRedirect) {
-                                    window.location.assign("/" + success);
-                                } else {
-                                    _this.close();
-                                }
-                            }, function (error) {
-                                alert("Unable to save changes. Please try again later.");
-                                console.log(error);
-                            });
-                        });
-                    });
-                });
-
-                this.logoutButton.click(function (event) {
-                    WL.logout();
-                    window.location.assign("/pages/logoff.aspx");
-                });
-
-                var preventEnterKeyPress = function (event) {
-                    if (event.which == 13) {
-                        event.preventDefault();
-                    }
-                };
-                this.usernameInput.keypress(preventEnterKeyPress);
-                this.emailInput.keypress(preventEnterKeyPress);
-            };
-
-            FormEditProfile.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormEditProfile.prototype.close = function () {
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-
-                this.activationSource.removeClass("active");
-            };
-            return FormEditProfile;
-        })(CZ.UI.FormUpdateEntity);
-        UI.FormEditProfile = FormEditProfile;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormLogin = (function (_super) {
-            __extends(FormLogin, _super);
-            function FormLogin(container, formInfo) {
-                _super.call(this, container, formInfo);
-            }
-            FormLogin.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-                this.activationSource.addClass("active");
-            };
-
-            FormLogin.prototype.close = function () {
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-                this.activationSource.removeClass("active");
-            };
-            return FormLogin;
-        })(CZ.UI.FormBase);
-        UI.FormLogin = FormLogin;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormHeaderSearch = (function (_super) {
-            __extends(FormHeaderSearch, _super);
-            function FormHeaderSearch(container, formInfo) {
-                _super.call(this, container, formInfo);
-
-                this.searchTextbox = container.find(formInfo.searchTextbox);
-                this.searchResultsBox = container.find(formInfo.searchResultsBox);
-                this.progressBar = container.find(formInfo.progressBar);
-                this.resultSections = container.find(formInfo.resultSections);
-                this.resultsCountTextblock = container.find(formInfo.resultsCountTextblock);
-
-                this.initialize();
-            }
-            FormHeaderSearch.prototype.initialize = function () {
-                var _this = this;
-                this.fillFormWithSearchResults();
-
-                this.searchResults = [];
-                this.progressBar.css("opacity", 0);
-                this.hideResultsCount();
-                this.clearResultSections();
-                this.hideSearchResults();
-                this.searchTextbox.off();
-
-                var onSearchQueryChanged = function (event) {
-                    clearTimeout(_this.delayedSearchRequest);
-
-                    _this.delayedSearchRequest = setTimeout(function () {
-                        var query = _this.searchTextbox.val();
-                        query = _this.escapeSearchQuery(query);
-                        _this.showProgressBar();
-                        _this.sendSearchQuery(query).then(function (response) {
-                            _this.hideProgressBar();
-                            _this.searchResults = response ? response.d : response;
-                            _this.updateSearchResults();
-                        }, function (error) {
-                            console.log("Error connecting to service: search.\n" + error.responseText);
-                        });
-                    }, 300);
-                };
-
-                this.searchTextbox.on("input search", onSearchQueryChanged);
-
-                var isIE9 = (CZ.Settings.ie === 9);
-                if (isIE9) {
-                    this.searchTextbox.on("keyup", function (event) {
-                        switch (event.which) {
-                            case 8:
-                            case 46:
-                                onSearchQueryChanged(event);
-                                break;
-                        }
-                    });
-                    this.searchTextbox.on("cut", onSearchQueryChanged);
-                }
-            };
-
-            FormHeaderSearch.prototype.sendSearchQuery = function (query) {
-                return (query === "") ? $.Deferred().resolve(null).promise() : CZ.Service.getSearch(query);
-            };
-
-            FormHeaderSearch.prototype.updateSearchResults = function () {
-                var _this = this;
-                this.clearResultSections();
-
-                if (this.searchResults === null) {
-                    this.hideSearchResults();
-                    return;
-                }
-
-                if (this.searchResults.length === 0) {
-                    this.showNoResults();
-                    return;
-                }
-
-                var resultTypes = {
-                    0: "exhibit",
-                    1: "timeline",
-                    2: "contentItem"
-                };
-
-                var sections = {
-                    exhibit: $(this.resultSections[1]),
-                    timeline: $(this.resultSections[0]),
-                    contentItem: $(this.resultSections[2])
-                };
-
-                var idPrefixes = {
-                    exhibit: "e",
-                    timeline: "t",
-                    contentItem: ""
-                };
-
-                this.searchResults.forEach(function (item) {
-                    var form = _this;
-                    var resultType = resultTypes[item.objectType];
-                    var resultId = idPrefixes[resultType] + item.id;
-                    var resultTitle = item.title;
-
-                    sections[resultType].append($("<div></div>", {
-                        class: "cz-form-search-result",
-                        text: resultTitle,
-                        "result-id": resultId,
-                        "result-type": resultType,
-                        click: function () {
-                            var self = $(this);
-                            CZ.Search.goToSearchResult(self.attr("result-id"), self.attr("result-type"));
-                            form.close();
-                        }
-                    }));
-                });
-
-                this.showResultsCount();
-                this.showNonEmptySections();
-            };
-
-            FormHeaderSearch.prototype.fillFormWithSearchResults = function () {
-                this.container.show();
-                this.searchResultsBox.css("height", "calc(100% - 150px)");
-                this.searchResultsBox.css("height", "-moz-calc(100% - 150px)");
-                this.searchResultsBox.css("height", "-webkit-calc(100% - 150px)");
-                this.searchResultsBox.css("height", "-o-calc(100% - 150px)");
-                this.container.hide();
-            };
-
-            FormHeaderSearch.prototype.clearResultSections = function () {
-                this.resultSections.find("div").remove();
-            };
-
-            FormHeaderSearch.prototype.escapeSearchQuery = function (query) {
-                return query ? query.replace(/"/g, "") : "";
-            };
-
-            FormHeaderSearch.prototype.getResultsCountString = function () {
-                var count = this.searchResults.length;
-                return count + ((count === 1) ? " result" : " results");
-            };
-
-            FormHeaderSearch.prototype.showProgressBar = function () {
-                this.progressBar.animate({
-                    opacity: 1
-                });
-            };
-
-            FormHeaderSearch.prototype.hideProgressBar = function () {
-                this.progressBar.animate({
-                    opacity: 0
-                });
-            };
-
-            FormHeaderSearch.prototype.showNonEmptySections = function () {
-                this.searchResultsBox.show();
-                this.resultSections.show();
-                this.resultSections.each(function (i, item) {
-                    var results = $(item).find("div");
-                    if (results.length === 0) {
-                        $(item).hide();
-                    }
-                });
-            };
-
-            FormHeaderSearch.prototype.showNoResults = function () {
-                this.searchResultsBox.show();
-                this.resultSections.hide();
-                this.resultsCountTextblock.show();
-                this.resultsCountTextblock.text("No results");
-            };
-
-            FormHeaderSearch.prototype.showResultsCount = function () {
-                this.searchResultsBox.show();
-                this.resultsCountTextblock.show();
-                this.resultsCountTextblock.text(this.getResultsCountString());
-            };
-
-            FormHeaderSearch.prototype.hideResultsCount = function () {
-                this.resultsCountTextblock.hide();
-            };
-
-            FormHeaderSearch.prototype.hideSearchResults = function () {
-                this.hideResultsCount();
-                this.searchResultsBox.hide();
-            };
-
-            FormHeaderSearch.prototype.show = function () {
-                var _this = this;
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        _this.searchTextbox.focus();
-                    }
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormHeaderSearch.prototype.close = function () {
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-
-                this.activationSource.removeClass("active");
-            };
-            return FormHeaderSearch;
-        })(CZ.UI.FormBase);
-        UI.FormHeaderSearch = FormHeaderSearch;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var TimeSeriesDataForm = (function (_super) {
-            __extends(TimeSeriesDataForm, _super);
-            function TimeSeriesDataForm(container, formInfo) {
-                _super.call(this, container, formInfo);
-
-                var existingTimSeriesList = $("#existingTimeSeries");
-
-                if (existingTimSeriesList.children().length == 0) {
-                    var preloadedlist;
-                    $.ajax({
-                        cache: false,
-                        type: "GET",
-                        async: false,
-                        dataType: "JSON",
-                        url: '/dumps/timeseries-preloaded.txt',
-                        success: function (result) {
-                            preloadedlist = result.d;
-                        },
-                        error: function (xhr) {
-                            alert("Error fetching pre-loaded timeseries list: " + xhr.responseText);
-                        }
-                    });
-
-                    preloadedlist.forEach(function (preloaded) {
-                        var li = $('<li></li>').css("margin-left", 10).css("margin-bottom", "3px").height(22).appendTo(existingTimSeriesList);
-
-                        var link = $('<a></a>').addClass("cz-form-preloadedrecord").appendTo(li);
-                        link.css("color", "#0464a2");
-                        link.css("font-size", "16px");
-                        link.css("float", "left");
-                        link.css("width", "140px");
-                        link.css("cursor", "pointer");
-                        link.text(preloaded.name);
-
-                        var div = $("<span></span>").addClass("cz-form-preloadedrecord").appendTo(li);
-                        div.text("Source:");
-
-                        var sourceDiv = $("<a></a>").addClass("cz-form-preloadedrecord").appendTo(li);
-                        sourceDiv.css("color", "#0464a2");
-                        sourceDiv.css("cursor", "pointer");
-                        sourceDiv.text(preloaded.source);
-                        sourceDiv.prop("href", preloaded.link);
-
-                        link.click(function (e) {
-                            var data;
-                            $.ajax({
-                                cache: false,
-                                type: "GET",
-                                async: false,
-                                dataType: "text",
-                                url: preloaded.file,
-                                success: function (result) {
-                                    data = result;
-                                },
-                                error: function (xhr) {
-                                    alert("Error fetching timeSeries Data: " + xhr.responseText);
-                                }
-                            });
-
-                            var dataSet = undefined;
-
-                            try  {
-                                dataSet = CZ.Data.csvToDataSet(data, preloaded.delimiter, preloaded.source);
-                            } catch (err) {
-                                alert(err);
-                                return;
-                            }
-
-                            CZ.HomePageViewModel.showTimeSeriesChart();
-                            CZ.rightDataSet = dataSet;
-                            var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                            CZ.HomePageViewModel.updateTimeSeriesChart(vp);
-                        });
-                    });
-                }
-
-                this.input = $("#fileLoader");
-                var that = this;
-
-                $("#fileLoader").change(function () {
-                    var fl = $("#fileLoader");
-                    $("#selectedFile").text(fl[0].files[0].name);
-                });
-
-                if (this.checkFileLoadCompatibility()) {
-                    $("#loadDataBtn").click(function () {
-                        var fr = that.openFile({
-                            "onload": function (e) {
-                                that.updateUserData(fr.result);
-                            }
-                        });
-                    });
-                } else {
-                    $("#uploadDataCnt").hide();
-                }
-            }
-            TimeSeriesDataForm.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            TimeSeriesDataForm.prototype.close = function () {
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-
-                this.activationSource.removeClass("active");
-            };
-
-            TimeSeriesDataForm.prototype.checkFileLoadCompatibility = function () {
-                return window['File'] && window['FileReader'] && window['FileList'] && window['Blob'];
-            };
-
-            TimeSeriesDataForm.prototype.openFile = function (callbacks) {
-                var file = this.input[0].files[0];
-                var fileReader = new FileReader();
-
-                fileReader.onloadstart = callbacks["onloadstart"];
-                fileReader.onerror = callbacks["onerror"];
-                fileReader.onabort = callbacks["onabort"];
-                fileReader.onload = callbacks["onload"];
-                fileReader.onloadend = callbacks["onloadend"];
-
-                fileReader.readAsText(file);
-
-                return fileReader;
-            };
-
-            TimeSeriesDataForm.prototype.updateUserData = function (csvString) {
-                var dataSet = undefined;
-
-                var delimValue = $("#delim").prop("value");
-                if (delimValue === "tab")
-                    delimValue = "\t";
-                else if (delimValue === "space")
-                    delimValue = " ";
-
-                try  {
-                    dataSet = CZ.Data.csvToDataSet(csvString, delimValue, this.input[0].files[0].name);
-                } catch (err) {
-                    alert(err);
-                    return;
-                }
-
-                CZ.HomePageViewModel.showTimeSeriesChart();
-                CZ.leftDataSet = dataSet;
-                var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                CZ.HomePageViewModel.updateTimeSeriesChart(vp);
-            };
-            return TimeSeriesDataForm;
-        })(CZ.UI.FormBase);
-        UI.TimeSeriesDataForm = TimeSeriesDataForm;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var MessageWindow = (function (_super) {
-            __extends(MessageWindow, _super);
-            function MessageWindow(container, message, title) {
-                _super.call(this, container, {
-                    activationSource: null,
-                    prevForm: null,
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    contentContainer: ".cz-form-content"
-                });
-
-                this.tourTitleInput = this.container.find(".cz-form-label");
-                this.titleTextblock.text(title || "ChronoZoom");
-                this.tourTitleInput.text(message);
-                this.setHeight();
-            }
-            MessageWindow.prototype.show = function () {
-                var _this = this;
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 300,
-                    complete: function () {
-                        $(document).on("keyup", _this, _this.onDocumentKeyPress);
-                    }
-                });
-            };
-
-            MessageWindow.prototype.close = function () {
-                var _this = this;
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 300,
-                    complete: function () {
-                        $(document).off("keyup", _this.onDocumentKeyPress);
-                    }
-                });
-            };
-
-            MessageWindow.prototype.onDocumentKeyPress = function (e) {
-                var self = e.data;
-                if (e.which == 27 && self.isFormVisible) {
-                    self.closeButton.click();
-                }
-            };
-
-            MessageWindow.prototype.setHeight = function () {
-                this.container.show();
-                var messageHeight = this.tourTitleInput.outerHeight(true);
-                this.contentContainer.height(messageHeight);
-                this.container.hide();
-            };
-            return MessageWindow;
-        })(CZ.UI.FormBase);
-        UI.MessageWindow = MessageWindow;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormHeaderSessionExpired = (function (_super) {
-            __extends(FormHeaderSessionExpired, _super);
-            function FormHeaderSessionExpired(container, formInfo) {
-                _super.call(this, container, formInfo);
-                this.time = 60;
-                this.sessionTimeSpan = container.find(formInfo.sessionTimeSpan);
-                this.sessionButton = container.find(formInfo.sessionButton);
-
-                this.initialize();
-            }
-            FormHeaderSessionExpired.prototype.initialize = function () {
-                var _this = this;
-                this.sessionButton.click(function () {
-                    CZ.Service.getProfile();
-                    clearTimeout(_this.timer);
-                    _this.time = 60;
-                    _this.close();
-                    _this.sessionTimeSpan.html(_this.time.toString());
-                    CZ.Authoring.resetSessionTimer();
-                    return false;
-                });
-            };
-
-            FormHeaderSessionExpired.prototype.onTimer = function () {
-                var _this = this;
-                if (this.time > 0) {
-                    this.time--;
-                    this.sessionTimeSpan.html(this.time.toString());
-                    clearTimeout(this.timer);
-                    this.timer = setTimeout(function () {
-                        _this.onTimer();
-                    }, 1000);
-                } else {
-                    clearTimeout(this.timer);
-
-                    this.close();
-                    document.location.href = "/account/logout";
-                }
-            };
-            FormHeaderSessionExpired.prototype.show = function () {
-                var _this = this;
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                    }
-                });
-
-                this.timer = setTimeout(function () {
-                    _this.onTimer();
-                }, 1000);
-                this.activationSource.addClass("active");
-            };
-
-            FormHeaderSessionExpired.prototype.close = function () {
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-                this.activationSource.removeClass("active");
-            };
-            return FormHeaderSessionExpired;
-        })(CZ.UI.FormBase);
-        UI.FormHeaderSessionExpired = FormHeaderSessionExpired;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormMediaPicker = (function (_super) {
-            __extends(FormMediaPicker, _super);
-            function FormMediaPicker(container, mediaPickerContainer, title, formInfo) {
-                _super.call(this, container, formInfo);
-
-                this.titleTextblock.text(title);
-                this.contentContainer.append(mediaPickerContainer);
-                $(this).off();
-            }
-            FormMediaPicker.prototype.show = function () {
-                var _this = this;
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        $(_this).trigger("showcompleted");
-                    }
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormMediaPicker.prototype.close = function () {
-                var _this = this;
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        $(_this).trigger("closecompleted");
-                    }
-                });
-
-                this.activationSource.removeClass("active");
-            };
-            return FormMediaPicker;
-        })(CZ.UI.FormBase);
-        UI.FormMediaPicker = FormMediaPicker;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-var CZ;
-(function (CZ) {
-    (function (StartPage) {
-        var _isRegimesVisible;
-
-        StartPage.tileData = [
-            {
-                "Idx": 0,
-                "Title": "Big History is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_bighistory.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999998954347&y=-0.46459331778482354&w=3.841695822797034e-12&h=3.7430627449314544e-12"
-            },
-            {
-                "Idx": 1,
-                "Title": "CERN is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_cern.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999192440875&y=-0.4645933209201501&w=3.729306137185042e-11&h=3.633558592459924e-11"
-            },
-            {
-                "Idx": 2,
-                "Title": "Earth Science is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_earthscience.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999988061194&y=-0.46459331795948755&w=4.546120315559252e-12&h=4.4294015903520115e-12"
-            },
-            {
-                "Idx": 3,
-                "Title": "King Tut is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_kingtut.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999967062717304&y=-0.4645931999741229&w=3.5221148563086766e-10&h=3.4316868149181225e-10"
-            },
-            {
-                "Idx": 4,
-                "Title": "Napoleon is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_napoleon.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999840411981&y=-0.46459346560505227&w=5.935054278147061e-10&h=5.782675563705605e-10"
-            },
-            {
-                "Idx": 5,
-                "Title": "World War I is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_ww1.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999485392826&y=-0.4645933221621095&w=3.314938789411939e-12&h=3.229829860746773e-12"
-            },
-            {
-                "Idx": 6,
-                "Title": "Coluseum is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_colosseum.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999988732590944&y=-0.4645934478931077&w=1.0069124184819225e-9&h=9.810605875309654e-10"
-            },
-            {
-                "Idx": 7,
-                "Title": "Justin Morrill is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_justin_morrill.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999897945675&y=-0.46459338150077905&w=1.9362194151655837e-10&h=1.8865082227261387e-10"
-            },
-            {
-                "Idx": 8,
-                "Title": "Big History 2 is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_bighistory.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4996898109169686&y=-0.46442779133805834&w=0.0007080832576286593&h=0.0006899036738441856"
-            }
-        ];
-
-        StartPage.tileLayout = [
-            {
-                "Name": "#combo0-icons",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9"
-                ]
-            },
-            {
-                "Name": "#FeaturedTimelinesBlock-tiles",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9"
-                ]
-            },
-            {
-                "Name": "#TwitterBlock-tiles",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9"
-                ]
-            },
-            {
-                "Name": "#FavoriteTimelinesBlock-tiles",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6"
-                ]
-            },
-            {
-                "Name": "#MyTimelinesBlock-tiles",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9"
-                ]
-            }
-        ];
-
-        function resizeCrop($image, imageProps, isListView) {
-            var $startPage = $("#start-page");
-
-            var width = $image.parent().width();
-            var height = $image.parent().height();
-
-            if (isListView) {
-                width = $image.width();
-                height = $image.height();
-            }
-
-            if (!$startPage.is(":visible")) {
-                $startPage.show();
-                width = $image.width();
-                height = $image.height();
-                $startPage.hide();
-            }
-
-            var naturalHeight = imageProps.naturalHeight;
-            var naturalWidth = imageProps.naturalWidth;
-            var ratio = naturalWidth / naturalHeight;
-            var marginTop = 0;
-            var marginLeft = 0;
-
-            if (naturalWidth > naturalHeight) {
-                $image.height(height);
-                $image.width(height * ratio);
-                marginLeft = ($image.width() - width) / 2;
-            } else if (naturalWidth < naturalHeight) {
-                $image.width(width);
-                $image.height(width / ratio);
-                marginTop = ($image.height() - height) / 2;
-            } else {
-                $image.width(width);
-                $image.height(height);
-            }
-
-            $image.css({
-                "margin-top": -marginTop + "px",
-                "margin-left": -marginLeft + "px"
-            });
-        }
-
-        function cloneTileTemplate(template, target, idx) {
-            for (var i = 0; i < target[idx].Visibility.length; i++) {
-                var o = $(template).clone(true, true).appendTo(target[idx].Name);
-                o.attr("class", target[idx].Visibility[i]);
-                o.attr("id", "t" + idx + "i" + i);
-                $("#t" + idx + "i" + i + " .boxInner .tile-photo img").attr("src", StartPage.tileData[i].Thumbnail).attr("alt", StartPage.tileData[i].Title);
-                $("#t" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-title").text(StartPage.tileData[i].Title);
-                $("#t" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-author").text(StartPage.tileData[i].Author);
-            }
-        }
-        StartPage.cloneTileTemplate = cloneTileTemplate;
-
-        function cloneListTemplate(template, target, idx) {
-            for (var i = 0; i < StartPage.tileData.length; i++) {
-                var o = $(template).clone(true, true).appendTo(target);
-                o.attr("id", "l" + idx + "i" + i);
-                $("#l" + idx + "i" + i + " .li-title a").attr("href", StartPage.tileData[i].URL);
-                $("#l" + idx + "i" + i + " .li-title a").text(StartPage.tileData[i].Title);
-                $("#l" + idx + "i" + i + " .li-author").text(StartPage.tileData[i].Author);
-                $("#l" + idx + "i" + i + " .li-icon").text(StartPage.tileData[i].Thumbnail);
-            }
-        }
-        StartPage.cloneListTemplate = cloneListTemplate;
-
-        function cloneTweetTemplate(template, target, idx) {
-            for (var i = 0; i < target[idx].Visibility.length; i++) {
-                var o = $(template).clone(true, true).appendTo(target[idx].Name);
-                o.attr("class", target[idx].Visibility[i]);
-                o.attr("id", "m" + idx + "i" + i);
-            }
-        }
-        StartPage.cloneTweetTemplate = cloneTweetTemplate;
-
-        function PlayIntroTour() {
-            var introTour = CZ.Tours.tours[0];
-
-            if (typeof introTour === "undefined") {
-                return false;
-            }
-
-            CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
-                activationSource: $(".tour-icon"),
-                navButton: ".cz-form-nav",
-                closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
-                titleTextblock: ".cz-tour-form-title",
-                contentContainer: ".cz-form-content",
-                minButton: ".cz-tour-form-min-btn > .cz-form-btn",
-                captionTextarea: ".cz-form-tour-caption",
-                tourPlayerContainer: ".cz-form-tour-player",
-                bookmarksCount: ".cz-form-tour-bookmarks-count",
-                narrationToggle: ".cz-toggle-narration",
-                context: introTour
-            });
-
-            CZ.Tours.tourCaptionForm.show();
-            CZ.Tours.activateTour(introTour, undefined);
-        }
-        StartPage.PlayIntroTour = PlayIntroTour;
-
-        function listFlip(name) {
-            if ('block' != document.getElementById(name + '-list').style.display) {
-                document.getElementById(name + '-list').style.display = 'block';
-                document.getElementById(name + '-tiles').style.display = 'none';
-                $("#" + name).find(".list-view-icon").addClass("active");
-            } else {
-                document.getElementById(name + '-list').style.display = 'none';
-                document.getElementById(name + '-tiles').style.display = 'block';
-                $("#" + name).find(".list-view-icon").removeClass("active");
-                $(window).resize();
-            }
-        }
-        StartPage.listFlip = listFlip;
-
-        function fillFeaturedTimelines(timelines) {
-            var $template = $("#template-tile .box");
-            var layout = CZ.StartPage.tileLayout[1];
-
-            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-                var $startPage = $("#start-page");
-                var $tile = $template.clone(true, true);
-                var $tileImage = $tile.find(".boxInner .tile-photo img");
-                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
-                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
-
-                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(timelineUrl, function (event) {
-                    window.location.href = event.data;
-                    hide();
-                }).invisible();
-
-                $tileImage.load($tile, function (event) {
-                    var $this = $(this);
-                    var imageProps = event.target || event.srcElement;
-
-                    resizeCrop($this, imageProps);
-
-                    $(window).resize({
-                        $image: $this,
-                        imageProps: imageProps
-                    }, function (event) {
-                        resizeCrop(event.data.$image, event.data.imageProps);
-                    });
-
-                    setTimeout(function () {
-                        event.data.visible();
-                    }, 0);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-
-                $tileTitle.text(timeline.Title.trim() || "No title :(");
-                $tileAuthor.text(timeline.Author);
-            }
-        }
-        StartPage.fillFeaturedTimelines = fillFeaturedTimelines;
-
-        function fillFeaturedTimelinesList(timelines) {
-            var template = "#template-timeline-list .timeline-list-item";
-            var target = "#FeaturedTimelinesBlock-list";
-
-            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-
-                var $timelineListItem = $(template).clone(true, true).appendTo(target);
-                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
-
-                var Name = "featured-list-elem" + i;
-                var idx = 1;
-
-                $timelineListItem.attr("id", "l" + idx + "i" + i);
-                $timelineListItem.click(timelineUrl, function (event) {
-                    window.location.href = event.data;
-                    hide();
-                });
-
-                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
-                $timelineListItem.attr("data-author", timeline.Author);
-
-                $timelineListItemImage.load($timelineListItemImage, function (event) {
-                    var $this = $(this);
-                    var imageProps = event.target || event.srcElement;
-
-                    resizeCrop($this, imageProps, true);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-            }
-        }
-        StartPage.fillFeaturedTimelinesList = fillFeaturedTimelinesList;
-
-        function fillFavoriteTimelines(timelines) {
-            var $template = $("#template-tile .box");
-            var layout = CZ.StartPage.tileLayout[3];
-
-            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-                var $startPage = $("#start-page");
-                var $tile = $template.clone(true, true);
-                var $tileImage = $tile.find(".boxInner .tile-photo img");
-                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
-                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
-
-                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "favorite" + i).click(timelineUrl, function (event) {
-                    window.location.href = event.data;
-                    hide();
-                }).invisible();
-
-                $tileImage.load($tile, function (event) {
-                    var $this = $(this);
-                    var imageProps = event.target || event.srcElement;
-
-                    resizeCrop($this, imageProps);
-
-                    $(window).resize({
-                        $image: $this,
-                        imageProps: imageProps
-                    }, function (event) {
-                        resizeCrop(event.data.$image, event.data.imageProps);
-                    });
-
-                    setTimeout(function () {
-                        event.data.visible();
-                    }, 0);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-
-                $tileTitle.text(timeline.Title.trim() || "No title :(");
-                $tileAuthor.text(timeline.Author);
-            }
-        }
-        StartPage.fillFavoriteTimelines = fillFavoriteTimelines;
-
-        function fillFavoriteTimelinesList(timelines) {
-            var template = "#template-timeline-list .timeline-list-item";
-            var target = "#FavoriteTimelinesBlock-list";
-
-            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-
-                var $timelineListItem = $(template).clone(true, true).appendTo(target);
-                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
-
-                var Name = "favorite-list-elem" + i;
-                var idx = 1;
-
-                $timelineListItem.attr("id", "lfav" + idx + "i" + i);
-                $timelineListItem.click(timelineUrl, function (event) {
-                    window.location.href = event.data;
-                    hide();
-                });
-
-                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
-                $timelineListItem.attr("data-author", timeline.Author);
-
-                $timelineListItemImage.load($timelineListItemImage, function (event) {
-                    var $this = $(this);
-                    var imageProps = event.target || event.srcElement;
-
-                    resizeCrop($this, imageProps, true);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-            }
-        }
-        StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
-
-        function fillMyTimelines(timelines) {
-            var $template = $("#template-tile .box");
-            var layout = CZ.StartPage.tileLayout[4];
-            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-                var $startPage = $("#start-page");
-                var $tile = $template.clone(true, true);
-                var $tileImage = $tile.find(".boxInner .tile-photo img");
-                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
-                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
-
-                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "my" + i).click(timelineUrl, function (event) {
-                    window.location.href = event.data;
-                    hide();
-                }).invisible();
-
-                $tileImage.load($tile, function (event) {
-                    var $this = $(this);
-                    $tileImage.show();
-                    var imageProps = event.target || event.srcElement;
-                    $tileImage.hide();
-
-                    resizeCrop($this, imageProps);
-                    $tileImage.show();
-
-                    $(window).resize({
-                        $image: $this,
-                        imageProps: imageProps
-                    }, function (event) {
-                        resizeCrop(event.data.$image, event.data.imageProps);
-                    });
-
-                    setTimeout(function () {
-                        event.data.visible();
-                    }, 0);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-
-                $tileTitle.text(timeline.Title.trim() || "No title :(");
-                $tileAuthor.text(timeline.Author);
-            }
-        }
-        StartPage.fillMyTimelines = fillMyTimelines;
-
-        function fillMyTimelinesList(timelines) {
-            var template = "#template-timeline-list .timeline-list-item";
-            var target = "#MyTimelinesBlock-list";
-
-            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-
-                var $timelineListItem = $(template).clone(true, true).appendTo(target);
-                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
-
-                var Name = "favorite-list-elem" + i;
-                var idx = 1;
-
-                $timelineListItem.attr("id", "lmy" + idx + "i" + i);
-                $timelineListItem.click(timelineUrl, function (event) {
-                    window.location.href = event.data;
-                    hide();
-                });
-
-                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
-                $timelineListItem.attr("data-author", timeline.Author);
-
-                $timelineListItemImage.load($timelineListItemImage, function (event) {
-                    var $this = $(this);
-                    var imageProps = event.target || event.srcElement;
-
-                    resizeCrop($this, imageProps, true);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-            }
-        }
-        StartPage.fillMyTimelinesList = fillMyTimelinesList;
-
-        function TwitterLayout(target, idx) {
-            var ListTemplate = "#template-tweet-list .tweet-list-item";
-            var ListElem = "#TwitterBlock-list";
-
-            CZ.Service.getRecentTweets().done(function (response) {
-                for (var i = 0, len = response.d.length; i < len; ++i) {
-                    var tweet = response.d[i];
-                    var text = tweet.Text;
-                    var fullname = tweet.User.Name;
-                    var username = tweet.User.ScreenName;
-                    var photo = tweet.User.ProfileImageUrl;
-                    var time = tweet.CreatedDate;
-                    var myDate = new Date(time.match(/\d+/)[0] * 1);
-                    var convertedDate = myDate.getDate() + "." + myDate.getMonth() + "." + myDate.getFullYear();
-
-                    var tweetUsernameLink = "https://twitter.com/" + username;
-                    var tweetLink = "https://twitter.com/" + username + "/statuses/" + tweet.IdStr;
-
-                    var $tweetTile = $("#m" + idx + "i" + i);
-                    var $tweetTileMeta = $tweetTile.find(".boxInner .tweet-meta");
-                    var $tileMessage = $tweetTileMeta.find(".tweet-meta-text");
-                    var $tileFullname = $tweetTileMeta.find(".tweet-meta-title");
-                    var $tileUsername = $tweetTileMeta.find(".tweet-meta-author");
-                    var $tileAvatar = $tweetTileMeta.find(".tweet-avatar-icon");
-                    var $tileDate = $tweetTileMeta.find(".tile-meta-time");
-
-                    $tweetTileMeta.invisible(true);
-                    $tileAvatar.load($tweetTileMeta, function (event) {
-                        event.data.visible();
-                    });
-
-                    text = text.replace(/(@([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
-                        href='https://twitter.com/$2'>$1</a>");
-
-                    text = text.replace(/(#([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
-                        href='https://twitter.com/search?q=$2&f=realtime'>$1</a>");
-
-                    $tileMessage.html(text).attr("href", tweetLink);
-                    $tileUsername.text("@" + username).attr("href", tweetUsernameLink);
-                    $tileFullname.text(fullname);
-                    $tileDate.text(convertedDate);
-
-                    $tileAvatar.attr("src", photo);
-
-                    var $tweetListItem = $(ListTemplate).clone(true, true).appendTo(ListElem);
-                    var $listItemMessage = $tweetListItem.find(".tweet-li-message");
-                    var $listItemUsername = $tweetListItem.find(".tweet-li-header .tweet-li-username");
-                    var $listItemFullname = $tweetListItem.find(".tweet-li-header .tweet-li-fullname");
-                    var $listItemAvatar = $tweetListItem.find(".tweet-li-header .tweet-li-avatar");
-                    var $listItemDate = $tweetListItem.find(".tweet-li-footer .tweet-li-date");
-
-                    $tweetListItem.attr("id", "l" + idx + "i" + i);
-                    $listItemMessage.html(text).attr("href", tweetLink);
-                    $listItemUsername.text("@" + username).attr("href", tweetUsernameLink);
-                    $listItemFullname.text(fullname);
-                    $listItemDate.text(convertedDate);
-                    $listItemAvatar.attr("src", photo);
-
-                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
-                        watch: "window"
-                    });
-                }
-            });
-        }
-        StartPage.TwitterLayout = TwitterLayout;
-
-        function show() {
-            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
-            $(".home-icon").addClass("active");
-
-            $disabledButtons.attr("disabled", "disabled").each(function (i, el) {
-                var events = $(el).data("events");
-                $(el).data("onclick", events && events.click && events.click[0]);
-            }).off();
-
-            $(".header-regimes").invisible();
-
-            $(".header-breadcrumbs").invisible();
-
-            CZ.HomePageViewModel.closeAllForms();
-
-            $("#start-page").fadeIn();
-        }
-        StartPage.show = show;
-
-        function compareTimelineTitles(first, second) {
-            if (first.Title.charAt(0) < second.Title.charAt(0))
-                return -1;
-            else if (first.Title.charAt(0) > second.Title.charAt(0))
-                return 1;
-            else
-                return 0;
-        }
-
-        function hide() {
-            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
-            $(".home-icon").removeClass("active");
-
-            $disabledButtons.removeAttr("disabled").each(function (i, el) {
-                $(el).click($(el).data("onclick"));
-            });
-
-            if (_isRegimesVisible) {
-                $(".header-regimes").visible();
-            }
-
-            $(".header-breadcrumbs").visible();
-
-            $("#start-page").fadeOut();
-        }
-        StartPage.hide = hide;
-
-        function initialize() {
-            _isRegimesVisible = $(".header-regimes").is(":visible");
-
-            $(".home-icon").click(function () {
-                if ($("#start-page").is(":visible")) {
-                    hide();
-                } else {
-                    show();
-                }
-            });
-
-            CZ.Service.getUserFeatured().done(function (response) {
-                var timelines = response ? response.reverse() : [];
-
-                timelines.sort(compareTimelineTitles);
-
-                fillFeaturedTimelines(timelines);
-                fillFeaturedTimelinesList(timelines);
-            });
-
-            CZ.Service.getUserFavorites().then(function (response) {
-                var timelines = response ? response.reverse() : [];
-
-                timelines.sort(compareTimelineTitles);
-
-                timelines.forEach(function (timeline) {
-                    CZ.Settings.favoriteTimelines.push(timeline.TimelineUrl.split("/").pop().slice(1));
-                });
-
-                if (timelines.length === 0) {
-                    $("#FavoriteTimelinesBlock .list-view-icon").hide();
-                    $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." + " Click star icon of the timeline you like to save it as favorite.");
-                } else {
-                    fillFavoriteTimelines(timelines);
-                    fillFavoriteTimelinesList(timelines);
-                }
-            }, function (error) {
-                console.log("[ERROR] getUserFavorites");
-            });
-
-            CZ.Service.getProfile().done(function (data) {
-                if ((data !== "") && (data.DisplayName !== null)) {
-                    CZ.Settings.userSuperCollectionName = data.DisplayName;
-                    CZ.Settings.userCollectionName = data.DisplayName;
-                }
-                CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(function (response) {
-                    var timelines = response ? response.reverse() : [];
-                    fillMyTimelines(timelines);
-                    fillMyTimelinesList(timelines);
-                }, function (error) {
-                    console.log("[ERROR] getUserTimelines");
-                });
-            });
-
-            CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2);
-            CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
-
-            var hash = CZ.UrlNav.getURL().hash;
-            if ((!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) && !CZ.Service.superCollectionName) {
-                show();
-            }
-        }
-        StartPage.initialize = initialize;
-    })(CZ.StartPage || (CZ.StartPage = {}));
-    var StartPage = CZ.StartPage;
-})(CZ || (CZ = {}));
-(function ($) {
-    $.fn.showError = function (msg, className, props) {
-        className = className || "error";
-        props = props || {};
-
-        $.extend(true, props, {
-            class: className,
-            text: msg
+        form.closeButton.click(function (event) {
+            alert("Global object value: " + context.file);
         });
 
-        var $errorTemplate = $("<div></div>", props).attr("error", true);
-        var $allErrors = $();
-        var $errorElems = $();
+        form.show();
+    };
+    return MediaPickerExample;
+})();
 
-        var result = this.each(function () {
-            var $this = $(this);
-            var isDiv;
-            var $div;
-            var $error;
+var FormTest = (function (_super) {
+    __extends(FormTest, _super);
+    function FormTest(container, formInfo) {
+        _super.call(this, container, formInfo);
 
-            if (!$this.data("error")) {
-                isDiv = $this.is("div");
-                $div = isDiv ? $this : $this.closest("div");
-                $error = $errorTemplate.clone();
+        this.testButton = container.find(formInfo.testButton);
 
-                $allErrors = $allErrors.add($error);
-
-                $errorElems = $errorElems.add($this);
-                $errorElems = $errorElems.add($div);
-                $errorElems = $errorElems.add($div.children());
-                $this.data("error", $error);
-
-                if (isDiv) {
-                    $div.append($error);
-                } else {
-                    $this.after($error);
-                }
-            }
+        this.testButton.click(function (event) {
+            alert("It Works!");
         });
+    }
+    FormTest.prototype.show = function () {
+        _super.prototype.show.call(this);
 
-        if ($allErrors.length > 0) {
-            $errorElems.addClass(className);
-            $allErrors.slideDown(CZ.Settings.errorMessageSlideDuration);
-        }
-
-        return result;
+        this.activationSource.addClass("activeButton");
     };
 
-    $.fn.hideError = function () {
-        var $allErrors = $();
-        var $errorElems = $();
-        var classes = "";
+    FormTest.prototype.close = function () {
+        _super.prototype.close.call(this);
 
-        var result = this.each(function () {
-            var $this = $(this);
-            var $error = $this.data("error");
-            var $div;
-            var className;
-
-            if ($error) {
-                $div = $this.is("div") ? $this : $this.closest("div");
-                className = $error.attr("class");
-
-                if (classes.split(" ").indexOf(className) === -1) {
-                    classes += " " + className;
-                }
-
-                $allErrors = $allErrors.add($error);
-
-                $errorElems = $errorElems.add($this);
-                $errorElems = $errorElems.add($div);
-                $errorElems = $errorElems.add($div.children());
-            }
-        });
-
-        if ($allErrors.length > 0) {
-            $allErrors.slideUp(CZ.Settings.errorMessageSlideDuration).promise().done(function () {
-                $allErrors.remove();
-                $errorElems.removeData("error");
-                $errorElems.removeClass(classes);
-            });
-        }
-
-        return result;
+        this.activationSource.removeClass("activeButton");
     };
-})(jQuery);
-(function ($) {
-    $.fn.visible = function (noTransition) {
-        return this.each(function () {
-            var $this = $(this);
-            if (noTransition) {
-                $this.addClass("no-transition");
-            } else {
-                $this.removeClass("no-transition");
-            }
-            $this.css({
-                opacity: 1,
-                visibility: "visible"
-            });
-        });
-    };
+    return FormTest;
+})(CZ.UI.FormBase);
 
-    $.fn.invisible = function (noTransition) {
-        return this.each(function () {
-            var $this = $(this);
-            if (noTransition) {
-                $this.addClass("no-transition");
-            } else {
-                $this.removeClass("no-transition");
-            }
-            $this.css({
-                opacity: 0,
-                visibility: "hidden"
-            });
+var RedGreenListBox = (function (_super) {
+    __extends(RedGreenListBox, _super);
+    function RedGreenListBox(container, listBoxInfo, listItemsInfo) {
+        listItemsInfo.red.ctor = RedListItem;
+        listItemsInfo.green.ctor = GreenListItem;
+        _super.call(this, container, listBoxInfo, listItemsInfo, function (item) {
+            var type = item.text.match(/red|green/i);
+            return type ? type[0].toLowerCase() : "default";
         });
-    };
-})(jQuery);
-var constants;
+    }
+    return RedGreenListBox;
+})(CZ.UI.ListBoxBase);
 
+var RedListItem = (function (_super) {
+    __extends(RedListItem, _super);
+    function RedListItem(parent, container, uiMap, context) {
+        var _this = this;
+        _super.call(this, parent, container, uiMap, context);
+
+        this.textblock = this.container.find(uiMap.textblock);
+        this.textblock.text(context.text);
+
+        this.container.click(function (event) {
+            var oldtext = _this.textblock.text();
+            _this.textblock.text("Clicked Red!");
+            setTimeout(function () {
+                _this.textblock.text(oldtext);
+            }, 1500);
+        });
+    }
+    return RedListItem;
+})(CZ.UI.ListItemBase);
+
+var GreenListItem = (function (_super) {
+    __extends(GreenListItem, _super);
+    function GreenListItem(parent, container, uiMap, context) {
+        var _this = this;
+        _super.call(this, parent, container, uiMap, context);
+
+        this.textblock = this.container.find(uiMap.textblock);
+        this.textblock.text(context.text);
+
+        this.container.click(function (event) {
+            var oldtext = _this.textblock.text();
+            _this.textblock.text("Clicked Green!");
+            setTimeout(function () {
+                _this.textblock.text(oldtext);
+            }, 1500);
+        });
+    }
+    return GreenListItem;
+})(CZ.UI.ListItemBase);
 var CZ;
 (function (CZ) {
-    CZ.timeSeriesChart;
-    CZ.leftDataSet;
-    CZ.rightDataSet;
-
-    (function (HomePageViewModel) {
-        var _uiMap = {
-            "#header-edit-form": "/ui/header-edit-form.html",
-            "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
-            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
-            "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
-            "$('<div></div>')": "/ui/contentitem-listbox.html",
-            "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html",
-            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
-            "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
-            "#toursList": "/ui/tourslist-form.html",
-            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
-            "#timeSeriesContainer": "/ui/timeseries-graph-form.html",
-            "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
-            "#message-window": "/ui/message-window.html",
-            "#header-search-form": "/ui/header-search-form.html",
-            "#header-session-expired-form": "/ui/header-session-expired-form.html",
-            "#tour-caption-form": "/ui/tour-caption-form.html",
-            "#mediapicker-form": "/ui/mediapicker-form.html",
-            "#start-page": "/ui/start-page.html",
-            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html"
-        };
-
-        (function (FeatureActivation) {
-            FeatureActivation[FeatureActivation["Enabled"] = 0] = "Enabled";
-            FeatureActivation[FeatureActivation["Disabled"] = 1] = "Disabled";
-            FeatureActivation[FeatureActivation["RootCollection"] = 2] = "RootCollection";
-            FeatureActivation[FeatureActivation["NotRootCollection"] = 3] = "NotRootCollection";
-            FeatureActivation[FeatureActivation["NotProduction"] = 4] = "NotProduction";
-        })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
-        var FeatureActivation = HomePageViewModel.FeatureActivation;
-
-        HomePageViewModel.sessionForm;
-
-        var _featureMap = [
-            {
-                Name: "Login",
-                Activation: 0 /* Enabled */,
-                JQueryReference: "#login-panel"
-            },
-            {
-                Name: "Search",
-                Activation: 0 /* Enabled */,
-                JQueryReference: "#search-button"
-            },
-            {
-                Name: "Tours",
-                Activation: 0 /* Enabled */,
-                JQueryReference: "#tours-index"
-            },
-            {
-                Name: "Authoring",
-                Activation: 0 /* Enabled */,
-                JQueryReference: ".header-icon.edit-icon"
-            },
-            {
-                Name: "TourAuthoring",
-                Activation: 0 /* Enabled */,
-                JQueryReference: ".cz-form-create-tour"
-            },
-            {
-                Name: "WelcomeScreen",
-                Activation: 2 /* RootCollection */,
-                JQueryReference: "#welcomeScreenBack"
-            },
-            {
-                Name: "Regimes",
-                Activation: 2 /* RootCollection */,
-                JQueryReference: ".header-regimes"
-            },
-            {
-                Name: "TimeSeries",
-                Activation: 0 /* Enabled */
-            },
-            {
-                Name: "ManageCollections",
-                Activation: 1 /* Disabled */,
-                JQueryReference: "#collections_button"
-            },
-            {
-                Name: "BreadCrumbs",
-                Activation: 0 /* Enabled */,
-                JQueryReference: ".header-breadcrumbs"
-            },
-            {
-                Name: "Skydrive",
-                Activation: 0 /* Enabled */
-            },
-            {
-                Name: "StartPage",
-                Activation: 0 /* Enabled */,
-                JQueryReference: ".header-icon.home-icon"
-            },
-            {
-                Name: "CollectionsAuthoring",
-                Activation: 0 /* Enabled */
+    (function (UI) {
+        var FormLogoutProfile = (function (_super) {
+            __extends(FormLogoutProfile, _super);
+            function FormLogoutProfile(container, formInfo) {
+                _super.call(this, container, formInfo);
             }
-        ];
+            FormLogoutProfile.prototype.show = function () {
+                _super.prototype.show.call(this);
 
-        HomePageViewModel.rootCollection;
-
-        function UserCanEditCollection(profile) {
-            if (!constants || !constants.environment || constants.environment === "localhost") {
-                return true;
-            }
-
-            if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
-                return true;
-            }
-
-            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
-                return false;
-            }
-
-            return true;
-        }
-
-        function InitializeToursUI(profile, forms) {
-            CZ.Tours.tourCaptionFormContainer = forms[16];
-            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
-
-            var onTakeTour = function (tour) {
-                CZ.HomePageViewModel.closeAllForms();
-                CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
-                    activationSource: $(".tour-icon"),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-tour-form-title",
-                    contentContainer: ".cz-form-content",
-                    minButton: ".cz-tour-form-min-btn > .cz-form-btn",
-                    captionTextarea: ".cz-form-tour-caption",
-                    tourPlayerContainer: ".cz-form-tour-player",
-                    bookmarksCount: ".cz-form-tour-bookmarks-count",
-                    narrationToggle: ".cz-toggle-narration",
-                    context: tour
-                });
-                CZ.Tours.tourCaptionForm.show();
-
-                CZ.Tours.removeActiveTour();
-                CZ.Tours.activateTour(tour, undefined);
+                this.activationSource.addClass("active");
             };
 
-            var onToursInitialized = function () {
-                $("#tours_index").click(function () {
-                    var toursListForm = getFormById("#toursList");
-                    console.log("toursListForm", toursListForm);
-                    if (toursListForm.isFormVisible) {
-                        toursListForm.close();
-                    } else {
-                        if (!$("#start-page").is(":visible")) {
-                            closeAllForms();
-                            var form = new CZ.UI.FormToursList(forms[9], {
-                                activationSource: $(this),
-                                navButton: ".cz-form-nav",
-                                closeButton: ".cz-form-close-btn > .cz-form-btn",
-                                titleTextblock: ".cz-form-title",
-                                tourTemplate: forms[10],
-                                tours: CZ.Tours.tours,
-                                takeTour: onTakeTour,
-                                editTour: allowEditing ? function (tour) {
-                                    if (CZ.Authoring.showEditTourForm)
-                                        CZ.Authoring.showEditTourForm(tour);
-                                } : null,
-                                createTour: ".cz-form-create-tour"
-                            });
-                            form.show();
-                        }
-                    }
-                });
+            FormLogoutProfile.prototype.close = function () {
+                _super.prototype.close.call(this);
+
+                this.activationSource.removeClass("active");
             };
-            if (CZ.Tours.tours)
-                onToursInitialized();
-            else
-                $("body").bind("toursInitialized", onToursInitialized);
-        }
-
-        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
-
-        $(document).ready(function () {
-            window.console = window.console || (function () {
-                var c = {};
-                c.log = c.warn = c.debug = c.info = c.log = c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () {
-                };
-                return c;
-            })();
-
-            $('.bubbleInfo').hide();
-
-            var url = CZ.UrlNav.getURL();
-            HomePageViewModel.rootCollection = url.superCollectionName === undefined;
-            CZ.Service.superCollectionName = url.superCollectionName;
-            CZ.Service.collectionName = url.collectionName;
-            CZ.Common.initialContent = url.content;
-
-            ApplyFeatureActivation();
-
-            CZ.Extensions.registerExtensions();
-
-            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
-            CZ.Media.initialize();
-
-            CZ.Common.initialize();
-            CZ.UILoader.loadAll(_uiMap).done(function () {
-                var forms = arguments;
-
-                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
-
-                $('#timeSeries_button').click(function () {
-                    var tsForm = getFormById('#timeSeriesDataForm');
-                    if (tsForm === false) {
-                        closeAllForms();
-
-                        var timSeriesDataFormDiv = forms[12];
-                        var timSeriesDataForm = new CZ.UI.TimeSeriesDataForm(timSeriesDataFormDiv, {
-                            activationSource: $("#timeSeries_button"),
-                            closeButton: ".cz-form-close-btn > .cz-form-btn"
-                        });
-                        timSeriesDataForm.show();
-                    } else {
-                        if (tsForm.isFormVisible) {
-                            tsForm.close();
-                        } else {
-                            closeAllForms();
-                            tsForm.show();
-                        }
-                    }
-                });
-
-                $(".header-icon.edit-icon").click(function () {
-                    var editForm = getFormById("#header-edit-form");
-                    if (editForm === false) {
-                        closeAllForms();
-                        var form = new CZ.UI.FormHeaderEdit(forms[0], {
-                            activationSource: $(this),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            createTimeline: ".cz-form-create-timeline",
-                            createExhibit: ".cz-form-create-exhibit",
-                            createTour: ".cz-form-create-tour"
-                        });
-                        form.show();
-                        ApplyFeatureActivation();
-                    } else {
-                        if (editForm.isFormVisible) {
-                            editForm.close();
-                        } else {
-                            closeAllForms();
-                            editForm.show();
-                        }
-                    }
-                });
-
-                $(".header-icon.search-icon").click(function () {
-                    var searchForm = getFormById("#header-search-form");
-                    if (searchForm === false) {
-                        closeAllForms();
-                        var form = new CZ.UI.FormHeaderSearch(forms[14], {
-                            activationSource: $(this),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            searchTextbox: ".cz-form-search-input",
-                            searchResultsBox: ".cz-form-search-results",
-                            progressBar: ".cz-form-progress-bar",
-                            resultSections: ".cz-form-search-results > .cz-form-search-section",
-                            resultsCountTextblock: ".cz-form-search-results-count"
-                        });
-                        form.show();
-                    } else {
-                        if (searchForm.isFormVisible) {
-                            searchForm.close();
-                        } else {
-                            closeAllForms();
-                            searchForm.show();
-                        }
-                    }
-                });
-
-                $("#editCollectionButton").click(function () {
-                    closeAllForms();
-                    var form = new CZ.UI.FormEditCollection(forms[19], {
-                        activationSource: $(".header-icon.edit-icon"),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        saveButton: ".cz-form-save",
-                        collectionTheme: CZ.Settings.theme,
-                        backgroundInput: $(".cz-form-collection-background"),
-                        kioskmodeInput: $(".cz-form-collection-kioskmode"),
-                        mediaListContainer: ".cz-form-medialist",
-                        timelineBackgroundColorInput: $(".cz-form-timeline-background"),
-                        timelineBackgroundOpacityInput: $(".cz-form-timeline-background-opacity"),
-                        timelineBorderColorInput: $(".cz-form-timeline-border"),
-                        exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
-                        exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
-                        exhibitBorderColorInput: $(".cz-form-exhibit-border")
-                    });
-                    form.show();
-                });
-
-                CZ.Authoring.initialize(CZ.Common.vc, {
-                    showMessageWindow: function (message, title, onClose) {
-                        var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
-                        if (onClose)
-                            wnd.container.bind("close", function () {
-                                wnd.container.unbind("close", onClose);
-                                onClose();
-                            });
-                        wnd.show();
-                    },
-                    hideMessageWindow: function () {
-                        var wnd = forms[13].data("form");
-                        if (wnd)
-                            wnd.close();
-                    },
-                    showEditTourForm: function (tour) {
-                        CZ.Tours.removeActiveTour();
-                        var form = new CZ.UI.FormEditTour(forms[7], {
-                            activationSource: $(".header-icon.edit-icon"),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            addStopButton: ".cz-form-tour-addstop",
-                            titleInput: ".cz-form-title",
-                            tourStopsListBox: "#stopsList",
-                            tourStopsTemplate: forms[8],
-                            context: tour
-                        });
-                        form.show();
-                    },
-                    showCreateTimelineForm: function (timeline) {
-                        CZ.Authoring.hideMessageWindow();
-                        CZ.Authoring.mode = "createTimeline";
-                        var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(".header-icon.edit-icon"),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            startDate: ".cz-form-time-start",
-                            endDate: ".cz-form-time-end",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            errorMessage: "#error-edit-timeline",
-                            context: timeline
-                        });
-                        form.show();
-                    },
-                    showCreateRootTimelineForm: function (timeline) {
-                        CZ.Authoring.mode = "createRootTimeline";
-                        var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(".header-icon.edit-icon"),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            startDate: ".cz-form-time-start",
-                            endDate: ".cz-form-time-end",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            errorMessage: "#error-edit-timeline",
-                            context: timeline
-                        });
-                        form.show();
-                    },
-                    showEditTimelineForm: function (timeline) {
-                        var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(".header-icon.edit-icon"),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            startDate: ".cz-form-time-start",
-                            endDate: ".cz-form-time-end",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            errorMessage: "#error-edit-timeline",
-                            context: timeline
-                        });
-                        form.show();
-                    },
-                    showCreateExhibitForm: function (exhibit) {
-                        CZ.Authoring.hideMessageWindow();
-                        var form = new CZ.UI.FormEditExhibit(forms[2], {
-                            activationSource: $(".header-icon.edit-icon"),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            titleInput: ".cz-form-item-title",
-                            datePicker: ".cz-form-time",
-                            createArtifactButton: ".cz-form-create-artifact",
-                            contentItemsListBox: ".cz-listbox",
-                            errorMessage: ".cz-form-errormsg",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            contentItemsTemplate: forms[4],
-                            context: exhibit
-                        });
-                        form.show();
-                    },
-                    showEditExhibitForm: function (exhibit) {
-                        var form = new CZ.UI.FormEditExhibit(forms[2], {
-                            activationSource: $(".header-icon.edit-icon"),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            titleInput: ".cz-form-item-title",
-                            datePicker: ".cz-form-time",
-                            createArtifactButton: ".cz-form-create-artifact",
-                            contentItemsListBox: ".cz-listbox",
-                            errorMessage: ".cz-form-errormsg",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            contentItemsTemplate: forms[4],
-                            context: exhibit
-                        });
-                        form.show();
-                    },
-                    showEditContentItemForm: function (ci, e, prevForm, noAnimation) {
-                        var form = new CZ.UI.FormEditCI(forms[3], {
-                            activationSource: $(".header-icon.edit-icon"),
-                            prevForm: prevForm,
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            errorMessage: ".cz-form-errormsg",
-                            saveButton: ".cz-form-save",
-                            titleInput: ".cz-form-item-title",
-                            mediaSourceInput: ".cz-form-item-mediasource",
-                            mediaInput: ".cz-form-item-mediaurl",
-                            descriptionInput: ".cz-form-item-descr",
-                            attributionInput: ".cz-form-item-attribution",
-                            mediaTypeInput: ".cz-form-item-media-type",
-                            mediaListContainer: ".cz-form-medialist",
-                            context: {
-                                exhibit: e,
-                                contentItem: ci
-                            }
-                        });
-                        form.show(noAnimation);
-                    }
-                });
-
-                HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
-                    activationSource: $("#header-session-expired-form"),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    titleInput: ".cz-form-item-title",
-                    context: "",
-                    sessionTimeSpan: "#session-time",
-                    sessionButton: "#session-button"
-                });
-
-                CZ.Service.getProfile().done(function (data) {
-                    if (data != "") {
-                        CZ.Settings.isAuthorized = true;
-                        CZ.Authoring.timer = setTimeout(function () {
-                            CZ.Authoring.showSessionForm();
-                        }, (CZ.Settings.sessionTime - 60) * 1000);
-                    }
-
-                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
-                }).fail(function (error) {
-                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
-                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
-                }).always(function () {
-                    if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
-                        $(".edit-icon").hide();
-                        $("#WelcomeBlock").attr("data-toggle", "show");
-                        $("#TwitterBlock").attr("data-toggle", "show");
-                    } else {
-                        $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
-                        $("#MyTimelinesBlock").attr("data-toggle", "show");
-                    }
-
-                    if (CZ.Authoring.isEnabled && IsFeatureEnabled(_featureMap, "CollectionsAuthoring")) {
-                        $("#editCollectionButton").show();
-                    }
-
-                    CZ.Common.loadData().then(function (response) {
-                        if (!response) {
-                            if (CZ.Authoring.isEnabled) {
-                                if (CZ.Authoring.showCreateRootTimelineForm) {
-                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
-                                }
-                            } else {
-                                CZ.Authoring.showMessageWindow("Looks like this collection is empty. Come back later when author will fill it with content.", "Collection is empty :(");
-                            }
-                        }
-                    });
-                });
-
-                var profileForm = new CZ.UI.FormEditProfile(forms[5], {
-                    activationSource: $("#login-panel"),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    saveButton: "#cz-form-save",
-                    logoutButton: "#cz-form-logout",
-                    titleInput: ".cz-form-item-title",
-                    usernameInput: ".cz-form-username",
-                    emailInput: ".cz-form-email",
-                    agreeInput: ".cz-form-agree",
-                    loginPanel: "#login-panel",
-                    profilePanel: "#profile-panel",
-                    loginPanelLogin: "#profile-panel.auth-panel-login",
-                    context: "",
-                    allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
-                });
-
-                var loginForm = new CZ.UI.FormLogin(forms[6], {
-                    activationSource: $("#login-panel"),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    titleInput: ".cz-form-item-title",
-                    context: ""
-                });
-
-                $("#profile-panel").click(function (event) {
-                    event.preventDefault();
-                    if (!profileForm.isFormVisible) {
-                        closeAllForms();
-                        profileForm.show();
-                    } else {
-                        profileForm.close();
-                    }
-                });
-
-                if (IsFeatureEnabled(_featureMap, "Login")) {
-                    CZ.Service.getProfile().done(function (data) {
-                        if (data == "") {
-                            $("#login-panel").show();
-                        } else if (data != "" && data.DisplayName == null) {
-                            $("#login-panel").hide();
-                            $("#profile-panel").show();
-                            $("#profile-panel input#username").focus();
-
-                            if (!profileForm.isFormVisible) {
-                                closeAllForms();
-                                profileForm.show();
-                            } else {
-                                profileForm.close();
-                            }
-                        } else {
-                            CZ.Settings.userSuperCollectionName = data.DisplayName;
-                            CZ.Settings.userCollectionName = data.DisplayName;
-                            $("#login-panel").hide();
-                            $("#profile-panel").show();
-                            $(".auth-panel-login").html(data.DisplayName);
-                        }
-
-                        InitializeToursUI(data, forms);
-                    }).fail(function (error) {
-                        $("#login-panel").show();
-
-                        InitializeToursUI(null, forms);
-                    });
-                }
-
-                $("#login-panel").click(function (event) {
-                    event.preventDefault();
-                    if (!loginForm.isFormVisible) {
-                        closeAllForms();
-                        loginForm.show();
-                    } else {
-                        loginForm.close();
-                    }
-                });
-                if (IsFeatureEnabled(_featureMap, "StartPage")) {
-                    CZ.StartPage.initialize();
-                }
-            });
-
-            CZ.Service.getServiceInformation().then(function (response) {
-                CZ.Settings.contentItemThumbnailBaseUri = response.thumbnailsPath;
-                CZ.Settings.signinUrlMicrosoft = response.signinUrlMicrosoft;
-                CZ.Settings.signinUrlGoogle = response.signinUrlGoogle;
-                CZ.Settings.signinUrlYahoo = response.signinUrlYahoo;
-            });
-
-            CZ.Settings.applyTheme(null, CZ.Service.superCollectionName != null);
-
-            if (CZ.Service.superCollectionName) {
-                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
-                    $(response).each(function (index) {
-                        if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
-                            var themeData = null;
-                            try  {
-                                themeData = JSON.parse(response[index].theme);
-                            } catch (e) {
-                            }
-
-                            CZ.Settings.applyTheme(themeData, false);
-                        }
-                    });
-                });
-            }
-
-            $('#breadcrumbs-nav-left').click(CZ.BreadCrumbs.breadCrumbNavLeft);
-            $('#breadcrumbs-nav-right').click(CZ.BreadCrumbs.breadCrumbNavRight);
-
-            $('#biblCloseButton').mouseout(function () {
-                CZ.Common.toggleOffImage('biblCloseButton', 'png');
-            }).mouseover(function () {
-                CZ.Common.toggleOnImage('biblCloseButton', 'png');
-            });
-
-            if (navigator.userAgent.match(/(iPhone|iPod|iPad)/)) {
-                document.addEventListener('touchmove', function (e) {
-                    e.preventDefault();
-                });
-            }
-
-            if (navigator.userAgent.indexOf('Mac') != -1) {
-                var body = document.getElementsByTagName('body')[0];
-                body.style.overflow = "hidden";
-            }
-
-            Seadragon.Config.imagePath = CZ.Settings.seadragonImagePath;
-
-            if (window.location.hash)
-                CZ.Common.startHash = window.location.hash;
-
-            CZ.Search.initializeSearch();
-            CZ.Bibliography.initializeBibliography();
-
-            var canvasGestures = CZ.Gestures.getGesturesStream(CZ.Common.vc);
-            var axisGestures = CZ.Gestures.applyAxisBehavior(CZ.Gestures.getGesturesStream(CZ.Common.ax));
-            var timeSeriesGestures = CZ.Gestures.getPanPinGesturesStream($("#timeSeriesContainer"));
-            var jointGesturesStream = canvasGestures.Merge(axisGestures.Merge(timeSeriesGestures));
-
-            CZ.Common.controller = new CZ.ViewportController.ViewportController2(function (visible) {
-                var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                var markerPos = CZ.Common.axis.markerPosition;
-                var oldMarkerPosInScreen = vp.pointVirtualToScreen(markerPos, 0).x;
-
-                CZ.Common.vc.virtualCanvas("setVisible", visible, CZ.Common.controller.activeAnimation);
-                CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
-                vp = CZ.Common.vc.virtualCanvas("getViewport");
-                if (CZ.Tours.pauseTourAtAnyAnimation) {
-                    CZ.Tours.tourPause();
-                    CZ.Tours.pauseTourAtAnyAnimation = false;
-                }
-
-                var hoveredInfodot = CZ.Common.vc.virtualCanvas("getHoveredInfodot");
-                var actAni = CZ.Common.controller.activeAnimation != undefined;
-
-                if (actAni) {
-                    var newMarkerPos = vp.pointScreenToVirtual(oldMarkerPosInScreen, 0).x;
-                    CZ.Common.updateMarker();
-                }
-
-                updateTimeSeriesChart(vp);
-            }, function () {
-                return CZ.Common.vc.virtualCanvas("getViewport");
-            }, jointGesturesStream);
-
-            var hashChangeFromOutside = true;
-
-            CZ.Common.controller.onAnimationComplete.push(function (id) {
-                hashChangeFromOutside = false;
-                if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.bookmark) {
-                    CZ.UrlNav.navigationAnchor = CZ.UrlNav.navStringTovcElement(CZ.Common.setNavigationStringTo.bookmark, CZ.Common.vc.virtualCanvas("getLayerContent"));
-                    window.location.hash = CZ.Common.setNavigationStringTo.bookmark;
-                } else {
-                    if (CZ.Common.setNavigationStringTo && CZ.Common.setNavigationStringTo.id == id)
-                        CZ.UrlNav.navigationAnchor = CZ.Common.setNavigationStringTo.element;
-
-                    var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                    window.location.hash = CZ.UrlNav.vcelementToNavString(CZ.UrlNav.navigationAnchor, vp);
-                }
-                CZ.Common.setNavigationStringTo = null;
-            });
-
-            window.addEventListener("hashchange", function () {
-                if (window.location.hash && hashChangeFromOutside && CZ.Common.hashHandle) {
-                    var hash = window.location.hash;
-                    var visReg = CZ.UrlNav.navStringToVisible(window.location.hash.substring(1), CZ.Common.vc);
-                    if (visReg) {
-                        CZ.Common.isAxisFreezed = true;
-                        CZ.Common.controller.moveToVisible(visReg, true);
-
-                        if (window.location.hash != hash) {
-                            hashChangeFromOutside = false;
-                            window.location.hash = hash;
-                        }
-                    }
-                    CZ.Common.hashHandle = true;
-                } else
-                    hashChangeFromOutside = true;
-            });
-
-            CZ.Common.controller.onAnimationComplete.push(function () {
-            });
-
-            CZ.Common.controller.onAnimationStarted.push(function () {
-            });
-
-            CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
-                if (oldId != undefined && newId == undefined) {
-                    setTimeout(function () {
-                    }, 500);
-                }
-            });
-
-            CZ.Common.controller.onAnimationComplete.push(function (id) {
-                if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
-                    CZ.Tours.tourBookmarkTransitionCompleted(id);
-                if (CZ.Tours.tour != undefined && CZ.Tours.tour.state != "finished")
-                    CZ.Tours.pauseTourAtAnyAnimation = true;
-            });
-
-            CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
-                if (CZ.Tours.tour != undefined) {
-                    if (CZ.Tours.tourBookmarkTransitionInterrupted != undefined) {
-                        var prevState = CZ.Tours.tour.state;
-                        CZ.Tours.tourBookmarkTransitionInterrupted(oldId);
-                        var alteredState = CZ.Tours.tour.state;
-
-                        if (prevState == "play" && alteredState == "pause")
-                            CZ.Tours.tourPause();
-
-                        CZ.Common.setNavigationStringTo = null;
-                    }
-                }
-            });
-
-            CZ.Common.updateLayout();
-
-            CZ.Common.vc.bind("elementclick", function (e) {
-                CZ.Search.navigateToElement(e);
-            });
-
-            CZ.Common.vc.bind('cursorPositionChanged', function (cursorPositionChangedEvent) {
-                CZ.Common.updateMarker();
-            });
-
-            CZ.Common.ax.bind('thresholdBookmarkChanged', function (thresholdBookmark) {
-                var bookmark = CZ.UrlNav.navStringToVisible(thresholdBookmark.Bookmark, CZ.Common.vc);
-                if (bookmark != undefined) {
-                    CZ.Common.controller.moveToVisible(bookmark, false);
-                }
-            });
-
-            CZ.Common.vc.bind("innerZoomConstraintChanged", function (constraint) {
-                CZ.Common.controller.effectiveExplorationZoomConstraint = constraint.zoomValue;
-                CZ.Common.axis.allowMarkerMovesOnHover = !constraint.zoomValue;
-            });
-
-            CZ.Common.vc.bind("breadCrumbsChanged", function (breadCrumbsEvent) {
-                CZ.BreadCrumbs.updateBreadCrumbsLabels(breadCrumbsEvent.breadCrumbs);
-            });
-
-            $(window).bind('resize', function () {
-                CZ.timeSeriesChart.updateCanvasHeight();
-                CZ.Common.updateLayout();
-
-                var vp = CZ.Common.vc.virtualCanvas("getViewport");
-                updateTimeSeriesChart(vp);
-            });
-
-            var vp = CZ.Common.vc.virtualCanvas("getViewport");
-            CZ.Common.vc.virtualCanvas("setVisible", CZ.VCContent.getVisibleForElement({
-                x: -13700000000,
-                y: 0,
-                width: 13700000000,
-                height: 5535444444.444445
-            }, 1.0, vp, false), true);
-            CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
-
-            var bid = window.location.hash.match("b=([a-z0-9_]+)");
-            if (bid) {
-                $("#bibliography .sources").empty();
-                $("#bibliography .title").append($("<span></span>", {
-                    text: "Loading..."
-                }));
-                $("#bibliographyBack").css("display", "block");
-            }
-        });
-
-        function IsFeatureEnabled(featureMap, featureName) {
-            var feature = $.grep(featureMap, function (e) {
-                return e.Name === featureName;
-            });
-            return feature[0].IsEnabled;
-        }
-        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
-
-        function closeAllForms() {
-            $('.cz-major-form').each(function (i, f) {
-                var form = $(f).data('form');
-                if (form && form.isFormVisible === true) {
-                    form.close();
-                }
-            });
-        }
-        HomePageViewModel.closeAllForms = closeAllForms;
-
-        function getFormById(name) {
-            var form = $(name).data("form");
-            if (form)
-                return form;
-            else
-                return false;
-        }
-        HomePageViewModel.getFormById = getFormById;
-
-        function showTimeSeriesChart() {
-            $('#timeSeriesContainer').height('30%');
-            $('#timeSeriesContainer').show();
-            $('#vc').height('70%');
-            CZ.timeSeriesChart.updateCanvasHeight();
-            CZ.Common.updateLayout();
-        }
-        HomePageViewModel.showTimeSeriesChart = showTimeSeriesChart;
-
-        function hideTimeSeriesChart() {
-            CZ.leftDataSet = undefined;
-            CZ.rightDataSet = undefined;
-            $('#timeSeriesContainer').height(0);
-            $('#timeSeriesContainer').hide();
-            $('#vc').height('100%');
-            CZ.Common.updateLayout();
-        }
-        HomePageViewModel.hideTimeSeriesChart = hideTimeSeriesChart;
-
-        function updateTimeSeriesChart(vp) {
-            var left = vp.pointScreenToVirtual(0, 0).x;
-            if (left < CZ.Settings.maxPermitedTimeRange.left)
-                left = CZ.Settings.maxPermitedTimeRange.left;
-            var right = vp.pointScreenToVirtual(vp.width, vp.height).x;
-            if (right > CZ.Settings.maxPermitedTimeRange.right)
-                right = CZ.Settings.maxPermitedTimeRange.right;
-
-            if (CZ.timeSeriesChart !== undefined) {
-                var leftCSS = vp.pointVirtualToScreen(left, 0).x;
-                var rightCSS = vp.pointVirtualToScreen(right, 0).x;
-                var leftPlot = CZ.Dates.getYMDFromCoordinate(left).year;
-                var rightPlot = CZ.Dates.getYMDFromCoordinate(right).year;
-
-                CZ.timeSeriesChart.clear(leftCSS, rightCSS);
-                CZ.timeSeriesChart.clearLegend("left");
-                CZ.timeSeriesChart.clearLegend("right");
-
-                var chartHeader = "TimeSeries Chart";
-
-                if (CZ.rightDataSet !== undefined || CZ.leftDataSet !== undefined) {
-                    CZ.timeSeriesChart.drawVerticalGridLines(leftCSS, rightCSS, leftPlot, rightPlot);
-                }
-
-                var screenWidthForLegend = rightCSS - leftCSS;
-                if (CZ.rightDataSet !== undefined && CZ.leftDataSet !== undefined) {
-                    screenWidthForLegend /= 2;
-                }
-                var isLegendVisible = CZ.timeSeriesChart.checkLegendVisibility(screenWidthForLegend);
-
-                if (CZ.leftDataSet !== undefined) {
-                    var padding = CZ.leftDataSet.getVerticalPadding() + 10;
-
-                    var plotBottom = Number.MAX_VALUE;
-                    var plotTop = Number.MIN_VALUE;
-
-                    CZ.leftDataSet.series.forEach(function (seria) {
-                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
-                            plotBottom = seria.appearanceSettings.yMin;
-                        }
-
-                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
-                            plotTop = seria.appearanceSettings.yMax;
-                        }
-                    });
-
-                    if ((plotTop - plotBottom) === 0) {
-                        var absY = Math.max(0.1, Math.abs(plotBottom));
-                        var offsetConstant = 0.01;
-                        plotTop += absY * offsetConstant;
-                        plotBottom -= absY * offsetConstant;
-                    }
-
-                    var axisAppearence = { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'left', font: '16px Calibri', verticalPadding: padding };
-                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(leftCSS, rightCSS, plotBottom, plotTop, axisAppearence);
-                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
-                    CZ.timeSeriesChart.drawDataSet(CZ.leftDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
-                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
-
-                    if (isLegendVisible) {
-                        for (var i = 0; i < CZ.leftDataSet.series.length; i++) {
-                            CZ.timeSeriesChart.addLegendRecord("left", CZ.leftDataSet.series[i].appearanceSettings.stroke, CZ.leftDataSet.series[i].appearanceSettings.name);
-                        }
-                    }
-
-                    chartHeader += " (" + CZ.leftDataSet.name;
-                }
-
-                if (CZ.rightDataSet !== undefined) {
-                    var padding = CZ.rightDataSet.getVerticalPadding() + 10;
-
-                    var plotBottom = Number.MAX_VALUE;
-                    var plotTop = Number.MIN_VALUE;
-
-                    CZ.rightDataSet.series.forEach(function (seria) {
-                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMin !== undefined && seria.appearanceSettings.yMin < plotBottom) {
-                            plotBottom = seria.appearanceSettings.yMin;
-                        }
-
-                        if (seria.appearanceSettings !== undefined && seria.appearanceSettings.yMax !== undefined && seria.appearanceSettings.yMax > plotTop) {
-                            plotTop = seria.appearanceSettings.yMax;
-                        }
-                    });
-
-                    if ((plotTop - plotBottom) === 0) {
-                        var absY = Math.max(0.1, Math.abs(plotBottom));
-                        var offsetConstant = 0.01;
-                        plotTop += absY * offsetConstant;
-                        plotBottom -= absY * offsetConstant;
-                    }
-
-                    var axisAppearence = { labelCount: 4, tickLength: 10, majorTickThickness: 1, stroke: 'black', axisLocation: 'right', font: '16px Calibri', verticalPadding: padding };
-                    var tickForDraw = CZ.timeSeriesChart.generateAxisParameters(rightCSS, leftCSS, plotBottom, plotTop, axisAppearence);
-                    CZ.timeSeriesChart.drawHorizontalGridLines(tickForDraw, axisAppearence);
-                    CZ.timeSeriesChart.drawDataSet(CZ.rightDataSet, leftCSS, rightCSS, padding, leftPlot, rightPlot, plotTop, plotBottom);
-                    CZ.timeSeriesChart.drawAxis(tickForDraw, axisAppearence);
-
-                    if (isLegendVisible) {
-                        for (var i = 0; i < CZ.rightDataSet.series.length; i++) {
-                            CZ.timeSeriesChart.addLegendRecord("right", CZ.rightDataSet.series[i].appearanceSettings.stroke, CZ.rightDataSet.series[i].appearanceSettings.name);
-                        }
-                    }
-
-                    var str = chartHeader.indexOf("(") > 0 ? ", " : " (";
-                    chartHeader += str + CZ.rightDataSet.name + ")";
-                } else {
-                    chartHeader += ")";
-                }
-
-                $("#timeSeriesChartHeader").text(chartHeader);
-            }
-        }
-        HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
-
-        function ApplyFeatureActivation() {
-            for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
-                var feature = _featureMap[idxFeature];
-
-                if (feature.IsEnabled === undefined) {
-                    var enabled = true;
-                    if (feature.Activation === 1 /* Disabled */) {
-                        enabled = false;
-                    }
-
-                    if (feature.Activation === 3 /* NotRootCollection */ && HomePageViewModel.rootCollection) {
-                        enabled = false;
-                    }
-
-                    if (feature.Activation === 2 /* RootCollection */ && !HomePageViewModel.rootCollection) {
-                        enabled = false;
-                    }
-
-                    if (feature.Activation === 4 /* NotProduction */ && (constants && constants.environment && constants.environment === "Production")) {
-                        enabled = false;
-                    }
-
-                    _featureMap[idxFeature].IsEnabled = enabled;
-                }
-
-                if (feature.JQueryReference) {
-                    if (!_featureMap[idxFeature].IsEnabled) {
-                        $(feature.JQueryReference).css("display", "none");
-                    } else if (!_featureMap[idxFeature].HasBeenActivated) {
-                        _featureMap[idxFeature].HasBeenActivated = true;
-                        $(feature.JQueryReference).css("display", "block");
-                    }
-                }
-            }
-        }
-    })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
-    var HomePageViewModel = CZ.HomePageViewModel;
+            return FormLogoutProfile;
+        })(CZ.UI.FormBase);
+        UI.FormLogoutProfile = FormLogoutProfile;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
 })(CZ || (CZ = {}));

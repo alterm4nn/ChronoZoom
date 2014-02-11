@@ -280,7 +280,7 @@ module CZ {
             private setDate_YearMode(coordinate: number, ZeroYearConversation): void {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
                 if ((date.regime.toLowerCase() == "bce") && (ZeroYearConversation)) date.year--;
-                this.yearSelector.val(date.year);
+                this.yearSelector.val(date.year.toString());
                 // reset selected regime
                 this.regimeSelector.find(":selected").attr("selected", "false");
 
@@ -298,7 +298,7 @@ module CZ {
             private setDate_DateMode(coordinate: number): void {
                 var date = CZ.Dates.getYMDFromCoordinate(coordinate);
 
-                this.yearSelector.val(date.year);
+                this.yearSelector.val(date.year.toString());
                 var self = this;
 
                 // set corresponding month in month select element
