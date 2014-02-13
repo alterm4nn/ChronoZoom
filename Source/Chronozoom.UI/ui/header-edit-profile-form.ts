@@ -78,7 +78,7 @@ module CZ {
                         }
                         this.emailInput.val(data.Email);
                         if (data.Email !== undefined && data.Email !== '' && data.Email != null) {
-                            this.agreeInput.attr('checked', true);
+                            this.agreeInput.attr('checked', 'true');
                             this.agreeInput.prop('disabled', true);
                         }
                     }

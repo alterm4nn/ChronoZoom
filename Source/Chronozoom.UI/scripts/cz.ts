@@ -864,7 +864,11 @@ module CZ {
             });
 
             $(window).bind('resize', function () {
-                timeSeriesChart.updateCanvasHeight();
+
+                if (timeSeriesChart) {
+                    timeSeriesChart.updateCanvasHeight();
+                }
+
                 CZ.Common.updateLayout();
 
                 //updating timeSeries chart
