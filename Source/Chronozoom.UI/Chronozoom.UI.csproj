@@ -396,7 +396,6 @@
     <Content Include="ui\controls\formbase.js">
       <DependentUpon>formbase.ts</DependentUpon>
     </Content>
-    <TypeScriptCompile Include="scripts\_references.ts" />
     <TypeScriptCompile Include="ui\controls\formbase.ts" />
     <TypeScriptCompile Include="scripts\data.ts" />
     <Content Include="ui\controls\listboxbase.js">
