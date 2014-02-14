@@ -14,6 +14,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
+using Microsoft.Practices.TransientFaultHandling;
+using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling;
+using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.AzureStorage;
+
 namespace Chronozoom.Entities
 {
     /// <summary>
@@ -30,6 +34,13 @@ namespace Chronozoom.Entities
     /// </summary>
     public partial class Storage : DbContext
     {
+        // Retry strategy: retry 10 times, half a second apart.
+        private static FixedInterval retryStrategy = new FixedInterval(10, TimeSpan.FromSeconds(0.5));
+
+        // Retry policy using the retry strategy and the Windows Azure storage transient fault detection strategy.
+        private static RetryPolicy retryPolicy = new RetryPolicy<StorageTransientErrorDetectionStrategy>(retryStrategy);
+
+
         private static readonly Lazy<int> StorageTimeout = new Lazy<int>(() =>
         {
             string storageTimeout = ConfigurationManager.AppSettings["StorageTimeout"];
@@ -71,7 +82,7 @@ namespace Chronozoom.Entities
 
         public DbSet<Tour> Tours { get; set; }
 
-        public DbSet<Bookmark> Bookmarks { get; set; } 
+        public DbSet<Bookmark> Bookmarks { get; set; }
 
         public DbSet<User> Users { get; set; }
 
@@ -124,9 +135,22 @@ namespace Chronozoom.Entities
         public IEnumerable<Timeline> RetrieveAllTimelines(Guid collectionId)
         {
             int maxAllElements = 0;
+            IEnumerable<TimelineRaw> allTimelines = new TimelineRaw[0];
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
 
-            IEnumerable<TimelineRaw> allTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_ID = {0}", collectionId);
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      allTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_ID = {0}", collectionId);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
             IEnumerable<Timeline> rootTimelines = FillTimelinesFromFlatList(allTimelines, timelinesMap, null, ref maxAllElements);
             FillTimelineRelations(timelinesMap, int.MaxValue);
 
@@ -138,16 +162,28 @@ namespace Chronozoom.Entities
         {
             int maxAllElements = 0;
             Dictionary<Guid, Timeline> timelinesMap = new Dictionary<Guid, Timeline>();
-            IEnumerable<TimelineRaw> allTimelines;
+            IEnumerable<TimelineRaw> allTimelines = new TimelineRaw[0];
 
-            if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.SqlClient"))
+            try
             {
-                allTimelines = Database.SqlQuery<TimelineRaw>("EXEC TimelineSubtreeQuery {0}, {1}, {2}, {3}, {4}, {5}", collectionId, leastCommonAncestor, minSpan, startTime, endTime, maxElements);
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.SqlClient"))
+                      {
+                          allTimelines = Database.SqlQuery<TimelineRaw>("EXEC TimelineSubtreeQuery {0}, {1}, {2}, {3}, {4}, {5}", collectionId, leastCommonAncestor, minSpan, startTime, endTime, maxElements);
+                      }
+                      else
+                      {
+                          allTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_ID = {0}", collectionId);
+                      }
+                  });
             }
-            else
+            catch (Exception e)
             {
-                allTimelines = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_ID = {0}", collectionId);
+                throw e;
             }
+
 
             IEnumerable<Timeline> rootTimelines = FillTimelinesFromFlatList(allTimelines, timelinesMap, null, ref maxAllElements);
             FillTimelineRelations(timelinesMap, int.MaxValue);
@@ -176,6 +212,7 @@ namespace Chronozoom.Entities
             if (!timelinesMap.Keys.Any())
                 return;
 
+
             // Populate Exhibits
             string exhibitsQuery = string.Format(
                 CultureInfo.InvariantCulture,
@@ -183,7 +220,22 @@ namespace Chronozoom.Entities
                 maxElements,
                 string.Join("', '", timelinesMap.Keys.ToArray()));
 
-            var exhibitsRaw = Database.SqlQuery<ExhibitRaw>(exhibitsQuery);
+            IEnumerable<ExhibitRaw> exhibitsRaw = new ExhibitRaw[0];
+
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      exhibitsRaw = Database.SqlQuery<ExhibitRaw>(exhibitsQuery);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+
             Dictionary<Guid, Exhibit> exhibits = new Dictionary<Guid, Exhibit>();
             foreach (ExhibitRaw exhibitRaw in exhibitsRaw)
             {
@@ -209,7 +261,22 @@ namespace Chronozoom.Entities
                         ORDER BY [Order] ASC
                     ",
                     string.Join("', '", exhibits.Keys.ToArray()));
-                var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
+
+                IEnumerable<ContentItemRaw> contentItemsRaw = new ContentItemRaw[0];
+                try
+                {
+                    retryPolicy.ExecuteAction(
+                      () =>
+                      {
+                          contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
+                      });
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+
+
                 foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
                 {
                     if (exhibits.Keys.Contains(contentItemRaw.Exhibit_ID))
@@ -257,9 +324,23 @@ namespace Chronozoom.Entities
                     CASE WHEN Timelines.Id = AncestorId THEN 1 ELSE 0 END DESC, 
                     CASE WHEN Timeline_Id = AncestorId THEN 1 ELSE 0 END DESC, 
                     ToYear-FromYear DESC";
+            IEnumerable<TimelineRaw> timelinesRaw = new TimelineRaw[0];
+            int maximum = maxElements;
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery, maximum, startTime, endTime, span, collectionId, commonAncestor, depth);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
             return FillTimelinesFromFlatList(
-                Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor, depth),
+                timelinesRaw,
                 timelinesMap,
                 commonAncestor,
                 ref maxElements);
@@ -293,8 +374,23 @@ namespace Chronozoom.Entities
             AS [CanvasTimelines] ORDER BY [CanvasTimelines].[TimeSpan] DESC 
             ";
 
+            IEnumerable<TimelineRaw> timelinesRaw = new TimelineRaw[0];
+            int maximum = maxElements;
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery, maximum, startTime, endTime, span, collectionId, commonAncestor);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
             return FillTimelinesFromFlatList(
-                Database.SqlQuery<TimelineRaw>(timelinesQuery, maxElements, startTime, endTime, span, collectionId, commonAncestor),
+                timelinesRaw,
                 timelinesMap,
                 commonAncestor,
                 ref maxElements);
@@ -387,14 +483,39 @@ namespace Chronozoom.Entities
         {
             string contentPath = string.Empty;
 
-            ContentItemRaw contentItem = Database.SqlQuery<ContentItemRaw>("SELECT * FROM ContentItems WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+            ContentItemRaw contentItem = null;
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      contentItem = Database.SqlQuery<ContentItemRaw>("SELECT * FROM ContentItems WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
             if (contentItem != null)
             {
                 contentPath = "/" + contentItem.Id;
                 contentId = contentItem.Exhibit_ID;
             }
 
-            ExhibitRaw exhibit = Database.SqlQuery<ExhibitRaw>("SELECT * FROM Exhibits WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+            ExhibitRaw exhibit = null;
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      exhibit = Database.SqlQuery<ExhibitRaw>("SELECT * FROM Exhibits WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
             if (exhibit != null)
             {
@@ -402,13 +523,37 @@ namespace Chronozoom.Entities
                 contentId = exhibit.Timeline_ID;
             }
 
-            TimelineRaw timeline = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+
+            TimelineRaw timeline = null;
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      timeline = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Collection_Id = {0} AND (Id = {1} OR Title = {2})", collectionId, contentId, title).FirstOrDefault();
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
             while (timeline != null)
             {
                 contentPath = "/t" + timeline.Id + contentPath;
-                timeline = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id = {0}", timeline.Timeline_ID).FirstOrDefault();
-            } 
+                try
+                {
+                    retryPolicy.ExecuteAction(
+                      () =>
+                      {
+                          timeline = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id = {0}", timeline.Timeline_ID).FirstOrDefault();
+                      });
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
 
             return contentPath.ToString(CultureInfo.InvariantCulture);
         }
@@ -422,7 +567,21 @@ namespace Chronozoom.Entities
                 CultureInfo.InvariantCulture,
                 "SELECT * FROM Timelines WHERE Timeline_Id IN ('{0}')",
                 string.Join("', '", id));
-            var timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery);
+
+
+            IEnumerable<TimelineRaw> timelinesRaw = new TimelineRaw[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      timelinesRaw = Database.SqlQuery<TimelineRaw>(timelinesQuery);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
             foreach (TimelineRaw timelineRaw in timelinesRaw)
                 timelines.Add(timelineRaw.Id);
@@ -439,7 +598,20 @@ namespace Chronozoom.Entities
                 CultureInfo.InvariantCulture,
                 "SELECT *, Year as [Time] FROM Exhibits WHERE Timeline_Id IN ('{0}')",
                 string.Join("', '", id));
-            var exhibitsRaw = Database.SqlQuery<ExhibitRaw>(exhibitsQuery);
+
+            IEnumerable<ExhibitRaw> exhibitsRaw = new ExhibitRaw[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      exhibitsRaw = Database.SqlQuery<ExhibitRaw>(exhibitsQuery);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
             foreach (ExhibitRaw exhibitRaw in exhibitsRaw)
                 exhibits.Add(exhibitRaw.Id);
@@ -457,7 +629,21 @@ namespace Chronozoom.Entities
                     CultureInfo.InvariantCulture,
                     "SELECT * FROM ContentItems WHERE Exhibit_Id IN ('{0}')",
                     string.Join("', '", id));
-            var contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
+
+
+            IEnumerable<ContentItemRaw> contentItemsRaw = new ContentItemRaw[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      contentItemsRaw = Database.SqlQuery<ContentItemRaw>(contentItemsQuery);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
             foreach (ContentItemRaw contentItemRaw in contentItemsRaw)
                 contentItems.Add(contentItemRaw.Id);
@@ -466,35 +652,92 @@ namespace Chronozoom.Entities
 
         public TimelineRaw GetParentTimelineRaw(Guid timelineId)
         {
-            var parentTimelinesRaw = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id in (SELECT Timeline_Id FROM Timelines WHERE Id = {0})", timelineId);
-
+            IEnumerable<TimelineRaw> parentTimelinesRaw = new TimelineRaw[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      parentTimelinesRaw = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id in (SELECT Timeline_Id FROM Timelines WHERE Id = {0})", timelineId);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
             return parentTimelinesRaw.FirstOrDefault();
         }
 
         public TimelineRaw GetExhibitParentTimeline(Guid exhibitId)
         {
-            var parentTimelinesRaw = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id in (SELECT Timeline_Id FROM Exhibits WHERE Id = {0})", exhibitId);
-
+            IEnumerable<TimelineRaw> parentTimelinesRaw = new TimelineRaw[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      parentTimelinesRaw = Database.SqlQuery<TimelineRaw>("SELECT * FROM Timelines WHERE Id in (SELECT Timeline_Id FROM Exhibits WHERE Id = {0})", exhibitId);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
             return parentTimelinesRaw.FirstOrDefault();
         }
 
         public ExhibitRaw GetContentItemParentExhibit(Guid contentItemId)
         {
-            var exhibitRaw = Database.SqlQuery<ExhibitRaw>("SELECT * FROM Exhibits WHERE Id in (SELECT Exhibit_Id FROM ContentItems WHERE Id = {0})", contentItemId);
-
+            IEnumerable<ExhibitRaw> exhibitRaw = new ExhibitRaw[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      exhibitRaw = Database.SqlQuery<ExhibitRaw>("SELECT * FROM Exhibits WHERE Id in (SELECT Exhibit_Id FROM ContentItems WHERE Id = {0})", contentItemId);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
             return exhibitRaw.FirstOrDefault();
         }
 
         public Timeline GetRootTimelines(Guid collectionId)
         {
-            var rootCollectionTimeline = Database.SqlQuery<Timeline>("SELECT * FROM Timelines WHERE Timeline_ID is NULL and Collection_ID = {0}", collectionId);
+            IEnumerable<Timeline> rootCollectionTimeline = new Timeline[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      rootCollectionTimeline = Database.SqlQuery<Timeline>("SELECT * FROM Timelines WHERE Timeline_ID is NULL and Collection_ID = {0}", collectionId);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
             return rootCollectionTimeline.FirstOrDefault();
         }
 
         public Guid GetCollectionGuid(string title)
         {
-            var collectionGuid = Database.SqlQuery<Guid>("SELECT Id FROM Collections WHERE Title = {0}", title);
+            IEnumerable<Guid> collectionGuid = new Guid[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      collectionGuid = Database.SqlQuery<Guid>("SELECT Id FROM Collections WHERE Title = {0}", title);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
             return collectionGuid.FirstOrDefault();
         }
@@ -506,31 +749,79 @@ namespace Chronozoom.Entities
                 return Guid.Empty;
             }
 
-            var collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM Timelines WHERE Id = {0}", timelineId);
+            IEnumerable<Guid> collectionGuid = new Guid[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM Timelines WHERE Id = {0}", timelineId);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
             return collectionGuid.FirstOrDefault();
         }
 
         public Guid GetCollectionFromExhibitGuid(Guid exhibitId)
         {
-            var collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM Exhibits WHERE Id = {0}", exhibitId);
+            IEnumerable<Guid> collectionGuid = new Guid[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM Exhibits WHERE Id = {0}", exhibitId);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
             return collectionGuid.FirstOrDefault();
         }
 
         public Guid GetCollectionFromContentItemGuid(Guid contentId)
         {
-            var collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM ContentItems WHERE Id = {0}", contentId);
-
+            IEnumerable<Guid> collectionGuid = new Guid[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      collectionGuid = Database.SqlQuery<Guid>("SELECT Collection_Id FROM ContentItems WHERE Id = {0}", contentId);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
             return collectionGuid.FirstOrDefault();
         }
- 
+
         // Returns the tour associated with a given bookmark id.
         public Tour GetBookmarkTour(Bookmark bookmark)
         {
             if (bookmark == null)
                 return null;
 
-            var bookmarkTour = Database.SqlQuery<Tour>("SELECT * FROM Tours WHERE Id in (SELECT Tour_Id FROM Bookmarks WHERE Id = {0})", bookmark.Id);
+            IEnumerable<Tour> bookmarkTour = new Tour[0];
+            try
+            {
+                retryPolicy.ExecuteAction(
+                  () =>
+                  {
+                      bookmarkTour = Database.SqlQuery<Tour>("SELECT * FROM Tours WHERE Id in (SELECT Tour_Id FROM Bookmarks WHERE Id = {0})", bookmark.Id);
+                  });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
             return bookmarkTour.FirstOrDefault();
         }
 

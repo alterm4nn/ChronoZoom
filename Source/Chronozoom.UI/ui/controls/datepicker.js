@@ -225,7 +225,7 @@ var CZ;
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
                 if ((date.regime.toLowerCase() == "bce") && (ZeroYearConversation))
                     date.year--;
-                this.yearSelector.val(date.year);
+                this.yearSelector.val(date.year.toString());
 
                 this.regimeSelector.find(":selected").attr("selected", "false");
 
@@ -239,7 +239,7 @@ var CZ;
             DatePicker.prototype.setDate_DateMode = function (coordinate) {
                 var date = CZ.Dates.getYMDFromCoordinate(coordinate);
 
-                this.yearSelector.val(date.year);
+                this.yearSelector.val(date.year.toString());
                 var self = this;
 
                 this.monthSelector.find("option").each(function (index) {

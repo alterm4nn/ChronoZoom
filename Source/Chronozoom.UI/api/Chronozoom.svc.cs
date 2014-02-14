@@ -30,10 +30,6 @@ using System.Text.RegularExpressions;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-using Microsoft.Practices.TransientFaultHandling;
-//using Microsoft.Practices.TransientFaultHandling.RetryStrategies;
-using Microsoft.Practices.EnterpriseLibrary.WindowsAzure.TransientFaultHandling.AzureStorage;
-
 namespace Chronozoom.UI
 {
     [DataContract]
@@ -151,15 +147,6 @@ namespace Chronozoom.UI
     public partial class ChronozoomSVC : IChronozoomSVC
     {
         private static readonly StorageCache Cache = new StorageCache();
-
-        // Define your retry strategy: retry 10 times, half a second apart.
-        private static FixedInterval retryStrategy = new FixedInterval(10, TimeSpan.FromSeconds(0.5));
-
-        // Retry policy using the retry strategy and the Windows Azure storage
-        // transient fault detection strategy.
-        private static RetryPolicy retryPolicy = new RetryPolicy<StorageTransientErrorDetectionStrategy>(retryStrategy);
-
-
         private static readonly TraceSource Trace = new TraceSource("Service", SourceLevels.All) { Listeners = { Global.SignalRTraceListener } };
         private static MD5 _md5Hasher = MD5.Create();
         private const decimal _minYear = -13700000000;
