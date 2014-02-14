@@ -766,7 +766,10 @@ var CZ;
             });
 
             $(window).bind('resize', function () {
-                CZ.timeSeriesChart.updateCanvasHeight();
+                if (CZ.timeSeriesChart) {
+                    CZ.timeSeriesChart.updateCanvasHeight();
+                }
+
                 CZ.Common.updateLayout();
 
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");

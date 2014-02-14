@@ -396,6 +396,7 @@
     <Content Include="ui\controls\formbase.js">
       <DependentUpon>formbase.ts</DependentUpon>
     </Content>
+    <TypeScriptCompile Include="scripts\_references.ts" />
     <TypeScriptCompile Include="ui\controls\formbase.ts" />
     <TypeScriptCompile Include="scripts\data.ts" />
     <Content Include="ui\controls\listboxbase.js">
@@ -767,14 +768,14 @@
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>tsc -target ES5 --removeComments --out "$(ProjectDir)cz.js" "$(ProjectDir)scripts\cz.ts" "$(ProjectDir)scripts\plugins\error-plugin.ts"
+exit 0</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
-    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
-    <TypeScriptSourceMap>false</TypeScriptSourceMap>
-    <TypeScriptOutFile>cz.js</TypeScriptOutFile>
+    <TypeScriptRemoveComments>True</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>False</TypeScriptSourceMap>
+    <TypeScriptModuleKind>none</TypeScriptModuleKind>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
