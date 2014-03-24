@@ -13357,8 +13357,8 @@ var CZ;
             };
 
             FormEditExhibit.prototype.close = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
@@ -13615,8 +13615,8 @@ var CZ;
             };
 
             FormEditCI.prototype.close = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
