@@ -3494,7 +3494,7 @@ var CZ;
             FormEditTour.prototype.initializeAsEdit = function () {
                 this.deleteButton.show();
                 this.titleTextblock.text("Edit Tour");
-                this.saveButton.text("update tour");
+                this.saveButton.text("Update Tour");
             };
 
             FormEditTour.prototype.initialize = function () {
@@ -3503,7 +3503,7 @@ var CZ;
                 if (this.tour == null) {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Tour");
-                    this.saveButton.text("create tour");
+                    this.saveButton.text("Create Tour");
                 } else {
                     this.initializeAsEdit();
                 }
@@ -12841,16 +12841,16 @@ var CZ;
                 if (CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
-                    this.saveButton.text("create timeline");
+                    this.saveButton.text("Create Timeline");
                 } else if (CZ.Authoring.mode === "editTimeline") {
                     this.deleteButton.show();
                     this.titleTextblock.text("Edit Timeline");
-                    this.saveButton.text("update timeline");
+                    this.saveButton.text("Update Timeline");
                 } else if (CZ.Authoring.mode === "createRootTimeline") {
                     this.deleteButton.hide();
                     this.closeButton.hide();
                     this.titleTextblock.text("Create Root Timeline");
-                    this.saveButton.text("create timeline");
+                    this.saveButton.text("Create Timeline");
                 } else {
                     console.log("Unexpected authoring mode in timeline form.");
                     this.close();
@@ -13093,7 +13093,7 @@ var CZ;
 
                 if (this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
-                    this.saveButton.text("create exhibit");
+                    this.saveButton.text("Create Exhibit");
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
@@ -13122,7 +13122,7 @@ var CZ;
                     });
                 } else if (this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
-                    this.saveButton.text("update exhibit");
+                    this.saveButton.text("Update Exhibit");
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
@@ -13357,8 +13357,8 @@ var CZ;
             };
 
             FormEditExhibit.prototype.close = function (noAnimation) {
-                var _this = this;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
@@ -13503,12 +13503,12 @@ var CZ;
 
                 if (CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
-                    this.saveButton.text("create artifiact");
+                    this.saveButton.text("Create Artifiact");
 
                     this.closeButton.hide();
                 } else if (CZ.Authoring.contentItemMode === "editContentItem") {
                     this.titleTextblock.text("Edit");
-                    this.saveButton.text("update artifact");
+                    this.saveButton.text("Update Artifact");
 
                     if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit)
                         this.closeButton.hide();
@@ -13615,8 +13615,8 @@ var CZ;
             };
 
             FormEditCI.prototype.close = function (noAnimation) {
-                var _this = this;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;

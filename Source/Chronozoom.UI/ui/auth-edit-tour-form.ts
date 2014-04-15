@@ -284,7 +284,7 @@ module CZ {
             private initializeAsEdit(): void {
                 this.deleteButton.show();
                 this.titleTextblock.text("Edit Tour");
-                this.saveButton.text("update tour");
+                this.saveButton.text("Update Tour");
             }
 
             private initialize(): void {
@@ -293,7 +293,7 @@ module CZ {
                 {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Tour");
-                    this.saveButton.text("create tour");
+                    this.saveButton.text("Create Tour");
                 }
                 else // editing an existing tour
                 {

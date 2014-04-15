@@ -51,7 +51,7 @@ var CZ;
 
                 if (this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
-                    this.saveButton.text("create exhibit");
+                    this.saveButton.text("Create Exhibit");
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
@@ -80,7 +80,7 @@ var CZ;
                     });
                 } else if (this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
-                    this.saveButton.text("update exhibit");
+                    this.saveButton.text("Update Exhibit");
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
@@ -315,8 +315,8 @@ var CZ;
             };
 
             FormEditExhibit.prototype.close = function (noAnimation) {
-                var _this = this;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;

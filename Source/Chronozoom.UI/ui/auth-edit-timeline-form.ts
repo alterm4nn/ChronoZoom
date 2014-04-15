@@ -52,18 +52,18 @@ module CZ {
                 if (CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
-                    this.saveButton.text("create timeline");
+                    this.saveButton.text("Create Timeline");
                 }
                 else if (CZ.Authoring.mode === "editTimeline") {
                     this.deleteButton.show();
                     this.titleTextblock.text("Edit Timeline");
-                    this.saveButton.text("update timeline");
+                    this.saveButton.text("Update Timeline");
                 }
                 else if (CZ.Authoring.mode === "createRootTimeline") {
                     this.deleteButton.hide();
                     this.closeButton.hide();
                     this.titleTextblock.text("Create Root Timeline");
-                    this.saveButton.text("create timeline");
+                    this.saveButton.text("Create Timeline");
                 }
                 else {
                     console.log("Unexpected authoring mode in timeline form.");
