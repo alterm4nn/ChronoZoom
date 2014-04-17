@@ -3137,7 +3137,7 @@ var CZ;
                 _super.call(this, container, listBoxInfo, listItemsInfo);
             }
             return TourStopListBox;
-        })(CZ.UI.ListBoxBase);
+        })(UI.ListBoxBase);
         UI.TourStopListBox = TourStopListBox;
 
         var TourStopListItem = (function (_super) {
@@ -3202,7 +3202,7 @@ var CZ;
                 myDescr.show(500);
             };
             return TourStopListItem;
-        })(CZ.UI.ListItemBase);
+        })(UI.ListItemBase);
         UI.TourStopListItem = TourStopListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -3494,7 +3494,7 @@ var CZ;
             FormEditTour.prototype.initializeAsEdit = function () {
                 this.deleteButton.show();
                 this.titleTextblock.text("Edit Tour");
-                this.saveButton.text("update tour");
+                this.saveButton.text("Update Tour");
             };
 
             FormEditTour.prototype.initialize = function () {
@@ -3503,7 +3503,7 @@ var CZ;
                 if (this.tour == null) {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Tour");
-                    this.saveButton.text("create tour");
+                    this.saveButton.text("Create Tour");
                 } else {
                     this.initializeAsEdit();
                 }
@@ -5452,7 +5452,7 @@ var CZ;
                 configurable: true
             });
             return TourListBox;
-        })(CZ.UI.ListBoxBase);
+        })(UI.ListBoxBase);
         UI.TourListBox = TourListBox;
 
         var TourListItem = (function (_super) {
@@ -5497,7 +5497,7 @@ var CZ;
                 }
             }
             return TourListItem;
-        })(CZ.UI.ListItemBase);
+        })(UI.ListItemBase);
         UI.TourListItem = TourListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -10772,7 +10772,7 @@ var CZ;
                 CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
 
-                CZ.Authoring.showEditTourForm(null);
+                Authoring.showEditTourForm(null);
             }
             UI.createTour = createTour;
 
@@ -12841,16 +12841,16 @@ var CZ;
                 if (CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
-                    this.saveButton.text("create timeline");
+                    this.saveButton.text("Create Timeline");
                 } else if (CZ.Authoring.mode === "editTimeline") {
                     this.deleteButton.show();
                     this.titleTextblock.text("Edit Timeline");
-                    this.saveButton.text("update timeline");
+                    this.saveButton.text("Update Timeline");
                 } else if (CZ.Authoring.mode === "createRootTimeline") {
                     this.deleteButton.hide();
                     this.closeButton.hide();
                     this.titleTextblock.text("Create Root Timeline");
-                    this.saveButton.text("create timeline");
+                    this.saveButton.text("Create Timeline");
                 } else {
                     console.log("Unexpected authoring mode in timeline form.");
                     this.close();
@@ -13011,7 +13011,7 @@ var CZ;
                 _super.prototype.remove.call(this, item);
             };
             return ContentItemListBox;
-        })(CZ.UI.ListBoxBase);
+        })(UI.ListBoxBase);
         UI.ContentItemListBox = ContentItemListBox;
 
         var ContentItemListItem = (function (_super) {
@@ -13041,7 +13041,7 @@ var CZ;
                 });
             }
             return ContentItemListItem;
-        })(CZ.UI.ListItemBase);
+        })(UI.ListItemBase);
         UI.ContentItemListItem = ContentItemListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -13093,7 +13093,7 @@ var CZ;
 
                 if (this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
-                    this.saveButton.text("create exhibit");
+                    this.saveButton.text("Create Exhibit");
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
@@ -13122,7 +13122,7 @@ var CZ;
                     });
                 } else if (this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
-                    this.saveButton.text("update exhibit");
+                    this.saveButton.text("Update Exhibit");
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
@@ -13394,7 +13394,7 @@ var CZ;
                 CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
             };
             return FormEditExhibit;
-        })(CZ.UI.FormUpdateEntity);
+        })(UI.FormUpdateEntity);
         UI.FormEditExhibit = FormEditExhibit;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -13503,14 +13503,14 @@ var CZ;
 
                 if (CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
-                    this.saveButton.text("create artifiact");
+                    this.saveButton.text("Create Artifiact");
 
                     this.closeButton.hide();
                 } else if (CZ.Authoring.contentItemMode === "editContentItem") {
                     this.titleTextblock.text("Edit");
-                    this.saveButton.text("update artifact");
+                    this.saveButton.text("Update Artifact");
 
-                    if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit)
+                    if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit)
                         this.closeButton.hide();
                     else
                         this.closeButton.show();
@@ -13547,7 +13547,7 @@ var CZ;
 
                 if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
-                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
+                        if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             this.prevForm.contentItemsListBox.add(newContentItem);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
@@ -13557,7 +13557,7 @@ var CZ;
                             this.back();
                         }
                     } else if (CZ.Authoring.contentItemMode === "editContentItem") {
-                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
+                        if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             var clickedListItem = this.prevForm.clickedListItem;
                             clickedListItem.iconImg.attr("src", newContentItem.uri);

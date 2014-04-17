@@ -111,7 +111,7 @@ namespace Application.Helper.Helpers
         private void DeleteTour()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='auth-edit-tours-form']/div[2]/button[text()='delete tour']"));
+            Click(By.XPath("//*[@id='auth-edit-tours-form']/div[2]/button[text()='Delete Tour']"));
             Logger.Log("->");
         }
 
@@ -136,7 +136,7 @@ namespace Application.Helper.Helpers
         private void CreateTour()
         {
             Logger.Log("<-");
-            Click(By.XPath("//*[@id='auth-edit-tours-form']//button[text()='create tour']"));
+            Click(By.XPath("//*[@id='auth-edit-tours-form']//button[text()='Create Tour']"));
             Logger.Log("->");
         }
 
@@ -153,7 +153,7 @@ namespace Application.Helper.Helpers
             foreach (var bookmark in bookmarks)
             {
                 Logger.Log("Add bookmark: " + bookmark.Name);
-                Click(By.XPath("//*[@id='auth-edit-tours-form']/div[2]/button[text()='add new stop']"));
+                Click(By.XPath("//*[@id='auth-edit-tours-form']/div[2]/button[text()='Add New Stop']"));
                 WaitForElementIsDisplayed(By.Id("message-window"));
                 NavigateToBookmark((Bookmark)bookmark);
                 WaitAnimation();
