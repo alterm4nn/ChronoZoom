@@ -15689,8 +15689,12 @@ var CZ;
 
             CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
-
             CZ.Common.initialize();
+
+            $('.header-logo').click(function () {
+                $('.home-icon').trigger('click');
+            });
+
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
