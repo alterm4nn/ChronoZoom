@@ -178,6 +178,7 @@ a
     background-position: center;
     background-image: url('../images/chronozoom.png');
     margin-left: 10px;
+    cursor: pointer;
 }
 
 .header-regimes {
@@ -234,6 +235,7 @@ a
     &[data-enabled~="true"] {
         &:hover {
             background-color: #0464a2;
+            cursor: pointer;
         }
     }
 
@@ -243,6 +245,7 @@ a
         &.active,
         &:hover {
             background-color: transparent;
+            cursor: default;
         }
     }
 }
@@ -283,6 +286,11 @@ a
     background-image: url('../images/profile-icon.png');
     background-position-x: 3px;
     display: inline-block;
+}
+
+#login-button
+{
+    cursor: pointer;
 }
 
 #login-panel label.header-icon-label
