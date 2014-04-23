@@ -10,7 +10,7 @@
                 CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
 
-                CZ.Authoring.showEditTourForm(null);
+                Authoring.showEditTourForm(null);
             }
             UI.createTour = createTour;
 
