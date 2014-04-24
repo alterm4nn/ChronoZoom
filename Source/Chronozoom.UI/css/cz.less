@@ -1119,6 +1119,11 @@ img.fallbackBackground
     clear: both;
 }
 
+.hidden
+{
+    display: none;
+}
+
 .unselectable
 {
     -webkit-user-select: none;
@@ -1295,6 +1300,46 @@ img.fallbackBackground
     /* W3C Markup, IE10 Release Preview */
     background-image: linear-gradient(to top, #0E4073 0%, #1B6AAB 100%);
 }
+.cz-button:hover
+{
+    opacity: 0.9;
+}
+
+.cz-button-inline   /* overlay for .cz-button */
+{
+    color: #000;
+    background-image: -webkit-gradient(
+	    linear,
+	    left top,
+	    left bottom,
+	    color-stop(0, #eee),
+	    color-stop(1, #ccc)
+    );
+    background-image: -o-linear-gradient(     bottom, #eee 0%, #ccc 100%);
+    background-image: -moz-linear-gradient(   bottom, #eee 0%, #ccc 100%);
+    background-image: -webkit-linear-gradient(bottom, #eee 0%, #ccc 100%);
+    background-image: -ms-linear-gradient(    bottom, #eee 0%, #ccc 100%);
+    background-image: linear-gradient(     to bottom, #eee 0%, #ccc 100%);
+    border: solid 1px #bbb;
+    border-top-color: #ccc;
+    text-shadow: 0px 1px 1px #fff;
+}
+.cz-button-inline:hover
+{
+    opacity: 1.0;
+    background-image: -webkit-gradient(
+	    linear,
+	    left top,
+	    left bottom,
+	    color-stop(0, #ddd),
+	    color-stop(1, #bbb)
+    );
+    background-image: -o-linear-gradient(     bottom, #ddd 0%, #bbb 100%);
+    background-image: -moz-linear-gradient(   bottom, #ddd 0%, #bbb 100%);
+    background-image: -webkit-linear-gradient(bottom, #ddd 0%, #bbb 100%);
+    background-image: -ms-linear-gradient(    bottom, #ddd 0%, #bbb 100%);
+    background-image: linear-gradient(     to bottom, #ddd 0%, #bbb 100%);
+}
 
 .cz-radiobutton + label
 {
@@ -1358,6 +1403,10 @@ img.fallbackBackground
 {
     margin: 5px 0;
     display: block;
+}
+.cz-form-label input[type="checkbox"]
+{
+    margin-left: 0px;
 }
 
 /***********************************************************

@@ -12821,6 +12821,7 @@ var CZ;
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
+                this.chkEditors = container.find(formInfo.chkEditors);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
 
@@ -12867,6 +12868,15 @@ var CZ;
                 } else {
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
+
+                this.chkEditors.click(function (event) {
+                    _this.renderManageEditorsButton();
+                });
+
+                this.btnEditors.click(function (event) {
+                    _this.errorMessage.text('This feature is currently being implemented.').show();
+                });
+
                 this.saveButton.click(function (event) {
                     _this.errorMessage.empty();
                     var isDataValid = false;
@@ -12916,6 +12926,14 @@ var CZ;
                         _this.close();
                     }
                 });
+            };
+
+            FormEditTimeline.prototype.renderManageEditorsButton = function () {
+                if (this.chkEditors.prop('checked')) {
+                    this.btnEditors.slideDown('fast');
+                } else {
+                    this.btnEditors.slideUp('fast');
+                }
             };
 
             FormEditTimeline.prototype.show = function () {
@@ -15836,6 +15854,8 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
+                            chkEditors: "#cz-form-multiuser-enable",
+                            btnEditors: '#cz-form-multiuser-manage',
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
@@ -15853,6 +15873,8 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
+                            chkEditors: "#cz-form-multiuser-enable",
+                            btnEditors: '#cz-form-multiuser-manage',
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
@@ -15869,6 +15891,8 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
+                            chkEditors: "#cz-form-multiuser-enable",
+                            btnEditors: '#cz-form-multiuser-manage',
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
