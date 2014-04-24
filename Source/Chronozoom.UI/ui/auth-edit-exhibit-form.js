@@ -352,7 +352,7 @@ var CZ;
                 CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
             };
             return FormEditExhibit;
-        })(CZ.UI.FormUpdateEntity);
+        })(UI.FormUpdateEntity);
         UI.FormEditExhibit = FormEditExhibit;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;

@@ -1,10 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -48,5 +42,11 @@ namespace Chronozoom.Entities
 
         /// <summary>SuperCollection for this collection</summary>
         public SuperCollection SuperCollection { get; set; }
+
+        /// <summary>
+        /// A list of users who have special rights to the collection, other than the collection owner.
+        /// </summary>
+        [DataMember]
+        public virtual Collection<Member> Members { get; set; }
     }
 }

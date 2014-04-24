@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -45,5 +46,11 @@ namespace Chronozoom.Entities
         [MaxLength(4000)]
         [Column(TypeName = "nvarchar")]
         public string IdentityProvider { get; set; }
+
+        /// <summary>
+        /// A list of collections where this user has special rights, other than being the collection owner.
+        /// </summary>
+        [DataMember]
+        public virtual Collection<Member> Memberships { get; set; }
     }
 }

@@ -14,7 +14,7 @@
     <RootNamespace>Chronozoom.UI</RootNamespace>
     <AssemblyName>Chronozoom.UI</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -53,6 +53,9 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="css\cz.min.css">
+      <DependentUpon>cz.less</DependentUpon>
+    </Content>
     <Content Include="css\media.css">
       <DependentUpon>media.less</DependentUpon>
     </Content>
@@ -72,6 +75,9 @@
     <Content Include="dumps\rin-dump.json" />
     <Content Include="dumps\home\timelines.json" />
     <Content Include="dumps\home\tweets.json" />
+    <None Include="Properties\PublishProfiles\NeilCresswell.pubxml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -753,9 +759,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>False</AutoAssignPort>
-          <DevelopmentServerPort>4949</DevelopmentServerPort>
+          <DevelopmentServerPort>80</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:4949/</IISUrl>
+          <IISUrl>http://chronozoom.localhost/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
