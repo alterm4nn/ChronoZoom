@@ -1,4 +1,4 @@
-var __extends = this.__extends || function (d, b) {
+﻿var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -20,6 +20,8 @@ var CZ;
                 this.activeCollectionTheme = jQuery.extend(true, {}, formInfo.collectionTheme);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.kioskmodeInput = formInfo.kioskmodeInput;
+                this.chkEditors = container.find(formInfo.chkEditors);
+                this.btnEditors = container.find(formInfo.btnEditors);
 
                 this.timelineBackgroundColorInput = formInfo.timelineBackgroundColorInput;
                 this.timelineBackgroundOpacityInput = formInfo.timelineBackgroundOpacityInput;
@@ -87,6 +89,7 @@ var CZ;
                 });
             }
             FormEditCollection.prototype.initialize = function () {
+                var _this = this;
                 this.saveButton.prop('disabled', false);
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
@@ -102,6 +105,13 @@ var CZ;
                 this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
+
+                this.chkEditors.click(function (event) {
+                    _this.renderManageEditorsButton();
+                });
+                this.btnEditors.click(function (event) {
+                    alert('This feature is not yet available.\nIt is currently being implemented.');
+                });
             };
 
             FormEditCollection.prototype.colorIsRgba = function (color) {
@@ -166,6 +176,14 @@ var CZ;
                     return "0" + hex;
 
                 return hex;
+            };
+
+            FormEditCollection.prototype.renderManageEditorsButton = function () {
+                if (this.chkEditors.prop('checked')) {
+                    this.btnEditors.slideDown('fast');
+                } else {
+                    this.btnEditors.slideUp('fast');
+                }
             };
 
             FormEditCollection.prototype.updateCollectionTheme = function (clearError) {

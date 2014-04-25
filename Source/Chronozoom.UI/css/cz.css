@@ -2103,7 +2103,8 @@ img.fallbackBackground {
   /* W3C Markup, IE10 Release Preview */
   background-image: linear-gradient(to top, #0e4073 0%, #1b6aab 100%);
 }
-.cz-button:hover {
+.cz-button:hover,
+.cz-medialist-item:hover {
   opacity: 0.9;
 }
 .cz-button-inline {
@@ -2188,6 +2189,11 @@ img.fallbackBackground {
                         Custom Forms
 
 ***********************************************************/
+.cz-form-color,
+.cz-form-range,
+.cz-medialist-item {
+  cursor: pointer;
+}
 /* Header Edit Form */
 .cz-header-edit-form {
   right: 0px;

@@ -372,6 +372,9 @@ module CZ {
                         exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
                         exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
                         exhibitBorderColorInput: $(".cz-form-exhibit-border"),
+
+                        chkEditors: "#cz-form-multiuser-enable",
+                        btnEditors: '#cz-form-multiuser-manage'
                     });
                     form.show();
                 });
@@ -418,8 +421,6 @@ module CZ {
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
-                            chkEditors: "#cz-form-multiuser-enable",
-                            btnEditors: '#cz-form-multiuser-manage',
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
@@ -437,8 +438,6 @@ module CZ {
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
-                            chkEditors: "#cz-form-multiuser-enable",
-                            btnEditors: '#cz-form-multiuser-manage',
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
@@ -455,8 +454,6 @@ module CZ {
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
-                            chkEditors: "#cz-form-multiuser-enable",
-                            btnEditors: '#cz-form-multiuser-manage',
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",

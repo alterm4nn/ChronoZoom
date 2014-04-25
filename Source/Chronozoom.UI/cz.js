@@ -12822,6 +12822,7 @@ var CZ;
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
                 this.chkEditors = container.find(formInfo.chkEditors);
+                this.btnEditors = container.find(formInfo.btnEditors);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
 
@@ -12874,7 +12875,7 @@ var CZ;
                 });
 
                 this.btnEditors.click(function (event) {
-                    _this.errorMessage.text('This feature is currently being implemented.').show();
+                    alert('This feature is not yet available.\nIt is currently being implemented.');
                 });
 
                 this.saveButton.click(function (event) {

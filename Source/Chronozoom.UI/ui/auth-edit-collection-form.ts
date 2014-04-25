@@ -20,6 +20,9 @@ module CZ {
             exhibitBackgroundColorInput: JQuery;
             exhibitBackgroundOpacityInput: JQuery;
             exhibitBorderColorInput: JQuery;
+
+            chkEditors: string;
+            btnEditors: string;
         }
 
         export class FormEditCollection extends CZ.UI.FormUpdateEntity {
@@ -39,6 +42,9 @@ module CZ {
             private exhibitBackgroundOpacityInput: JQuery;
             private exhibitBorderColorInput: JQuery;
 
+            private chkEditors: JQuery;
+            private btnEditors: JQuery;
+
             // We only need to add additional initialization in constructor.
             constructor(container: JQuery, formInfo: IFormEditCollectionInfo) {
                 super(container, formInfo);
@@ -49,6 +55,8 @@ module CZ {
                 this.activeCollectionTheme = jQuery.extend(true, {}, formInfo.collectionTheme);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.kioskmodeInput = formInfo.kioskmodeInput;
+                this.chkEditors = container.find(formInfo.chkEditors);
+                this.btnEditors = container.find(formInfo.btnEditors);
 
                 this.timelineBackgroundColorInput = formInfo.timelineBackgroundColorInput;
                 this.timelineBackgroundOpacityInput = formInfo.timelineBackgroundOpacityInput;
@@ -132,6 +140,10 @@ module CZ {
                 this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
+
+                // TODO: populate chkEditors then call this.renderManageEditorsButton();
+                this.chkEditors.click(event => { this.renderManageEditorsButton(); });
+                this.btnEditors.click(event => { alert('This feature is not yet available.\nIt is currently being implemented.'); });
             }
 
             private colorIsRgba(color: string) {
@@ -194,6 +206,15 @@ module CZ {
                     return "0" + hex;
 
                 return hex;
+            }
+
+            private renderManageEditorsButton(): void {
+                if (this.chkEditors.prop('checked')) {
+                    this.btnEditors.slideDown('fast');
+                }
+                else {
+                    this.btnEditors.slideUp(  'fast');
+                }
             }
 
             private updateCollectionTheme(clearError: boolean) {

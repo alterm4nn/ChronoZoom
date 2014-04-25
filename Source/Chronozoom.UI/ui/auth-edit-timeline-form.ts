@@ -7,8 +7,6 @@ module CZ {
         export interface IFormEditTimelineInfo extends CZ.UI.IFormUpdateEntityInfo {
             startDate: string;
             endDate: string;
-            chkEditors: string;
-            btnEditors: string;
             deleteButton: string;
             titleInput: string;
             errorMessage: string;
@@ -20,8 +18,6 @@ module CZ {
             private deleteButton: JQuery;
             private startDate: CZ.UI.DatePicker;
             private endDate: CZ.UI.DatePicker;
-            private chkEditors: JQuery;
-            private btnEditors: JQuery;
             private titleInput: JQuery;
             private errorMessage: JQuery;
 
@@ -36,8 +32,6 @@ module CZ {
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
-                this.chkEditors = container.find(formInfo.chkEditors);
-                this.btnEditors = container.find(formInfo.btnEditors);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
 
@@ -88,12 +82,6 @@ module CZ {
                 else {
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
-
-                // TODO: populate chkEditors then call this.renderManageEditorsButton();
-
-                this.chkEditors.click(event => { this.renderManageEditorsButton(); });
-
-                this.btnEditors.click(event => { alert('This feature is not yet available.\nIt is currently being implemented.'); });
 
                 this.saveButton.click(event => {
                     this.errorMessage.empty();
@@ -150,15 +138,6 @@ module CZ {
                         this.close();
                     }
                 });
-            }
-
-            public renderManageEditorsButton(): void {
-                if (this.chkEditors.prop('checked')) {
-                    this.btnEditors.slideDown('fast');
-                }
-                else {
-                    this.btnEditors.slideUp(  'fast');
-                }
             }
 
             public show(): void {
