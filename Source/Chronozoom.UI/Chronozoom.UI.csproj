@@ -393,6 +393,8 @@
       <DependentUpon>utility-plugins.ts</DependentUpon>
     </Content>
     <TypeScriptCompile Include="scripts\plugins\utility-plugins.ts" />
+    <Content Include="ui\auth-edit-collection-editors.html" />
+    <Content Include="ui\auth-edit-collection-editors.ts" />
     <Content Include="ui\auth-edit-collection-form.html" />
     <Content Include="ui\auth-edit-tour-form.html" />
     <Content Include="ui\auth-edit-tour-form.js">

@@ -27,7 +27,8 @@ var CZ;
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
             "#start-page": "/ui/start-page.html",
-            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html"
+            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html",
+            "#auth-edit-collection-editors": "/ui/auth-edit-collection-editors.html"
         };
 
         (function (FeatureActivation) {
@@ -310,6 +311,17 @@ var CZ;
                         exhibitBorderColorInput: $(".cz-form-exhibit-border"),
                         chkEditors: "#cz-form-multiuser-enable",
                         btnEditors: '#cz-form-multiuser-manage'
+                    });
+                    form.show();
+                });
+
+                $('body').on('click', '#cz-form-multiuser-manage', function (event) {
+                    var form = new CZ.UI.FormManageEditors(forms[20], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        titleTextblock: ".cz-form-title",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        saveButton: ".cz-form-save"
                     });
                     form.show();
                 });

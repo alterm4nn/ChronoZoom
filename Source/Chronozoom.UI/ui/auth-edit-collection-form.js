@@ -1,4 +1,4 @@
-﻿var __extends = this.__extends || function (d, b) {
+var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -62,8 +62,6 @@ var CZ;
                     _this.updateCollectionTheme(true);
                 });
 
-                this.saveButton.off();
-
                 this.backgroundInput.focus(function () {
                     _this.backgroundInput.hideError();
                 });
@@ -74,7 +72,7 @@ var CZ;
                     console.log("Error initializing collection form attributes");
                 }
 
-                this.saveButton.click(function (event) {
+                this.saveButton.off().click(function (event) {
                     _this.updateCollectionTheme(true);
                     _this.activeCollectionTheme = _this.collectionTheme;
 
@@ -106,11 +104,8 @@ var CZ;
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
 
-                this.chkEditors.click(function (event) {
+                this.chkEditors.off().click(function (event) {
                     _this.renderManageEditorsButton();
-                });
-                this.btnEditors.click(function (event) {
-                    alert('This feature is not yet available.\nIt is currently being implemented.');
                 });
             };
 

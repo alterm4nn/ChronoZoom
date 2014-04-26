@@ -12821,8 +12821,6 @@ var CZ;
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
-                this.chkEditors = container.find(formInfo.chkEditors);
-                this.btnEditors = container.find(formInfo.btnEditors);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
 
@@ -12869,14 +12867,6 @@ var CZ;
                 } else {
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
-
-                this.chkEditors.click(function (event) {
-                    _this.renderManageEditorsButton();
-                });
-
-                this.btnEditors.click(function (event) {
-                    alert('This feature is not yet available.\nIt is currently being implemented.');
-                });
 
                 this.saveButton.click(function (event) {
                     _this.errorMessage.empty();
@@ -12927,14 +12917,6 @@ var CZ;
                         _this.close();
                     }
                 });
-            };
-
-            FormEditTimeline.prototype.renderManageEditorsButton = function () {
-                if (this.chkEditors.prop('checked')) {
-                    this.btnEditors.slideDown('fast');
-                } else {
-                    this.btnEditors.slideUp('fast');
-                }
             };
 
             FormEditTimeline.prototype.show = function () {
@@ -13685,6 +13667,8 @@ var CZ;
                 this.activeCollectionTheme = jQuery.extend(true, {}, formInfo.collectionTheme);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.kioskmodeInput = formInfo.kioskmodeInput;
+                this.chkEditors = container.find(formInfo.chkEditors);
+                this.btnEditors = container.find(formInfo.btnEditors);
 
                 this.timelineBackgroundColorInput = formInfo.timelineBackgroundColorInput;
                 this.timelineBackgroundOpacityInput = formInfo.timelineBackgroundOpacityInput;
@@ -13725,8 +13709,6 @@ var CZ;
                     _this.updateCollectionTheme(true);
                 });
 
-                this.saveButton.off();
-
                 this.backgroundInput.focus(function () {
                     _this.backgroundInput.hideError();
                 });
@@ -13737,7 +13719,7 @@ var CZ;
                     console.log("Error initializing collection form attributes");
                 }
 
-                this.saveButton.click(function (event) {
+                this.saveButton.off().click(function (event) {
                     _this.updateCollectionTheme(true);
                     _this.activeCollectionTheme = _this.collectionTheme;
 
@@ -13752,6 +13734,7 @@ var CZ;
                 });
             }
             FormEditCollection.prototype.initialize = function () {
+                var _this = this;
                 this.saveButton.prop('disabled', false);
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
@@ -13767,6 +13750,13 @@ var CZ;
                 this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
+
+                this.chkEditors.off().click(function (event) {
+                    _this.renderManageEditorsButton();
+                });
+                this.btnEditors.off().click(function (event) {
+                    alert('This feature is not yet available.\nIt is currently being implemented.');
+                });
             };
 
             FormEditCollection.prototype.colorIsRgba = function (color) {
@@ -13831,6 +13821,14 @@ var CZ;
                     return "0" + hex;
 
                 return hex;
+            };
+
+            FormEditCollection.prototype.renderManageEditorsButton = function () {
+                if (this.chkEditors.prop('checked')) {
+                    this.btnEditors.slideDown('fast');
+                } else {
+                    this.btnEditors.slideUp('fast');
+                }
             };
 
             FormEditCollection.prototype.updateCollectionTheme = function (clearError) {
@@ -13914,6 +13912,20 @@ var CZ;
             return FormEditCollection;
         })(CZ.UI.FormUpdateEntity);
         UI.FormEditCollection = FormEditCollection;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormManageEditors = (function (_super) {
+            __extends(FormManageEditors, _super);
+            function FormManageEditors(container, formInfo) {
+                _super.call(this, container, formInfo);
+            }
+            return FormManageEditors;
+        })(UI.FormUpdateEntity);
+        UI.FormManageEditors = FormManageEditors;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
@@ -15528,7 +15540,8 @@ var CZ;
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
             "#start-page": "/ui/start-page.html",
-            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html"
+            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html",
+            "#auth-edit-collection-editors": "/ui/auth-edit-collection-editors.html"
         };
 
         (function (FeatureActivation) {
@@ -15808,7 +15821,9 @@ var CZ;
                         timelineBorderColorInput: $(".cz-form-timeline-border"),
                         exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
                         exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
-                        exhibitBorderColorInput: $(".cz-form-exhibit-border")
+                        exhibitBorderColorInput: $(".cz-form-exhibit-border"),
+                        chkEditors: "#cz-form-multiuser-enable",
+                        btnEditors: '#cz-form-multiuser-manage'
                     });
                     form.show();
                 });
@@ -15855,8 +15870,6 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
-                            chkEditors: "#cz-form-multiuser-enable",
-                            btnEditors: '#cz-form-multiuser-manage',
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
@@ -15874,8 +15887,6 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
-                            chkEditors: "#cz-form-multiuser-enable",
-                            btnEditors: '#cz-form-multiuser-manage',
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
@@ -15892,8 +15903,6 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
-                            chkEditors: "#cz-form-multiuser-enable",
-                            btnEditors: '#cz-form-multiuser-manage',
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",

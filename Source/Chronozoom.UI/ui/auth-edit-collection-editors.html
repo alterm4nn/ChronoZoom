@@ -1,0 +1,47 @@
+﻿<div class="cz-form-header">
+    <ul>
+        <!-- don't need breadcrumbs
+        <li class="cz-form-nav">&lt;</li>
+        -->
+        <li class="cz-form-title">Manage Editors' List</li>
+        <li class="cz-form-close-btn">
+            <a class="cz-form-btn">X</a>
+        </li>
+    </ul>
+</div>
+<div class="cz-form-content">
+    <div style="max-height: 400px;">
+        <form id="frmAddEditors" style="width: 50%; float: left; height: 100%;">
+            <input type="search" class="cz-input cz-form-search-input" placeholder="Search for user name" /><br />
+            <div>Some list box&hellip;</div>
+            <button type="submit" class="cz-button cz-button-inline">Add to Editors' List</button>
+        </form>
+        <table id="tblDelEditors" class="table-blue" style="width: 50%;">
+            <caption>Allowed Editors</caption>
+            <tbody>
+                <tr><td class="delete" title="Remove Editor"></td><td data-id="1" title="Tom, Dick, Harriet">Tom, Dick, Harriet</td></tr>
+                <tr><td class="delete" title="Remove Editor"></td><td data-id="2" title="Apples and Oranges">Apples and Oranges</td></tr>
+                <tr><td class="delete" title="Remove Editor"></td><td data-id="3" title="Oranges and Pears Beep Beep">Oranges and Pears Beep Beep</td></tr>
+                <tr><td class="delete" title="Remove Editor"></td><td data-id="3" title="SomethingWithoutABreakSoCanTestScrolling">SomethingWithoutABreakSoCanTestScrolling</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <br />
+    <div class="bottom-button-block">
+        <button class="cz-button cz-form-save">Save Changes</button>
+    </div>
+</div>
+<script type="text/javascript">
+    // TODO: place in .ts
+    $('body').on('click', '.table-blue .delete', function (event)
+    {
+        if ($(this).closest('tbody').children().length > 1)
+        {
+            $(this).closest('tr').remove();
+        }
+        else
+        {
+            $(this).closest('tbody').html('<tr><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
+        }
+    });
+</script>

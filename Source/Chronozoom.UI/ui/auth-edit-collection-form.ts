@@ -97,8 +97,6 @@ module CZ {
                     this.updateCollectionTheme(true);
                 });
 
-                this.saveButton.off();
-
                 this.backgroundInput.focus(() => {
                     this.backgroundInput.hideError();
                 });
@@ -110,7 +108,7 @@ module CZ {
                     console.log("Error initializing collection form attributes");
                 }
 
-                this.saveButton.click(event => {
+                this.saveButton.off().click(event => {
                     this.updateCollectionTheme(true);
                     this.activeCollectionTheme = this.collectionTheme;
 
@@ -142,8 +140,7 @@ module CZ {
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
 
                 // TODO: populate chkEditors then call this.renderManageEditorsButton();
-                this.chkEditors.click(event => { this.renderManageEditorsButton(); });
-                this.btnEditors.click(event => { alert('This feature is not yet available.\nIt is currently being implemented.'); });
+                this.chkEditors.off().click(event => { this.renderManageEditorsButton(); });
             }
 
             private colorIsRgba(color: string) {
