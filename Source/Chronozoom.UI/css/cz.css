@@ -2004,8 +2004,20 @@ img.fallbackBackground {
 .table-blue td.delete:hover {
   text-shadow: 0px 1px 1px #333;
 }
+.left {
+  text-align: left;
+}
+.right {
+  text-align: right;
+}
 .center {
   text-align: center !important;
+}
+.justify {
+  text-align: justify;
+}
+.max {
+  width: 100%;
 }
 .fleft {
   float: left;

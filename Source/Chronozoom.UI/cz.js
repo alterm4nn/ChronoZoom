@@ -13754,9 +13754,6 @@ var CZ;
                 this.chkEditors.off().click(function (event) {
                     _this.renderManageEditorsButton();
                 });
-                this.btnEditors.off().click(function (event) {
-                    alert('This feature is not yet available.\nIt is currently being implemented.');
-                });
             };
 
             FormEditCollection.prototype.colorIsRgba = function (color) {
@@ -13922,6 +13919,7 @@ var CZ;
             __extends(FormManageEditors, _super);
             function FormManageEditors(container, formInfo) {
                 _super.call(this, container, formInfo);
+                $('#frmAddEditors input').focus();
             }
             return FormManageEditors;
         })(UI.FormUpdateEntity);
@@ -15824,6 +15822,17 @@ var CZ;
                         exhibitBorderColorInput: $(".cz-form-exhibit-border"),
                         chkEditors: "#cz-form-multiuser-enable",
                         btnEditors: '#cz-form-multiuser-manage'
+                    });
+                    form.show();
+                });
+
+                $('body').on('click', '#cz-form-multiuser-manage', function (event) {
+                    var form = new CZ.UI.FormManageEditors(forms[20], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        titleTextblock: ".cz-form-title",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        saveButton: ".cz-form-save"
                     });
                     form.show();
                 });
