@@ -11,7 +11,7 @@ var CZ;
             __extends(FormManageEditors, _super);
             function FormManageEditors(container, formInfo) {
                 _super.call(this, container, formInfo);
-                $('#frmAddEditors input').focus();
+                $('#tblAddEditors input[type="search"]').focus();
             }
             return FormManageEditors;
         })(UI.FormUpdateEntity);

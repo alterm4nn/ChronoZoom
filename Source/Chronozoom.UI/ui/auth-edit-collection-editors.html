@@ -11,18 +11,29 @@
 </div>
 <div class="cz-form-content">
     <div style="max-height: 400px;">
-        <form id="frmAddEditors" style="width: 50%; float: left; height: 100%;">
-            <input type="search" class="cz-input cz-form-search-input" placeholder="Search for user name" /><br />
-            <div>Some list box&hellip;</div>
-            <button type="submit" class="cz-button cz-button-inline">Add to Editors' List</button>
-        </form>
-        <table id="tblDelEditors" class="table-blue" style="width: 50%;">
-            <caption>Allowed Editors</caption>
+        <table id="tblAddEditors" class="table-blue" style="width: 48%; float: left; height: 100%;">
+            <caption>Find &amp; Add Users</caption>
+            <thead>
+                <tr><td class="select"><input type="checkbox" title="Select/Unselect All" /></td><td><input type="search" placeholder="Find User Name &hellip;" title="Enter part of a name to search for it." /></td></tr>
+            </thead>
+            <tfoot>
+                <tr><td class="select">&nbsp;</td><td><button class="cz-button cz-button-inline" title="Add Selected Users to Editors' List">Add Selected to List<span class="btn-icon">&#9654;</span></button></td></tr>
+            </tfoot>
             <tbody>
-                <tr><td class="delete" title="Remove Editor"></td><td data-id="1" title="Tom, Dick, Harriet">Tom, Dick, Harriet</td></tr>
-                <tr><td class="delete" title="Remove Editor"></td><td data-id="2" title="Apples and Oranges">Apples and Oranges</td></tr>
-                <tr><td class="delete" title="Remove Editor"></td><td data-id="3" title="Oranges and Pears Beep Beep">Oranges and Pears Beep Beep</td></tr>
-                <tr><td class="delete" title="Remove Editor"></td><td data-id="3" title="SomethingWithoutABreakSoCanTestScrolling">SomethingWithoutABreakSoCanTestScrolling</td></tr>
+                <tr data-id="10"><td class="select" title="Select/Unselect This User"><input type="checkbox" /></td><td title="Javier Luraschi">Javier Luraschi</td></tr>
+                <tr data-id="11"><td class="select" title="Select/Unselect This User"><input type="checkbox" /></td><td title="Jay Beavers">Jay Beavers</td></tr>
+                <tr data-id="12"><td class="select" title="Select/Unselect This User"><input type="checkbox" /></td><td title="Lori Ada Kilty">Lori Ada Kilty</td></tr>
+                <tr data-id="13"><td class="select" title="Select/Unselect This User"><input type="checkbox" /></td><td title="Neil Cresswell">Neil Cresswell</td></tr>
+            </tbody>
+        </table>
+        <div style="width: 4%; float: left; height: 100%;">&nbsp;</div>
+        <table id="tblDelEditors"  class="table-blue" style="width: 48%;">
+            <caption>Editors' List</caption>
+            <tbody>
+                <tr data-id="21"><td class="delete" title="Remove Editor"></td><td title="Tom, Dick, Harriet">Tom, Dick, Harriet</td></tr>
+                <tr data-id="22"><td class="delete" title="Remove Editor"></td><td title="Apples and Oranges">Apples and Oranges</td></tr>
+                <tr data-id="23"><td class="delete" title="Remove Editor"></td><td title="Oranges and Pears Beep Beep">Oranges and Pears Beep Beep</td></tr>
+                <tr data-id="24"><td class="delete" title="Remove Editor"></td><td title="SomethingWithoutABreakSoCanTestScrolling">SomethingWithoutABreakSoCanTestScrolling</td></tr>
             </tbody>
         </table>
     </div>
@@ -32,8 +43,23 @@
     </div>
 </div>
 <script type="text/javascript">
-    // TODO: place in .ts
-    $('body').on('click', '.table-blue .delete', function (event)
+    // TODO: replace UI mockup JS with TS code
+
+    // hook select/unselect all users
+    $('#tblAddEditors thead .select input').on('click', function (event)
+    {
+        $('#tblAddEditors tbody .select input').prop('checked', $(this).prop('checked'));
+    });
+
+    // hook clicking on user name selects/unselects user
+    $('#tblAddEditors').on('click', 'tbody tr', function (event)
+    {
+        var checkbox = $(this).find('.select input');
+        checkbox.prop('checked', !checkbox.prop('checked'));
+    });
+
+    // hook removal of user from editors' list in UI
+    $('#tblDelEditors').on('click', '.delete', function (event)
     {
         if ($(this).closest('tbody').children().length > 1)
         {

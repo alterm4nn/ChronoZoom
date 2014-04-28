@@ -1967,15 +1967,20 @@ img.fallbackBackground {
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 }
+.table-blue thead,
+.table-blue tfoot {
+  background-color: #efefef;
+}
 .table-blue tbody {
   background-color: #efefef;
+  font-size: 0.9em;
   overflow-y: scroll;
 }
-.table-blue tr:hover {
+.table-blue tbody tr:hover {
   background-color: #ddd;
 }
 .table-blue td {
-  padding: 3px 5px 5px 5px;
+  padding: 3px 5px 4px 5px;
   vertical-align: top;
   text-align: left;
   overflow: hidden;
@@ -1989,8 +1994,16 @@ img.fallbackBackground {
 .table-blue tr:last-child td:last-child {
   border-bottom-right-radius: 4px;
 }
+.table-blue input[type="search"],
+.table-blue button {
+  background-color: #fff;
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  margin-left: -2px;
+}
 .table-blue td.delete {
-  width: 20px;
+  width: 15px;
   padding-top: 0px;
   text-align: center;
   font-size: 1.2em;
@@ -2003,6 +2016,13 @@ img.fallbackBackground {
 /* &times; */
 .table-blue td.delete:hover {
   text-shadow: 0px 1px 1px #333;
+}
+.table-blue thead td.select {
+  padding-top: 5px;
+}
+.table-blue td.select {
+  width: 15px;
+  text-align: center;
 }
 .left {
   text-align: left;
@@ -2030,6 +2050,13 @@ img.fallbackBackground {
 }
 .hidden {
   display: none;
+}
+.btn-icon {
+  color: #444;
+  font-weight: bold;
+  padding-left: 5px;
+  position: relative;
+  top: -1px;
 }
 .unselectable {
   -webkit-user-select: none;
@@ -2188,24 +2215,17 @@ img.fallbackBackground {
 }
 .cz-button-inline {
   color: #000;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #eeeeee), color-stop(1, #cccccc));
-  background-image: -o-linear-gradient(bottom, #eeeeee 0%, #cccccc 100%);
-  background-image: -moz-linear-gradient(bottom, #eeeeee 0%, #cccccc 100%);
-  background-image: -webkit-linear-gradient(bottom, #eeeeee 0%, #cccccc 100%);
-  background-image: -ms-linear-gradient(bottom, #eeeeee 0%, #cccccc 100%);
-  background-image: linear-gradient(to bottom, #eeeeee 0%, #cccccc 100%);
-  border: solid 1px #bbb;
-  border-top-color: #ccc;
-  text-shadow: 0px 1px 1px #fff;
-}
-.cz-button-inline:hover {
-  opacity: 1.0;
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #dddddd), color-stop(1, #bbbbbb));
   background-image: -o-linear-gradient(bottom, #dddddd 0%, #bbbbbb 100%);
   background-image: -moz-linear-gradient(bottom, #dddddd 0%, #bbbbbb 100%);
   background-image: -webkit-linear-gradient(bottom, #dddddd 0%, #bbbbbb 100%);
   background-image: -ms-linear-gradient(bottom, #dddddd 0%, #bbbbbb 100%);
   background-image: linear-gradient(to bottom, #dddddd 0%, #bbbbbb 100%);
+  border: solid 1px #aaa;
+  -xborder: outset 1px #bbb;
+  border-top-color: #bbb;
+  text-shadow: 0px 1px 1px #fff;
+  padding: 4px 6px 5px 6px;
 }
 .cz-radiobutton + label {
   margin-right: 25px;

@@ -16,7 +16,7 @@ module CZ
             constructor(container: JQuery, formInfo: IFormManageEditors)
             {
                 super(container, formInfo);
-                $('#frmAddEditors input').focus();
+                $('#tblAddEditors input[type="search"]').focus();
             }
         }
     }

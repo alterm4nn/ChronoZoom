@@ -1122,14 +1122,22 @@ img.fallbackBackground
 
 .table-blue { table-layout: fixed; border-spacing: 0px; border: solid 1px #6ae; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; }
 .table-blue caption { padding: 3px 5px 6px 5px; background-color: #6ae; color: #fff; text-shadow: 0px 1px 1px #888; border-top-left-radius: 4px; border-top-right-radius: 4px; }
-.table-blue tbody { background-color: #efefef; overflow-y: scroll; }
-.table-blue tr:hover { background-color: #ddd; }
-.table-blue td { padding: 3px 5px 5px 5px; vertical-align: top; text-align: left; overflow: hidden; -ms-text-overflow: ellipsis; -o-text-overflow: ellipsis; text-overflow: ellipsis; }
+.table-blue thead,
+.table-blue tfoot { background-color: #efefef; }
+.table-blue tbody { background-color: #efefef; font-size: 0.9em; overflow-y: scroll; }
+.table-blue tbody tr:hover { background-color: #ddd; }
+.table-blue td { padding: 3px 5px 4px 5px; vertical-align: top; text-align: left; overflow: hidden; -ms-text-overflow: ellipsis; -o-text-overflow: ellipsis; text-overflow: ellipsis; }
 .table-blue tr:last-child td:first-child { border-bottom-left-radius:  4px; }
 .table-blue tr:last-child td:last-child  { border-bottom-right-radius: 4px; }
-.table-blue td.delete { width: 20px; padding-top: 0px; text-align: center; font-size: 1.2em; font-weight: bold; cursor: pointer;}
+.table-blue input[type="search"],
+.table-blue button { background-color: #fff; display: block; width: 100%; border-radius: 4px; margin-left: -2px; }
+
+.table-blue td.delete { width: 15px; padding-top: 0px; text-align: center; font-size: 1.2em; font-weight: bold; cursor: pointer;}
 .table-blue td.delete:after { content: '\00D7'; } /* &times; */
 .table-blue td.delete:hover { text-shadow: 0px 1px 1px #333; }
+
+.table-blue thead td.select { padding-top: 5px; }
+.table-blue td.select { width: 15px; text-align: center; }
 
 .left
 {
@@ -1174,6 +1182,15 @@ img.fallbackBackground
 .hidden
 {
     display: none;
+}
+
+.btn-icon
+{
+    color: #444;
+    font-weight: bold;
+    padding-left: 5px;
+    position: relative;
+    top: -1px;
 }
 
 .unselectable
@@ -1365,25 +1382,6 @@ img.fallbackBackground
 	    linear,
 	    left top,
 	    left bottom,
-	    color-stop(0, #eee),
-	    color-stop(1, #ccc)
-    );
-    background-image: -o-linear-gradient(     bottom, #eee 0%, #ccc 100%);
-    background-image: -moz-linear-gradient(   bottom, #eee 0%, #ccc 100%);
-    background-image: -webkit-linear-gradient(bottom, #eee 0%, #ccc 100%);
-    background-image: -ms-linear-gradient(    bottom, #eee 0%, #ccc 100%);
-    background-image: linear-gradient(     to bottom, #eee 0%, #ccc 100%);
-    border: solid 1px #bbb;
-    border-top-color: #ccc;
-    text-shadow: 0px 1px 1px #fff;
-}
-.cz-button-inline:hover
-{
-    opacity: 1.0;
-    background-image: -webkit-gradient(
-	    linear,
-	    left top,
-	    left bottom,
 	    color-stop(0, #ddd),
 	    color-stop(1, #bbb)
     );
@@ -1392,6 +1390,11 @@ img.fallbackBackground
     background-image: -webkit-linear-gradient(bottom, #ddd 0%, #bbb 100%);
     background-image: -ms-linear-gradient(    bottom, #ddd 0%, #bbb 100%);
     background-image: linear-gradient(     to bottom, #ddd 0%, #bbb 100%);
+    border: solid 1px #aaa;
+    -xborder: outset 1px #bbb;
+    border-top-color: #bbb;
+    text-shadow: 0px 1px 1px #fff;
+    padding: 4px 6px 5px 6px;
 }
 
 .cz-radiobutton + label
