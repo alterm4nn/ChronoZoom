@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Chronozoom.Entities.Exhibit">
-    <Position X="5.5" Y="4.5" Width="1.5" />
+    <Position X="3.25" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAABAAAQEAAAAAAAAAAAAAAAAAkAAAAAAAAAAA=</HashCode>
       <FileName>Exhibit.cs</FileName>
@@ -11,18 +11,34 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Chronozoom.Entities.Timeline">
-    <Position X="3.25" Y="3" Width="1.5" />
+    <Position X="0.5" Y="6.25" Width="1.5" />
     <Members>
       <Property Name="Height" Hidden="true" />
       <Property Name="Regime" Hidden="true" />
     </Members>
-    <AssociationLine Name="Exhibits" Type="Chronozoom.Entities.Exhibit" FixedFromPoint="true" FixedToPoint="true">
+    <AssociationLine Name="ChildTimelines" Type="Chronozoom.Entities.Timeline" ManuallyRouted="true">
       <Path>
-        <Point X="4.75" Y="3.657" />
-        <Point X="5.125" Y="3.657" />
-        <Point X="5.125" Y="5.261" />
-        <Point X="5.5" Y="5.261" />
+        <Point X="1.032" Y="8.507" />
+        <Point X="1.032" Y="8.757" />
+        <Point X="1.478" Y="8.757" />
+        <Point X="1.478" Y="8.507" />
       </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.047" Y="0.3" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Exhibits" Type="Chronozoom.Entities.Exhibit" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2" Y="7.188" />
+        <Point X="2.33" Y="7.188" />
+        <Point X="2.33" Y="7.188" />
+        <Point X="3.25" Y="7.188" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="Collection" Type="Chronozoom.Entities.Collection">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.079" Y="0.487" />
+      </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAACAgCABAAAQGAIAAAAAAAAAAABAACgAAAAAAAAAIA=</HashCode>
@@ -37,7 +53,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Chronozoom.Entities.ContentItem">
-    <Position X="8.25" Y="5.5" Width="1.5" />
+    <Position X="6" Y="6.25" Width="1.5" />
     <Members>
       <Property Name="MediaSource" Hidden="true" />
       <Property Name="MediaType" Hidden="true" />
@@ -50,7 +66,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Chronozoom.Entities.Tour">
-    <Position X="10" Y="4.5" Width="1.5" />
+    <Position X="3.25" Y="0.5" Width="1.5" />
     <Members>
       <Property Name="Bookmarks" Hidden="true" />
       <Property Name="Category" Hidden="true" />
@@ -63,14 +79,27 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Chronozoom.Entities.Collection">
-    <Position X="0.5" Y="2.25" Width="1.5" />
+    <Position X="0.5" Y="3" Width="1.5" />
+    <AssociationLine Name="Members" Type="Chronozoom.Entities.Member">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.381" Y="0.07" />
+      </MemberNameLabel>
+    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAADAAAAAAAAAEAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAADAAAAAAAAAEAQQAAAAAAAAAAAAAAIAAAEAAAAAAA=</HashCode>
       <FileName>Collection.cs</FileName>
     </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Members" />
+    </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Chronozoom.Entities.SuperCollection">
     <Position X="0.5" Y="0.5" Width="1.5" />
+    <AssociationLine Name="Collections" Type="Chronozoom.Entities.Collection">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.079" Y="0.768" />
+      </MemberNameLabel>
+    </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAADAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAIAAAAA=</HashCode>
       <FileName>SuperCollection.cs</FileName>
@@ -80,9 +109,9 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Chronozoom.Entities.Triple">
-    <Position X="5" Y="0.5" Width="1.5" />
+    <Position X="11.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAEAAAAAAAIAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAACAAAAAEAAAAAAAIAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
       <FileName>Triple.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -90,18 +119,75 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Chronozoom.Entities.TripleObject">
-    <Position X="7.25" Y="2.25" Width="1.5" />
+    <Position X="11.25" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAgAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>TripleObject.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Chronozoom.Entities.TriplePrefix">
-    <Position X="8.75" Y="0.5" Width="1.5" />
+    <Position X="9.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAACAAAAIAAAAAAAAAAAAAA=</HashCode>
       <FileName>TriplePrefix.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="Chronozoom.Entities.Bitmask">
+    <Position X="6" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAiAAAAAAAAAAAAAAAAAEAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bitmask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chronozoom.Entities.Bookmark">
+    <Position X="11.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAACAABAgAAAAAAAAAAQAAAAEAAAACAAAAAAIAAA=</HashCode>
+      <FileName>Bookmark.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chronozoom.Entities.Member">
+    <Position X="3.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Member.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chronozoom.Entities.SearchResult">
+    <Position X="8.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAEAAAAAAAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>SearchResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chronozoom.Entities.User">
+    <Position X="6" Y="3" Width="1.5" />
+    <AssociationLine Name="Memberships" Type="Chronozoom.Entities.Member">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.193" Y="0.06" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACEAAAACQAAAAAAgAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>User.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Memberships" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Enum Name="Chronozoom.Entities.BookmarkType">
+    <Position X="11.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAABAAA=</HashCode>
+      <FileName>Bookmark.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Chronozoom.Entities.ObjectType">
+    <Position X="8.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAABAAA=</HashCode>
+      <FileName>SearchResult.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

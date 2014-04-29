@@ -3,7 +3,7 @@ namespace Chronozoom.Entities
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddCollectionMembers : DbMigration
+    public partial class AddCollectionMembership : DbMigration
     {
         public override void Up()
         {
@@ -14,7 +14,6 @@ namespace Chronozoom.Entities
                 c => new
                     {
                         Id = c.Guid(nullable: false),
-                        Role = c.Int(nullable: false),
                         Collection_Id = c.Guid(),
                         User_Id = c.Guid(),
                     })
@@ -24,6 +23,7 @@ namespace Chronozoom.Entities
                 .Index(t => t.Collection_Id)
                 .Index(t => t.User_Id);
             
+            AddColumn("dbo.Collections", "MembersAllowed", c => c.Boolean(nullable: false));
             DropColumn("dbo.Users", "Collection_Id");
         }
         
@@ -34,6 +34,7 @@ namespace Chronozoom.Entities
             DropIndex("dbo.Members", new[] { "Collection_Id" });
             DropForeignKey("dbo.Members", "User_Id", "dbo.Users");
             DropForeignKey("dbo.Members", "Collection_Id", "dbo.Collections");
+            DropColumn("dbo.Collections", "MembersAllowed");
             DropTable("dbo.Members");
             CreateIndex("dbo.Users", "Collection_Id");
             AddForeignKey("dbo.Users", "Collection_Id", "dbo.Collections", "Id");

@@ -97,11 +97,10 @@
     <Compile Include="Member.cs" />
     <Compile Include="ContentItem.cs" />
     <Compile Include="Exhibit.cs" />
-    <Compile Include="Migrations\201404222359341_AddCollectionMembers.cs" />
-    <Compile Include="Migrations\201404222359341_AddCollectionMembers.Designer.cs">
-      <DependentUpon>201404222359341_AddCollectionMembers.cs</DependentUpon>
+    <Compile Include="Migrations\201404290013000_AddCollectionMembership.cs" />
+    <Compile Include="Migrations\201404290013000_AddCollectionMembership.Designer.cs">
+      <DependentUpon>201404290013000_AddCollectionMembership.cs</DependentUpon>
     </Compile>
-    <Compile Include="Role.cs" />
     <Compile Include="TimelineShortcut.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Migrations\201305102053361_RemoveBetaFields.cs" />
@@ -208,8 +207,8 @@
     <EmbeddedResource Include="Migrations\201306210557399_RemoveBFSCachedFields.resx">
       <DependentUpon>201306210557399_RemoveBFSCachedFields.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201404222359341_AddCollectionMembers.resx">
-      <DependentUpon>201404222359341_AddCollectionMembers.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201404290013000_AddCollectionMembership.resx">
+      <DependentUpon>201404290013000_AddCollectionMembership.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

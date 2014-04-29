@@ -14,6 +14,14 @@ namespace Chronozoom.Entities
     public class Collection
     {
         /// <summary>
+        /// Constructor used to set default values.
+        /// </summary>
+        public Collection()
+        {
+            this.MembersAllowed = false;
+        }
+
+        /// <summary>
         /// The ID of the collection.
         /// </summary>
         [Key]
@@ -42,6 +50,13 @@ namespace Chronozoom.Entities
 
         /// <summary>SuperCollection for this collection</summary>
         public SuperCollection SuperCollection { get; set; }
+
+        /// <summary>
+        /// On/Off switch for permitting a list of members to edit this collection.
+        /// </summary>
+        [DataMember]
+        [Column(TypeName = "bit")]
+        public bool MembersAllowed { get; set; }
 
         /// <summary>
         /// A list of users who have special rights to the collection, other than the collection owner.

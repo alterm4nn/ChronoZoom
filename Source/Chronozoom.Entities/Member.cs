@@ -20,8 +20,5 @@ namespace Chronozoom.Entities
 
         [DataMember]
         public User User { get; set; }
-
-        [DataMember]
-        public Role Role { get; set; }
     }
 }
