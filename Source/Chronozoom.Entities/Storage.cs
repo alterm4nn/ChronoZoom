@@ -86,6 +86,8 @@ namespace Chronozoom.Entities
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Member> Members { get; set; }
+
         public DbSet<Collection> Collections { get; set; }
 
         public DbSet<SuperCollection> SuperCollections { get; set; }

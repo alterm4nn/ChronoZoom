@@ -47,10 +47,12 @@ namespace Chronozoom.Entities
         [Column(TypeName = "nvarchar")]
         public string IdentityProvider { get; set; }
 
+        /* -- TODO: getting circular references and not needed so leave out for now --
         /// <summary>
         /// A list of collections where this user has special rights, other than being the collection owner.
         /// </summary>
         [DataMember]
         public virtual Collection<Member> Memberships { get; set; }
+        */
     }
 }

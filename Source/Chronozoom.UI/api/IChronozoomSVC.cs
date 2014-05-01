@@ -530,6 +530,16 @@ namespace Chronozoom.UI
         IEnumerable<Collection> GetCollections(string superCollectionName);
 
         /// <summary>
+        /// Returns a list of members and their user records who have editing rights to the specified collection.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection</param>
+        /// <param name="collection">Name of the collection</param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/members")]
+        IEnumerable<Member> GetMembers(string superCollection, string collection);
+
+        /// <summary>
         /// Retrieve file mime type by url
         /// </summary>
         /// <example><![CDATA[  

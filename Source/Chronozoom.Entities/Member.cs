@@ -6,8 +6,9 @@ using System.Runtime.Serialization;
 
 namespace Chronozoom.Entities
 {
-    // A collection can have a list of users other than the collection owner which have edit or other special rights.
-
+    /// <summary>
+    /// A collection can have a list of members, users other than the collection owner which have edit or other special rights.
+    /// </summary>
     [DataContract]
     public class Member
     {

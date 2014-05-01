@@ -18,6 +18,7 @@ namespace Chronozoom.Entities
         /// </summary>
         public Collection()
         {
+            this.Id = Guid.NewGuid();       // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
             this.MembersAllowed = false;
         }
 

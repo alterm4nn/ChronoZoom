@@ -1950,6 +1950,19 @@ namespace Chronozoom.UI
             });
         }
 
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public IEnumerable<Member> GetMembers(string superCollection, string collection)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Guid collectionId    = CollectionIdOrDefault(storage, superCollection, collection);
+                List<Member> members = storage.Members.Where(m => m.Collection.Id == collectionId).Include(m => m.User).ToList();
+                return members;
+            });
+        }
+
         private static bool FindParentTimeline(Storage storage, Guid? parentTimelineGuid, out Timeline parentTimeline)
         {
             parentTimeline = null;
