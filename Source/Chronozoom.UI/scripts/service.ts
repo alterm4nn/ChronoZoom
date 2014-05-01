@@ -177,6 +177,40 @@ module CZ {
             });
         }
 
+        // .../find/users?partial={partialName}
+        export function findUsers(partialName: string) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("find");
+            request.addToPath("users?partial=" + partialName);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
+
+        // .../{supercollection}/{collection}/members
+        export function getMembers() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
         // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         // NOTE: Not implemented in current API.
         export function getStructure(r) {

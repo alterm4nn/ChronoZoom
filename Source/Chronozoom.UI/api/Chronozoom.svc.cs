@@ -1952,13 +1952,48 @@ namespace Chronozoom.UI
 
         /// <summary>
         /// Documentation under IChronozoomSVC
+        /// IdentityProvider null check is used to exclude anonymous users from results list
+        /// </summary>
+        /// <param name="partialName"></param>
+        /// <returns></returns>
+        public IEnumerable<User> FindUsers(string partialName)
+        {
+            partialName = partialName.Trim();
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                List<User> users;
+                switch (partialName.Length)
+                {
+                    case 0:
+                        // don't bother searching
+                        users = new List<User>();
+                        break;
+
+                    case 1:
+                    case 2:
+                        // exact match only as list could be very large
+                        users = storage.Users.Where(u => u.DisplayName == partialName && u.IdentityProvider != null).OrderBy(u => u.DisplayName).ToList();
+                        break;
+
+                    default:
+                        // partial match
+                        users = storage.Users.Where(u => u.DisplayName.Contains(partialName) && u.IdentityProvider != null).OrderBy(u => u.DisplayName).ToList();
+                        break;
+                }
+                return users;
+            });
+        }
+
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
         /// </summary>
         public IEnumerable<Member> GetMembers(string superCollection, string collection)
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
                 Guid collectionId    = CollectionIdOrDefault(storage, superCollection, collection);
-                List<Member> members = storage.Members.Where(m => m.Collection.Id == collectionId).Include(m => m.User).ToList();
+                List<Member> members = storage.Members.Where(m => m.Collection.Id == collectionId).Include(m => m.User).OrderBy(m => m.User.DisplayName).ToList();
                 return members;
             });
         }

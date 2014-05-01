@@ -11,7 +11,32 @@ var CZ;
             __extends(FormManageEditors, _super);
             function FormManageEditors(container, formInfo) {
                 _super.call(this, container, formInfo);
-                $('#tblAddEditors input[type="search"]').focus();
+
+                CZ.Service.getMembers().done(function (data) {
+                    if (data.length == 0) {
+                        $('#tblDelEditors tbody').append('<tr><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
+                    } else {
+                        data.forEach(function (member) {
+                            $('#tblDelEditors tbody').append('<tr data-id="' + member.User.Id + '">' + '<td class="delete" title="Remove Editor"></td>' + '<td title="' + member.User.DisplayName + '">' + member.User.DisplayName + '</td>' + '</tr>');
+                        });
+                    }
+                });
+
+                $('#tblAddEditors input[type="search"]').off('input').on('input', function (event) {
+                    var _this = this;
+                    CZ.Service.findUsers($(this).val()).done(function (data) {
+                        $(_this).closest('table').find('tbody').html('');
+                        $(_this).closest('tr').find('input[type="checkbox"]').prop('checked', false);
+                        data.forEach(function (user) {
+                            $('#tblAddEditors tbody').append('<tr data-id="' + user.Id + '">' + '<td class="select" title="Select/Unselect This User"><input type="checkbox" /></td>' + '<td title="' + user.DisplayName + '">' + user.DisplayName + '</td>' + '</tr>');
+                        });
+                        if (data.length == 0) {
+                            $(_this).closest('table').find('tfoot').hide();
+                        } else {
+                            $(_this).closest('table').find('tfoot').show();
+                        }
+                    });
+                });
             }
             return FormManageEditors;
         })(UI.FormUpdateEntity);

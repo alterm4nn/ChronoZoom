@@ -3855,6 +3855,23 @@ var CZ;
         }
         Service.getCollections = getCollections;
 
+        function getMembers() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getMembers = getMembers;
+
         function getStructure(r) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -13919,6 +13936,17 @@ var CZ;
             __extends(FormManageEditors, _super);
             function FormManageEditors(container, formInfo) {
                 _super.call(this, container, formInfo);
+
+                CZ.Service.getMembers().done(function (data) {
+                    if (data.length == 0) {
+                        $('#tblDelEditors tbody').append('<tr><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
+                    } else {
+                        data.forEach(function (member) {
+                            $('#tblDelEditors tbody').append('<tr data-id="' + member.User.Id + '">' + '<td class="delete" title="Remove Editor"></td>' + '<td title="' + member.User.DisplayName + '">' + member.User.DisplayName + '</td>' + '</tr>');
+                        });
+                    }
+                });
+
                 $('#tblAddEditors input[type="search"]').focus();
             }
             return FormManageEditors;

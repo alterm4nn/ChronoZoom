@@ -16,24 +16,28 @@
             <thead>
                 <tr><td class="select"><input type="checkbox" title="Select/Unselect All" /></td><td><input type="search" placeholder="Find User Name &hellip;" title="Enter part of a name to search for it." /></td></tr>
             </thead>
-            <tfoot>
+            <tfoot class="hidden">
                 <tr><td class="select">&nbsp;</td><td><button class="cz-button cz-button-inline" title="Add Selected Users to Editors' List">Add Selected to List<span class="btn-icon">&#9654;</span></button></td></tr>
             </tfoot>
             <tbody>
+                <!--
                 <tr data-id="10"><td class="select" title="Select/Unselect This User"><input type="checkbox" /></td><td title="Javier Luraschi">Javier Luraschi</td></tr>
                 <tr data-id="11"><td class="select" title="Select/Unselect This User"><input type="checkbox" /></td><td title="Jay Beavers">Jay Beavers</td></tr>
                 <tr data-id="12"><td class="select" title="Select/Unselect This User"><input type="checkbox" /></td><td title="Lori Ada Kilty">Lori Ada Kilty</td></tr>
                 <tr data-id="13"><td class="select" title="Select/Unselect This User"><input type="checkbox" /></td><td title="Neil Cresswell">Neil Cresswell</td></tr>
+                -->
             </tbody>
         </table>
         <div style="width: 4%; float: left; height: 100%;">&nbsp;</div>
         <table id="tblDelEditors"  class="table-blue" style="width: 48%;">
             <caption>Editors' List</caption>
             <tbody>
+                <!--
                 <tr data-id="21"><td class="delete" title="Remove Editor"></td><td title="Tom, Dick, Harriet">Tom, Dick, Harriet</td></tr>
                 <tr data-id="22"><td class="delete" title="Remove Editor"></td><td title="Apples and Oranges">Apples and Oranges</td></tr>
                 <tr data-id="23"><td class="delete" title="Remove Editor"></td><td title="Oranges and Pears Beep Beep">Oranges and Pears Beep Beep</td></tr>
                 <tr data-id="24"><td class="delete" title="Remove Editor"></td><td title="SomethingWithoutABreakSoCanTestScrolling">SomethingWithoutABreakSoCanTestScrolling</td></tr>
+                -->
             </tbody>
         </table>
     </div>
@@ -43,7 +47,6 @@
     </div>
 </div>
 <script type="text/javascript">
-    // TODO: replace UI mockup JS with TS code
 
     // hook select/unselect all users
     $('#tblAddEditors thead .select input').on('click', function (event)
@@ -52,9 +55,9 @@
     });
 
     // hook clicking on user name selects/unselects user
-    $('#tblAddEditors').on('click', 'tbody tr', function (event)
+    $('#tblAddEditors').on('click', 'tbody tr td:nth-of-type(2)', function (event)
     {
-        var checkbox = $(this).find('.select input');
+        var checkbox = $(this).closest('tr').find('.select input');
         checkbox.prop('checked', !checkbox.prop('checked'));
     });
 
@@ -67,7 +70,36 @@
         }
         else
         {
-            $(this).closest('tbody').html('<tr><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
+            $(this).closest('tbody').html('<tr class="none"><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
         }
     });
+
+    // hook add to editors' list in UI
+    $('#tblAddEditors button').click(function (event)
+    {
+        $('#tblAddEditors tbody input:checked').each(function (index)
+        {
+            var userId   = $(this).closest('tr').attr('data-id');
+            var userName = $(this).parent('td').next().attr('title');
+
+            // remove any existing '--none--' display
+            if ($('#tblDelEditors tbody .none').length > 0) $('#tblDelEditors tbody .none').remove();
+
+            // only insert into editors' list if not already present there
+            if ($('#tblDelEditors tbody tr[data-id="' + userId + '"]').length == 0)
+            {
+                $('#tblDelEditors tbody').append
+                (
+                    '<tr data-id="' + userId + '">' +
+                        '<td class="delete" title="Remove Editor"></td>' +
+                        '<td title="' + userName + '">' + userName + '</td>' +
+                    '</tr>'
+                );
+            }
+        });
+    });
+
+    // initial focus on search box
+    $('#tblAddEditors input[type="search"]').focus();
+
 </script>

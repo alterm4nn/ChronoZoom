@@ -530,6 +530,15 @@ namespace Chronozoom.UI
         IEnumerable<Collection> GetCollections(string superCollectionName);
 
         /// <summary>
+        /// Returns a list of users whose display names match the partial display name provided as a parameter.
+        /// </summary>
+        /// <param name="partialName">Part of a User's DisplayName.</param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/find/users?partial={partialName}")]
+        IEnumerable<User> FindUsers(string partialName);
+
+        /// <summary>
         /// Returns a list of members and their user records who have editing rights to the specified collection.
         /// </summary>
         /// <param name="superCollection">Name of the super collection</param>

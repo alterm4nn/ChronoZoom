@@ -171,6 +171,39 @@
         }
         Service.getCollections = getCollections;
 
+        function findUsers(partialName) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("find");
+            request.addToPath("users?partial=" + partialName);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.findUsers = findUsers;
+
+        function getMembers() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getMembers = getMembers;
+
         function getStructure(r) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
