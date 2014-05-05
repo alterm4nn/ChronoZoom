@@ -211,6 +211,25 @@ module CZ {
             });
         }
 
+        // .../{supercollection}/{collection}/members
+        export function putMembers(superCollectionName: string, collectionName: string, userIds) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(userIds)
+            });
+        }
+
         // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         // NOTE: Not implemented in current API.
         export function getStructure(r) {

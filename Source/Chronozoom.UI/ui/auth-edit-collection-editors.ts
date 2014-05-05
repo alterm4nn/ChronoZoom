@@ -57,6 +57,16 @@ module CZ
                         }
                     });
                 });
+
+                // send chosen list of user ids when save button is clicked
+                $('.cz-form-save').off().click(function (event) {
+
+                    var userIds = JSON.stringify($('#tblDelEditors tbody tr').attr('data-id'));
+
+                    CZ.Service.putMembers(CZ.Service.superCollectionName, CZ.Service.collectionName, userIds).always(() => {
+                        $('#auth-edit-collection-editors').hide();
+                    });
+                });
             }
         }
     }

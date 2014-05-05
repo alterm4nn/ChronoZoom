@@ -204,6 +204,25 @@
         }
         Service.getMembers = getMembers;
 
+        function putMembers(superCollectionName, collectionName, userIds) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(userIds)
+            });
+        }
+        Service.putMembers = putMembers;
+
         function getStructure(r) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);

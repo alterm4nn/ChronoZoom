@@ -1974,7 +1974,8 @@ img.fallbackBackground {
 .table-blue tbody {
   background-color: #efefef;
   font-size: 0.9em;
-  overflow-y: scroll;
+  display: block;
+  overflow-y: auto;
 }
 .table-blue tbody tr:hover {
   background-color: #ddd;
@@ -1988,6 +1989,10 @@ img.fallbackBackground {
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
 }
+.table-blue tr {
+  display: block;
+}
+/* part of webkit fix for tbody overflow auto */
 .table-blue tr:last-child td:first-child {
   border-bottom-left-radius: 4px;
 }

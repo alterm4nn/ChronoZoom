@@ -37,6 +37,14 @@ var CZ;
                         }
                     });
                 });
+
+                $('.cz-form-save').off().click(function (event) {
+                    var userIds = JSON.stringify($('#tblDelEditors tbody tr').attr('data-id'));
+
+                    CZ.Service.putMembers(CZ.Service.superCollectionName, CZ.Service.collectionName, userIds).always(function () {
+                        $('#auth-edit-collection-editors').hide();
+                    });
+                });
             }
             return FormManageEditors;
         })(UI.FormUpdateEntity);

@@ -1984,7 +1984,6 @@ namespace Chronozoom.UI
             });
         }
 
-
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
@@ -1996,6 +1995,19 @@ namespace Chronozoom.UI
                 List<Member> members = storage.Members.Where(m => m.Collection.Id == collectionId).Include(m => m.User).OrderBy(m => m.User.DisplayName).ToList();
                 return members;
             });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public bool PutMembers(string superCollection, string collection, IEnumerable<Guid> userIds)
+        {
+            foreach (Guid userId in userIds)
+            {
+                Debugger.Log(1, "PutMembers GUID", userId.ToString());
+            }
+
+            return false; // TODO
         }
 
         private static bool FindParentTimeline(Storage storage, Guid? parentTimelineGuid, out Timeline parentTimeline)

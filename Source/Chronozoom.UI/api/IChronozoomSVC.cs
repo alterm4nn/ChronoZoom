@@ -541,12 +541,24 @@ namespace Chronozoom.UI
         /// <summary>
         /// Returns a list of members and their user records who have editing rights to the specified collection.
         /// </summary>
-        /// <param name="superCollection">Name of the super collection</param>
-        /// <param name="collection">Name of the collection</param>
+        /// <param name="superCollection">Name of the super collection.</param>
+        /// <param name="collection">Name of the collection.</param>
         /// <returns></returns>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/members")]
         IEnumerable<Member> GetMembers(string superCollection, string collection);
+
+        /// <summary>
+        /// Sets the entire list of users who have editing rights to the specified collection.
+        /// Note that this list is not an append list but the entire list, which replaces any existing list.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection.</param>
+        /// <param name="collection">Name of the collection.</param>
+        /// <param name="userIds">A list of all of the user ids which are to be given editing rights.</param>
+        /// <returns>Success or failure Boolean. Will fail if submitting user is not the owner or not in the pre-existing editors' list.</returns>
+        [OperationContract]
+        [WebInvoke(Method = "PUT", ResponseFormat = WebMessageFormat.Json, RequestFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/members")]
+        bool PutMembers(string superCollection, string collection, IEnumerable<Guid> userIds);
 
         /// <summary>
         /// Retrieve file mime type by url

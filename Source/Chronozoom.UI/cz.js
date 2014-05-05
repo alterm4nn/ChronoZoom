@@ -3855,6 +3855,22 @@ var CZ;
         }
         Service.getCollections = getCollections;
 
+        function findUsers(partialName) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("find");
+            request.addToPath("users?partial=" + partialName);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.findUsers = findUsers;
+
         function getMembers() {
             CZ.Authoring.resetSessionTimer();
 
@@ -3871,6 +3887,25 @@ var CZ;
             });
         }
         Service.getMembers = getMembers;
+
+        function putMembers(superCollectionName, collectionName, userIds) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(userIds)
+            });
+        }
+        Service.putMembers = putMembers;
 
         function getStructure(r) {
             CZ.Authoring.resetSessionTimer();
@@ -13935,7 +13970,9 @@ var CZ;
         var FormManageEditors = (function (_super) {
             __extends(FormManageEditors, _super);
             function FormManageEditors(container, formInfo) {
+                var _this = this;
                 _super.call(this, container, formInfo);
+                this.saveButton = container.find(formInfo.saveButton);
 
                 CZ.Service.getMembers().done(function (data) {
                     if (data.length == 0) {
@@ -13947,7 +13984,29 @@ var CZ;
                     }
                 });
 
-                $('#tblAddEditors input[type="search"]').focus();
+                $('#tblAddEditors input[type="search"]').off('input').on('input', function (event) {
+                    var _this = this;
+                    CZ.Service.findUsers($(this).val()).done(function (data) {
+                        $(_this).closest('table').find('tbody').html('');
+                        $(_this).closest('tr').find('input[type="checkbox"]').prop('checked', false);
+                        data.forEach(function (user) {
+                            $('#tblAddEditors tbody').append('<tr data-id="' + user.Id + '">' + '<td class="select" title="Select/Unselect This User"><input type="checkbox" /></td>' + '<td title="' + user.DisplayName + '">' + user.DisplayName + '</td>' + '</tr>');
+                        });
+                        if (data.length == 0) {
+                            $(_this).closest('table').find('tfoot').hide();
+                        } else {
+                            $(_this).closest('table').find('tfoot').show();
+                        }
+                    });
+                });
+
+                this.saveButton.off().click(function (event) {
+                    var userIds = JSON.stringify($('#tblDelEditors tbody tr').attr('data-id'));
+
+                    CZ.Service.putMembers(CZ.Service.superCollectionName, CZ.Service.collectionName, userIds).always(function () {
+                        _this.close();
+                    });
+                });
             }
             return FormManageEditors;
         })(UI.FormUpdateEntity);
