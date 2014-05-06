@@ -28,7 +28,7 @@ module CZ {
                     direction: "left",
                     duration: 300,
                     complete: () => {
-                        $(document).on("keyup", this, this.onDocumentKeyPress);                        
+                        $(document).on("keyup", this.onDocumentKeyPress);                        
                     }
                 });
             }

@@ -108,12 +108,12 @@ var CZ;
 
                 if (CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
-                    this.saveButton.text("create artifiact");
+                    this.saveButton.text("Create Artifiact");
 
                     this.closeButton.hide();
                 } else if (CZ.Authoring.contentItemMode === "editContentItem") {
                     this.titleTextblock.text("Edit");
-                    this.saveButton.text("update artifact");
+                    this.saveButton.text("Update Artifact");
 
                     if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit)
                         this.closeButton.hide();

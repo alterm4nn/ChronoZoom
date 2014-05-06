@@ -91,22 +91,35 @@ var CZ;
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
-                this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode);
+                this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode.toString());
 
-                this.timelineBackgroundColorInput.val(this.getColorFromRGBA(this.collectionTheme.timelineColor));
-                this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor));
-                this.timelineBorderColorInput.val(this.collectionTheme.timelineStrokeStyle);
+                if (!this.collectionTheme.timelineColor)
+                    this.collectionTheme.timelineColor = CZ.Settings.timelineColorOverride;
+                this.timelineBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineColor));
+                this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor).toString());
+                this.timelineBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineStrokeStyle));
 
-                this.exhibitBackgroundColorInput.val(this.getColorFromRGBA(this.collectionTheme.infoDotFillColor));
-                this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor));
-                this.exhibitBorderColorInput.val(this.collectionTheme.infoDotBorderColor);
+                this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
+                this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
+                this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
             };
 
             FormEditCollection.prototype.colorIsRgba = function (color) {
-                return color.substr(0, 5) === "rgba(";
+                return color ? color.substr(0, 5) === "rgba(" : false;
+            };
+
+            FormEditCollection.prototype.colorIsRgb = function (color) {
+                return color ? color.substr(0, 4) === "rgb(" : false;
+            };
+
+            FormEditCollection.prototype.colorIsHex = function (color) {
+                return color ? color.substr(0, 1) === "#" && color.length >= 7 : false;
             };
 
             FormEditCollection.prototype.rgbaFromColor = function (color, alpha) {
+                if (!color)
+                    return color;
+
                 if (this.colorIsRgba(color)) {
                     var parts = color.substr(5, color.length - 5 - 1).split(",");
                     if (parts.length > 3)
@@ -126,17 +139,23 @@ var CZ;
             FormEditCollection.prototype.getOpacityFromRGBA = function (rgba) {
                 if (!rgba)
                     return null;
+                if (!this.colorIsRgba(rgba))
+                    return 1.0;
 
                 var parts = rgba.split(",");
                 var lastPart = parts[parts.length - 1].split(")")[0];
                 return parseFloat(lastPart);
             };
 
-            FormEditCollection.prototype.getColorFromRGBA = function (rgba) {
-                if (!this.colorIsRgba(rgba))
+            FormEditCollection.prototype.getHexColorFromColor = function (color) {
+                if (this.colorIsHex(color))
+                    return color;
+
+                if (!this.colorIsRgb(color) && !this.colorIsRgba(color))
                     return null;
 
-                var parts = rgba.substr(5, rgba.length - 5 - 1).split(",");
+                var offset = this.colorIsRgb(color) ? 4 : 5;
+                var parts = color.substr(offset, color.length - offset - 1).split(",");
                 var lastPart = parts[parts.length - 1].split(")")[0];
                 return "#" + this.colorHexFromInt(parts[0]) + this.colorHexFromInt(parts[1]) + this.colorHexFromInt(parts[2]);
             };
@@ -160,7 +179,7 @@ var CZ;
                     kioskMode: this.kioskmodeInput.prop("checked")
                 };
 
-                if (this.colorIsRgba(this.timelineBackgroundColorInput.val())) {
+                if (this.colorIsRgb(this.timelineBackgroundColorInput.val())) {
                     this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
                     this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
                 }

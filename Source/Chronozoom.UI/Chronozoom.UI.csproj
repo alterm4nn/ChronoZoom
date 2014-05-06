@@ -72,6 +72,7 @@
     <Content Include="dumps\rin-dump.json" />
     <Content Include="dumps\home\timelines.json" />
     <Content Include="dumps\home\tweets.json" />
+    <None Include="Properties\PublishProfiles\cz-nodelete-chronozoom-prod.pubxml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -768,18 +769,20 @@
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PostBuildEvent>tsc -target ES5 --removeComments --out "$(ProjectDir)cz.js" "$(ProjectDir)scripts\cz.ts" "$(ProjectDir)scripts\plugins\error-plugin.ts"
-      exit 0</PostBuildEvent>
+    <PostBuildEvent>tsc -target ES5 --removeComments --out "$(ProjectDir)cz.js" "$(ProjectDir)scripts\cz.ts" "$(ProjectDir)scripts\plugins\error-plugin.ts" "$(ProjectDir)scripts\plugins\utility-plugins.ts"
+exit 0</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
-    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
-    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+    <TypeScriptRemoveComments>True</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>False</TypeScriptSourceMap>
+    <TypeScriptModuleKind>none</TypeScriptModuleKind>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
+    <TypeScriptOutFile>cz.js</TypeScriptOutFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

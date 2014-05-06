@@ -42,6 +42,7 @@ namespace Chronozoom.UI
                         var timeline = storage.Timelines.Where(x => x.Id == g)
                             .Include("Collection")
                             .Include("Collection.User")
+                            .Include("Collection.SuperCollection")
                             .Include("Exhibits")
                             .Include("Exhibits.ContentItems")
                             .FirstOrDefault();

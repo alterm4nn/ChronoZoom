@@ -267,8 +267,8 @@ namespace Chronozoom.Entities
             }
             else
             {
-                ts.TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.User.DisplayName, timeline.Collection.Title, GetContentPath(timeline.Collection.Id, timeline.Id, null));
-                ts.Author = timeline.Collection.User.DisplayName;
+                ts.TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.SuperCollection.Title, timeline.Collection.Title, GetContentPath(timeline.Collection.Id, timeline.Id, null));
+                ts.Author = timeline.Collection.User != null ? timeline.Collection.User.DisplayName : ""; 
             }
             ts.ImageUrl = GetTimelineImageUrl(timeline);
             return ts;

@@ -291,7 +291,7 @@ var CZ;
             FormEditTour.prototype.initializeAsEdit = function () {
                 this.deleteButton.show();
                 this.titleTextblock.text("Edit Tour");
-                this.saveButton.text("update tour");
+                this.saveButton.text("Update Tour");
             };
 
             FormEditTour.prototype.initialize = function () {
@@ -300,7 +300,7 @@ var CZ;
                 if (this.tour == null) {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Tour");
-                    this.saveButton.text("create tour");
+                    this.saveButton.text("Create Tour");
                 } else {
                     this.initializeAsEdit();
                 }

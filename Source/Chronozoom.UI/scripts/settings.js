@@ -47,6 +47,7 @@
         Settings.timelineBreadCrumbBorderOffset = 50;
         Settings.timelineCenterOffsetAcceptableImplicity = 0.00001;
         Settings.timelineColor = null;
+        Settings.timelineColorOverride = 'rgba(0,0,0,0.25)';
         Settings.timelineHoverAnimation = 3 / 60.0;
         Settings.timelineGradientFillStyle = null;
 

@@ -47,6 +47,7 @@
         Settings.timelineBreadCrumbBorderOffset = 50;
         Settings.timelineCenterOffsetAcceptableImplicity = 0.00001;
         Settings.timelineColor = null;
+        Settings.timelineColorOverride = 'rgba(0,0,0,0.25)';
         Settings.timelineHoverAnimation = 3 / 60.0;
         Settings.timelineGradientFillStyle = null;
 
@@ -2180,6 +2181,7 @@ var CZ;
             elem.setAttribute("src", srcData[0]);
             elem.setAttribute("scrolling", "no");
             elem.setAttribute("frameborder", "0");
+            elem.setAttribute("sandbox", "allow-forms allow-scripts");
             this.initializeContent(elem);
 
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
@@ -3384,7 +3386,7 @@ var CZ;
             FormEditTour.prototype.initializeAsEdit = function () {
                 this.deleteButton.show();
                 this.titleTextblock.text("Edit Tour");
-                this.saveButton.text("update tour");
+                this.saveButton.text("Update Tour");
             };
 
             FormEditTour.prototype.initialize = function () {
@@ -3393,7 +3395,7 @@ var CZ;
                 if (this.tour == null) {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Tour");
-                    this.saveButton.text("create tour");
+                    this.saveButton.text("Create Tour");
                 } else {
                     this.initializeAsEdit();
                 }
@@ -10587,7 +10589,7 @@ var CZ;
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
                 if ((date.regime.toLowerCase() == "bce") && (ZeroYearConversation))
                     date.year--;
-                this.yearSelector.val(date.year);
+                this.yearSelector.val(date.year.toString());
 
                 this.regimeSelector.find(":selected").attr("selected", "false");
 
@@ -10601,7 +10603,7 @@ var CZ;
             DatePicker.prototype.setDate_DateMode = function (coordinate) {
                 var date = CZ.Dates.getYMDFromCoordinate(coordinate);
 
-                this.yearSelector.val(date.year);
+                this.yearSelector.val(date.year.toString());
                 var self = this;
 
                 this.monthSelector.find("option").each(function (index) {
@@ -12731,16 +12733,16 @@ var CZ;
                 if (CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
                     this.titleTextblock.text("Create Timeline");
-                    this.saveButton.text("create timeline");
+                    this.saveButton.text("Create Timeline");
                 } else if (CZ.Authoring.mode === "editTimeline") {
                     this.deleteButton.show();
                     this.titleTextblock.text("Edit Timeline");
-                    this.saveButton.text("update timeline");
+                    this.saveButton.text("Update Timeline");
                 } else if (CZ.Authoring.mode === "createRootTimeline") {
                     this.deleteButton.hide();
                     this.closeButton.hide();
                     this.titleTextblock.text("Create Root Timeline");
-                    this.saveButton.text("create timeline");
+                    this.saveButton.text("Create Timeline");
                 } else {
                     console.log("Unexpected authoring mode in timeline form.");
                     this.close();
@@ -12983,7 +12985,7 @@ var CZ;
 
                 if (this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
-                    this.saveButton.text("create exhibit");
+                    this.saveButton.text("Create Exhibit");
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
@@ -13012,7 +13014,7 @@ var CZ;
                     });
                 } else if (this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
-                    this.saveButton.text("update exhibit");
+                    this.saveButton.text("Update Exhibit");
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
@@ -13393,12 +13395,12 @@ var CZ;
 
                 if (CZ.Authoring.contentItemMode === "createContentItem") {
                     this.titleTextblock.text("Create New");
-                    this.saveButton.text("create artifiact");
+                    this.saveButton.text("Create Artifiact");
 
                     this.closeButton.hide();
                 } else if (CZ.Authoring.contentItemMode === "editContentItem") {
                     this.titleTextblock.text("Edit");
-                    this.saveButton.text("update artifact");
+                    this.saveButton.text("Update Artifact");
 
                     if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit)
                         this.closeButton.hide();
@@ -13627,22 +13629,35 @@ var CZ;
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
-                this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode);
+                this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode.toString());
 
-                this.timelineBackgroundColorInput.val(this.getColorFromRGBA(this.collectionTheme.timelineColor));
-                this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor));
-                this.timelineBorderColorInput.val(this.collectionTheme.timelineStrokeStyle);
+                if (!this.collectionTheme.timelineColor)
+                    this.collectionTheme.timelineColor = CZ.Settings.timelineColorOverride;
+                this.timelineBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineColor));
+                this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor).toString());
+                this.timelineBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineStrokeStyle));
 
-                this.exhibitBackgroundColorInput.val(this.getColorFromRGBA(this.collectionTheme.infoDotFillColor));
-                this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor));
-                this.exhibitBorderColorInput.val(this.collectionTheme.infoDotBorderColor);
+                this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
+                this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
+                this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
             };
 
             FormEditCollection.prototype.colorIsRgba = function (color) {
-                return color.substr(0, 5) === "rgba(";
+                return color ? color.substr(0, 5) === "rgba(" : false;
+            };
+
+            FormEditCollection.prototype.colorIsRgb = function (color) {
+                return color ? color.substr(0, 4) === "rgb(" : false;
+            };
+
+            FormEditCollection.prototype.colorIsHex = function (color) {
+                return color ? color.substr(0, 1) === "#" && color.length >= 7 : false;
             };
 
             FormEditCollection.prototype.rgbaFromColor = function (color, alpha) {
+                if (!color)
+                    return color;
+
                 if (this.colorIsRgba(color)) {
                     var parts = color.substr(5, color.length - 5 - 1).split(",");
                     if (parts.length > 3)
@@ -13662,17 +13677,23 @@ var CZ;
             FormEditCollection.prototype.getOpacityFromRGBA = function (rgba) {
                 if (!rgba)
                     return null;
+                if (!this.colorIsRgba(rgba))
+                    return 1.0;
 
                 var parts = rgba.split(",");
                 var lastPart = parts[parts.length - 1].split(")")[0];
                 return parseFloat(lastPart);
             };
 
-            FormEditCollection.prototype.getColorFromRGBA = function (rgba) {
-                if (!this.colorIsRgba(rgba))
+            FormEditCollection.prototype.getHexColorFromColor = function (color) {
+                if (this.colorIsHex(color))
+                    return color;
+
+                if (!this.colorIsRgb(color) && !this.colorIsRgba(color))
                     return null;
 
-                var parts = rgba.substr(5, rgba.length - 5 - 1).split(",");
+                var offset = this.colorIsRgb(color) ? 4 : 5;
+                var parts = color.substr(offset, color.length - offset - 1).split(",");
                 var lastPart = parts[parts.length - 1].split(")")[0];
                 return "#" + this.colorHexFromInt(parts[0]) + this.colorHexFromInt(parts[1]) + this.colorHexFromInt(parts[2]);
             };
@@ -13696,7 +13717,7 @@ var CZ;
                     kioskMode: this.kioskmodeInput.prop("checked")
                 };
 
-                if (this.colorIsRgba(this.timelineBackgroundColorInput.val())) {
+                if (this.colorIsRgb(this.timelineBackgroundColorInput.val())) {
                     this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
                     this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
                 }
@@ -13874,7 +13895,7 @@ var CZ;
                         }
                         _this.emailInput.val(data.Email);
                         if (data.Email !== undefined && data.Email !== '' && data.Email != null) {
-                            _this.agreeInput.attr('checked', true);
+                            _this.agreeInput.attr('checked', 'true');
                             _this.agreeInput.prop('disabled', true);
                         }
                     }
@@ -14401,7 +14422,7 @@ var CZ;
                     direction: "left",
                     duration: 300,
                     complete: function () {
-                        $(document).on("keyup", _this, _this.onDocumentKeyPress);
+                        $(document).on("keyup", _this.onDocumentKeyPress);
                     }
                 });
             };
@@ -15560,8 +15581,12 @@ var CZ;
 
             CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
-
             CZ.Common.initialize();
+
+            $('.header-logo').click(function () {
+                $('.home-icon').trigger('click');
+            });
+
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
@@ -16117,7 +16142,10 @@ var CZ;
             });
 
             $(window).bind('resize', function () {
-                CZ.timeSeriesChart.updateCanvasHeight();
+                if (CZ.timeSeriesChart) {
+                    CZ.timeSeriesChart.updateCanvasHeight();
+                }
+
                 CZ.Common.updateLayout();
 
                 var vp = CZ.Common.vc.virtualCanvas("getViewport");

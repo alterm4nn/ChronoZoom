@@ -147,7 +147,6 @@ namespace Chronozoom.UI
     public partial class ChronozoomSVC : IChronozoomSVC
     {
         private static readonly StorageCache Cache = new StorageCache();
-
         private static readonly TraceSource Trace = new TraceSource("Service", SourceLevels.All) { Listeners = { Global.SignalRTraceListener } };
         private static MD5 _md5Hasher = MD5.Create();
         private const decimal _minYear = -13700000000;
@@ -308,7 +307,9 @@ namespace Chronozoom.UI
 
                 IEnumerable<Timeline> timelines = null;
                 if (!_progressiveLoadEnabled.Value || !string.IsNullOrWhiteSpace(depth))
+                {
                     timelines = storage.TimelinesQuery(collectionId, startTime, endTime, span, lcaParsed == Guid.Empty ? (Guid?)null : lcaParsed, maxElementsParsed, depthParsed);
+                }   
                 else
                 {
                     //if (ShouldRetrieveAllTimelines(storage, commonAncestor, collectionId, maxElementsParsed))

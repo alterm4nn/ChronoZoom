@@ -1818,6 +1818,7 @@ module CZ {
             elem.setAttribute("src", srcData[0]);
             elem.setAttribute("scrolling", "no");
             elem.setAttribute("frameborder", "0");
+            elem.setAttribute("sandbox", "allow-forms allow-scripts");
             this.initializeContent(elem);
 
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {

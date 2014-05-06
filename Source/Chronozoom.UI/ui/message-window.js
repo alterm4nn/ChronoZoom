@@ -31,7 +31,7 @@ var CZ;
                     direction: "left",
                     duration: 300,
                     complete: function () {
-                        $(document).on("keyup", _this, _this.onDocumentKeyPress);
+                        $(document).on("keyup", _this.onDocumentKeyPress);
                     }
                 });
             };

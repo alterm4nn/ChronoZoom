@@ -1208,6 +1208,7 @@ a:visited {
   background-position: center;
   background-image: url('../images/chronozoom.png');
   margin-left: 10px;
+  cursor: pointer;
 }
 .header-regimes {
   -webkit-transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
@@ -1255,6 +1256,7 @@ a:visited {
 }
 .header-icon[data-enabled~="true"]:hover {
   background-color: #0464a2;
+  cursor: pointer;
 }
 .header-icon[disabled="disabled"] {
   opacity: 0.5;
@@ -1262,6 +1264,7 @@ a:visited {
 .header-icon[disabled="disabled"].active,
 .header-icon[disabled="disabled"]:hover {
   background-color: transparent;
+  cursor: default;
 }
 .tour-icon {
   background-image: url('../images/tour-icon.png');
@@ -1286,6 +1289,9 @@ a:visited {
   background-image: url('../images/profile-icon.png');
   background-position-x: 3px;
   display: inline-block;
+}
+#login-button {
+  cursor: pointer;
 }
 #login-panel label.header-icon-label {
   margin-left: 0px;

@@ -262,8 +262,13 @@ module CZ {
             // Register ChronoZoom Media Pickers.
             CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
-
             CZ.Common.initialize();
+
+            // hook logo click
+            $('.header-logo').click(function () {
+                $('.home-icon').trigger('click');
+            });
+
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
@@ -864,7 +869,11 @@ module CZ {
             });
 
             $(window).bind('resize', function () {
-                timeSeriesChart.updateCanvasHeight();
+
+                if (timeSeriesChart) {
+                    timeSeriesChart.updateCanvasHeight();
+                }
+
                 CZ.Common.updateLayout();
 
                 //updating timeSeries chart
