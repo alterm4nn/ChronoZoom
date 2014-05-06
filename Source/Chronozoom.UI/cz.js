@@ -15304,6 +15304,19 @@ var CZ;
         }
         StartPage.fillMyTimelinesList = fillMyTimelinesList;
 
+        function startExploring() {
+            var urlParts = window.location.href.replace('//', '').toLowerCase().split('/');
+
+            CZ.StartPage.hide();
+
+            if (urlParts[1] == '#') {
+                $('#regime-link-cosmos').trigger('click');
+            } else {
+                window.location.href = '/#/cosmos';
+            }
+        }
+        StartPage.startExploring = startExploring;
+
         function TwitterLayout(target, idx) {
             var ListTemplate = "#template-tweet-list .tweet-list-item";
             var ListElem = "#TwitterBlock-list";

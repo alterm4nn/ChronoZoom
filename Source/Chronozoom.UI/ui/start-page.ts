@@ -544,7 +544,23 @@ module CZ {
             }
         }
 
- 
+        export function startExploring() {
+
+            var urlParts = window.location.href.replace('//', '').toLowerCase().split('/');
+
+            CZ.StartPage.hide();
+
+            if (urlParts[1] == '#') {
+                // cosmos supercollection - expand out to full view
+                $('#regime-link-cosmos').trigger('click');
+            }
+            else {
+                // a different supercollection - switch to cosmos
+                window.location.href = '/#/cosmos';
+            }
+
+        }
+        
         export function TwitterLayout(target, idx) {
             var ListTemplate = "#template-tweet-list .tweet-list-item";
             var ListElem = "#TwitterBlock-list";
