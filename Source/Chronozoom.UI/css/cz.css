@@ -1970,9 +1970,13 @@ img.fallbackBackground {
 .table-blue thead,
 .table-blue tfoot {
   background-color: #efefef;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 .table-blue tbody {
   background-color: #efefef;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
   font-size: 0.9em;
   display: block;
   overflow-y: auto;
