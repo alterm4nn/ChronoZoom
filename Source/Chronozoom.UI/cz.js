@@ -13357,8 +13357,8 @@ var CZ;
             };
 
             FormEditExhibit.prototype.close = function (noAnimation) {
-                var _this = this;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
@@ -13615,8 +13615,8 @@ var CZ;
             };
 
             FormEditCI.prototype.close = function (noAnimation) {
-                var _this = this;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
@@ -15184,6 +15184,20 @@ var CZ;
             }
         }
         StartPage.fillMyTimelinesList = fillMyTimelinesList;
+
+        function startExploring() {
+            var urlParts = window.location.href.replace('//', '').toLowerCase().split('/');
+
+            CZ.StartPage.hide();
+
+            if (urlParts[1] == '#') {
+                $('#regime-link-cosmos').trigger('click');
+            } else {
+                window.location.href = '/#/cosmos';
+            }
+        }
+        StartPage.startExploring = startExploring;
+        StartPage.startExploring = startExploring;
 
         function TwitterLayout(target, idx) {
             var ListTemplate = "#template-tweet-list .tweet-list-item";
