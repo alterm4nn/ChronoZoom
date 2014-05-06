@@ -77,13 +77,14 @@
     // hook add to editors' list in UI
     $('#tblAddEditors button').click(function (event)
     {
+        // remove any existing '--none--' display
+        $('#tblDelEditors tbody .none').remove();
+
+        // for each user checked for adding
         $('#tblAddEditors tbody input:checked').each(function (index)
         {
             var userId   = $(this).closest('tr').attr('data-id');
             var userName = $(this).parent('td').next().attr('title');
-
-            // remove any existing '--none--' display
-            if ($('#tblDelEditors tbody .none').length > 0) $('#tblDelEditors tbody .none').remove();
 
             // only insert into editors' list if not already present there
             if ($('#tblDelEditors tbody tr[data-id="' + userId + '"]').length == 0)
@@ -97,6 +98,12 @@
                 );
             }
         });
+
+        // if there are no users, add '--none--' display
+        if ($('#tblDelEditors tbody').children().length == 0)
+        {
+            $('#tblDelEditors tbody').html('<tr class="none"><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
+        }
     });
 
     // initial focus on search box

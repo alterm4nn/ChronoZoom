@@ -20,9 +20,10 @@ module CZ
                 // populate list of existing editors
                 CZ.Service.getMembers().done(data => {
                     if (data.length == 0) {
-                        $('#tblDelEditors tbody').append('<tr><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
+                        $('#tblDelEditors tbody').html('<tr class="none"><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
                     }
                     else {
+                        $('#tblDelEditors tbody').html('');
                         data.forEach(function (member) {
                             $('#tblDelEditors tbody').append
                             (
@@ -59,9 +60,13 @@ module CZ
                 });
 
                 // send chosen list of user ids when save button is clicked
-                $('.cz-form-save').off().click(function (event) {
+                $('#auth-edit-collection-editors .cz-form-save').off().click(function (event) {
 
-                    var userIds = JSON.stringify($('#tblDelEditors tbody tr').attr('data-id'));
+                    var userIds = new Array();
+
+                    $('#tblDelEditors tbody tr:not(.none)').each(function (index) {
+                        userIds.push($(this).attr('data-id'));
+                    });
 
                     CZ.Service.putMembers(CZ.Service.superCollectionName, CZ.Service.collectionName, userIds).always(() => {
                         $('#auth-edit-collection-editors').hide();

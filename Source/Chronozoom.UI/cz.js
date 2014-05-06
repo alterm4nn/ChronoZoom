@@ -13970,14 +13970,13 @@ var CZ;
         var FormManageEditors = (function (_super) {
             __extends(FormManageEditors, _super);
             function FormManageEditors(container, formInfo) {
-                var _this = this;
                 _super.call(this, container, formInfo);
-                this.saveButton = container.find(formInfo.saveButton);
 
                 CZ.Service.getMembers().done(function (data) {
                     if (data.length == 0) {
-                        $('#tblDelEditors tbody').append('<tr><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
+                        $('#tblDelEditors tbody').html('<tr class="none"><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
                     } else {
+                        $('#tblDelEditors tbody').html('');
                         data.forEach(function (member) {
                             $('#tblDelEditors tbody').append('<tr data-id="' + member.User.Id + '">' + '<td class="delete" title="Remove Editor"></td>' + '<td title="' + member.User.DisplayName + '">' + member.User.DisplayName + '</td>' + '</tr>');
                         });
@@ -14000,11 +13999,15 @@ var CZ;
                     });
                 });
 
-                this.saveButton.off().click(function (event) {
-                    var userIds = JSON.stringify($('#tblDelEditors tbody tr').attr('data-id'));
+                $('#auth-edit-collection-editors .cz-form-save').off().click(function (event) {
+                    var userIds = new Array();
+
+                    $('#tblDelEditors tbody tr:not(.none)').each(function (index) {
+                        userIds.push($(this).attr('data-id'));
+                    });
 
                     CZ.Service.putMembers(CZ.Service.superCollectionName, CZ.Service.collectionName, userIds).always(function () {
-                        _this.close();
+                        $('#auth-edit-collection-editors').hide();
                     });
                 });
             }

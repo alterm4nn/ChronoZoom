@@ -1987,6 +1987,24 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        public bool UserIsMember(string collectionId)
+        {
+            Guid collectionGUID = new Guid(collectionId);
+
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                return // is owner or (members are allowed and is member)
+                    (storage.Collections.Where(c => c.Id == collectionGUID && c.User.Id == user.Id).Count() > 0) ||
+                    (
+                        (storage.Collections.Where(c => c.Id == collectionGUID && c.MembersAllowed).Count() > 0) &&
+                        (storage.Members.Where(m => m.User.Id == user.Id && m.Collection.Id == collectionGUID).Count() > 0)
+                    );
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
         public IEnumerable<Member> GetMembers(string superCollection, string collection)
         {
             return ApiOperation(delegate(User user, Storage storage)
@@ -2002,12 +2020,38 @@ namespace Chronozoom.UI
         /// </summary>
         public bool PutMembers(string superCollection, string collection, IEnumerable<Guid> userIds)
         {
-            foreach (Guid userId in userIds)
+            return ApiOperation(delegate(User user, Storage storage)
             {
-                Debugger.Log(1, "PutMembers GUID", userId.ToString());
-            }
+                Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
 
-            return false; // TODO
+                // ascertain if current user has right to edit the collection membership
+                if (UserIsMember(collectionId.ToString()))
+                {
+                    // EF extended not installed so no RemoveAll or other batch options. Therefore instead of
+                    // one db call per userId, will batch up into just a couple of bulk sql commands...
+
+                    // remove existing users
+                    storage.Database.ExecuteSqlCommand("DELETE FROM Members WHERE Collection_Id = {0};", collectionId);
+
+                    // add new user list
+                    if (userIds.Count() > 0)
+                    {
+                        string sql = "INSERT INTO Members (Id, Collection_Id, User_Id) VALUES ";
+                        foreach (Guid userId in userIds)
+                        {
+                            sql += "('" + Guid.NewGuid().ToString() + "', '" + collectionId.ToString() + "', '" + userId.ToString().Replace("'", "") + "'),";
+                        }
+                        sql = sql.Remove(sql.Length - 1) + ";";
+                        storage.Database.ExecuteSqlCommand(sql);
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            });
         }
 
         private static bool FindParentTimeline(Storage storage, Guid? parentTimelineGuid, out Timeline parentTimeline)

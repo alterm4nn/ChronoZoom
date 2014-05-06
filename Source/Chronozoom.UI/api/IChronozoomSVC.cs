@@ -539,6 +539,17 @@ namespace Chronozoom.UI
         IEnumerable<User> FindUsers(string partialName);
 
         /// <summary>
+        /// Returns true/force depending on if the currently logged in user has a membership to the specified collection.
+        /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection.</param>
+        /// <param name="collection">Name of the collection.</param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/user/ismember/{collectionId}")]
+        bool UserIsMember(string collectionId);
+
+        /// <summary>
         /// Returns a list of members and their user records who have editing rights to the specified collection.
         /// </summary>
         /// <param name="superCollection">Name of the super collection.</param>
