@@ -13822,6 +13822,9 @@ var CZ;
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
 
                 CZ.Service.getCollection().done(function (data) {
+                    var themeFromDb = JSON.parse(data.theme);
+                    if (themeFromDb != null)
+                        $(_this.kioskmodeInput).prop('checked', themeFromDb.kioskMode);
                     $(_this.chkEditors).prop('checked', data.MembersAllowed);
                     _this.renderManageEditorsButton();
                 });

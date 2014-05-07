@@ -141,7 +141,9 @@ module CZ {
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
 
                 CZ.Service.getCollection().done(data => {
-                    $(this.chkEditors).prop('checked', data.MembersAllowed );
+                    var themeFromDb = JSON.parse(data.theme);
+                    if (themeFromDb != null) $(this.kioskmodeInput).prop('checked', themeFromDb.kioskMode);
+                    $(this.chkEditors).prop('checked', data.MembersAllowed);
                     this.renderManageEditorsButton();
                 });
 
