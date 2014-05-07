@@ -171,6 +171,23 @@
         }
         Service.getCollections = getCollections;
 
+        function getCollection() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("data");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getCollection = getCollection;
+
         function findUsers(partialName) {
             CZ.Authoring.resetSessionTimer();
 

@@ -162,12 +162,28 @@ module CZ {
             */
 
         // .../{superCollectionName}/collections
-        // NOTE: Not implemented in current API.
         export function getCollections(superCollectionName: string) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
             request.addToPath("collections");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
+        // .../{supercollection}/{collection}/data
+        export function getCollection() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("data");
 
             return $.ajax({
                 type: "GET",
@@ -192,7 +208,6 @@ module CZ {
                 url: request.url
             });
         }
-
 
         // .../{supercollection}/{collection}/members
         export function getMembers() {

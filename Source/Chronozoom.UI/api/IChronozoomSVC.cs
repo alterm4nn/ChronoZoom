@@ -530,6 +530,16 @@ namespace Chronozoom.UI
         IEnumerable<Collection> GetCollections(string superCollectionName);
 
         /// <summary>
+        /// Returns core data for a single collection, including owner and theme. Members and timelines are not included.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection.</param>
+        /// <param name="collection">Name of the collection.</param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/data")]
+        Collection GetCollection(string superCollection, string collection);
+
+        /// <summary>
         /// Returns a list of users whose display names match the partial display name provided as a parameter.
         /// </summary>
         /// <param name="partialName">Part of a User's DisplayName.</param>

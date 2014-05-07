@@ -828,7 +828,8 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
 
-                collection.Theme = collectionRequest.Theme;
+                collection.Theme            = collectionRequest.Theme;
+                collection.MembersAllowed   = collectionRequest.MembersAllowed;
 
                 storage.SaveChanges();
                 return collection.Id;
@@ -1947,6 +1948,19 @@ namespace Chronozoom.UI
 
                 storage.Entry(superCollection).Collection(x => x.Collections).Load();
                 return superCollection.Collections;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public Collection GetCollection(string superCollection, string collection)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
+                Collection rv = storage.Collections.Where(c => c.Id == collectionId).FirstOrDefault();
+                return rv;
             });
         }
 

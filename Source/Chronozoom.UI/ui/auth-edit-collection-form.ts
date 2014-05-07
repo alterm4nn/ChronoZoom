@@ -112,11 +112,12 @@ module CZ {
                     this.updateCollectionTheme(true);
                     this.activeCollectionTheme = this.collectionTheme;
 
-                    var themeData = {
-                        theme: JSON.stringify(this.collectionTheme)
+                    var collectionData = {
+                        theme: JSON.stringify(this.collectionTheme),
+                        MembersAllowed: $(this.chkEditors).prop('checked')
                     };
 
-                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, themeData).always(() => {
+                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, collectionData).always(() => {
                         this.saveButton.prop('disabled', false);
                         this.close();
                     })
@@ -139,8 +140,14 @@ module CZ {
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
 
-                // TODO: populate chkEditors then call this.renderManageEditorsButton();
-                this.chkEditors.off().click(event => { this.renderManageEditorsButton(); });
+                CZ.Service.getCollection().done(data => {
+                    $(this.chkEditors).prop('checked', data.MembersAllowed );
+                    this.renderManageEditorsButton();
+                });
+
+                this.chkEditors.off().click(event => {
+                    this.renderManageEditorsButton();
+                });
             }
 
             private colorIsRgba(color: string) {

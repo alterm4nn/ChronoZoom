@@ -76,11 +76,12 @@ var CZ;
                     _this.updateCollectionTheme(true);
                     _this.activeCollectionTheme = _this.collectionTheme;
 
-                    var themeData = {
-                        theme: JSON.stringify(_this.collectionTheme)
+                    var collectionData = {
+                        theme: JSON.stringify(_this.collectionTheme),
+                        MembersAllowed: $(_this.chkEditors).prop('checked')
                     };
 
-                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, themeData).always(function () {
+                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, collectionData).always(function () {
                         _this.saveButton.prop('disabled', false);
                         _this.close();
                     });
@@ -103,6 +104,11 @@ var CZ;
                 this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
+
+                CZ.Service.getCollection().done(function (data) {
+                    $(_this.chkEditors).prop('checked', data.MembersAllowed);
+                    _this.renderManageEditorsButton();
+                });
 
                 this.chkEditors.off().click(function (event) {
                     _this.renderManageEditorsButton();
