@@ -15706,7 +15706,7 @@ var CZ;
             CZ.Common.initialize();
 
             $('.header-logo').click(function () {
-                $('.home-icon').trigger('click');
+                window.location.href = '/';
             });
 
             CZ.UILoader.loadAll(_uiMap).done(function () {
