@@ -268,7 +268,8 @@ module CZ {
 
             // hook logo click
             $('.header-logo').click(function () {
-                $('.home-icon').trigger('click');
+                //$('.home-icon').trigger('click');
+                window.location.href = '/';
             });
 
             CZ.UILoader.loadAll(_uiMap).done(function () {
