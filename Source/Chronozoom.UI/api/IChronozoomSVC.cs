@@ -552,8 +552,7 @@ namespace Chronozoom.UI
         /// Returns true/force depending on if the currently logged in user has a membership to the specified collection.
         /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
         /// </summary>
-        /// <param name="superCollection">Name of the super collection.</param>
-        /// <param name="collection">Name of the collection.</param>
+        /// <param name="collectionId">GUID of the collection. (Not of the super-collection.)</param>
         /// <returns></returns>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/user/ismember/{collectionId}")]
