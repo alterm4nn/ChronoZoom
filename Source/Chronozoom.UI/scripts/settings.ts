@@ -257,7 +257,7 @@ module CZ {
 
         // WL API constants
         export var WLAPIClientID = "0000000040101FFA";
-        export var WLAPIRedirectUrl = "http://chronozoom.localhost/"; // "http://test.chronozoom.com/";
+        export var WLAPIRedirectUrl = "http://test.chronozoom.com/";
 
         export var errorMessageSlideDuration = 0; // slide animation duration of input error messages
     }
