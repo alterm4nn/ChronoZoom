@@ -1586,9 +1586,9 @@ var CZ;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if (this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
-                    } else if (this.contentItem.mediaType.toLowerCase() === 'skydrive-document') {
+                    } else if (this.contentItem.mediaType.toLowerCase() === 'onedrive-document') {
                         VCContent.addSkydriveDocument(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
-                    } else if (this.contentItem.mediaType.toLowerCase() === 'skydrive-image') {
+                    } else if (this.contentItem.mediaType.toLowerCase() === 'onedrive-image') {
                         VCContent.addSkydriveImage(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if (CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
                         VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);

@@ -270,10 +270,10 @@ module CZ {
                 var clearError: boolean = true;
 
                 // Using tempSource is less than ideal; however, SkyDrive does not support any permanent link to the file and therefore we will warn users. Future: Create an image cache in the server.
-                if (this.contentItem.mediaType == "skydrive-image") {
+                if (this.contentItem.mediaType == "onedrive-image") {
                     this.backgroundInput.val(this.contentItem.tempSource || "");
                     clearError = false;
-                    this.backgroundInput.showError("SkyDrive static links are not permanent. Consider hosting it as a public image instead.");
+                    this.backgroundInput.showError("OneDrive static links are not permanent. Consider hosting it as a public image instead.");
                 }
                 else {
                     this.backgroundInput.val(this.contentItem.uri || "");

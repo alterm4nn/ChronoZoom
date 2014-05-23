@@ -2405,9 +2405,9 @@ var CZ;
                         addAudio(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if (this.contentItem.mediaType.toLowerCase() === 'pdf') {
                         VCContent.addPdf(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
-                    } else if (this.contentItem.mediaType.toLowerCase() === 'skydrive-document') {
+                    } else if (this.contentItem.mediaType.toLowerCase() === 'onedrive-document') {
                         VCContent.addSkydriveDocument(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
-                    } else if (this.contentItem.mediaType.toLowerCase() === 'skydrive-image') {
+                    } else if (this.contentItem.mediaType.toLowerCase() === 'onedrive-image') {
                         VCContent.addSkydriveImage(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if (CZ.Extensions.mediaTypeIsExtension(contentItem.mediaType)) {
                         VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
@@ -5406,17 +5406,17 @@ var CZ;
                             isValid = false;
                         }
                     }
-                } else if (ci.mediaType.toLowerCase() === "skydrive-document") {
-                    var skydrive = /skydrive\.live\.com\/embed/;
+                } else if (ci.mediaType.toLowerCase() === "onedrive-document") {
+                    var skydrive = /onedrive\.live\.com\/embed/;
 
                     if (!skydrive.test(ci.uri)) {
-                        alert("This is not a Skydrive embed link.");
+                        alert("This is not a OneDrive embed link.");
                         isValid = false;
                     }
-                } else if (ci.mediaType.toLowerCase() === "skydrive-image") {
+                } else if (ci.mediaType.toLowerCase() === "onedrive-image") {
                     var splited = ci.uri.split(' ');
 
-                    var skydrive = /skydrive\.live\.com\/embed/;
+                    var skydrive = /onedrive\.live\.com\/embed/;
 
                     var width = /[0-9]/;
 
@@ -5424,7 +5424,7 @@ var CZ;
 
                     if (!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
                         if (mediaInput) {
-                            mediaInput.showError("This is not a Skydrive embed link.");
+                            mediaInput.showError("This is not a OneDrive embed link.");
                         }
 
                         isValid = false;
@@ -12649,10 +12649,10 @@ var CZ;
             function getEmbed(response) {
                 switch (response.data.files[0].type) {
                     case "photo":
-                        mediaType = "skydrive-image";
+                        mediaType = "onedrive-image";
                         break;
                     default:
-                        mediaType = "skydrive-document";
+                        mediaType = "onedrive-document";
                         break;
                 }
 
@@ -12668,7 +12668,7 @@ var CZ;
 
                 var uri = src;
 
-                if (mediaType === "skydrive-image") {
+                if (mediaType === "onedrive-image") {
                     var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
                     var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
                     uri += ' ' + width + ' ' + height;
@@ -12696,7 +12696,7 @@ var CZ;
             }
 
             function onLogout() {
-                if (window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
+                if (window.confirm("Are you sure want to logout from OneDrive? All your unsaved changes will be lost.")) {
                     SkyDriveMediaPicker.logoutButton.hide();
                     SkyDriveMediaPicker.helperText.hide();
                     SkyDriveMediaPicker.filePicker.cancel();
@@ -13549,14 +13549,14 @@ var CZ;
                     }
                 });
 
-                if (CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
+                if (CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='onedrive-image']").length === 0) {
                     $("<option></option>", {
-                        value: "skydrive-image",
-                        text: " Skydrive Image "
+                        value: "onedrive-image",
+                        text: " OneDrive Image "
                     }).appendTo(this.mediaTypeInput);
                     $("<option></option>", {
-                        value: "skydrive-document",
-                        text: " Skydrive Document "
+                        value: "onedrive-document",
+                        text: " OneDrive Document "
                     }).appendTo(this.mediaTypeInput);
                 }
 
@@ -13948,10 +13948,10 @@ var CZ;
             FormEditCollection.prototype.updateMediaInfo = function () {
                 var clearError = true;
 
-                if (this.contentItem.mediaType == "skydrive-image") {
+                if (this.contentItem.mediaType == "onedrive-image") {
                     this.backgroundInput.val(this.contentItem.tempSource || "");
                     clearError = false;
-                    this.backgroundInput.showError("SkyDrive static links are not permanent. Consider hosting it as a public image instead.");
+                    this.backgroundInput.showError("OneDrive static links are not permanent. Consider hosting it as a public image instead.");
                 } else {
                     this.backgroundInput.val(this.contentItem.uri || "");
                 }

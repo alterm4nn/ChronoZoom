@@ -66,10 +66,10 @@ module CZ {
             function getEmbed(response) {
                 switch (response.data.files[0].type) {
                     case "photo":
-                        mediaType = "skydrive-image";
+                        mediaType = "onedrive-image";
                         break;
                     default:
-                        mediaType = "skydrive-document";
+                        mediaType = "onedrive-document";
                         break;
                 }
 
@@ -89,7 +89,7 @@ module CZ {
                 
                 var uri = src;
 
-                if (mediaType === "skydrive-image") {
+                if (mediaType === "onedrive-image") {
                     var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
                     var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
                     uri += ' ' + width + ' ' + height;
@@ -124,7 +124,7 @@ module CZ {
              * Logout and closes file picker and opens login dialog.
              */
             function onLogout() {
-                if (window.confirm("Are you sure want to logout from Skydrive? All your unsaved changes will be lost.")) {
+                if (window.confirm("Are you sure want to logout from OneDrive? All your unsaved changes will be lost.")) {
                     logoutButton.hide();
                 helperText.hide();
                     filePicker.cancel();
