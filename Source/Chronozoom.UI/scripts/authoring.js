@@ -616,17 +616,17 @@
                             isValid = false;
                         }
                     }
-                } else if (ci.mediaType.toLowerCase() === "onedrive-document") {
-                    var skydrive = /onedrive\.live\.com\/embed/;
+                } else if (ci.mediaType.toLowerCase() === "skydrive-document") {
+                    var skydrive = /skydrive\.live\.com\/embed/;
 
                     if (!skydrive.test(ci.uri)) {
-                        alert("This is not a OneDrive embed link.");
+                        alert("This is not a Skydrive embed link.");
                         isValid = false;
                     }
-                } else if (ci.mediaType.toLowerCase() === "onedrive-image") {
+                } else if (ci.mediaType.toLowerCase() === "skydrive-image") {
                     var splited = ci.uri.split(' ');
 
-                    var skydrive = /onedrive\.live\.com\/embed/;
+                    var skydrive = /skydrive\.live\.com\/embed/;
 
                     var width = /[0-9]/;
 
@@ -634,7 +634,7 @@
 
                     if (!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
                         if (mediaInput) {
-                            mediaInput.showError("This is not a OneDrive embed link.");
+                            mediaInput.showError("This is not a Skydrive embed link.");
                         }
 
                         isValid = false;

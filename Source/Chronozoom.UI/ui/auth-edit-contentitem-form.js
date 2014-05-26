@@ -84,14 +84,14 @@ var CZ;
                     }
                 });
 
-                if (CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='onedrive-image']").length === 0) {
+                if (CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
                     $("<option></option>", {
-                        value: "onedrive-image",
-                        text: " OneDrive Image "
+                        value: "skydrive-image",
+                        text: " Skydrive Image "
                     }).appendTo(this.mediaTypeInput);
                     $("<option></option>", {
-                        value: "onedrive-document",
-                        text: " OneDrive Document "
+                        value: "skydrive-document",
+                        text: " Skydrive Document "
                     }).appendTo(this.mediaTypeInput);
                 }
 

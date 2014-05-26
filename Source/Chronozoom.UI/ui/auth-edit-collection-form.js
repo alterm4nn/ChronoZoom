@@ -232,10 +232,10 @@ var CZ;
             FormEditCollection.prototype.updateMediaInfo = function () {
                 var clearError = true;
 
-                if (this.contentItem.mediaType == "onedrive-image") {
+                if (this.contentItem.mediaType == "skydrive-image") {
                     this.backgroundInput.val(this.contentItem.tempSource || "");
                     clearError = false;
-                    this.backgroundInput.showError("OneDrive static links are not permanent. Consider hosting it as a public image instead.");
+                    this.backgroundInput.showError("SkyDrive static links are not permanent. Consider hosting it as a public image instead.");
                 } else {
                     this.backgroundInput.val(this.contentItem.uri || "");
                 }

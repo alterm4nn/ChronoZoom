@@ -1191,7 +1191,7 @@ namespace Chronozoom.UI
             error = "";
 
             // Custom validation for Skydrive images
-            if (contentitem.MediaType == "onedrive-image")
+            if (contentitem.MediaType == "skydrive-image")
             {
                 // Parse url parameters. url pattern is - {url} {width} {height}
                 var splited = contentitem.Uri.Split(' ');
