@@ -2247,7 +2247,8 @@ namespace Chronozoom.UI
             }
             else
             {
-                return collection.User.NameIdentifier == user.NameIdentifier;
+              //return collection.User.NameIdentifier == user.NameIdentifier;   // <-- old code - only author can edit collection
+                return Instance.UserIsMember(collection.Id.ToString());         // <-- new code - author or editor can edit collection
             }
         }
 
