@@ -138,7 +138,7 @@ module CZ {
                     "box ex3 ex4 ex6"
                 ],
             },
-                        {
+            {
                 "Name": "#MyTimelinesBlock-tiles",
                 "Visibility": [
                     "box",
@@ -173,7 +173,7 @@ module CZ {
                 height = $image.height();
                 $startPage.hide();
             }
-            
+
             var naturalHeight = imageProps.naturalHeight;
             var naturalWidth = imageProps.naturalWidth;
             var ratio = naturalWidth / naturalHeight;
@@ -211,23 +211,23 @@ module CZ {
             }
         }
 
-       export function cloneListTemplate(template,target,idx){
-            for( var i = 0; i < tileData.length; i++){
-                var o=$(template).clone( true, true).appendTo(target);
-                o.attr("id","l"+idx+"i"+i);
-                $("#l" + idx + "i" + i + " .li-title a").attr("href",tileData[i].URL);
+        export function cloneListTemplate(template, target, idx) {
+            for (var i = 0; i < tileData.length; i++) {
+                var o = $(template).clone(true, true).appendTo(target);
+                o.attr("id", "l" + idx + "i" + i);
+                $("#l" + idx + "i" + i + " .li-title a").attr("href", tileData[i].URL);
                 $("#l" + idx + "i" + i + " .li-title a").text(tileData[i].Title);
                 $("#l" + idx + "i" + i + " .li-author").text(tileData[i].Author);
                 $("#l" + idx + "i" + i + " .li-icon").text(tileData[i].Thumbnail);
             }
         }
-        
-        export function cloneTweetTemplate(template, target, idx){
+
+        export function cloneTweetTemplate(template, target, idx) {
             for (var i = 0; i < target[idx].Visibility.length; i++) {
                 var o = $(template).clone(true, true).appendTo(target[idx].Name);
                 o.attr("class", target[idx].Visibility[i]);
                 o.attr("id", "m" + idx + "i" + i);
-               }
+            }
         }
 
         export function PlayIntroTour() {
@@ -258,14 +258,14 @@ module CZ {
             CZ.Tours.activateTour(introTour, undefined);
         }
 
-        export function listFlip(name){
-            if( 'block' != document.getElementById(name+'-list').style.display){
-                document.getElementById(name+'-list').style.display = 'block';
-                document.getElementById(name+'-tiles').style.display = 'none';
+        export function listFlip(name) {
+            if ('block' != document.getElementById(name + '-list').style.display) {
+                document.getElementById(name + '-list').style.display = 'block';
+                document.getElementById(name + '-tiles').style.display = 'none';
                 $("#" + name).find(".list-view-icon").addClass("active");
             } else {
-                document.getElementById(name+'-list').style.display = 'none';
-                document.getElementById(name+'-tiles').style.display = 'block';
+                document.getElementById(name + '-list').style.display = 'none';
+                document.getElementById(name + '-tiles').style.display = 'block';
                 $("#" + name).find(".list-view-icon").removeClass("active");
                 $(window).resize();
             }
@@ -308,17 +308,17 @@ module CZ {
                         $image: $this,
                         imageProps: imageProps
                     }, function (event) {
-                        resizeCrop(event.data.$image, event.data.imageProps);
-                    });
+                            resizeCrop(event.data.$image, event.data.imageProps);
+                        });
 
                     // Show the tile with transition.
                     setTimeout(function () {
                         event.data.visible();
                     }, 0);
                 }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
+                        src: timeline.ImageUrl,
+                        alt: timeline.Title
+                    });
 
                 // Set title and author.
                 $tileTitle.text(timeline.Title.trim() || "No title :(");
@@ -330,7 +330,7 @@ module CZ {
             var template = "#template-timeline-list .timeline-list-item";
             var target = "#FeaturedTimelinesBlock-list";
 
-            for (var i = 0; i < Math.min(tileData.length, timelines.length); i++){
+            for (var i = 0; i < Math.min(tileData.length, timelines.length); i++) {
                 var timeline = timelines[i];
                 var timelineUrl = timeline.TimelineUrl;
 
@@ -356,9 +356,9 @@ module CZ {
                     // Resize and crop the image.
                     resizeCrop($this, imageProps, true);
                 }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
+                        src: timeline.ImageUrl,
+                        alt: timeline.Title
+                    });
             }
         }
 
@@ -399,17 +399,17 @@ module CZ {
                         $image: $this,
                         imageProps: imageProps
                     }, function (event) {
-                        resizeCrop(event.data.$image, event.data.imageProps);
-                    });
+                            resizeCrop(event.data.$image, event.data.imageProps);
+                        });
 
                     // Show the tile with transition.
                     setTimeout(function () {
                         event.data.visible();
                     }, 0);
                 }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
+                        src: timeline.ImageUrl,
+                        alt: timeline.Title
+                    });
 
                 // Set title and author.
                 $tileTitle.text(timeline.Title.trim() || "No title :(");
@@ -421,7 +421,7 @@ module CZ {
             var template = "#template-timeline-list .timeline-list-item";
             var target = "#FavoriteTimelinesBlock-list";
 
-            for (var i = 0; i < Math.min(tileData.length, timelines.length) ; i++) {
+            for (var i = 0; i < Math.min(tileData.length, timelines.length); i++) {
                 var timeline = timelines[i];
                 var timelineUrl = timeline.TimelineUrl;
 
@@ -447,9 +447,9 @@ module CZ {
                     // Resize and crop the image.
                     resizeCrop($this, imageProps, true);
                 }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
+                        src: timeline.ImageUrl,
+                        alt: timeline.Title
+                    });
             }
         }
 
@@ -545,11 +545,11 @@ module CZ {
         }
 
         export function startExploring() {
-
+            
             var urlParts = window.location.href.replace('//', '').toLowerCase().split('/');
-
+            
             CZ.StartPage.hide();
-
+            
             if (urlParts[1] == '#') {
                 // cosmos supercollection - expand out to full view
                 $('#regime-link-cosmos').trigger('click');
@@ -560,7 +560,7 @@ module CZ {
             }
 
         }
-        
+
         export function TwitterLayout(target, idx) {
             var ListTemplate = "#template-tweet-list .tweet-list-item";
             var ListElem = "#TwitterBlock-list";
@@ -598,14 +598,14 @@ module CZ {
                         /(@([A-Za-z0-9_]+))/gi,
                         "<a class='tweet-message-link' target='blank' \
                         href='https://twitter.com/$2'>$1</a>"
-                    );
+                        );
 
                     // Replace all #tags with links.
                     text = text.replace(
                         /(#([A-Za-z0-9_]+))/gi,
                         "<a class='tweet-message-link' target='blank' \
                         href='https://twitter.com/search?q=$2&f=realtime'>$1</a>"
-                    );
+                        );
 
                     // Set tweet's properties to corresponding elements.
                     $tileMessage.html(text).attr("href", tweetLink);
@@ -615,7 +615,7 @@ module CZ {
 
                     // Set avatar.
                     $tileAvatar.attr("src", photo);
-              
+
                     // List View.
                     var $tweetListItem = $(ListTemplate).clone(true, true).appendTo(ListElem);
                     var $listItemMessage = $tweetListItem.find(".tweet-li-message");
@@ -623,7 +623,7 @@ module CZ {
                     var $listItemFullname = $tweetListItem.find(".tweet-li-header .tweet-li-fullname");
                     var $listItemAvatar = $tweetListItem.find(".tweet-li-header .tweet-li-avatar");
                     var $listItemDate = $tweetListItem.find(".tweet-li-footer .tweet-li-date");
-                    
+
                     $tweetListItem.attr("id", "l" + idx + "i" + i);
                     $listItemMessage.html(text).attr("href", tweetLink);
                     $listItemUsername.text("@" + username).attr("href", tweetUsernameLink);
@@ -639,7 +639,7 @@ module CZ {
             });
         }
 
-        export function show() {      
+        export function show() {
             var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
             $(".home-icon").addClass("active");
 
@@ -707,8 +707,8 @@ module CZ {
                     show();
                 }
             });
-            
-            
+
+
 
             // TODO: Replace with current user.
             CZ.Service.getUserFeatured().done(function (response) {
@@ -736,16 +736,16 @@ module CZ {
                 if (timelines.length === 0) {
                     $("#FavoriteTimelinesBlock .list-view-icon").hide();
                     $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." +
-                         " Click star icon of the timeline you like to save it as favorite.");
+                        " Click star icon of the timeline you like to save it as favorite.");
                 }
                 else {
                     fillFavoriteTimelines(timelines);
                     fillFavoriteTimelinesList(timelines);
                 }
             },
-            error => {
-                console.log("[ERROR] getUserFavorites");
-            });
+                error => {
+                    console.log("[ERROR] getUserFavorites");
+                });
 
             //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
             //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
@@ -765,7 +765,7 @@ module CZ {
                     error => {
                         console.log("[ERROR] getUserTimelines");
                     }
-                );
+                    );
             });
 
 
