@@ -2007,6 +2007,8 @@ namespace Chronozoom.UI
 
             return ApiOperation(delegate(User user, Storage storage)
             {
+                if (user == null) return false;
+
                 return // is owner or (members are allowed and is member)
                     (storage.Collections.Where(c => c.Id == collectionGUID && c.User.Id == user.Id).Count() > 0) ||
                     (
@@ -2023,6 +2025,8 @@ namespace Chronozoom.UI
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
+                if (user == null) return false;
+
                 Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
                 return UserIsMember(collectionId.ToString());
             });

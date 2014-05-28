@@ -15872,7 +15872,10 @@ var CZ;
                 CZ.Service.canEdit = false;
                 finishLoad();
             } else {
-                finishLoad();
+                CZ.Service.getCanEdit().done(function (result) {
+                    CZ.Service.canEdit = (result === true);
+                    finishLoad();
+                });
             }
         });
 
