@@ -110,19 +110,15 @@ var CZ;
         HomePageViewModel.rootCollection;
 
         function UserCanEditCollection(profile) {
-            if (!constants || !constants.environment || constants.environment === "localhost") {
-                return true;
-            }
-
-            if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
-                return true;
-            }
-
-            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
+            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || !CZ.Service.collectionName) {
                 return false;
             }
 
-            return true;
+            if (CZ.Service.superCollectionName.toLowerCase() === "sandbox" && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
+                return true;
+            }
+
+            return CZ.Service.canEdit;
         }
 
         function InitializeToursUI(profile, forms) {
@@ -214,6 +210,18 @@ var CZ;
                 window.location.href = '/';
             });
 
+            if (CZ.Service.superCollectionName === undefined || CZ.Service.collectionName === undefined) {
+                CZ.Service.canEdit = false;
+                finishLoad();
+            } else {
+                CZ.Service.getCanEdit().done(function (result) {
+                    CZ.Service.canEdit = (result === true);
+                    finishLoad();
+                });
+            }
+        });
+
+        function finishLoad() {
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
@@ -811,7 +819,7 @@ var CZ;
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
-        });
+        }
 
         function IsFeatureEnabled(featureMap, featureName) {
             var feature = $.grep(featureMap, function (e) {

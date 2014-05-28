@@ -132,8 +132,9 @@
         Service.Request = Request;
         ;
 
-        Service.collectionName = "";
         Service.superCollectionName = "";
+        Service.collectionName = "";
+        Service.canEdit = false;
 
         function getTimelines(r, sc, c) {
             if (typeof sc === "undefined") { sc = Service.superCollectionName; }
@@ -203,6 +204,23 @@
             });
         }
         Service.findUsers = findUsers;
+
+        function getCanEdit() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("canedit");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getCanEdit = getCanEdit;
 
         function getMembers() {
             CZ.Authoring.resetSessionTimer();

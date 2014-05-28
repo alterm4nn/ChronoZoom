@@ -549,7 +549,7 @@ namespace Chronozoom.UI
         IEnumerable<User> FindUsers(string partialName);
 
         /// <summary>
-        /// Returns true/force depending on if the currently logged in user has a membership to the specified collection.
+        /// Returns true/force depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
         /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
         /// </summary>
         /// <param name="collectionId">GUID of the collection. (Not of the super-collection.)</param>
@@ -559,7 +559,20 @@ namespace Chronozoom.UI
         bool UserIsMember(string collectionId);
 
         /// <summary>
+        /// Returns true/force depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
+        /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
+        /// An overload to the more efficient UserIsMember(string collectionId) for when the collectionId GUID is not already known.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection.</param>
+        /// <param name="collection">Name of the collection.</param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/canedit")]
+        bool UserCanEdit(string superCollection, string collection);
+
+        /// <summary>
         /// Returns a list of members and their user records who have editing rights to the specified collection.
+        /// Does not necesssarily include owner in list.
         /// </summary>
         /// <param name="superCollection">Name of the super collection.</param>
         /// <param name="collection">Name of the collection.</param>

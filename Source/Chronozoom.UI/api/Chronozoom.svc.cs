@@ -2019,6 +2019,18 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
+        public bool UserCanEdit(string superCollection, string collection)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
+                return UserIsMember(collectionId.ToString());
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
         public IEnumerable<Member> GetMembers(string superCollection, string collection)
         {
             return ApiOperation(delegate(User user, Storage storage)

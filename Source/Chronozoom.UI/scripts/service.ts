@@ -131,8 +131,9 @@ module CZ {
 
 
         // NOTE: Clear collections to let the server decide what to load.
-        export var collectionName = "";
         export var superCollectionName = "";
+        export var collectionName = "";
+        export var canEdit = false;
 
         /**
         * Chronozoom.svc Requests.
@@ -200,6 +201,23 @@ module CZ {
             var request = new Request(_serviceUrl);
             request.addToPath("find");
             request.addToPath("users?partial=" + partialName);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
+        // .../{supercollection}/{collection}/canedit
+        export function getCanEdit() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("canedit");
 
             return $.ajax({
                 type: "GET",

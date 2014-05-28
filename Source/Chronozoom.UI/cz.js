@@ -3816,8 +3816,9 @@ var CZ;
         Service.Request = Request;
         ;
 
-        Service.collectionName = "";
         Service.superCollectionName = "";
+        Service.collectionName = "";
+        Service.canEdit = false;
 
         function getTimelines(r, sc, c) {
             if (typeof sc === "undefined") { sc = Service.superCollectionName; }
@@ -3887,6 +3888,23 @@ var CZ;
             });
         }
         Service.findUsers = findUsers;
+
+        function getCanEdit() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("canedit");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getCanEdit = getCanEdit;
 
         function getMembers() {
             CZ.Authoring.resetSessionTimer();
@@ -15750,19 +15768,15 @@ var CZ;
         HomePageViewModel.rootCollection;
 
         function UserCanEditCollection(profile) {
-            if (!constants || !constants.environment || constants.environment === "localhost") {
-                return true;
-            }
-
-            if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
-                return true;
-            }
-
-            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
+            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || !CZ.Service.collectionName) {
                 return false;
             }
 
-            return true;
+            if (CZ.Service.superCollectionName.toLowerCase() === "sandbox" && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
+                return true;
+            }
+
+            return CZ.Service.canEdit;
         }
 
         function InitializeToursUI(profile, forms) {
@@ -15854,6 +15868,15 @@ var CZ;
                 window.location.href = '/';
             });
 
+            if (CZ.Service.superCollectionName === undefined || CZ.Service.collectionName === undefined) {
+                CZ.Service.canEdit = false;
+                finishLoad();
+            } else {
+                finishLoad();
+            }
+        });
+
+        function finishLoad() {
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
@@ -16451,7 +16474,7 @@ var CZ;
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
-        });
+        }
 
         function IsFeatureEnabled(featureMap, featureName) {
             var feature = $.grep(featureMap, function (e) {

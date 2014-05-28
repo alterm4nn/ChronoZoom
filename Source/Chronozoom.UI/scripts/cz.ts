@@ -160,6 +160,9 @@ module CZ {
         export var rootCollection: boolean;
 
         function UserCanEditCollection(profile) {
+
+            /* old code prior to multi-user:
+
             // Allow developers to edit any collection locally (sign-in scenarios are not currently supported in dev box)
             if (!constants || !constants.environment || constants.environment === "localhost") {
                 return true;
@@ -174,6 +177,21 @@ module CZ {
             }
 
             return true;
+            */
+
+            // can't edit if no profile, no display name, no supercollection or no collection
+            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || !CZ.Service.collectionName) {
+                return false;
+            }
+
+            // override - anyone can edit the sandbox
+            if (CZ.Service.superCollectionName.toLowerCase() === "sandbox" && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
+                return true;
+            }
+
+            // if here then logged in and on a page (other than sandbox) with a supercollection and collection
+            // so return canEdit Boolean, which was previously set after looking up permissions in db.
+            return CZ.Service.canEdit;
         }
 
         function InitializeToursUI(profile, forms) {
@@ -238,30 +256,33 @@ module CZ {
 
         var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
 
+
         $(document).ready(function () {
-            //Ensures there will be no 'console is undefined' errors
+
+            // ensures there will be no 'console is undefined' errors
             window.console = window.console || <any>(function () {
                 var c = <any>{};
                 c.log = c.warn = c.debug = c.info = c.log =
-                    c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () { };
+                c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () { };
                 return c;
             })();
-           
+
             $('.bubbleInfo').hide();
 
+            // populate collection names from URL
             var url = CZ.UrlNav.getURL();
             rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
 
-            // Apply features
+            // apply features
             ApplyFeatureActivation();
 
-            // Register ChronoZoom Extensions
+            // register ChronoZoom extensions
             CZ.Extensions.registerExtensions();
 
-            // Register ChronoZoom Media Pickers.
+            // register ChronoZoom media pickers
             CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
             CZ.Common.initialize();
@@ -271,6 +292,25 @@ module CZ {
                 //$('.home-icon').trigger('click');
                 window.location.href = '/';
             });
+
+            // if URL has a supercollection and collection then
+            // check if current user has edit permissions before continuing with load
+            // since other parts of load need to know if can display edit buttons etc.
+            if (CZ.Service.superCollectionName === undefined || CZ.Service.collectionName === undefined) {
+                CZ.Service.canEdit = false;
+                finishLoad();
+            }
+            else {
+              CZ.Service.getCanEdit().done(result => {
+                  CZ.Service.canEdit = (result === true);
+                    finishLoad();
+              });
+            }
+
+        });
+
+        function finishLoad() {
+            // only invoked after user's edit permissions are checked (AJAX callback)
 
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
@@ -917,7 +957,7 @@ module CZ {
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
-        });
+        }//);
 
         export function IsFeatureEnabled(featureMap: FeatureInfo[], featureName: string) {
             var feature: FeatureInfo[] = $.grep(featureMap, function (e) { return e.Name === featureName; });
