@@ -601,8 +601,10 @@ module CZ {
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
                     CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(() => {
+
+                    if (!CZ.Authoring.isEnabled) $('.edit-icon').hide(); // hide create icon if don't have edit rights
+
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
-                        $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
                         $("#TwitterBlock").attr("data-toggle", "show");
                     }

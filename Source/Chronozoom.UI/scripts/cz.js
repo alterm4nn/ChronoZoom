@@ -503,8 +503,10 @@ var CZ;
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
                     CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(function () {
+                    if (!CZ.Authoring.isEnabled)
+                        $('.edit-icon').hide();
+
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
-                        $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
                         $("#TwitterBlock").attr("data-toggle", "show");
                     } else {
