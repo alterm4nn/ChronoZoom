@@ -376,6 +376,9 @@
     <TypeScriptCompile Include="scripts\bibliography.ts" />
     <TypeScriptCompile Include="scripts\breadcrumbs.ts" />
     <TypeScriptCompile Include="scripts\common.ts" />
+    <Content Include="scripts\external\airbrake-shim.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="scripts\external\csvToArray.v2.1.js" />
     <Content Include="scripts\external\jquery-1.7.2.min.js" />
     <Content Include="scripts\external\jquery-ui.js" />
