@@ -97,9 +97,9 @@
     <Compile Include="Member.cs" />
     <Compile Include="ContentItem.cs" />
     <Compile Include="Exhibit.cs" />
-    <Compile Include="Migrations\201404290013000_AddCollectionMembership.cs" />
-    <Compile Include="Migrations\201404290013000_AddCollectionMembership.Designer.cs">
-      <DependentUpon>201404290013000_AddCollectionMembership.cs</DependentUpon>
+    <Compile Include="Migrations\201406020351501_MultipleEditors.cs" />
+    <Compile Include="Migrations\201406020351501_MultipleEditors.Designer.cs">
+      <DependentUpon>201406020351501_MultipleEditors.cs</DependentUpon>
     </Compile>
     <Compile Include="TimelineShortcut.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -207,8 +207,8 @@
     <EmbeddedResource Include="Migrations\201306210557399_RemoveBFSCachedFields.resx">
       <DependentUpon>201306210557399_RemoveBFSCachedFields.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201404290013000_AddCollectionMembership.resx">
-      <DependentUpon>201404290013000_AddCollectionMembership.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201406020351501_MultipleEditors.resx">
+      <DependentUpon>201406020351501_MultipleEditors.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

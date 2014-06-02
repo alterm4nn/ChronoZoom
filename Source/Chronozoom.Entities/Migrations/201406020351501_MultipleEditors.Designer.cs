@@ -5,13 +5,13 @@ namespace Chronozoom.Entities
     using System.Data.Entity.Migrations.Infrastructure;
     using System.Resources;
     
-    public sealed partial class AddCollectionMembership : IMigrationMetadata
+    public sealed partial class MultipleEditors : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddCollectionMembership));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(MultipleEditors));
         
         string IMigrationMetadata.Id
         {
-            get { return "201404290013000_AddCollectionMembership"; }
+            get { return "201406020351501_MultipleEditors"; }
         }
         
         string IMigrationMetadata.Source

@@ -75,6 +75,7 @@
     <Content Include="dumps\rin-dump.json" />
     <Content Include="dumps\home\timelines.json" />
     <Content Include="dumps\home\tweets.json" />
+    <None Include="Properties\PublishProfiles\cz-neil-test-no-dependencies.pubxml" />
     <None Include="Properties\PublishProfiles\NeilCresswell.pubxml">
       <SubType>Designer</SubType>
     </None>
