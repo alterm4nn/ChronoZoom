@@ -1,15 +1,8 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
+﻿using Chronozoom.Entities.Migration;
 using System;
 using System.Data.Entity.Migrations;
 using System.Diagnostics;
 using System.Linq;
-
-using Chronozoom.Entities.Migration;
 
 namespace Chronozoom.Entities
 {
@@ -35,6 +28,7 @@ namespace Chronozoom.Entities
         public StorageMigrationsConfiguration()
         {
             AutomaticMigrationsEnabled = true;
+            AutomaticMigrationDataLossAllowed = true;
         }
     }
 }
