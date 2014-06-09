@@ -72,7 +72,7 @@ namespace Chronozoom.Entities
                 else
                 {
                     // schema exists - build list of already executed migration steps
-                    sql = "SELECT MigrationId AS MigrationTitle FROM [MigrationHistory] (NOLOCK) ORDER BY MigrationId";
+                    sql = "SELECT MigrationId AS MigrationTitle FROM [MigrationHistory] WITH (NOLOCK) ORDER BY MigrationId";
                     using (SqlCommand cmd = new SqlCommand(sql, cn))
                     {
                         using (SqlDataReader rs = cmd.ExecuteReader())

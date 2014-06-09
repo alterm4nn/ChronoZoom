@@ -23,7 +23,7 @@ CREATE TABLE [dbo].[MigrationHistory]
 GO
 
 INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
-SELECT MigrationId, Model, ProductVersion FROM [__MigrationHistory] (NOLOCK);
+SELECT MigrationId, Model, ProductVersion FROM [__MigrationHistory] WITH (NOLOCK);
 GO
 
 DROP TABLE __MigrationHistory;
