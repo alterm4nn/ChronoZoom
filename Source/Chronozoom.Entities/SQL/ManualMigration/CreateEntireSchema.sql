@@ -21,9 +21,7 @@ CREATE TABLE [dbo].[Users]
     (
         [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
 GO
 
 
@@ -39,9 +37,7 @@ CREATE TABLE [dbo].[Bitmasks]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
 GO
 
 
@@ -56,9 +52,7 @@ CREATE TABLE [dbo].[SuperCollections]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[SuperCollections] WITH CHECK
@@ -81,9 +75,7 @@ CREATE TABLE [dbo].[Collections]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[Collections] WITH CHECK
@@ -104,9 +96,7 @@ CREATE TABLE [dbo].[Members]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[Members] WITH CHECK
@@ -137,9 +127,7 @@ CREATE TABLE [dbo].[Timelines]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[Timelines] WITH CHECK
@@ -163,9 +151,7 @@ CREATE TABLE [dbo].[Exhibits]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[Exhibits] WITH CHECK
@@ -195,9 +181,7 @@ CREATE TABLE [dbo].[ContentItems]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[ContentItems] WITH CHECK
@@ -218,9 +202,7 @@ CREATE TABLE [dbo].[Triples]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
 
@@ -234,9 +216,7 @@ CREATE TABLE [dbo].[TriplePrefixes]
     (
 	    [Prefix] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
 
@@ -251,9 +231,7 @@ CREATE TABLE [dbo].[TripleObjects]
     (
 	    [TripleObject_Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[TripleObjects] WITH CHECK
@@ -278,9 +256,7 @@ CREATE TABLE [dbo].[Tours]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[Tours] WITH CHECK
@@ -306,9 +282,7 @@ CREATE TABLE [dbo].[Bookmarks]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[Bookmarks] WITH CHECK
@@ -319,7 +293,7 @@ GO
 
 -- MigrationHistory --
 
-CREATE TABLE [dbo].[MigrationHistory] -- need not be a system table - marked as a system table just to hide
+CREATE TABLE [dbo].[MigrationHistory]
 (
 	[MigrationId]       [nvarchar](255)         NOT NULL,
 	[Model]             [varbinary](max)        NOT NULL,
@@ -328,12 +302,7 @@ CREATE TABLE [dbo].[MigrationHistory] -- need not be a system table - marked as 
     (
 	    [MigrationId] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
-GO
-
-EXEC sys.sp_MS_marksystemobject [MigrationHistory]
 GO
 
 INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)

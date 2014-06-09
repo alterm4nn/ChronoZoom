@@ -8,11 +8,9 @@ CREATE TABLE [dbo].[Bitmasks]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY];
 
-INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
 VALUES
     ('201305102117597_AddRITreeWithIndex', CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
 GO

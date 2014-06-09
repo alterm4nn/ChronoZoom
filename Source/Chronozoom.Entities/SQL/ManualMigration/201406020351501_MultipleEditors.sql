@@ -22,9 +22,7 @@ CREATE TABLE [dbo].[Members]
     (
 	    [Id] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
 GO
 
 -- add new fields for circa date scenario --

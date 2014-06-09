@@ -1,13 +1,16 @@
 /*
     It is important to rename the __MigrationHistory table to prevent
     Entity Framework from performing a schema version check.
-
-    EXEC sp_rename '__MigrationHistory', 'MigrationHistory' does not work.
-    Probably this is because table is a system table. So, we will create
-    a new table from scratch, move data over then delete old table.
+    
+    EXEC sp_rename '__MigrationHistory', 'MigrationHistory' does not work if table was previously
+    marked as a system table using sp_MS_marksystemobject. So, we will create a new table from scratch,
+    move the data from the old table to the new table, then delete the old table.
+    
+    Note that we don't use sp_MS_marksystemobject as this is not supported in Azure.
+    It actually isn't required and was only used to hide the table, not for any other purpose.
 */
 
-CREATE TABLE [dbo].[MigrationHistory] -- need not be a system table - marked as a system table just to hide
+CREATE TABLE [dbo].[MigrationHistory]
 (
 	[MigrationId]       [nvarchar](255)         NOT NULL,
 	[Model]             [varbinary](max)        NOT NULL,
@@ -16,12 +19,7 @@ CREATE TABLE [dbo].[MigrationHistory] -- need not be a system table - marked as 
     (
 	    [MigrationId] ASC
     )
-    ON [PRIMARY]
 )
-ON [PRIMARY]
-GO
-
-EXEC sys.sp_MS_marksystemobject [MigrationHistory]
 GO
 
 INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)

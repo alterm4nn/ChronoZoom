@@ -16,7 +16,7 @@ GO
 DROP TABLE [References];
 DROP TABLE [Thresholds];
 
-INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
 VALUES
     ('201305102053361_RemoveBetaFields', CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
 GO
