@@ -168,6 +168,7 @@
     <Content Include="SQL\ManualMigration\CreateEntireSchema.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="SQL\ManualMigration\RenameMigrationHistory.sql" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

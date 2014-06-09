@@ -17,8 +17,9 @@ namespace Chronozoom.Entities
         // constructor - undertakes a migration needed check
         public ManualMigrationCheck()
         {
+            Dictionary<string, string>  migrated    = new Dictionary<string,string>();
+            bool                        rename      = false;
             string                      sql;
-            Dictionary<string, string>  migrated = new Dictionary<string,string>();
 
             NewInstall = false;
 
@@ -27,11 +28,31 @@ namespace Chronozoom.Entities
             {
                 cn.Open();
 
-                // check if schema exists
-                sql = "SELECT OBJECT_ID(N'[dbo].[__MigrationHistory]', 'U')";
+                // check if schema exists - should always be a migration history table
+                sql =
+                    @"
+                    SELECT 
+                    OBJECT_ID(N'[dbo].[__MigrationHistory]', 'U') AS OldHistory,
+                    OBJECT_ID(N'[dbo].[MigrationHistory]',   'U') AS NewHistory
+                    ";
                 using (SqlCommand cmd = new SqlCommand(sql, cn))
                 {
-                    NewInstall = (cmd.ExecuteScalar().ToString() == "");
+                    using (SqlDataReader rs = cmd.ExecuteReader())
+                    {
+                        rs.Read();
+
+                        // note new install if no schema exists
+                        if (rs["OldHistory"].ToString() == "" && rs["NewHistory"].ToString() == "") NewInstall = true;
+
+                        // note to rename table if __MigrationHistory table exists
+                        if (rs["OldHistory"].ToString() != "") rename = true;
+                    }
+                }
+
+                // Rename __MigrationHistory table to MigrationHistory (prevents entity framework version check)
+                if (rename)
+                {
+                    ExecNativeSQL(Properties.Resources.RenameMigrationHistory, cn);
                 }
 
                 // if no schema then create entire schema then populate bitmasks
@@ -51,7 +72,7 @@ namespace Chronozoom.Entities
                 else
                 {
                     // schema exists - build list of already executed migration steps
-                    sql = "SELECT MigrationId AS MigrationTitle FROM [__MigrationHistory] (NOLOCK) ORDER BY MigrationId";
+                    sql = "SELECT MigrationId AS MigrationTitle FROM [MigrationHistory] (NOLOCK) ORDER BY MigrationId";
                     using (SqlCommand cmd = new SqlCommand(sql, cn))
                     {
                         using (SqlDataReader rs = cmd.ExecuteReader())
@@ -85,28 +106,28 @@ namespace Chronozoom.Entities
                             sql += Properties.Resources._201306050753190_ProgressiveLoad; // adds two sprocs
                         }
                         // even if logic in qualifier to add sprocs is not true, we still need to note this migration step has completed
-                        sql += @"
-                                INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
-                                VALUES
-                                    ('201306050753190_ProgressiveLoad', CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
-                                GO;
-                                ";
+                        sql +=
+                            @"
+                            INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
+                            VALUES
+                                ('201306050753190_ProgressiveLoad', CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
+                            GO;
+                            ";
                     }
                     if (!migrated.ContainsKey("201306072040327")) sql += Properties.Resources._201306072040327_ToursUserMissingMaxLen;              // Note: original migration broken as doesn't do anything
                     if (!migrated.ContainsKey("201306210425512")) sql += Properties.Resources._201306210425512_IncreaseYearPrecision;
                     if (!migrated.ContainsKey("201306210557399")) sql += Properties.Resources._201306210557399_RemoveBFSCachedFields;
                     if (!migrated.ContainsKey("201406020351501")) sql += Properties.Resources._201406020351501_MultipleEditors;
 
-                    // execute sql for any missing steps
+                    // if any steps were missing
                     if (sql != "")
                     {
+                        // execute sql for any missing steps
                         ExecNativeSQL(sql, cn);
 
-                        // and if any steps were missing ensure bitmasks are populated
+                        // ensure bitmasks are populated/repopulated
                         EnsureBitmasksPopulated();
                     }
-
-                    // and if any steps were missing see if need to populate bitmasks
                 }
 
                 cn.Close();

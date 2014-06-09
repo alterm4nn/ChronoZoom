@@ -36,7 +36,7 @@ GO
 
 -- note transformation completed --
 
-INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
 VALUES
     ('201406020351501_MultipleEditors', CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
 GO

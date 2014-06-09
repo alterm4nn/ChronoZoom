@@ -317,14 +317,14 @@ ADD
 GO
 
 
--- __MigrationHistory --
+-- MigrationHistory --
 
-CREATE TABLE [dbo].[__MigrationHistory] -- need not be a system table - marked as a system table just to hide
+CREATE TABLE [dbo].[MigrationHistory] -- need not be a system table - marked as a system table just to hide
 (
 	[MigrationId]       [nvarchar](255)         NOT NULL,
 	[Model]             [varbinary](max)        NOT NULL,
 	[ProductVersion]    [nvarchar](32)          NOT NULL,
-    CONSTRAINT [PK_dbo.__MigrationHistory] PRIMARY KEY CLUSTERED 
+    CONSTRAINT [PK_dbo.MigrationHistory] PRIMARY KEY CLUSTERED 
     (
 	    [MigrationId] ASC
     )
@@ -333,10 +333,10 @@ CREATE TABLE [dbo].[__MigrationHistory] -- need not be a system table - marked a
 ON [PRIMARY]
 GO
 
-EXEC sys.sp_MS_marksystemobject [__MigrationHistory]
+EXEC sys.sp_MS_marksystemobject [MigrationHistory]
 GO
 
-INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
 VALUES
     ('201305102053361_RemoveBetaFields',        CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
     ('201305102115428_RemoveRITree',            CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),

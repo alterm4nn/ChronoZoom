@@ -148,7 +148,7 @@ namespace Chronozoom.Entities.Properties {
         /// <summary>
         ///   Looks up a localized string similar to ALTER TABLE [Tours] ALTER COLUMN [Description] NVARCHAR(4000);
         ///
-        ///INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
         ///VALUES
         ///    (&apos;201306040017265_ToursDescription&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
         ///GO.
@@ -175,7 +175,7 @@ namespace Chronozoom.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///   Looks up a localized string similar to INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
         ///VALUES
         ///    (&apos;201306072040327_ToursUserMissingMaxLen&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
         ///GO.
@@ -192,7 +192,7 @@ namespace Chronozoom.Entities.Properties {
         ///ALTER TABLE [ContentItems]  ALTER COLUMN [Year]     NUMERIC(18, 7);
         ///ALTER TABLE [Exhibits]      ALTER COLUMN [Year]     NUMERIC(18, 7);
         ///
-        ///INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
         ///VALUES
         ///    (&apos;201306210425512_IncreaseYearPrecision&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
         ///GO.
@@ -206,7 +206,7 @@ namespace Chronozoom.Entities.Properties {
         /// <summary>
         ///   Looks up a localized string similar to ALTER TABLE [Timelines] DROP COLUMN [FirstNodeInSubtree], [Predecessor], [Successor];
         ///
-        ///INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
         ///VALUES
         ///    (&apos;201306210557399_RemoveBFSCachedFields&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
         ///GO
@@ -265,6 +265,26 @@ namespace Chronozoom.Entities.Properties {
         internal static string CreateEntireSchema {
             get {
                 return ResourceManager.GetString("CreateEntireSchema", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /*
+        ///    It is important to rename the __MigrationHistory table to prevent
+        ///    Entity Framework from performing a schema version check.
+        ///
+        ///    EXEC sp_rename &apos;__MigrationHistory&apos;, &apos;MigrationHistory&apos; does not work.
+        ///    Probably this is because table is a system table. So, we will create
+        ///    a new table from scratch, move data over then delete old table.
+        ///*/
+        ///
+        ///CREATE TABLE [dbo].[MigrationHistory] -- need not be a system table - marked as a system table just to hide
+        ///(
+        ///	[MigrationId]       [nvarchar](255) [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string RenameMigrationHistory {
+            get {
+                return ResourceManager.GetString("RenameMigrationHistory", resourceCulture);
             }
         }
     }
