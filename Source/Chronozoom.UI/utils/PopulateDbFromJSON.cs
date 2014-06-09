@@ -1,80 +1,38 @@
-﻿// ---------------------------------------​---------------------------------------​--------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// ---------------------------------------​---------------------------------------​--------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
-using System.Text;
-using System.IO;
 using System.Security.Cryptography;
+using System.Text;
+using Chronozoom.Entities;
 
-namespace Chronozoom.Entities.Migration
+namespace Chronozoom.UI.Utils
 {
-    internal class Migrator
+    public class PopulateDbFromJSON : IDisposable
     {
-        private readonly Storage _storage;
-        private static readonly MD5 _md5Hasher = MD5.Create();
-        private const string _defaultUserName = "anonymous";
+        private const    string     _defaultUser    = "anonymous";
+        private readonly string     _jsonDirectory;
+        private const int           _maxTimelines   = 10000;            // max # to import
+        private static readonly MD5 _md5Hasher      = MD5.Create();
+        private Storage             _storage        = new Storage();
 
-        // The user that is able to modify the base collections (e.g. Beta Content, AIDS Quilt)
-        private static readonly Lazy<string> _baseContentAdmin = new Lazy<string>(() => ConfigurationManager.AppSettings["BaseCollectionsAdministrator"]);
-
-        private static readonly Lazy<string> _baseDirectory = new Lazy<string>(() =>
+        [DataContract]
+        private class BaseJsonResult<T>
         {
-            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["BaseDataMigrationDirectory"]))
-                return ConfigurationManager.AppSettings["BaseDataMigrationDirectory"];
-
-            return AppDomain.CurrentDomain.BaseDirectory;
-        });
-
-        private static readonly Lazy<int> _maxTimelinesToImport = new Lazy<int>(() =>
-        {
-            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["MaxTimelinesToImport"]))
-                return int.Parse(ConfigurationManager.AppSettings["MaxTimelinesToImport"], CultureInfo.InvariantCulture);
-
-            return 10000;
-        });
-
-        public Migrator(Storage storage)
-        {
-            _storage = storage;
+            [DataMember]
+            public T d { get; set; }
         }
 
-        public void Migrate()
+        // constructor
+        public PopulateDbFromJSON()
         {
-            MigrateRiTree();
-            LoadDataFromDump("Beta Content", "Beta Content", "beta-get.json", "beta-gettours.json", false, _baseContentAdmin.Value);
-            LoadDataFromDump("Sandbox", "Sandbox", "beta-get.json", null, true, null);
-            LoadDataFromDump("Sandbox", "Extensions", "extensions-get.json", null, true, null);
-            LoadDataFromDump("AIDS Timeline", "AIDS Timeline", "aidstimeline-get.json", "aidstimeline-gettours.json", false, _baseContentAdmin.Value);
-       }
-
-        private void MigrateRiTree()
-        {
-            if (_storage.Bitmasks.Any()) return;
-            long v = 1;
-            foreach (var b in _storage.Bitmasks)
-            {
-                _storage.Bitmasks.Remove(b);
-            }
-            _storage.SaveChanges();
-            for (int r = 0; r < 63; ++r)
-            {
-                var b = new Bitmask {B1 = -(v << 1), B2 = v, B3 = v << 1};
-                _storage.Bitmasks.Add(b);
-                v <<= 1;
-            }
-            _storage.SaveChanges();
+            _jsonDirectory = AppDomain.CurrentDomain.BaseDirectory + @"Dumps\";
         }
 
-        private void LoadDataFromDump(string superCollectionName, string collectionName, string getFileName, string getToursFileName, bool replaceGuids, string contentAdminId)
+        public void LoadDataFromDump(string superCollectionName, string collectionName, string getFileName, string getToursFileName, bool replaceGuids, string contentAdminId)
         {
             SuperCollection superCollection = _storage.SuperCollections.Find(CollectionIdFromText(superCollectionName));
             bool createCollection = true;
@@ -87,45 +45,45 @@ namespace Chronozoom.Entities.Migration
 
             if (superCollection == null || createCollection)
             {
-                // Load the Beta Content collection
                 Collection collection = LoadCollections(superCollectionName, collectionName, contentAdminId);
-                using (Stream getData = File.OpenRead(_baseDirectory.Value + @"Dumps\" + getFileName))
-                using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(_baseDirectory.Value + @"Dumps\" + getToursFileName))
+                using (Stream getData = File.OpenRead(_jsonDirectory + getFileName))
+                using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(_jsonDirectory + getToursFileName))
                 {
                     LoadData(getData, getToursData, collection, replaceGuids);
                 }
 
-                // Save changes to storage
                 _storage.SaveChanges();
             }
         }
 
+        #region Private Methods descended from LoadDataFromDump
+
         private Collection LoadCollections(string superCollectionName, string collectionName, string userId)
         {
-            User user = (userId == null 
-                             ? _storage.Users.FirstOrDefault(candidate => candidate.NameIdentifier == null) 
+            User user = (userId == null
+                             ? _storage.Users.FirstOrDefault(candidate => candidate.NameIdentifier == null)
                              : _storage.Users.FirstOrDefault(candidate => candidate.NameIdentifier == userId)) ??
-                        new User {Id = Guid.NewGuid(), NameIdentifier = userId, DisplayName = userId ?? _defaultUserName};
+                        new User { Id = Guid.NewGuid(), NameIdentifier = userId, DisplayName = userId ?? _defaultUser };
 
-            // Load Collection
+            // load collection
             var collection = new Collection
-                {
-                    Title = collectionName,
-                    Id = CollectionIdFromSuperCollection(superCollectionName, collectionName),
-                    User = user
-                };
+            {
+                Title = collectionName,
+                Id = CollectionIdFromSuperCollection(superCollectionName, collectionName),
+                User = user
+            };
 
-            // Load SuperCollection
+            // load supercollection
             SuperCollection superCollection = _storage.SuperCollections.FirstOrDefault(candidate => candidate.Title == superCollectionName);
 
             if (superCollection == null)
             {
                 superCollection = new SuperCollection
-                    {
-                        Title = superCollectionName,
-                        Id = CollectionIdFromText(superCollectionName),
-                        User = user
-                    };
+                {
+                    Title = superCollectionName,
+                    Id = CollectionIdFromText(superCollectionName),
+                    User = user
+                };
                 _storage.SuperCollections.Add(superCollection);
             }
 
@@ -149,10 +107,10 @@ namespace Chronozoom.Entities.Migration
 
             int importedTimelinesCount = 0;
 
-            // Associate each timeline with the root collection
+            // associate each timeline with the root collection
             TraverseTimelines(timelines, timeline =>
             {
-                if (++importedTimelinesCount < _maxTimelinesToImport.Value)
+                if (++importedTimelinesCount < _maxTimelines)
                 {
                     timeline.Collection = collection;
 
@@ -177,7 +135,7 @@ namespace Chronozoom.Entities.Migration
 
             if (replaceGuids)
             {
-                // Replace GUIDs to ensure multiple collections can be imported
+                // replace GUIDs to ensure multiple collections can be imported
                 TraverseTimelines(timelines, timeline =>
                 {
                     timeline.Id = Guid.NewGuid();
@@ -207,11 +165,11 @@ namespace Chronozoom.Entities.Migration
                 {
                     if (replaceGuids) timeline.Id = Guid.NewGuid();
                     timeline.Collection = collection;
-                    timeline.Depth = -1;  // this denotes no migration has been applied to current timeline
+                    timeline.Depth = -1; // this denotes no migration has been applied to current timeline
                     timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
                 }
 
-                foreach (var timeline in timelines)  // note: timeline objects in "timelines" are ordered by depth already since they are parsed from a nested-JSON file 
+                foreach (var timeline in timelines) // note: timeline objects in "timelines" are ordered by depth already since they are parsed from a nested-JSON file 
                 {
                     if (timeline.Depth == -1)
                     {
@@ -226,7 +184,7 @@ namespace Chronozoom.Entities.Migration
             if (dataTours != null)
             {
                 var bjrTours =
-                    new DataContractJsonSerializer(typeof (BaseJsonResult<IEnumerable<Tour>>)).ReadObject(dataTours) as
+                    new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Tour>>)).ReadObject(dataTours) as
                     BaseJsonResult<IEnumerable<Tour>>;
 
                 if (bjrTours != null)
@@ -246,6 +204,24 @@ namespace Chronozoom.Entities.Migration
                     }
                 _storage.SaveChanges();
             }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Lowercase is URL friendly")]
+        private static Guid CollectionIdFromSuperCollection(string supercollection, string collection)
+        {
+            return CollectionIdFromText(string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}|{1}",
+                supercollection.ToLower(CultureInfo.InvariantCulture),
+                collection.ToLower(CultureInfo.InvariantCulture)));
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Lowercase is URL friendly")]
+        private static Guid CollectionIdFromText(string value)
+        {
+            value       = value.Replace(' ', '-'); // replace with URL friendly representation
+            byte[] data = _md5Hasher.ComputeHash(Encoding.Default.GetBytes(value.ToLowerInvariant()));
+            return new Guid(data);
         }
 
         public static void MigrateInPlace(Timeline timeline)
@@ -280,14 +256,7 @@ namespace Chronozoom.Entities.Migration
             timeline.SubtreeSize = subtreeSize;
         }
 
-        [DataContract]
-        public class BaseJsonResult<T>
-        {
-            [DataMember]
-            public T d { get; set; }
-        }
-
-        public static void TraverseTimelines(IEnumerable<Timeline> timelines, TraverseOperation operation)
+        private static void TraverseTimelines(IEnumerable<Timeline> timelines, TraverseOperation operation)
         {
             foreach (Timeline timeline in timelines)
             {
@@ -295,24 +264,23 @@ namespace Chronozoom.Entities.Migration
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Lowercase is URL friendly")]
-        private static Guid CollectionIdFromSuperCollection(string supercollection, string collection)
+        #endregion
+
+        public void Dispose()
         {
-            return CollectionIdFromText(string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}|{1}",
-                supercollection.ToLower(CultureInfo.InvariantCulture),
-                collection.ToLower(CultureInfo.InvariantCulture)));
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Lowercase is URL friendly")]
-        private static Guid CollectionIdFromText(string value)
+        public virtual void Dispose(bool disposing)
         {
-            // Replace with URL friendly representations
-            value = value.Replace(' ', '-');
-
-            byte[] data = _md5Hasher.ComputeHash(Encoding.Default.GetBytes(value.ToLowerInvariant()));
-            return new Guid(data);
+            if (disposing)
+            {
+                // free any managed resources
+                _storage.Dispose();
+                _md5Hasher.Dispose();
+            }
+            // free any native resources
         }
     }
 }

@@ -1,3 +1,9 @@
+/*
+ * NOTE: This SQL is only run if the following is true in C#, which it seems is never the case due to the question mark.
+ * if (System.Configuration.ConfigurationManager.ConnectionStrings["Storage"].ProviderName.Equals("System.Data.?SqlClient"))
+ * Since this is conditional, the SQL to add an entry to __MigrationHistory is not contained herein and should be run separately.
+ */
+
 IF EXISTS (SELECT object_id FROM sys.objects WHERE object_id = OBJECT_ID(N'TimelineSubtreeQuery') AND type in (N'P', N'PC'))
 	DROP PROCEDURE TimelineSubtreeQuery
 GO
@@ -33,7 +39,6 @@ BEGIN
 	END
 	SELECT Timelines.* FROM Timelines JOIN @path ON Timelines.Id = "@path".Id ORDER BY DEPTH
 END
-
 GO
 
 CREATE PROCEDURE TimelineSubtreeQuery
@@ -112,3 +117,4 @@ BEGIN
 	IF @return_path_to_root <> 0 AND @lca <> CAST(CAST(0 AS BINARY) AS UNIQUEIDENTIFIER)
 		EXEC TracePathToRoot @collection_id, @lca, @include_sibling
 END
+GO

@@ -69,6 +69,9 @@
     <Reference Include="Microsoft.Practices.Unity.Interception.Configuration">
       <HintPath>..\packages\Unity.Interception.2.1.505.2\lib\NET35\Microsoft.Practices.Unity.Interception.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SqlServer.Management.Sdk.Sfc, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SqlServer.Smo, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -84,6 +87,7 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -94,56 +98,12 @@
     <Compile Include="Bitmask.cs" />
     <Compile Include="Bookmark.cs" />
     <Compile Include="Collection.cs" />
+    <Compile Include="ManualMigrationCheck.cs" />
     <Compile Include="Member.cs" />
     <Compile Include="ContentItem.cs" />
     <Compile Include="Exhibit.cs" />
-    <Compile Include="Migrations\201406020351501_MultipleEditors.cs" />
-    <Compile Include="Migrations\201406020351501_MultipleEditors.Designer.cs">
-      <DependentUpon>201406020351501_MultipleEditors.cs</DependentUpon>
-    </Compile>
     <Compile Include="TimelineShortcut.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Migrations\201305102053361_RemoveBetaFields.cs" />
-    <Compile Include="Migrations\201305102053361_RemoveBetaFields.Designer.cs">
-      <DependentUpon>201305102053361_RemoveBetaFields.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201305102115428_RemoveRITree.cs" />
-    <Compile Include="Migrations\201305102115428_RemoveRITree.Designer.cs">
-      <DependentUpon>201305102115428_RemoveRITree.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201305102117597_AddRITreeWithIndex.cs" />
-    <Compile Include="Migrations\201305102117597_AddRITreeWithIndex.Designer.cs">
-      <DependentUpon>201305102117597_AddRITreeWithIndex.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201305240425388_ChangeTours.cs" />
-    <Compile Include="Migrations\201305240425388_ChangeTours.Designer.cs">
-      <DependentUpon>201305240425388_ChangeTours.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201305282325585_TitleLength.cs" />
-    <Compile Include="Migrations\201305282325585_TitleLength.Designer.cs">
-      <DependentUpon>201305282325585_TitleLength.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201306040017265_ToursDescription.cs" />
-    <Compile Include="Migrations\201306040017265_ToursDescription.Designer.cs">
-      <DependentUpon>201306040017265_ToursDescription.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201306050753190_ProgressiveLoad.cs" />
-    <Compile Include="Migrations\201306050753190_ProgressiveLoad.Designer.cs">
-      <DependentUpon>201306050753190_ProgressiveLoad.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201306072040327_ToursUserMissingMaxLen.cs" />
-    <Compile Include="Migrations\201306072040327_ToursUserMissingMaxLen.Designer.cs">
-      <DependentUpon>201306072040327_ToursUserMissingMaxLen.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201306210425512_IncreaseYearPrecision.cs" />
-    <Compile Include="Migrations\201306210425512_IncreaseYearPrecision.Designer.cs">
-      <DependentUpon>201306210425512_IncreaseYearPrecision.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201306210557399_RemoveBFSCachedFields.cs" />
-    <Compile Include="Migrations\201306210557399_RemoveBFSCachedFields.Designer.cs">
-      <DependentUpon>201306210557399_RemoveBFSCachedFields.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migration\Migrator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -152,7 +112,6 @@
     </Compile>
     <Compile Include="SearchResult.cs" />
     <Compile Include="Storage.cs" />
-    <Compile Include="StorageMigrationsConfiguration.cs" />
     <Compile Include="SuperCollection.cs" />
     <Compile Include="Timeline.cs" />
     <Compile Include="TimelineExtensions.cs" />
@@ -173,43 +132,45 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SQL\TimelineSubtreeQuery.sql" />
+    <Content Include="SQL\ManualMigration\201305102053361_RemoveBetaFields.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\201305102115428_RemoveRITree.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\201305102117597_AddRITreeWithIndex.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\201305240425388_ChangeTours.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\201305282325585_TitleLength.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\201306040017265_ToursDescription.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\201306050753190_ProgressiveLoad.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\201306072040327_ToursUserMissingMaxLen.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\201306210425512_IncreaseYearPrecision.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\201306210557399_RemoveBFSCachedFields.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\201406020351501_MultipleEditors.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQL\ManualMigration\CreateEntireSchema.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201305102053361_RemoveBetaFields.resx">
-      <DependentUpon>201305102053361_RemoveBetaFields.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201305102115428_RemoveRITree.resx">
-      <DependentUpon>201305102115428_RemoveRITree.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201305102117597_AddRITreeWithIndex.resx">
-      <DependentUpon>201305102117597_AddRITreeWithIndex.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201305240425388_ChangeTours.resx">
-      <DependentUpon>201305240425388_ChangeTours.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201305282325585_TitleLength.resx">
-      <DependentUpon>201305282325585_TitleLength.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201306040017265_ToursDescription.resx">
-      <DependentUpon>201306040017265_ToursDescription.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201306050753190_ProgressiveLoad.resx">
-      <DependentUpon>201306050753190_ProgressiveLoad.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201306072040327_ToursUserMissingMaxLen.resx">
-      <DependentUpon>201306072040327_ToursUserMissingMaxLen.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201306210425512_IncreaseYearPrecision.resx">
-      <DependentUpon>201306210425512_IncreaseYearPrecision.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201306210557399_RemoveBFSCachedFields.resx">
-      <DependentUpon>201306210557399_RemoveBFSCachedFields.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201406020351501_MultipleEditors.resx">
-      <DependentUpon>201406020351501_MultipleEditors.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
