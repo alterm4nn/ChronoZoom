@@ -24,8 +24,8 @@ namespace Chronozoom.UI
             AnalyticsServiceId      = ConfigurationManager.AppSettings["AnalyticsServiceId"];
             AirbrakeProjectId       = ConfigurationManager.AppSettings["AirbrakeProjectId"];
             AirbrakeProjectKey      = ConfigurationManager.AppSettings["AirbrakeProjectKey"];
-            AirbrakeEnvironmentName = ConfigurationManager.AppSettings["AirbrakeEnvironmentName"];
-            if (AirbrakeEnvironmentName == "") AirbrakeEnvironmentName = "development";
+            AirbrakeEnvironmentName = ConfigurationManager.AppSettings["AirbrakeEnvironmentName"];  if (AirbrakeEnvironmentName == "") AirbrakeEnvironmentName = "development";
+            OneDriveClientID        = ConfigurationManager.AppSettings["OneDriveClientID"];
             Images = new List<string>();
         }
 
@@ -33,6 +33,7 @@ namespace Chronozoom.UI
         public string AirbrakeProjectId         { get; private set; }
         public string AirbrakeProjectKey        { get; private set; }
         public string AirbrakeEnvironmentName   { get; private set; }
+        public string OneDriveClientID          { get; private set; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string Title { get; set; }
@@ -219,6 +220,7 @@ namespace Chronozoom.UI
                 "airbrakeProjectId: \""         + pageInformation.AirbrakeProjectId         + "\", " +
                 "airbrakeProjectKey: \""        + pageInformation.AirbrakeProjectKey        + "\", " +
                 "airbrakeEnvironmentName: \""   + pageInformation.AirbrakeEnvironmentName   + "\", " +
+                "onedriveClientId: \""          + pageInformation.OneDriveClientID          + "\", " +
                 "environment: \""               + CurrentEnvironment.ToString()             + "\"  " +
                 "};";
 
