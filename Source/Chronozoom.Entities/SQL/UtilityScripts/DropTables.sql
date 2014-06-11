@@ -1,6 +1,8 @@
 IF (SELECT OBJECT_ID(N'[dbo].[__MigrationHistory]', 'U')) IS NOT NULL DROP TABLE __MigrationHistory;
 IF (SELECT OBJECT_ID(N'[dbo].[MigrationHistory]',   'U')) IS NOT NULL DROP TABLE MigrationHistory;
 
+IF (SELECT 1 FROM sys.triggers WHERE name = 'Exhibits_InsertUpdate') = 1 DROP TRIGGER [Exhibits_InsertUpdate];
+
 DROP TABLE Bookmarks;
 DROP TABLE Tours;
 

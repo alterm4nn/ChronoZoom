@@ -147,6 +147,8 @@ CREATE TABLE [dbo].[Exhibits]
 	[Year]              [decimal](18, 7)        NOT NULL,
 	[Collection_Id]     [uniqueidentifier]      NULL,
 	[Timeline_Id]       [uniqueidentifier]      NULL,
+    [UpdatedBy_Id]      [uniqueidentifier]      NULL,
+    [UpdatedTime]       [datetime2]             NULL            DEFAULT (GETUTCDATE()),
     CONSTRAINT [PK_dbo.Exhibits] PRIMARY KEY CLUSTERED 
     (
 	    [Id] ASC
@@ -157,7 +159,16 @@ GO
 ALTER TABLE [dbo].[Exhibits] WITH CHECK
 ADD
     CONSTRAINT [FK_dbo.Exhibits_dbo.Collections_Collection_Id] FOREIGN KEY([Collection_Id]) REFERENCES [dbo].[Collections] ([Id]),
-    CONSTRAINT [FK_dbo.Exhibits_dbo.Timelines_Timeline_Id]     FOREIGN KEY([Timeline_Id])   REFERENCES [dbo].[Timelines]   ([Id])
+    CONSTRAINT [FK_dbo.Exhibits_dbo.Timelines_Timeline_Id]     FOREIGN KEY([Timeline_Id])   REFERENCES [dbo].[Timelines]   ([Id]),
+    CONSTRAINT [FK_dbo.Exhibits_dbo.Users_UpdatedBy_Id]        FOREIGN KEY([UpdatedBy_Id])  REFERENCES [dbo].[Users]       ([Id])
+GO
+
+CREATE TRIGGER [dbo].[Exhibits_InsertUpdate] ON [dbo].[Exhibits] FOR INSERT, UPDATE
+AS BEGIN
+    UPDATE [dbo].[Exhibits]
+    SET [UpdatedTime] = GETUTCDATE()
+    FROM INSERTED WHERE INSERTED.Id = [dbo].[Exhibits].Id;
+END
 GO
 
 

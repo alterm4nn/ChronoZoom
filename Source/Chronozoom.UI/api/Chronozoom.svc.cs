@@ -1065,6 +1065,7 @@ namespace Chronozoom.UI
                     newExhibit.Year = exhibitRequest.Year;
                     newExhibit.Collection = collection;
                     newExhibit.Depth = parentTimeline.Depth + 1;
+                    //newExhibit.UpdatedBy = user;
 
                     // Update parent timeline.
                     storage.Entry(parentTimeline).Collection(_ => _.Exhibits).Load();
@@ -1106,9 +1107,10 @@ namespace Chronozoom.UI
                     }
 
                     // Update the exhibit fields
-                    updateExhibit.Title = exhibitRequest.Title;
-                    updateExhibit.Year = exhibitRequest.Year;
-                    returnValue.ExhibitId = exhibitRequest.Id;
+                    updateExhibit.Title     = exhibitRequest.Title;
+                    updateExhibit.Year      = exhibitRequest.Year;
+                  //updateExhibit.UpdatedBy = user;
+                    returnValue.ExhibitId   = exhibitRequest.Id;
 
                     // Update the content items
                     if (exhibitRequest.ContentItems != null)

@@ -41,9 +41,24 @@ namespace Chronozoom.Entities
 
         /// <summary>
         /// The year in which the exhibit appears.
-        /// </summary
+        /// </summary>
         [DataMember(Name = "time")]
         public decimal Year { get; set; }
+
+        /// <summary>
+        /// The user who last updated this exhibit.
+        /// Can be null if there have been no updates.
+        /// </summary>
+        [DataMember]
+        public User UpdatedBy { get; set; }
+
+        /// <summary>
+        /// Date/Time is UTC/GMT, is never null, and is not displayed to the user.
+        /// Ideally should not set since create/update trigger in db always sets.
+        /// </summary>
+        [DataMember]
+        [Column(TypeName = "datetime2")]
+        public DateTime UpdatedTime { get; set; }
 
         /// <summary>
         /// Specifies the collection of content items that is associated with the exhibit.
