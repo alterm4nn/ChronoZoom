@@ -194,6 +194,23 @@ module CZ {
             });
         }
 
+        // .../exhibit/{exhibitId}/lastupdate
+        export function getExhibitLastUpdate(exhibitId: string) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("exhibit");
+            request.addToPath(exhibitId);
+            request.addToPath("lastupdate");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
         // .../find/users?partial={partialName}
         export function findUsers(partialName: string) {
             CZ.Authoring.resetSessionTimer();

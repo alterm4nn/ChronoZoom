@@ -548,6 +548,11 @@ namespace Chronozoom.UI
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/find/users?partial={partialName}")]
         IEnumerable<User> FindUsers(string partialName);
 
+        //public DateTime? GetExhibitLastUpdateTime(string exhibitId)
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/exhibit/{exhibitId}/lastupdate")]
+        DateTime? GetExhibitLastUpdate(string exhibitId);
+
         /// <summary>
         /// Returns true/force depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
         /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.

@@ -1066,6 +1066,7 @@ namespace Chronozoom.UI
                     newExhibit.Collection = collection;
                     newExhibit.Depth = parentTimeline.Depth + 1;
                     //newExhibit.UpdatedBy = user;
+                    newExhibit.UpdatedTime = DateTime.Now.ToUniversalTime();    // force timestamp update even if no changes have been made since save is still requested
 
                     // Update parent timeline.
                     storage.Entry(parentTimeline).Collection(_ => _.Exhibits).Load();
@@ -1107,10 +1108,11 @@ namespace Chronozoom.UI
                     }
 
                     // Update the exhibit fields
-                    updateExhibit.Title     = exhibitRequest.Title;
-                    updateExhibit.Year      = exhibitRequest.Year;
-                  //updateExhibit.UpdatedBy = user;
-                    returnValue.ExhibitId   = exhibitRequest.Id;
+                    updateExhibit.Title         = exhibitRequest.Title;
+                    updateExhibit.Year          = exhibitRequest.Year;
+                  //updateExhibit.UpdatedBy     = user;
+                    updateExhibit.UpdatedTime   = DateTime.Now.ToUniversalTime();   // force timestamp update even if no changes have been made since save is still requested
+                    returnValue.ExhibitId       = exhibitRequest.Id;
 
                     // Update the content items
                     if (exhibitRequest.ContentItems != null)
@@ -1997,6 +1999,23 @@ namespace Chronozoom.UI
                         break;
                 }
                 return users;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public DateTime? GetExhibitLastUpdate(string exhibitId)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                DateTime? rv = null; // to return null if exhibit not found
+
+                Guid exhibitGUID = new Guid(exhibitId);
+                Exhibit exhibit  = storage.Exhibits.Where(e => e.Id == exhibitGUID).FirstOrDefault();
+                if (exhibit != null) rv = exhibit.UpdatedTime;
+
+                return rv;
             });
         }
 

@@ -189,6 +189,23 @@
         }
         Service.getCollection = getCollection;
 
+        function getExhibitLastUpdate(exhibitId) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("exhibit");
+            request.addToPath(exhibitId);
+            request.addToPath("lastupdate");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getExhibitLastUpdate = getExhibitLastUpdate;
+
         function findUsers(partialName) {
             CZ.Authoring.resetSessionTimer();
 
