@@ -159,7 +159,7 @@ Open the Git command prompt and use the following command. You will be prompted 
  
 ### Preview Your Site! ###
 
-Browse to http://**mycz**.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard. For operational management details, see [Chronozoom Operations Guide](Doc/ChronoZoom_Operations_Guide.md).
+Browse to http://**mycz**.azurewebsites.net/ and behold your own copy of ChronoZoom! Your site URL is listed in the **quick glance** column of the Azure dashboard. For operational management details, see [Chronozoom Operations Guide](https://github.com/alterm4nn/ChronoZoom/blob/master/Doc/ChronoZoom_Operations_Guide.md).
 
 ## How to set up Bing search API ##
 Bing search API is used in Authoring Tool, you need to provide Windows Azure Marketplace Account Key to be able to use it.
