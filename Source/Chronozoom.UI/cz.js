@@ -218,10 +218,10 @@
         Settings.applyTheme = applyTheme;
 
         function getCurrentRootURL() {
-            var url = window.location.protocol + '//' + window.location.hostname;
+            var root = window.location.protocol + '//' + window.location.hostname;
             if (window.location.port != '' && window.location.port != '80' && window.location.port != '443')
-                url += ':' + window.location.port;
-            return url + '/';
+                root += ':' + window.location.port;
+            return root + '/';
         }
         Settings.getCurrentRootURL = getCurrentRootURL;
 

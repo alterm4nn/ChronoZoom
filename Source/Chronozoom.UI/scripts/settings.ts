@@ -243,14 +243,14 @@ module CZ {
                 CZ.Settings.contentItemSourceHeight = 10.0 / 540;
             }
         }
-
+        
         export function getCurrentRootURL() {
-            var url = window.location.protocol + '//' + window.location.hostname;
+            var root = window.location.protocol + '//' + window.location.hostname;
             if (window.location.port != '' && window.location.port != '80' && window.location.port != '443')
-                url += ':' + window.location.port;
-            return url + '/';
+                root += ':' + window.location.port;
+            return root + '/';
         }
-
+        
         // Bing search API constants
         export var defaultBingSearchTop = 50; // the number of the results to return
         export var defaultBingSearchSkip = 0; // offset requested for the srarting point of returned results
