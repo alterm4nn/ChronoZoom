@@ -1,4 +1,7 @@
-﻿.cz-datepicker-mode {
+/***************
+ * Date Picker *
+ ***************/
+.cz-datepicker-mode {
   display: inline-block;
   width: 80px;
   margin-right: 20px;
@@ -9,6 +12,16 @@
 }
 .cz-datepicker-container:after {
   clear: both;
+}
+.cz-datepicker-circa {
+  font-size: 13px;
+  text-align: right;
+  margin-top: 5px;
+}
+.cz-datepicker-circa input {
+  vertical-align: bottom;
+  margin-bottom: 1px;
+  margin-right: 0px;
 }
 .cz-datepicker-regime {
   height: 30px;

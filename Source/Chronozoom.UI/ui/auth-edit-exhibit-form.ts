@@ -79,6 +79,7 @@ module CZ {
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
+
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -97,6 +98,12 @@ module CZ {
                 } else if (this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("Update Exhibit");
+
+                    // store when exhibit last updated
+                    // exhibit.id = letter "e" followed by exhibitId GUID, so strip off leading "e" before passing
+                    CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(data => {
+                        this.saveButton.data('lastUpdate', data);
+                    });
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
@@ -195,40 +202,33 @@ module CZ {
                     CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) &&
                     this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
 
-                    this.saveButton.prop('disabled', true);
-                        CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
-                            success => {
-                                this.isCancel = false;
-                                this.isModified = false;
-                                this.close();
+                    if (this.mode === "editExhibit") {
 
-                                this.exhibit.id = arguments[0].id;
-
-                                this.exhibit.onmouseclick();
-
-                            },
-                            error => {
-                                var errorMessage = JSON.parse(error.responseText).errorMessage;
-                                if (errorMessage !== "") {
-                                    this.errorMessage.text(errorMessage);
-                                    var that = this;
-                                    var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
-                                    errCI.forEach(function (contentItemIndex) {
-                                        var item = that.contentItemsListBox.items[contentItemIndex];
-                                        item.container.find(".cz-listitem").css("border-color", "red");
-                                    });
-                                    errorMessage = "(1/" + errCI.length + ") " + JSON.parse(error.responseText).errorMessage;;
-                                    this.errorMessage.text(errorMessage);
+                        // edit mode - see if someone else has saved edit since we loaded it
+                        CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(data => {
+                            if (data == this.saveButton.data('lastUpdate')) {
+                                // no-one else has touched - save without warning
+                                this.onSave_PerformSave(newExhibit);
+                            } else {
+                                // someone else has touched - warn and give options
+                                if (confirm("Someone else has made changes to this exhibit since you began editing it.\n\n" +
+                                            "Do you want to replace their changes with yours? This will cause all of their changes to be lost.")) {
+                                    this.onSave_PerformSave(newExhibit);
+                                } else {
+                                    alert(  "Your changes were not saved.\n\n" +
+                                            "You can click on your artifacts to copy off any changes you've made before closing the Edit Exhibit pane. " +
+                                            "After closing the Edit Exhibits pane, you can then refresh your browser to see the latest changes.");
+                                }
                             }
-                            else {
-                                this.errorMessage.text("Sorry, internal server error :(")
-                            }
+                        });
 
-                            this.errorMessage.show().delay(7000).fadeOut();
-                        }
-                    ).always(() => {
-                        this.saveButton.prop('disabled', false);
-                    });
+                    } else {
+
+                        // create mode - just save
+                        this.onSave_PerformSave(newExhibit);
+
+                    }
+
                 } else if (this.exhibit.contentItems.length === 0) {
                     var self = this;
                     var origMsg = this.errorMessage.text();
@@ -240,6 +240,42 @@ module CZ {
                 } else {
                     this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
+            }
+
+            private onSave_PerformSave(newExhibit) {
+
+                this.saveButton.prop('disabled', true);
+
+                CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(
+                    success => {
+                        this.isCancel = false;
+                        this.isModified = false;
+                        this.close();
+                        this.exhibit.id = arguments[0].id;
+                        this.exhibit.onmouseclick();
+                    },
+                    error => {
+                        var errorMessage = JSON.parse(error.responseText).errorMessage;
+                        if (errorMessage !== "") {
+                            this.errorMessage.text(errorMessage);
+                            var that = this;
+                            var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
+                            errCI.forEach(function (contentItemIndex) {
+                                var item = that.contentItemsListBox.items[contentItemIndex];
+                                item.container.find(".cz-listitem").css("border-color", "red");
+                            });
+                            errorMessage = "(1/" + errCI.length + ") " + JSON.parse(error.responseText).errorMessage;;
+                            this.errorMessage.text(errorMessage);
+                        }
+                        else {
+                            this.errorMessage.text("Sorry, internal server error :(")
+                                }
+                        this.errorMessage.show().delay(7000).fadeOut();
+                    }
+                ).always(() => {
+                        this.saveButton.prop('disabled', false);
+                });
+
             }
 
             private onDelete() {

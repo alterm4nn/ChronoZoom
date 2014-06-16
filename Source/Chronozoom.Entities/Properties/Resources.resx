@@ -118,7 +118,43 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="TimelineSubtreeQuery" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\SQL\TimelineSubtreeQuery.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="CreateEntireSchema" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\CreateEntireSchema.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="RenameMigrationHistory" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\RenameMigrationHistory.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201305102053361_RemoveBetaFields" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201305102053361_RemoveBetaFields.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201305102115428_RemoveRITree" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201305102115428_RemoveRITree.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201305102117597_AddRITreeWithIndex" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201305102117597_AddRITreeWithIndex.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201305240425388_ChangeTours" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201305240425388_ChangeTours.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201305282325585_TitleLength" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201305282325585_TitleLength.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201306040017265_ToursDescription" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201306040017265_ToursDescription.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201306050753190_ProgressiveLoad" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201306050753190_ProgressiveLoad.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201306072040327_ToursUserMissingMaxLen" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201306072040327_ToursUserMissingMaxLen.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201306210425512_IncreaseYearPrecision" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201306210425512_IncreaseYearPrecision.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201306210557399_RemoveBFSCachedFields" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201306210557399_RemoveBFSCachedFields.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201406020351501_MultipleEditors" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201406020351501_MultipleEditors.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
 </root>

@@ -56,7 +56,6 @@ var CZ;
 
             DatePicker.prototype.remove = function () {
                 this.datePicker.empty();
-
                 this.datePicker.removeClass("cz-datepicker");
             };
 
@@ -138,6 +137,7 @@ var CZ;
 
                 this.yearSelector = $("<input type='text' class='cz-datepicker-year-year cz-input'></input>");
                 this.regimeSelector = $("<select class='cz-datepicker-regime cz-input'></select>");
+                this.circaSelector = $('<div class="cz-datepicker-circa">Circa / Approximate: <input type="checkbox" /></label>');
 
                 this.yearSelector.focus(function (event) {
                     _this.errorMsg.text("");
@@ -164,6 +164,8 @@ var CZ;
 
                 this.dateContainer.append(this.yearSelector);
                 this.dateContainer.append(this.regimeSelector);
+                this.dateContainer.append('<br />');
+                this.dateContainer.append(this.circaSelector);
             };
 
             DatePicker.prototype.editModeDate = function () {
@@ -173,6 +175,7 @@ var CZ;
                 this.daySelector = $("<select class='cz-datepicker-day-selector cz-input'></select>");
                 this.monthSelector = $("<select class='cz-datepicker-month-selector cz-input'></select>");
                 this.yearSelector = $("<input type='text' class='cz-datepicker-year-date cz-input'></input>");
+                this.circaSelector = $('<div class="cz-datepicker-circa">Circa / Approximate: <input type="checkbox" /></label>');
 
                 this.yearSelector.focus(function (event) {
                     _this.errorMsg.text("");
@@ -206,6 +209,8 @@ var CZ;
                 this.dateContainer.append(this.monthSelector);
                 this.dateContainer.append(this.daySelector);
                 this.dateContainer.append(this.yearSelector);
+                this.dateContainer.append('<br />');
+                this.dateContainer.append(this.circaSelector);
             };
 
             DatePicker.prototype.editModeInfinite = function () {

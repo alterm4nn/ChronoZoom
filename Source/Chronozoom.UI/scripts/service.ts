@@ -131,8 +131,9 @@ module CZ {
 
 
         // NOTE: Clear collections to let the server decide what to load.
-        export var collectionName = "";
         export var superCollectionName = "";
+        export var collectionName = "";
+        export var canEdit = false;
 
         /**
         * Chronozoom.svc Requests.
@@ -162,7 +163,6 @@ module CZ {
             */
 
         // .../{superCollectionName}/collections
-        // NOTE: Not implemented in current API.
         export function getCollections(superCollectionName: string) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
@@ -174,6 +174,109 @@ module CZ {
                 cache: false,
                 dataType: "json",
                 url: request.url
+            });
+        }
+
+        // .../{supercollection}/{collection}/data
+        export function getCollection() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("data");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
+        // .../exhibit/{exhibitId}/lastupdate
+        export function getExhibitLastUpdate(exhibitId: string) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("exhibit");
+            request.addToPath(exhibitId);
+            request.addToPath("lastupdate");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
+        // .../find/users?partial={partialName}
+        export function findUsers(partialName: string) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("find");
+            request.addToPath("users?partial=" + partialName);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
+        // .../{supercollection}/{collection}/canedit
+        export function getCanEdit() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("canedit");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
+        // .../{supercollection}/{collection}/members
+        export function getMembers() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+
+        // .../{supercollection}/{collection}/members
+        export function putMembers(superCollectionName: string, collectionName: string, userIds) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(userIds)
             });
         }
 
