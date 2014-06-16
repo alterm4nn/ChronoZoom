@@ -1,4 +1,4 @@
-INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
 VALUES
-    ('201305240425388_ChangeTours', CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
+    ('201305240425388_ChangeTours', 'Manual Migration');
 GO

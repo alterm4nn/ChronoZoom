@@ -1,6 +1,7 @@
 DROP TABLE [Bitmasks];
+GO
 
-INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
 VALUES
-    ('201305102115428_RemoveRITree', CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
+    ('201305102115428_RemoveRITree', 'Manual Migration');
 GO

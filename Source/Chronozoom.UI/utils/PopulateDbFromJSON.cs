@@ -116,7 +116,8 @@ namespace Chronozoom.UI.Utils
 
                     foreach (Exhibit exhibit in timeline.Exhibits)
                     {
-                        exhibit.Collection = collection;
+                        exhibit.Collection  = collection;
+                        exhibit.UpdatedTime = DateTime.UtcNow;
 
                         if (exhibit.ContentItems != null)
                         {

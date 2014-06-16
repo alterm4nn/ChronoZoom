@@ -1066,7 +1066,7 @@ namespace Chronozoom.UI
                     newExhibit.Collection = collection;
                     newExhibit.Depth = parentTimeline.Depth + 1;
                     //newExhibit.UpdatedBy = user;
-                    newExhibit.UpdatedTime = DateTime.Now.ToUniversalTime();    // force timestamp update even if no changes have been made since save is still requested
+                    newExhibit.UpdatedTime = DateTime.UtcNow;   // force timestamp update even if no changes have been made since save is still requested and someone else could've edited in meantime
 
                     // Update parent timeline.
                     storage.Entry(parentTimeline).Collection(_ => _.Exhibits).Load();
@@ -1111,7 +1111,7 @@ namespace Chronozoom.UI
                     updateExhibit.Title         = exhibitRequest.Title;
                     updateExhibit.Year          = exhibitRequest.Year;
                   //updateExhibit.UpdatedBy     = user;
-                    updateExhibit.UpdatedTime   = DateTime.Now.ToUniversalTime();   // force timestamp update even if no changes have been made since save is still requested
+                    updateExhibit.UpdatedTime   = DateTime.UtcNow;  // force timestamp update even if no changes have been made since save is still requested and someone else could've edited in meantime
                     returnValue.ExhibitId       = exhibitRequest.Id;
 
                     // Update the content items

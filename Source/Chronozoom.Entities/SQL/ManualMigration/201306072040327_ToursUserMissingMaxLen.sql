@@ -1,4 +1,4 @@
-INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
 VALUES
-    ('201306072040327_ToursUserMissingMaxLen', CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
+    ('201306072040327_ToursUserMissingMaxLen', 'Manual Migration');
 GO

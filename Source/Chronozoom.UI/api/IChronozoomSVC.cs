@@ -554,7 +554,7 @@ namespace Chronozoom.UI
         DateTime? GetExhibitLastUpdate(string exhibitId);
 
         /// <summary>
-        /// Returns true/force depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
+        /// Returns true/false depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
         /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
         /// </summary>
         /// <param name="collectionId">GUID of the collection. (Not of the super-collection.)</param>
@@ -564,7 +564,7 @@ namespace Chronozoom.UI
         bool UserIsMember(string collectionId);
 
         /// <summary>
-        /// Returns true/force depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
+        /// Returns true/false depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
         /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
         /// An overload to the more efficient UserIsMember(string collectionId) for when the collectionId GUID is not already known.
         /// </summary>

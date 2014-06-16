@@ -13,7 +13,7 @@
 CREATE TABLE [dbo].[MigrationHistory]
 (
 	[MigrationId]       [nvarchar](255)         NOT NULL,
-	[Model]             [varbinary](max)        NOT NULL,
+	[Model]             [varbinary](max)        NULL,
 	[ProductVersion]    [nvarchar](32)          NOT NULL,
     CONSTRAINT [PK_dbo.MigrationHistory] PRIMARY KEY CLUSTERED 
     (

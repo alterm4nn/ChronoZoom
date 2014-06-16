@@ -1,13 +1,3 @@
-/**************************************************************************************
- * Prerequisite: At least empty db needs to exist, which should be active connection. *
- **************************************************************************************/
-
-SET ANSI_NULLS          ON
-SET ANSI_PADDING        ON
-SET QUOTED_IDENTIFIER   ON
-GO
-
-
 -- Users --
 
 CREATE TABLE [dbo].[Users]
@@ -148,7 +138,7 @@ CREATE TABLE [dbo].[Exhibits]
 	[Collection_Id]     [uniqueidentifier]      NULL,
 	[Timeline_Id]       [uniqueidentifier]      NULL,
     [UpdatedBy_Id]      [uniqueidentifier]      NULL,
-    [UpdatedTime]       [datetime2]             NULL            DEFAULT (GETUTCDATE()),
+    [UpdatedTime]       [datetime]              NULL            DEFAULT (GETUTCDATE()),
     CONSTRAINT [PK_dbo.Exhibits] PRIMARY KEY CLUSTERED 
     (
 	    [Id] ASC
@@ -307,7 +297,7 @@ GO
 CREATE TABLE [dbo].[MigrationHistory]
 (
 	[MigrationId]       [nvarchar](255)         NOT NULL,
-	[Model]             [varbinary](max)        NOT NULL,
+	[Model]             [varbinary](max)        NULL,
 	[ProductVersion]    [nvarchar](32)          NOT NULL,
     CONSTRAINT [PK_dbo.MigrationHistory] PRIMARY KEY CLUSTERED 
     (
@@ -316,17 +306,51 @@ CREATE TABLE [dbo].[MigrationHistory]
 )
 GO
 
-INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
-VALUES
-    ('201305102053361_RemoveBetaFields',        CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
-    ('201305102115428_RemoveRITree',            CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
-    ('201305102117597_AddRITreeWithIndex',      CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
-    ('201305240425388_ChangeTours',             CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
-    ('201305282325585_TitleLength',             CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
-    ('201306040017265_ToursDescription',        CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
-    ('201306050753190_ProgressiveLoad',         CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
-    ('201306072040327_ToursUserMissingMaxLen',  CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
-    ('201306210425512_IncreaseYearPrecision',   CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
-    ('201306210557399_RemoveBFSCachedFields',   CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
-    ('201406020351501_MultipleEditors',         CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
+-- We should be able to do this but CE only seems to like a single insert per SqlCeCommand --
+--
+--INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
+--VALUES
+--    ('201305102053361_RemoveBetaFields',        CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
+--    ('201305102115428_RemoveRITree',            CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
+--    ('201305102117597_AddRITreeWithIndex',      CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
+--    ('201305240425388_ChangeTours',             CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
+--    ('201305282325585_TitleLength',             CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
+--    ('201306040017265_ToursDescription',        CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
+--    ('201306050753190_ProgressiveLoad',         CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
+--    ('201306072040327_ToursUserMissingMaxLen',  CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
+--    ('201306210425512_IncreaseYearPrecision',   CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
+--    ('201306210557399_RemoveBFSCachedFields',   CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
+--    ('201406020351501_MultipleEditors',         CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201305102053361_RemoveBetaFields',        'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201305102115428_RemoveRITree',            'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201305102117597_AddRITreeWithIndex',      'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201305240425388_ChangeTours',             'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201305282325585_TitleLength',             'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201306040017265_ToursDescription',        'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201306050753190_ProgressiveLoad',         'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201306072040327_ToursUserMissingMaxLen',  'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201306210425512_IncreaseYearPrecision',   'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201306210557399_RemoveBFSCachedFields',   'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201406020351501_MultipleEditors',         'Manual Migration');
 GO

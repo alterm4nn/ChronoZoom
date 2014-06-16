@@ -26,7 +26,7 @@ CREATE TABLE [dbo].[Members]
 
 ALTER TABLE [dbo].[Exhibits] ADD
     [UpdatedBy_Id]      [uniqueidentifier]      NULL,
-    [UpdatedTime]       [datetime2]             NULL        DEFAULT (GETUTCDATE());
+    [UpdatedTime]       [datetime]              NULL        DEFAULT (GETUTCDATE());
 GO
 
 ALTER TABLE [dbo].[Exhibits] WITH CHECK
@@ -54,7 +54,7 @@ GO
 
 -- note transformation completed --
 
-INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
 VALUES
-    ('201406020351501_MultipleEditors', CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
+    ('201406020351501_MultipleEditors', 'Manual Migration');
 GO

@@ -1,10 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,6 +13,14 @@ namespace Chronozoom.Entities
     [DataContract]
     public class Exhibit
     {
+        /// <summary>
+        /// Constructor used to set default values.
+        /// </summary>
+        public Exhibit()
+        {
+            this.UpdatedTime = DateTime.UtcNow; // Must be set on creation else we'd need to store as datetime2, which isn't supported in CE.
+        }
+
         /// <summary>
         /// The ID of the exhibit.
         /// </summary>
@@ -54,10 +56,9 @@ namespace Chronozoom.Entities
 
         /// <summary>
         /// Date/Time is UTC/GMT, is never null, and is not displayed to the user.
-        /// Ideally should not set since create/update trigger in db always sets.
         /// </summary>
         [DataMember]
-        [Column(TypeName = "datetime2")]
+        [Column(TypeName = "datetime")]
         public DateTime UpdatedTime { get; set; }
 
         /// <summary>
