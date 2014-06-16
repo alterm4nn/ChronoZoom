@@ -42,7 +42,7 @@ var CZ;
                 _super.call(this, container, listBoxInfo, listItemsInfo);
             }
             return TourStopListBox;
-        })(CZ.UI.ListBoxBase);
+        })(UI.ListBoxBase);
         UI.TourStopListBox = TourStopListBox;
 
         var TourStopListItem = (function (_super) {
@@ -107,7 +107,7 @@ var CZ;
                 myDescr.show(500);
             };
             return TourStopListItem;
-        })(CZ.UI.ListItemBase);
+        })(UI.ListItemBase);
         UI.TourStopListItem = TourStopListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;

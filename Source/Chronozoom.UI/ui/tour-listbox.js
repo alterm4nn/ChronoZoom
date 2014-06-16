@@ -49,7 +49,7 @@ var CZ;
                 configurable: true
             });
             return TourListBox;
-        })(CZ.UI.ListBoxBase);
+        })(UI.ListBoxBase);
         UI.TourListBox = TourListBox;
 
         var TourListItem = (function (_super) {
@@ -94,7 +94,7 @@ var CZ;
                 }
             }
             return TourListItem;
-        })(CZ.UI.ListItemBase);
+        })(UI.ListItemBase);
         UI.TourListItem = TourListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
