@@ -1,4 +1,4 @@
-var __extends = this.__extends || function (d, b) {
+﻿var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -107,8 +107,11 @@ var CZ;
 
                 CZ.Service.getCollection().done(function (data) {
                     var themeFromDb = JSON.parse(data.theme);
-                    if (themeFromDb != null)
+                    if (themeFromDb == null) {
+                        $(_this.kioskmodeInput).prop('checked', false);
+                    } else {
                         $(_this.kioskmodeInput).prop('checked', themeFromDb.kioskMode);
+                    }
                     $(_this.chkEditors).prop('checked', data.MembersAllowed);
                     _this.renderManageEditorsButton();
                 });

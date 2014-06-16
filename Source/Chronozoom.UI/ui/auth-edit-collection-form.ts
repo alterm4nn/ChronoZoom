@@ -142,7 +142,11 @@ module CZ {
 
                 CZ.Service.getCollection().done(data => {
                     var themeFromDb = JSON.parse(data.theme);
-                    if (themeFromDb != null) $(this.kioskmodeInput).prop('checked', themeFromDb.kioskMode);
+                    if (themeFromDb == null) {
+                        $(this.kioskmodeInput).prop('checked', false);
+                    } else {
+                        $(this.kioskmodeInput).prop('checked', themeFromDb.kioskMode);
+                    }
                     $(this.chkEditors).prop('checked', data.MembersAllowed);
                     this.renderManageEditorsButton();
                 });
