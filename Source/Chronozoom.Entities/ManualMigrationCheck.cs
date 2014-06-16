@@ -251,9 +251,17 @@ namespace Chronozoom.Entities
         /// <param name="sqlConnection">The SQLConnection to run the script against, which should already be established.</param>
         private void ExecFullNativeSQL(string sqlScript, SqlConnection sqlConnection)
         {
-            ServerConnection serverConnection   = new ServerConnection(sqlConnection);
-            Server           server             = new Server(serverConnection);
-            server.ConnectionContext.ExecuteNonQuery(sqlScript);
+            try
+            {
+                ServerConnection serverConnection = new ServerConnection(sqlConnection);
+                Server server = new Server(serverConnection);
+                server.ConnectionContext.ExecuteNonQuery(sqlScript);
+            }
+            catch (Exception ex)
+            {
+                // ensure full text of SQL is included in any error details
+                throw new Exception("ExecFullNativeSQL sqlScript:\n\n" + sqlScript, ex);
+            }
         }
 
         /// <summary>

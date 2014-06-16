@@ -1,12 +1,15 @@
 -- remove users.collection_id (appears to be an existing entity change that previously wasn't db migrated) --
 
-ALTER TABLE [Users] DROP CONSTRAINT [FK_dbo.Users_dbo.Collections_Collection_Id];
-GO
-
-DROP INDEX [IX_Collection_Id] ON [dbo].[Users];
-GO
-
-ALTER TABLE [Users] DROP COLUMN [Collection_Id];
+IF EXISTS
+(
+    SELECT (1) FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WITH (NOLOCK)
+    WHERE CONSTRAINT_NAME = 'FK_dbo.Users_dbo.Collections_Collection_Id'
+)
+BEGIN
+    ALTER TABLE [Users] DROP CONSTRAINT [FK_dbo.Users_dbo.Collections_Collection_Id];
+    DROP INDEX [IX_Collection_Id] ON [dbo].[Users];
+    ALTER TABLE [Users] DROP COLUMN [Collection_Id];
+END
 GO
 
 -- add new schema elements for multi-user scenario --
