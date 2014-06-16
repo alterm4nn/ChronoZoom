@@ -13629,7 +13629,7 @@ var CZ;
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
-                this.kioskmodeInput.attr("checked", this.collectionTheme.kioskMode.toString());
+                this.kioskmodeInput.prop('checked', false);
 
                 if (!this.collectionTheme.timelineColor)
                     this.collectionTheme.timelineColor = CZ.Settings.timelineColorOverride;
