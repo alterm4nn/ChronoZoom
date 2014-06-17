@@ -1,10 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,6 +13,15 @@ namespace Chronozoom.Entities
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
     public class Collection
     {
+        /// <summary>
+        /// Constructor used to set default values.
+        /// </summary>
+        public Collection()
+        {
+            this.Id = Guid.NewGuid();       // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
+            this.MembersAllowed = false;
+        }
+
         /// <summary>
         /// The ID of the collection.
         /// </summary>
@@ -48,5 +51,18 @@ namespace Chronozoom.Entities
 
         /// <summary>SuperCollection for this collection</summary>
         public SuperCollection SuperCollection { get; set; }
+
+        /// <summary>
+        /// On/Off switch for permitting a list of members to edit this collection.
+        /// </summary>
+        [DataMember]
+        [Column(TypeName = "bit")]
+        public bool MembersAllowed { get; set; }
+
+        /// <summary>
+        /// A list of users who have special rights to the collection, other than the collection owner.
+        /// </summary>
+        [DataMember]
+        public virtual Collection<Member> Members { get; set; }
     }
 }

@@ -63,6 +63,7 @@ var CZ;
                 } else {
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
+
                 this.saveButton.click(function (event) {
                     _this.errorMessage.empty();
                     var isDataValid = false;

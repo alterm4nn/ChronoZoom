@@ -22,6 +22,15 @@ namespace Chronozoom.Entities
     public class Timeline
     {
         /// <summary>
+        /// Constructor used to set default values.
+        /// </summary>
+        public Timeline()
+        {
+            this.FromIsCirca = false;
+            this.ToIsCirca   = false;
+        }
+
+        /// <summary>
         /// The ID of the timeline (GUID).
         /// </summary>
         [Key]
@@ -61,10 +70,26 @@ namespace Chronozoom.Entities
         public decimal FromYear { get; set; }
 
         /// <summary>
+        /// If true, the timeline start date is circa/approximate.
+        /// Default is false.
+        /// </summary>
+        [DataMember]
+        [Column(TypeName = "bit")]
+        public bool FromIsCirca { get; set; }
+
+        /// <summary>
         /// The year the timeline ends.
         /// </summary>
         [DataMember(Name = "end")]
         public decimal ToYear { get; set; }
+
+        /// <summary>
+        /// If true, the timeline end date is circa/approximate.
+        /// Default is false.
+        /// </summary>
+        [DataMember]
+        [Column(TypeName = "bit")]
+        public bool ToIsCirca { get; set; }
 
         /// <summary>
         /// ???
@@ -110,7 +135,9 @@ namespace Chronozoom.Entities
             Title = t.Title;
             Regime = t.Regime;
             FromYear = t.FromYear;
+            FromIsCirca = t.FromIsCirca;
             ToYear = t.ToYear;
+            ToIsCirca = t.ToIsCirca;
             ForkNode = t.ForkNode;
             Height = t.Height;
         }

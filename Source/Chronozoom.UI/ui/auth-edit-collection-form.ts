@@ -20,6 +20,9 @@ module CZ {
             exhibitBackgroundColorInput: JQuery;
             exhibitBackgroundOpacityInput: JQuery;
             exhibitBorderColorInput: JQuery;
+
+            chkEditors: string;
+            btnEditors: string;
         }
 
         export class FormEditCollection extends CZ.UI.FormUpdateEntity {
@@ -39,6 +42,9 @@ module CZ {
             private exhibitBackgroundOpacityInput: JQuery;
             private exhibitBorderColorInput: JQuery;
 
+            private chkEditors: JQuery;
+            private btnEditors: JQuery;
+
             // We only need to add additional initialization in constructor.
             constructor(container: JQuery, formInfo: IFormEditCollectionInfo) {
                 super(container, formInfo);
@@ -49,6 +55,8 @@ module CZ {
                 this.activeCollectionTheme = jQuery.extend(true, {}, formInfo.collectionTheme);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.kioskmodeInput = formInfo.kioskmodeInput;
+                this.chkEditors = container.find(formInfo.chkEditors);
+                this.btnEditors = container.find(formInfo.btnEditors);
 
                 this.timelineBackgroundColorInput = formInfo.timelineBackgroundColorInput;
                 this.timelineBackgroundOpacityInput = formInfo.timelineBackgroundOpacityInput;
@@ -89,8 +97,6 @@ module CZ {
                     this.updateCollectionTheme(true);
                 });
 
-                this.saveButton.off();
-
                 this.backgroundInput.focus(() => {
                     this.backgroundInput.hideError();
                 });
@@ -102,15 +108,16 @@ module CZ {
                     console.log("Error initializing collection form attributes");
                 }
 
-                this.saveButton.click(event => {
+                this.saveButton.off().click(event => {
                     this.updateCollectionTheme(true);
                     this.activeCollectionTheme = this.collectionTheme;
 
-                    var themeData = {
-                        theme: JSON.stringify(this.collectionTheme)
+                    var collectionData = {
+                        theme: JSON.stringify(this.collectionTheme),
+                        MembersAllowed: $(this.chkEditors).prop('checked')
                     };
 
-                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, themeData).always(() => {
+                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, collectionData).always(() => {
                         this.saveButton.prop('disabled', false);
                         this.close();
                     })
@@ -132,6 +139,21 @@ module CZ {
                 this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
+
+                CZ.Service.getCollection().done(data => {
+                    var themeFromDb = JSON.parse(data.theme);
+                    if (themeFromDb == null) {
+                        $(this.kioskmodeInput).prop('checked', false);
+                    } else {
+                        $(this.kioskmodeInput).prop('checked', themeFromDb.kioskMode);
+                    }
+                    $(this.chkEditors).prop('checked', data.MembersAllowed);
+                    this.renderManageEditorsButton();
+                });
+
+                this.chkEditors.off().click(event => {
+                    this.renderManageEditorsButton();
+                });
             }
 
             private colorIsRgba(color: string) {
@@ -194,6 +216,15 @@ module CZ {
                     return "0" + hex;
 
                 return hex;
+            }
+
+            private renderManageEditorsButton(): void {
+                if (this.chkEditors.prop('checked')) {
+                    this.btnEditors.slideDown('fast');
+                }
+                else {
+                    this.btnEditors.slideUp(  'fast');
+                }
             }
 
             private updateCollectionTheme(clearError: boolean) {

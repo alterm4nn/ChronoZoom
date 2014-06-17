@@ -22,6 +22,7 @@ module CZ {
             private monthSelector: JQuery;
             private yearSelector: JQuery;
             private regimeSelector: JQuery;
+            private circaSelector: JQuery;
 
             private coordinate: number;
 
@@ -83,7 +84,6 @@ module CZ {
             */
             public remove(): void {
                 this.datePicker.empty();
-
                 this.datePicker.removeClass("cz-datepicker");
             }
 
@@ -175,8 +175,9 @@ module CZ {
             private editModeYear(): void {
                 this.dateContainer.empty();
 
-                this.yearSelector = $("<input type='text' class='cz-datepicker-year-year cz-input'></input>");
+                this.yearSelector   = $("<input type='text' class='cz-datepicker-year-year cz-input'></input>");
                 this.regimeSelector = $("<select class='cz-datepicker-regime cz-input'></select>");
+                this.circaSelector  = $('<div class="cz-datepicker-circa">Circa / Approximate: <input type="checkbox" /></label>');
 
                 this.yearSelector.focus(event => {
                     this.errorMsg.text("");
@@ -207,6 +208,8 @@ module CZ {
 
                 this.dateContainer.append(this.yearSelector);
                 this.dateContainer.append(this.regimeSelector);
+                this.dateContainer.append('<br />');
+                this.dateContainer.append(this.circaSelector);
             }
 
             /**
@@ -215,9 +218,10 @@ module CZ {
             private editModeDate(): void {
                 this.dateContainer.empty();
 
-                this.daySelector = $("<select class='cz-datepicker-day-selector cz-input'></select>");
-                this.monthSelector = $("<select class='cz-datepicker-month-selector cz-input'></select>");
-                this.yearSelector = $("<input type='text' class='cz-datepicker-year-date cz-input'></input>");
+                this.daySelector    = $("<select class='cz-datepicker-day-selector cz-input'></select>");
+                this.monthSelector  = $("<select class='cz-datepicker-month-selector cz-input'></select>");
+                this.yearSelector   = $("<input type='text' class='cz-datepicker-year-date cz-input'></input>");
+                this.circaSelector  = $('<div class="cz-datepicker-circa">Circa / Approximate: <input type="checkbox" /></label>');
 
                 this.yearSelector.focus(event => {
                     this.errorMsg.text("");
@@ -253,6 +257,8 @@ module CZ {
                 this.dateContainer.append(this.monthSelector);
                 this.dateContainer.append(this.daySelector);
                 this.dateContainer.append(this.yearSelector);
+                this.dateContainer.append('<br />');
+                this.dateContainer.append(this.circaSelector);
             }
 
             /**

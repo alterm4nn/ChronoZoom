@@ -217,6 +217,14 @@
         }
         Settings.applyTheme = applyTheme;
 
+        function getCurrentRootURL() {
+            var root = window.location.protocol + '//' + window.location.hostname;
+            if (window.location.port != '' && window.location.port != '80' && window.location.port != '443')
+                root += ':' + window.location.port;
+            return root + '/';
+        }
+        Settings.getCurrentRootURL = getCurrentRootURL;
+
         Settings.defaultBingSearchTop = 50;
         Settings.defaultBingSearchSkip = 0;
 
@@ -226,8 +234,8 @@
         Settings.mediapickerVideoThumbnailMaxWidth = 190;
         Settings.mediapickerVideoThumbnailMaxHeight = 130;
 
-        Settings.WLAPIClientID = "0000000040101FFA";
-        Settings.WLAPIRedirectUrl = "http://test.chronozoom.com/";
+        Settings.WLAPIClientID = constants.onedriveClientId;
+        Settings.WLAPIRedirectUrl = getCurrentRootURL();
 
         Settings.errorMessageSlideDuration = 0;
     })(CZ.Settings || (CZ.Settings = {}));

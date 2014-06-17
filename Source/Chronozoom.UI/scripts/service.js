@@ -132,8 +132,9 @@
         Service.Request = Request;
         ;
 
-        Service.collectionName = "";
         Service.superCollectionName = "";
+        Service.collectionName = "";
+        Service.canEdit = false;
 
         function getTimelines(r, sc, c) {
             if (typeof sc === "undefined") { sc = Service.superCollectionName; }
@@ -170,6 +171,109 @@
             });
         }
         Service.getCollections = getCollections;
+
+        function getCollection() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("data");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getCollection = getCollection;
+
+        function getExhibitLastUpdate(exhibitId) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("exhibit");
+            request.addToPath(exhibitId);
+            request.addToPath("lastupdate");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getExhibitLastUpdate = getExhibitLastUpdate;
+
+        function findUsers(partialName) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("find");
+            request.addToPath("users?partial=" + partialName);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.findUsers = findUsers;
+
+        function getCanEdit() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("canedit");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getCanEdit = getCanEdit;
+
+        function getMembers() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getMembers = getMembers;
+
+        function putMembers(superCollectionName, collectionName, userIds) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(userIds)
+            });
+        }
+        Service.putMembers = putMembers;
 
         function getStructure(r) {
             CZ.Authoring.resetSessionTimer();

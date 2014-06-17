@@ -243,7 +243,14 @@ module CZ {
                 CZ.Settings.contentItemSourceHeight = 10.0 / 540;
             }
         }
-
+        
+        export function getCurrentRootURL() {
+            var root = window.location.protocol + '//' + window.location.hostname;
+            if (window.location.port != '' && window.location.port != '80' && window.location.port != '443')
+                root += ':' + window.location.port;
+            return root + '/';
+        }
+        
         // Bing search API constants
         export var defaultBingSearchTop = 50; // the number of the results to return
         export var defaultBingSearchSkip = 0; // offset requested for the srarting point of returned results
@@ -255,9 +262,10 @@ module CZ {
         export var mediapickerVideoThumbnailMaxWidth = 190; // the max allowed width of thumbnail
         export var mediapickerVideoThumbnailMaxHeight = 130; // the max allowed height of thumbnail
 
-        // WL API constants
-        export var WLAPIClientID = "0000000040101FFA";
-        export var WLAPIRedirectUrl = "http://test.chronozoom.com/";
+        // WL API constants - Used for SkyDrive/OneDrive
+        // See http://msdn.microsoft.com/en-us/library/dn659751.aspx for how to set up a clientid/url pair 
+        export var WLAPIClientID    = constants.onedriveClientId;   // example: "0000000040101FFA" (need to pair with Redirect URL)
+        export var WLAPIRedirectUrl = getCurrentRootURL();          // example: "http://test.chronozoom.com/"
 
         export var errorMessageSlideDuration = 0; // slide animation duration of input error messages
     }

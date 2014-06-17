@@ -82,6 +82,7 @@ module CZ {
                 else {
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
+
                 this.saveButton.click(event => {
                     this.errorMessage.empty();
                     var isDataValid = false;

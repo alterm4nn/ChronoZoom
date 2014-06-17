@@ -64,7 +64,7 @@ namespace Chronozoom.Entities
         public Storage()
         {
             Configuration.ProxyCreationEnabled = false;
-            if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.​SqlClient"))
+            if (System.Configuration.ConfigurationManager.ConnectionStrings["Storage"].ProviderName.Equals("System.Data.​SqlClient"))
             {
                 ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = StorageTimeout.Value;
             }
@@ -85,6 +85,8 @@ namespace Chronozoom.Entities
         public DbSet<Bookmark> Bookmarks { get; set; }
 
         public DbSet<User> Users { get; set; }
+
+        public DbSet<Member> Members { get; set; }
 
         public DbSet<Collection> Collections { get; set; }
 
@@ -169,7 +171,7 @@ namespace Chronozoom.Entities
                 retryPolicy.ExecuteAction(
                   () =>
                   {
-                      if (System.Configuration.ConfigurationManager.ConnectionStrings[0].ProviderName.Equals("System.Data.SqlClient"))
+                      if (System.Configuration.ConfigurationManager.ConnectionStrings["Storage"].ProviderName.Equals("System.Data.SqlClient"))
                       {
                           allTimelines = Database.SqlQuery<TimelineRaw>("EXEC TimelineSubtreeQuery {0}, {1}, {2}, {3}, {4}, {5}", collectionId, leastCommonAncestor, minSpan, startTime, endTime, maxElements);
                       }
