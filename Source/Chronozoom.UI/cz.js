@@ -13893,7 +13893,6 @@ var CZ;
 
                 CZ.Service.getCollection().done(function (data) {
                     var themeFromDb = JSON.parse(data.theme);
-
                     if (themeFromDb == null) {
                         $(_this.kioskmodeInput).prop('checked', false);
                     } else {
@@ -15905,6 +15904,15 @@ var CZ;
             })();
 
             $('.bubbleInfo').hide();
+
+            $('#wait').hide();
+
+            $(document).ajaxStart(function () {
+                $('#wait').show();
+            });
+            $(document).ajaxStop(function () {
+                $('#wait').hide();
+            });
 
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;
