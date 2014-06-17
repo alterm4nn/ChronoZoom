@@ -13269,34 +13269,34 @@ var CZ;
 
             FormEditExhibit.prototype.onSave_PerformSave = function (newExhibit) {
                 var _this = this;
-                    this.saveButton.prop('disabled', true);
+                this.saveButton.prop('disabled', true);
 
-                    CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
-                        _this.isCancel = false;
-                        _this.isModified = false;
-                        _this.close();
-                        _this.exhibit.id = arguments[0].id;
-                        _this.exhibit.onmouseclick();
-                    }, function (error) {
-                        var errorMessage = JSON.parse(error.responseText).errorMessage;
-                        if (errorMessage !== "") {
-                            _this.errorMessage.text(errorMessage);
-                            var that = _this;
-                            var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
-                            errCI.forEach(function (contentItemIndex) {
-                                var item = that.contentItemsListBox.items[contentItemIndex];
-                                item.container.find(".cz-listitem").css("border-color", "red");
-                            });
-                            errorMessage = "(1/" + errCI.length + ") " + JSON.parse(error.responseText).errorMessage;
-                            ;
-                            _this.errorMessage.text(errorMessage);
-                        } else {
-                            _this.errorMessage.text("Sorry, internal server error :(");
-                        }
-                        _this.errorMessage.show().delay(7000).fadeOut();
-                    }).always(function () {
-                        _this.saveButton.prop('disabled', false);
-                    });
+                CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
+                    _this.isCancel = false;
+                    _this.isModified = false;
+                    _this.close();
+                    _this.exhibit.id = arguments[0].id;
+                    _this.exhibit.onmouseclick();
+                }, function (error) {
+                    var errorMessage = JSON.parse(error.responseText).errorMessage;
+                    if (errorMessage !== "") {
+                        _this.errorMessage.text(errorMessage);
+                        var that = _this;
+                        var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
+                        errCI.forEach(function (contentItemIndex) {
+                            var item = that.contentItemsListBox.items[contentItemIndex];
+                            item.container.find(".cz-listitem").css("border-color", "red");
+                        });
+                        errorMessage = "(1/" + errCI.length + ") " + JSON.parse(error.responseText).errorMessage;
+                        ;
+                        _this.errorMessage.text(errorMessage);
+                    } else {
+                        _this.errorMessage.text("Sorry, internal server error :(");
+                    }
+                    _this.errorMessage.show().delay(7000).fadeOut();
+                }).always(function () {
+                    _this.saveButton.prop('disabled', false);
+                });
             };
 
             FormEditExhibit.prototype.onDelete = function () {
