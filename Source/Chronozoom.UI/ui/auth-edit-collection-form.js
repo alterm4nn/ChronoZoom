@@ -20,6 +20,8 @@ var CZ;
                 this.activeCollectionTheme = jQuery.extend(true, {}, formInfo.collectionTheme);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.kioskmodeInput = formInfo.kioskmodeInput;
+                this.chkEditors = container.find(formInfo.chkEditors);
+                this.btnEditors = container.find(formInfo.btnEditors);
 
                 this.timelineBackgroundColorInput = formInfo.timelineBackgroundColorInput;
                 this.timelineBackgroundOpacityInput = formInfo.timelineBackgroundOpacityInput;
@@ -60,8 +62,6 @@ var CZ;
                     _this.updateCollectionTheme(true);
                 });
 
-                this.saveButton.off();
-
                 this.backgroundInput.focus(function () {
                     _this.backgroundInput.hideError();
                 });
@@ -72,21 +72,23 @@ var CZ;
                     console.log("Error initializing collection form attributes");
                 }
 
-                this.saveButton.click(function (event) {
+                this.saveButton.off().click(function (event) {
                     _this.updateCollectionTheme(true);
                     _this.activeCollectionTheme = _this.collectionTheme;
 
-                    var themeData = {
-                        theme: JSON.stringify(_this.collectionTheme)
+                    var collectionData = {
+                        theme: JSON.stringify(_this.collectionTheme),
+                        MembersAllowed: $(_this.chkEditors).prop('checked')
                     };
 
-                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, themeData).always(function () {
+                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, collectionData).always(function () {
                         _this.saveButton.prop('disabled', false);
                         _this.close();
                     });
                 });
             }
             FormEditCollection.prototype.initialize = function () {
+                var _this = this;
                 this.saveButton.prop('disabled', false);
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
@@ -102,6 +104,21 @@ var CZ;
                 this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
+
+                CZ.Service.getCollection().done(function (data) {
+                    var themeFromDb = JSON.parse(data.theme);
+                    if (themeFromDb == null) {
+                        $(_this.kioskmodeInput).prop('checked', false);
+                    } else {
+                        $(_this.kioskmodeInput).prop('checked', themeFromDb.kioskMode);
+                    }
+                    $(_this.chkEditors).prop('checked', data.MembersAllowed);
+                    _this.renderManageEditorsButton();
+                });
+
+                this.chkEditors.off().click(function (event) {
+                    _this.renderManageEditorsButton();
+                });
             };
 
             FormEditCollection.prototype.colorIsRgba = function (color) {
@@ -166,6 +183,14 @@ var CZ;
                     return "0" + hex;
 
                 return hex;
+            };
+
+            FormEditCollection.prototype.renderManageEditorsButton = function () {
+                if (this.chkEditors.prop('checked')) {
+                    this.btnEditors.slideDown('fast');
+                } else {
+                    this.btnEditors.slideUp('fast');
+                }
             };
 
             FormEditCollection.prototype.updateCollectionTheme = function (clearError) {

@@ -512,7 +512,6 @@ var CZ;
             }
         }
         StartPage.startExploring = startExploring;
-        StartPage.startExploring = startExploring;
 
         function TwitterLayout(target, idx) {
             var ListTemplate = "#template-tweet-list .tweet-list-item";

@@ -1,10 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.ServiceModel.Activation;
@@ -16,7 +10,7 @@ using System.Web.UI;
 using Chronozoom.Entities;
 using OuterCurve;
 using Microsoft.IdentityModel.Web;
-
+using System.Configuration;
 
 namespace Chronozoom.UI
 {
@@ -95,8 +89,24 @@ namespace Chronozoom.UI
             RouteTable.Routes.MapHubs();
             RegisterRoutes(RouteTable.Routes);
 
-            Trace.TraceInformation("Application Starting");
+            Trace.TraceInformation("Checking Db Schema");
+            using (Entities.ManualMigrationCheck check = new Entities.ManualMigrationCheck())
+            {
+                if (check.NewInstall)
+                {
+                    Trace.TraceInformation("New Install - Populating Initial Db Content");
+                    string populatedContentAdmin = ConfigurationManager.AppSettings["BaseCollectionsAdministrator"].ToString();
+                    using (Utils.PopulateDbFromJSON populator = new Utils.PopulateDbFromJSON())
+                    {
+                        populator.LoadDataFromDump("Beta Content",  "Beta Content",     "beta-get.json",            "beta-gettours.json",           false,  populatedContentAdmin);
+                        populator.LoadDataFromDump("Sandbox",       "Sandbox",          "beta-get.json",            null,                           true,   null);
+                        populator.LoadDataFromDump("Sandbox",       "Extensions",       "extensions-get.json",      null,                           true,   null);
+                        populator.LoadDataFromDump("AIDS Timeline", "AIDS Timeline",    "aidstimeline-get.json",    "aidstimeline-gettours.json",   false,  populatedContentAdmin);
+                    }
+                }
+            }
 
+            Trace.TraceInformation("Application Starting");
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]

@@ -1,4 +1,4 @@
-﻿/* Height of input element */
+/* Height of input element */
 /* Font-size of error message */
 /* Error messages */
 .error-message {
@@ -181,6 +181,9 @@ input.error {
   -ms-user-select: none;
   user-select: none;
 }
+/***************
+ * Date Picker *
+ ***************/
 .cz-datepicker-mode {
   display: inline-block;
   width: 80px;
@@ -192,6 +195,16 @@ input.error {
 }
 .cz-datepicker-container:after {
   clear: both;
+}
+.cz-datepicker-circa {
+  font-size: 13px;
+  text-align: right;
+  margin-top: 5px;
+}
+.cz-datepicker-circa input {
+  vertical-align: bottom;
+  margin-bottom: 1px;
+  margin-right: 0px;
 }
 .cz-datepicker-regime {
   height: 30px;
@@ -1319,7 +1332,6 @@ a:visited {
   width: 100%;
   height: 100%;
   /* Fallback for older browsers */
-
   height: calc(100% - 36px - 25px - 25px + 8px);
   height: -moz-calc(100% - 36px - 25px - 25px + 8px);
   height: -webkit-calc(100% - 36px - 25px - 25px + 8px);
@@ -1690,12 +1702,9 @@ img.fallbackBackground {
   width: 100%;
   height: auto;
   /* Set up positioning */
-
   min-width: 1024px;
   /* Set up proportionate scaling */
-
   /* Set rules to fill background */
-
   min-height: 100%;
 }
 @media screen and (max-width: 1024px) {
@@ -1944,6 +1953,114 @@ img.fallbackBackground {
                             Auxiliary
 
 ***********************************************************/
+.border-box {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.bottom-button-block {
+  position: absolute;
+  bottom: 15px;
+  left: 0px;
+  width: 100%;
+  text-align: center;
+}
+.table-blue {
+  table-layout: fixed;
+  border-spacing: 0px;
+  border: solid 1px #6ae;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+.table-blue caption {
+  padding: 3px 5px 6px 5px;
+  background-color: #6ae;
+  color: #fff;
+  text-shadow: 0px 1px 1px #888;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.table-blue thead,
+.table-blue tfoot {
+  background-color: #efefef;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+.table-blue tbody {
+  background-color: #efefef;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  font-size: 0.9em;
+  display: block;
+  overflow-y: auto;
+}
+.table-blue tbody tr:hover {
+  background-color: #ddd;
+}
+.table-blue td {
+  padding: 3px 5px 4px 5px;
+  vertical-align: top;
+  text-align: left;
+  overflow: hidden;
+  -ms-text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+.table-blue tr {
+  display: block;
+}
+/* part of webkit fix for tbody overflow auto */
+.table-blue tr:last-child td:first-child {
+  border-bottom-left-radius: 4px;
+}
+.table-blue tr:last-child td:last-child {
+  border-bottom-right-radius: 4px;
+}
+.table-blue input[type="search"],
+.table-blue button {
+  background-color: #fff;
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  margin-left: -2px;
+}
+.table-blue td.delete {
+  width: 15px;
+  padding-top: 0px;
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  cursor: pointer;
+}
+.table-blue td.delete:after {
+  content: '\00D7';
+}
+/* &times; */
+.table-blue td.delete:hover {
+  text-shadow: 0px 1px 1px #333;
+}
+.table-blue thead td.select {
+  padding-top: 5px;
+}
+.table-blue td.select {
+  width: 15px;
+  text-align: center;
+}
+.left {
+  text-align: left;
+}
+.right {
+  text-align: right;
+}
+.center {
+  text-align: center !important;
+}
+.justify {
+  text-align: justify;
+}
+.max {
+  width: 100%;
+}
 .fleft {
   float: left;
 }
@@ -1952,6 +2069,16 @@ img.fallbackBackground {
 }
 .clearer {
   clear: both;
+}
+.hidden {
+  display: none;
+}
+.btn-icon {
+  color: #444;
+  font-weight: bold;
+  padding-left: 5px;
+  position: relative;
+  top: -1px;
 }
 .unselectable {
   -webkit-user-select: none;
@@ -2090,26 +2217,37 @@ img.fallbackBackground {
   padding: 10px 5px;
   font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', 'San Serif';
   /* IE9 */
-
   filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#1B6AAB', EndColorStr='#0E4073', GradientType=0);
   /* IE10 Consumer Preview */
-
   background-image: -ms-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Mozilla Firefox */
-
   background-image: -moz-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Opera */
-
   background-image: -o-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* Webkit (Safari/Chrome 10) */
-
   background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #0e4073), color-stop(1, #1b6aab));
   /* Webkit (Chrome 11+) */
-
   background-image: -webkit-linear-gradient(bottom, #0e4073 0%, #1b6aab 100%);
   /* W3C Markup, IE10 Release Preview */
-
   background-image: linear-gradient(to top, #0e4073 0%, #1b6aab 100%);
+}
+.cz-button:hover,
+.cz-medialist-item:hover {
+  opacity: 0.9;
+}
+.cz-button-inline {
+  color: #000;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #dddddd), color-stop(1, #bbbbbb));
+  background-image: -o-linear-gradient(bottom, #dddddd 0%, #bbbbbb 100%);
+  background-image: -moz-linear-gradient(bottom, #dddddd 0%, #bbbbbb 100%);
+  background-image: -webkit-linear-gradient(bottom, #dddddd 0%, #bbbbbb 100%);
+  background-image: -ms-linear-gradient(bottom, #dddddd 0%, #bbbbbb 100%);
+  background-image: linear-gradient(to bottom, #dddddd 0%, #bbbbbb 100%);
+  border: solid 1px #aaa;
+  -xborder: outset 1px #bbb;
+  border-top-color: #bbb;
+  text-shadow: 0px 1px 1px #fff;
+  padding: 4px 6px 5px 6px;
 }
 .cz-radiobutton + label {
   margin-right: 25px;
@@ -2164,14 +2302,22 @@ img.fallbackBackground {
   margin: 5px 0;
   display: block;
 }
-.cz-form-label a {
+a {
   color: #0464a2;
+}
+.cz-form-label input[type="checkbox"] {
+  margin-left: 0px;
 }
 /***********************************************************
 
                         Custom Forms
 
 ***********************************************************/
+.cz-form-color,
+.cz-form-range,
+.cz-medialist-item {
+  cursor: pointer;
+}
 /* Header Edit Form */
 .cz-header-edit-form {
   right: 0px;
@@ -2237,7 +2383,6 @@ img.fallbackBackground {
   max-width: 450px;
   width: 30.2734375%;
   /* 310 / 1024 */
-
   right: 0px;
   bottom: 25px;
 }
@@ -2258,7 +2403,6 @@ img.fallbackBackground {
   max-width: 450px;
   width: 30.2734375%;
   /* 310 / 1024 */
-
   bottom: 25px;
   left: 0;
 }

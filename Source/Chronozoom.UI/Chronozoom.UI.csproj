@@ -14,7 +14,7 @@
     <RootNamespace>Chronozoom.UI</RootNamespace>
     <AssemblyName>Chronozoom.UI</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -53,6 +53,12 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="css\cz.min.css">
+      <DependentUpon>cz.less</DependentUpon>
+    </Content>
+    <Content Include="css\datepicker.min.css">
+      <DependentUpon>datepicker.less</DependentUpon>
+    </Content>
     <Content Include="css\media.css">
       <DependentUpon>media.less</DependentUpon>
     </Content>
@@ -287,6 +293,7 @@
     <Compile Include="pages\sitemap.aspx.designer.cs">
       <DependentUpon>sitemap.aspx</DependentUpon>
     </Compile>
+    <Compile Include="utils\PopulateDbFromJSON.cs" />
     <Compile Include="utils\ThumbnailGenerator.cs" />
     <Content Include="dumps\250-be5yavg.csv" />
     <Content Include="dumps\2k-moberg2000.csv" />
@@ -371,6 +378,9 @@
     <TypeScriptCompile Include="scripts\bibliography.ts" />
     <TypeScriptCompile Include="scripts\breadcrumbs.ts" />
     <TypeScriptCompile Include="scripts\common.ts" />
+    <Content Include="scripts\external\airbrake-shim.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="scripts\external\csvToArray.v2.1.js" />
     <Content Include="scripts\external\jquery-1.7.2.min.js" />
     <Content Include="scripts\external\jquery-ui.js" />
@@ -389,6 +399,8 @@
       <DependentUpon>utility-plugins.ts</DependentUpon>
     </Content>
     <TypeScriptCompile Include="scripts\plugins\utility-plugins.ts" />
+    <Content Include="ui\auth-edit-collection-editors.html" />
+    <Content Include="ui\auth-edit-collection-editors.ts" />
     <Content Include="ui\auth-edit-collection-form.html" />
     <Content Include="ui\auth-edit-tour-form.html" />
     <Content Include="ui\auth-edit-tour-form.js">
@@ -757,7 +769,7 @@
           <AutoAssignPort>False</AutoAssignPort>
           <DevelopmentServerPort>4949</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:4949/</IISUrl>
+          <IISUrl>http://chronozoom.localhost/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

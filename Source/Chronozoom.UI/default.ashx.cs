@@ -15,22 +15,25 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-
 namespace Chronozoom.UI
 {
     public class PageInformation
     {
-
         public PageInformation()
         {
-            AnalyticsServiceId = ConfigurationManager.AppSettings["AnalyticsServiceId"];
-            ExceptionsServiceId = ConfigurationManager.AppSettings["ExceptionsServiceId"];
+            AnalyticsServiceId      = ConfigurationManager.AppSettings["AnalyticsServiceId"];
+            AirbrakeProjectId       = ConfigurationManager.AppSettings["AirbrakeProjectId"];
+            AirbrakeProjectKey      = ConfigurationManager.AppSettings["AirbrakeProjectKey"];
+            AirbrakeEnvironmentName = ConfigurationManager.AppSettings["AirbrakeEnvironmentName"];  if (AirbrakeEnvironmentName == "") AirbrakeEnvironmentName = "development";
+            OneDriveClientID        = ConfigurationManager.AppSettings["OneDriveClientID"];
             Images = new List<string>();
         }
 
-        public string AnalyticsServiceId { get; set; }
-
-        public string ExceptionsServiceId { get; set; }
+        public string AnalyticsServiceId        { get; private set; }
+        public string AirbrakeProjectId         { get; private set; }
+        public string AirbrakeProjectKey        { get; private set; }
+        public string AirbrakeEnvironmentName   { get; private set; }
+        public string OneDriveClientID          { get; private set; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string Title { get; set; }
@@ -213,9 +216,12 @@ namespace Chronozoom.UI
         {
             XElement scriptNode = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:script[@id='constants']", xmlNamespaceManager);
             scriptNode.Value = "var constants = { " +
-                "analyticsId: \"" + pageInformation.AnalyticsServiceId + "\", " +
-                "exceptionsId: \"" + pageInformation.ExceptionsServiceId + "\", " +
-                "environment: \"" + CurrentEnvironment.ToString() + "\" " +
+                "analyticsId: \""               + pageInformation.AnalyticsServiceId        + "\", " +
+                "airbrakeProjectId: \""         + pageInformation.AirbrakeProjectId         + "\", " +
+                "airbrakeProjectKey: \""        + pageInformation.AirbrakeProjectKey        + "\", " +
+                "airbrakeEnvironmentName: \""   + pageInformation.AirbrakeEnvironmentName   + "\", " +
+                "onedriveClientId: \""          + pageInformation.OneDriveClientID          + "\", " +
+                "environment: \""               + CurrentEnvironment.ToString()             + "\"  " +
                 "};";
 
             if (!string.IsNullOrEmpty(pageInformation.Title))

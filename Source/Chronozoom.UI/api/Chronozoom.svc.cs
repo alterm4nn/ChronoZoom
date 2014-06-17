@@ -828,7 +828,8 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
 
-                collection.Theme = collectionRequest.Theme;
+                collection.Theme            = collectionRequest.Theme;
+                collection.MembersAllowed   = collectionRequest.MembersAllowed;
 
                 storage.SaveChanges();
                 return collection.Id;
@@ -1064,6 +1065,8 @@ namespace Chronozoom.UI
                     newExhibit.Year = exhibitRequest.Year;
                     newExhibit.Collection = collection;
                     newExhibit.Depth = parentTimeline.Depth + 1;
+                    //newExhibit.UpdatedBy = user;
+                    newExhibit.UpdatedTime = DateTime.UtcNow;   // force timestamp update even if no changes have been made since save is still requested and someone else could've edited in meantime
 
                     // Update parent timeline.
                     storage.Entry(parentTimeline).Collection(_ => _.Exhibits).Load();
@@ -1105,9 +1108,11 @@ namespace Chronozoom.UI
                     }
 
                     // Update the exhibit fields
-                    updateExhibit.Title = exhibitRequest.Title;
-                    updateExhibit.Year = exhibitRequest.Year;
-                    returnValue.ExhibitId = exhibitRequest.Id;
+                    updateExhibit.Title         = exhibitRequest.Title;
+                    updateExhibit.Year          = exhibitRequest.Year;
+                  //updateExhibit.UpdatedBy     = user;
+                    updateExhibit.UpdatedTime   = DateTime.UtcNow;  // force timestamp update even if no changes have been made since save is still requested and someone else could've edited in meantime
+                    returnValue.ExhibitId       = exhibitRequest.Id;
 
                     // Update the content items
                     if (exhibitRequest.ContentItems != null)
@@ -1950,6 +1955,156 @@ namespace Chronozoom.UI
             });
         }
 
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public Collection GetCollection(string superCollection, string collection)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
+                Collection rv = storage.Collections.Where(c => c.Id == collectionId).FirstOrDefault();
+                return rv;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// IdentityProvider null check is used to exclude anonymous users from results list
+        /// </summary>
+        /// <param name="partialName"></param>
+        /// <returns></returns>
+        public IEnumerable<User> FindUsers(string partialName)
+        {
+            partialName = partialName.Trim();
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                List<User> users;
+                switch (partialName.Length)
+                {
+                    case 0:
+                        // don't bother searching
+                        users = new List<User>();
+                        break;
+
+                    case 1:
+                    case 2:
+                        // exact match only as list could be very large
+                        users = storage.Users.Where(u => u.DisplayName == partialName && u.IdentityProvider != null).OrderBy(u => u.DisplayName).ToList();
+                        break;
+
+                    default:
+                        // partial match
+                        users = storage.Users.Where(u => u.DisplayName.Contains(partialName) && u.IdentityProvider != null).OrderBy(u => u.DisplayName).ToList();
+                        break;
+                }
+                return users;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public DateTime? GetExhibitLastUpdate(string exhibitId)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                DateTime? rv = null; // to return null if exhibit not found
+
+                Guid exhibitGUID = new Guid(exhibitId);
+                Exhibit exhibit  = storage.Exhibits.Where(e => e.Id == exhibitGUID).FirstOrDefault();
+                if (exhibit != null) rv = exhibit.UpdatedTime;
+
+                return rv;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public bool UserIsMember(string collectionId)
+        {
+            Guid collectionGUID = new Guid(collectionId);
+
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                if (user == null) return false;
+
+                return // is owner or (members are allowed and is member)
+                    (storage.Collections.Where(c => c.Id == collectionGUID && c.User.Id == user.Id).Count() > 0) ||
+                    (
+                        (storage.Collections.Where(c => c.Id == collectionGUID && c.MembersAllowed).Count() > 0) &&
+                        (storage.Members.Where(m => m.User.Id == user.Id && m.Collection.Id == collectionGUID).Count() > 0)
+                    );
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public bool UserCanEdit(string superCollection, string collection)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                if (user == null) return false;
+
+                Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
+                return UserIsMember(collectionId.ToString());
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public IEnumerable<Member> GetMembers(string superCollection, string collection)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Guid collectionId    = CollectionIdOrDefault(storage, superCollection, collection);
+                List<Member> members = storage.Members.Where(m => m.Collection.Id == collectionId).Include(m => m.User).OrderBy(m => m.User.DisplayName).ToList();
+                return members;
+            });
+        }
+
+        /// <summary>
+        /// Documentation under IChronozoomSVC
+        /// </summary>
+        public bool PutMembers(string superCollection, string collection, IEnumerable<Guid> userIds)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
+
+                // ascertain if current user has right to edit the collection membership
+                if (UserIsMember(collectionId.ToString()))
+                {
+                    // EF extended not installed so no RemoveAll or other batch options. Therefore instead of
+                    // one db call per userId, will batch up into just a couple of bulk sql commands...
+
+                    // remove existing users
+                    storage.Database.ExecuteSqlCommand("DELETE FROM Members WHERE Collection_Id = {0};", collectionId);
+
+                    // add new user list
+                    if (userIds.Count() > 0)
+                    {
+                        string sql = "INSERT INTO Members (Id, Collection_Id, User_Id) VALUES ";
+                        foreach (Guid userId in userIds)
+                        {
+                            sql += "('" + Guid.NewGuid().ToString() + "', '" + collectionId.ToString() + "', '" + userId.ToString().Replace("'", "") + "'),";
+                        }
+                        sql = sql.Remove(sql.Length - 1) + ";";
+                        storage.Database.ExecuteSqlCommand(sql);
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            });
+        }
+
         private static bool FindParentTimeline(Storage storage, Guid? parentTimelineGuid, out Timeline parentTimeline)
         {
             parentTimeline = null;
@@ -2129,7 +2284,8 @@ namespace Chronozoom.UI
             }
             else
             {
-                return collection.User.NameIdentifier == user.NameIdentifier;
+              //return collection.User.NameIdentifier == user.NameIdentifier;   // <-- old code - only author can edit collection
+                return Instance.UserIsMember(collection.Id.ToString());         // <-- new code - author or editor can edit collection
             }
         }
 

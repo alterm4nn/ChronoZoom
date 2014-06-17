@@ -530,6 +530,75 @@ namespace Chronozoom.UI
         IEnumerable<Collection> GetCollections(string superCollectionName);
 
         /// <summary>
+        /// Returns core data for a single collection, including owner and theme. Members and timelines are not included.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection.</param>
+        /// <param name="collection">Name of the collection.</param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/data")]
+        Collection GetCollection(string superCollection, string collection);
+
+        /// <summary>
+        /// Returns a list of users whose display names match the partial display name provided as a parameter.
+        /// </summary>
+        /// <param name="partialName">Part of a User's DisplayName.</param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/find/users?partial={partialName}")]
+        IEnumerable<User> FindUsers(string partialName);
+
+        //public DateTime? GetExhibitLastUpdateTime(string exhibitId)
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/exhibit/{exhibitId}/lastupdate")]
+        DateTime? GetExhibitLastUpdate(string exhibitId);
+
+        /// <summary>
+        /// Returns true/false depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
+        /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
+        /// </summary>
+        /// <param name="collectionId">GUID of the collection. (Not of the super-collection.)</param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/user/ismember/{collectionId}")]
+        bool UserIsMember(string collectionId);
+
+        /// <summary>
+        /// Returns true/false depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
+        /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
+        /// An overload to the more efficient UserIsMember(string collectionId) for when the collectionId GUID is not already known.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection.</param>
+        /// <param name="collection">Name of the collection.</param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/canedit")]
+        bool UserCanEdit(string superCollection, string collection);
+
+        /// <summary>
+        /// Returns a list of members and their user records who have editing rights to the specified collection.
+        /// Does not necesssarily include owner in list.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection.</param>
+        /// <param name="collection">Name of the collection.</param>
+        /// <returns></returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/members")]
+        IEnumerable<Member> GetMembers(string superCollection, string collection);
+
+        /// <summary>
+        /// Sets the entire list of users who have editing rights to the specified collection.
+        /// Note that this list is not an append list but the entire list, which replaces any existing list.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection.</param>
+        /// <param name="collection">Name of the collection.</param>
+        /// <param name="userIds">A list of all of the user ids which are to be given editing rights.</param>
+        /// <returns>Success or failure Boolean. Will fail if submitting user is not the owner or not in the pre-existing editors' list.</returns>
+        [OperationContract]
+        [WebInvoke(Method = "PUT", ResponseFormat = WebMessageFormat.Json, RequestFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/members")]
+        bool PutMembers(string superCollection, string collection, IEnumerable<Guid> userIds);
+
+        /// <summary>
         /// Retrieve file mime type by url
         /// </summary>
         /// <example><![CDATA[  

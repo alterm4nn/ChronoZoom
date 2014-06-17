@@ -1,10 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,6 +13,14 @@ namespace Chronozoom.Entities
     [DataContract]
     public class Exhibit
     {
+        /// <summary>
+        /// Constructor used to set default values.
+        /// </summary>
+        public Exhibit()
+        {
+            this.UpdatedTime = DateTime.UtcNow; // Must be set on creation else we'd need to store as datetime2, which isn't supported in CE.
+        }
+
         /// <summary>
         /// The ID of the exhibit.
         /// </summary>
@@ -41,9 +43,23 @@ namespace Chronozoom.Entities
 
         /// <summary>
         /// The year in which the exhibit appears.
-        /// </summary
+        /// </summary>
         [DataMember(Name = "time")]
         public decimal Year { get; set; }
+
+        /// <summary>
+        /// The user who last updated this exhibit.
+        /// Can be null if there have been no updates.
+        /// </summary>
+        [DataMember]
+        public User UpdatedBy { get; set; }
+
+        /// <summary>
+        /// Date/Time is UTC/GMT, is never null, and is not displayed to the user.
+        /// </summary>
+        [DataMember]
+        [Column(TypeName = "datetime")]
+        public DateTime UpdatedTime { get; set; }
 
         /// <summary>
         /// Specifies the collection of content items that is associated with the exhibit.

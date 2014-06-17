@@ -15,6 +15,7 @@
 /// <reference path='../ui/auth-edit-contentitem-form.ts'/>
 /// <reference path='../ui/auth-edit-tour-form.ts'/>
 /// <reference path='../ui/auth-edit-collection-form.ts'/>
+/// <reference path='../ui/auth-edit-collection-editors.ts'/>
 /// <reference path='../ui/header-edit-form.ts' />
 /// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
@@ -44,26 +45,27 @@ module CZ {
     export module HomePageViewModel {
         // Contains mapping: CSS selector -> html file.
         var _uiMap = {
-            "#header-edit-form": "/ui/header-edit-form.html",
-            "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
-            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
-            "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
-            "$('<div></div>')": "/ui/contentitem-listbox.html",
-            "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html",
-            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html", // 7
-            "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html", // 8
-            "#toursList": "/ui/tourslist-form.html", // 9
-            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html", // 10
-            "#timeSeriesContainer": "/ui/timeseries-graph-form.html", //11
-            "#timeSeriesDataForm": "/ui/timeseries-data-form.html", //12
-            "#message-window": "/ui/message-window.html", // 13
-            "#header-search-form": "/ui/header-search-form.html", // 14
-            "#header-session-expired-form": "/ui/header-session-expired-form.html", // 15
-            "#tour-caption-form": "/ui/tour-caption-form.html", // 16
-            "#mediapicker-form": "/ui/mediapicker-form.html", // 17
-            "#start-page":"/ui/start-page.html", // 18
-			"#auth-edit-collection-form": "/ui/auth-edit-collection-form.html", // 19
+            "#header-edit-form": "/ui/header-edit-form.html",                           //  0
+            "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",             //  1
+            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",               //  2
+            "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",       //  3
+            "$('<div></div>')": "/ui/contentitem-listbox.html",                         //  4
+            "#profile-form": "/ui/header-edit-profile-form.html",                       //  5
+            "#login-form": "/ui/header-login-form.html",                                //  6
+            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",                    //  7
+            "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",      //  8
+            "#toursList": "/ui/tourslist-form.html",                                    //  9
+            "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",         // 10
+            "#timeSeriesContainer": "/ui/timeseries-graph-form.html",                   // 11
+            "#timeSeriesDataForm": "/ui/timeseries-data-form.html",                     // 12
+            "#message-window": "/ui/message-window.html",                               // 13
+            "#header-search-form": "/ui/header-search-form.html",                       // 14
+            "#header-session-expired-form": "/ui/header-session-expired-form.html",     // 15
+            "#tour-caption-form": "/ui/tour-caption-form.html",                         // 16
+            "#mediapicker-form": "/ui/mediapicker-form.html",                           // 17
+            "#start-page":"/ui/start-page.html",                                        // 18
+            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html",         // 19
+            "#auth-edit-collection-editors": "/ui/auth-edit-collection-editors.html"    // 20
         };
 
         export enum FeatureActivation {
@@ -158,6 +160,9 @@ module CZ {
         export var rootCollection: boolean;
 
         function UserCanEditCollection(profile) {
+
+            /* old code prior to multi-user:
+
             // Allow developers to edit any collection locally (sign-in scenarios are not currently supported in dev box)
             if (!constants || !constants.environment || constants.environment === "localhost") {
                 return true;
@@ -172,6 +177,21 @@ module CZ {
             }
 
             return true;
+            */
+
+            // can't edit if no profile, no display name, no supercollection or no collection
+            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || !CZ.Service.collectionName) {
+                return false;
+            }
+
+            // override - anyone can edit the sandbox
+            if (CZ.Service.superCollectionName.toLowerCase() === "sandbox" && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
+                return true;
+            }
+
+            // if here then logged in and on a page (other than sandbox) with a supercollection and collection
+            // so return canEdit Boolean, which was previously set after looking up permissions in db.
+            return CZ.Service.canEdit;
         }
 
         function InitializeToursUI(profile, forms) {
@@ -236,30 +256,33 @@ module CZ {
 
         var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
 
+
         $(document).ready(function () {
-            //Ensures there will be no 'console is undefined' errors
+
+            // ensures there will be no 'console is undefined' errors
             window.console = window.console || <any>(function () {
                 var c = <any>{};
                 c.log = c.warn = c.debug = c.info = c.log =
-                    c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () { };
+                c.error = c.time = c.dir = c.profile = c.clear = c.exception = c.trace = c.assert = function () { };
                 return c;
             })();
-           
+
             $('.bubbleInfo').hide();
 
+            // populate collection names from URL
             var url = CZ.UrlNav.getURL();
             rootCollection = url.superCollectionName === undefined;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
 
-            // Apply features
+            // apply features
             ApplyFeatureActivation();
 
-            // Register ChronoZoom Extensions
+            // register ChronoZoom extensions
             CZ.Extensions.registerExtensions();
 
-            // Register ChronoZoom Media Pickers.
+            // register ChronoZoom media pickers
             CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
             CZ.Media.initialize();
             CZ.Common.initialize();
@@ -269,6 +292,25 @@ module CZ {
                 //$('.home-icon').trigger('click');
                 window.location.href = '/';
             });
+
+            // if URL has a supercollection and collection then
+            // check if current user has edit permissions before continuing with load
+            // since other parts of load need to know if can display edit buttons etc.
+            if (CZ.Service.superCollectionName === undefined || CZ.Service.collectionName === undefined) {
+                CZ.Service.canEdit = false;
+                finishLoad();
+            }
+            else {
+              CZ.Service.getCanEdit().done(result => {
+                  CZ.Service.canEdit = (result === true);
+                    finishLoad();
+              });
+            }
+
+        });
+
+        function finishLoad() {
+            // only invoked after user's edit permissions are checked (AJAX callback)
 
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
@@ -373,6 +415,20 @@ module CZ {
                         exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
                         exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
                         exhibitBorderColorInput: $(".cz-form-exhibit-border"),
+
+                        chkEditors: "#cz-form-multiuser-enable",
+                        btnEditors: '#cz-form-multiuser-manage'
+                    });
+                    form.show();
+                });
+
+                $('body').on('click', '#cz-form-multiuser-manage', function (event) {
+                    var form = new CZ.UI.FormManageEditors(forms[20], {
+                        activationSource: $(this),
+                        navButton:      ".cz-form-nav",
+                        titleTextblock: ".cz-form-title",
+                        closeButton:    ".cz-form-close-btn > .cz-form-btn",
+                        saveButton:     ".cz-form-save"
                     });
                     form.show();
                 });
@@ -545,8 +601,10 @@ module CZ {
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
                     CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(() => {
+
+                    if (!CZ.Authoring.isEnabled) $('.edit-icon').hide(); // hide create icon if don't have edit rights
+
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
-                        $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
                         $("#TwitterBlock").attr("data-toggle", "show");
                     }
@@ -901,7 +959,7 @@ module CZ {
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
-        });
+        }//);
 
         export function IsFeatureEnabled(featureMap: FeatureInfo[], featureName: string) {
             var feature: FeatureInfo[] = $.grep(featureMap, function (e) { return e.Name === featureName; });

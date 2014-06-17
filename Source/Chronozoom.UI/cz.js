@@ -217,6 +217,14 @@
         }
         Settings.applyTheme = applyTheme;
 
+        function getCurrentRootURL() {
+            var root = window.location.protocol + '//' + window.location.hostname;
+            if (window.location.port != '' && window.location.port != '80' && window.location.port != '443')
+                root += ':' + window.location.port;
+            return root + '/';
+        }
+        Settings.getCurrentRootURL = getCurrentRootURL;
+
         Settings.defaultBingSearchTop = 50;
         Settings.defaultBingSearchSkip = 0;
 
@@ -226,8 +234,8 @@
         Settings.mediapickerVideoThumbnailMaxWidth = 190;
         Settings.mediapickerVideoThumbnailMaxHeight = 130;
 
-        Settings.WLAPIClientID = "00000000440FD1D7";
-        Settings.WLAPIRedirectUrl = "http://www.chronozoom.com/";
+        Settings.WLAPIClientID = constants.onedriveClientId;
+        Settings.WLAPIRedirectUrl = getCurrentRootURL();
 
         Settings.errorMessageSlideDuration = 0;
     })(CZ.Settings || (CZ.Settings = {}));
@@ -3708,8 +3716,9 @@ var CZ;
         Service.Request = Request;
         ;
 
-        Service.collectionName = "";
         Service.superCollectionName = "";
+        Service.collectionName = "";
+        Service.canEdit = false;
 
         function getTimelines(r, sc, c) {
             if (typeof sc === "undefined") { sc = Service.superCollectionName; }
@@ -3746,6 +3755,109 @@ var CZ;
             });
         }
         Service.getCollections = getCollections;
+
+        function getCollection() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("data");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getCollection = getCollection;
+
+        function getExhibitLastUpdate(exhibitId) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("exhibit");
+            request.addToPath(exhibitId);
+            request.addToPath("lastupdate");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getExhibitLastUpdate = getExhibitLastUpdate;
+
+        function findUsers(partialName) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath("find");
+            request.addToPath("users?partial=" + partialName);
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.findUsers = findUsers;
+
+        function getCanEdit() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("canedit");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getCanEdit = getCanEdit;
+
+        function getMembers() {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(Service.collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getMembers = getMembers;
+
+        function putMembers(superCollectionName, collectionName, userIds) {
+            CZ.Authoring.resetSessionTimer();
+
+            var request = new Request(_serviceUrl);
+            request.addToPath(superCollectionName);
+            request.addToPath(collectionName);
+            request.addToPath("members");
+
+            return $.ajax({
+                type: "PUT",
+                cache: false,
+                contentType: "application/json",
+                dataType: "json",
+                url: request.url,
+                data: JSON.stringify(userIds)
+            });
+        }
+        Service.putMembers = putMembers;
 
         function getStructure(r) {
             CZ.Authoring.resetSessionTimer();
@@ -10420,7 +10532,6 @@ var CZ;
 
             DatePicker.prototype.remove = function () {
                 this.datePicker.empty();
-
                 this.datePicker.removeClass("cz-datepicker");
             };
 
@@ -10502,6 +10613,7 @@ var CZ;
 
                 this.yearSelector = $("<input type='text' class='cz-datepicker-year-year cz-input'></input>");
                 this.regimeSelector = $("<select class='cz-datepicker-regime cz-input'></select>");
+                this.circaSelector = $('<div class="cz-datepicker-circa">Circa / Approximate: <input type="checkbox" /></label>');
 
                 this.yearSelector.focus(function (event) {
                     _this.errorMsg.text("");
@@ -10528,6 +10640,8 @@ var CZ;
 
                 this.dateContainer.append(this.yearSelector);
                 this.dateContainer.append(this.regimeSelector);
+                this.dateContainer.append('<br />');
+                this.dateContainer.append(this.circaSelector);
             };
 
             DatePicker.prototype.editModeDate = function () {
@@ -10537,6 +10651,7 @@ var CZ;
                 this.daySelector = $("<select class='cz-datepicker-day-selector cz-input'></select>");
                 this.monthSelector = $("<select class='cz-datepicker-month-selector cz-input'></select>");
                 this.yearSelector = $("<input type='text' class='cz-datepicker-year-date cz-input'></input>");
+                this.circaSelector = $('<div class="cz-datepicker-circa">Circa / Approximate: <input type="checkbox" /></label>');
 
                 this.yearSelector.focus(function (event) {
                     _this.errorMsg.text("");
@@ -10570,6 +10685,8 @@ var CZ;
                 this.dateContainer.append(this.monthSelector);
                 this.dateContainer.append(this.daySelector);
                 this.dateContainer.append(this.yearSelector);
+                this.dateContainer.append('<br />');
+                this.dateContainer.append(this.circaSelector);
             };
 
             DatePicker.prototype.editModeInfinite = function () {
@@ -12759,6 +12876,7 @@ var CZ;
                 } else {
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
+
                 this.saveButton.click(function (event) {
                     _this.errorMessage.empty();
                     var isDataValid = false;
@@ -12989,6 +13107,7 @@ var CZ;
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
+
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -13015,6 +13134,10 @@ var CZ;
                 } else if (this.mode === "editExhibit") {
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("Update Exhibit");
+
+                    CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
+                        _this.saveButton.data('lastUpdate', data);
+                    });
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
@@ -13118,14 +13241,41 @@ var CZ;
                 }
 
                 if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                    if (this.mode === "editExhibit") {
+                        CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
+                            if (data == _this.saveButton.data('lastUpdate')) {
+                                _this.onSave_PerformSave(newExhibit);
+                            } else {
+                                if (confirm("Someone else has made changes to this exhibit since you began editing it.\n\n" + "Do you want to replace their changes with yours? This will cause all of their changes to be lost.")) {
+                                    _this.onSave_PerformSave(newExhibit);
+                                } else {
+                                    alert("Your changes were not saved.\n\n" + "You can click on your artifacts to copy off any changes you've made before closing the Edit Exhibit pane. " + "After closing the Edit Exhibits pane, you can then refresh your browser to see the latest changes.");
+                                }
+                            }
+                        });
+                    } else {
+                        this.onSave_PerformSave(newExhibit);
+                    }
+                } else if (this.exhibit.contentItems.length === 0) {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Cannot create exhibit without artifacts.").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
+                } else {
+                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
+                }
+            };
+
+            FormEditExhibit.prototype.onSave_PerformSave = function (newExhibit) {
+                var _this = this;
                     this.saveButton.prop('disabled', true);
+
                     CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                         _this.isCancel = false;
                         _this.isModified = false;
                         _this.close();
-
                         _this.exhibit.id = arguments[0].id;
-
                         _this.exhibit.onmouseclick();
                     }, function (error) {
                         var errorMessage = JSON.parse(error.responseText).errorMessage;
@@ -13143,20 +13293,10 @@ var CZ;
                         } else {
                             _this.errorMessage.text("Sorry, internal server error :(");
                         }
-
                         _this.errorMessage.show().delay(7000).fadeOut();
                     }).always(function () {
                         _this.saveButton.prop('disabled', false);
                     });
-                } else if (this.exhibit.contentItems.length === 0) {
-                    var self = this;
-                    var origMsg = this.errorMessage.text();
-                    this.errorMessage.text("Cannot create exhibit without artifacts.").show().delay(7000).fadeOut(function () {
-                        return self.errorMessage.text(origMsg);
-                    });
-                } else {
-                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
-                }
             };
 
             FormEditExhibit.prototype.onDelete = function () {
@@ -13558,6 +13698,8 @@ var CZ;
                 this.activeCollectionTheme = jQuery.extend(true, {}, formInfo.collectionTheme);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.kioskmodeInput = formInfo.kioskmodeInput;
+                this.chkEditors = container.find(formInfo.chkEditors);
+                this.btnEditors = container.find(formInfo.btnEditors);
 
                 this.timelineBackgroundColorInput = formInfo.timelineBackgroundColorInput;
                 this.timelineBackgroundOpacityInput = formInfo.timelineBackgroundOpacityInput;
@@ -13598,8 +13740,6 @@ var CZ;
                     _this.updateCollectionTheme(true);
                 });
 
-                this.saveButton.off();
-
                 this.backgroundInput.focus(function () {
                     _this.backgroundInput.hideError();
                 });
@@ -13610,21 +13750,23 @@ var CZ;
                     console.log("Error initializing collection form attributes");
                 }
 
-                this.saveButton.click(function (event) {
+                this.saveButton.off().click(function (event) {
                     _this.updateCollectionTheme(true);
                     _this.activeCollectionTheme = _this.collectionTheme;
 
-                    var themeData = {
-                        theme: JSON.stringify(_this.collectionTheme)
+                    var collectionData = {
+                        theme: JSON.stringify(_this.collectionTheme),
+                        MembersAllowed: $(_this.chkEditors).prop('checked')
                     };
 
-                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, themeData).always(function () {
+                    CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, collectionData).always(function () {
                         _this.saveButton.prop('disabled', false);
                         _this.close();
                     });
                 });
             }
             FormEditCollection.prototype.initialize = function () {
+                var _this = this;
                 this.saveButton.prop('disabled', false);
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
@@ -13640,6 +13782,21 @@ var CZ;
                 this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
+
+                CZ.Service.getCollection().done(function (data) {
+                    var themeFromDb = JSON.parse(data.theme);
+                    if (themeFromDb == null) {
+                        $(_this.kioskmodeInput).prop('checked', false);
+                    } else {
+                        $(_this.kioskmodeInput).prop('checked', themeFromDb.kioskMode);
+                    }
+                    $(_this.chkEditors).prop('checked', data.MembersAllowed);
+                    _this.renderManageEditorsButton();
+                });
+
+                this.chkEditors.off().click(function (event) {
+                    _this.renderManageEditorsButton();
+                });
             };
 
             FormEditCollection.prototype.colorIsRgba = function (color) {
@@ -13704,6 +13861,14 @@ var CZ;
                     return "0" + hex;
 
                 return hex;
+            };
+
+            FormEditCollection.prototype.renderManageEditorsButton = function () {
+                if (this.chkEditors.prop('checked')) {
+                    this.btnEditors.slideDown('fast');
+                } else {
+                    this.btnEditors.slideUp('fast');
+                }
             };
 
             FormEditCollection.prototype.updateCollectionTheme = function (clearError) {
@@ -13787,6 +13952,59 @@ var CZ;
             return FormEditCollection;
         })(CZ.UI.FormUpdateEntity);
         UI.FormEditCollection = FormEditCollection;
+    })(CZ.UI || (CZ.UI = {}));
+    var UI = CZ.UI;
+})(CZ || (CZ = {}));
+var CZ;
+(function (CZ) {
+    (function (UI) {
+        var FormManageEditors = (function (_super) {
+            __extends(FormManageEditors, _super);
+            function FormManageEditors(container, formInfo) {
+                _super.call(this, container, formInfo);
+
+                CZ.Service.getMembers().done(function (data) {
+                    if (data.length == 0) {
+                        $('#tblDelEditors tbody').html('<tr class="none"><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
+                    } else {
+                        $('#tblDelEditors tbody').html('');
+                        data.forEach(function (member) {
+                            $('#tblDelEditors tbody').append('<tr data-id="' + member.User.Id + '">' + '<td class="delete" title="Remove Editor"></td>' + '<td title="' + member.User.DisplayName + '">' + member.User.DisplayName + '</td>' + '</tr>');
+                        });
+                    }
+                });
+
+                $('#tblAddEditors input[type="search"]').off('input').on('input', function (event) {
+                    var _this = this;
+                    CZ.Service.findUsers($(this).val()).done(function (data) {
+                        $(_this).closest('table').find('tbody').html('');
+                        $(_this).closest('tr').find('input[type="checkbox"]').prop('checked', false);
+                        data.forEach(function (user) {
+                            $('#tblAddEditors tbody').append('<tr data-id="' + user.Id + '">' + '<td class="select" title="Select/Unselect This User"><input type="checkbox" /></td>' + '<td title="' + user.DisplayName + '">' + user.DisplayName + '</td>' + '</tr>');
+                        });
+                        if (data.length == 0) {
+                            $(_this).closest('table').find('tfoot').hide();
+                        } else {
+                            $(_this).closest('table').find('tfoot').show();
+                        }
+                    });
+                });
+
+                $('#auth-edit-collection-editors .cz-form-save').off().click(function (event) {
+                    var userIds = new Array();
+
+                    $('#tblDelEditors tbody tr:not(.none)').each(function (index) {
+                        userIds.push($(this).attr('data-id'));
+                    });
+
+                    CZ.Service.putMembers(CZ.Service.superCollectionName, CZ.Service.collectionName, userIds).always(function () {
+                        $('#auth-edit-collection-editors').hide();
+                    });
+                });
+            }
+            return FormManageEditors;
+        })(CZ.UI.FormUpdateEntity);
+        UI.FormManageEditors = FormManageEditors;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
@@ -15089,7 +15307,6 @@ var CZ;
             }
         }
         StartPage.startExploring = startExploring;
-        StartPage.startExploring = startExploring;
 
         function TwitterLayout(target, idx) {
             var ListTemplate = "#template-tweet-list .tweet-list-item";
@@ -15415,7 +15632,8 @@ var CZ;
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
             "#start-page": "/ui/start-page.html",
-            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html"
+            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html",
+            "#auth-edit-collection-editors": "/ui/auth-edit-collection-editors.html"
         };
 
         (function (FeatureActivation) {
@@ -15497,19 +15715,15 @@ var CZ;
         HomePageViewModel.rootCollection;
 
         function UserCanEditCollection(profile) {
-            if (!constants || !constants.environment || constants.environment === "localhost") {
-                return true;
-            }
-
-            if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
-                return true;
-            }
-
-            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
+            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || !CZ.Service.collectionName) {
                 return false;
             }
 
-            return true;
+            if (CZ.Service.superCollectionName.toLowerCase() === "sandbox" && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
+                return true;
+            }
+
+            return CZ.Service.canEdit;
         }
 
         function InitializeToursUI(profile, forms) {
@@ -15601,6 +15815,18 @@ var CZ;
                 window.location.href = '/';
             });
 
+            if (CZ.Service.superCollectionName === undefined || CZ.Service.collectionName === undefined) {
+                CZ.Service.canEdit = false;
+                finishLoad();
+            } else {
+                CZ.Service.getCanEdit().done(function (result) {
+                    CZ.Service.canEdit = (result === true);
+                    finishLoad();
+                });
+            }
+        });
+
+        function finishLoad() {
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
@@ -15695,7 +15921,20 @@ var CZ;
                         timelineBorderColorInput: $(".cz-form-timeline-border"),
                         exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
                         exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
-                        exhibitBorderColorInput: $(".cz-form-exhibit-border")
+                        exhibitBorderColorInput: $(".cz-form-exhibit-border"),
+                        chkEditors: "#cz-form-multiuser-enable",
+                        btnEditors: '#cz-form-multiuser-manage'
+                    });
+                    form.show();
+                });
+
+                $('body').on('click', '#cz-form-multiuser-manage', function (event) {
+                    var form = new CZ.UI.FormManageEditors(forms[20], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        titleTextblock: ".cz-form-title",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        saveButton: ".cz-form-save"
                     });
                     form.show();
                 });
@@ -15869,8 +16108,10 @@ var CZ;
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
                     CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(function () {
+                    if (!CZ.Authoring.isEnabled)
+                        $('.edit-icon').hide();
+
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
-                        $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
                         $("#TwitterBlock").attr("data-toggle", "show");
                     } else {
@@ -16183,7 +16424,7 @@ var CZ;
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
-        });
+        }
 
         function IsFeatureEnabled(featureMap, featureName) {
             var feature = $.grep(featureMap, function (e) {

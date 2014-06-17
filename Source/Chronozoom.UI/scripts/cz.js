@@ -27,7 +27,8 @@ var CZ;
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
             "#start-page": "/ui/start-page.html",
-            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html"
+            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html",
+            "#auth-edit-collection-editors": "/ui/auth-edit-collection-editors.html"
         };
 
         (function (FeatureActivation) {
@@ -109,19 +110,15 @@ var CZ;
         HomePageViewModel.rootCollection;
 
         function UserCanEditCollection(profile) {
-            if (!constants || !constants.environment || constants.environment === "localhost") {
-                return true;
-            }
-
-            if (CZ.Service.superCollectionName && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
-                return true;
-            }
-
-            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || profile.DisplayName.toLowerCase() !== CZ.Service.superCollectionName.toLowerCase()) {
+            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || !CZ.Service.collectionName) {
                 return false;
             }
 
-            return true;
+            if (CZ.Service.superCollectionName.toLowerCase() === "sandbox" && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
+                return true;
+            }
+
+            return CZ.Service.canEdit;
         }
 
         function InitializeToursUI(profile, forms) {
@@ -213,6 +210,18 @@ var CZ;
                 window.location.href = '/';
             });
 
+            if (CZ.Service.superCollectionName === undefined || CZ.Service.collectionName === undefined) {
+                CZ.Service.canEdit = false;
+                finishLoad();
+            } else {
+                CZ.Service.getCanEdit().done(function (result) {
+                    CZ.Service.canEdit = (result === true);
+                    finishLoad();
+                });
+            }
+        });
+
+        function finishLoad() {
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
@@ -307,7 +316,20 @@ var CZ;
                         timelineBorderColorInput: $(".cz-form-timeline-border"),
                         exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
                         exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
-                        exhibitBorderColorInput: $(".cz-form-exhibit-border")
+                        exhibitBorderColorInput: $(".cz-form-exhibit-border"),
+                        chkEditors: "#cz-form-multiuser-enable",
+                        btnEditors: '#cz-form-multiuser-manage'
+                    });
+                    form.show();
+                });
+
+                $('body').on('click', '#cz-form-multiuser-manage', function (event) {
+                    var form = new CZ.UI.FormManageEditors(forms[20], {
+                        activationSource: $(this),
+                        navButton: ".cz-form-nav",
+                        titleTextblock: ".cz-form-title",
+                        closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        saveButton: ".cz-form-save"
                     });
                     form.show();
                 });
@@ -481,8 +503,10 @@ var CZ;
                     CZ.Authoring.isEnabled = UserCanEditCollection(null);
                     CZ.Settings.isAuthorized = UserCanEditCollection(null);
                 }).always(function () {
+                    if (!CZ.Authoring.isEnabled)
+                        $('.edit-icon').hide();
+
                     if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
-                        $(".edit-icon").hide();
                         $("#WelcomeBlock").attr("data-toggle", "show");
                         $("#TwitterBlock").attr("data-toggle", "show");
                     } else {
@@ -795,7 +819,7 @@ var CZ;
                 }));
                 $("#bibliographyBack").css("display", "block");
             }
-        });
+        }
 
         function IsFeatureEnabled(featureMap, featureName) {
             var feature = $.grep(featureMap, function (e) {
