@@ -57,7 +57,7 @@ namespace Chronozoom.UI
         /// For example, x.js?v=2014-12-31--17-30 is seen by browsers as a different file compared to x.js?v2015-01-01--00-00.
         /// It should be noted that this particular approach is not be suitable for a web farm unless sticky IPs are used on the load balancer.
         /// </summary>
-        /// <param name="relativePath">Path to static content file such as .js or .css file.</param>
+        /// <param name="webPath">Path to static content file such as .js or .css file.</param>
         /// <returns>String based off of file creation date and time.</returns>
         private string GetFileVersion(string webPath)
         {

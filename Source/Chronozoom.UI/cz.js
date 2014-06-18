@@ -3145,7 +3145,7 @@ var CZ;
                 _super.call(this, container, listBoxInfo, listItemsInfo);
             }
             return TourStopListBox;
-        })(UI.ListBoxBase);
+        })(CZ.UI.ListBoxBase);
         UI.TourStopListBox = TourStopListBox;
 
         var TourStopListItem = (function (_super) {
@@ -3210,7 +3210,7 @@ var CZ;
                 myDescr.show(500);
             };
             return TourStopListItem;
-        })(UI.ListItemBase);
+        })(CZ.UI.ListItemBase);
         UI.TourStopListItem = TourStopListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -5564,7 +5564,7 @@ var CZ;
                 configurable: true
             });
             return TourListBox;
-        })(UI.ListBoxBase);
+        })(CZ.UI.ListBoxBase);
         UI.TourListBox = TourListBox;
 
         var TourListItem = (function (_super) {
@@ -5609,7 +5609,7 @@ var CZ;
                 }
             }
             return TourListItem;
-        })(UI.ListItemBase);
+        })(CZ.UI.ListItemBase);
         UI.TourListItem = TourListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -10889,7 +10889,7 @@ var CZ;
                 CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
 
-                Authoring.showEditTourForm(null);
+                CZ.Authoring.showEditTourForm(null);
             }
             UI.createTour = createTour;
 
@@ -13129,7 +13129,7 @@ var CZ;
                 _super.prototype.remove.call(this, item);
             };
             return ContentItemListBox;
-        })(UI.ListBoxBase);
+        })(CZ.UI.ListBoxBase);
         UI.ContentItemListBox = ContentItemListBox;
 
         var ContentItemListItem = (function (_super) {
@@ -13159,7 +13159,7 @@ var CZ;
                 });
             }
             return ContentItemListItem;
-        })(UI.ListItemBase);
+        })(CZ.UI.ListItemBase);
         UI.ContentItemListItem = ContentItemListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -13497,8 +13497,8 @@ var CZ;
             };
 
             FormEditExhibit.prototype.close = function (noAnimation) {
-                var _this = this;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
@@ -13534,7 +13534,7 @@ var CZ;
                 CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
             };
             return FormEditExhibit;
-        })(UI.FormUpdateEntity);
+        })(CZ.UI.FormUpdateEntity);
         UI.FormEditExhibit = FormEditExhibit;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -13650,7 +13650,7 @@ var CZ;
                     this.titleTextblock.text("Edit");
                     this.saveButton.text("Update Artifact");
 
-                    if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit)
+                    if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit)
                         this.closeButton.hide();
                     else
                         this.closeButton.show();
@@ -13687,7 +13687,7 @@ var CZ;
 
                 if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
-                        if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
+                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
                             this.isCancel = false;
                             this.prevForm.contentItemsListBox.add(newContentItem);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
@@ -13697,7 +13697,7 @@ var CZ;
                             this.back();
                         }
                     } else if (CZ.Authoring.contentItemMode === "editContentItem") {
-                        if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
+                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
                             this.isCancel = false;
                             var clickedListItem = this.prevForm.clickedListItem;
                             clickedListItem.iconImg.attr("src", newContentItem.uri);
@@ -13755,8 +13755,8 @@ var CZ;
             };
 
             FormEditCI.prototype.close = function (noAnimation) {
-                var _this = this;
                 if (typeof noAnimation === "undefined") { noAnimation = false; }
+                var _this = this;
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
@@ -14111,7 +14111,7 @@ var CZ;
                 });
             }
             return FormManageEditors;
-        })(UI.FormUpdateEntity);
+        })(CZ.UI.FormUpdateEntity);
         UI.FormManageEditors = FormManageEditors;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
