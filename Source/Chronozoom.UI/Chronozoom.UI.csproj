@@ -343,6 +343,9 @@
     <Content Include="images\twitter_profile_pic.gif" />
     <Content Include="images\view-icon.png" />
     <Content Include="images\edit.svg" />
+    <Content Include="images\wait.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="pages\crawler.aspx" />
     <Content Include="pages\logoff.aspx" />
     <Content Include="pages\sitemap.aspx" />
