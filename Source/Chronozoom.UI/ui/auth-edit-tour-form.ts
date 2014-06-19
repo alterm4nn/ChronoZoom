@@ -117,14 +117,16 @@ module CZ {
             private id: string;
             private title: string;
             private description: string;
+            private audio: string;
             private sequence: number;
             private stops: CZ.UI.TourStop[];
             private category: string;
 
-            constructor(id: string, title: string, description: string, category: string, sequence: number, stops: CZ.UI.TourStop[]) {
+            constructor(id: string, title: string, description: string, audio: string, category: string, sequence: number, stops: CZ.UI.TourStop[]) {
                 this.id = id;
                 this.title = title;
                 this.description = description;
+                this.audio = audio;
                 this.sequence = sequence;
                 this.stops = stops;
                 this.category = category;
@@ -154,6 +156,14 @@ module CZ {
                 this.description = val;
             }
 
+            public get Audio(): string {
+                return this.audio;
+            }
+
+            public set Audio(val: string) {
+                this.audio = val;
+            }
+
             public get Stops(): TourStop[] {
                 return this.stops;
             }
@@ -166,6 +176,8 @@ module CZ {
             private titleInput: JQuery;
             private tourTitleInput: JQuery;
             private tourDescriptionInput: JQuery;
+            private tourAudioInput: JQuery;
+            private tourAudioControls: JQuery;
             private tour: CZ.Tours.Tour;
 
             public tourStopsListBox: TourStopListBox;
@@ -182,6 +194,8 @@ module CZ {
 
                 this.tourTitleInput = this.container.find(".cz-form-tour-title");
                 this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
+                this.tourAudioInput = this.container.find('#cz-form-tour-audio');
+                this.tourAudioControls = this.container.find('#cz-form-tour-audio-controls');
                 this.clean();
 
                 this.saveButton.off();
@@ -193,6 +207,7 @@ module CZ {
                 if (this.tour) {
                     this.tourTitleInput.val(this.tour.title);
                     this.tourDescriptionInput.val(this.tour.description);
+                    this.tourAudioInput.val(this.tour.audio);
                     for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i]; // bookmarks are already ordered in the tour
                         var stop = FormEditTour.bookmarkToTourstop(bookmark);
@@ -244,6 +259,7 @@ module CZ {
                 // Add the tour to the local tours collection
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
+                var audio = this.tourAudioInput.val();
                 var category = "tours";
                 var n = stops.length;
                 var tourId = undefined;
@@ -254,7 +270,7 @@ module CZ {
                 }
 
                 // Posting the tour to the service
-                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, category, n, stops));
+                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, audio, category, n, stops));
 
                 request.done(q => {
                     // build array of bookmarks of current tour
@@ -271,7 +287,7 @@ module CZ {
                         CZ.Tours.bookmarkTransition,
                         CZ.Common.vc,
                         category, // category
-                        "", //audio
+                        audio, //audio
                         sequenceNum,
                         descr);
                     deferred.resolve(tour);
@@ -301,6 +317,22 @@ module CZ {
                 }
 
                 var self = this;
+
+                this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
+
+                this.tourAudioInput.change(event =>
+                {
+                    this.tourAudioControls.stop();
+                    this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
+
+                    if (CZ.Data.validURL(this.tourAudioInput.val())) {
+                        this.tourAudioControls.show();
+                    }
+                    else {
+                        this.tourAudioControls.hide();
+                    }
+                });
+
                 this.addStopButton.click(event =>
                 {
                     CZ.Authoring.isActive = true; // for now we do not watch for mouse moves                    
@@ -319,11 +351,22 @@ module CZ {
                         }
                     }, 500);
                 });
+
                 this.saveButton.click(event =>
                 {
-                    var message: string;
-                    if (!this.tourTitleInput.val()) message = "Please enter the title.";
-                    else if (this.tourStopsListBox.items.length == 0) message = "Please add a tour stop to the tour.";
+                    var message: string = '';
+
+                    if (!this.tourTitleInput.val()) message += "Please enter a title.\n";
+
+                    // audio URL validation
+                    this.tourAudioInput.val($.trim(this.tourAudioInput.val())); // first trim excess space
+                    if (this.tourAudioInput.val() != '' && !CZ.Data.validURL(this.tourAudioInput.val())) {
+                        // content has been entered and is not a validly formed URL
+                        message += 'Please provide a valid audio URL.\n';
+                    }
+
+                    if (this.tourStopsListBox.items.length == 0) message += "Please add a tour stop to the tour.\n";
+
                     if (message) {
                         alert(message);
                         return;
@@ -368,6 +411,7 @@ module CZ {
                         }
                     }
                 });
+
                 this.deleteButton.click(event =>
                 {
                     if (this.tour == null) return;
@@ -439,6 +483,7 @@ module CZ {
                 this.container.find(".cz-listbox").empty();
                 this.tourTitleInput.val("");
                 this.tourDescriptionInput.val("");
+                this.tourAudioInput.val('');
             }
 
             private onStopsReordered() {
