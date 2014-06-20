@@ -3158,8 +3158,17 @@ var CZ;
                 this.typeTextblock = this.container.find(uiMap.typeTextblock);
 
                 var self = this;
+
+                var lapse = this.container.find(".cz-tourstop-lapse");
                 var descr = this.container.find(".cz-tourstop-description");
+
+                lapse.val(self.data.lapseTime);
                 descr.text(self.data.Description);
+
+                lapse.change(function (ev) {
+                    self.data.lapseTime = self.LapseTime;
+                });
+
                 descr.change(function (ev) {
                     self.data.Description = self.Description;
                 });
@@ -3195,6 +3204,18 @@ var CZ;
                     CZ.Search.navigateToElement(target);
                 });
             }
+            Object.defineProperty(TourStopListItem.prototype, "LapseTime", {
+                get: function () {
+                    var element = this.container.find('.cz-tourstop-lapse');
+                    var rv = parseInt('0' + element.val());
+                    if (rv > 3600)
+                        rv = 3600;
+                    return rv;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
             Object.defineProperty(TourStopListItem.prototype, "Description", {
                 get: function () {
                     var descr = this.container.find(".cz-tourstop-description");
@@ -3205,9 +3226,9 @@ var CZ;
             });
 
             TourStopListItem.prototype.Activate = function () {
-                var myDescr = this.container.find(".cz-tourstop-description");
-                this.parent.container.find(".cz-tourstop-description").not(myDescr).hide();
-                myDescr.show(500);
+                var myDetails = this.container.find(".cz-tourstop-detailblock");
+                this.parent.container.find(".cz-tourstop-detailblock").not(myDetails).hide();
+                myDetails.show(500);
             };
             return TourStopListItem;
         })(UI.ListItemBase);
@@ -3426,6 +3447,7 @@ var CZ;
                 this.tourTitleInput = this.container.find(".cz-form-tour-title");
                 this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
                 this.tourAudioInput = this.container.find('#cz-form-tour-audio');
+                this.tourAudioControls = this.container.find('#cz-form-tour-audio-controls');
                 this.clean();
 
                 this.saveButton.off();
@@ -3533,6 +3555,12 @@ var CZ;
                 }
 
                 var self = this;
+
+                this.renderAudioControls();
+                this.tourAudioInput.on('change input', function (event) {
+                    _this.renderAudioControls();
+                });
+
                 this.addStopButton.click(function (event) {
                     CZ.Authoring.isActive = true;
                     CZ.Authoring.mode = "editTour-selectTarget";
@@ -3549,19 +3577,18 @@ var CZ;
                         }
                     }, 500);
                 });
+
                 this.saveButton.click(function (event) {
                     var message = '';
 
-                    _this.tourAudioInput.val($.trim(_this.tourAudioInput.val()));
-                    if (_this.tourAudioInput.val() != '') {
-                        if (/^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(_this.tourAudioInput.val())) {
-                        } else {
-                            message += '';
-                        }
-                    }
-
                     if (!_this.tourTitleInput.val())
                         message += "Please enter a title.\n";
+
+                    _this.tourAudioInput.val($.trim(_this.tourAudioInput.val()));
+                    if (_this.tourAudioInput.val() != '' && !CZ.Data.validURL(_this.tourAudioInput.val())) {
+                        message += 'Please provide a valid audio URL.\n';
+                    }
+
                     if (_this.tourStopsListBox.items.length == 0)
                         message += "Please add a tour stop to the tour.\n";
 
@@ -3606,6 +3633,7 @@ var CZ;
                         }
                     }
                 });
+
                 this.deleteButton.click(function (event) {
                     if (_this.tour == null)
                         return;
@@ -3676,6 +3704,17 @@ var CZ;
                 this.tourTitleInput.val("");
                 this.tourDescriptionInput.val("");
                 this.tourAudioInput.val('');
+            };
+
+            FormEditTour.prototype.renderAudioControls = function () {
+                this.tourAudioControls.stop();
+                this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
+
+                if (CZ.Data.validURL(this.tourAudioInput.val())) {
+                    this.tourAudioControls.show();
+                } else {
+                    this.tourAudioControls.hide();
+                }
             };
 
             FormEditTour.prototype.onStopsReordered = function () {
@@ -11144,6 +11183,11 @@ var CZ;
             return result;
         }
         Data.parseStyleString = parseStyleString;
+
+        function validURL(url) {
+            return /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url);
+        }
+        Data.validURL = validURL;
     })(CZ.Data || (CZ.Data = {}));
     var Data = CZ.Data;
 })(CZ || (CZ = {}));

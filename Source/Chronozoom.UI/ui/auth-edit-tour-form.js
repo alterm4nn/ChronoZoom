@@ -324,17 +324,9 @@ var CZ;
 
                 var self = this;
 
-                this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
-
-                this.tourAudioInput.change(function (event) {
-                    _this.tourAudioControls.stop();
-                    _this.tourAudioControls.html('<source src="' + _this.tourAudioInput.val() + '" />');
-
-                    if (CZ.Data.validURL(_this.tourAudioInput.val())) {
-                        _this.tourAudioControls.show();
-                    } else {
-                        _this.tourAudioControls.hide();
-                    }
+                this.renderAudioControls();
+                this.tourAudioInput.on('change input', function (event) {
+                    _this.renderAudioControls();
                 });
 
                 this.addStopButton.click(function (event) {
@@ -480,6 +472,17 @@ var CZ;
                 this.tourTitleInput.val("");
                 this.tourDescriptionInput.val("");
                 this.tourAudioInput.val('');
+            };
+
+            FormEditTour.prototype.renderAudioControls = function () {
+                this.tourAudioControls.stop();
+                this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
+
+                if (CZ.Data.validURL(this.tourAudioInput.val())) {
+                    this.tourAudioControls.show();
+                } else {
+                    this.tourAudioControls.hide();
+                }
             };
 
             FormEditTour.prototype.onStopsReordered = function () {

@@ -1,4 +1,4 @@
-﻿var CZ;
+var CZ;
 (function (CZ) {
     (function (Data) {
         function getTimelines(r) {

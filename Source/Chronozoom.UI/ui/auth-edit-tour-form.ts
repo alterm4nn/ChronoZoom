@@ -318,19 +318,10 @@ module CZ {
 
                 var self = this;
 
-                this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
-
-                this.tourAudioInput.change(event =>
+                this.renderAudioControls();
+                this.tourAudioInput.on('change input', event =>
                 {
-                    this.tourAudioControls.stop();
-                    this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
-
-                    if (CZ.Data.validURL(this.tourAudioInput.val())) {
-                        this.tourAudioControls.show();
-                    }
-                    else {
-                        this.tourAudioControls.hide();
-                    }
+                    this.renderAudioControls();
                 });
 
                 this.addStopButton.click(event =>
@@ -453,7 +444,6 @@ module CZ {
                 this.activationSource.addClass("active");
             }
 
-
             public hide(noAnimation: boolean = false) {
                 super.close(noAnimation ? undefined : {
                     effect: "slide",
@@ -462,7 +452,6 @@ module CZ {
                 });
                 this.activationSource.removeClass("active");
             }
-
 
             public close() {
                 super.close({
@@ -484,6 +473,18 @@ module CZ {
                 this.tourTitleInput.val("");
                 this.tourDescriptionInput.val("");
                 this.tourAudioInput.val('');
+            }
+
+            private renderAudioControls() {
+                this.tourAudioControls.stop();
+                this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
+
+                if (CZ.Data.validURL(this.tourAudioInput.val())) {
+                    this.tourAudioControls.show();
+                }
+                else {
+                    this.tourAudioControls.hide();
+                }
             }
 
             private onStopsReordered() {

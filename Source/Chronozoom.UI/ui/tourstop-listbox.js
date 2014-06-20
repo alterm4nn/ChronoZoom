@@ -55,8 +55,17 @@ var CZ;
                 this.typeTextblock = this.container.find(uiMap.typeTextblock);
 
                 var self = this;
+
+                var lapse = this.container.find(".cz-tourstop-lapse");
                 var descr = this.container.find(".cz-tourstop-description");
+
+                lapse.val(self.data.lapseTime);
                 descr.text(self.data.Description);
+
+                lapse.change(function (ev) {
+                    self.data.lapseTime = self.LapseTime;
+                });
+
                 descr.change(function (ev) {
                     self.data.Description = self.Description;
                 });
@@ -92,6 +101,18 @@ var CZ;
                     CZ.Search.navigateToElement(target);
                 });
             }
+            Object.defineProperty(TourStopListItem.prototype, "LapseTime", {
+                get: function () {
+                    var element = this.container.find('.cz-tourstop-lapse');
+                    var rv = parseInt('0' + element.val());
+                    if (rv > 3600)
+                        rv = 3600;
+                    return rv;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
             Object.defineProperty(TourStopListItem.prototype, "Description", {
                 get: function () {
                     var descr = this.container.find(".cz-tourstop-description");
@@ -102,9 +123,9 @@ var CZ;
             });
 
             TourStopListItem.prototype.Activate = function () {
-                var myDescr = this.container.find(".cz-tourstop-description");
-                this.parent.container.find(".cz-tourstop-description").not(myDescr).hide();
-                myDescr.show(500);
+                var myDetails = this.container.find(".cz-tourstop-detailblock");
+                this.parent.container.find(".cz-tourstop-detailblock").not(myDetails).hide();
+                myDetails.show(500);
             };
             return TourStopListItem;
         })(UI.ListItemBase);
