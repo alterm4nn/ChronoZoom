@@ -2,16 +2,22 @@
     <div class="cz-form-tour-contentitem-listitem-icon">
         <img src="/images/Temp-Thumbnail2.png" alt="" />
     </div>
-
     <div class="cz-contentitem-listitem-tourstop">
         <h4 class="cz-contentitem-listitem-title">Tour Stop</h4>
         <p class="cz-contentitem-listitem-highlighted">Type</p>
-        
     </div>
-
     <div class="cz-listitem-close-btn">
         X   
     </div>
-
-    <textarea class="cz-tourstop-description cz-input" />
+    <div class="cz-tourstop-detailblock">
+        <div class="fright cz-tourstop-lapseblock">
+            <label class="cz-form-label cz-lightgray" title="Position in audio track (in seconds) at which tour stop should appear.">Load Time&nbsp;</label>
+            <input class="cz-input cz-tourstop-lapse" type="number" min="0" max="3600" step="1" value="" />
+        </div>
+        <div class="fleft">
+            <label class="cz-form-label cz-lightgray">Stop Description</label>
+        </div>
+        <br class="clearer" />
+        <textarea class="cz-input cz-tourstop-description" />
+    </div>
 </li>

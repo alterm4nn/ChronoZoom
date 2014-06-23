@@ -45,8 +45,8 @@ namespace Chronozoom.UI
             AirbrakeEnvironmentName = ConfigurationManager.AppSettings["AirbrakeEnvironmentName"];  if (AirbrakeEnvironmentName == "") AirbrakeEnvironmentName = "development";
             OneDriveClientID        = ConfigurationManager.AppSettings["OneDriveClientID"];
 
-            CSSFileVersion  = GetFileVersion("/scripts/cz.js");
-            JSFileVersion   = GetFileVersion("/css/cz.min.css");
+            CSSFileVersion = GetFileVersion("/css/cz.min.css");
+            JSFileVersion = GetFileVersion("/cz.js");
 
             Images = new List<string>();
         }

@@ -51,7 +51,7 @@ module CZ {
                             closeButton: ".cz-listitem-close-btn",
                             iconImg: ".cz-form-tour-contentitem-listitem-icon > img",
                             titleTextblock: ".cz-contentitem-listitem-title",
-                            typeTextblock: ".cz-contentitem-listitem-highlighted"
+                            typeTextblock: ".cz-contentitem-listitem-highlighted"//,
                         }
                     }
                 };
@@ -78,8 +78,17 @@ module CZ {
                 this.typeTextblock = this.container.find(uiMap.typeTextblock);
 
                 var self = this;
+
+                var lapse = this.container.find(".cz-tourstop-lapse");
                 var descr = this.container.find(".cz-tourstop-description");
+
+                lapse.val(self.data.lapseTime);
                 descr.text(self.data.Description);
+
+                lapse.change(ev => {
+                    self.data.lapseTime = self.LapseTime;
+                });
+
                 descr.change(ev => {
                     self.data.Description = self.Description;
                 });
@@ -94,7 +103,6 @@ module CZ {
                         console.warn("Could not load a thumbnail image " + thumbUrl);
                 };
                 img.src = thumbUrl; // fires off loading of image
-
 
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
@@ -118,6 +126,13 @@ module CZ {
                 });
             }
 
+            public get LapseTime(): number {
+                var element = this.container.find('.cz-tourstop-lapse');
+                var rv = parseInt('0' + element.val());
+                if (rv > 3600) rv = 3600; // max 1 hour
+                return rv;
+            }
+
             public get Description(): string {
                 var descr = this.container.find(".cz-tourstop-description");
                 return descr.val();
@@ -125,9 +140,9 @@ module CZ {
 
             public Activate()
             {
-                var myDescr = this.container.find(".cz-tourstop-description");
-                this.parent.container.find(".cz-tourstop-description").not(myDescr).hide();
-                myDescr.show(500);
+                var myDetails = this.container.find(".cz-tourstop-detailblock");
+                this.parent.container.find(".cz-tourstop-detailblock").not(myDetails).hide();
+                myDetails.show(500);
             }
         }
     }

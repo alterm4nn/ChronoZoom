@@ -25,7 +25,7 @@ module CZ {
                     id: t.Id,
                     name: t.Title,
                     description: t.Description,
-                    audio: "",
+                    audio: t.Audio,
                     category: t.Category,
                     sequence: t.Sequence,
                     bookmarks: bookmarks
