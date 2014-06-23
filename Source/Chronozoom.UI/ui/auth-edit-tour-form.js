@@ -126,10 +126,11 @@ var CZ;
         UI.TourStop = TourStop;
 
         var Tour = (function () {
-            function Tour(id, title, description, category, sequence, stops) {
+            function Tour(id, title, description, audio, category, sequence, stops) {
                 this.id = id;
                 this.title = title;
                 this.description = description;
+                this.audio = audio;
                 this.sequence = sequence;
                 this.stops = stops;
                 this.category = category;
@@ -178,6 +179,18 @@ var CZ;
             });
 
 
+            Object.defineProperty(Tour.prototype, "Audio", {
+                get: function () {
+                    return this.audio;
+                },
+                set: function (val) {
+                    this.audio = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+
             Object.defineProperty(Tour.prototype, "Stops", {
                 get: function () {
                     return this.stops;
@@ -201,6 +214,8 @@ var CZ;
 
                 this.tourTitleInput = this.container.find(".cz-form-tour-title");
                 this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
+                this.tourAudioInput = this.container.find('#cz-form-tour-audio');
+                this.tourAudioControls = this.container.find('#cz-form-tour-audio-controls');
                 this.clean();
 
                 this.saveButton.off();
@@ -212,6 +227,7 @@ var CZ;
                 if (this.tour) {
                     this.tourTitleInput.val(this.tour.title);
                     this.tourDescriptionInput.val(this.tour.description);
+                    this.tourAudioInput.val(this.tour.audio);
                     for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i];
                         var stop = FormEditTour.bookmarkToTourstop(bookmark);
@@ -262,6 +278,7 @@ var CZ;
 
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
+                var audio = this.tourAudioInput.val();
                 var category = "tours";
                 var n = stops.length;
                 var tourId = undefined;
@@ -270,7 +287,7 @@ var CZ;
                     tourId = this.tour.id;
                 }
 
-                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, category, n, stops));
+                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, audio, category, n, stops));
 
                 request.done(function (q) {
                     var tourBookmarks = new Array();
@@ -280,7 +297,7 @@ var CZ;
                         tourBookmarks.push(bookmark);
                     }
 
-                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", sequenceNum, descr);
+                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, audio, sequenceNum, descr);
                     deferred.resolve(tour);
                 }).fail(function (q) {
                     deferred.reject(q);
@@ -306,6 +323,12 @@ var CZ;
                 }
 
                 var self = this;
+
+                this.renderAudioControls();
+                this.tourAudioInput.on('change input', function (event) {
+                    _this.renderAudioControls();
+                });
+
                 this.addStopButton.click(function (event) {
                     CZ.Authoring.isActive = true;
                     CZ.Authoring.mode = "editTour-selectTarget";
@@ -322,12 +345,21 @@ var CZ;
                         }
                     }, 500);
                 });
+
                 this.saveButton.click(function (event) {
-                    var message;
+                    var message = '';
+
                     if (!_this.tourTitleInput.val())
-                        message = "Please enter the title.";
-                    else if (_this.tourStopsListBox.items.length == 0)
-                        message = "Please add a tour stop to the tour.";
+                        message += "Please enter a title.\n";
+
+                    _this.tourAudioInput.val($.trim(_this.tourAudioInput.val()));
+                    if (_this.tourAudioInput.val() != '' && !CZ.Data.validURL(_this.tourAudioInput.val())) {
+                        message += 'Please provide a valid audio URL.\n';
+                    }
+
+                    if (_this.tourStopsListBox.items.length == 0)
+                        message += "Please add a tour stop to the tour.\n";
+
                     if (message) {
                         alert(message);
                         return;
@@ -369,6 +401,7 @@ var CZ;
                         }
                     }
                 });
+
                 this.deleteButton.click(function (event) {
                     if (_this.tour == null)
                         return;
@@ -438,6 +471,18 @@ var CZ;
                 this.container.find(".cz-listbox").empty();
                 this.tourTitleInput.val("");
                 this.tourDescriptionInput.val("");
+                this.tourAudioInput.val('');
+            };
+
+            FormEditTour.prototype.renderAudioControls = function () {
+                this.tourAudioControls.stop();
+                this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
+
+                if (CZ.Data.validURL(this.tourAudioInput.val())) {
+                    this.tourAudioControls.show();
+                } else {
+                    this.tourAudioControls.hide();
+                }
             };
 
             FormEditTour.prototype.onStopsReordered = function () {

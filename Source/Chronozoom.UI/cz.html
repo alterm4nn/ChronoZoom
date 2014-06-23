@@ -33,13 +33,10 @@
             }
         })();
     </script>
-    <link rel="stylesheet" type="text/css" href="/css/cz.css" />
-
-    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-    <script type="text/javascript" src="https://js.live.net/v5.0/wl.js"></script>
+    <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="/scripts/external/airbrake-shim.js"></script>
-
+    <script type="text/javascript" src="//code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="//js.live.net/v5.0/wl.js"></script>
     <script type="text/javascript" src="/scripts/external/jquery.cookie.js"></script>
     <script type="text/javascript" src="/scripts/external/rx.js"></script>
     <script type="text/javascript" src="/scripts/external/rx.jQuery.js"></script>
@@ -49,12 +46,21 @@
     <script type="text/javascript" src="/scripts/external/modernizr.custom.55478.js"></script>
     <script type="text/javascript" src="/scripts/external/jquery.dotdotdot.js"></script>
     <script type="text/javascript">
+        function AddCSS(path)
+        {
+            var link    = document.createElement('link');
+            link.type   = 'text/css';
+            link.rel    = 'stylesheet';
+            link.href   = path + '?v=' + constants.cssFileVersion;
+            document.getElementsByTagName('head')[0].appendChild(link);
+        }
         function AddScript(path) {
-            var script = document.createElement("script");
+            var script  = document.createElement("script");
             script.type = "text/javascript";
-            script.src = path;
+            script.src  = path + '?v=' + constants.jsFileVersion;
             document.getElementsByTagName("head")[0].appendChild(script);
         }
+        AddCSS('/css/cz.min.css');
         if (Modernizr.canvas) {
             if (!constants.environment || constants.environment == 'Localhost') {
                 AddScript("/scripts/settings.js");
@@ -148,36 +154,36 @@
         <div class="fright navigation header-icons elements-kiosk-hide">
             <ul>
                 <li class=" fright">
-            <div style="display: none" id="profile-panel" data-enabled="true" title="Signed on">
-                <label for="edit_profile_button" class="auth-panel-login"></label>
-                <div id="edit_profile_button" class="header-icon profile-icon"></div>
-            </div>
-            </li>
-            <li class="fright">
-                <div style="display: none" id="login-panel" title="Sign in to ChronoZoom" data-enabled="true">
-                    <label for="login-button" class="header-icon-label"></label>
-                    <div id="login-button" class="header-icon profile-icon"></div>
-                </div>
-            </li>
-            <li class="fright">
-                <div class="header-icon edit-icon" title="Create Your Events" data-enabled="true"></div>
-            </li>
-            <li class="fright">
-                <div id="timeSeries_button" class="header-icon timeSeries-icon" title="Show/Hide Time Series" data-enabled="true"></div>
-            </li>
-            <li class="fright">
-                <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
-            </li>
+                    <div style="display: none" id="profile-panel" data-enabled="true" title="Signed on">
+                        <label for="edit_profile_button" class="auth-panel-login"></label>
+                        <div id="edit_profile_button" class="header-icon profile-icon"></div>
+                    </div>
+                </li>
+                <li class="fright">
+                    <div style="display: none" id="login-panel" title="Sign in to ChronoZoom" data-enabled="true">
+                        <label for="login-button" class="header-icon-label"></label>
+                        <div id="login-button" class="header-icon profile-icon"></div>
+                    </div>
+                </li>
+                <li class="fright">
+                    <div class="header-icon edit-icon" title="Create Your Events" data-enabled="true"></div>
+                </li>
+                <li class="fright">
+                    <div id="timeSeries_button" class="header-icon timeSeries-icon" title="Show/Hide Time Series" data-enabled="true"></div>
+                </li>
+                <li class="fright">
+                    <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
+                </li>
 
-            <li class="fright">
-                <div class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
-            </li>
-            <li class="fright">
-                <div id="tours_index" class="header-icon tour-icon" title="Take a Guided Tour" data-enabled="true"></div>
-            </li>
-            <li class="fright">
-                <div id="home_button" class="header-icon home-icon" title="View Home Screen" data-enabled="true"></div>
-            </li>
+                <li class="fright">
+                    <div class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
+                </li>
+                <li class="fright">
+                    <div id="tours_index" class="header-icon tour-icon" title="Take a Guided Tour" data-enabled="true"></div>
+                </li>
+                <li class="fright">
+                    <div id="home_button" class="header-icon home-icon" title="View Home Screen" data-enabled="true"></div>
+                </li>
             </ul>
         </div>
     </header>
@@ -197,6 +203,7 @@
         </div>
     </nav>
     <div id="content" class="fleft">
+        <div id="wait"><img src="/images/wait.gif" alt="Loading - Please Wait..." /></div>
         <div id="axis" style="position: relative;">
         </div>
         <div id="vc-container">
@@ -268,7 +275,7 @@
                     </a>
                 </li>
                 <li class="fleft">
-                    <a class="footer-link-credits elements-kiosk-disable" target="_blank" href="http://fao.cs.msu.su">
+                    <a class="footer-link-credits elements-kiosk-disable" target="_blank" href="http://en.cs.msu.ru">
                         <img src="/images/credits/msu.png" border="0" />
                     </a>
                 </li>

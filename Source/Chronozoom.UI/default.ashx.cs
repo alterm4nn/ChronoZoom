@@ -19,21 +19,13 @@ namespace Chronozoom.UI
 {
     public class PageInformation
     {
-        public PageInformation()
-        {
-            AnalyticsServiceId      = ConfigurationManager.AppSettings["AnalyticsServiceId"];
-            AirbrakeProjectId       = ConfigurationManager.AppSettings["AirbrakeProjectId"];
-            AirbrakeProjectKey      = ConfigurationManager.AppSettings["AirbrakeProjectKey"];
-            AirbrakeEnvironmentName = ConfigurationManager.AppSettings["AirbrakeEnvironmentName"];  if (AirbrakeEnvironmentName == "") AirbrakeEnvironmentName = "development";
-            OneDriveClientID        = ConfigurationManager.AppSettings["OneDriveClientID"];
-            Images = new List<string>();
-        }
-
         public string AnalyticsServiceId        { get; private set; }
         public string AirbrakeProjectId         { get; private set; }
         public string AirbrakeProjectKey        { get; private set; }
         public string AirbrakeEnvironmentName   { get; private set; }
         public string OneDriveClientID          { get; private set; }
+        public string CSSFileVersion            { get; private set; }
+        public string JSFileVersion             { get; private set; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string Title { get; set; }
@@ -43,6 +35,37 @@ namespace Chronozoom.UI
 
         [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
         public List<string> Images { get; private set; }
+
+        // constructor
+        public PageInformation()
+        {
+            AnalyticsServiceId      = ConfigurationManager.AppSettings["AnalyticsServiceId"];
+            AirbrakeProjectId       = ConfigurationManager.AppSettings["AirbrakeProjectId"];
+            AirbrakeProjectKey      = ConfigurationManager.AppSettings["AirbrakeProjectKey"];
+            AirbrakeEnvironmentName = ConfigurationManager.AppSettings["AirbrakeEnvironmentName"];  if (AirbrakeEnvironmentName == "") AirbrakeEnvironmentName = "development";
+            OneDriveClientID        = ConfigurationManager.AppSettings["OneDriveClientID"];
+
+            CSSFileVersion = GetFileVersion("/css/cz.min.css");
+            JSFileVersion = GetFileVersion("/cz.js");
+
+            Images = new List<string>();
+        }
+
+        /// <summary>
+        /// Used to obtain a versioning value that can be used in a query string when linking static content such as .js and .css files.
+        /// The versioning value changes every time the file is changed, and can be used so that browsers do not need to be manually refreshed by users when static content changes.
+        /// For example, x.js?v=2014-12-31--17-30 is seen by browsers as a different file compared to x.js?v2015-01-01--00-00.
+        /// It should be noted that this particular approach is not be suitable for a web farm unless sticky IPs are used on the load balancer.
+        /// </summary>
+        /// <param name="webPath">Path to static content file such as .js or .css file.</param>
+        /// <returns>String based off of file creation date and time.</returns>
+        private string GetFileVersion(string webPath)
+        {
+            FileInfo info   = new FileInfo(HttpContext.Current.Server.MapPath(webPath));
+            DateTime stamp  = info.LastWriteTimeUtc;
+
+            return stamp.ToString("yyyy-MM-dd--HH-mm-ss");
+        }
     }
 
     /// <summary>
@@ -221,6 +244,8 @@ namespace Chronozoom.UI
                 "airbrakeProjectKey: \""        + pageInformation.AirbrakeProjectKey        + "\", " +
                 "airbrakeEnvironmentName: \""   + pageInformation.AirbrakeEnvironmentName   + "\", " +
                 "onedriveClientId: \""          + pageInformation.OneDriveClientID          + "\", " +
+                "cssFileVersion: \""            + pageInformation.CSSFileVersion            + "\", " +
+                "jsFileVersion: \""             + pageInformation.JSFileVersion             + "\", " +
                 "environment: \""               + CurrentEnvironment.ToString()             + "\"  " +
                 "};";
 

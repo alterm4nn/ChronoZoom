@@ -1137,6 +1137,17 @@ a:visited {
   color: #fff;
   text-decoration: none;
 }
+/* Loading Hourglass */
+#wait {
+  display: block;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  text-align: center;
+  margin-top: 100px;
+  z-index: 1000;
+}
 /***********************************************************
 
                             Header            
@@ -2366,9 +2377,17 @@ a {
   margin: 0px 5px;
   vertical-align: top;
 }
+.cz-tourstop-lapseblock label {
+  cursor: help;
+  display: inline-block;
+}
+.cz-tourstop-lapse {
+  text-align: right;
+  width: 55px;
+}
 .cz-tourstop-description {
   display: block;
-  height: 100px;
+  height: 80px;
   width: 100%;
   resize: none;
 }

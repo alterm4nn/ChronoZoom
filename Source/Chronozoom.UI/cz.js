@@ -3050,8 +3050,17 @@ var CZ;
                 this.typeTextblock = this.container.find(uiMap.typeTextblock);
 
                 var self = this;
+
+                var lapse = this.container.find(".cz-tourstop-lapse");
                 var descr = this.container.find(".cz-tourstop-description");
+
+                lapse.val(self.data.lapseTime);
                 descr.text(self.data.Description);
+
+                lapse.change(function (ev) {
+                    self.data.lapseTime = self.LapseTime;
+                });
+
                 descr.change(function (ev) {
                     self.data.Description = self.Description;
                 });
@@ -3087,6 +3096,18 @@ var CZ;
                     CZ.Search.navigateToElement(target);
                 });
             }
+            Object.defineProperty(TourStopListItem.prototype, "LapseTime", {
+                get: function () {
+                    var element = this.container.find('.cz-tourstop-lapse');
+                    var rv = parseInt('0' + element.val());
+                    if (rv > 3600)
+                        rv = 3600;
+                    return rv;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
             Object.defineProperty(TourStopListItem.prototype, "Description", {
                 get: function () {
                     var descr = this.container.find(".cz-tourstop-description");
@@ -3097,9 +3118,9 @@ var CZ;
             });
 
             TourStopListItem.prototype.Activate = function () {
-                var myDescr = this.container.find(".cz-tourstop-description");
-                this.parent.container.find(".cz-tourstop-description").not(myDescr).hide();
-                myDescr.show(500);
+                var myDetails = this.container.find(".cz-tourstop-detailblock");
+                this.parent.container.find(".cz-tourstop-detailblock").not(myDetails).hide();
+                myDetails.show(500);
             };
             return TourStopListItem;
         })(CZ.UI.ListItemBase);
@@ -3229,10 +3250,11 @@ var CZ;
         UI.TourStop = TourStop;
 
         var Tour = (function () {
-            function Tour(id, title, description, category, sequence, stops) {
+            function Tour(id, title, description, audio, category, sequence, stops) {
                 this.id = id;
                 this.title = title;
                 this.description = description;
+                this.audio = audio;
                 this.sequence = sequence;
                 this.stops = stops;
                 this.category = category;
@@ -3281,6 +3303,18 @@ var CZ;
             });
 
 
+            Object.defineProperty(Tour.prototype, "Audio", {
+                get: function () {
+                    return this.audio;
+                },
+                set: function (val) {
+                    this.audio = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+
             Object.defineProperty(Tour.prototype, "Stops", {
                 get: function () {
                     return this.stops;
@@ -3304,6 +3338,8 @@ var CZ;
 
                 this.tourTitleInput = this.container.find(".cz-form-tour-title");
                 this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
+                this.tourAudioInput = this.container.find('#cz-form-tour-audio');
+                this.tourAudioControls = this.container.find('#cz-form-tour-audio-controls');
                 this.clean();
 
                 this.saveButton.off();
@@ -3315,6 +3351,7 @@ var CZ;
                 if (this.tour) {
                     this.tourTitleInput.val(this.tour.title);
                     this.tourDescriptionInput.val(this.tour.description);
+                    this.tourAudioInput.val(this.tour.audio);
                     for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
                         var bookmark = this.tour.bookmarks[i];
                         var stop = FormEditTour.bookmarkToTourstop(bookmark);
@@ -3365,6 +3402,7 @@ var CZ;
 
                 var name = this.tourTitleInput.val();
                 var descr = this.tourDescriptionInput.val();
+                var audio = this.tourAudioInput.val();
                 var category = "tours";
                 var n = stops.length;
                 var tourId = undefined;
@@ -3373,7 +3411,7 @@ var CZ;
                     tourId = this.tour.id;
                 }
 
-                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, category, n, stops));
+                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, audio, category, n, stops));
 
                 request.done(function (q) {
                     var tourBookmarks = new Array();
@@ -3383,7 +3421,7 @@ var CZ;
                         tourBookmarks.push(bookmark);
                     }
 
-                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, "", sequenceNum, descr);
+                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, audio, sequenceNum, descr);
                     deferred.resolve(tour);
                 }).fail(function (q) {
                     deferred.reject(q);
@@ -3409,6 +3447,12 @@ var CZ;
                 }
 
                 var self = this;
+
+                this.renderAudioControls();
+                this.tourAudioInput.on('change input', function (event) {
+                    _this.renderAudioControls();
+                });
+
                 this.addStopButton.click(function (event) {
                     CZ.Authoring.isActive = true;
                     CZ.Authoring.mode = "editTour-selectTarget";
@@ -3425,12 +3469,21 @@ var CZ;
                         }
                     }, 500);
                 });
+
                 this.saveButton.click(function (event) {
-                    var message;
+                    var message = '';
+
                     if (!_this.tourTitleInput.val())
-                        message = "Please enter the title.";
-                    else if (_this.tourStopsListBox.items.length == 0)
-                        message = "Please add a tour stop to the tour.";
+                        message += "Please enter a title.\n";
+
+                    _this.tourAudioInput.val($.trim(_this.tourAudioInput.val()));
+                    if (_this.tourAudioInput.val() != '' && !CZ.Data.validURL(_this.tourAudioInput.val())) {
+                        message += 'Please provide a valid audio URL.\n';
+                    }
+
+                    if (_this.tourStopsListBox.items.length == 0)
+                        message += "Please add a tour stop to the tour.\n";
+
                     if (message) {
                         alert(message);
                         return;
@@ -3472,6 +3525,7 @@ var CZ;
                         }
                     }
                 });
+
                 this.deleteButton.click(function (event) {
                     if (_this.tour == null)
                         return;
@@ -3541,6 +3595,18 @@ var CZ;
                 this.container.find(".cz-listbox").empty();
                 this.tourTitleInput.val("");
                 this.tourDescriptionInput.val("");
+                this.tourAudioInput.val('');
+            };
+
+            FormEditTour.prototype.renderAudioControls = function () {
+                this.tourAudioControls.stop();
+                this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
+
+                if (CZ.Data.validURL(this.tourAudioInput.val())) {
+                    this.tourAudioControls.show();
+                } else {
+                    this.tourAudioControls.hide();
+                }
             };
 
             FormEditTour.prototype.onStopsReordered = function () {
@@ -3606,7 +3672,7 @@ var CZ;
                     id: t.Id,
                     name: t.Title,
                     description: t.Description,
-                    audio: "",
+                    audio: t.Audio,
                     category: t.Category,
                     sequence: t.Sequence,
                     bookmarks: bookmarks
@@ -11009,6 +11075,11 @@ var CZ;
             return result;
         }
         Data.parseStyleString = parseStyleString;
+
+        function validURL(url) {
+            return /^([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url);
+        }
+        Data.validURL = validURL;
     })(CZ.Data || (CZ.Data = {}));
     var Data = CZ.Data;
 })(CZ || (CZ = {}));
@@ -15796,6 +15867,15 @@ var CZ;
             })();
 
             $('.bubbleInfo').hide();
+
+            $('#wait').hide();
+
+            $(document).ajaxStart(function () {
+                $('#wait').show();
+            });
+            $(document).ajaxStop(function () {
+                $('#wait').hide();
+            });
 
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;

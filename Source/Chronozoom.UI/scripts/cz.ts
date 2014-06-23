@@ -269,6 +269,16 @@ module CZ {
 
             $('.bubbleInfo').hide();
 
+            // auto-hourglass
+            $('#wait').hide();
+
+            $(document).ajaxStart(function () {
+                $('#wait').show();
+            });
+            $(document).ajaxStop(function () {
+                $('#wait').hide();
+            });
+
             // populate collection names from URL
             var url = CZ.UrlNav.getURL();
             rootCollection = url.superCollectionName === undefined;
