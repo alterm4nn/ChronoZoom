@@ -94,7 +94,11 @@ module CZ {
                 var optionIntinite: JQuery = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             }
-            
+
+            public setCirca(circa: boolean) {
+                $(this.circaSelector).find('input').prop('checked', circa);
+            }
+
             /**
             * Sets date corresponding to given virtual coordinate
             */
@@ -146,6 +150,19 @@ module CZ {
                         });
                         this.editModeDate();
                         this.setDate_DateMode(coordinate);
+                        break;
+                }
+            }
+
+            public getCirca() {
+                var mode = this.modeSelector.find(":selected").val();
+                switch (mode) {
+                    case "year":
+                    case "date":
+                        return $(this.circaSelector).find('input').prop('checked');
+                        break;
+                    default: // infinite
+                        return false;
                         break;
                 }
             }
