@@ -3145,7 +3145,7 @@ var CZ;
                 _super.call(this, container, listBoxInfo, listItemsInfo);
             }
             return TourStopListBox;
-        })(CZ.UI.ListBoxBase);
+        })(UI.ListBoxBase);
         UI.TourStopListBox = TourStopListBox;
 
         var TourStopListItem = (function (_super) {
@@ -3231,7 +3231,7 @@ var CZ;
                 myDetails.show(500);
             };
             return TourStopListItem;
-        })(CZ.UI.ListItemBase);
+        })(UI.ListItemBase);
         UI.TourStopListItem = TourStopListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -5630,7 +5630,7 @@ var CZ;
                 configurable: true
             });
             return TourListBox;
-        })(CZ.UI.ListBoxBase);
+        })(UI.ListBoxBase);
         UI.TourListBox = TourListBox;
 
         var TourListItem = (function (_super) {
@@ -5675,7 +5675,7 @@ var CZ;
                 }
             }
             return TourListItem;
-        })(CZ.UI.ListItemBase);
+        })(UI.ListItemBase);
         UI.TourListItem = TourListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -10714,6 +10714,10 @@ var CZ;
                 this.modeSelector.append(optionIntinite);
             };
 
+            DatePicker.prototype.setCirca = function (circa) {
+                $(this.circaSelector).find('input').prop('checked', circa);
+            };
+
             DatePicker.prototype.setDate = function (coordinate, ZeroYearConversation) {
                 if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
                 if (!this.validateNumber(coordinate)) {
@@ -10761,6 +10765,19 @@ var CZ;
                         });
                         this.editModeDate();
                         this.setDate_DateMode(coordinate);
+                        break;
+                }
+            };
+
+            DatePicker.prototype.getCirca = function () {
+                var mode = this.modeSelector.find(":selected").val();
+                switch (mode) {
+                    case "year":
+                    case "date":
+                        return $(this.circaSelector).find('input').prop('checked');
+                        break;
+                    default:
+                        return false;
                         break;
                 }
             };
@@ -10955,7 +10972,7 @@ var CZ;
                 CZ.Authoring.isActive = false;
                 CZ.Authoring.mode = "editTour";
 
-                CZ.Authoring.showEditTourForm(null);
+                Authoring.showEditTourForm(null);
             }
             UI.createTour = createTour;
 
@@ -13200,7 +13217,7 @@ var CZ;
                 _super.prototype.remove.call(this, item);
             };
             return ContentItemListBox;
-        })(CZ.UI.ListBoxBase);
+        })(UI.ListBoxBase);
         UI.ContentItemListBox = ContentItemListBox;
 
         var ContentItemListItem = (function (_super) {
@@ -13230,7 +13247,7 @@ var CZ;
                 });
             }
             return ContentItemListItem;
-        })(CZ.UI.ListItemBase);
+        })(UI.ListItemBase);
         UI.ContentItemListItem = ContentItemListItem;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -13568,8 +13585,8 @@ var CZ;
             };
 
             FormEditExhibit.prototype.close = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
@@ -13605,7 +13622,7 @@ var CZ;
                 CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
             };
             return FormEditExhibit;
-        })(CZ.UI.FormUpdateEntity);
+        })(UI.FormUpdateEntity);
         UI.FormEditExhibit = FormEditExhibit;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
@@ -13721,7 +13738,7 @@ var CZ;
                     this.titleTextblock.text("Edit");
                     this.saveButton.text("Update Artifact");
 
-                    if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit)
+                    if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit)
                         this.closeButton.hide();
                     else
                         this.closeButton.show();
@@ -13758,7 +13775,7 @@ var CZ;
 
                 if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
                     if (CZ.Authoring.contentItemMode === "createContentItem") {
-                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
+                        if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             this.prevForm.contentItemsListBox.add(newContentItem);
                             $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
@@ -13768,7 +13785,7 @@ var CZ;
                             this.back();
                         }
                     } else if (CZ.Authoring.contentItemMode === "editContentItem") {
-                        if (this.prevForm && this.prevForm instanceof CZ.UI.FormEditExhibit) {
+                        if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
                             this.isCancel = false;
                             var clickedListItem = this.prevForm.clickedListItem;
                             clickedListItem.iconImg.attr("src", newContentItem.uri);
@@ -13826,8 +13843,8 @@ var CZ;
             };
 
             FormEditCI.prototype.close = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 var _this = this;
+                if (typeof noAnimation === "undefined") { noAnimation = false; }
                 if (this.isModified) {
                     if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
                         this.isModified = false;
@@ -14182,7 +14199,7 @@ var CZ;
                 });
             }
             return FormManageEditors;
-        })(CZ.UI.FormUpdateEntity);
+        })(UI.FormUpdateEntity);
         UI.FormManageEditors = FormManageEditors;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
