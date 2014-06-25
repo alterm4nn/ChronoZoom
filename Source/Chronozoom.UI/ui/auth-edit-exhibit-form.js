@@ -1,3 +1,7 @@
+/// <reference path='contentitem-listbox.ts' />
+/// <reference path='../ui/controls/formbase.ts' />
+/// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -29,11 +33,11 @@ var CZ;
                 this.contentItemsTemplate = formInfo.contentItemsTemplate;
 
                 this.exhibit = formInfo.context;
-                this.exhibitCopy = $.extend({}, formInfo.context, { children: null });
-                this.exhibitCopy = $.extend(true, {}, this.exhibitCopy);
+                this.exhibitCopy = $.extend({}, formInfo.context, { children: null }); // shallow copy of exhibit (without children)
+                this.exhibitCopy = $.extend(true, {}, this.exhibitCopy); // deep copy of exhibit
                 delete this.exhibitCopy.children;
 
-                this.mode = CZ.Authoring.mode;
+                this.mode = CZ.Authoring.mode; // deep copy mode. it never changes throughout the lifecycle of the form.
                 this.isCancel = true;
                 this.isModified = false;
                 this.initUI();
@@ -61,6 +65,7 @@ var CZ;
                     this.saveButton.show();
                     this.deleteButton.hide();
 
+                    // this.closeButton.click() is handled by base
                     this.createArtifactButton.off();
                     this.createArtifactButton.click(function () {
                         return _this.onCreateArtifact();
@@ -83,6 +88,8 @@ var CZ;
                     this.titleTextblock.text("Edit Exhibit");
                     this.saveButton.text("Update Exhibit");
 
+                    // store when exhibit last updated
+                    // exhibit.id = letter "e" followed by exhibitId GUID, so strip off leading "e" before passing
                     CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
                         _this.saveButton.data('lastUpdate', data);
                     });
@@ -95,6 +102,7 @@ var CZ;
                     this.saveButton.show();
                     this.deleteButton.show();
 
+                    // this.closeButton.click() is handled by base
                     this.createArtifactButton.off();
                     this.createArtifactButton.click(function () {
                         return _this.onCreateArtifact();
@@ -190,10 +198,13 @@ var CZ;
 
                 if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
                     if (this.mode === "editExhibit") {
+                        // edit mode - see if someone else has saved edit since we loaded it
                         CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
                             if (data == _this.saveButton.data('lastUpdate')) {
+                                // no-one else has touched - save without warning
                                 _this.onSave_PerformSave(newExhibit);
                             } else {
+                                // someone else has touched - warn and give options
                                 if (confirm("Someone else has made changes to this exhibit since you began editing it.\n\n" + "Do you want to replace their changes with yours? This will cause all of their changes to be lost.")) {
                                     _this.onSave_PerformSave(newExhibit);
                                 } else {
@@ -202,6 +213,7 @@ var CZ;
                             }
                         });
                     } else {
+                        // create mode - just save
                         this.onSave_PerformSave(newExhibit);
                     }
                 } else if (this.exhibit.contentItems.length === 0) {

@@ -1,31 +1,49 @@
-﻿var CZ;
+﻿/// <reference path='settings.ts'/>
+/// <reference path='common.ts'/>
+/// <reference path='vccontent.ts'/>
+/// <reference path='service.ts'/>
+/// <reference path='dates.ts' />
+/**
+* The CZ submodule for Authoring Tool functionality.
+* Use initialize() method to bind UI with Authoring Tool.
+*/
+var CZ;
 (function (CZ) {
     (function (Authoring) {
+        // Virtual canvas widget.
         var _vcwidget;
 
+        // Mouse position.
         var _dragStart = {};
         var _dragPrev = {};
         var _dragCur = {};
 
+        // Current hovered object in virtual canvas.
         var _hovered = {};
 
+        // New timeline rectangle.
         var _rectPrev = { type: "rectangle" };
         var _rectCur = { type: "rectangle" };
 
+        // New exhibit circle.
         var _circlePrev = { type: "circle" };
         var _circleCur = { type: "circle" };
 
+        // Selected objects for editing.
         Authoring.selectedTimeline = {};
         Authoring.selectedExhibit = {};
         Authoring.selectedContentItem = {};
 
+        // Authoring Tool state.
         Authoring.isActive = false;
         Authoring.isEnabled = false;
         Authoring.isDragging = false;
 
+        //TODO: use enum for authoring modes when new authoring forms will be completly integrated
         Authoring.mode = null;
         Authoring.contentItemMode = null;
 
+        // Forms' handlers.
         Authoring.showCreateTimelineForm = null;
         Authoring.showCreateRootTimelineForm = null;
         Authoring.showEditTimelineForm = null;
@@ -36,10 +54,17 @@
         Authoring.showMessageWindow = null;
         Authoring.hideMessageWindow = null;
 
+        // Generic callback function set by the form when waits user's input (e.g. mouse click) to continue.
         Authoring.callback = null;
 
         Authoring.timer;
 
+        /**
+        * Tests a timeline/exhibit on intersection with another virtual canvas object.
+        * @param  {Object}  te   A timeline/exhibit to test.
+        * @param  {Object}  obj  Virtual canvas object.
+        * @return {Boolean}      True in case of intersection, False otherwise.
+        */
         function isIntersecting(te, obj) {
             switch (obj.type) {
                 case "timeline":
@@ -50,6 +75,12 @@
             }
         }
 
+        /**
+        * Tests a virtual canvas object on inclusion in a timeline.
+        * @param  {Object}  tp  An estimated parent timeline.
+        * @param  {Object}  obj An estimated child virtual canvas object.
+        * @return {Boolean}     True in case of inclusion, False otherwise.
+        */
         function isIncluded(tp, obj) {
             switch (obj.type) {
                 case "infodot":
@@ -64,15 +95,27 @@
             }
         }
 
+        /**
+        * The main function to test a timeline on intersections.
+        * First of all it tests on inclusion in parent timeline.
+        * Then it tests a timeline on intersection with each parent's child.
+        * Also tests on inclusion all timeline's children if it has some.
+        * @param  {Object} tp       An estimated parent timeline.
+        * @param  {Object} tc       An estimated child timeline. This one will be tested.
+        * @param  {Boolean} editmode If true, it doesn't take into account edited timeline.
+        * @return {Boolean}          True if test is passed, False otherwise.
+        */
         function checkTimelineIntersections(tp, tc, editmode) {
             var i = 0;
             var len = 0;
             var selfIntersection = false;
 
+            // If creating root timeline, skip intersection validations
             if (!tp || tp.guid === null) {
                 return true;
             }
 
+            // Test on inclusion in parent.
             if (!isIncluded(tp, tc) && tp.id !== "__root__") {
                 return false;
             }
@@ -84,6 +127,7 @@
                 }
             }
 
+            // Test on children's inclusion (only possible in editmode).
             if (editmode && Authoring.selectedTimeline.children && Authoring.selectedTimeline.children.length > 0) {
                 for (i = 0, len = Authoring.selectedTimeline.children.length; i < len; ++i) {
                     if (!isIncluded(tc, Authoring.selectedTimeline.children[i])) {
@@ -95,11 +139,21 @@
             return true;
         }
 
+        /**
+        * The main function to test an exhibit on intersections.
+        * First of all it tests on inclusion in parent timeline.
+        * Then it tests a timeline on intersection with each parent's child.
+        * @param  {Object} tp       An estimated parent timeline.
+        * @param  {Object} ec       An estimated child exhibit. This one will be tested.
+        * @param  {Boolean} editmode If true, it doesn't take into account edited exhibit.
+        * @return {Boolean}          True if test is passed, False otherwise.
+        */
         function checkExhibitIntersections(tp, ec, editmode) {
             var i = 0;
             var len = 0;
             var selfIntersection = false;
 
+            // Test on inclusion in parent.
             if (!isIncluded(tp, ec)) {
                 return false;
             }
@@ -108,13 +162,19 @@
         }
         Authoring.checkExhibitIntersections = checkExhibitIntersections;
 
+        /**
+        * Updates rectangle of new timeline during creation.
+        */
         function updateNewRectangle() {
+            // Update rectangle's size and position.
             _rectCur.x = Math.min(_dragStart.x, _dragCur.x);
             _rectCur.y = Math.min(_dragStart.y, _dragCur.y);
             _rectCur.width = Math.abs(_dragStart.x - _dragCur.x);
             _rectCur.height = Math.abs(_dragStart.y - _dragCur.y);
 
+            // Test on intersections and update timeline's rectangle if it passes the test.
             if (checkTimelineIntersections(_hovered, _rectCur, false)) {
+                // Set border's color of timeline's rectangle.
                 var settings = $.extend({}, _hovered.settings);
                 settings.strokeStyle = "yellow";
 
@@ -127,13 +187,19 @@
             }
         }
 
+        /**
+        * Updates circle of new exhibit during creation.
+        */
         function updateNewCircle() {
+            // Update circle's position and radius.
+            // NOTE: These values are heuristic.
             _circleCur.r = (_hovered.width > _hovered.height) ? _hovered.height / 27.7 : _hovered.width / 10.0;
 
             _circleCur.x = _dragCur.x - _circleCur.r;
             _circleCur.y = _dragCur.y - _circleCur.r;
             _circleCur.width = _circleCur.height = 2 * _circleCur.r;
 
+            // Test on intersections and update exhibits's circle if it passes the test.
             if (checkExhibitIntersections(_hovered, _circleCur, false)) {
                 $.extend(_circlePrev, _circleCur);
 
@@ -146,6 +212,12 @@
             }
         }
 
+        /**
+        * Removes and then adds exhibit and all of its nested content from canvas. Used to simplify
+        * update of exhibit's info.
+        * Use it in when you need to update exhibit's or some of its content item's info.
+        * @param  {Object} e    An exhibit to renew.
+        */
         function renewExhibit(e) {
             var vyc = e.y + e.height / 2;
             var time = e.x + e.width / 2;
@@ -158,11 +230,16 @@
             var parent = e.parent;
             var radv = e.outerRad;
 
+            // remove and then adding infodot to position content items properly
             CZ.VCContent.removeChild(parent, id);
             return CZ.VCContent.addInfodot(parent, "layerInfodots", id, time, vyc, radv, cis, descr);
         }
         Authoring.renewExhibit = renewExhibit;
 
+        /**
+        * Creates new timeline and adds it to virtual canvas.
+        * @return {Object} Created timeline.
+        */
         function createNewTimeline() {
             return CZ.VCContent.addTimeline(_hovered, _hovered.layerid, undefined, {
                 timeStart: _rectCur.x,
@@ -179,6 +256,10 @@
         }
         Authoring.createNewTimeline = createNewTimeline;
 
+        /**
+        * Creates new exhibit and adds it to virtual canvas.
+        * @return {Object} Created exhibit.
+        */
         function createNewExhibit() {
             CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
             return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [], {
@@ -188,15 +269,23 @@
             });
         }
 
+        /**
+        * Updates title of edited timeline. It creates new CanvasText
+        * object for title for recalculation of title's size.
+        * @param  {Object} t Edited timeline, whose title to update.
+        */
         function updateTimelineTitle(t) {
+            // computing titleBorderBox - margins, width, height of canvas text based on algorithm in layout.ts
             var canvas = document.createElement("canvas");
             var ctx = canvas.getContext("2d");
             t.left = t.x;
             t.right = t.x + t.width;
             var titleBorderBox = CZ.Layout.GenerateTitleObject(t.height, t, ctx);
 
+            // remove old timeline header
             CZ.VCContent.removeChild(t, t.id + "__header__");
 
+            // add new timeline's header
             var baseline = t.y + titleBorderBox.marginTop + titleBorderBox.height / 2.0;
             t.titleObject = CZ.VCContent.addText(t, t.layerid, t.id + "__header__", t.x + titleBorderBox.marginLeft, t.y + titleBorderBox.marginTop, baseline, titleBorderBox.height, t.title, {
                 fontName: CZ.Settings.timelineHeaderFontName,
@@ -205,6 +294,7 @@
                 opacity: 1
             }, titleBorderBox.width);
 
+            //remove edit button to reinitialize it
             if (CZ.Authoring.isEnabled && typeof t.editButton !== "undefined") {
                 t.editButton.x = t.x + t.width - 1.15 * t.titleObject.height;
                 t.editButton.y = t.titleObject.y;
@@ -212,6 +302,7 @@
                 t.editButton.height = t.titleObject.height;
             }
 
+            // remove favorite button to reinitialiez it
             if (typeof t.favoriteBtn !== "undefined") {
                 t.favoriteBtn.x = t.x + t.width - 1.8 * t.titleObject.height;
                 t.favoriteBtn.y = t.titleObject.y + 0.15 * t.titleObject.height;
@@ -220,6 +311,11 @@
             }
         }
 
+        /**
+        * Represents a collection of mouse events' handlers for each mode.
+        * Example of using: CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mouseup"]();
+        *                   (calls mouseup event handler for current mode)
+        */
         Authoring.modeMouseHandlers = {
             createTimeline: {
                 mousemove: function () {
@@ -280,6 +376,13 @@
             }
         };
 
+        /**
+        * The main function for binding UI and Authoring Tool.
+        * It assigns additional handlers for virtual canvas mouse
+        * events and forms' handlers.
+        * @param  {Object} vc           jQuery instance of virtual canvas.
+        * @param  {Object} formHandlers An object with the same "show..." methods as Authoring object.
+        */
         function initialize(vc, formHandlers) {
             _vcwidget = vc.data("ui-virtualCanvas");
 
@@ -307,6 +410,7 @@
                     _dragPrev = _dragCur;
                     _dragCur = posv;
 
+                    // NOTE: Using global variable to disable animation on click!
                     CZ.Common.controller.stopAnimation();
 
                     CZ.Authoring.modeMouseHandlers[CZ.Authoring.mode]["mouseup"]();
@@ -326,6 +430,7 @@
                 }
             });
 
+            // Assign forms' handlers.
             Authoring.showCreateTimelineForm = formHandlers && formHandlers.showCreateTimelineForm || function () {
             };
             Authoring.showCreateRootTimelineForm = formHandlers && formHandlers.showCreateRootTimelineForm || function () {
@@ -347,6 +452,13 @@
         }
         Authoring.initialize = initialize;
 
+        /**
+        * Updates timeline's properties.
+        * Use it externally from forms' handlers.
+        * @param  {Object} t    A timeline to update.
+        * @param  {Object} prop An object with properties' values.
+        * @param  {Widget} form A dialog form for editing timeline.
+        */
         function updateTimeline(t, prop) {
             var deffered = jQuery.Deferred();
 
@@ -363,6 +475,11 @@
                 t.width = temp.width;
                 t.endDate = prop.end;
 
+                // Decrease height if possible to make better aspect ratio.
+                // Source: layout.js, LayoutTimeline method.
+                // NOTE: it won't cause intersection errors since height decreases
+                //       and the timeline has no any children (except CanvasImage
+                //       and CanvasText for edit button and title).
                 if (t.children.length < 3) {
                     t.height = Math.min.apply(Math, [
                         t.parent.height * CZ.Layout.timelineHeightRate,
@@ -371,15 +488,18 @@
                     ]);
                 }
 
+                // Update title.
                 t.title = prop.title;
                 updateTimelineTitle(t);
 
                 CZ.Service.putTimeline(t).then(function (success) {
+                    // update ids if existing elements with returned from server
                     t.id = "t" + success;
                     t.guid = success;
                     t.titleObject.id = "t" + success + "__header__";
 
                     if (!t.parent.guid) {
+                        // Root timeline, refresh page
                         document.location.reload(true);
                     } else {
                         CZ.Common.vc.virtualCanvas("requestInvalidate");
@@ -397,6 +517,11 @@
         Authoring.updateTimeline = updateTimeline;
         ;
 
+        /**
+        * Removes a timeline from virtual canvas.
+        * Use it externally from form's handlers.
+        * @param  {Object} t A timeline to remove.
+        */
         function removeTimeline(t) {
             var deferred = $.Deferred();
 
@@ -408,21 +533,29 @@
             CZ.VCContent.removeChild(t.parent, t.id);
 
             if (isRoot) {
+                // Root timeline, refresh page
                 document.location.reload(true);
             }
         }
         Authoring.removeTimeline = removeTimeline;
 
+        /**
+        * Updates exhibit's properties.
+        * Use it externally from forms' handlers.
+        * @param  {Object} e    An exhibit to update.
+        * @param  {Object} args An object with properties' values.
+        */
         function updateExhibit(oldExhibit, args) {
             var deferred = $.Deferred();
 
             if (oldExhibit && oldExhibit.contentItems && args) {
                 var newExhibit = $.extend({}, oldExhibit, { children: null });
-                newExhibit = $.extend(true, {}, newExhibit);
+                newExhibit = $.extend(true, {}, newExhibit); // deep copy exhibit
                 delete newExhibit.children;
                 delete newExhibit.contentItems;
-                $.extend(true, newExhibit, args);
+                $.extend(true, newExhibit, args); // overwrite and append properties
 
+                // pass cloned objects to CZ.Service calls to avoid any side effects
                 CZ.Service.putExhibit(newExhibit).then(function (response) {
                     newExhibit.guid = response.ExhibitId;
                     for (var i = 0; i < newExhibit.contentItems.length; i++) {
@@ -451,6 +584,11 @@
         }
         Authoring.updateExhibit = updateExhibit;
 
+        /**
+        * Removes an exhibit from virtual canvas.
+        * Use it externally from form's handlers.
+        * @param  {Object} e An exhibit to remove.
+        */
         function removeExhibit(e) {
             var deferred = $.Deferred();
 
@@ -474,6 +612,13 @@
         }
         Authoring.removeExhibit = removeExhibit;
 
+        /**
+        * Updates content item's properties in selected exhibit.
+        * Use it externally from forms' handlers.
+        * @param  {CanvasInfodot} e A selected exhibit.
+        * @param  {ContentItemMetadata} c A content item in selected exhibit.
+        * @param  {Object} args An object with updated property values.
+        */
         function updateContentItem(e, c, args) {
             var deferred = $.Deferred();
 
@@ -498,6 +643,12 @@
         }
         Authoring.updateContentItem = updateContentItem;
 
+        /**
+        * Removes content item from selected exhibit.
+        * Use it externally from form's handlers.
+        * @param  {CanvasInfodot} e A selected exhibit.
+        * @param  {ContentItemMetadata} c A content item in selected exhibit.
+        */
         function removeContentItem(e, c) {
             var deferred = $.Deferred();
 
@@ -521,6 +672,9 @@
         }
         Authoring.removeContentItem = removeContentItem;
 
+        /**
+        * Validates possible input errors for timelines.
+        */
         function validateTimelineData(start, end, title) {
             var isValid = (start !== false) && (end !== false);
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
@@ -529,6 +683,9 @@
         }
         Authoring.validateTimelineData = validateTimelineData;
 
+        /**
+        * Validates possible input errors for exhibits.
+        */
         function validateExhibitData(date, title, contentItems) {
             var isValid = date !== false;
             isValid = isValid && CZ.Authoring.isNotEmpty(title);
@@ -537,27 +694,42 @@
         }
         Authoring.validateExhibitData = validateExhibitData;
 
+        /**
+        * Validates,if number is valid.
+        */
         function validateNumber(number) {
             return !isNaN(Number(number) && parseFloat(number)) && isNotEmpty(number) && (number !== false);
         }
         Authoring.validateNumber = validateNumber;
 
+        /**
+        * Validates,if field is empty.
+        */
         function isNotEmpty(obj) {
             return (obj !== '' && obj !== null);
         }
         Authoring.isNotEmpty = isNotEmpty;
 
+        /**
+        * Validates,if url is adequate
+        */
         function isValidURL(url) {
             var objRE = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return objRE.test(url);
         }
         Authoring.isValidURL = isValidURL;
 
+        /**
+        * Validates,if timeline size is not negative or null
+        */
         function isIntervalPositive(start, end) {
             return (parseFloat(start) + 1 / 366 <= parseFloat(end));
         }
         Authoring.isIntervalPositive = isIntervalPositive;
 
+        /**
+        * Validates,if content item data is correct.
+        */
         function validateContentItems(contentItems, mediaInput) {
             var isValid = true;
             if (contentItems.length == 0) {
@@ -585,8 +757,10 @@
                         }
                     }
                 } else if (ci.mediaType.toLowerCase() === "video") {
+                    // Youtube
                     var youtube = /(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|[\S\?\&]+&v=|\/user\/\S+))([^\/&#]{10,12})/;
 
+                    // Vimeo
                     var vimeo = /vimeo\.com\/([0-9]+)/i;
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i;
 
@@ -597,6 +771,7 @@
                         var vimeoVideoId = ci.uri.match(vimeo)[1];
                         ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
                     } else if (vimeoEmbed.test(ci.uri)) {
+                        //Embedded link provided
                     } else {
                         if (mediaInput) {
                             mediaInput.showError("Sorry, only YouTube or Vimeo videos are supported.");
@@ -605,6 +780,8 @@
                         isValid = false;
                     }
                 } else if (ci.mediaType.toLowerCase() === "pdf") {
+                    //Google PDF viewer
+                    //Example: http://docs.google.com/viewer?url=http%3A%2F%2Fwww.selab.isti.cnr.it%2Fws-mate%2Fexample.pdf&embedded=true
                     var pdf = /\.(pdf)$|\.(pdf)\?/i;
 
                     if (!pdf.test(ci.uri)) {
@@ -617,6 +794,7 @@
                         }
                     }
                 } else if (ci.mediaType.toLowerCase() === "skydrive-document") {
+                    // Skydrive embed link
                     var skydrive = /(onedrive|skydrive)\.live\.com\/embed/;
 
                     if (!skydrive.test(ci.uri)) {
@@ -624,12 +802,16 @@
                         isValid = false;
                     }
                 } else if (ci.mediaType.toLowerCase() === "skydrive-image") {
+                    // uri pattern is - {url} {width} {height}
                     var splited = ci.uri.split(' ');
 
+                    // Skydrive embed link
                     var skydrive = /(onedrive|skydrive)\.live\.com\/embed/;
 
+                    // validate width
                     var width = /[0-9]/;
 
+                    // validate height
                     var height = /[0-9]/;
 
                     if (!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
@@ -648,6 +830,9 @@
         }
         Authoring.validateContentItems = validateContentItems;
 
+        /**
+        * Returns list of erroneous content items
+        */
         function erroneousContentItemsList(errorMassage) {
             var pos;
             var errCI = [];
@@ -669,11 +854,17 @@
         }
         Authoring.erroneousContentItemsList = erroneousContentItemsList;
 
+        /**
+        * Opens "session ends" form
+        */
         function showSessionForm() {
             CZ.HomePageViewModel.sessionForm.show();
         }
         Authoring.showSessionForm = showSessionForm;
 
+        /**
+        * Resets timer to default
+        */
         function resetSessionTimer() {
             if (CZ.Authoring.timer != null) {
                 clearTimeout(CZ.Authoring.timer);

@@ -1,3 +1,8 @@
+/// <reference path='../ui/controls/formbase.ts'/>
+/// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../scripts/media.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -41,7 +46,7 @@ var CZ;
                 this.exhibit = formInfo.context.exhibit;
                 this.contentItem = formInfo.context.contentItem;
 
-                this.mode = CZ.Authoring.mode;
+                this.mode = CZ.Authoring.mode; // deep copy mode. it never changes throughout the lifecycle of the form.
                 this.isCancel = true;
                 this.isModified = false;
                 this.initUI();

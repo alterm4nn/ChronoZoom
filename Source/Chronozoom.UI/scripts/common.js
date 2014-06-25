@@ -1,4 +1,15 @@
-﻿
+﻿/// <reference path='settings.ts'/>
+/// <reference path='tours.ts'/>
+/// <reference path='breadcrumbs.ts'/>
+/// <reference path='search.ts'/>
+/// <reference path='urlnav.ts'/>
+/// <reference path='layout.ts'/>
+/// <reference path='timescale.ts'/>
+/// <reference path='virtual-canvas.ts'/>
+/// <reference path='authoring-ui.ts'/>
+/// <reference path='data.ts'/>
+/// <reference path='../ui/timeseries-graph-form.ts'/>
+
 var CZ;
 (function (CZ) {
     (function (Common) {
@@ -9,6 +20,9 @@ var CZ;
         Common.isAxisFreezed = true;
         Common.startHash;
 
+        /*
+        Array for logging of inners messages and exceptions
+        */
         var searchString;
         Common.ax;
         Common.axis;
@@ -34,8 +48,11 @@ var CZ;
         Common.supercollection = "";
         Common.collection = "";
 
+        // Initial Content contains the identifier (e.g. ID or Title) of the content that should be loaded initially.
         Common.initialContent = null;
 
+        /* Initialize the JQuery UI Widgets
+        */
         function initialize() {
             Common.ax = $('#axis');
             Common.axis = new CZ.Timescale(Common.ax);
@@ -46,15 +63,25 @@ var CZ;
         }
         Common.initialize = initialize;
 
+        /* Calculates local offset of mouse cursor in specified jQuery element.
+        @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
+        @param event   (Mouse event args) mouse event args describing mouse cursor.
+        */
         function getXBrowserMouseOrigin(jqelement, event) {
             var offsetX;
 
+            ///if (!event.offsetX)
             offsetX = event.pageX - jqelement[0].offsetLeft;
 
+            //else
+            //    offsetX = event.offsetX;
             var offsetY;
 
+            //if (!event.offsetY)
             offsetY = event.pageY - jqelement[0].offsetTop;
 
+            //else
+            //    offsetY = event.offsetY;
             return {
                 x: offsetX,
                 y: offsetY
@@ -67,6 +94,9 @@ var CZ;
         }
         Common.sqr = sqr;
 
+        // Prevents the event from bubbling.
+        // In non IE browsers, use e.stopPropagation() instead.
+        // To cancel event bubbling across browsers, you should check for support for e.stopPropagation(), and proceed accordingly:
         function preventbubble(e) {
             if (e && e.stopPropagation)
                 e.stopPropagation();
@@ -106,6 +136,7 @@ var CZ;
         }
         Common.showFooter = showFooter;
 
+        /*Animation tooltip parameter*/
         Common.animationTooltipRunning = null;
         Common.tooltipMode = "default";
 
@@ -118,6 +149,8 @@ var CZ;
 
                 Common.animationTooltipRunning = null;
 
+                //tooltipMode = "default"; //default
+                //tooltipIsShown = false;
                 $(".bubbleInfo").attr("id", "defaultBox");
 
                 $(".bubbleInfo").hide();
@@ -125,11 +158,15 @@ var CZ;
         }
         Common.stopAnimationTooltip = stopAnimationTooltip;
 
+        // Compares 2 visibles. Returns true if they are equal with an allowable imprecision
         function compareVisibles(vis1, vis2) {
             return vis2 != null ? (Math.abs(vis1.centerX - vis2.centerX) < CZ.Settings.allowedVisibileImprecision && Math.abs(vis1.centerY - vis2.centerY) < CZ.Settings.allowedVisibileImprecision && Math.abs(vis1.scale - vis2.scale) < CZ.Settings.allowedVisibileImprecision) : false;
         }
         Common.compareVisibles = compareVisibles;
 
+        /*
+        Is called by direct user actions like links, bread crumbs clicking, etc.
+        */
         function setVisibleByUserDirectly(visible) {
             CZ.Tours.pauseTourAtAnyAnimation = false;
             if (CZ.Tours.tour != undefined && CZ.Tours.tour.state == "play")
@@ -150,7 +187,9 @@ var CZ;
         }
         Common.updateMarker = updateMarker;
 
+        // Retrieves the URL to download the data from
         function loadDataUrl() {
+            // The following regexp extracts the pattern dataurl=url from the page hash to enable loading timelines from arbitrary sources.
             var match = /dataurl=([^\/]*)/g.exec(window.location.hash);
             if (match) {
                 return unescape(match[1]);
@@ -168,6 +207,7 @@ var CZ;
             }
         }
 
+        //loading the data from the service
         function loadData() {
             return CZ.Data.getTimelines(null).then(function (response) {
                 if (!response) {
@@ -221,7 +261,7 @@ var CZ;
 
                 if (Common.startHash && window.location.hash !== Common.startHash) {
                     hashChangeFromOutside = false;
-                    window.location.hash = Common.startHash;
+                    window.location.hash = Common.startHash; // synchronizing
                 }
             }
         }
@@ -286,6 +326,7 @@ var CZ;
                 bottom: cosmosTimeline.y + cosmosTimeline.height
             };
 
+            // update virtual canvas horizontal borders
             CZ.Settings.maxPermitedTimeRange = {
                 left: cosmosTimeline.left,
                 right: cosmosTimeline.right
@@ -299,6 +340,7 @@ var CZ;
 
             Common.vc.virtualCanvas("updateViewport");
 
+            //ax.axis("updateWidth");
             updateAxis(Common.vc, Common.ax);
 
             CZ.BreadCrumbs.updateBreadCrumbsLabels();

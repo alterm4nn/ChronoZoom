@@ -1,3 +1,4 @@
+/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -78,6 +79,7 @@ var CZ;
                 this.saveButton = this.container.find(formInfo.saveButton);
 
                 this.container.keypress(function (event) {
+                    // trigger click on save button if ENTER was pressed
                     if (event.keyCode === 13) {
                         _this.saveButton.trigger("click");
                     }

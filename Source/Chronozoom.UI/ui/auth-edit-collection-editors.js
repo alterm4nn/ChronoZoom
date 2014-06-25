@@ -1,4 +1,8 @@
-﻿var __extends = this.__extends || function (d, b) {
+﻿/// <reference path='../ui/controls/formbase.ts'/>
+/// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../scripts/settings.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -12,6 +16,7 @@ var CZ;
             function FormManageEditors(container, formInfo) {
                 _super.call(this, container, formInfo);
 
+                // populate list of existing editors
                 CZ.Service.getMembers().done(function (data) {
                     if (data.length == 0) {
                         $('#tblDelEditors tbody').html('<tr class="none"><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
@@ -23,6 +28,7 @@ var CZ;
                     }
                 });
 
+                // populate search results every time find input is altered
                 $('#tblAddEditors input[type="search"]').off('input').on('input', function (event) {
                     var _this = this;
                     CZ.Service.findUsers($(this).val()).done(function (data) {
@@ -39,6 +45,7 @@ var CZ;
                     });
                 });
 
+                // send chosen list of user ids when save button is clicked
                 $('#auth-edit-collection-editors .cz-form-save').off().click(function (event) {
                     var userIds = new Array();
 

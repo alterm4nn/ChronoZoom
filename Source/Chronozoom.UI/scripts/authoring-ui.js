@@ -1,13 +1,22 @@
-﻿var CZ;
+﻿/// <reference path='authoring.ts'/>
+/// <reference path='settings.ts'/>
+/// <reference path='layout.ts'/>
+/// <reference path='../ui/controls/datepicker.ts'/>
+/// <reference path='typings/jqueryui/jqueryui.d.ts'/>
+/// <reference path='typings/jquery/jquery.d.ts'/>
+var CZ;
 (function (CZ) {
     (function (Authoring) {
         (function (UI) {
+            // Mouseup handlers.
+            // Opens a window for creating new tour.
             function createTour() {
+                // skip authoring during ongoing dynamic layout animation
                 if (CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
 
-                CZ.Authoring.isActive = false;
+                CZ.Authoring.isActive = false; // for now we do not watch for mouse moves
                 CZ.Authoring.mode = "editTour";
 
                 Authoring.showEditTourForm(null);
@@ -15,6 +24,7 @@
             UI.createTour = createTour;
 
             function createTimeline() {
+                // skip authoring during ongoing dynamic layout animation
                 if (CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
@@ -39,6 +49,7 @@
             UI.createTimeline = createTimeline;
 
             function editTimeline() {
+                // skip authoring during ongoing dynamic layout animation
                 if (CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
@@ -49,6 +60,7 @@
             UI.editTimeline = editTimeline;
 
             function createExhibit() {
+                // skip authoring during ongoing dynamic layout animation
                 if (CZ.Layout.animatingElements.length != 0) {
                     return;
                 }
@@ -73,6 +85,7 @@
             UI.createExhibit = createExhibit;
 
             function editExhibit() {
+                // skip authoring during ongoing dynamic layout animation
                 if (CZ.Layout.animatingElements.length != 0) {
                     return;
                 }

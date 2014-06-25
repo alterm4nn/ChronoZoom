@@ -101,7 +101,6 @@
     <Content Include="Scripts\Specs\datepickerSpec.js" />
     <Content Include="Scripts\Specs\datesSpec.js" />
     <Content Include="Scripts\Specs\timeSeriesSpec.js" />
-    <Content Include="Scripts\typings\jasmine\jasmine.d.ts" />
     <Content Include="Scripts\Specs\profileDataSpec.js" />
     <Content Include="Scripts\Specs\timeScaleSpec.js" />
   </ItemGroup>

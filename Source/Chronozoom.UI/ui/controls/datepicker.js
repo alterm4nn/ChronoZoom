@@ -1,10 +1,16 @@
+/// <reference path='../../scripts/dates.ts'/>
+/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
+/* TODO: implement public get/set functions for edit mode
+*/
 var CZ;
 (function (CZ) {
     (function (UI) {
         var DatePicker = (function () {
             function DatePicker(datePicker) {
                 this.datePicker = datePicker;
+                // Value that represents infinity date
                 this.INFINITY_VALUE = 9999;
+                // Error messages
                 this.WRONG_YEAR_INPUT = "Year should be a number.";
                 if (!(datePicker instanceof jQuery && datePicker.is("div")))
                     throw "DatePicker parameter is invalid! It should be jQuery instance of DIV.";
@@ -13,6 +19,9 @@ var CZ;
 
                 this.initialize();
             }
+            /**
+            * Creates datepicker based on given JQuery instance of div
+            */
             DatePicker.prototype.initialize = function () {
                 var _this = this;
                 this.datePicker.addClass("cz-datepicker");
@@ -50,22 +59,33 @@ var CZ;
                 this.datePicker.append(this.dateContainer);
                 this.datePicker.append(this.errorMsg);
 
+                // set "year" mode by default
                 this.editModeYear();
                 this.setDate(this.coordinate, true);
             };
 
+            /**
+            * Removes datepicker object
+            */
             DatePicker.prototype.remove = function () {
                 this.datePicker.empty();
                 this.datePicker.removeClass("cz-datepicker");
             };
 
+            /**
+            * Adds edit mode "infinite"
+            */
             DatePicker.prototype.addEditMode_Infinite = function () {
                 var optionIntinite = $("<option value='infinite'>Infinite</option>");
                 this.modeSelector.append(optionIntinite);
             };
 
+            /**
+            * Sets date corresponding to given virtual coordinate
+            */
             DatePicker.prototype.setDate = function (coordinate, ZeroYearConversation) {
                 if (typeof ZeroYearConversation === "undefined") { ZeroYearConversation = false; }
+                // invalid input
                 if (!this.validateNumber(coordinate)) {
                     return false;
                 }
@@ -74,6 +94,7 @@ var CZ;
                 this.coordinate = coordinate;
                 var regime = CZ.Dates.convertCoordinateToYear(this.coordinate).regime;
 
+                // set edit mode to infinite in case if coordinate is infinity
                 if (this.coordinate === this.INFINITY_VALUE) {
                     this.modeSelector.find(":selected").attr("selected", "false");
                     this.modeSelector.find("option").each(function () {
@@ -115,6 +136,9 @@ var CZ;
                 }
             };
 
+            /**
+            * Returns date converted to virtual coordinate if date is valid, otherwise returns false.
+            */
             DatePicker.prototype.getDate = function () {
                 var mode = this.modeSelector.find(":selected").val();
                 switch (mode) {
@@ -131,6 +155,9 @@ var CZ;
                 }
             };
 
+            /**
+            * Modify date container to match "year" edit mode
+            */
             DatePicker.prototype.editModeYear = function () {
                 var _this = this;
                 this.dateContainer.empty();
@@ -168,6 +195,9 @@ var CZ;
                 this.dateContainer.append(this.circaSelector);
             };
 
+            /**
+            * Modify date container to match "date" edit mode
+            */
             DatePicker.prototype.editModeDate = function () {
                 var _this = this;
                 this.dateContainer.empty();
@@ -192,6 +222,7 @@ var CZ;
                 this.monthSelector.change(function (event) {
                     self.daySelector.empty();
 
+                    // update days in days select to match current month
                     var selectedIndex = self.monthSelector[0].selectedIndex;
                     for (var i = 0; i < CZ.Dates.daysInMonth[selectedIndex]; i++) {
                         var dayOption = $("<option value='" + (i + 1) + "'>" + (i + 1) + "</option>");
@@ -204,6 +235,7 @@ var CZ;
                     this.monthSelector.append(monthOption);
                 }
 
+                // raise change event to initialize days select element
                 self.monthSelector.trigger("change");
 
                 this.dateContainer.append(this.monthSelector);
@@ -213,10 +245,16 @@ var CZ;
                 this.dateContainer.append(this.circaSelector);
             };
 
+            /**
+            * Modify date container to match "infinite" edit mode
+            */
             DatePicker.prototype.editModeInfinite = function () {
                 this.dateContainer.empty();
             };
 
+            /**
+            * If year in CE and BCE mode is not integer - remove non integral part in the box
+            */
             DatePicker.prototype.checkAndRemoveNonIntegerPart = function () {
                 var regime = this.regimeSelector.find(":selected").val().toLowerCase();
                 var mode = this.modeSelector.find(":selected").val().toLowerCase();
@@ -226,14 +264,19 @@ var CZ;
                 }
             };
 
+            /**
+            * Sets year corresponding to given virtual coordinate
+            */
             DatePicker.prototype.setDate_YearMode = function (coordinate, ZeroYearConversation) {
                 var date = CZ.Dates.convertCoordinateToYear(coordinate);
                 if ((date.regime.toLowerCase() == "bce") && (ZeroYearConversation))
                     date.year--;
                 this.yearSelector.val(date.year.toString());
 
+                // reset selected regime
                 this.regimeSelector.find(":selected").attr("selected", "false");
 
+                // select appropriate regime
                 this.regimeSelector.find("option").each(function () {
                     if (this.value === date.regime.toLowerCase()) {
                         $(this).attr("selected", "selected");
@@ -241,17 +284,23 @@ var CZ;
                 });
             };
 
+            /**
+            * Sets date corresponding to given virtual coordinate
+            */
             DatePicker.prototype.setDate_DateMode = function (coordinate) {
                 var date = CZ.Dates.getYMDFromCoordinate(coordinate);
 
                 this.yearSelector.val(date.year.toString());
                 var self = this;
 
+                // set corresponding month in month select element
                 this.monthSelector.find("option").each(function (index) {
                     if (this.value === CZ.Dates.months[date.month]) {
                         $(this).attr("selected", "selected");
 
+                        // event handler of "month changed" is async. using $.promise to update days selection element as callback
                         $.when(self.monthSelector.trigger("change")).done(function () {
+                            // month was set, now set corresponding day
                             self.daySelector.find("option").each(function () {
                                 if (parseInt(this.value) === date.day) {
                                     $(this).attr("selected", "selected");
@@ -262,6 +311,9 @@ var CZ;
                 });
             };
 
+            /**
+            * Returns year converted to virtual coordinate if input is valid, otherwise returns false
+            */
             DatePicker.prototype.getDate_YearMode = function () {
                 var year = this.yearSelector.val();
                 if (!this.validateNumber(year))
@@ -271,6 +323,9 @@ var CZ;
                 return CZ.Dates.convertYearToCoordinate(year, regime);
             };
 
+            /**
+            * Returns date converted to virtual coordinate if input is valid, otherwise returns false
+            */
             DatePicker.prototype.getDate_DateMode = function () {
                 var year = this.yearSelector.val();
                 if (!this.validateNumber(year))
@@ -284,6 +339,9 @@ var CZ;
                 return CZ.Dates.getCoordinateFromYMD(year, month, day);
             };
 
+            /**
+            * Validates that given string is a non infinite number, returns false if not
+            */
             DatePicker.prototype.validateNumber = function (year) {
                 return !isNaN(Number(year)) && isFinite(Number(year)) && !isNaN(parseFloat(year));
             };
