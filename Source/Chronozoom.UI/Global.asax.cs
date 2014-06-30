@@ -90,8 +90,12 @@ namespace Chronozoom.UI
             RouteTable.Routes.MapHubs();
             RegisterRoutes(RouteTable.Routes);
 
+            /* Not using bundling as has issues merging CZ scripts. Bundling does have a few known gotchas, including comment on last line of a .js file commenting out a code line in next .js file.
+             * Instead we use enable minification and .map creation in Web Essentials (a VS extension.)
+             * 
             BundleTable.EnableOptimizations = true; // enables bundling for debug mode
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            */
 
             Trace.TraceInformation("Checking Db Schema");
             using (Entities.ManualMigrationCheck check = new Entities.ManualMigrationCheck())

@@ -84,6 +84,336 @@
     <Content Include="dumps\home\timelines.json" />
     <Content Include="dumps\home\tweets.json" />
     <Content Include="css\cz.css.map" />
+    <Content Include="scripts\authoring-ui.min.js">
+      <DependentUpon>authoring-ui.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\authoring-ui.min.js.map">
+      <DependentUpon>authoring-ui.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\authoring.min.js">
+      <DependentUpon>authoring.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\authoring.min.js.map">
+      <DependentUpon>authoring.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\bibliography.min.js">
+      <DependentUpon>bibliography.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\bibliography.min.js.map">
+      <DependentUpon>bibliography.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\breadcrumbs.min.js">
+      <DependentUpon>breadcrumbs.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\breadcrumbs.min.js.map">
+      <DependentUpon>breadcrumbs.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\common.min.js">
+      <DependentUpon>common.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\common.min.js.map">
+      <DependentUpon>common.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\cz.min.js">
+      <DependentUpon>cz.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\cz.min.js.map">
+      <DependentUpon>cz.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\data.min.js">
+      <DependentUpon>data.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\data.min.js.map">
+      <DependentUpon>data.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\dates.min.js">
+      <DependentUpon>dates.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\dates.min.js.map">
+      <DependentUpon>dates.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\extensions.min.js">
+      <DependentUpon>extensions.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\rinplayer.min.js">
+      <DependentUpon>rinplayer.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\gestures.min.js">
+      <DependentUpon>gestures.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\gestures.min.js.map">
+      <DependentUpon>gestures.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\layout.min.js">
+      <DependentUpon>layout.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\layout.min.js.map">
+      <DependentUpon>layout.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\media.min.js">
+      <DependentUpon>media.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\media.min.js.map">
+      <DependentUpon>media.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\plugins\error-plugin.min.js">
+      <DependentUpon>error-plugin.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\plugins\utility-plugins.min.js">
+      <DependentUpon>utility-plugins.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\search.min.js">
+      <DependentUpon>search.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\search.min.js.map">
+      <DependentUpon>search.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\service.min.js">
+      <DependentUpon>service.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\service.min.js.map">
+      <DependentUpon>service.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\settings.min.js">
+      <DependentUpon>settings.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\settings.min.js.map">
+      <DependentUpon>settings.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\timescale.min.js">
+      <DependentUpon>timescale.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\timescale.min.js.map">
+      <DependentUpon>timescale.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\tours.min.js">
+      <DependentUpon>tours.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\tours.min.js.map">
+      <DependentUpon>tours.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\uiloader.min.js">
+      <DependentUpon>uiloader.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\uiloader.min.js.map">
+      <DependentUpon>uiloader.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\urlnav.min.js">
+      <DependentUpon>urlnav.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\urlnav.min.js.map">
+      <DependentUpon>urlnav.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\vccontent.min.js">
+      <DependentUpon>vccontent.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\vccontent.min.js.map">
+      <DependentUpon>vccontent.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport-animation.min.js">
+      <DependentUpon>viewport-animation.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport-animation.min.js.map">
+      <DependentUpon>viewport-animation.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport-controller.min.js">
+      <DependentUpon>viewport-controller.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport-controller.min.js.map">
+      <DependentUpon>viewport-controller.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport.min.js">
+      <DependentUpon>viewport.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport.min.js.map">
+      <DependentUpon>viewport.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\virtual-canvas.min.js">
+      <DependentUpon>virtual-canvas.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\virtual-canvas.min.js.map">
+      <DependentUpon>virtual-canvas.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-collection-editors.min.js">
+      <DependentUpon>auth-edit-collection-editors.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-collection-form.min.js">
+      <DependentUpon>auth-edit-collection-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-contentitem-form.min.js">
+      <DependentUpon>auth-edit-contentitem-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-exhibit-form.min.js">
+      <DependentUpon>auth-edit-exhibit-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-timeline-form.min.js">
+      <DependentUpon>auth-edit-timeline-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-tour-form.min.js">
+      <DependentUpon>auth-edit-tour-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\contentitem-listbox.min.js">
+      <DependentUpon>contentitem-listbox.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\datepicker.min.js">
+      <DependentUpon>datepicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\datepicker.min.js.map">
+      <DependentUpon>datepicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\formbase.min.js">
+      <DependentUpon>formbase.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\formbase.min.js.map">
+      <DependentUpon>formbase.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\listboxbase.min.js">
+      <DependentUpon>listboxbase.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\listboxbase.min.js.map">
+      <DependentUpon>listboxbase.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\medialist.min.js">
+      <DependentUpon>medialist.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\medialist.min.js.map">
+      <DependentUpon>medialist.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\plugins\error-plugin.min.js.map">
+      <DependentUpon>error-plugin.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\plugins\utility-plugins.min.js.map">
+      <DependentUpon>utility-plugins.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\extensions.min.js.map">
+      <DependentUpon>extensions.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\rinplayer.min.js.map">
+      <DependentUpon>rinplayer.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-edit-form.min.js">
+      <DependentUpon>header-edit-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-edit-profile-form.min.js">
+      <DependentUpon>header-edit-profile-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-login-form.min.js">
+      <DependentUpon>header-login-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-logout-form.min.js">
+      <DependentUpon>header-logout-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-search-form.min.js">
+      <DependentUpon>header-search-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-session-expired-form.min.js">
+      <DependentUpon>header-session-expired-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\mediapicker-form.min.js">
+      <DependentUpon>mediapicker-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\media\bing-mediapicker.min.js">
+      <DependentUpon>bing-mediapicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\media\bing-mediapicker.min.js.map">
+      <DependentUpon>bing-mediapicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\media\skydrive-mediapicker.min.js">
+      <DependentUpon>skydrive-mediapicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\media\skydrive-mediapicker.min.js.map">
+      <DependentUpon>skydrive-mediapicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-collection-editors.min.js.map">
+      <DependentUpon>auth-edit-collection-editors.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-collection-form.min.js.map">
+      <DependentUpon>auth-edit-collection-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-contentitem-form.min.js.map">
+      <DependentUpon>auth-edit-contentitem-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-exhibit-form.min.js.map">
+      <DependentUpon>auth-edit-exhibit-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-timeline-form.min.js.map">
+      <DependentUpon>auth-edit-timeline-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-tour-form.min.js.map">
+      <DependentUpon>auth-edit-tour-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\contentitem-listbox.min.js.map">
+      <DependentUpon>contentitem-listbox.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-edit-form.min.js.map">
+      <DependentUpon>header-edit-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-edit-profile-form.min.js.map">
+      <DependentUpon>header-edit-profile-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-login-form.min.js.map">
+      <DependentUpon>header-login-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-logout-form.min.js.map">
+      <DependentUpon>header-logout-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-search-form.min.js.map">
+      <DependentUpon>header-search-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-session-expired-form.min.js.map">
+      <DependentUpon>header-session-expired-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\mediapicker-form.min.js.map">
+      <DependentUpon>mediapicker-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\message-window.min.js">
+      <DependentUpon>message-window.js</DependentUpon>
+    </Content>
+    <Content Include="ui\message-window.min.js.map">
+      <DependentUpon>message-window.js</DependentUpon>
+    </Content>
+    <Content Include="ui\start-page.min.js">
+      <DependentUpon>start-page.js</DependentUpon>
+    </Content>
+    <Content Include="ui\start-page.min.js.map">
+      <DependentUpon>start-page.js</DependentUpon>
+    </Content>
+    <Content Include="ui\timeseries-data-form.min.js">
+      <DependentUpon>timeseries-data-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\timeseries-data-form.min.js.map">
+      <DependentUpon>timeseries-data-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\timeseries-graph-form.min.js">
+      <DependentUpon>timeseries-graph-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\timeseries-graph-form.min.js.map">
+      <DependentUpon>timeseries-graph-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tour-caption-form.min.js">
+      <DependentUpon>tour-caption-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tour-caption-form.min.js.map">
+      <DependentUpon>tour-caption-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tour-listbox.min.js">
+      <DependentUpon>tour-listbox.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tour-listbox.min.js.map">
+      <DependentUpon>tour-listbox.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tourslist-form.min.js">
+      <DependentUpon>tourslist-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tourslist-form.min.js.map">
+      <DependentUpon>tourslist-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tourstop-listbox.min.js">
+      <DependentUpon>tourstop-listbox.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tourstop-listbox.min.js.map">
+      <DependentUpon>tourstop-listbox.js</DependentUpon>
+    </Content>
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />

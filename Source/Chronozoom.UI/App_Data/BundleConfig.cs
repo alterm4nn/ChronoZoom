@@ -9,7 +9,7 @@ namespace Chronozoom.UI
             // CSS bundling and minification handled by LESS, otherwise one
             // could use new StyleBundle in the same format as ScriptBundle.
 
-            bundles.Add(new ScriptBundle("~/cz.min.js").Include(
+            bundles.Add(new ScriptBundle("~/cz.min.js").Include
             (
                 "~/scripts/settings.js",
                 "~/scripts/common.js",
