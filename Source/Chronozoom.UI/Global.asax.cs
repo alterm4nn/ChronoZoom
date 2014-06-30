@@ -5,6 +5,7 @@ using System.ServiceModel.Activation;
 using System.Web;
 using System.Web.Compilation;
 using System.Web.Mvc;
+using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.UI;
 using Chronozoom.Entities;
@@ -88,6 +89,9 @@ namespace Chronozoom.UI
 
             RouteTable.Routes.MapHubs();
             RegisterRoutes(RouteTable.Routes);
+
+            BundleTable.EnableOptimizations = true; // enables bundling for debug mode
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             Trace.TraceInformation("Checking Db Schema");
             using (Entities.ManualMigrationCheck check = new Entities.ManualMigrationCheck())
