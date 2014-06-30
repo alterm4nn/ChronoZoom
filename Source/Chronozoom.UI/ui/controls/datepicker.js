@@ -80,6 +80,11 @@ var CZ;
                 this.modeSelector.append(optionIntinite);
             };
 
+            DatePicker.prototype.setCirca = function (circa)
+            {
+                $(this.circaSelector).find('input').prop('checked', circa);
+            };
+
             /**
             * Sets date corresponding to given virtual coordinate
             */
@@ -132,6 +137,21 @@ var CZ;
                         });
                         this.editModeDate();
                         this.setDate_DateMode(coordinate);
+                        break;
+                }
+            };
+
+            DatePicker.prototype.getCirca = function ()
+            {
+                var mode = this.modeSelector.find(":selected").val();
+                switch (mode)
+                {
+                    case "year":
+                    case "date":
+                        return $(this.circaSelector).find('input').prop('checked');
+                        break;
+                    default:
+                        return false;
                         break;
                 }
             };
