@@ -148,6 +148,9 @@
     <Content Include="scripts\extensions\rinplayer.min.js">
       <DependentUpon>rinplayer.js</DependentUpon>
     </Content>
+    <Content Include="scripts\external\audiojs\audiojs\audio.min.js" />
+    <Content Include="scripts\external\audiojs\audiojs\audiojs.swf" />
+    <Content Include="scripts\external\audiojs\audiojs\player-graphics.gif" />
     <Content Include="scripts\gestures.min.js">
       <DependentUpon>gestures.js</DependentUpon>
     </Content>

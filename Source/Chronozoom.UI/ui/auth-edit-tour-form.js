@@ -221,7 +221,7 @@ var CZ;
                 this.tourTitleInput = this.container.find(".cz-form-tour-title");
                 this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
                 this.tourAudioInput = this.container.find('#cz-form-tour-audio');
-                this.tourAudioControls = this.container.find('#cz-form-tour-audio-controls');
+                this.tourAudioControls = this.container.find('.audiojs');
                 this.clean();
 
                 this.saveButton.off();
@@ -491,8 +491,8 @@ var CZ;
             };
 
             FormEditTour.prototype.renderAudioControls = function () {
-                this.tourAudioControls.stop();
-                this.tourAudioControls.html('<source src="' + this.tourAudioInput.val() + '" />');
+                this.tourAudioControls.find('audio').stop();
+                this.tourAudioControls.find('audio').html('<source src="' + this.tourAudioInput.val() + '" />');
 
                 if (CZ.Data.validURL(this.tourAudioInput.val())) {
                     this.tourAudioControls.show();
