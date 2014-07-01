@@ -66,10 +66,18 @@
     <Content Include="css\start-page.css">
       <DependentUpon>start-page.less</DependentUpon>
     </Content>
-    <Content Include="css\start-page.min.css" />
-    <Content Include="css\_colors.css" />
-    <Content Include="css\_mixins.css" />
-    <Content Include="css\_vars.css" />
+    <Content Include="css\start-page.min.css">
+      <DependentUpon>start-page.less</DependentUpon>
+    </Content>
+    <Content Include="css\_colors.css">
+      <DependentUpon>_colors.less</DependentUpon>
+    </Content>
+    <Content Include="css\_mixins.css">
+      <DependentUpon>_mixins.less</DependentUpon>
+    </Content>
+    <Content Include="css\_vars.css">
+      <DependentUpon>_vars.less</DependentUpon>
+    </Content>
     <Content Include="dumps\extensions\GaribaldiTourJSON.js" />
     <Content Include="dumps\extensions\narrative.js" />
     <Content Include="dumps\extensions\rin-sample.js" />
@@ -83,7 +91,9 @@
     <Content Include="dumps\rin-dump.json" />
     <Content Include="dumps\home\timelines.json" />
     <Content Include="dumps\home\tweets.json" />
-    <Content Include="css\cz.css.map" />
+    <Content Include="css\cz.css.map">
+      <DependentUpon>cz.less</DependentUpon>
+    </Content>
     <Content Include="scripts\authoring-ui.min.js">
       <DependentUpon>authoring-ui.js</DependentUpon>
     </Content>
@@ -883,7 +893,6 @@
     <Content Include="css\cz.css">
       <DependentUpon>cz.less</DependentUpon>
     </Content>
-    <Content Include="css\Site.css" />
     <Content Include="ui\message-window.html" />
     <Content Include="ui\start-page.html" />
     <Content Include="ui\start-page.js" />
