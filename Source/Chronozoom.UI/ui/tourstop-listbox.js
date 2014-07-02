@@ -124,11 +124,15 @@ var CZ;
                 enumerable: true,
                 configurable: true
             });
-
+            
             TourStopListItem.prototype.Activate = function () {
-                var myDetails = this.container.find(".cz-tourstop-detailblock");
-                this.parent.container.find(".cz-tourstop-detailblock").not(myDetails).hide();
-                myDetails.show(500);
+                var selectedStop = this.container.find('.cz-tourstop-detailblock');
+                this.parent.container.find('.cz-tourstop-detailblock').not(selectedStop).hide();
+                selectedStop
+                    .show(500)
+                    .find('.cz-tourstop-lapse')
+                        .autoNumeric('destroy')
+                        .autoNumeric('init');
             };
             return TourStopListItem;
         })(UI.ListItemBase);
