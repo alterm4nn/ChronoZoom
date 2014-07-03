@@ -46,7 +46,7 @@ namespace Chronozoom.UI
             OneDriveClientID        = ConfigurationManager.AppSettings["OneDriveClientID"];
 
             CSSFileVersion = GetFileVersion("/css/cz.min.css");
-            JSFileVersion = GetFileVersion("/cz.js");
+            JSFileVersion  = GetFileVersion();
 
             Images = new List<string>();
         }
@@ -57,14 +57,25 @@ namespace Chronozoom.UI
         /// For example, x.js?v=2014-12-31--17-30 is seen by browsers as a different file compared to x.js?v2015-01-01--00-00.
         /// It should be noted that this particular approach is not be suitable for a web farm unless sticky IPs are used on the load balancer.
         /// </summary>
-        /// <param name="webPath">Path to static content file such as .js or .css file.</param>
-        /// <returns>String based off of file creation date and time.</returns>
-        private string GetFileVersion(string webPath)
+        /// <param name="webPath">Optional path to static content file such as .js or .css file. Leave blank to use assembly build date/time.</param>
+        /// <returns>GMT/UTC string based off of file creation date and time.</returns>
+        private string GetFileVersion(string webPath = "")
         {
-            FileInfo info   = new FileInfo(HttpContext.Current.Server.MapPath(webPath));
-            DateTime stamp  = info.LastWriteTimeUtc;
+            DateTime rv;
 
-            return stamp.ToString("yyyy-MM-dd--HH-mm-ss");
+            if (webPath == "")
+            {
+                // use assembly date/time (from when last built)
+                rv = File.GetCreationTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToUniversalTime();
+            }
+            else
+            {
+                // get date/time from file specified in webPath
+                FileInfo info = new FileInfo(HttpContext.Current.Server.MapPath(webPath));
+                rv = info.LastWriteTimeUtc;
+            }
+
+            return rv.ToString("yyyy-MM-dd--HH-mm-ss");
         }
     }
 

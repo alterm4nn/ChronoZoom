@@ -1,3 +1,4 @@
+/// <reference path='typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (UILoader) {
@@ -5,6 +6,7 @@ var CZ;
             var container = $(selector);
             var promise = $.Deferred();
 
+            // NOTE: Allow undefined filepath. The method will return initial container.
             if (!filepath) {
                 promise.resolve(container);
                 return promise;

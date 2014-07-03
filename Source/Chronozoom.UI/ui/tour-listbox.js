@@ -1,3 +1,6 @@
+/// <reference path="../scripts/authoring.ts" />
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../ui/controls/listboxbase.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -74,7 +77,7 @@ var CZ;
                     if (console && console.warn)
                         console.warn("Could not load a thumbnail image " + thumbUrl);
                 };
-                img.src = thumbUrl;
+                img.src = thumbUrl; // fires off loading of image
 
                 this.titleTextblock.text(this.data.title);
                 if (this.data.description)
