@@ -128,6 +128,13 @@ var CZ;
                     return;
                 }
 
+                _gaq.push
+                ([
+                    '_trackEvent',
+                    'Search',
+                    'Bing Search',
+                    mediaType
+                ]);
                 this.searchResultsBox.empty();
                 this.showProgressBar();
 
