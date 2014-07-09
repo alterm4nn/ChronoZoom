@@ -1,4 +1,10 @@
-﻿
+﻿/// <reference path='settings.ts'/>
+/// <reference path='common.ts'/>
+/// <reference path='bibliography.ts'/>
+/// <reference path='urlnav.ts'/>
+/// <reference path='cz.ts'/>
+/// <reference path='extensions/extensions.ts'/>
+
 var CZ;
 (function (CZ) {
     (function (VCContent) {
@@ -24,7 +30,7 @@ var CZ;
         }
         VCContent.getVisibleForElement = getVisibleForElement;
 
-        var zoomToElementHandler = function (sender, e, scale) {
+        var zoomToElementHandler = function (sender, e, scale /* n [time units] / m [pixels] */ ) {
             var vp = sender.vc.getViewport();
             var visible = getVisibleForElement(sender, scale, vp, true);
             elementclick.newvisible = visible;
@@ -33,6 +39,19 @@ var CZ;
             return true;
         };
 
+        /*  Represents a base element that can be added to the VirtualCanvas.
+        @remarks CanvasElement has extension in virtual space, that enables to check visibility of an object and render it.
+        @param vc   (jquery to virtual canvas) note that vc.element[0] is the virtual canvas object
+        @param layerid   (any type) id of the layer for this object
+        @param id   (any type) id of the object
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @remarks
+        If element.isRendered defined and true, the element was actually rendered on a canvas.
+        If element.onIsRenderedChanged defined, it is called when isRendered changes.
+        */
         function CanvasElement(vc, layerid, id, vx, vy, vw, vh) {
             this.vc = vc;
             this.id = id;
@@ -45,31 +64,80 @@ var CZ;
             this.newHeight = vh;
 
             this.children = [];
-            this.fadeIn = false;
+            this.fadeIn = false; // indicates whether element has had fade in animation or not
 
+            /* Checks whether this object is visible in the given visible box (in virtual space)
+            @param visibleBox_v   ({Left,Top,Right,Bottom}) Visible region in virtual space
+            @returns    True, if visible.
+            */
             this.isVisible = function (visibleBox_v) {
                 var objRight = this.x + this.width;
                 var objBottom = this.y + this.height;
                 return Math.max(this.x, visibleBox_v.Left) <= Math.min(objRight, visibleBox_v.Right) && Math.max(this.y, visibleBox_v.Top) <= Math.min(objBottom, visibleBox_v.Bottom);
             };
 
+            /* Checks whether the given point (virtual) is inside the object
+            (should take into account the shape) */
             this.isInside = function (point_v) {
                 return point_v.x >= this.x && point_v.x <= this.x + this.width && point_v.y >= this.y && point_v.y <= this.y + this.height;
             };
 
+            /* Renders a CanvasElement.
+            @param ctx              (context2d) Canvas context2d to render on.
+            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
+            @param viewport2d       (Viewport2d) current viewport
+            @param size_p           ({x,y}) size of bounding box of this element in pixels
+            @param opacity          (float in [0,1]) 0 means transparent, 1 means opaque.
+            @remarks The method is implemented for each particular VirtualCanvas element.
+            */
             this.render = function (ctx, visibleBox_v, viewport2d, size_p, opacity) {
             };
         }
         VCContent.CanvasElement = CanvasElement;
 
+        /* Adds a rectangle as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the rectangle appearance
+        */
         VCContent.addRectangle = function (element, layerid, id, vx, vy, vw, vh, settings) {
             return VCContent.addChild(element, new CanvasRectangle(element.vc, layerid, id, vx, vy, vw, vh, settings), false);
         };
 
+        /* Adds a circle as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id        (any type) id of an element
+        @param vxc       (number) center x in virtual space
+        @param vyc       (number) center y in virtual space
+        @param vradius   (number) radius in virtual space
+        @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the circle appearance
+        @remarks
+        The element is always rendered as a circle and ignores the aspect ratio of the viewport.
+        For this, circle radius in pixels is computed from its virtual width.
+        */
         VCContent.addCircle = function (element, layerid, id, vxc, vyc, vradius, settings, suppressCheck) {
             return VCContent.addChild(element, new CanvasCircle(element.vc, layerid, id, vxc, vyc, vradius, settings), suppressCheck);
         };
 
+        /* Adds an image as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param z    (number) z-index
+        @param imgSrc (string) image URI
+        @param onload (optional callback function) called when image is loaded
+        @param parent (CanvasElement) Parent element, whose children is to be new element.
+        */
         VCContent.addImage = function (element, layerid, id, vx, vy, vw, vh, imgSrc, onload) {
             if (vw <= 0 || vh <= 0)
                 throw "Image size must be positive";
@@ -80,6 +148,11 @@ var CZ;
                 throw "Image size must be positive";
             return VCContent.addChild(element, new CanvasLODImage(element.vc, layerid, id, imgSources, vx, vy, vw, vh, onload), false);
         };
+        VCContent.addSeadragonImage = function (element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
+            if (vw <= 0 || vh <= 0)
+                throw "Image size must be positive";
+            return VCContent.addChild(element, new SeadragonImage(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
+        };
 
         VCContent.addExtension = function (extensionName, element, layerid, id, vx, vy, vw, vh, z, imgSrc, onload) {
             if (vw <= 0 || vh <= 0)
@@ -89,26 +162,94 @@ var CZ;
             return VCContent.addChild(element, initializer(element.vc, element, layerid, id, imgSrc, vx, vy, vw, vh, z, onload), false);
         };
 
+        /* Adds a video as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param videoSource (string) video URI
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param z (number) z-index
+        */
         VCContent.addVideo = function (element, layerid, id, videoSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasVideoItem(element.vc, layerid, id, videoSource, vx, vy, vw, vh, z), false);
         };
 
+        /* Adds a pdf as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param pdfSource (string) pdf URI
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param z (number) z-index
+        */
         VCContent.addPdf = function (element, layerid, id, pdfSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasPdfItem(element.vc, layerid, id, pdfSource, vx, vy, vw, vh, z), false);
         };
 
+        /* Adds an audio as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param audioSource (string) audio URI
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param z (number) z-index
+        */
         var addAudio = function (element, layerid, id, audioSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasAudioItem(element.vc, layerid, id, audioSource, vx, vy, vw, vh, z), false);
         };
 
+        /* Adds a embed skydrive document as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param embedSource (string) embed document code
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param z (number) z-index
+        */
         VCContent.addSkydriveDocument = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasSkydriveDocumentItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
 
+        /* Adds a embed skydrive image as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param embedSource (string) embed image code. pattern: {url} {width} {height}
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param z (number) z-index
+        */
         VCContent.addSkydriveImage = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
             return VCContent.addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
 
+        /*  Adds a text element as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param baseline (number) y coordinate of the baseline in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param settings     ({ fillStyle, fontName }) Parameters of the text appearance
+        @param vw (number) optional width of the text; if undefined, it is automatically asigned to width of the given text line.
+        @remarks
+        Text width is adjusted using measureText() on first render call.
+        */
         function addText(element, layerid, id, vx, vy, baseline, vh, text, settings, vw) {
             return VCContent.addChild(element, new CanvasText(element.vc, layerid, id, vx, vy, baseline, vh, text, settings, vw), false);
         }
@@ -121,6 +262,18 @@ var CZ;
         VCContent.addScrollText = addScrollText;
         ;
 
+        /*  Adds a multiline text element as a child of the given virtual canvas element.
+        @param element   (CanvasElement) Parent element, whose children is to be new element.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vh   (number) height of a text
+        @param lineWidth (number) width of a line to text output
+        @param settings     ({ fillStyle, fontName }) Parameters of the text appearance
+        @remarks
+        Text width is adjusted using measureText() on first render call.
+        */
         function addMultiLineText(element, layerid, id, vx, vy, baseline, vh, text, lineWidth, settings) {
             return VCContent.addChild(element, new CanvasMultiLineTextItem(element.vc, layerid, id, vx, vy, vh, text, lineWidth, settings), false);
         }
@@ -138,6 +291,13 @@ var CZ;
             }
         }
 
+        /* Renders a CanvasElement recursively
+        @param element          (CanvasElement) element to render
+        @param contexts         (map<layerid,context2d>) Contexts for layers' canvases.
+        @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
+        @param viewport2d       (Viewport2d) current viewport
+        @param opacity          (float in [0,1]) 0 means transparent, 1 means opaque.
+        */
         VCContent.render = function (element, contexts, visibleBox_v, viewport2d, opacity) {
             if (!element.isVisible(visibleBox_v)) {
                 if (element.isRendered)
@@ -157,6 +317,7 @@ var CZ;
                 opacity *= element.opacity;
             }
 
+            // Rendering an element
             if (element.isRendered == undefined || !element.isRendered) {
                 element.isRendered = true;
                 if (element.onIsRenderedChanged)
@@ -171,19 +332,35 @@ var CZ;
             }
         };
 
+        /* Adds a CanvasElement instance to the children array of this element.
+        @param  element     (CanvasElement) new child of this element
+        @returns    the added element
+        @remarks    Bounding box of element must be included in bounding box of the this element. Otherwise, throws an exception.
+        The method must be called within the BeginEdit/EndEdit of the root item.
+        */
         VCContent.addChild = function (parent, element, suppresCheck) {
             var isWithin = parent.width == Infinity || (element.x >= parent.x && element.x + element.width <= parent.x + parent.width) && (element.y >= parent.y && element.y + element.height <= parent.y + parent.height);
 
+            // if (!isWithin)
+            //     console.log("Child element does not belong to the parent element " + parent.id + " " + element.ID);
+            //if (!suppresCheck && !isWithin) throw "Child element does not belong to the parent element";
             parent.children.push(element);
             element.parent = parent;
             return element;
         };
 
+        /* Looks up an element with given id in the children of this element and removes it with its children.
+        @param id   (any) id of an element
+        @returns    true, if element found and removed; otherwise, false.
+        @remarks    The method must be called within the BeginEdit/EndEdit of the root item.
+        If a child has onRemove() method, it is called right after removing of the child and clearing of all its children (recursively).
+        */
         VCContent.removeChild = function (parent, id) {
             var n = parent.children.length;
             for (var i = 0; i < n; i++) {
                 var child = parent.children[i];
                 if (child.id == id) {
+                    // remove element from hash map of animating elements in dynamic layout animation
                     if (typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
                         delete CZ.Layout.animatingElements[child.id];
                         CZ.Layout.animatingElements.length--;
@@ -206,18 +383,25 @@ var CZ;
             for (var i = 0; i < n; i++) {
                 var child = timeline.children[i];
 
+                //clear(timeline);
                 if (timeline.onRemove)
                     timeline.onRemove();
 
+                //child.parent = null;
                 child.parent = timeline.parent;
             }
         };
 
+        /* Removes all children elements of this object (recursively).
+        @remarks    The method must be called within the BeginEdit/EndEdit of the root item.
+        For each descendant element that has onRemove() method, the method is called right after its removing and clearing of all its children (recursively).
+        */
         function clear(element) {
             var n = element.children.length;
             for (var i = 0; i < n; i++) {
                 var child = element.children[i];
 
+                // remove element from hash map of animating elements in dynamic layout animation
                 if (typeof CZ.Layout.animatingElements[child.id] !== 'undefined') {
                     delete CZ.Layout.animatingElements[child.id];
                     CZ.Layout.animatingElements.length--;
@@ -232,6 +416,11 @@ var CZ;
         }
         ;
 
+        /* Finds and returns a child element with given id (no recursion)
+        @param id   (any) id of a child element
+        @returns    The children object (derived from CanvasContentItem)
+        @exception  if there is no child with the id
+        */
         function getChild(element, id) {
             var n = element.children.length;
             for (var i = 0; i < n; i++) {
@@ -243,28 +432,58 @@ var CZ;
         VCContent.getChild = getChild;
         ;
 
+        /*****************************************************************************************/
+        /* Root element                                                                          */
+        /*  A root of an element tree of a VirtualCanvas.
+        @param vc   (VirtualCanvas) A virtual canvas that own this element tree.
+        @param layerid   (any type) id of the layer for this object
+        @param id   (any type) id of the object
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        */
         function CanvasRootElement(vc, layerid, id, vx, vy, vw, vh) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
             this.opacity = 0;
 
+            /* Overrides base function. Root element is visible when it has at least one child. */
             this.isVisible = function (visibleBox_v) {
                 return this.children.length != 0;
             };
 
+            /* Begins editing of the element tree.
+            @returns This element.
+            @remarks Call BeginEdit prior to modify an element tree. The EndEdit method must be called, when editing is to be completed.
+            The VirtualCanvas is invalidated on EndEdit only.
+            */
             this.beginEdit = function () {
                 return this;
             };
 
+            /* Ends editing of the element tree.
+            @param dontRender   (number) if zero (default value), invalidates and renders the virtual canvas content.
+            @returns This element.
+            @remarks Call BeginEdit prior to modify an element tree. The EndEdit method must be called, when editing is to be completed.
+            The VirtualCanvas is invalidated on EndEdit only, if dontRender is false.
+            */
             this.endEdit = function (dontRender) {
                 if (!dontRender)
                     this.vc.invalidate();
             };
 
+            /* Checks whether the given point (virtual) is inside the object
+            (should take into account the shape) */
             this.isInside = function (point_v) {
                 return true;
             };
 
+            /* Renders a CanvasElement recursively
+            @param contexts         (map<layerid,context2d>) Contexts for layers' canvases.
+            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
+            @param viewport2d       (Viewport2d) current viewport
+            */
             this.render = function (contexts, visibleBox_v, viewport2d) {
                 this.vc.breadCrumbs = [];
                 if (!this.isVisible(visibleBox_v))
@@ -289,6 +508,12 @@ var CZ;
         }
         VCContent.CanvasRootElement = CanvasRootElement;
 
+        /*****************************************************************************************/
+        /* Dynamic Level of Details element                                                      */
+        /* Gets the zoom level for the given size of an element (in pixels).
+        @param size_p           ({x,y}) size of bounding box of this element in pixels
+        @returns (number)   zoom level which minimum natural number or zero zl so that max(size_p.x,size_p.y) <= 2^zl
+        */
         function getZoomLevel(size_p) {
             var sz = Math.max(size_p.x, size_p.y);
             if (sz <= 1)
@@ -306,6 +531,10 @@ var CZ;
             return zl;
         }
 
+        /* A base class for elements those support different content for different zoom levels.
+        @remarks
+        Property "removeWhenInvisible" is optional. If set, the content is completely removed every time when isRendered changes from true to false.
+        */
         function CanvasDynamicLOD(vc, layerid, id, vx, vy, vw, vh) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -317,6 +546,9 @@ var CZ;
 
             var self = this;
 
+            /* Returns new content elements tree for the given zoom level, if it should change, or null.
+            @returns { zoomLevel: number, content: CanvasElement}, or null.
+            */
             this.changeZoomLevel = function (currentZoomLevel, newZoomLevel) {
                 return null;
             };
@@ -345,6 +577,13 @@ var CZ;
                 }
             };
 
+            /* Renders a rectangle.
+            @param ctx              (context2d) Canvas context2d to render on.
+            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
+            @param viewport2d       (Viewport2d) current viewport
+            @param size_p           ({x,y}) size of bounding box of this element in pixels
+            @remarks The method is implemented for each particular VirtualCanvas element.
+            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 if (this.asyncContent)
                     return;
@@ -367,6 +606,9 @@ var CZ;
                     var renderTimeDiff = renderTime.getTime() - self.lastRenderTime;
                     self.lastRenderTime = renderTime.getTime();
 
+                    // Override the default contentAppearanceAnimationStep,
+                    // instead of being a constant it now depends on the time,
+                    // such that each transition animation takes about 1.6 sec.
                     var contentAppearanceAnimationStep = renderTimeDiff / 1600;
 
                     var doInvalidate = false;
@@ -413,12 +655,23 @@ var CZ;
                         this.content = null;
                     }
 
+                    /* Set hasContentItems to false for parent infodot.
+                    if (this.parent.hasContentItems != null || this.parent.hasContentItems)
+                    this.parent.hasContentItems = false; */
                     this.zoomLevel = 0;
                 }
             };
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
 
+        /*****************************************************************************************/
+        /* Primitive elements                                                                    */
+        /*  An element which doesn't have visual representation, but can contain other elements.
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        */
         function ContainerElement(vc, layerid, id, vx, vy, vw, vh) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -429,12 +682,28 @@ var CZ;
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
 
+        /*  A rectangle element that can be added to a VirtualCanvas.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param settings  ({strokeStyle,lineWidth,fillStyle,outline:boolean}) Parameters of the rectangle appearance
+        */
         function CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
             this.settings = settings;
             this.type = "rectangle";
 
+            /* Renders a rectangle.
+            @param ctx              (context2d) Canvas context2d to render on.
+            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
+            @param viewport2d       (Viewport2d) current viewport
+            @param size_p           ({x,y}) size of bounding box of this element in pixels
+            @remarks The method is implemented for each particular VirtualCanvas element.
+            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 var p = viewport2d.pointVirtualToScreen(this.x, this.y);
                 var p2 = viewport2d.pointVirtualToScreen(this.x + this.width, this.y + this.height);
@@ -468,7 +737,7 @@ var CZ;
                             if (this.settings.isLineWidthVirtual) {
                                 ctx.lineWidth = viewport2d.widthVirtualToScreen(this.settings.lineWidth);
                             } else {
-                                ctx.lineWidth = this.settings.lineWidth;
+                                ctx.lineWidth = this.settings.lineWidth; // in pixels
                             }
                         } else
                             ctx.lineWidth = 1;
@@ -528,6 +797,15 @@ var CZ;
         }
         VCContent.CanvasRectangle = CanvasRectangle;
 
+        /*  A Timeline element that can be added to a VirtualCanvas (Rect + caption + bread crumbs tracing).
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the rectangle appearance
+        */
         function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo) {
             this.base = CanvasRectangle;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -567,15 +845,19 @@ var CZ;
                 this.settings.gradientFillStyle = timelineinfo.gradientFillStyle || timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
             }
 
+            //this.opacity = timelineinfo.opacity;
             this.reactsOnMouse = true;
 
-            this.tooltipEnabled = true;
-            this.tooltipIsShown = false;
+            this.tooltipEnabled = true; //enable tooltips to timelines
+            this.tooltipIsShown = false; // indicates whether tooltip is shown or not
 
             this.onmouseclick = function (e) {
                 return zoomToElementHandler(this, e, 1.0);
             };
             this.onmousehover = function (pv, e) {
+                //previous timeline also hovered and mouse leave don't appear, hide it
+                //if infodot is null or undefined, we should stop animation
+                //if it's ok, infodot's tooltip don't wink
                 if (this.vc.currentlyHoveredTimeline != null && this.vc.currentlyHoveredTimeline.id != id) {
                     try  {
                         this.vc.currentlyHoveredInfodot.id;
@@ -585,6 +867,7 @@ var CZ;
                     }
                 }
 
+                //make currentTimeline to this
                 this.vc.currentlyHoveredTimeline = this;
 
                 this.settings.strokeStyle = CZ.Settings.timelineHoveredBoxBorderColor;
@@ -593,11 +876,14 @@ var CZ;
                 this.settings.hoverAnimationDelta = CZ.Settings.timelineHoverAnimation;
                 this.vc.requestInvalidate();
 
+                //if title is not in visible region, try to eval its screenFontSize using
+                //formula based on height of its parent timeline
                 if (this.titleObject.initialized == false) {
                     var vp = this.vc.getViewport();
                     this.titleObject.screenFontSize = CZ.Settings.timelineHeaderSize * vp.heightVirtualToScreen(this.height);
                 }
 
+                //if timeline title is small, show tooltip
                 if (this.titleObject.screenFontSize <= CZ.Settings.timelineTooltipMaxHeaderSize)
                     this.tooltipEnabled = true;
                 else
@@ -612,6 +898,7 @@ var CZ;
                         return;
                     }
 
+                    // show tooltip if it is enabled and is not shown yet
                     if (this.tooltipIsShown == false) {
                         switch (this.regime) {
                             case "Cosmos":
@@ -636,8 +923,8 @@ var CZ;
                         }
 
                         $(".bubbleInfo span").text(this.title);
-                        this.panelWidth = $('.bubbleInfo').outerWidth();
-                        this.panelHeight = $('.bubbleInfo').outerHeight();
+                        this.panelWidth = $('.bubbleInfo').outerWidth(); // complete width of tooltip panel
+                        this.panelHeight = $('.bubbleInfo').outerHeight(); // complete height of tooltip panel
 
                         this.tooltipIsShown = true;
                         CZ.Common.animationTooltipRunning = $('.bubbleInfo').fadeIn();
@@ -664,17 +951,27 @@ var CZ;
                 this.vc.requestInvalidate();
             };
 
+            //saving render call before overriding it
             this.base_render = this.render;
 
+            /* Renders a timeline.
+            @param ctx              (context2d) Canvas context2d to render on.
+            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
+            @param viewport2d       (Viewport2d) current viewport
+            @param size_p           ({x,y}) size of bounding box of this element in pixels
+            @remarks The method is implemented for each particular VirtualCanvas element.
+            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
-                this.titleObject.initialized = false;
+                this.titleObject.initialized = false; //disable CanvasText initialized (rendered) option by default
 
                 if (this.settings.hoverAnimationDelta) {
                     this.settings.gradientOpacity = Math.min(1, Math.max(0, this.settings.gradientOpacity + this.settings.hoverAnimationDelta));
                 }
 
+                //rendering itself
                 this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
 
+                // initialize add favorite button if user is authorized
                 if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0) {
                     var btnX = this.x + this.width - 1.0 * this.titleObject.height;
                     var btnY = this.titleObject.y + 0.15 * this.titleObject.height;
@@ -710,6 +1007,7 @@ var CZ;
                         this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                     };
 
+                    // remove event handlers to prevent their stacking
                     this.favoriteBtn.onRemove = function () {
                         this.onmousehover = undefined;
                         this.onmouseunhover = undefined;
@@ -717,6 +1015,7 @@ var CZ;
                     };
                 }
 
+                // initialize edit button if it isn't root collection and titleObject was already initialized
                 if (CZ.Authoring.isEnabled && typeof this.editButton === "undefined" && this.titleObject.width !== 0) {
                     this.editButton = VCContent.addImage(this, layerid, id + "__edit", this.x + this.titleObject.height * 0.15, this.titleObject.y, this.titleObject.height, this.titleObject.height, "/images/edit.svg");
                     this.editButton.reactsOnMouse = true;
@@ -738,6 +1037,7 @@ var CZ;
                         this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                     };
 
+                    // remove event handlers to prevent their stacking
                     this.editButton.onRemove = function () {
                         this.onmousehover = undefined;
                         this.onmouseunhover = undefined;
@@ -755,8 +1055,10 @@ var CZ;
                 var p = viewport2d.pointVirtualToScreen(this.x, this.y);
                 var p2 = { x: p.x + size_p.x, y: p.y + size_p.y };
 
+                // is center of canvas inside timeline
                 var isCenterInside = viewport2d.visible.centerX - CZ.Settings.timelineCenterOffsetAcceptableImplicity <= this.x + this.width && viewport2d.visible.centerX + CZ.Settings.timelineCenterOffsetAcceptableImplicity >= this.x && viewport2d.visible.centerY - CZ.Settings.timelineCenterOffsetAcceptableImplicity <= this.y + this.height && viewport2d.visible.centerY + CZ.Settings.timelineCenterOffsetAcceptableImplicity >= this.y;
 
+                // is timeline inside "breadcrumb offset box"
                 var isVisibleInTheRectangle = ((p.x < CZ.Settings.timelineBreadCrumbBorderOffset && p2.x > viewport2d.width - CZ.Settings.timelineBreadCrumbBorderOffset) || (p.y < CZ.Settings.timelineBreadCrumbBorderOffset && p2.y > viewport2d.height - CZ.Settings.timelineBreadCrumbBorderOffset));
 
                 if (isVisibleInTheRectangle && isCenterInside) {
@@ -773,14 +1075,33 @@ var CZ;
             this.prototype = new CanvasRectangle(vc, layerid, id, vx, vy, vw, vh, settings);
         }
 
+        /*  A circle element that can be added to a VirtualCanvas.
+        @param layerid   (any type) id of the layer for this element
+        @param id        (any type) id of an element
+        @param vxc       (number) center x in virtual space
+        @param vyc       (number) center y in virtual space
+        @param vradius   (number) radius in virtual space
+        @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the circle appearance
+        @remarks
+        The element is always rendered as a circle and ignores the aspect ratio of the viewport.
+        For this, circle radius in pixels is computed from its virtual width.
+        */
         function CanvasCircle(vc, layerid, id, vxc, vyc, vradius, settings) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vxc - vradius, vyc - vradius, 2.0 * vradius, 2.0 * vradius);
             this.settings = settings;
-            this.isObservedNow = false;
+            this.isObservedNow = false; //whether the circle is the largest circle under exploration,
 
+            //that takes large enough rendering space according to infoDotAxisFreezeThreshold var in settings.js
             this.type = "circle";
 
+            /* Renders a circle.
+            @param ctx              (context2d) Canvas context2d to render on.
+            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
+            @param viewport2d       (Viewport2d) current viewport
+            @param size_p           ({x,y}) size of bounding box of this element in pixels
+            @remarks The method is implemented for each particular VirtualCanvas element.
+            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 var rad = this.width / 2.0;
                 var xc = this.x + rad;
@@ -798,7 +1119,7 @@ var CZ;
                         if (this.settings.isLineWidthVirtual) {
                             ctx.lineWidth = viewport2d.widthVirtualToScreen(this.settings.lineWidth);
                         } else {
-                            ctx.lineWidth = this.settings.lineWidth;
+                            ctx.lineWidth = this.settings.lineWidth; // in pixels
                         }
                     } else
                         ctx.lineWidth = 1;
@@ -810,6 +1131,8 @@ var CZ;
                 }
             };
 
+            /* Checks whether the given point (virtual) is inside the object
+            (should take into account the shape) */
             this.isInside = function (point_v) {
                 var len2 = CZ.Common.sqr(point_v.x - vxc) + CZ.Common.sqr(point_v.y - this.y - this.height / 2);
                 return len2 <= vradius * vradius;
@@ -818,6 +1141,8 @@ var CZ;
             this.prototype = new CanvasElement(vc, layerid, id, vxc - vradius / 2, vyc - vradius / 2, vradius, vradius);
         }
 
+        /*A popup window element
+        */
         function addPopupWindow(url, id, width, height, scrollbars, resizable) {
             var w = width;
             var h = height;
@@ -827,6 +1152,10 @@ var CZ;
             window.open(url, id, features);
         }
 
+        /*
+        Draws text by scaling canvas to match fontsize rather than change fontsize.
+        This behaviour minimizes text shaking in chrome.
+        */
         function drawText(text, ctx, x, y, fontSize, fontName) {
             var br = $.browser;
             var isIe9 = br.msie && parseInt(br.version, 10) >= 9;
@@ -846,9 +1175,23 @@ var CZ;
             }
         }
 
+        /*  A text element on a virtual canvas.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param baseline (number) y coordinate of the baseline in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param settings     ({ fillStyle, fontName, textAlign, textBaseLine, wrapText, numberOfLines, adjustWidth }) Parameters of the text appearance
+        @param vw (number) optional width of the text; if undefined, it is automatically asigned to width of the given text line.
+        @remarks
+        Text width is adjusted using measureText() on first render call.
+        If textAlign is center, then width must be provided.
+        */
         function CanvasText(vc, layerid, id, vx, vy, baseline, vh, text, settings, wv) {
             this.base = CanvasElement;
-            this.base(vc, layerid, id, vx, vy, wv ? wv : 0, vh);
+            this.base(vc, layerid, id, vx, vy, wv ? wv : 0, vh); // proper text width will be computed on first render
             this.text = text;
             this.baseline = baseline;
             this.newBaseline = baseline;
@@ -861,8 +1204,15 @@ var CZ;
             }
 
             this.initialized = false;
-            this.screenFontSize = 0;
+            this.screenFontSize = 0; //not initialized
 
+            /* Renders text.
+            @param ctx              (context2d) Canvas context2d to render on.
+            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
+            @param viewport2d       (Viewport2d) current viewport
+            @param size_p           ({x,y}) size of bounding box of this element in pixels
+            @remarks The method is implemented for each particular VirtualCanvas element.
+            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 var p = viewport2d.pointVirtualToScreen(this.x, this.newY);
                 var bp = viewport2d.pointVirtualToScreen(this.x, this.newBaseline).y;
@@ -875,6 +1225,7 @@ var CZ;
                 if (this.screenFontSize != fontSize)
                     this.screenFontSize = fontSize;
 
+                // initialization
                 if (!this.initialized) {
                     if (this.settings.wrapText) {
                         var numberOfLines = this.settings.numberOfLines ? this.settings.numberOfLines : 1;
@@ -882,8 +1233,9 @@ var CZ;
                         fontSize = size_p.y / numberOfLines / k;
 
                         while (true) {
-                            ctx.font = fontSize + "pt " + this.settings.fontName;
+                            ctx.font = fontSize + "pt " + this.settings.fontName; // assign it here to measure text in next lines
 
+                            // Splitting the text into lines
                             var mlines = this.text.split('\n');
                             var textHeight = 0;
                             var lines = [];
@@ -903,6 +1255,7 @@ var CZ;
                                         iw--;
                                         currentLine = '';
                                     } else {
+                                        // we're still within the limit
                                         if (currentLine === '')
                                             currentLine = words[iw];
                                         else
@@ -932,11 +1285,11 @@ var CZ;
                             }
                         }
 
-                        this.screenFontSize = fontSize;
+                        this.screenFontSize = fontSize; // try to save fontSize
                     } else {
-                        ctx.font = fontSize + "pt " + this.settings.fontName;
+                        ctx.font = fontSize + "pt " + this.settings.fontName; // assign it here to measure text in next lines
 
-                        this.screenFontSize = fontSize;
+                        this.screenFontSize = fontSize; // try to save fontSize
 
                         if (this.width == 0) {
                             var size = ctx.measureText(this.text);
@@ -951,7 +1304,7 @@ var CZ;
                                 }
                                 fontSize = viewport2d.heightVirtualToScreen(this.height);
 
-                                this.screenFontSize = fontSize;
+                                this.screenFontSize = fontSize; // try to save fontSize
                             } else if (typeof this.settings.adjustWidth && this.settings.adjustWidth) {
                                 var nwidth = viewport2d.widthScreenToVirtual(size.width);
 
@@ -970,6 +1323,7 @@ var CZ;
                     this.initialized = true;
                 }
 
+                // Rendering text
                 if (this.settings.textAlign) {
                     ctx.textAlign = this.settings.textAlign;
                     if (this.settings.textAlign === 'center')
@@ -985,7 +1339,7 @@ var CZ;
                     drawText(this.text, ctx, p.x, bp, fontSize, this.settings.fontName);
                 } else {
                     fontSize = viewport2d.heightVirtualToScreen(this.settings.fontSizeVirtual);
-                    this.screenFontSize = fontSize;
+                    this.screenFontSize = fontSize; // try to save fontSize
                     ctx.textBaseline = 'middle';
 
                     var bp = p.y + fontSize * k / 2;
@@ -1008,9 +1362,20 @@ var CZ;
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, wv ? wv : 0, vh);
         }
 
+        /*  A multiline text element on a virtual canvas.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vh   (number) height of a text
+        @param lineWidth (number) width of a line to text output
+        @param settings     ({ fillStyle, fontName }) Parameters of the text appearance
+        @remarks
+        Text width is adjusted using measureText() on first render call.
+        */
         function CanvasMultiLineTextItem(vc, layerid, id, vx, vy, vh, text, lineWidth, settings) {
             this.base = CanvasElement;
-            this.base(vc, layerid, id, vx, vy, vh * 10, vh);
+            this.base(vc, layerid, id, vx, vy, vh * 10, vh); // todo: measure properly text width
             this.settings = settings;
             this.text = text;
 
@@ -1051,17 +1416,29 @@ var CZ;
                 ctx.textBaseline = 'top';
                 var height = viewport2d.heightVirtualToScreen(this.height);
                 textOutput(ctx, this.text, p.x, p.y, height, lineWidth * height);
+                // ctx.fillText(this.text, p.x, p.y);
             };
 
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vh * 10, vh);
         }
 
+        /*  Represents an image on a virtual canvas.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param onload (optional callback function) called when image is loaded
+        @remarks
+        optional property onLoad() is called if defined when the image is loaded and the element is completely initialized.
+        */
         function CanvasImage(vc, layerid, id, imageSource, vx, vy, vw, vh, onload) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
             this.onload = onload;
 
-            this.isLoading = true;
+            this.isLoading = true; // I am async
             var img = new Image();
             this.img = img;
             this.img.isLoaded = false;
@@ -1070,15 +1447,18 @@ var CZ;
             var onCanvasImageLoad = function (s) {
                 img['isLoading'] = false;
                 if (!img['isRemoved']) {
+                    // adjusting aspect ratio
                     if (img.naturalHeight) {
                         var ar0 = self.width / self.height;
                         var ar1 = img.naturalWidth / img.naturalHeight;
                         if (ar0 > ar1) {
+                            // vh ~ img.height, vw is to be adjusted
                             var imgWidth = ar1 * self.height;
                             var offset = (self.width - imgWidth) / 2.0;
                             self.x += offset;
                             self.width = imgWidth;
                         } else if (ar0 < ar1) {
+                            // vw ~ img.width, vh is to be adjusted
                             var imgHeight = self.width / ar1;
                             var offset = (self.height - imgHeight) / 2.0;
                             self.y += offset;
@@ -1108,7 +1488,7 @@ var CZ;
             if (onload)
                 this.img.addEventListener("load", onload, false);
             this.img.addEventListener("error", onCanvasImageLoadError, false);
-            this.img.src = imageSource;
+            this.img.src = imageSource; // todo: stop image loading if it is not needed anymore (see http://stackoverflow.com/questions/1339901/stop-loading-of-images-with-javascript-lazyload)
 
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
                 if (!this.img.isLoaded)
@@ -1129,6 +1509,16 @@ var CZ;
             this.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
 
+        /*  Represents an image on a virtual canvas with support of dynamic level of detail.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param imageSources   [{ zoomLevel, imageSource }] Ordered array of image sources for different zoom levels
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param onload (optional callback function) called when image is loaded
+        */
         function CanvasLODImage(vc, layerid, id, imageSources, vx, vy, vw, vh, onload) {
             this.base = CanvasDynamicLOD;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -1154,12 +1544,25 @@ var CZ;
             this.prototype = new CanvasDynamicLOD(vc, layerid, id, vx, vy, vw, vh);
         }
 
+        /* A canvas element which can host any of HTML elements.
+        @param vc        (jquery to virtual canvas) note that vc.element[0] is the virtual canvas object
+        @param layerid   (any type) id of the layer for this element
+        @param id        (any type) id of an element
+        @param vx        (number)   x of left top corner in virtual space
+        @param vy        (number)   y of left top corner in virtual space
+        @param vw        (number)   width of in virtual space
+        @param vh        (number)   height of in virtual space
+        @param z         (number) z-index
+        */
         function CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z) {
             this.base = CanvasElement;
             this.base(vc, layerid, id, vx, vy, vw, vh);
 
+            /* Initializes content of the CanvasDomItem.
+            @param content          HTML element to add to virtual canvas
+            @remarks The method assigns this.content property and sets up the styles of the content. */
             this.initializeContent = function (content) {
-                this.content = content;
+                this.content = content; // todo: ref to DOM potentially causes memory leak.
                 if (content) {
                     content.style.position = 'absolute';
                     content.style.overflow = 'hidden';
@@ -1167,6 +1570,7 @@ var CZ;
                 }
             };
 
+            /* This function is called when isRendered changes, i.e. when we stop or start render this element. */
             this.onIsRenderedChanged = function () {
                 if (!this.content)
                     return;
@@ -1178,6 +1582,7 @@ var CZ;
                     }
                     this.content.style.display = 'block';
                 } else {
+                    /* If we stop render it, we make it invisible */
                     this.content.style.display = 'none';
                 }
             };
@@ -1186,13 +1591,17 @@ var CZ;
                     return;
                 var p = viewport2d.pointVirtualToScreen(this.x, this.y);
 
+                // p.x = p.x + 8; p.y = p.y + 8; // todo: properly position relative to VC and remove this offset
+                //Define screen rectangle
                 var screenTop = 0;
                 var screenBottom = viewport2d.height;
                 var screenLeft = 0;
                 var screenRight = viewport2d.width;
 
+                //Define clip rectangle. By defautlt, video is not clipped. If video element crawls from screen rect, clip it
                 var clipRectTop = 0, clipRectLeft = 0, clipRectBottom = size_p.y, clipRectRight = size_p.x;
 
+                //Vertical intersection ([a1,a2] are screen top and bottom, [b1,b2] are iframe top and bottom)
                 var a1 = screenTop;
                 var a2 = screenBottom;
                 var b1 = p.y;
@@ -1204,17 +1613,19 @@ var CZ;
                     clipRectBottom = c2 - p.y;
                 }
 
+                //Horizontal intersection ([a1,a2] are screen left and right, [b1,b2] are iframe left and right)
                 a1 = screenLeft;
                 a2 = screenRight;
                 b1 = p.x;
                 b2 = p.x + size_p.x;
                 c1 = Math.max(a1, b1);
-                c2 = Math.min(a2, b2);
+                c2 = Math.min(a2, b2); //[c1,c2] is intersection
                 if (c1 <= c2) {
                     clipRectLeft = c1 - p.x;
                     clipRectRight = c2 - p.x;
                 }
 
+                //Finally, reset iframe style.
                 this.content.style.left = p.x + 'px';
                 this.content.style.top = p.y + 'px';
                 this.content.style.width = size_p.x + 'px';
@@ -1224,13 +1635,14 @@ var CZ;
                 this.content.style.filter = 'alpha(opacity=' + (opacity * 100) + ')';
             };
 
+            /* The functions is called when the canvas element is removed from the elements tree */
             this.onRemove = function () {
                 if (!this.content)
                     return;
                 try  {
                     if (this.content.isAdded) {
                         if (this.content.src)
-                            this.content.src = "";
+                            this.content.src = ""; // Stop loading content
                         this.vc.element[0].removeChild(this.content);
                         this.content.isAdded = false;
                     }
@@ -1243,10 +1655,26 @@ var CZ;
         }
         VCContent.CanvasDomItem = CanvasDomItem;
 
+        /*Represents Text block with scroll*/
+        /*  Represents an image on a virtual canvas.
+        @param videoSrc     video source
+        @param vx           x of left top corner in virtual space
+        @param vy           y of left top corner in virtual space
+        @param vw           width of in virtual space
+        @param vh           height of in virtual space
+        @param z            z-index
+        @param settings     Parameters of the appearance
+        */
         function CanvasScrollTextItem(vc, layerid, id, vx, vy, vw, vh, text, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
 
+            //Creating content element
+            //Our text will be drawn on div
+            //To enable overflow:auto effect in IE, we have to use position:relative
+            //But in vccontent we use position:absolute
+            //So, we create "wrapping" div elemWrap, with position:absolute
+            //Inside elemWrap, create child div with position:relative
             var elem = $("<div></div>", {
                 id: "citext_" + id,
                 class: "contentItemDescription"
@@ -1259,9 +1687,11 @@ var CZ;
             var textElem = $("<div style='position:relative; white-space: pre-line' class='text'></div>");
             textElem.text(text).appendTo(elem);
 
+            //Initialize content
             this.initializeContent(elem[0]);
 
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                //Scale new font size
                 var fontSize = size_p.y / CZ.Settings.contentItemDescriptionNumberOfLines;
                 elem.css('font-size', fontSize + "px");
 
@@ -1281,6 +1711,14 @@ var CZ;
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
+        /*Represents PDF element
+        @param pdfSrc     pdf source
+        @param vx           x of left top corner in virtual space
+        @param vy           y of left top corner in virtual space
+        @param vw           width of in virtual space
+        @param vh           height of in virtual space
+        @param z            z-index
+        */
         function CanvasPdfItem(vc, layerid, id, pdfSrc, vx, vy, vw, vh, z) {
             var pdfViewer = "http://docs.google.com/viewer?url=";
             this.base = CanvasDomItem;
@@ -1306,6 +1744,14 @@ var CZ;
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
+        /*Represents video element
+        @param videoSrc     video source
+        @param vx           x of left top corner in virtual space
+        @param vy           y of left top corner in virtual space
+        @param vw           width of in virtual space
+        @param vh           height of in virtual space
+        @param z            z-index
+        */
         function CanvasVideoItem(vc, layerid, id, videoSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
@@ -1325,6 +1771,16 @@ var CZ;
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
+        /*Represents Audio element*/
+        /*  Represents an image on a virtual canvas.
+        @param audioSrc     audio source
+        @param vx           x of left top corner in virtual space
+        @param vy           y of left top corner in virtual space
+        @param vw           width of in virtual space
+        @param vh           height of in virtual space
+        @param z            z-index
+        @param settings     Parameters of the appearance
+        */
         function CanvasAudioItem(vc, layerid, id, audioSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
@@ -1339,6 +1795,14 @@ var CZ;
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
+        /*Represents skydrive embed document
+        @param embedSrc     embed document source code
+        @param vx           x of left top corner in virtual space
+        @param vy           y of left top corner in virtual space
+        @param vw           width of in virtual space
+        @param vh           height of in virtual space
+        @param z            z-index
+        */
         function CanvasSkydriveDocumentItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
@@ -1351,10 +1815,20 @@ var CZ;
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
+        /*Represents skydrive embed image
+        Image is scaled to fit entire container.
+        @param embedSrc     embed image source code. pattern: {url} {width} {height}
+        @param vx           x of left top corner in virtual space
+        @param vy           y of left top corner in virtual space
+        @param vw           width of in virtual space
+        @param vh           height of in virtual space
+        @param z            z-index
+        */
         function CanvasSkydriveImageItem(vc, layerid, id, embededSrc, vx, vy, vw, vh, z) {
             this.base = CanvasDomItem;
             this.base(vc, layerid, id, vx, vy, vw, vh, z);
 
+            // parse src params
             var srcData = embededSrc.split(" ");
 
             var elem = document.createElement('iframe');
@@ -1371,14 +1845,18 @@ var CZ;
 
                 var p = viewport2d.pointVirtualToScreen(this.x, this.y);
 
+                // p.x = p.x + 8; p.y = p.y + 8; // todo: properly position relative to VC and remove this offset
+                // parse base size of iframe
                 var width = parseFloat(srcData[1]);
                 var height = parseFloat(srcData[2]);
 
+                // calculate scale level
                 var scale = size_p.x / width;
                 if (height / width > size_p.y / size_p.x) {
                     scale = size_p.y / height;
                 }
 
+                // position image in center of container
                 this.content.style.left = (p.x + size_p.x / 2) + 'px';
                 this.content.style.top = (p.y + size_p.y / 2) + 'px';
                 this.content.style.marginLeft = (-width / 2) + 'px';
@@ -1389,6 +1867,7 @@ var CZ;
                 this.content.style.opacity = opacity;
                 this.content.style.filter = 'alpha(opacity=' + (opacity * 100) + ')';
 
+                // scale iframe to fit entire container
                 this.content.style.webkitTransform = "scale(" + scale + ")";
                 this.content.style.msTransform = "scale(" + scale + ")";
                 this.content.style.MozTransform = "scale(" + scale + ")";
@@ -1397,6 +1876,131 @@ var CZ;
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
         }
 
+        /*Represents a Seadragon based image
+        @param imageSource  image source
+        @param vx           x of left top corner in virtual space
+        @param vy           y of left top corner in virtual space
+        @param vw           width of in virtual space
+        @param vh           height of in virtual space
+        @param z            z-index
+        @param onload       (optional callback function) called when image is loaded
+        @oaram parent       parent element, whose child is to be seadragon image.
+        */
+        function SeadragonImage(vc, parent, layerid, id, imageSource, vx, vy, vw, vh, z, onload) {
+            var self = this;
+            this.base = CanvasDomItem;
+            this.base(vc, layerid, id, vx, vy, vw, vh, z);
+            this.onload = onload;
+            this.nAttempts = 0;
+            this.timeoutHandles = [];
+
+            var container = document.createElement('div');
+            container.setAttribute("id", id);
+            container.setAttribute("style", "color: white"); // color to use for displaying messages
+            this.initializeContent(container);
+
+            this.viewer = new Seadragon.Viewer(container);
+            this.viewer.elmt.addEventListener("mousemove", CZ.Common.preventbubble, false);
+            this.viewer.elmt.addEventListener("mousedown", CZ.Common.preventbubble, false);
+            this.viewer.elmt.addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
+            this.viewer.elmt.addEventListener("mousewheel", CZ.Common.preventbubble, false);
+
+            this.viewer.addEventListener("open", function (e) {
+                if (self.onload)
+                    self.onload();
+                self.vc.requestInvalidate();
+            });
+
+            this.viewer.addEventListener("resize", function (e) {
+                self.viewer.setDashboardEnabled(e.elmt.clientWidth > 250);
+            });
+
+            this.onSuccess = function (resp) {
+                if (resp.error) {
+                    // the URL is malformed or the service is down
+                    self.showFallbackImage();
+                    return;
+                }
+
+                var content = resp.content;
+                if (content.ready) {
+                    for (var i = 0; i < self.timeoutHandles.length; i++)
+                        clearTimeout(self.timeoutHandles[i]);
+
+                    self.viewer.openDzi(content.dzi);
+                } else if (content.failed) {
+                    self.showFallbackImage();
+                } else {
+                    if (self.nAttempts < CZ.Settings.seadragonMaxConnectionAttempts) {
+                        self.viewer.showMessage("Loading " + Math.round(100 * content.progress) + "% done.");
+                        self.timeoutHandles.push(setTimeout(self.requestDZI, CZ.Settings.seadragonRetryInterval)); // retry
+                    } else {
+                        self.showFallbackImage();
+                    }
+                }
+            };
+
+            this.onError = function () {
+                // ajax query failed
+                if (self.nAttempts < CZ.Settings.seadragonMaxConnectionAttempts) {
+                    self.timeoutHandles.push(setTimeout(self.requestDZI, CZ.Settings.seadragonRetryInterval)); // retry
+                } else {
+                    self.showFallbackImage();
+                }
+            };
+
+            this.requestDZI = function () {
+                self.nAttempts++;
+                $.ajax({
+                    url: CZ.Settings.seadragonServiceURL + encodeURIComponent(imageSource),
+                    dataType: "jsonp",
+                    success: self.onSuccess,
+                    error: self.onError
+                });
+            };
+
+            this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                if (self.viewer.isFullPage())
+                    return;
+
+                this.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
+                if (self.viewer.viewport) {
+                    self.viewer.viewport.resize({ x: size_p.x, y: size_p.y });
+                    self.viewer.viewport.update();
+                }
+            };
+
+            this.onRemove = function () {
+                self.viewer.close(); // closes any open content
+                this.prototype.onRemove.call(this);
+            };
+
+            this.showFallbackImage = function () {
+                for (var i = 0; i < self.timeoutHandles.length; i++)
+                    clearTimeout(self.timeoutHandles[i]);
+
+                self.onRemove(); // removes the dom element
+                VCContent.removeChild(parent, self.id); // removes the cur seadragon object from the scene graph
+                VCContent.addImage(parent, layerid, id, vx, vy, vw, vh, imageSource);
+            };
+
+            // run
+            self.requestDZI();
+
+            this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+
+        /*******************************************************************************************************/
+        /* Timelines                                                                                           */
+        /*******************************************************************************************************/
+        /* Adds a timeline composite element into a virtual canvas.
+        @param element   (CanvasElement) Parent element, whose children is to be new timeline.
+        @param layerid   (any type) id of the layer for this element
+        @param id        (any type) id of an element
+        @param timelineinfo  ({ timeStart (minus number of years BP), timeEnd (minus number of years BP), top (number), height (number),
+        header (string), fillStyle (color) })
+        @returns         root of the timeline tree
+        */
         function addTimeline(element, layerid, id, timelineinfo) {
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
             var timeline = VCContent.addChild(element, new CanvasTimeline(element.vc, layerid, id, timelineinfo.timeStart, timelineinfo.top, width, timelineinfo.height, {
@@ -1409,6 +2013,23 @@ var CZ;
         }
         VCContent.addTimeline = addTimeline;
 
+        /*******************************************************************************************************/
+        /* Infodots & content items                                                                            */
+        /*******************************************************************************************************/
+        /*  Represents an image on a virtual canvas with support of dynamic level of detail.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param contentItem ({ id, guid, date (string), title (string), description (string), mediaUrl (string), mediaType (string) }) describes content of this content item
+        @remarks Supported media types (contentItem.mediaType) are:
+        - image
+        - video
+        - audio
+        - pdf
+        */
         function ContentItem(vc, layerid, id, vx, vy, vw, vh, contentItem) {
             this.base = CanvasDynamicLOD;
             this.base(vc, layerid, id, vx, vy, vw, vh);
@@ -1416,6 +2037,7 @@ var CZ;
             this.type = 'contentItem';
             this.contentItem = contentItem;
 
+            // Building content of the item
             var titleHeight = vh * CZ.Settings.contentItemTopTitleHeight * 0.8;
             var mediaHeight = vh * CZ.Settings.contentItemMediaHeight;
             var descrHeight = CZ.Settings.contentItemFontHeight * vh;
@@ -1431,6 +2053,7 @@ var CZ;
             var sourceHeight = vh * CZ.Settings.contentItemSourceHeight * 0.8;
             var titleTop = sourceTop + verticalMargin + sourceHeight;
 
+            // Bounding rectangle
             var rect = VCContent.addRectangle(this, layerid, id + "__rect__", vx, vy, vw, vh, {
                 strokeStyle: CZ.Settings.contentItemBoundingBoxBorderColor, lineWidth: CZ.Settings.contentItemBoundingBoxBorderWidth * vw, fillStyle: CZ.Settings.contentItemBoundingBoxFillColor,
                 isLineWidthVirtual: true
@@ -1466,10 +2089,13 @@ var CZ;
 
                     var container = new ContainerElement(vc, layerid, id + "__content", vx, vy, vw, vh);
 
+                    // Media
                     var mediaID = id + "__media__";
                     var imageElem = null;
                     if (this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
                         imageElem = VCContent.addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
+                    } else if (this.contentItem.mediaType.toLowerCase() === 'deepimage') {
+                        imageElem = VCContent.addSeadragonImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     } else if (this.contentItem.mediaType.toLowerCase() === 'video') {
                         VCContent.addVideo(container, layerid, mediaID, this.contentItem.uri, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex);
                     } else if (this.contentItem.mediaType.toLowerCase() === 'audio') {
@@ -1486,6 +2112,7 @@ var CZ;
                         VCContent.addExtension(contentItem.mediaType, container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, CZ.Settings.mediaContentElementZIndex, this.contentItem.uri);
                     }
 
+                    // Title
                     var titleText = this.contentItem.title;
                     addText(container, layerid, id + "__title__", vx + leftOffset, titleTop, titleTop + titleHeight / 2.0, 0.9 * titleHeight, titleText, {
                         fontName: CZ.Settings.contentItemHeaderFontName,
@@ -1497,6 +2124,7 @@ var CZ;
                         numberOfLines: 1
                     }, contentWidth);
 
+                    // Source
                     var sourceText = this.contentItem.attribution;
                     var mediaSource = this.contentItem.mediaSource;
                     if (sourceText) {
@@ -1533,9 +2161,11 @@ var CZ;
                         addSourceText(vx + leftOffset, contentWidth, sourceTop);
                     }
 
+                    // Description
                     var descrTop = titleTop + titleHeight + verticalMargin;
                     var descr = addScrollText(container, layerid, id + "__description__", vx + leftOffset, descrTop, contentWidth, descrHeight, this.contentItem.description, 30, {});
 
+                    //adding edit button
                     if (CZ.Authoring.isEnabled) {
                         var imageSize = (container.y + container.height - descr.y - descr.height) * 0.75;
                         var editButton = VCContent.addImage(container, layerid, id + "__edit", container.x + container.width - 1.25 * imageSize, descrTop + descrHeight, imageSize, imageSize, "/images/edit.svg");
@@ -1587,6 +2217,15 @@ var CZ;
             this.prototype = new CanvasDynamicLOD(vc, layerid, id, vx, vy, vw, vh);
         }
 
+        /*  An Infodot element that can be added to a VirtualCanvas.
+        @param layerid   (any type) id of the layer for this element
+        @param id   (any type) id of an element
+        @param vx   (number) x of left top corner in virtual space
+        @param vy   (number) y of left top corner in virtual space
+        @param vw   (number) width of a bounding box in virtual space
+        @param vh   (number) height of a bounding box in virtual space
+        @param infodotDescription  ({title})
+        */
         function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
             this.base = CanvasCircle;
             this.base(vc, layerid, id, time, vyc, radv, { strokeStyle: CZ.Settings.infoDotBorderColor, lineWidth: CZ.Settings.infoDotBorderWidth * radv, fillStyle: CZ.Settings.infoDotFillColor, isLineWidthVirtual: true });
@@ -1625,8 +2264,8 @@ var CZ;
 
             this.reactsOnMouse = true;
 
-            this.tooltipEnabled = true;
-            this.tooltipIsShown = false;
+            this.tooltipEnabled = true; // indicates whether tooltip is enabled for this infodot at this moment or not
+            this.tooltipIsShown = false; // indicates whether tooltip is shown or not
 
             this.onmousehover = function (pv, e) {
                 this.vc.currentlyHoveredInfodot = this;
@@ -1642,17 +2281,21 @@ var CZ;
                 this.settings.lineWidth = CZ.Settings.infoDotHoveredBorderWidth * radv;
                 this.vc.requestInvalidate();
 
+                // clear tooltipIsShown flag for currently hovered timeline
+                // it can be null because of mouse events sequence: mouseenter for infodot -> mousehover for timeline -> mouseunhover for timeline
                 if (this.vc.currentlyHoveredTimeline != null) {
+                    // stop active tooltip fadein animation and hide tooltip
                     CZ.Common.stopAnimationTooltip();
                     this.vc.currentlyHoveredTimeline.tooltipIsShown = false;
                 }
 
                 $(".bubbleInfo span").text(infodotDescription.title);
-                this.panelWidth = $('.bubbleInfo').outerWidth();
-                this.panelHeight = $('.bubbleInfo').outerHeight();
+                this.panelWidth = $('.bubbleInfo').outerWidth(); // complete width of tooltip panel
+                this.panelHeight = $('.bubbleInfo').outerHeight(); // complete height of tooltip panel
 
-                CZ.Common.tooltipMode = "infodot";
+                CZ.Common.tooltipMode = "infodot"; //set tooltip mode to infodot
 
+                // start tooltip fadein animation for this infodot
                 if ((this.tooltipEnabled == true) && (this.tooltipIsShown == false)) {
                     this.tooltipIsShown = true;
                     $(".bubbleInfo").attr("id", "defaultBox");
@@ -1671,6 +2314,7 @@ var CZ;
                 this.settings.lineWidth = CZ.Settings.infoDotBorderWidth * radv;
                 this.vc.requestInvalidate();
 
+                // stop active fadein animation and hide tooltip
                 if (this.tooltipIsShown == true)
                     CZ.Common.stopAnimationTooltip();
 
@@ -1686,8 +2330,10 @@ var CZ;
                 return zoomToElementHandler(this, e, 1.0);
             };
 
+            //Bibliography flag accroding to BUG 215750
             var bibliographyFlag = true;
 
+            // Building dynamic LOD content
             var infodot = this;
             var root = new CanvasDynamicLOD(vc, layerid, id + "_dlod", time - innerRad, vyc - innerRad, 2 * innerRad, 2 * innerRad);
             root.removeWhenInvisible = true;
@@ -1697,6 +2343,7 @@ var CZ;
             root.changeZoomLevel = function (curZl, newZl) {
                 var vyc = infodot.newY + radv;
 
+                // Showing only thumbnails for every content item of the infodot
                 if (newZl >= CZ.Settings.infodotShowContentThumbZoomLevel && newZl < CZ.Settings.infodotShowContentZoomLevel) {
                     var URL = CZ.UrlNav.getURL();
                     if (typeof URL.hash.params != 'undefined' && typeof URL.hash.params['b'] != 'undefined')
@@ -1705,6 +2352,7 @@ var CZ;
                     if (curZl >= CZ.Settings.infodotShowContentThumbZoomLevel && curZl < CZ.Settings.infodotShowContentZoomLevel)
                         return null;
 
+                    // Tooltip is enabled now.
                     infodot.tooltipEnabled = true;
 
                     var contentItem = null;
@@ -1729,8 +2377,10 @@ var CZ;
                     if (curZl >= CZ.Settings.infodotShowContentZoomLevel)
                         return null;
 
+                    // Tooltip is disabled now.
                     infodot.tooltipEnabled = false;
 
+                    // stop active fadein animation and hide tooltip
                     if (infodot.tooltipIsShown == true) {
                         CZ.Common.stopAnimationTooltip();
                         infodot.tooltipIsShown = false;
@@ -1767,6 +2417,7 @@ var CZ;
                                 title = infodotDescription.title + '\n(' + exhibitYMD.year + "." + (exhibitYMD.month + 1) + "." + exhibitYMD.day + ' ' + exhibitDate.regime + ')';
                             }
                         } else {
+                            // Format year title with fixed precision
                             title = infodotDescription.title + '\n(' + parseFloat(exhibitDate.year.toFixed(2)) + ' ' + exhibitDate.regime + ')';
                         }
                     }
@@ -1781,6 +2432,7 @@ var CZ;
                         numberOfLines: 2
                     }, titleWidth);
 
+                    //adding edit button
                     if (CZ.Authoring.isEnabled) {
                         var imageSize = (titleTop - infodot.y) * 0.75;
                         var editButton = VCContent.addImage(infodot, layerid, id + "__edit", time - imageSize / 2, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/edit.svg");
@@ -1829,8 +2481,11 @@ var CZ;
                         this.vc.element.css('cursor', 'default');
                     };
 
+                    //Parse url for parameter b (bibliography).
                     var bid = window.location.hash.match("b=([a-z0-9_\-]+)");
                     if (bid && bibliographyFlag) {
+                        //bid[0] - source string
+                        //bid[1] - found match
                         CZ.Bibliography.showBibliography({ infodot: infodotDescription, contentItems: infodot.contentItems }, contentItem, bid[1]);
                     }
 
@@ -1842,6 +2497,7 @@ var CZ;
                         };
                     }
                 } else {
+                    // Tooltip is enabled now.
                     infodot.tooltipEnabled = true;
 
                     infodot.hasContentItems = false;
@@ -1876,6 +2532,7 @@ var CZ;
                 }
             };
 
+            // Applying Jessica's proportions
             var _rad = 450.0 / 2.0;
             var k = 1.0 / _rad;
             var _wc = (252.0 + 0) * k;
@@ -1887,8 +2544,15 @@ var CZ;
             var xlt1 = _wc / 2 * radv + time;
             var ylt1 = _hc / 2 * radv + vyc;
 
+            /* Renders an infodot.
+            @param ctx              (context2d) Canvas context2d to render on.
+            @param visibleBox_v     ({Left,Right,Top,Bottom}) describes visible region in the virtual space
+            @param viewport2d       (Viewport2d) current viewport
+            @param size_p           ({x,y}) size of bounding box of this element in pixels
+            @remarks The method is implemented for each particular VirtualCanvas element.
+            */
             this.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
-                this.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity);
+                this.prototype.render.call(this, ctx, visibleBox, viewport2d, size_p, opacity); // rendering the circle
 
                 var sw = viewport2d.widthVirtualToScreen(strokeWidth);
                 if (sw < 0.5)
@@ -1913,6 +2577,8 @@ var CZ;
                 ctx.strokeStyle = CZ.Settings.contentItemBoundingBoxFillColor;
             };
 
+            /* Checks whether the given point (virtual) is inside the object
+            (should take into account the shape) */
             this.isInside = function (point_v) {
                 var len2 = CZ.Common.sqr(point_v.x - this.x - (this.width / 2)) + CZ.Common.sqr(point_v.y - this.y - (this.height / 2));
                 var rad = this.width / 2.0;
@@ -1922,6 +2588,11 @@ var CZ;
             this.prototype = new CanvasCircle(vc, layerid, id, time, vyc, radv, { strokeStyle: CZ.Settings.infoDotBorderColor, lineWidth: CZ.Settings.infoDotBorderWidth * radv, fillStyle: CZ.Settings.infoDotFillColor, isLineWidthVirtual: true });
         }
 
+        /*
+        @param infodot {CanvasElement}  Parent of the content item
+        @param cid  {string}            id of the content item
+        Returns {id,x,y,width,height,parent,type,vc} of a content item even if it is not presented yet in the infodot children collection.
+        */
         function getContentItem(infodot, cid) {
             if (infodot.type !== 'infodot' || infodot.contentItems.length === 0)
                 return null;
@@ -1944,6 +2615,14 @@ var CZ;
         }
         VCContent.getContentItem = getContentItem;
 
+        /* Adds an infodot composite element into a virtual canvas.
+        @param vc        (VirtualCanvas) VirtualCanvas hosting this element
+        @param element   (CanvasElement) Parent element, whose children is to be new timeline.
+        @param layerid   (any type) id of the layer for this element
+        @param id        (any type) id of an element
+        @param contentItems (array of { id, date (string), title (string), description (string), mediaUrl (string), mediaType (string) }) content items of the infodot, first is central.
+        @returns         root of the content item tree
+        */
         function addInfodot(element, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
             var infodot = new CanvasInfodot(element.vc, layerid, id, time, vyc, radv, contentItems, infodotDescription);
             return VCContent.addChild(element, infodot, true);
@@ -1978,6 +2657,7 @@ var CZ;
             var xr = xc + rad * (_xrc - _lw / 2);
             var yb = yc + rad * (_ybc - _lh / 2);
 
+            // build content items
             var vcitems = [];
 
             for (var i = 0, len = Math.min(CZ.Settings.infodotMaxContentItemsCount, n); i < len; i++) {
@@ -1996,12 +2676,17 @@ var CZ;
             return vcitems;
         }
 
+        /* Arranges given number of content items in a single part of an infodot, along a single coordinate axis (either x or y).
+        @param n    (number) Number of content items to arrange
+        @param dx   (number) Size of content item along the axis on which we arrange content items.
+        @returns null, if n is 0; array of lefts (tops) for each coordinate item. */
         function arrangeContentItemsInField(n, dx) {
             if (n == 0)
                 return null;
             var margin = 0.05 * dx;
             var x1, x2, x3, x4;
             if (n % 2 == 0) {
+                // 3 1 2 4
                 x1 = -margin / 2 - dx;
                 x2 = margin / 2;
                 if (n == 4) {
@@ -2011,6 +2696,7 @@ var CZ;
                 }
                 return [x1, x2];
             } else {
+                // 3 1 2
                 x1 = -dx / 2;
                 if (n > 1) {
                     x2 = dx / 2 + margin;

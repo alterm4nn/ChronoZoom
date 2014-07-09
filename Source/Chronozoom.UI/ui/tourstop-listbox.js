@@ -1,4 +1,7 @@
-﻿var __extends = this.__extends || function (d, b) {
+﻿/// <reference path="../scripts/authoring.ts" />
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../ui/controls/listboxbase.ts'/>
+var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -79,7 +82,7 @@ var CZ;
                     if (console && console.warn)
                         console.warn("Could not load a thumbnail image " + thumbUrl);
                 };
-                img.src = thumbUrl;
+                img.src = thumbUrl; // fires off loading of image
 
                 this.titleTextblock.text(this.data.Title);
                 this.typeTextblock.text(this.data.Type);
@@ -106,7 +109,7 @@ var CZ;
                     var element = this.container.find('.cz-tourstop-lapse');
                     var rv = parseInt('0' + element.val());
                     if (rv > 3600)
-                        rv = 3600;
+                        rv = 3600; // max 1 hour
                     return rv;
                 },
                 enumerable: true,
@@ -121,11 +124,15 @@ var CZ;
                 enumerable: true,
                 configurable: true
             });
-
+            
             TourStopListItem.prototype.Activate = function () {
-                var myDetails = this.container.find(".cz-tourstop-detailblock");
-                this.parent.container.find(".cz-tourstop-detailblock").not(myDetails).hide();
-                myDetails.show(500);
+                var selectedStop = this.container.find('.cz-tourstop-detailblock');
+                this.parent.container.find('.cz-tourstop-detailblock').not(selectedStop).hide();
+                selectedStop
+                    .show(500)
+                    .find('.cz-tourstop-lapse')
+                        .autoNumeric('destroy')
+                        .autoNumeric('init');
             };
             return TourStopListItem;
         })(UI.ListItemBase);

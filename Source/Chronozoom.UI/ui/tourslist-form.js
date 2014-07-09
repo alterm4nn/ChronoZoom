@@ -1,3 +1,7 @@
+/// <reference path='../ui/controls/formbase.ts'/>
+/// <reference path='../ui/tour-listbox.ts'/>
+/// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9,6 +13,7 @@ var CZ;
     (function (UI) {
         var FormToursList = (function (_super) {
             __extends(FormToursList, _super);
+            // We only need to add additional initialization in constructor.
             function FormToursList(container, formInfo) {
                 var _this = this;
                 _super.call(this, container, formInfo);

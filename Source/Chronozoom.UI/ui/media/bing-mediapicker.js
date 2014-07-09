@@ -1,3 +1,7 @@
+/// <reference path='../../scripts/cz.ts'/>
+/// <reference path='../../scripts/media.ts'/>
+/// <reference path='../../ui/controls/formbase.ts'/>
+/// <reference path='../../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
     (function (Media) {
@@ -20,10 +24,12 @@ var CZ;
                 var mediaPicker = new BingMediaPicker(mediaPickerContainer, context, formHost);
                 var formContainer = $(".cz-form-bing-mediapicker");
 
+                // Create container for Media Picker's form if it doesn't exist.
                 if (formContainer.length === 0) {
                     formContainer = $("#mediapicker-form").clone().removeAttr("id").addClass("cz-form-bing-mediapicker").appendTo($("#content"));
                 }
 
+                // Create form for Media Picker and append Media Picker to it.
                 var form = new CZ.UI.FormMediaPicker(formContainer, mediaPickerContainer, "Import from Bing", {
                     activationSource: $(),
                     navButton: ".cz-form-nav",
@@ -40,6 +46,7 @@ var CZ;
                     form.close();
                 });
 
+                // Align search results on window resize.
                 var onWindowResize = function () {
                     return mediaPicker.onWindowResize();
                 };
@@ -63,6 +70,7 @@ var CZ;
                 this.searchTextbox.keypress(function (event) {
                     var code = event.which || event.keyCode;
 
+                    // If Enter button is pressed.
                     if (code === 13) {
                         event.preventDefault();
                         _this.search();
@@ -120,6 +128,13 @@ var CZ;
                     return;
                 }
 
+                _gaq.push
+                ([
+                    '_trackEvent',
+                    'Search',
+                    'Bing Search',
+                    mediaType
+                ]);
                 this.searchResultsBox.empty();
                 this.showProgressBar();
 
@@ -160,6 +175,7 @@ var CZ;
 
             BingMediaPicker.prototype.searchVideos = function (query) {
                 var _this = this;
+                // NOTE: Only YouTube and Vimeo videos are supported.
                 query += " (+site:youtube.com OR +site:vimeo.com)";
                 CZ.Service.getBingVideos(query).done(function (response) {
                     _this.hideProgressBar();
@@ -183,6 +199,7 @@ var CZ;
 
             BingMediaPicker.prototype.searchDocuments = function (query) {
                 var _this = this;
+                // NOTE: Currently only PDF is supported.
                 CZ.Service.getBingDocuments(query, "pdf").done(function (response) {
                     _this.hideProgressBar();
 
@@ -204,8 +221,10 @@ var CZ;
 
             BingMediaPicker.prototype.createImageResult = function (result) {
                 var _this = this;
+                // thumbnail size
                 var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerImageThumbnailMaxWidth, CZ.Settings.mediapickerImageThumbnailMaxHeight);
 
+                // vertical offset to align image vertically
                 var imageOffset = (CZ.Settings.mediapickerImageThumbnailMaxHeight - rectangle.height) / 2;
 
                 var container = $("<div></div>", {
@@ -258,10 +277,13 @@ var CZ;
 
             BingMediaPicker.prototype.createVideoResult = function (result) {
                 var _this = this;
+                // Set default thumbnail if there is no any.
                 result.Thumbnail = result.Thumbnail || this.createDefaultThumbnail();
 
+                // thumbnail size
                 var rectangle = this.fitThumbnailToContainer(result.Thumbnail.Width / result.Thumbnail.Height, CZ.Settings.mediapickerVideoThumbnailMaxWidth, CZ.Settings.mediapickerVideoThumbnailMaxHeight);
 
+                // vertical offset to align image vertically
                 var imageOffset = (CZ.Settings.mediapickerVideoThumbnailMaxHeight - rectangle.height) / 2;
 
                 var container = $("<div></div>", {
@@ -338,6 +360,7 @@ var CZ;
                     target: "_blank"
                 });
 
+                // NOTE: Currently only PDF is supported.
                 title.add(descr).click(function (event) {
                     $(_this).trigger("resultclick", _this.convertResultToMediaInfo(result, "pdf"));
                 });
@@ -410,6 +433,7 @@ var CZ;
                     var curElementOuterWidth = curElement.outerWidth(true);
                     var curElementInnerWidth = curElement.innerWidth();
 
+                    // next thumbnail exceed row width
                     if (rowWidth < currentRow.width + curElementActualWidth) {
                         var delta = rowWidth - currentRow.width;
                         for (var j = 0, rowLen = currentRow.elements.length; j < rowLen; j++) {
@@ -420,10 +444,12 @@ var CZ;
                         currentRow.elements = [];
                         currentRow.elements.push(curElement);
 
+                        // content width + margin + padding + border width
                         currentRow.width = Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
                     } else {
                         currentRow.elements.push(curElement);
 
+                        // content width + margin + padding + border width
                         currentRow.width += Math.ceil(curElementActualWidth + curElementOuterWidth - curElementInnerWidth);
                     }
                 }
@@ -436,6 +462,7 @@ var CZ;
                     height: maxHeight
                 };
 
+                // doesn't fit in default rectangle
                 if (aspectRatio > maxAspectRatio) {
                     output.width = maxWidth;
                     output.height = maxWidth / aspectRatio;

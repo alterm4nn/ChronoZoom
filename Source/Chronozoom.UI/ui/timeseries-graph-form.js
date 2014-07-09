@@ -1,4 +1,9 @@
-﻿var CZ;
+﻿/// <reference path='controls/formbase.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../scripts/data.ts'/>
+/// <reference path='../scripts/cz.ts'/>
+/// <reference path='../scripts/gestures.ts'/>
+var CZ;
 (function (CZ) {
     (function (UI) {
         var LineChart = (function () {
@@ -139,19 +144,24 @@
 
                 var context = this.context;
 
+                // size of the canvas
                 var xmin = screenLeft, xmax = screenRight;
                 var ymin = 0, ymax = this.canvas.height;
 
                 dataSet.series.forEach(function (seria) {
+                    //setup appearance
                     context.strokeStyle = seria.appearanceSettings.stroke;
                     context.lineWidth = seria.appearanceSettings.thickness;
 
+                    //ctx.lineCap = 'round';
+                    //drawing line
                     var y = seria.values;
 
                     context.beginPath();
                     var x1, x2, y1, y2;
                     var i = 0;
 
+                    // Looking for non-missing value
                     var nextValuePoint = function () {
                         for (; i < n; i++) {
                             if (isNaN(x[i]) || isNaN(y[i]))
@@ -173,7 +183,7 @@
                     for (i++; i < n; i++) {
                         if (isNaN(x[i]) || isNaN(y[i])) {
                             if (m == 1) {
-                                context.stroke();
+                                context.stroke(); // finishing previous segment (it is broken by missing value)
                                 var c = that.code(x1, y1, xmin, xmax, ymin, ymax);
                                 if (c == 0) {
                                     context.beginPath();
@@ -181,7 +191,7 @@
                                     context.fill();
                                 }
                             } else {
-                                context.stroke();
+                                context.stroke(); // finishing previous segment (it is broken by missing value)
                             }
                             context.beginPath();
                             i++;
@@ -195,6 +205,7 @@
                         if (Math.abs(x1 - x2) < 1 && Math.abs(y1 - y2) < 1)
                             continue;
 
+                        // Clipping and drawing segment p1 - p2:
                         c1_ = c1;
                         c2_ = c2 = that.code(x2, y2, xmin, xmax, ymin, ymax);
 
@@ -247,8 +258,9 @@
                         c1 = c2_;
                     }
 
+                    // Final stroke
                     if (m == 1) {
-                        context.stroke();
+                        context.stroke(); // finishing previous segment (it is broken by missing value)
                         var c = that.code(x1, y1, xmin, xmax, ymin, ymax);
                         if (c == 0) {
                             context.beginPath();
@@ -256,11 +268,12 @@
                             context.fill();
                         }
                     } else {
-                        context.stroke();
+                        context.stroke(); // finishing previous segment (it is broken by missing value)
                     }
                 });
             };
 
+            // Clipping algorithms
             LineChart.prototype.code = function (x, y, xmin, xmax, ymin, ymax) {
                 var a = x < xmin ? 1 : 0;
                 var b = x > xmax ? 1 : 0;

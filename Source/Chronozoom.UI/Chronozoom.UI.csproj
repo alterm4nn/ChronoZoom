@@ -21,6 +21,7 @@
     <IISExpressUseClassicPipelineMode />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <WebGreaseLibPath>..\packages\WebGrease.1.5.2\lib</WebGreaseLibPath>
   </PropertyGroup>
   <PropertyGroup>
     <RunCodeAnalysis>Always</RunCodeAnalysis>
@@ -65,6 +66,18 @@
     <Content Include="css\start-page.css">
       <DependentUpon>start-page.less</DependentUpon>
     </Content>
+    <Content Include="css\start-page.min.css">
+      <DependentUpon>start-page.less</DependentUpon>
+    </Content>
+    <Content Include="css\_colors.css">
+      <DependentUpon>_colors.less</DependentUpon>
+    </Content>
+    <Content Include="css\_mixins.css">
+      <DependentUpon>_mixins.less</DependentUpon>
+    </Content>
+    <Content Include="css\_vars.css">
+      <DependentUpon>_vars.less</DependentUpon>
+    </Content>
     <Content Include="dumps\extensions\GaribaldiTourJSON.js" />
     <Content Include="dumps\extensions\narrative.js" />
     <Content Include="dumps\extensions\rin-sample.js" />
@@ -78,7 +91,343 @@
     <Content Include="dumps\rin-dump.json" />
     <Content Include="dumps\home\timelines.json" />
     <Content Include="dumps\home\tweets.json" />
-    <None Include="Properties\PublishProfiles\cz-nodelete-chronozoom-prod.pubxml" />
+    <Content Include="css\cz.css.map">
+      <DependentUpon>cz.less</DependentUpon>
+    </Content>
+    <Content Include="scripts\authoring-ui.min.js">
+      <DependentUpon>authoring-ui.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\authoring-ui.min.js.map">
+      <DependentUpon>authoring-ui.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\authoring.min.js">
+      <DependentUpon>authoring.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\authoring.min.js.map">
+      <DependentUpon>authoring.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\bibliography.min.js">
+      <DependentUpon>bibliography.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\bibliography.min.js.map">
+      <DependentUpon>bibliography.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\breadcrumbs.min.js">
+      <DependentUpon>breadcrumbs.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\breadcrumbs.min.js.map">
+      <DependentUpon>breadcrumbs.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\common.min.js">
+      <DependentUpon>common.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\common.min.js.map">
+      <DependentUpon>common.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\cz.min.js">
+      <DependentUpon>cz.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\cz.min.js.map">
+      <DependentUpon>cz.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\data.min.js">
+      <DependentUpon>data.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\data.min.js.map">
+      <DependentUpon>data.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\dates.min.js">
+      <DependentUpon>dates.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\dates.min.js.map">
+      <DependentUpon>dates.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\extensions.min.js">
+      <DependentUpon>extensions.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\rinplayer.min.js">
+      <DependentUpon>rinplayer.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\external\audiojs\audiojs\audio.min.js" />
+    <Content Include="scripts\external\audiojs\audiojs\audiojs.swf" />
+    <Content Include="scripts\external\audiojs\audiojs\player-graphics.gif" />
+    <Content Include="scripts\external\jquery.autonumeric-1.9.24.min.js" />
+    <Content Include="scripts\gestures.min.js">
+      <DependentUpon>gestures.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\gestures.min.js.map">
+      <DependentUpon>gestures.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\layout.min.js">
+      <DependentUpon>layout.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\layout.min.js.map">
+      <DependentUpon>layout.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\media.min.js">
+      <DependentUpon>media.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\media.min.js.map">
+      <DependentUpon>media.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\plugins\error-plugin.min.js">
+      <DependentUpon>error-plugin.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\plugins\utility-plugins.min.js">
+      <DependentUpon>utility-plugins.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\search.min.js">
+      <DependentUpon>search.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\search.min.js.map">
+      <DependentUpon>search.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\service.min.js">
+      <DependentUpon>service.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\service.min.js.map">
+      <DependentUpon>service.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\settings.min.js">
+      <DependentUpon>settings.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\settings.min.js.map">
+      <DependentUpon>settings.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\timescale.min.js">
+      <DependentUpon>timescale.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\timescale.min.js.map">
+      <DependentUpon>timescale.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\tours.min.js">
+      <DependentUpon>tours.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\tours.min.js.map">
+      <DependentUpon>tours.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\uiloader.min.js">
+      <DependentUpon>uiloader.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\uiloader.min.js.map">
+      <DependentUpon>uiloader.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\urlnav.min.js">
+      <DependentUpon>urlnav.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\urlnav.min.js.map">
+      <DependentUpon>urlnav.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\vccontent.min.js">
+      <DependentUpon>vccontent.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\vccontent.min.js.map">
+      <DependentUpon>vccontent.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport-animation.min.js">
+      <DependentUpon>viewport-animation.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport-animation.min.js.map">
+      <DependentUpon>viewport-animation.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport-controller.min.js">
+      <DependentUpon>viewport-controller.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport-controller.min.js.map">
+      <DependentUpon>viewport-controller.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport.min.js">
+      <DependentUpon>viewport.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\viewport.min.js.map">
+      <DependentUpon>viewport.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\virtual-canvas.min.js">
+      <DependentUpon>virtual-canvas.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\virtual-canvas.min.js.map">
+      <DependentUpon>virtual-canvas.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-collection-editors.min.js">
+      <DependentUpon>auth-edit-collection-editors.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-collection-form.min.js">
+      <DependentUpon>auth-edit-collection-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-contentitem-form.min.js">
+      <DependentUpon>auth-edit-contentitem-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-exhibit-form.min.js">
+      <DependentUpon>auth-edit-exhibit-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-timeline-form.min.js">
+      <DependentUpon>auth-edit-timeline-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-tour-form.min.js">
+      <DependentUpon>auth-edit-tour-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\contentitem-listbox.min.js">
+      <DependentUpon>contentitem-listbox.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\datepicker.min.js">
+      <DependentUpon>datepicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\datepicker.min.js.map">
+      <DependentUpon>datepicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\formbase.min.js">
+      <DependentUpon>formbase.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\formbase.min.js.map">
+      <DependentUpon>formbase.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\listboxbase.min.js">
+      <DependentUpon>listboxbase.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\listboxbase.min.js.map">
+      <DependentUpon>listboxbase.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\medialist.min.js">
+      <DependentUpon>medialist.js</DependentUpon>
+    </Content>
+    <Content Include="ui\controls\medialist.min.js.map">
+      <DependentUpon>medialist.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\plugins\error-plugin.min.js.map">
+      <DependentUpon>error-plugin.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\plugins\utility-plugins.min.js.map">
+      <DependentUpon>utility-plugins.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\extensions.min.js.map">
+      <DependentUpon>extensions.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\extensions\rinplayer.min.js.map">
+      <DependentUpon>rinplayer.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-edit-form.min.js">
+      <DependentUpon>header-edit-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-edit-profile-form.min.js">
+      <DependentUpon>header-edit-profile-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-login-form.min.js">
+      <DependentUpon>header-login-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-logout-form.min.js">
+      <DependentUpon>header-logout-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-search-form.min.js">
+      <DependentUpon>header-search-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-session-expired-form.min.js">
+      <DependentUpon>header-session-expired-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\mediapicker-form.min.js">
+      <DependentUpon>mediapicker-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\media\bing-mediapicker.min.js">
+      <DependentUpon>bing-mediapicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\media\bing-mediapicker.min.js.map">
+      <DependentUpon>bing-mediapicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\media\skydrive-mediapicker.min.js">
+      <DependentUpon>skydrive-mediapicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\media\skydrive-mediapicker.min.js.map">
+      <DependentUpon>skydrive-mediapicker.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-collection-editors.min.js.map">
+      <DependentUpon>auth-edit-collection-editors.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-collection-form.min.js.map">
+      <DependentUpon>auth-edit-collection-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-contentitem-form.min.js.map">
+      <DependentUpon>auth-edit-contentitem-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-exhibit-form.min.js.map">
+      <DependentUpon>auth-edit-exhibit-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-timeline-form.min.js.map">
+      <DependentUpon>auth-edit-timeline-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\auth-edit-tour-form.min.js.map">
+      <DependentUpon>auth-edit-tour-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\contentitem-listbox.min.js.map">
+      <DependentUpon>contentitem-listbox.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-edit-form.min.js.map">
+      <DependentUpon>header-edit-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-edit-profile-form.min.js.map">
+      <DependentUpon>header-edit-profile-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-login-form.min.js.map">
+      <DependentUpon>header-login-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-logout-form.min.js.map">
+      <DependentUpon>header-logout-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-search-form.min.js.map">
+      <DependentUpon>header-search-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\header-session-expired-form.min.js.map">
+      <DependentUpon>header-session-expired-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\mediapicker-form.min.js.map">
+      <DependentUpon>mediapicker-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\message-window.min.js">
+      <DependentUpon>message-window.js</DependentUpon>
+    </Content>
+    <Content Include="ui\message-window.min.js.map">
+      <DependentUpon>message-window.js</DependentUpon>
+    </Content>
+    <Content Include="ui\start-page.min.js">
+      <DependentUpon>start-page.js</DependentUpon>
+    </Content>
+    <Content Include="ui\start-page.min.js.map">
+      <DependentUpon>start-page.js</DependentUpon>
+    </Content>
+    <Content Include="ui\timeseries-data-form.min.js">
+      <DependentUpon>timeseries-data-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\timeseries-data-form.min.js.map">
+      <DependentUpon>timeseries-data-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\timeseries-graph-form.min.js">
+      <DependentUpon>timeseries-graph-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\timeseries-graph-form.min.js.map">
+      <DependentUpon>timeseries-graph-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tour-caption-form.min.js">
+      <DependentUpon>tour-caption-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tour-caption-form.min.js.map">
+      <DependentUpon>tour-caption-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tour-listbox.min.js">
+      <DependentUpon>tour-listbox.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tour-listbox.min.js.map">
+      <DependentUpon>tour-listbox.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tourslist-form.min.js">
+      <DependentUpon>tourslist-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tourslist-form.min.js.map">
+      <DependentUpon>tourslist-form.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tourstop-listbox.min.js">
+      <DependentUpon>tourstop-listbox.js</DependentUpon>
+    </Content>
+    <Content Include="ui\tourstop-listbox.min.js.map">
+      <DependentUpon>tourstop-listbox.js</DependentUpon>
+    </Content>
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -96,6 +445,9 @@
     <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\README_ENU.txt" />
     <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\msvcr90.dll" />
     <None Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+    <Reference Include="Antlr3.Runtime">
+      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
@@ -143,7 +495,7 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="OuterCurve.SignalRTraceListener">
       <HintPath>..\..\External\OuterCurve.TraceListener\OuterCurve.SignalRTraceListener.dll</HintPath>
@@ -210,6 +562,9 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
@@ -242,6 +597,9 @@
     <Reference Include="TweetSharp">
       <HintPath>..\..\External\TweetSharp\TweetSharp.dll</HintPath>
     </Reference>
+    <Reference Include="WebGrease">
+      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\Bing.svc.cs">
@@ -265,6 +623,7 @@
     <Compile Include="api\errorhandler.cs" />
     <Compile Include="api\external\BingSearchContainer.cs" />
     <Compile Include="api\storagecache.cs" />
+    <Compile Include="App_Data\BundleConfig.cs" />
     <Compile Include="default.ashx.cs">
       <DependentUpon>default.ashx</DependentUpon>
     </Compile>
@@ -304,7 +663,6 @@
     <Content Include="dumps\timeseries-preloaded.txt" />
     <Compile Include="utils\UrlHelper.cs" />
     <Content Include="cz.html" />
-    <Content Include="cz.js" />
     <Content Include="fallback.html" />
     <Content Include="Global.asax" />
     <Content Include="images\arrow-left-hover.png" />
@@ -318,6 +676,35 @@
     <Content Include="images\credits\ucb.png" />
     <Content Include="images\credits\uw.png" />
     <Content Include="images\default-tile.png" />
+    <Content Include="images\dummy\icon_create.png" />
+    <Content Include="images\dummy\icon_down_arrow.png" />
+    <Content Include="images\dummy\icon_help.png" />
+    <Content Include="images\dummy\icon_home.png" />
+    <Content Include="images\dummy\icon_right_arrow.png" />
+    <Content Include="images\dummy\icon_timeseries.png" />
+    <Content Include="images\dummy\icon_twitter.png" />
+    <Content Include="images\dummy\icon_user.png" />
+    <Content Include="images\dummy\list-expander2.png" />
+    <Content Include="images\dummy\tile_akhttomb.jpg" />
+    <Content Include="images\dummy\tile_bighistory.jpg" />
+    <Content Include="images\dummy\tile_cern.jpg" />
+    <Content Include="images\dummy\tile_colosseum.jpg" />
+    <Content Include="images\dummy\tile_earthscience.jpg" />
+    <Content Include="images\dummy\tile_gradient.png" />
+    <Content Include="images\dummy\tile_justin_morrill.jpg" />
+    <Content Include="images\dummy\tile_kingtut.jpg" />
+    <Content Include="images\dummy\tile_lucy.jpg" />
+    <Content Include="images\dummy\tile_mayan.jpg" />
+    <Content Include="images\dummy\tile_napoleon.jpg" />
+    <Content Include="images\dummy\tile_plateosaurus.jpg" />
+    <Content Include="images\dummy\tile_pyramid.jpg" />
+    <Content Include="images\dummy\tile_starforming.jpg" />
+    <Content Include="images\dummy\tile_turtle.jpg" />
+    <Content Include="images\dummy\tile_twitterbg.png" />
+    <Content Include="images\dummy\tile_wanapitei.jpg" />
+    <Content Include="images\dummy\tile_ww1.jpg" />
+    <Content Include="images\dummy\twitter_profile_pic.gif" />
+    <Content Include="images\dummy\video_intro.gif" />
     <Content Include="images\edit-icon.png" />
     <Content Include="images\home-icon.png" />
     <Content Include="images\icon_home.png" />
@@ -330,6 +717,7 @@
     <Content Include="images\narration-off.png" />
     <Content Include="images\narration-on.png" />
     <Content Include="images\profile-icon.png" />
+    <Content Include="images\profile.png" />
     <Content Include="images\search-icon.png" />
     <Content Include="images\star.svg" />
     <Content Include="images\Temp-Thumbnail-Aqua.png" />
@@ -348,115 +736,49 @@
     <Content Include="pages\crawler.aspx" />
     <Content Include="pages\logoff.aspx" />
     <Content Include="pages\sitemap.aspx" />
-    <TypeScriptCompile Include="scripts\extensions\rinplayer.ts" />
-    <TypeScriptCompile Include="scripts\extensions\extensions.ts" />
     <Content Include="samples\custom-mediapicker\main.html" />
     <Content Include="samples\custom-mediapicker\mediapicker-example.html" />
-    <Content Include="samples\custom-mediapicker\mediapicker-example.js">
-      <DependentUpon>mediapicker-example.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="samples\custom-mediapicker\mediapicker-example.ts" />
+    <Content Include="samples\custom-mediapicker\mediapicker-example.js" />
     <Content Include="samples\bingSearchSample.html" />
-    <Content Include="scripts\extensions\extensions.js">
-      <DependentUpon>extensions.ts</DependentUpon>
-    </Content>
+    <Content Include="scripts\extensions\extensions.js" />
     <Content Include="scripts\extensions\rin-scripts\raphael.js" />
     <Content Include="scripts\extensions\rin-scripts\rin-core-1.0.js" />
     <Content Include="scripts\extensions\rin-scripts\rin-experiences-1.0.js" />
     <Content Include="scripts\extensions\rin-scripts\tagInk.js" />
-    <Content Include="scripts\extensions\rinplayer.js">
-      <DependentUpon>rinplayer.ts</DependentUpon>
-    </Content>
+    <Content Include="scripts\extensions\rinplayer.js" />
     <Content Include="scripts\external\ACS.js" />
-    <TypeScriptCompile Include="scripts\authoring.ts" />
-    <Content Include="scripts\authoring.js">
-      <DependentUpon>authoring.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\authoring-ui.js">
-      <DependentUpon>authoring-ui.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="scripts\authoring-ui.ts" />
-    <TypeScriptCompile Include="scripts\bibliography.ts" />
-    <TypeScriptCompile Include="scripts\breadcrumbs.ts" />
-    <TypeScriptCompile Include="scripts\common.ts" />
+    <Content Include="scripts\authoring.js" />
+    <Content Include="scripts\authoring-ui.js" />
     <Content Include="scripts\external\airbrake-shim.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="scripts\external\csvToArray.v2.1.js" />
     <Content Include="scripts\external\jquery-1.7.2.min.js" />
+    <Content Include="scripts\external\jquery-ui-1.8.16.custom.min.js" />
     <Content Include="scripts\external\jquery-ui.js" />
     <Content Include="scripts\external\jquery.dotdotdot.js" />
     <Content Include="scripts\external\jquery.mousewheel.js" />
-    <Content Include="scripts\external\modernizr.custom.55478.js" />
-    <Content Include="scripts\media.js">
-      <DependentUpon>media.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="scripts\media.ts" />
-    <TypeScriptCompile Include="scripts\plugins\error-plugin.ts" />
-    <Content Include="scripts\plugins\error-plugin.js">
-      <DependentUpon>error-plugin.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\plugins\utility-plugins.js">
-      <DependentUpon>utility-plugins.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="scripts\plugins\utility-plugins.ts" />
+    <Content Include="scripts\media.js" />
+    <Content Include="scripts\plugins\error-plugin.js" />
+    <Content Include="scripts\plugins\utility-plugins.js" />
     <Content Include="ui\auth-edit-collection-editors.html" />
-    <Content Include="ui\auth-edit-collection-editors.ts" />
+    <Content Include="ui\auth-edit-collection-editors.js" />
     <Content Include="ui\auth-edit-collection-form.html" />
     <Content Include="ui\auth-edit-tour-form.html" />
-    <Content Include="ui\auth-edit-tour-form.js">
-      <DependentUpon>auth-edit-tour-form.ts</DependentUpon>
-    </Content>
+    <Content Include="ui\auth-edit-tour-form.js" />
     <Content Include="scripts\external\seadragon-min.js" />
-    <Content Include="ui\controls\formbase.js">
-      <DependentUpon>formbase.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\controls\formbase.ts" />
-    <TypeScriptCompile Include="scripts\data.ts" />
-    <Content Include="ui\controls\listboxbase.js">
-      <DependentUpon>listboxbase.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\controls\listboxbase.ts" />
-    <Content Include="scripts\data.js">
-      <DependentUpon>data.ts</DependentUpon>
-    </Content>
-    <TypeScriptComplie Include="scripts\dates.ts" />
-    <TypeScriptCompile Include="ui\controls\datepicker.ts" />
-    <Content Include="ui\controls\datepicker.js">
-      <DependentUpon>datepicker.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\dates.js">
-      <DependentUpon>dates.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\cz.js">
-      <DependentUpon>cz.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="scripts\settings.ts" />
-    <TypeScriptCompile Include="scripts\cz.ts" />
-    <TypeScriptCompile Include="scripts\service.ts" />
+    <Content Include="ui\controls\formbase.js" />
+    <Content Include="ui\controls\listboxbase.js" />
+    <Content Include="scripts\data.js" />
+    <Content Include="ui\controls\datepicker.js" />
+    <Content Include="scripts\dates.js" />
+    <Content Include="scripts\cz.js" />
     <Content Include="scripts\external\flash_detect.js" />
     <Content Include="scripts\external\jquery.cookie.js" />
     <Content Include="scripts\external\jquery.signalR-1.0.0-rc2.js" />
     <Content Include="scripts\external\rx.jQuery.js" />
     <Content Include="scripts\external\rx.js" />
-    <TypeScriptCompile Include="scripts\gestures.ts" />
-    <TypeScriptCompile Include="scripts\layout.ts" />
-    <TypeScriptCompile Include="scripts\search.ts" />
-    <TypeScriptCompile Include="scripts\timescale.ts" />
-    <TypeScriptCompile Include="scripts\tours.ts" />
-    <Content Include="scripts\typings\jqueryui\jqueryui.d.ts" />
-    <Content Include="scripts\typings\jquery\jquery.d.ts" />
-    <Content Include="scripts\typings\rx.js\rx.js.d.ts" />
-    <Content Include="scripts\uiloader.js">
-      <DependentUpon>uiloader.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="scripts\uiloader.ts" />
-    <TypeScriptCompile Include="scripts\urlnav.ts" />
-    <TypeScriptCompile Include="scripts\vccontent.ts" />
-    <TypeScriptCompile Include="scripts\viewport.ts" />
-    <TypeScriptCompile Include="scripts\viewport-animation.ts" />
-    <TypeScriptCompile Include="scripts\viewport-controller.ts" />
-    <TypeScriptCompile Include="scripts\virtual-canvas.ts" />
+    <Content Include="scripts\uiloader.js" />
     <Compile Include="ACS\Hrd\HrdClient.cs" />
     <Compile Include="ACS\Hrd\HrdRequest.cs" />
     <Compile Include="ACS\Models\HrdIdentityProvider.cs" />
@@ -465,95 +787,40 @@
     <Compile Include="ACS\Util\RequireAuthenticationAttribute.cs" />
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml" />
     <Content Include="samples\custom-form\form-example.html" />
-    <Content Include="samples\custom-form\form-example.js">
-      <DependentUpon>form-example.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="samples\custom-form\form-example.ts" />
+    <Content Include="samples\custom-form\form-example.js" />
     <Content Include="samples\custom-form\main.html" />
     <Content Include="samples\custom-listbox\listbox-example.html" />
-    <Content Include="samples\custom-listbox\listbox-example.js">
-      <DependentUpon>listbox-example.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="samples\custom-listbox\listbox-example.ts" />
+    <Content Include="samples\custom-listbox\listbox-example.js" />
     <Content Include="samples\custom-listbox\main.html" />
     <Content Include="samples\datepicker.html" />
     <Content Include="ui\auth-edit-exhibit-form.html" />
-    <TypeScriptCompile Include="ui\auth-edit-exhibit-form.ts" />
-    <Content Include="ui\auth-edit-exhibit-form.js">
-      <DependentUpon>auth-edit-exhibit-form.ts</DependentUpon>
-    </Content>
+    <Content Include="ui\auth-edit-exhibit-form.js" />
     <Content Include="ui\auth-edit-contentitem-form.html" />
-    <TypeScriptCompile Include="ui\auth-edit-contentitem-form.ts" />
-    <Content Include="ui\auth-edit-contentitem-form.js">
-      <DependentUpon>auth-edit-contentitem-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\auth-edit-timeline-form.ts" />
-    <Content Include="ui\auth-edit-timeline-form.js">
-      <DependentUpon>auth-edit-timeline-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\auth-edit-collection-form.ts" />
-    <Content Include="ui\auth-edit-collection-form.js">
-      <DependentUpon>auth-edit-collection-form.ts</DependentUpon>
-    </Content>
+    <Content Include="ui\auth-edit-contentitem-form.js" />
+    <Content Include="ui\auth-edit-timeline-form.js" />
+    <Content Include="ui\auth-edit-collection-form.js" />
     <Content Include="ui\auth-edit-timeline-form.html" />
     <Content Include="ui\contentitem-listbox.html" />
-    <Content Include="ui\contentitem-listbox.js">
-      <DependentUpon>contentitem-listbox.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\contentitem-listbox.ts" />
-    <TypeScriptCompile Include="ui\auth-edit-tour-form.ts" />
-    <Content Include="ui\controls\medialist.js">
-      <DependentUpon>medialist.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\controls\medialist.ts" />
-    <Content Include="ui\header-session-expired-form.js">
-      <DependentUpon>header-session-expired-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\header-session-expired-form.ts" />
+    <Content Include="ui\contentitem-listbox.js" />
+    <Content Include="ui\controls\medialist.js" />
+    <Content Include="ui\header-session-expired-form.js" />
     <Content Include="ui\header-search-form.html" />
-    <Content Include="ui\header-search-form.js">
-      <DependentUpon>header-search-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\header-search-form.ts" />
+    <Content Include="ui\header-search-form.js" />
     <Content Include="ui\header-session-expired-form.html" />
     <Content Include="ui\mediapicker-form.html" />
-    <Content Include="ui\mediapicker-form.js">
-      <DependentUpon>mediapicker-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\mediapicker-form.ts" />
+    <Content Include="ui\mediapicker-form.js" />
     <Content Include="ui\media\bing-mediapicker.html" />
-    <Content Include="ui\media\bing-mediapicker.js">
-      <DependentUpon>bing-mediapicker.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\media\bing-mediapicker.ts" />
-    <Content Include="ui\media\skydrive-mediapicker.js">
-      <DependentUpon>skydrive-mediapicker.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\media\skydrive-mediapicker.ts" />
-    <Content Include="ui\message-window.js">
-      <DependentUpon>message-window.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\message-window.ts" />
+    <Content Include="ui\media\bing-mediapicker.js" />
+    <Content Include="ui\media\skydrive-mediapicker.js" />
+    <Content Include="ui\message-window.js" />
     <Content Include="ui\header-edit-form.html" />
-    <TypeScriptCompile Include="ui\header-edit-form.ts" />
-    <Content Include="ui\header-edit-form.js">
-      <DependentUpon>header-edit-form.ts</DependentUpon>
-    </Content>
+    <Content Include="ui\header-edit-form.js" />
     <Content Include="ui\header-login-form.html" />
-    <Content Include="ui\header-login-form.js">
-      <DependentUpon>header-login-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\header-login-form.ts" />
+    <Content Include="ui\header-login-form.js" />
     <Content Include="ui\header-logout-form.html" />
-    <Content Include="ui\header-logout-form.js">
-      <DependentUpon>header-logout-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\header-logout-form.ts" />
+    <Content Include="ui\header-logout-form.js" />
     <Content Include="ui\header-edit-profile-form.html" />
-    <Content Include="ui\header-edit-profile-form.js">
-      <DependentUpon>header-edit-profile-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\header-edit-profile-form.ts" />
+    <Content Include="ui\header-edit-profile-form.js" />
     <Content Include="favicon.ico" />
     <Content Include="images\background.jpg" />
     <Content Include="images\backgroundWithBlur.jpg" />
@@ -582,16 +849,10 @@
     <Content Include="images\seadragonControls\zoomout_hover.png" />
     <Content Include="images\seadragonControls\zoomout_pressed.png" />
     <Content Include="images\seadragonControls\zoomout_rest.png" />
-    <Content Include="scripts\service.js">
-      <DependentUpon>service.ts</DependentUpon>
-    </Content>
+    <Content Include="scripts\service.js" />
     <Content Include="robots.txt" />
-    <Content Include="scripts\breadcrumbs.js">
-      <DependentUpon>breadcrumbs.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\timescale.js">
-      <DependentUpon>timescale.ts</DependentUpon>
-    </Content>
+    <Content Include="scripts\breadcrumbs.js" />
+    <Content Include="scripts\timescale.js" />
     <Content Include="css\timescale.css">
       <DependentUpon>timescale.less</DependentUpon>
     </Content>
@@ -619,86 +880,38 @@
     <Content Include="images\tour_play_on.jpg" />
     <Content Include="images\tour_prev_off.jpg" />
     <Content Include="images\tour_prev_on.jpg" />
-    <Content Include="scripts\bibliography.js">
-      <DependentUpon>bibliography.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\search.js">
-      <DependentUpon>search.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\tours.js">
-      <DependentUpon>tours.ts</DependentUpon>
-    </Content>
+    <Content Include="scripts\bibliography.js" />
+    <Content Include="scripts\search.js" />
+    <Content Include="scripts\tours.js" />
     <Content Include="api\chronozoom.svc" />
-    <Content Include="scripts\urlnav.js">
-      <DependentUpon>urlnav.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\layout.js">
-      <DependentUpon>layout.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\common.js">
-      <DependentUpon>common.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\settings.js">
-      <DependentUpon>settings.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\gestures.js">
-      <DependentUpon>gestures.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\vccontent.js">
-      <DependentUpon>vccontent.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\viewport.js">
-      <DependentUpon>viewport.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\viewport-animation.js">
-      <DependentUpon>viewport-animation.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\viewport-controller.js">
-      <DependentUpon>viewport-controller.ts</DependentUpon>
-    </Content>
-    <Content Include="scripts\virtual-canvas.js">
-      <DependentUpon>virtual-canvas.ts</DependentUpon>
-    </Content>
+    <Content Include="scripts\urlnav.js" />
+    <Content Include="scripts\layout.js" />
+    <Content Include="scripts\common.js" />
+    <Content Include="scripts\settings.js" />
+    <Content Include="scripts\gestures.js" />
+    <Content Include="scripts\vccontent.js" />
+    <Content Include="scripts\viewport.js" />
+    <Content Include="scripts\viewport-animation.js" />
+    <Content Include="scripts\viewport-controller.js" />
+    <Content Include="scripts\virtual-canvas.js" />
     <Content Include="css\cz.css">
       <DependentUpon>cz.less</DependentUpon>
     </Content>
-    <Content Include="css\Site.css" />
     <Content Include="ui\message-window.html" />
-    <TypeScriptCompile Include="ui\start-page.ts" />
     <Content Include="ui\start-page.html" />
-    <Content Include="ui\start-page.js">
-      <DependentUpon>start-page.ts</DependentUpon>
-    </Content>
+    <Content Include="ui\start-page.js" />
     <Content Include="ui\timeseries-data-form.html" />
-    <TypeScriptCompile Include="ui\timeseries-data-form.ts" />
-    <Content Include="ui\timeseries-data-form.js">
-      <DependentUpon>timeseries-data-form.ts</DependentUpon>
-    </Content>
+    <Content Include="ui\timeseries-data-form.js" />
     <Content Include="ui\timeseries-graph-form.html" />
-    <Content Include="ui\timeseries-graph-form.js">
-      <DependentUpon>timeseries-graph-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\timeseries-graph-form.ts" />
+    <Content Include="ui\timeseries-graph-form.js" />
     <Content Include="ui\tour-caption-form.html" />
-    <Content Include="ui\tour-caption-form.js">
-      <DependentUpon>tour-caption-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\tour-caption-form.ts" />
+    <Content Include="ui\tour-caption-form.js" />
     <Content Include="ui\tour-listbox.html" />
-    <TypeScriptCompile Include="ui\tour-listbox.ts" />
-    <Content Include="ui\tour-listbox.js">
-      <DependentUpon>tour-listbox.ts</DependentUpon>
-    </Content>
+    <Content Include="ui\tour-listbox.js" />
     <Content Include="ui\tourslist-form.html" />
-    <Content Include="ui\tourslist-form.js">
-      <DependentUpon>tourslist-form.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\tourslist-form.ts" />
+    <Content Include="ui\tourslist-form.js" />
     <Content Include="ui\tourstop-listbox.html" />
-    <Content Include="ui\tourstop-listbox.js">
-      <DependentUpon>tourstop-listbox.ts</DependentUpon>
-    </Content>
-    <TypeScriptCompile Include="ui\tourstop-listbox.ts" />
+    <Content Include="ui\tourstop-listbox.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -710,8 +923,6 @@
     </Compile>
     <Compile Include="ACS\controllers\AccountController.cs" />
     <Compile Include="utils\GlobalSuppressions.cs" />
-    <!--<Compile Include="Models\Reference.cs" />-->
-    <!--<Compile Include="Models\Utility.cs" />-->
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
@@ -722,7 +933,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="fonts\" />
   </ItemGroup>
   <ItemGroup>
@@ -782,22 +992,13 @@
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <PropertyGroup>
-    <PostBuildEvent>tsc -target ES5 --removeComments --out "$(ProjectDir)cz.js" "$(ProjectDir)scripts\cz.ts" "$(ProjectDir)scripts\plugins\error-plugin.ts" "$(ProjectDir)scripts\plugins\utility-plugins.ts"
-exit 0</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <TypeScriptTarget>ES5</TypeScriptTarget>
-    <TypeScriptRemoveComments>True</TypeScriptRemoveComments>
-    <TypeScriptSourceMap>False</TypeScriptSourceMap>
-    <TypeScriptModuleKind>none</TypeScriptModuleKind>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <TypeScriptTarget>ES5</TypeScriptTarget>
-    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
-    <TypeScriptSourceMap>false</TypeScriptSourceMap>
-    <TypeScriptOutFile>cz.js</TypeScriptOutFile>
   </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

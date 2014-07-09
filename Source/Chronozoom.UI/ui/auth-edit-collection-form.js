@@ -1,3 +1,9 @@
+/// <reference path='../ui/controls/formbase.ts'/>
+/// <reference path='../scripts/authoring.ts'/>
+/// <reference path='../scripts/settings.ts'/>
+/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
+/// <reference path='../scripts/media.ts'/>
+/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9,6 +15,7 @@ var CZ;
     (function (UI) {
         var FormEditCollection = (function (_super) {
             __extends(FormEditCollection, _super);
+            // We only need to add additional initialization in constructor.
             function FormEditCollection(container, formInfo) {
                 var _this = this;
                 _super.call(this, container, formInfo);
@@ -93,7 +100,7 @@ var CZ;
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
-                this.kioskmodeInput.prop('checked', false);
+                this.kioskmodeInput.prop('checked', false); // temp default to false for now until fix in place that loads theme from db (full fix implemented in MultiUser branch)
 
                 if (!this.collectionTheme.timelineColor)
                     this.collectionTheme.timelineColor = CZ.Settings.timelineColorOverride;
@@ -204,6 +211,7 @@ var CZ;
                     kioskMode: this.kioskmodeInput.prop("checked")
                 };
 
+                // If the input holds an rgba color, update the textbox with new alpha value
                 if (this.colorIsRgb(this.timelineBackgroundColorInput.val())) {
                     this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
                     this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
@@ -235,6 +243,7 @@ var CZ;
             FormEditCollection.prototype.updateMediaInfo = function () {
                 var clearError = true;
 
+                // Using tempSource is less than ideal; however, SkyDrive does not support any permanent link to the file and therefore we will warn users. Future: Create an image cache in the server.
                 if (this.contentItem.mediaType == "skydrive-image") {
                     this.backgroundInput.val(this.contentItem.tempSource || "");
                     clearError = false;
