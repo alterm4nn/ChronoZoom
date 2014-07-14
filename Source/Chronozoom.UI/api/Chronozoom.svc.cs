@@ -338,22 +338,6 @@ namespace Chronozoom.UI
             });
         }
 
-        //private static bool ShouldRetrieveAllTimelines(Storage storage, string commonAncestor, Guid collectionId, int maxElements)
-        //{
-        //    if (!string.IsNullOrEmpty(commonAncestor))
-        //        return false;
-
-        //    Timeline rootTimeline = storage.GetRootTimelines(collectionId);
-
-        //    if (rootTimeline == null)
-        //        return true;
-
-        //    if (rootTimeline.SubtreeSize < maxElements)
-        //        return true;
-
-        //    return false;
-        //}
-
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>

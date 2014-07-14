@@ -851,6 +851,23 @@ var CZ;
         }
         Service.getUserTimelines = getUserTimelines;
 
+        function getEditableTimelines(includeMine)
+        {
+            if (typeof includeMine !== 'boolean') { includeMine = false; }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath('editabletimelines');
+            request.addParameter('includeMine', includeMine);
+            return $.ajax({
+                type: 'GET',
+                cache: false,
+                dataType: 'json',
+                url: request.url
+                //url: _isLocalHost ? _dumpTimelinesUrl : request.url
+            });
+        }
+        Service.getEditableTimelines = getEditableTimelines;
+
         function getUserFavorites() {
             var result = "";
             CZ.Authoring.resetSessionTimer();
