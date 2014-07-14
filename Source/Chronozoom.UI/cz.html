@@ -73,7 +73,7 @@
         {
             var script  = document.createElement("script");
             script.type = "text/javascript";
-            if (!constants.environment || constants.environment == 'Localhost')
+            if (true || !constants.environment || constants.environment == 'Localhost')
             {
                 script.src = path                           + '?v=' + constants.jsFileVersion;      // developer - use standard .js files
             }
