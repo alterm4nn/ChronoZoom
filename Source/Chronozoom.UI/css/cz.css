@@ -904,6 +904,7 @@ iframe[sutra=picker] + div {
     overflow: visible;
     min-height: 250px;
   }
+  .OtherEditableTimelinesBlock,
   .FeaturedTimelinesBlock {
     height: calc(60% - 10px);
     height: -webkit-calc(60% - 10px);
@@ -988,6 +989,7 @@ iframe[sutra=picker] + div {
     min-height: 500px;
     overflow: hidden;
   }
+  .OtherEditableTimelinesBlock,
   .FeaturedTimelinesBlock {
     float: left;
     margin: 5px;
@@ -1063,6 +1065,7 @@ iframe[sutra=picker] + div {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
+  .OtherEditableTimelinesBlock,
   .FeaturedTimelinesBlock {
     float: left;
     margin: 5px;
