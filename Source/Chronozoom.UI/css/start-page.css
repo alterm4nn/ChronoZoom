@@ -1,4 +1,4 @@
-﻿/* Height of input element */
+/* Height of input element */
 /* Font-size of error message */
 /* Error messages */
 .error-message {
@@ -582,6 +582,7 @@ input.error {
     overflow: visible;
     min-height: 250px;
   }
+  .OtherEditableTimelinesBlock,
   .FeaturedTimelinesBlock {
     height: calc(60% - 10px);
     height: -webkit-calc(60% - 10px);
@@ -666,6 +667,7 @@ input.error {
     min-height: 500px;
     overflow: hidden;
   }
+  .OtherEditableTimelinesBlock,
   .FeaturedTimelinesBlock {
     float: left;
     margin: 5px;
@@ -741,6 +743,7 @@ input.error {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
+  .OtherEditableTimelinesBlock,
   .FeaturedTimelinesBlock {
     float: left;
     margin: 5px;

@@ -149,6 +149,20 @@ var CZ;
                     "box ex3 ex4 ex6 ex9",
                     "box ex3 ex4 ex6 ex9"
                 ]
+            },
+            {
+                "Name": "#OtherEditableTimelinesBlock-tiles",
+                "Visibility": [
+                    "box",
+                    "box",
+                    "box ex3",
+                    "box ex3 ex4",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9",
+                    "box ex3 ex4 ex6 ex9"
+                ]
             }
         ];
 
@@ -732,20 +746,28 @@ var CZ;
                 console.log("[ERROR] getUserFavorites");
             });
 
-            //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 1); /* featured Timelines */
-            //CZ.StartPage.cloneTileTemplate("#template-tile .box", CZ.StartPage.tileLayout, 2); /* popular Timelines */
-            //CZ.StartPage.cloneListTemplate("#template-list .list-item", "#TwitterBlock-list", 2); /* featured Timelines */
             CZ.Service.getProfile().done(function (data) {
                 if ((data !== "") && (data.DisplayName !== null)) {
                     CZ.Settings.userSuperCollectionName = data.DisplayName;
                     CZ.Settings.userCollectionName = data.DisplayName;
                 }
+                /*
                 CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(function (response) {
                     var timelines = response ? response.reverse() : [];
                     fillMyTimelines(timelines);
                     fillMyTimelinesList(timelines);
                 }, function (error) {
                     console.log("[ERROR] getUserTimelines");
+                });
+                */
+                CZ.Service.getEditableTimelines(true).then(function (response)
+                {
+                    var timelines = response ? response : [];
+                    fillMyTimelines(timelines);
+                    fillMyTimelinesList(timelines);
+                }, function (error)
+                {
+                    console.log("[ERROR] getEditableTimelines");
                 });
             });
 

@@ -661,9 +661,29 @@ namespace Chronozoom.UI
         #endregion
 
         #region MyTimelines
+
+        /// <summary>
+        /// Returns timelines belonging to a particular collection.
+        /// Ostensibly used to obtain the current users' timelines but could be used to obtain other users' timelines.
+        /// </summary>
+        /// <param name="superCollection"></param>
+        /// <param name="Collection"></param>
+        /// <returns></returns>
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/usertimelines?superCollection={superCollection}&Collection={Collection}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         Collection<TimelineShortcut> GetUserTimelines(string superCollection, string Collection);
+
+        /// <summary>
+        /// Returns timelines that the current user can edit, usually excluding those owned by the current user.
+        /// i.e. Can provide a list of other people's timelines that the current user has edit rights on.
+        /// Has option to also include those owned by current user in addition to edit rights on others.
+        /// </summary>
+        /// <param name="includeMine">Boolean. Defaults to false. Whether or not to include current user's timelines.</param>
+        /// <returns>A list of timeline shortcuts. Each shortcut includes the author, image URL, timeline URL and title.</returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/editabletimelines?includeMine={includeMine}")]
+        Collection<TimelineShortcut> GetEditableTimelines(bool includeMine = false);
+
         #endregion
 
     }
