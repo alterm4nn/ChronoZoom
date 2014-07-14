@@ -548,10 +548,14 @@ namespace Chronozoom.UI
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/find/users?partial={partialName}")]
         IEnumerable<User> FindUsers(string partialName);
 
-        //public DateTime? GetExhibitLastUpdateTime(string exhibitId)
+        /// <summary>
+        /// Returns a string that can be used later to see when an exhibit was last changed, and who by.
+        /// </summary>
+        /// <param name="exhibitId"></param>
+        /// <returns>A string consisting of date/time last change made and who made change, separated by a pipe.</returns>
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/exhibit/{exhibitId}/lastupdate")]
-        DateTime? GetExhibitLastUpdate(string exhibitId);
+        string GetExhibitLastUpdate(string exhibitId);
 
         /// <summary>
         /// Returns true/false depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
