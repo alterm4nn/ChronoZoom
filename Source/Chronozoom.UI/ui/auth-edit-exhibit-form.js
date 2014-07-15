@@ -205,10 +205,26 @@ var CZ;
                                 _this.onSave_PerformSave(newExhibit);
                             } else {
                                 // someone else has touched - warn and give options
-                                if (confirm("Someone else has made changes to this exhibit since you began editing it.\n\n" + "Do you want to replace their changes with yours? This will cause all of their changes to be lost.")) {
+                                if 
+                                (
+                                    confirm
+                                    (
+                                      //"Someone else has made changes to this exhibit since you began editing it.\n\n" +
+                                        data.split('|')[1] + " has made changes to this exhibit since you began editing it.\n\n" +
+                                        "Do you want to replace their changes with yours? This will cause all of their changes to be lost."
+                                    )
+                                )
+                                {
                                     _this.onSave_PerformSave(newExhibit);
-                                } else {
-                                    alert("Your changes were not saved.\n\n" + "You can click on your artifacts to copy off any changes you've made before closing the Edit Exhibit pane. " + "After closing the Edit Exhibits pane, you can then refresh your browser to see the latest changes.");
+                                }
+                                else
+                                {
+                                    alert
+                                    (
+                                        "Your changes were not saved.\n\n" +
+                                        "You can click on your artifacts to copy off any changes you've made before closing the Edit Exhibit pane. " +
+                                        "After closing the Edit Exhibits pane, you can then refresh your browser to see the latest changes."
+                                    );
                                 }
                             }
                         });
