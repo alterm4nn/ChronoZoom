@@ -1043,14 +1043,14 @@ namespace Chronozoom.UI
                     }
 
                     // Parent timeline is valid - add new exhibit
-                    Guid newExhibitGuid = Guid.NewGuid();
-                    Exhibit newExhibit = new Exhibit { Id = newExhibitGuid };
-                    newExhibit.Title = exhibitRequest.Title;
-                    newExhibit.Year = exhibitRequest.Year;
-                    newExhibit.Collection = collection;
-                    newExhibit.Depth = parentTimeline.Depth + 1;
-                    //newExhibit.UpdatedBy = user;
-                    newExhibit.UpdatedTime = DateTime.UtcNow;   // force timestamp update even if no changes have been made since save is still requested and someone else could've edited in meantime
+                    Guid newExhibitGuid     = Guid.NewGuid();
+                    Exhibit newExhibit      = new Exhibit { Id = newExhibitGuid };
+                    newExhibit.Title        = exhibitRequest.Title;
+                    newExhibit.Year         = exhibitRequest.Year;
+                    newExhibit.Collection   = collection;
+                    newExhibit.Depth        = parentTimeline.Depth + 1;
+                    newExhibit.UpdatedBy    = storage.Users.Where(u => user.Id == user.Id).FirstOrDefault();
+                    newExhibit.UpdatedTime  = DateTime.UtcNow;  // force timestamp update even if no changes have been made since save is still requested and someone else could've edited in meantime
 
                     // Update parent timeline.
                     storage.Entry(parentTimeline).Collection(_ => _.Exhibits).Load();
@@ -1094,7 +1094,7 @@ namespace Chronozoom.UI
                     // Update the exhibit fields
                     updateExhibit.Title         = exhibitRequest.Title;
                     updateExhibit.Year          = exhibitRequest.Year;
-                  //updateExhibit.UpdatedBy     = user;
+                    updateExhibit.UpdatedBy     = storage.Users.Where(u => user.Id == user.Id).FirstOrDefault();
                     updateExhibit.UpdatedTime   = DateTime.UtcNow;  // force timestamp update even if no changes have been made since save is still requested and someone else could've edited in meantime
                     returnValue.ExhibitId       = exhibitRequest.Id;
 
@@ -1989,15 +1989,18 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        public DateTime? GetExhibitLastUpdate(string exhibitId)
+        public string GetExhibitLastUpdate(string exhibitId)
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
-                DateTime? rv = null; // to return null if exhibit not found
+                string rv = "";
 
                 Guid exhibitGUID = new Guid(exhibitId);
-                Exhibit exhibit  = storage.Exhibits.Where(e => e.Id == exhibitGUID).FirstOrDefault();
-                if (exhibit != null) rv = exhibit.UpdatedTime;
+                Exhibit exhibit  = storage.Exhibits.Where(e => e.Id == exhibitGUID).Include("UpdatedBy").FirstOrDefault();
+                if (exhibit != null)
+                {
+                    rv = exhibit.UpdatedTime.ToString("yyyy/MM/dd HH:mm:ss") + "|" + exhibit.UpdatedBy.DisplayName;
+                }
 
                 return rv;
             });
