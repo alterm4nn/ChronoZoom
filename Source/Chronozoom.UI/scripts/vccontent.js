@@ -971,15 +971,18 @@ var CZ;
                 //rendering itself
                 this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
 
-                // initialize add favorite button if user is authorized
-                if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0) {
+                // initialize add favorite button and copy timeline button if user is authorized
+                if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0)
+                {
+                    // favorite button
                     var btnX = this.x + this.width - 1.0 * this.titleObject.height;
                     var btnY = this.titleObject.y + 0.15 * this.titleObject.height;
 
                     this.favoriteBtn = VCContent.addImage(this, layerid, id + "__favorite", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/star.svg");
                     this.favoriteBtn.reactsOnMouse = true;
 
-                    this.favoriteBtn.onmouseclick = function () {
+                    this.favoriteBtn.onmouseclick = function (event)
+                    {
                         var _this = this;
                         if (CZ.Settings.favoriteTimelines.indexOf(this.parent.guid) !== -1) {
                             CZ.Service.deleteUserFavorite(this.parent.guid).then(function (success) {
@@ -999,16 +1002,45 @@ var CZ;
                         return true;
                     };
 
-                    this.favoriteBtn.onmousehover = function () {
+                    this.favoriteBtn.onmousehover = function (event)
+                    {
                         this.parent.settings.strokeStyle = "yellow";
                     };
 
-                    this.favoriteBtn.onmouseunhover = function () {
+                    this.favoriteBtn.onmouseunhover = function (event)
+                    {
                         this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                     };
 
-                    // remove event handlers to prevent their stacking
-                    this.favoriteBtn.onRemove = function () {
+                    this.favoriteBtn.onRemove = function (event)    // remove event handlers to prevent their stacking
+                    {
+                        this.onmousehover = undefined;
+                        this.onmouseunhover = undefined;
+                        this.onmouseclick = undefined;
+                    };
+
+                    // copy button
+                    btnX -= this.titleObject.height;
+                    this.copyButton = VCContent.addImage(this, layerid, id + "__copy", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/copy.svg");
+                    this.copyButton.reactsOnMouse = true
+                    
+                    this.copyButton.onmousehover = function (event)
+                    {
+                        this.parent.settings.strokeStyle = "yellow";
+                    }
+
+                    this.copyButton.onmouseunhover = function (event)
+                    {
+                        this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+                    }
+
+                    this.copyButton.onmouseclick = function (event)
+                    {
+                        CZ.Authoring.showMessageWindow('"' + this.parent.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
+                    }
+
+                    this.copyButton.onRemove = function (event)     // remove event handlers to prevent their stacking
+                    {
                         this.onmousehover = undefined;
                         this.onmouseunhover = undefined;
                         this.onmouseclick = undefined;
