@@ -9,7 +9,8 @@ Community
 ----------
 
 * [Mailing List for Developers](https://groups.google.com/d/forum/chronozoom-dev)
-* [Skype Group Chat for Developers](skype:?chat&blob=F2NxTFrqpjbZLnJ6iNEChQ0Ic339uMi5yfm_4cMI8Fw09dUX_QjGFUA835lXNO0)
+* [Skype General Chat](skype:?chat&blob=BHGGx-O6KF-_wx3bsy9BG9xACOfhtqAkBxo1_ajRCIW1PO0ZbU87MJt0ZhM)
+* IRC: `#ChronoZoom` channel on Freenode
 * [Documentation](ChronoZoom/tree/master/Doc)
 * [File a Bug](https://github.com/alterm4nn/ChronoZoom/issues)
 
@@ -28,12 +29,11 @@ Skype "ChronoZoom Development" group [here](skype:?chat&blob=zzTEF-H_3Be_mkI2LO-
 Installation
 ----------
 
-* Make a fork of https://github.com/alterm4nn/ChronoZoom
-* git clone git://github.com/<your-username>/ChronoZoom.git (Case Sensitive)
+* Make a fork of ChronoZoom by running `git clone git://github.com/<your-username>/ChronoZoom.git` (Case Sensitive)
 * Install Windows Identity Foundation (Control Panel, Programs and Features, Turn Windows Feature on or off, Turn on Windows Identity Foundation 3.5)
-* Launch source\chronozoom.sln
+* Launch `Source\Chronozoom.sln`
 * Enable EnableNuGetPackageRestore (Right click on VS Solution - Enable NuGet Package Restore)
-* Use [F5] to compile and run ChronoZoom locally
+* Use `[F5]` to compile and run ChronoZoom locally
 
 For detailed instructions, see the [ChronoZoom Developer's Guide](Doc/ChronoZoom_Developer_Guide.md).
 
