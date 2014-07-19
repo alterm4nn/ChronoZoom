@@ -23,6 +23,20 @@ namespace Chronozoom.UI
     public interface IChronozoomSVC
     {
         /// <summary>
+        /// For exporting a timeline and it's descendant sub-timelines to temporary storage so can be imported later
+        /// as a copy under a different timeline or collection.
+        /// </summary>
+        /// <param name="topmostTimelineId">Must be a GUID.</param>
+        /// <returns>
+        /// A flattened list of timelines in JSON format, starting with the timeline indicated via the topmostTimelineId,
+        /// and including each descendant timeline. (Timelines can contain child timelines.)
+        /// Each flattened timeline entry includes all of it's exhibits and their content items.
+        /// </returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/export/timeline/{topmostTimelineId}")]
+        List<Utils.ExportImport.FlatTimeline> ExportTimelines(string topmostTimelineId);
+
+        /// <summary>
         /// Returns timeline data within a specified range of years from a collection or a superCollection.
         /// </summary>
         /// <param name="superCollection">Name of the superCollection to query.</param>

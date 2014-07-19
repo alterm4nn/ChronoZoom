@@ -141,6 +141,32 @@ var CZ;
         Service.collectionName = "";
         Service.canEdit = false;
 
+        // .../export/timeline/{topmostTimelineId}
+        function exportTimelines(topmostTimelineId)
+        {
+            if (typeof topmostTimelineId === 'undefined')
+            {
+                throw 'exportTimelines(topmostTimelineId) requires a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(topmostTimelineId) == false)
+            {
+                throw 'exportTimelines(topmostTimelineId) has an invalid parameter. The provided parameter must be a GUID.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath("export");
+            request.addToPath("timeline");
+            request.addToPath(topmostTimelineId);
+            return $.ajax
+            ({
+                type:       "GET",
+                cache:      false,
+                dataType:   "json",
+                url:        request.url
+            });
+        }
+        Service.exportTimelines = exportTimelines;
+
         /**
         * Chronozoom.svc Requests.
         */

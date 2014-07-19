@@ -1036,7 +1036,11 @@ var CZ;
 
                     this.copyButton.onmouseclick = function (event)
                     {
-                        CZ.Authoring.showMessageWindow('"' + this.parent.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
+                        CZ.Service.exportTimelines(this.parent.guid).then(function (exportData)
+                        {
+                            localStorage.setItem('ExportedTimeline', exportData);
+                            CZ.Authoring.showMessageWindow('"' + exportData[0].timeline.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
+                        });
                     }
 
                     this.copyButton.onRemove = function (event)     // remove event handlers to prevent their stacking
