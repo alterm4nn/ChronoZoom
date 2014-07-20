@@ -971,7 +971,7 @@ var CZ;
                 //rendering itself
                 this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
 
-                // initialize add favorite button and copy timeline button if user is authorized
+                // initialize add favorite button and copy and paste timeline buttons if user is authorized
                 if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0)
                 {
                     // favorite button
@@ -1019,10 +1019,44 @@ var CZ;
                         this.onmouseclick = undefined;
                     };
 
+                    // paste button (only display if valid content on CZ clipboard)
+                    if ((localStorage.getItem('ExportedSchemaVersion') == constants.schemaVersion) && (localStorage.getItem('ExportedTimeline') != null))
+                    {
+                        btnX -= this.titleObject.height;
+                        this.pasteButton = VCContent.addImage(this, layerid, id + "__paste", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/paste.svg");
+                        this.pasteButton.reactsOnMouse = true;
+
+                        this.pasteButton.onmousehover = function (event)
+                        {
+                            this.parent.settings.strokeStyle = "yellow";
+                        }
+
+                        this.pasteButton.onmouseunhover = function (event)
+                        {
+                            this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+                        }
+
+                        this.pasteButton.onmouseclick = function (event)
+                        {
+                            var newTimeline = localStorage.getItem('ExportedTimeline');
+                            CZ.Service.importTimelines(this.parent.guid, newTimeline).then(function (importMessage)
+                            {
+                                CZ.Authoring.showMessageWindow(importMessage);
+                            });
+                        }
+
+                        this.pasteButton.onRemove = function (event)    // remove event handlers to prevent their stacking
+                        {
+                            this.onmousehover = undefined;
+                            this.onmouseunhover = undefined;
+                            this.onmouseclick = undefined;
+                        };
+                    }
+
                     // copy button
                     btnX -= this.titleObject.height;
                     this.copyButton = VCContent.addImage(this, layerid, id + "__copy", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/copy.svg");
-                    this.copyButton.reactsOnMouse = true
+                    this.copyButton.reactsOnMouse = true;
                     
                     this.copyButton.onmousehover = function (event)
                     {
@@ -1038,7 +1072,8 @@ var CZ;
                     {
                         CZ.Service.exportTimelines(this.parent.guid).then(function (exportData)
                         {
-                            localStorage.setItem('ExportedTimeline', exportData);
+                            localStorage.setItem('ExportedSchemaVersion', constants.schemaVersion);
+                            localStorage.setItem('ExportedTimeline', JSON.stringify(exportData));
                             CZ.Authoring.showMessageWindow('"' + exportData[0].timeline.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
                         });
                     }
@@ -1049,6 +1084,7 @@ var CZ;
                         this.onmouseunhover = undefined;
                         this.onmouseclick = undefined;
                     };
+
                 }
 
                 // initialize edit button if it isn't root collection and titleObject was already initialized

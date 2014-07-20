@@ -291,6 +291,19 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        /// <param name="intoTimelineId"></param>
+        /// <param name="newTimelineTree"></param>
+        /// <returns></returns>
+        public String ImportTimelines(string intoTimelineId, List<Utils.ExportImport.FlatTimeline> newTimelineTree)
+        {
+            string rvMessage = "This feature is currently under development.";
+
+            return rvMessage;
+        }
+
+        /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]

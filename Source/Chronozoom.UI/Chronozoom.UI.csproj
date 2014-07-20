@@ -95,6 +95,7 @@
       <DependentUpon>cz.less</DependentUpon>
     </Content>
     <Content Include="images\copy.svg" />
+    <Content Include="images\paste.svg" />
     <Content Include="scripts\authoring-ui.min.js">
       <DependentUpon>authoring-ui.js</DependentUpon>
     </Content>

@@ -154,18 +154,50 @@ var CZ;
             }
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
-            request.addToPath("export");
-            request.addToPath("timeline");
+            request.addToPath('export');
+            request.addToPath('timeline');
             request.addToPath(topmostTimelineId);
             return $.ajax
             ({
-                type:       "GET",
+                type:       'GET',
                 cache:      false,
-                dataType:   "json",
-                url:        request.url
+                url:        request.url,
+                dataType:   'json'
             });
         }
         Service.exportTimelines = exportTimelines;
+
+        // .../import/timeline/{intoTimelineId}
+        function importTimelines(intoTimelineId, newTimelineTree)
+        {
+            if (typeof intoTimelineId === 'undefined' || typeof newTimelineTree === 'undefined')
+            {
+                throw 'importTimelines(intoTimelineId, newTimelineTree) is missing a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(intoTimelineId) == false)
+            {
+                throw 'importTimelines(intoTimelineId, newTimelineTree) has an invalid intoTimelineId parameter. This must be a GUID.';
+            }
+            if (typeof newTimelineTree !== 'string')
+            {
+                throw 'importTimelines(intoTimelineId, newTimelineTree) has an invalid newTimelineTree parameter. This must be a JSON.stringify string.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath('import');
+            request.addToPath('timeline');
+            request.addToPath(intoTimelineId);
+            return $.ajax
+            ({
+                type: 'PUT',
+                cache: false,
+                url: request.url,
+                contentType: 'application/json',
+                dataType: 'json',
+                data: newTimelineTree // should already be JSON.stringified
+            });
+        }
+        Service.importTimelines = importTimelines;
 
         /**
         * Chronozoom.svc Requests.

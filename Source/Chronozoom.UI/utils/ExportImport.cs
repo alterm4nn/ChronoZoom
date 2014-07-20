@@ -7,14 +7,13 @@ using Chronozoom.Entities;
 
 namespace Chronozoom.UI.Utils
 {
-    /// <summary>
-    /// Example:
-    /// 
-    /// using (Chronozoom.UI.Utils.ExportImport xfer = new Utils.ExportImport())
-    /// {
-    ///     List<Utils.ExportImport.FlatTimeline> test = xfer.GetTimelines(new Guid("00000000-0000-0000-0000-000000000000")); // cosmos
-    /// }
-    /// </summary>
+    //  Example:
+    // 
+    //  using (Chronozoom.UI.Utils.ExportImport xfer = new Utils.ExportImport())
+    //  {
+    //      List<Utils.ExportImport.FlatTimeline> test = xfer.GetTimelines(new Guid("00000000-0000-0000-0000-000000000000")); // cosmos
+    //  }
+
     public class ExportImport : IDisposable
     {
         private Storage             _storage;
