@@ -150,6 +150,7 @@ var CZ;
             }
             if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(topmostTimelineId) == false)
             {
+                if (topmostTimelineId != "00000000-0000-0000-0000-000000000000")
                 throw 'exportTimelines(topmostTimelineId) has an invalid parameter. The provided parameter must be a GUID.';
             }
             CZ.Authoring.resetSessionTimer();
@@ -176,6 +177,7 @@ var CZ;
             }
             if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(intoTimelineId) == false)
             {
+                if (intoTimelineId != "00000000-0000-0000-0000-000000000000")
                 throw 'importTimelines(intoTimelineId, newTimelineTree) has an invalid intoTimelineId parameter. This must be a GUID.';
             }
             if (typeof newTimelineTree !== 'string')
@@ -189,12 +191,12 @@ var CZ;
             request.addToPath(intoTimelineId);
             return $.ajax
             ({
-                type: 'PUT',
-                cache: false,
-                url: request.url,
-                contentType: 'application/json',
-                dataType: 'json',
-                data: newTimelineTree // should already be JSON.stringified
+                type:           'PUT',
+                cache:          false,
+                url:            request.url,
+                contentType:    'application/json',
+                dataType:       'json',
+                data:           newTimelineTree     // should already be JSON.stringified
             });
         }
         Service.importTimelines = importTimelines;

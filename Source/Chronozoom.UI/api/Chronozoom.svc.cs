@@ -286,7 +286,7 @@ namespace Chronozoom.UI
 
             using (Utils.ExportImport xfer = new Utils.ExportImport())
             {
-                return xfer.GetTimelines(guid);
+                return xfer.ExportTimelines(guid);
             }
         }
 
@@ -298,9 +298,12 @@ namespace Chronozoom.UI
         /// <returns></returns>
         public String ImportTimelines(string intoTimelineId, List<Utils.ExportImport.FlatTimeline> newTimelineTree)
         {
-            string rvMessage = "This feature is currently under development.";
+            Guid guid = new Guid(intoTimelineId);
 
-            return rvMessage;
+            using (Utils.ExportImport xfer = new Utils.ExportImport())
+            {
+                return xfer.ImportTimelines(guid, newTimelineTree);
+            }
         }
 
         /// <summary>
