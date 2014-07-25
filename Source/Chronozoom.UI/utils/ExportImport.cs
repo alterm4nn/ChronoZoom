@@ -37,13 +37,6 @@ namespace Chronozoom.UI.Utils
 
             // persist user object
             _user = GetUser();
-
-            // ensure user is logged in
-            if (_user == null)
-            {
-                throw new UnauthorizedAccessException("In order to export or import data, the user must first be logged in.");
-            }
-            
         }
 
         private User GetUser()
@@ -123,9 +116,11 @@ namespace Chronozoom.UI.Utils
 
             try
             {
-                if (target == null) { return "The destination timeline, \"" + intoTimelineId.ToString() + "\", where you want to copy to, does not exist."; }
+                if (target == null)                         { return "The destination timeline, \"" + intoTimelineId.ToString() + "\", where you want to copy to, does not exist."; }
 
-                if (!UserIsMember(target.Collection.Id)) { return "You do not have permission to alter the \"" + target.Title + "\" timeline."; }
+                if (_user == null)                          { return "In order to change a timeline, you must first be logged in."; }
+
+                if (!UserIsMember(target.Collection.Id))    { return "You do not have permission to alter the \"" + target.Title + "\" timeline."; }
                 
                 // iterate through each timeline
                 foreach (FlatTimeline flat in importContent)
