@@ -34,7 +34,7 @@ var CZ;
         Settings.fallbackImageUri = '/images/Temp-Thumbnail2.png';
 
         // Styles of timelines
-        Settings.timelineHeaderMargin = 1.0 / 18.0;
+        Settings.timelineHeaderMargin = 1.0 / 12.0  // new marger is larger to allow for extra copy/paste buttons - was 1.0 / 18.0.
         Settings.timelineHeaderSize = 1.0 / 9.0;
         Settings.timelineTooltipMaxHeaderSize = 5;
         Settings.timelineHeaderFontName = 'Arial';

@@ -141,6 +141,66 @@ var CZ;
         Service.collectionName = "";
         Service.canEdit = false;
 
+        // .../export/timeline/{topmostTimelineId}
+        function exportTimelines(topmostTimelineId)
+        {
+            if (typeof topmostTimelineId === 'undefined')
+            {
+                throw 'exportTimelines(topmostTimelineId) requires a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(topmostTimelineId) == false)
+            {
+                if (topmostTimelineId != "00000000-0000-0000-0000-000000000000")
+                throw 'exportTimelines(topmostTimelineId) has an invalid parameter. The provided parameter must be a GUID.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath('export');
+            request.addToPath('timeline');
+            request.addToPath(topmostTimelineId);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                url:        request.url,
+                dataType:   'json'
+            });
+        }
+        Service.exportTimelines = exportTimelines;
+
+        // .../import/timeline/{intoTimelineId}
+        function importTimelines(intoTimelineId, newTimelineTree)
+        {
+            if (typeof intoTimelineId === 'undefined' || typeof newTimelineTree === 'undefined')
+            {
+                throw 'importTimelines(intoTimelineId, newTimelineTree) is missing a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(intoTimelineId) == false)
+            {
+                if (intoTimelineId != "00000000-0000-0000-0000-000000000000")
+                throw 'importTimelines(intoTimelineId, newTimelineTree) has an invalid intoTimelineId parameter. This must be a GUID.';
+            }
+            if (typeof newTimelineTree !== 'string')
+            {
+                throw 'importTimelines(intoTimelineId, newTimelineTree) has an invalid newTimelineTree parameter. This must be a JSON.stringify string.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath('import');
+            request.addToPath('timeline');
+            request.addToPath(intoTimelineId);
+            return $.ajax
+            ({
+                type:           'PUT',
+                cache:          false,
+                url:            request.url,
+                contentType:    'application/json',
+                dataType:       'json',
+                data:           newTimelineTree     // should already be JSON.stringified
+            });
+        }
+        Service.importTimelines = importTimelines;
+
         /**
         * Chronozoom.svc Requests.
         */

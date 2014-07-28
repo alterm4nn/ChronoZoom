@@ -94,6 +94,8 @@
     <Content Include="css\cz.css.map">
       <DependentUpon>cz.less</DependentUpon>
     </Content>
+    <Content Include="images\copy.svg" />
+    <Content Include="images\paste.svg" />
     <Content Include="scripts\authoring-ui.min.js">
       <DependentUpon>authoring-ui.js</DependentUpon>
     </Content>
@@ -508,6 +510,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -652,6 +655,7 @@
     <Compile Include="pages\sitemap.aspx.designer.cs">
       <DependentUpon>sitemap.aspx</DependentUpon>
     </Compile>
+    <Compile Include="utils\ExportImport.cs" />
     <Compile Include="utils\PopulateDbFromJSON.cs" />
     <Compile Include="utils\ThumbnailGenerator.cs" />
     <Content Include="dumps\250-be5yavg.csv" />

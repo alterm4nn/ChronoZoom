@@ -276,6 +276,37 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        /// <param name="topmostTimelineId"></param>
+        /// <returns></returns>
+        public List<Utils.ExportImport.FlatTimeline> ExportTimelines(string topmostTimelineId)
+        {
+            Guid guid = new Guid(topmostTimelineId);
+
+            using (Utils.ExportImport xfer = new Utils.ExportImport())
+            {
+                return xfer.ExportTimelines(guid);
+            }
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        /// <param name="intoTimelineId"></param>
+        /// <param name="newTimelineTree"></param>
+        /// <returns></returns>
+        public String ImportTimelines(string intoTimelineId, List<Utils.ExportImport.FlatTimeline> newTimelineTree)
+        {
+            Guid guid = new Guid(intoTimelineId);
+
+            using (Utils.ExportImport xfer = new Utils.ExportImport())
+            {
+                return xfer.ImportTimelines(guid, newTimelineTree);
+            }
+        }
+
+        /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "minspan")]
