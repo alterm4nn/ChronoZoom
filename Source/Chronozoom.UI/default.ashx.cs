@@ -26,6 +26,7 @@ namespace Chronozoom.UI
         public string OneDriveClientID          { get; private set; }
         public string CSSFileVersion            { get; private set; }
         public string JSFileVersion             { get; private set; }
+        public string SchemaVersion             { get; private set; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string Title { get; set; }
@@ -47,6 +48,7 @@ namespace Chronozoom.UI
 
             CSSFileVersion = GetFileVersion("/css/cz.min.css");
             JSFileVersion  = GetFileVersion();
+            SchemaVersion  = GetLastSchemaUpdate();
 
             Images = new List<string>();
         }
@@ -76,6 +78,20 @@ namespace Chronozoom.UI
             }
 
             return rv.ToString("yyyy-MM-dd--HH-mm-ss");
+        }
+
+        /// <summary>
+        /// Used to obtain a string that is unique for each version of the db schema.
+        /// When importing a saved timeline, this is used to ensure that the timeline being imported
+        /// was created under the same version of the db schema as is currently being run.
+        /// </summary>
+        /// <returns>A multipart string that includes a date prefix, but no need to break down further.</returns>
+        private string GetLastSchemaUpdate()
+        {
+            using (Entities.Version version = new Entities.Version())
+            {
+                return version.LastUpdate();
+            }
         }
     }
 
@@ -257,6 +273,7 @@ namespace Chronozoom.UI
                 "onedriveClientId: \""          + pageInformation.OneDriveClientID          + "\", " +
                 "cssFileVersion: \""            + pageInformation.CSSFileVersion            + "\", " +
                 "jsFileVersion: \""             + pageInformation.JSFileVersion             + "\", " +
+                "schemaVersion: \""             + pageInformation.SchemaVersion             + "\", " +
                 "environment: \""               + CurrentEnvironment.ToString()             + "\"  " +
                 "};";
 
