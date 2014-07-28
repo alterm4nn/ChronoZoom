@@ -122,6 +122,7 @@
     <Compile Include="TriplePrefix.cs" />
     <Compile Include="Triples.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="Version.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Settings.StyleCop">

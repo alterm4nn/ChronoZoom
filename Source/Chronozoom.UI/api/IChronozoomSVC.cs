@@ -23,6 +23,33 @@ namespace Chronozoom.UI
     public interface IChronozoomSVC
     {
         /// <summary>
+        /// For exporting a timeline and it's descendant sub-timelines to temporary storage so can be imported later
+        /// as a copy under a different timeline or collection.
+        /// </summary>
+        /// <param name="topmostTimelineId">Must be a GUID, provided as a string.</param>
+        /// <returns>
+        /// A flattened list of timelines in JSON format, starting with the timeline indicated via the topmostTimelineId,
+        /// and including each descendant timeline. (Timelines can contain child timelines.)
+        /// Each flattened timeline entry includes all of it's exhibits and their content items.
+        /// </returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/export/timeline/{topmostTimelineId}")]
+        List<Utils.ExportImport.FlatTimeline> ExportTimelines(string topmostTimelineId);
+
+        /// <summary>
+        /// For importing a timeline and it's descendant sub-timelines into an existing timeline.
+        /// Typically this is a timeline from a different collection that is being copied.
+        /// It should be noted that the supplied new timeline tree to import must fit within the
+        /// date bounds of the target destination timeline's start and end dates.
+        /// </summary>
+        /// <param name="intoTimelineId">Must be a GUID, provided as a string.</param>
+        /// <param name="newTimelineTree">Must be a structure created by an IChronozoomSVC.ExportTimelines implementation, provided as a JSON.stringify string.</param>
+        /// <returns>A success, warning about date bounds exceeded, or general error message.</returns>
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/import/timeline/{intoTimelineId}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        String ImportTimelines(string intoTimelineId, List<Utils.ExportImport.FlatTimeline> newTimelineTree);
+
+        /// <summary>
         /// Returns timeline data within a specified range of years from a collection or a superCollection.
         /// </summary>
         /// <param name="superCollection">Name of the superCollection to query.</param>
