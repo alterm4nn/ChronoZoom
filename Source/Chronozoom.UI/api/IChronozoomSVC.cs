@@ -73,6 +73,14 @@ namespace Chronozoom.UI
         Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth);
 
         /// <summary>
+        /// Use to populate a drop-down list box of search scope options. Returns a select element friendly version of the SearchScope enum.
+        /// </summary>
+        /// <returns>A descriptive list of all of the search scope options, along with the value to pass (which is the dictionary key.)</returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/search/scope/options")]
+        Dictionary<byte, string> SearchScopeOptions();
+
+        /// <summary>
         /// Performs a search for a specific term within a collection or a superCollection.
         /// </summary>
         /// <remarks>
@@ -90,7 +98,7 @@ namespace Chronozoom.UI
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        BaseJsonResult<IEnumerable<SearchResult>> Search(string superCollection, string collection, string searchTerm);
+        BaseJsonResult<IEnumerable<SearchResult>> Search(string superCollection, string collection, string searchTerm, byte searchScope = 1);
 
         /// <summary>
         /// Returns a list of tours for the default collection and default superCollection.

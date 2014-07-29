@@ -2592,13 +2592,17 @@ a {
   bottom: 25px;
   left: 0;
 }
-.cz-header-search-form > .cz-form-content {
+.cz-header-search-form .cz-form-content {
   position: absolute;
   top: 36px;
   right: 0;
   bottom: 0;
   left: 0;
   overflow-y: hidden;
+}
+.cz-header-search-form .cz-input {
+  display: block;
+  width: 100%;
 }
 .cz-form-progress-bar {
   display: block;

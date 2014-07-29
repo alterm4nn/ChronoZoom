@@ -1,22 +1,21 @@
 <div class="cz-form-header">
     <ul>
-        <li class="cz-form-nav">
-            &lt;
-        </li>
-        <li class="cz-form-title">
-            Search
-        </li>
+        <li class="cz-form-nav">&lt;</li>
+        <li class="cz-form-title">Search ChronoZoom</li>
         <li class="cz-form-close-btn">
-            <a class="cz-form-btn">
-                X
-            </a>
+            <a class="cz-form-btn">X</a>
         </li>
     </ul>
 </div>
 <div class="cz-form-content">
-    <label class="cz-lightgray cz-form-label">Search for timeline or event.</label>
-    <input type="search" class="cz-input cz-form-search-input"
-           style="display: block; width: 100%;" maxlength="200" />
+    <label class="cz-lightgray cz-form-label">Search for Timeline or Event</label>
+    <input type="search" maxlength="200" class="cz-input cz-form-search-input" placeholder="Type the text or title you are looking for and press enter ..." />
+    <div id="scope" class="hidden">
+        <label class="cz-lightgray cz-form-label">Where to Search</label>
+        <select class="cz-input">
+            <option value="1" selected="selected">Only this page</option>
+        </select>
+    </div>
     <div class="cz-form-content-box">
         <img class="cz-form-progress-bar" src="/images/loading.gif" alt="searching..." />
         <div class="cz-form-search-results-count"></div>

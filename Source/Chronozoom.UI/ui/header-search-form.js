@@ -16,6 +16,7 @@ var CZ;
                 _super.call(this, container, formInfo);
 
                 this.searchTextbox = container.find(formInfo.searchTextbox);
+                this.searchScope = $('#scope');
                 this.searchResultsBox = container.find(formInfo.searchResultsBox);
                 this.progressBar = container.find(formInfo.progressBar);
                 this.resultSections = container.find(formInfo.resultSections);
@@ -33,6 +34,23 @@ var CZ;
                 this.clearResultSections();
                 this.hideSearchResults();
                 this.searchTextbox.off();
+
+                // populate search scope option choices
+                CZ.Service.getSearchScopeOptions().done(function (response)
+                {
+                    _this.searchScope.find('select').html('');
+
+                    for (loop = 0; loop < response.length; loop++)
+                    {
+                        _this.searchScope.find('select').append(new Option
+                        (
+                            response[loop].Value,
+                            response[loop].Key,
+                            response[loop].Key == 1,
+                            response[loop].Key == 1
+                        ));
+                    }
+                });
 
                 var onSearchQueryChanged = function (event) {
                     clearTimeout(_this.delayedSearchRequest);
@@ -152,7 +170,7 @@ var CZ;
 
             FormHeaderSearch.prototype.getResultsCountString = function () {
                 var count = this.searchResults.length;
-                return count + ((count === 1) ? " result" : " results");
+                return count + ((count === 1) ? " Result:" : " Results:");
             };
 
             FormHeaderSearch.prototype.showProgressBar = function () {

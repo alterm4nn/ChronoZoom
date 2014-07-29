@@ -29,6 +29,7 @@ using System.ServiceModel.Description;
 using System.Text.RegularExpressions;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using System.ComponentModel;
 
 namespace Chronozoom.UI
 {
@@ -116,6 +117,13 @@ namespace Chronozoom.UI
             _erroneouscontentItemIndex.Add(id);
         }
 
+    }
+
+    public enum SearchScope : byte
+    {
+        CurrentCollection           = 1,    // default
+        AllMyCollections            = 2,
+        AllSearchableCollections    = 3
     }
 
     public class TourResult
@@ -370,10 +378,30 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<byte, string> SearchScopeOptions()
+        {
+            Dictionary<byte, string> rv = new Dictionary<byte,string>();
+
+            foreach (SearchScope scope in (SearchScope[]) Enum.GetValues(typeof(SearchScope)))
+            {
+                rv.Add
+                (
+                    (byte) scope,
+                    System.Text.RegularExpressions.Regex.Replace(scope.ToString(), "[A-Z]", " $0").Trim()   // changes enum name to a displayable description with spaces before each capital letter
+                );
+            }
+
+            return rv;
+        }
+
+        /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public BaseJsonResult<IEnumerable<SearchResult>> Search(string superCollection, string collection, string searchTerm)
+        public BaseJsonResult<IEnumerable<SearchResult>> Search(string superCollection, string collection, string searchTerm, byte searchScope = 1)
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
@@ -398,7 +426,7 @@ namespace Chronozoom.UI
                     ).Take(MaxSearchLimit).ToList();
                 searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem }));
 
-                Trace.TraceInformation("Search called for search term {0}", searchTerm);
+                Trace.TraceInformation("Searched for \"{0}\" with {1} scope.", searchTerm, ((SearchScope) searchScope).ToString());
                 return new BaseJsonResult<IEnumerable<SearchResult>>(searchResults);
             });
         }
