@@ -1157,6 +1157,20 @@ a:visited {
   margin-top: 100px;
   z-index: 1000;
 }
+a.help-link {
+  color: #25a1ea !important;
+  float: right;
+  font-size: 0.7em;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+a.help-link:hover {
+  color: #0464a2 !important;
+}
+div.preview {
+  padding: 0px 10px 0px 10px;
+  opacity: 0.7;
+}
 /***********************************************************
 
                             Header            
