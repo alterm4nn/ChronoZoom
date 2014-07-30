@@ -25,6 +25,8 @@ var CZ;
                 this.mediaTypeInput = container.find(formInfo.mediaTypeInput);
                 this.attributionInput = container.find(formInfo.attributionInput);
                 this.descriptionInput = container.find(formInfo.descriptionInput);
+                this.previewButton = container.find('a.preview');
+                this.previewBox = container.find('div.preview');
                 this.errorMessage = container.find(formInfo.errorMessage);
                 this.saveButton = container.find(formInfo.saveButton);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
@@ -106,6 +108,31 @@ var CZ;
                 this.mediaTypeInput.val(this.contentItem.mediaType || "");
                 this.attributionInput.val(this.contentItem.attribution || "");
                 this.descriptionInput.val(this.contentItem.description || "");
+
+                this.renderPreviewButton = function ()
+                {
+                    if (_this.previewBox.is(':visible'))
+                    {
+                        _this.previewButton.text('edit');
+                        _this.previewButton.attr('title', 'Return to editing the description');
+                    }
+                    else
+                    {
+                        _this.previewButton.text('preview');
+                        _this.previewButton.attr('title', 'See what the description looks like using Markdown');
+                    }
+                };
+
+                this.renderPreviewButton(); // call to set initial label and text
+
+                this.previewButton.off().on('click', function (event)
+                {
+                    _this.previewBox.html(marked(_this.descriptionInput.val()));
+                    _this.descriptionInput.toggle();
+                    _this.previewBox.toggle();
+                    _this.renderPreviewButton();
+                });
+
                 this.saveButton.off();
                 this.saveButton.click(function () {
                     return _this.onSave();

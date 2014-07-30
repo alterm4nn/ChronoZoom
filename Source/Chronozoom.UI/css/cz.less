@@ -69,6 +69,26 @@ a:visited
     z-index: 1000;
 }
 
+a.help-link
+{
+    color: #25a1ea !important;
+    float: right;
+    font-size: 0.7em;
+    margin-left: 10px;
+    margin-top: 5px;
+
+    &:hover
+    {
+        color: #0464a2 !important;
+    }
+}
+
+div.preview
+{
+    padding: 0px 10px 0px 10px;
+    opacity: 0.7;
+}
+
 /***********************************************************
 
                             Header            
@@ -1578,6 +1598,7 @@ a
     height: 80px;
     width: 100%;
     resize: none;
+    font-family: Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;
 }
 
 .cz-tourlist-cleardiv {
@@ -1647,6 +1668,11 @@ a
         bottom: 0;
         left: 0;
         overflow-y: auto;
+    }
+
+    .cz-form-item-descr
+    {
+        font-family: Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;
     }
 
 /* Edit Content Item Form */
