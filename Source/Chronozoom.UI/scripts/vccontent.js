@@ -1789,8 +1789,8 @@ var CZ;
             elem[0].addEventListener("mousedown", CZ.Common.preventbubble, false);
             elem[0].addEventListener("DOMMouseScroll", CZ.Common.preventbubble, false);
             elem[0].addEventListener("mousewheel", CZ.Common.preventbubble, false);
-            var textElem = $("<div style='position:relative; white-space: pre-line' class='text'></div>");
-            textElem.text(text).appendTo(elem);
+            var textElem = $("<div style='position:relative;' class='text'></div>");
+            textElem.html(marked(text)).appendTo(elem);
 
             //Initialize content
             this.initializeContent(elem[0]);

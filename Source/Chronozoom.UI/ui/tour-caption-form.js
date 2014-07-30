@@ -147,7 +147,7 @@ var CZ;
             };
 
             FormTourCaption.prototype.showBookmark = function (bookmark) {
-                this.captionTextarea.text(bookmark.text);
+                this.captionTextarea.html(marked(bookmark.text));
                 this.bookmarksCount.text("Slide " + bookmark.number + " of " + this.tour.bookmarks.length);
                 this.captionTextarea.stop();
                 this.captionTextarea.animate({
