@@ -345,6 +345,7 @@ namespace Chronozoom.Entities
             if (!migrated.ContainsKey("201306210425512")) sql += Properties.Resources._201306210425512_IncreaseYearPrecision;
             if (!migrated.ContainsKey("201306210557399")) sql += Properties.Resources._201306210557399_RemoveBFSCachedFields;
             if (!migrated.ContainsKey("201406020351501")) sql += Properties.Resources._201406020351501_MultipleEditors;
+            if (!migrated.ContainsKey("201408040000000")) sql += Properties.Resources._201408040000000_PubliclySearchable;
 
             return sql;
         }

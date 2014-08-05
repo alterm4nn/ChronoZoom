@@ -871,8 +871,9 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
 
-                collection.Theme            = collectionRequest.Theme;
-                collection.MembersAllowed   = collectionRequest.MembersAllowed;
+                collection.Theme                = collectionRequest.Theme;
+                collection.PubliclySearchable   = collectionRequest.PubliclySearchable;
+                collection.MembersAllowed       = collectionRequest.MembersAllowed;
 
                 storage.SaveChanges();
                 return collection.Id;

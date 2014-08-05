@@ -55,12 +55,13 @@ GO
 
 CREATE TABLE [dbo].[Collections]
 (
-	[Id]                [uniqueidentifier]      NOT NULL,
-	[Title]             [nvarchar](4000)        NULL,
-	[User_Id]           [uniqueidentifier]      NULL,
-	[SuperCollection_Id] [uniqueidentifier]     NULL,
-	[Theme]             [nvarchar](max)         NULL,
-	[MembersAllowed]    [bit]                   NOT NULL    DEFAULT (0),
+	[Id]                    [uniqueidentifier]  NOT NULL,
+	[Title]                 [nvarchar](4000)    NULL,
+	[User_Id]               [uniqueidentifier]  NULL,
+	[SuperCollection_Id]    [uniqueidentifier]  NULL,
+	[Theme]                 [nvarchar](max)     NULL,
+	[MembersAllowed]        [bit]               NOT NULL    DEFAULT (0),
+    [PubliclySearchable]    [bit]               NOT NULL    DEFAULT (0),
     CONSTRAINT [PK_dbo.Collections] PRIMARY KEY CLUSTERED 
     (
 	    [Id] ASC
@@ -321,6 +322,7 @@ GO
 --    ('201306210425512_IncreaseYearPrecision',   CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
 --    ('201306210557399_RemoveBFSCachedFields',   CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
 --    ('201406020351501_MultipleEditors',         CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
+--    ('201408040000000_PubliclySearchable',      CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
 
 INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201305102053361_RemoveBetaFields',        'Manual Migration');
 GO
@@ -353,4 +355,7 @@ INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('2013062105
 GO
 
 INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201406020351501_MultipleEditors',         'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201408040000000_PubliclySearchable',      'Manual Migration');
 GO

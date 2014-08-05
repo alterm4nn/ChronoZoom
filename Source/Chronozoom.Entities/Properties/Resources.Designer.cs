@@ -80,10 +80,11 @@ namespace Chronozoom.Entities.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to DROP TABLE [Bitmasks];
+        ///GO
         ///
-        ///INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
         ///VALUES
-        ///    (&apos;201305102115428_RemoveRITree&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
+        ///    (&apos;201305102115428_RemoveRITree&apos;, &apos;Manual Migration&apos;);
         ///GO.
         /// </summary>
         internal static string _201305102115428_RemoveRITree {
@@ -103,13 +104,13 @@ namespace Chronozoom.Entities.Properties {
         ///    (
         ///	    [Id] ASC
         ///    )
-        ///    ON [PRIMARY]
         ///)
-        ///ON [PRIMARY];
+        ///GO
         ///
-        ///INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
         ///VALUES
-        ///    (&apos;201305102117597_AddRITreeWithIndex&apos;, CONVERT( [rest of string was truncated]&quot;;.
+        ///    (&apos;201305102117597_AddRITreeWithIndex&apos;, &apos;Manual Migration&apos;);
+        ///GO.
         /// </summary>
         internal static string _201305102117597_AddRITreeWithIndex {
             get {
@@ -118,9 +119,9 @@ namespace Chronozoom.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///   Looks up a localized string similar to INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
         ///VALUES
-        ///    (&apos;201305240425388_ChangeTours&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
+        ///    (&apos;201305240425388_ChangeTours&apos;, &apos;Manual Migration&apos;);
         ///GO.
         /// </summary>
         internal static string _201305240425388_ChangeTours {
@@ -133,10 +134,11 @@ namespace Chronozoom.Entities.Properties {
         ///   Looks up a localized string similar to ALTER TABLE [Timelines]     ALTER COLUMN [Title] NVARCHAR(200);
         ///ALTER TABLE [Exhibits]      ALTER COLUMN [Title] NVARCHAR(200);
         ///ALTER TABLE [ContentItems]  ALTER COLUMN [Title] NVARCHAR(200);
+        ///GO
         ///
-        ///INSERT INTO [__MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
         ///VALUES
-        ///    (&apos;201305282325585_TitleLength&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
+        ///    (&apos;201305282325585_TitleLength&apos;, &apos;Manual Migration&apos;);
         ///GO.
         /// </summary>
         internal static string _201305282325585_TitleLength {
@@ -147,10 +149,11 @@ namespace Chronozoom.Entities.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to ALTER TABLE [Tours] ALTER COLUMN [Description] NVARCHAR(4000);
+        ///GO
         ///
-        ///INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
         ///VALUES
-        ///    (&apos;201306040017265_ToursDescription&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
+        ///    (&apos;201306040017265_ToursDescription&apos;, &apos;Manual Migration&apos;);
         ///GO.
         /// </summary>
         internal static string _201306040017265_ToursDescription {
@@ -175,10 +178,11 @@ namespace Chronozoom.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///   Looks up a localized string similar to INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
         ///VALUES
-        ///    (&apos;201306072040327_ToursUserMissingMaxLen&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
-        ///GO.
+        ///    (&apos;201306072040327_ToursUserMissingMaxLen&apos;, &apos;Manual Migration&apos;);
+        ///GO
+        ///.
         /// </summary>
         internal static string _201306072040327_ToursUserMissingMaxLen {
             get {
@@ -191,11 +195,13 @@ namespace Chronozoom.Entities.Properties {
         ///ALTER TABLE [Timelines]     ALTER COLUMN [ToYear]   NUMERIC(18, 7);
         ///ALTER TABLE [ContentItems]  ALTER COLUMN [Year]     NUMERIC(18, 7);
         ///ALTER TABLE [Exhibits]      ALTER COLUMN [Year]     NUMERIC(18, 7);
+        ///GO
         ///
-        ///INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
         ///VALUES
-        ///    (&apos;201306210425512_IncreaseYearPrecision&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
-        ///GO.
+        ///    (&apos;201306210425512_IncreaseYearPrecision&apos;, &apos;Manual Migration&apos;);
+        ///GO
+        ///.
         /// </summary>
         internal static string _201306210425512_IncreaseYearPrecision {
             get {
@@ -205,10 +211,11 @@ namespace Chronozoom.Entities.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to ALTER TABLE [Timelines] DROP COLUMN [FirstNodeInSubtree], [Predecessor], [Successor];
+        ///GO
         ///
-        ///INSERT INTO [MigrationHistory] (MigrationId, Model, ProductVersion)
+        ///INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
         ///VALUES
-        ///    (&apos;201306210557399_RemoveBFSCachedFields&apos;, CONVERT(VARBINARY(MAX), &apos;&apos;), &apos;Manual Migration&apos;);
+        ///    (&apos;201306210557399_RemoveBFSCachedFields&apos;, &apos;Manual Migration&apos;);
         ///GO
         ///.
         /// </summary>
@@ -221,22 +228,19 @@ namespace Chronozoom.Entities.Properties {
         /// <summary>
         ///   Looks up a localized string similar to -- remove users.collection_id (appears to be an existing entity change that previously wasn&apos;t db migrated) --
         ///
-        ///ALTER TABLE [Users] DROP CONSTRAINT [FK_dbo.Users_dbo.Collections_Collection_Id];
-        ///GO
-        ///
-        ///DROP INDEX [IX_Collection_Id] ON [dbo].[Users]
-        ///GO
-        ///
-        ///ALTER TABLE [Users] DROP COLUMN [Collection_Id]
-        ///GO
-        ///
-        ///-- add new schema elements for multi-user scenario --
-        ///
-        ///ALTER TABLE [Collections] ADD [MembersAllowed] BIT NOT NULL DEFAULT (0);
-        ///
-        ///CREATE TABLE [dbo].[Members]
+        ///IF EXISTS
         ///(
-        ///	[Id]                [uniqueidentif [rest of string was truncated]&quot;;.
+        ///    SELECT (1) FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WITH (NOLOCK)
+        ///    WHERE CONSTRAINT_NAME = &apos;FK_dbo.Users_dbo.Collections_Collection_Id&apos;
+        ///)
+        ///BEGIN
+        ///    ALTER TABLE [Users] DROP CONSTRAINT [FK_dbo.Users_dbo.Collections_Collection_Id];
+        ///    DROP INDEX [IX_Collection_Id] ON [dbo].[Users];
+        ///    ALTER TABLE [Users] DROP COLUMN [Collection_Id];
+        ///END
+        ///GO
+        ///
+        ///-- add new schema  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _201406020351501_MultipleEditors {
             get {
@@ -245,22 +249,49 @@ namespace Chronozoom.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /**************************************************************************************
-        /// * Prerequisite: At least empty db needs to exist, which should be active connection. *
-        /// **************************************************************************************/
+        ///   Looks up a localized string similar to -- add PubliclySearchable field to Collections table
         ///
-        ///SET ANSI_NULLS          ON
-        ///SET ANSI_PADDING        ON
-        ///SET QUOTED_IDENTIFIER   ON
+        ///ALTER TABLE [Collections] ADD [PubliclySearchable] BIT NOT NULL DEFAULT (0);
         ///GO
         ///
         ///
-        ///-- Users --
+        ///-- note transformation completed --
+        ///
+        ///INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
+        ///VALUES
+        ///    (&apos;201408040000000_PubliclySearchable&apos;, &apos;Manual Migration&apos;);
+        ///GO
+        ///.
+        /// </summary>
+        internal static string _201408040000000_PubliclySearchable {
+            get {
+                return ResourceManager.GetString("_201408040000000_PubliclySearchable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -- Users --
         ///
         ///CREATE TABLE [dbo].[Users]
         ///(
         ///	[Id]                [uniqueidentifier]      NOT NULL,
-        ///	[DisplayName]       [nvarchar](4000)        NUL [rest of string was truncated]&quot;;.
+        ///	[DisplayName]       [nvarchar](4000)        NULL,
+        ///	[Email]             [nvarchar](4000)        NULL,
+        ///	[NameIdentifier]    [nvarchar](4000)        NULL,
+        ///	[IdentityProvider]  [nvarchar](4000)        NULL,
+        ///    CONSTRAINT [PK_dbo.Users] PRIMARY KEY CLUSTERED
+        ///    (
+        ///        [Id] ASC
+        ///    )
+        ///)
+        ///GO
+        ///
+        ///
+        ///-- Bitmasks --
+        ///
+        ///CREATE TABLE [dbo].[Bitmasks]
+        ///(
+        ///	[Id]                [int] IDENTITY(1,1)     NOT NULL, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CreateEntireSchema {
             get {
@@ -272,15 +303,12 @@ namespace Chronozoom.Entities.Properties {
         ///   Looks up a localized string similar to /*
         ///    It is important to rename the __MigrationHistory table to prevent
         ///    Entity Framework from performing a schema version check.
-        ///
-        ///    EXEC sp_rename &apos;__MigrationHistory&apos;, &apos;MigrationHistory&apos; does not work.
-        ///    Probably this is because table is a system table. So, we will create
-        ///    a new table from scratch, move data over then delete old table.
-        ///*/
-        ///
-        ///CREATE TABLE [dbo].[MigrationHistory] -- need not be a system table - marked as a system table just to hide
-        ///(
-        ///	[MigrationId]       [nvarchar](255) [rest of string was truncated]&quot;;.
+        ///    
+        ///    EXEC sp_rename &apos;__MigrationHistory&apos;, &apos;MigrationHistory&apos; does not work if table was previously
+        ///    marked as a system table using sp_MS_marksystemobject. So, we will create a new table from scratch,
+        ///    move the data from the old table to the new table, then delete the old table.
+        ///    
+        ///    Note that we don&apos;t use sp_MS_marksystemobject as this is not supported i [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string RenameMigrationHistory {
             get {
