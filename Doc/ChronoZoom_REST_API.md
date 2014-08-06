@@ -24,15 +24,16 @@ Use JSON for the request body:
 - [BookmarkType](#bookmarktype)
 - [Bookmark](#bookmark)
 - [Collection](#collection)
+- [Member](#member)
 - [ContentItem](#contentitem)
 - [Exhibit](#exhibit)
 - [ObjectType](#objecttype)
 - [SearchResult](#searchresult)
 - [StorageCorruptedException](#storagecorruptedexception)
 - [Storage](#storage)
-- [StorageMigrationsConfiguration](#storagemigrationsconfiguration)
 - [SuperCollection](#supercollection)
 - [Timeline](#timeline)
+- [TripleName](#triplename)
 - [User](#user)
 
 ### BookmarkType ###
@@ -78,6 +79,18 @@ Represents a collection of timelines.
 |Title|The title of the collection.|
 |User|The user ID for the collection owner.|
 |Theme|The theme (i.e. space, blue, etc) associated to this collection.|
+|SuperCollection|SuperCollection for this collection|
+|MembersAllowed|On/Off switch for permitting a list of members to edit this collection.|
+|Members|A list of users who have special rights to the collection, other than the collection owner.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### Member ###
+ 
+A collection can have a list of members, users other than the collection owner which have edit or other special rights.
+ 
  
 [top](#chronozoom-rest-api-reference)
  
@@ -114,6 +127,10 @@ Contains a set of content items, and is contained by a timeline or a collection.
 |Id|The ID of the exhibit.|
 |Depth|The depth of the exhibit in the timeline tree|
 |Title|The title of the exhibit.|
+|Year|The year in which the exhibit appears.|
+|UpdatedBy|The user who last updated this exhibit.
+            Can be null if there have been no updates.|
+|UpdatedTime|Date/Time is UTC/GMT, is never null, and is not displayed to the user.|
 |ContentItems|Specifies the collection of content items that is associated with the exhibit.|
 |Collection|Specifies the collection that is associated with the exhibit.|
  
@@ -167,15 +184,6 @@ Storage implementation for ChronoZoom based on Entity Framework.
  
 ----------
  
-### StorageMigrationsConfiguration ###
- 
-Describes storage migration options. Used when a schema upgrade is required.
- 
- 
-[top](#chronozoom-rest-api-reference)
- 
-----------
- 
 ### SuperCollection ###
  
 Represents a set of collections.
@@ -203,10 +211,24 @@ A visual representation of a time period that contains a set of Exhibits, child 
 |Title|The title of the timeline.|
 |Regime|The regime in which the timeline should occur.|
 |FromYear|The year the timeline begins.|
+|FromIsCirca|If true, the timeline start date is circa/approximate.
+            Default is false.|
 |ToYear|The year the timeline ends.|
+|ToIsCirca|If true, the timeline end date is circa/approximate.
+            Default is false.|
 |ForkNode|???|
 |ChildTimelines|The collection of child timelines belonging to the timeline.|
 |Exhibits|The collection of exhibits belonging to the timeline.|
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### TripleName ###
+ 
+Describes triple full name with name, namespace and prefix.
+            Namespace or prefix may be absent
+ 
  
 [top](#chronozoom-rest-api-reference)
  
@@ -228,6 +250,8 @@ A registered user.
  
 
 ## ChronoZoom REST Commands ##
+- [ExportTimelines](#exporttimelines)
+- [ImportTimelines](#importtimelines)
 - [GetTimelines](#gettimelines)
 - [Search](#search)
 - [GetDefaultTours](#getdefaulttours)
@@ -252,8 +276,60 @@ A registered user.
 - [GetContentPath](#getcontentpath)
 - [GetSuperCollections](#getsupercollections)
 - [GetCollections](#getcollections)
+- [GetCollection](#getcollection)
+- [FindUsers](#findusers)
+- [GetExhibitLastUpdate](#getexhibitlastupdate)
+- [UserIsMember](#userismember)
+- [UserCanEdit](#usercanedit)
+- [GetMembers](#getmembers)
+- [PutMembers](#putmembers)
 - [GetMimeTypeByUrl](#getmimetypebyurl)
+- [GetUserTimelines](#getusertimelines)
+- [GetEditableTimelines](#geteditabletimelines)
 
+### ExportTimelines ###
+ 
+For exporting a timeline and it's descendant sub-timelines to temporary storage so can be imported later
+            as a copy under a different timeline or collection.
+ 
+**Returns**
+A flattened list of timelines in JSON format, starting with the timeline indicated via the topmostTimelineId,
+            and including each descendant timeline. (Timelines can contain child timelines.)
+            Each flattened timeline entry includes all of it's exhibits and their content items.
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|topmostTimelineId|Must be a GUID, provided as a string.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### ImportTimelines ###
+ 
+For importing a timeline and it's descendant sub-timelines into an existing timeline.
+            Typically this is a timeline from a different collection that is being copied.
+            It should be noted that the supplied new timeline tree to import must fit within the
+            date bounds of the target destination timeline's start and end dates.
+ 
+**Returns**
+A success, warning about date bounds exceeded, or general error message.
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|intoTimelineId|Must be a GUID, provided as a string.|
+|newTimelineTree|Must be a structure created by an IChronozoomSVC.ExportTimelines implementation, provided as a JSON.stringify string.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### GetTimelines ###
  
 Returns timeline data within a specified range of years from a collection or a superCollection.
@@ -812,8 +888,7 @@ A list of guids of the tour guid followed by bookmark guids in JSON format.
 |tourRequest|The tour data in JSON format.|
  
 **Remarks**
-    must have permission to modify that collection.
-    Supported operations include:
+    to modify that collection. Supported operations include:
     To Create a new tour, do not specify a tour id or bookmark ids for the new entities to be created.
     To modify an existing tour, specify the tour id and any of the tour fields (id, description, audio) that need to be modified.
     If a tour id is specified and it does not exist, a "not found" status is returned.
@@ -978,6 +1053,142 @@ None.
  
 ----------
  
+### GetCollection ###
+ 
+Returns core data for a single collection, including owner and theme. Members and timelines are not included.
+ 
+**Returns**
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollection|Name of the super collection.|
+|collection|Name of the collection.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### FindUsers ###
+ 
+Returns a list of users whose display names match the partial display name provided as a parameter.
+ 
+**Returns**
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|partialName|Part of a User's DisplayName.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### GetExhibitLastUpdate ###
+ 
+Returns a string that can be used later to see when an exhibit was last changed, and who by.
+ 
+**Returns**
+A string consisting of date/time last change made and who made change, separated by a pipe.
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|exhibitId||
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### UserIsMember ###
+ 
+Returns true/false depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
+            i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
+ 
+**Returns**
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|collectionId|GUID of the collection. (Not of the super-collection.)|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### UserCanEdit ###
+ 
+Returns true/false depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
+            i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
+            An overload to the more efficient UserIsMember(string collectionId) for when the collectionId GUID is not already known.
+ 
+**Returns**
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollection|Name of the super collection.|
+|collection|Name of the collection.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### GetMembers ###
+ 
+Returns a list of members and their user records who have editing rights to the specified collection.
+            Does not necesssarily include owner in list.
+ 
+**Returns**
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollection|Name of the super collection.|
+|collection|Name of the collection.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### PutMembers ###
+ 
+Sets the entire list of users who have editing rights to the specified collection.
+            Note that this list is not an append list but the entire list, which replaces any existing list.
+ 
+**Returns**
+Success or failure Boolean. Will fail if submitting user is not the owner or not in the pre-existing editors' list.
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollection|Name of the super collection.|
+|collection|Name of the collection.|
+|userIds|A list of all of the user ids which are to be given editing rights.|
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
 ### GetMimeTypeByUrl ###
  
 Retrieve file mime type by url
@@ -991,6 +1202,46 @@ Retrieve file mime type by url
  
 **Parameters**
 None.
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### GetUserTimelines ###
+ 
+Returns timelines belonging to a particular collection.
+            Ostensibly used to obtain the current users' timelines but could be used to obtain other users' timelines.
+ 
+**Returns**
+
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|superCollection||
+|Collection||
+ 
+ 
+[top](#chronozoom-rest-api-reference)
+ 
+----------
+ 
+### GetEditableTimelines ###
+ 
+Returns timelines that the current user can edit, usually excluding those owned by the current user.
+            i.e. Can provide a list of other people's timelines that the current user has edit rights on.
+            Has option to also include those owned by current user in addition to edit rights on others.
+ 
+**Returns**
+A list of timeline shortcuts. Each shortcut includes the author, image URL, timeline URL and title.
+ 
+**Parameters**
+ 
+|Parameter|Value|
+|:--------|:----|
+|includeMine|Boolean. Defaults to false. Whether or not to include current user's timelines.|
  
  
 [top](#chronozoom-rest-api-reference)
