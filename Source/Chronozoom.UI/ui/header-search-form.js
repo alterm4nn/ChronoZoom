@@ -52,24 +52,32 @@ var CZ;
                     }
                 });
 
-                var onSearchQueryChanged = function (event) {
+                var onSearchQueryChanged = function (event)
+                {
+                    if (_this.searchTextbox.val().length < 2) return;
+
                     clearTimeout(_this.delayedSearchRequest);
 
-                    _this.delayedSearchRequest = setTimeout(function () {
+                    _this.delayedSearchRequest = setTimeout(function ()
+                    {
                         var query = _this.searchTextbox.val();
-                        query = _this.escapeSearchQuery(query);
+                        var scope = parseInt(_this.searchScope.find('select').val());
+                        query     = _this.escapeSearchQuery(query);
                         _this.showProgressBar();
-                        _this.sendSearchQuery(query).then(function (response) {
+                        _this.sendSearchQuery(query, scope).then(function (response)
+                        {
                             _this.hideProgressBar();
-                            _this.searchResults = response ? response.d : response;
+                            _this.searchResults = response;
                             _this.updateSearchResults();
-                        }, function (error) {
+                        }, function (error)
+                        {
                             console.log("Error connecting to service: search.\n" + error.responseText);
                         });
                     }, 300);
                 };
 
-                this.searchTextbox.on("input search", onSearchQueryChanged);
+                this.searchTextbox.on('input search',        onSearchQueryChanged);
+                this.searchScope.find('select').on('change', onSearchQueryChanged);
 
                 // NOTE: Workaround for IE9. IE9 doesn't fire 'input' event on backspace/delete buttons.
                 //       http://www.useragentman.com/blog/2011/05/12/fixing-oninput-in-ie9-using-html5widgets/
@@ -88,8 +96,9 @@ var CZ;
                 }
             };
 
-            FormHeaderSearch.prototype.sendSearchQuery = function (query) {
-                return (query === "") ? $.Deferred().resolve(null).promise() : CZ.Service.getSearch(query);
+            FormHeaderSearch.prototype.sendSearchQuery = function (query, scope)
+            {
+                return (query === "") ? $.Deferred().resolve(null).promise() : CZ.Service.getSearch(query, scope);
             };
 
             FormHeaderSearch.prototype.updateSearchResults = function () {
@@ -127,21 +136,34 @@ var CZ;
                     contentItem: ""
                 };
 
-                this.searchResults.forEach(function (item) {
-                    var form = _this;
-                    var resultType = resultTypes[item.objectType];
-                    var resultId = idPrefixes[resultType] + item.id;
-                    var resultTitle = item.title;
+                this.searchResults.forEach(function (item)
+                {
+                    var form        = _this;
+                    var resultType  = resultTypes[item.ObjectType];
+                    var resultId    = idPrefixes[resultType] + item.Id;
+                    var resultTitle = item.Title;
+                    var resultURL   = item.ReplacementURL ? item.ReplacementURL : '';
 
-                    sections[resultType].append($("<div></div>", {
-                        class: "cz-form-search-result",
-                        text: resultTitle,
-                        "result-id": resultId,
-                        "result-type": resultType,
-                        click: function () {
+                    sections[resultType].append($('<div></div>',
+                    {
+                        class:              'cz-form-search-result',
+                        text:               resultTitle,
+                        'data-result-id':   resultId,
+                        'data-result-type': resultType,
+                        'data-result-url':  resultURL,
+                        click: function ()
+                        {
                             var self = $(this);
-                            CZ.Search.goToSearchResult(self.attr("result-id"), self.attr("result-type"));
-                            form.close();
+
+                            if (self.attr('data-result-url') == '')
+                            {
+                                CZ.Search.goToSearchResult(self.attr('data-result-id'), self.attr('data-result-type'));
+                                form.close();
+                            }
+                            else
+                            {
+                                window.location = self.attr('data-result-url');
+                            }
                         }
                     }));
                 });
@@ -153,10 +175,10 @@ var CZ;
             FormHeaderSearch.prototype.fillFormWithSearchResults = function () {
                 // NOTE: Initially the form is hidden. Show it to compute heights and then hide again.
                 this.container.show();
-                this.searchResultsBox.css("height", "calc(100% - 150px)");
-                this.searchResultsBox.css("height", "-moz-calc(100% - 150px)");
-                this.searchResultsBox.css("height", "-webkit-calc(100% - 150px)");
-                this.searchResultsBox.css("height", "-o-calc(100% - 150px)");
+                this.searchResultsBox.css("height", "calc(100% - 190px)");
+                this.searchResultsBox.css("height", "-moz-calc(100% - 190px)");
+                this.searchResultsBox.css("height", "-webkit-calc(100% - 190px)");
+                this.searchResultsBox.css("height", "-o-calc(100% - 190px)");
                 this.container.hide();
             };
 

@@ -635,7 +635,7 @@ var CZ;
         }
         Service.getSearchScopeOptions = getSearchScopeOptions;
 
-        // .../search
+        // .../search?superCollection={superCollection}&collection={collection}&searchTerm={searchTerm}&searchScope={searchScope}
         function getSearch(query, scope)
         {
             if (scope !== parseInt(scope))  scope = 1;
@@ -647,10 +647,10 @@ var CZ;
 
             var data =
             {
-                searchTerm:         query,
-                searchScope:        scope,
                 supercollection:    CZ.Service.superCollectionName,
-                collection:         CZ.Service.collectionName
+                collection:         CZ.Service.collectionName,
+                searchTerm:         query,
+                searchScope:        scope
             };
 
             console.log("[GET] " + request.url);
