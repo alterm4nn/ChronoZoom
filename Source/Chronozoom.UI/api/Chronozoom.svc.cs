@@ -223,6 +223,9 @@ namespace Chronozoom.UI
         // The Maximum number of elements retured in each section of a search (searches have 3 sections)
         private const int MaxSearchLimit = 25;
 
+        // The user name associated with existing pre-loaded collections that come with ChronoZoom
+        private static string _baseCollectionsUserName = ConfigurationManager.AppSettings["BaseCollectionsAdministrator"];
+
         // Is default progressive load enabled?
         private static Lazy<bool> _progressiveLoadEnabled = new Lazy<bool>(() =>
         {
@@ -433,25 +436,38 @@ namespace Chronozoom.UI
                 {
                     /*
                     case SearchScope.AllCollections:
-                    timelines = storage.Timelines
-                                .Include("Collection.User")
-                                .Where(t => t.Title.ToUpper().Contains(searchTerm))
-                                .Take(MaxSearchLimit).OrderBy(t => t.Title).ToList();
-                    exhibits  = storage.Exhibits
-                                .Include("Collection.User")
-                                .Where(e => e.Title.ToUpper().Contains(searchTerm))
-                                .Take(MaxSearchLimit).OrderBy(e => e.Title).ToList();
-                    content   = storage.ContentItems
-                                .Include("Collection.User")
-                                .Where
-                                (c =>
-                                    c.Title.ToUpper().Contains(searchTerm) ||
-                                    c.Caption.ToUpper().Contains(searchTerm)
-                                )
-                                .Take(MaxSearchLimit).OrderBy(c => c.Title).ToList();
-                    break;
+                        
+                        timelines = storage.Timelines
+                                    .Include("Collection.User")
+                                    .Where(t => t.Title.ToUpper().Contains(searchTerm))
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(t => t.Title)
+                                    .ThenByDescending(t => t.Collection.Id == currentCollectionId)
+                                    .ToList();
+                        
+                        exhibits  = storage.Exhibits
+                                    .Include("Collection.User")
+                                    .Where(e => e.Title.ToUpper().Contains(searchTerm))
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(e => e.Title)
+                                    .ThenByDescending(e => e.Collection.Id == currentCollectionId)
+                                    .ToList();
+                        
+                        content   = storage.ContentItems
+                                    .Include("Collection.User")
+                                    .Where
+                                    (c =>
+                                        c.Title.ToUpper().Contains(searchTerm) ||
+                                        c.Caption.ToUpper().Contains(searchTerm)
+                                    )
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(c => c.Title)
+                                    .ThenByDescending(c => c.Collection.Id == currentCollectionId)
+                                    .ToList();
+                        
+                        break;
                     */
-                    
+
                     case SearchScope.AllSearchableCollections:
                         if (user == null)
                         {
@@ -462,7 +478,11 @@ namespace Chronozoom.UI
                                             t.Title.ToUpper().Contains(searchTerm)
                                             && t.Collection.PubliclySearchable
                                         )
-                                        .Take(MaxSearchLimit).OrderBy(t => t.Title).ToList();
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(t => t.Title)
+                                        .ThenByDescending(t => t.Collection.Id == currentCollectionId)
+                                        .ToList();
+
                             exhibits = storage.Exhibits
                                         .Include("Collection.User")
                                         .Where
@@ -470,7 +490,11 @@ namespace Chronozoom.UI
                                             e.Title.ToUpper().Contains(searchTerm)
                                             && e.Collection.PubliclySearchable
                                         )
-                                        .Take(MaxSearchLimit).OrderBy(e => e.Title).ToList();
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(e => e.Title)
+                                        .ThenByDescending(e => e.Collection.Id == currentCollectionId)
+                                        .ToList();
+
                             content = storage.ContentItems
                                         .Include("Collection.User")
                                         .Where
@@ -481,7 +505,10 @@ namespace Chronozoom.UI
                                             )
                                             && c.Collection.PubliclySearchable
                                         )
-                                        .Take(MaxSearchLimit).OrderBy(c => c.Title).ToList();
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(c => c.Title)
+                                        .ThenByDescending(c => c.Collection.Id == currentCollectionId)
+                                        .ToList();
                         }
                         else
                         {
@@ -496,7 +523,11 @@ namespace Chronozoom.UI
                                                 t.Collection.User.Id == user.Id
                                             )
                                         )
-                                        .Take(MaxSearchLimit).OrderBy(t => t.Title).ToList();
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(t => t.Title)
+                                        .ThenByDescending(t => t.Collection.Id == currentCollectionId)
+                                        .ToList();
+
                             exhibits = storage.Exhibits
                                         .Include("Collection.User")
                                         .Where
@@ -508,7 +539,11 @@ namespace Chronozoom.UI
                                                 e.Collection.User.Id == user.Id
                                             )
                                         )
-                                        .Take(MaxSearchLimit).OrderBy(e => e.Title).ToList();
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(e => e.Title)
+                                        .ThenByDescending(e => e.Collection.Id == currentCollectionId)
+                                        .ToList();
+
                             content = storage.ContentItems
                                         .Include("Collection.User")
                                         .Where
@@ -523,20 +558,33 @@ namespace Chronozoom.UI
                                                 c.Collection.User.Id == user.Id
                                             )
                                         )
-                                        .Take(MaxSearchLimit).OrderBy(c => c.Title).ToList();
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(c => c.Title)
+                                        .ThenByDescending(c => c.Collection.Id == currentCollectionId)
+                                        .ToList();
                         }
                         break;
                         
                     case SearchScope.AllMyCollections:
+
                         if (user == null) return null; // if not logged in then provide empty list
+
                         timelines = storage.Timelines
                                     .Include("Collection.User")
                                     .Where(t => t.Title.ToUpper().Contains(searchTerm) && t.Collection.User.Id == user.Id)
-                                    .Take(MaxSearchLimit).OrderBy(t => t.Title).ToList();
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(t => t.Title)
+                                    .ThenByDescending(t => t.Collection.Id == currentCollectionId)
+                                    .ToList();
+
                         exhibits  = storage.Exhibits
                                     .Include("Collection.User")
                                     .Where(e => e.Title.ToUpper().Contains(searchTerm) && e.Collection.User.Id == user.Id)
-                                    .Take(MaxSearchLimit).OrderBy(e => e.Title).ToList();
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(e => e.Title)
+                                    .ThenByDescending(e => e.Collection.Id == currentCollectionId)
+                                    .ToList();
+
                         content   = storage.ContentItems
                                     .Include("Collection.User")
                                     .Where
@@ -547,18 +595,31 @@ namespace Chronozoom.UI
                                         )
                                         && c.Collection.User.Id == user.Id
                                     )
-                                    .Take(MaxSearchLimit).OrderBy(c => c.Title).ToList();
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(c => c.Title)
+                                    .ThenByDescending(c => c.Collection.Id == currentCollectionId)
+                                    .ToList();
+
                         break;
 
                     default: // SearchScope.CurrentCollection
+
                         timelines = storage.Timelines
                                     .Include("Collection.User")
                                     .Where(t => t.Title.ToUpper().Contains(searchTerm) && t.Collection.Id == currentCollectionId)
-                                    .Take(MaxSearchLimit).OrderBy(t => t.Title).ToList();
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(t => t.Title)
+                                    .ThenByDescending(t => t.Collection.Id == currentCollectionId)
+                                    .ToList();
+
                         exhibits  = storage.Exhibits
                                     .Include("Collection.User")
                                     .Where(e => e.Title.ToUpper().Contains(searchTerm) && e.Collection.Id == currentCollectionId)
-                                    .Take(MaxSearchLimit).OrderBy(e => e.Title).ToList();
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(e => e.Title)
+                                    .ThenByDescending(e => e.Collection.Id == currentCollectionId)
+                                    .ToList();
+
                         content   = storage.ContentItems
                                     .Include("Collection.User")
                                     .Where
@@ -569,7 +630,11 @@ namespace Chronozoom.UI
                                         )
                                         && c.Collection.Id == currentCollectionId
                                     )
-                                    .Take(MaxSearchLimit).OrderBy(c => c.Title).ToList();
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(c => c.Title)
+                                    .ThenByDescending(c => c.Collection.Id == currentCollectionId)
+                                    .ToList();
+
                         break;
                 }
 
@@ -578,6 +643,8 @@ namespace Chronozoom.UI
                     Id              = t.Id,
                     ObjectType      = ObjectType.Timeline,
                     Title           = t.Title,
+                    UserName        = t.Collection.User.DisplayName,
+                    CollectionName  = t.Collection.Title,
                     ReplacementURL  = (t.Collection.Id == currentCollectionId ? null : Search_GetTimelinePath(t))
                 }));
 
@@ -586,6 +653,8 @@ namespace Chronozoom.UI
                     Id              = e.Id,
                     ObjectType      = ObjectType.Exhibit,
                     Title           = e.Title,
+                    UserName        = e.Collection.User.DisplayName,
+                    CollectionName  = e.Collection.Title,
                     ReplacementURL = (e.Collection.Id == currentCollectionId ? null : Search_GetExhibitPath(storage, e))
                 }));
 
@@ -594,6 +663,8 @@ namespace Chronozoom.UI
                     Id              = c.Id,
                     ObjectType      = ObjectType.ContentItem,
                     Title           = c.Title,
+                    UserName        = c.Collection.User.DisplayName,
+                    CollectionName  = c.Collection.Title,
                     ReplacementURL = (c.Collection.Id == currentCollectionId ? null : Search_GetContentPath(storage, c))
                 }));
 
@@ -606,15 +677,16 @@ namespace Chronozoom.UI
             string rv = "/";
 
             // insert supercollection and collection into path
-            if (timeline.Collection.User.IdentityProvider == null)
+            if (timeline.Collection.User.DisplayName == (_baseCollectionsUserName).ToString() && timeline.Collection.Title == "Cosmos")
             {
-                rv += "#"; // cosmos
+                // use shortened URL for curated Cosmos collection (default collection for site)
+                rv += "#";
             }
             else
             {
-                // TODO: fix once collections no longer replaced by user name
-                rv += timeline.Collection.User.DisplayName + "/" +
-                      timeline.Collection.User.DisplayName + "/#";
+                // use full URL that includes supercollection name (user name) and collection name
+                rv +=   HttpUtility.UrlPathEncode(timeline.Collection.User.DisplayName) + "/" +
+                        HttpUtility.UrlPathEncode(timeline.Collection.Title)            + "/#";
             }
 
             // insert all ancestor timeline ids and current timeline id into path

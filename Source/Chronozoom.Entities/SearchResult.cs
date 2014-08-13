@@ -27,6 +27,8 @@ namespace Chronozoom.Entities
         public Guid         Id              { get; set; }
         public ObjectType   ObjectType      { get; set; }
         public string       Title           { get; set; }
+        public string       UserName        { get; set; }
+        public string       CollectionName  { get; set; }
         public string       ReplacementURL  { get; set; }
     }
 

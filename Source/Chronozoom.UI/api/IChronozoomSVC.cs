@@ -96,7 +96,11 @@ namespace Chronozoom.UI
         /// Choices include the current collection and all publicly viewable collections.
         /// Use GET SearchScopeOptions to obtain a copy of the enumeration list.
         /// </param>
-        /// <returns>A list of search results in JSON format, including the type of result (timeline, exhibit or content item,) it's title, and sufficient data to navigate to each result.</returns>
+        /// <returns>
+        /// A list of search results in JSON format, including the type of result (timeline, exhibit or content item,) it's title, what collection it belongs to,
+        /// and sufficient data to navigate to each result. Results are sorted alphabetically within each type of result, with the current collection's results
+        /// appearing first when there are multiple results with the same title.
+        /// </returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]

@@ -147,6 +147,7 @@ var CZ;
                     sections[resultType].append($('<div></div>',
                     {
                         class:              'cz-form-search-result',
+                        title:              'Curator: "' + item.UserName + '". Collection: "' + item.CollectionName + '".',
                         text:               resultTitle,
                         'data-result-id':   resultId,
                         'data-result-type': resultType,
