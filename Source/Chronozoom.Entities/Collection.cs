@@ -18,8 +18,9 @@ namespace Chronozoom.Entities
         /// </summary>
         public Collection()
         {
-            this.Id = Guid.NewGuid();       // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
-            this.MembersAllowed = false;
+            this.Id                 = Guid.NewGuid();   // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
+            this.Default            = false;
+            this.MembersAllowed     = false;
             this.PubliclySearchable = true;
         }
 
@@ -31,12 +32,29 @@ namespace Chronozoom.Entities
         public Guid Id { get; set; }
 
         /// <summary>
+        /// Indicates if the collection is the default collection for the indicated supercollection.
+        /// There should be only one default collection per supercollection.
+        /// </summary>
+        [DataMember]
+        [Column(TypeName = "bit")]
+        public bool Default { get; set; }
+
+        /// <summary>
         /// The title of the collection.
         /// </summary>
         [DataMember]
-        [MaxLength(4000)]
+        [MaxLength(50)]
         [Column(TypeName = "nvarchar")]
         public string Title { get; set; }
+
+        /// <summary>
+        /// URL-sanitized version of title, which will be used as part of a URL path.
+        /// Only Aa-Zz and 0-9 are allowed. This should be unique per supercollection.
+        /// </summary>
+        [DataMember]
+        [MaxLength(50)]
+        [Column(TypeName = "varchar")]
+        public string Path { get; set; }
 
         /// <summary>
         /// The user ID for the collection owner.

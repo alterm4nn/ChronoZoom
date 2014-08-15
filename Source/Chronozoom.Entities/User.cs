@@ -27,7 +27,7 @@ namespace Chronozoom.Entities
         /// The display name of the user.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        [MaxLength(4000)]
+        [MaxLength(50)]
         [Column(TypeName = "nvarchar")]
         public string DisplayName { get; set; }
 
@@ -35,16 +35,16 @@ namespace Chronozoom.Entities
         /// The email address of the user.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        [MaxLength(4000)]
-        [Column(TypeName = "nvarchar")]
+        [MaxLength(100)]
+        [Column(TypeName = "varchar")]
         public string Email { get; set; }
 
-        [MaxLength(4000)]
-        [Column(TypeName = "nvarchar")]
-        public string NameIdentifier { get; set; }
-
-        [MaxLength(4000)]
-        [Column(TypeName = "nvarchar")]
+        [MaxLength(25)]
+        [Column(TypeName = "varchar")]
         public string IdentityProvider { get; set; }
+
+        [MaxLength(150)]
+        [Column(TypeName = "varchar")]
+        public string NameIdentifier { get; set; }
     }
 }

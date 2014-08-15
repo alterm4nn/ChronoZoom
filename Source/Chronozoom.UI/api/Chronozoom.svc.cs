@@ -1,9 +1,3 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,7 +17,6 @@ using System.Text;
 using System.Web;
 using Chronozoom.Entities;
 using System.Data.Entity;
-
 using Chronozoom.UI.Utils;
 using System.ServiceModel.Description;
 using System.Text.RegularExpressions;
@@ -160,10 +153,8 @@ namespace Chronozoom.UI
         private const decimal _minYear = -13700000000;
         private const decimal _maxYear = 9999;
         private const int _defaultDepth = 30;
-        private const string _defaultUserCollectionName = "default";
-        private const string _defaultUserName = "anonymous";
+        private static Guid _defaultSuperCollectionId = Guid.Empty;
         private const string _sandboxSuperCollectionName = "Sandbox";
-        private const string _sandboxCollectionName = "Sandbox";
 
         // The default number of max elements returned by the API
         private static Lazy<int> _maxElements = new Lazy<int>(() =>
@@ -233,8 +224,6 @@ namespace Chronozoom.UI
 
             return string.IsNullOrEmpty(progressiveLoadEnabled) ? true : bool.Parse(progressiveLoadEnabled);
         });
-
-        private static Guid _defaultSuperCollectionId = Guid.Empty;
 
         // error code descriptions
         private static partial class ErrorDescription
@@ -668,7 +657,7 @@ namespace Chronozoom.UI
                     ReplacementURL = (c.Collection.Id == currentCollectionId ? null : Search_GetContentPath(storage, c))
                 }));
 
-                return rv; 
+                return rv;
             });
         }
 
@@ -949,71 +938,6 @@ namespace Chronozoom.UI
                 storage.SuperCollections.Remove(superCollection);
                 storage.SaveChanges();
             });
-        }
-
-        private static Uri UpdatePersonalCollection(Storage storage, string userId, User user)
-        {
-            if (string.IsNullOrEmpty(userId))
-            {
-                // Anonymous user so use the sandbox superCollection and collection
-                SuperCollection sandboxSuperCollection = storage.SuperCollections.Where(candidate => candidate.Title == _sandboxSuperCollectionName).FirstOrDefault();
-                if (sandboxSuperCollection == null)
-                {
-                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.SandboxSuperCollectionNotFound);
-                    return new Uri(string.Format(
-                        CultureInfo.InvariantCulture,
-                        @"{0}/{1}/",
-                        String.Empty,
-                        String.Empty), UriKind.Relative);
-                }
-                else
-                {
-                    return new Uri(string.Format(
-                        CultureInfo.InvariantCulture,
-                        @"{0}/{1}/",
-                        FriendlyUrlReplacements(sandboxSuperCollection.Title),
-                        _sandboxCollectionName), UriKind.Relative);
-                }
-            }
-
-            SuperCollection superCollection = storage.SuperCollections.Where(candidate => candidate.User.NameIdentifier == user.NameIdentifier).FirstOrDefault();
-            if (superCollection == null)
-            {
-                // Create the personal superCollection
-                superCollection = new SuperCollection();
-                superCollection.Title = user.DisplayName;
-                superCollection.Id = CollectionIdFromText(user.DisplayName);
-                superCollection.User = user;
-                superCollection.Collections = new Collection<Collection>();
-
-                // Create the personal collection
-                Collection personalCollection = new Collection();
-                personalCollection.Title = user.DisplayName;
-                personalCollection.Id = CollectionIdFromSuperCollection(superCollection.Title, personalCollection.Title);
-                personalCollection.User = user;
-
-                superCollection.Collections.Add(personalCollection);
-
-                // Add root timeline Cosmos to the personal collection
-                Timeline rootTimeline = new Timeline { Id = Guid.NewGuid(), Title = "Cosmos", Regime = "Cosmos" };
-                rootTimeline.FromYear = -13700000000;
-                rootTimeline.ToYear = 9999;
-                rootTimeline.Collection = personalCollection;
-                rootTimeline.Depth = 0;
-
-                storage.SuperCollections.Add(superCollection);
-                storage.Collections.Add(personalCollection);
-                storage.Timelines.Add(rootTimeline);
-                storage.SaveChanges();
-
-                Trace.TraceInformation("Personal collection saved.");
-            }
-
-            return new Uri(string.Format(
-                CultureInfo.InvariantCulture,
-                @"{0}/{1}/",
-                FriendlyUrlReplacements(superCollection.Title),
-                FriendlyUrlReplacements(superCollection.Title)), UriKind.Relative);
         }
 
         private static Uri EnsurePersonalCollection(Storage storage, User user)

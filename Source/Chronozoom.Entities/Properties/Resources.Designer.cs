@@ -249,23 +249,34 @@ namespace Chronozoom.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to -- add PubliclySearchable field to Collections table
-        ///
+        ///   Looks up a localized string similar to -- Add PubliclySearchable field to Collections table:
         ///ALTER TABLE [Collections] ADD [PubliclySearchable] BIT NOT NULL DEFAULT (0);
         ///GO
         ///
-        ///
-        ///-- note transformation completed --
-        ///
-        ///INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
-        ///VALUES
-        ///    (&apos;201408040000000_PubliclySearchable&apos;, &apos;Manual Migration&apos;);
-        ///GO
-        ///.
+        ///-- Default is that all existing collections are not publicly searchable, and
+        ///-- new collections when created will be publicly searchable, (publicly searchable set to true in code at creation.)
+        ///-- However, we need a special exception to make Cosmos&apos; collection publicly searchable, if it already exists:
+        ///UPDATE  [Collections]
+        ///SET     PubliclySearchable = 1
+        ///WHERE   Id I [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _201408040000000_PubliclySearchable {
             get {
                 return ResourceManager.GetString("_201408040000000_PubliclySearchable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -- tighten-up schema so required fields are not null and lengths are not crazy since they&apos;re used in URLs --
+        ///-- chronozoom.com production database was examined on 2014-08-13 to ensure that it fits these adjustments --
+        ///
+        ///ALTER TABLE [Users]             ALTER COLUMN [DisplayName]          NVARCHAR(50)        NOT NULL;
+        ///ALTER TABLE [SuperCollections]  ALTER COLUMN [Title]                NVARCHAR(50)        NOT NULL;
+        ///ALTER TABLE [SuperCollections]  ALTER COLUMN [User_Id]              UNIQUEIDENTIFIER    NOT  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _201408130000000_MultipleCollections {
+            get {
+                return ResourceManager.GetString("_201408130000000_MultipleCollections", resourceCulture);
             }
         }
         

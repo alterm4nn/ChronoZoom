@@ -3,10 +3,10 @@
 CREATE TABLE [dbo].[Users]
 (
 	[Id]                [uniqueidentifier]      NOT NULL,
-	[DisplayName]       [nvarchar](4000)        NULL,
-	[Email]             [nvarchar](4000)        NULL,
-	[NameIdentifier]    [nvarchar](4000)        NULL,
-	[IdentityProvider]  [nvarchar](4000)        NULL,
+	[DisplayName]       [nvarchar](50)          NOT NULL,
+	[Email]             [varchar](100)          NULL,
+	[IdentityProvider]  [varchar](25)           NULL,
+	[NameIdentifier]    [varchar](150)          NULL,
     CONSTRAINT [PK_dbo.Users] PRIMARY KEY CLUSTERED
     (
         [Id] ASC
@@ -36,8 +36,8 @@ GO
 CREATE TABLE [dbo].[SuperCollections]
 (
 	[Id]                [uniqueidentifier]      NOT NULL,
-	[Title]             [nvarchar](4000)        NULL,
-	[User_Id]           [uniqueidentifier]      NULL,
+	[Title]             [varchar](50)           NOT NULL,
+	[User_Id]           [uniqueidentifier]      NOT NULL,
     CONSTRAINT [PK_dbo.SuperCollections] PRIMARY KEY CLUSTERED 
     (
 	    [Id] ASC
@@ -56,15 +56,21 @@ GO
 CREATE TABLE [dbo].[Collections]
 (
 	[Id]                    [uniqueidentifier]  NOT NULL,
-	[Title]                 [nvarchar](4000)    NULL,
-	[User_Id]               [uniqueidentifier]  NULL,
-	[SuperCollection_Id]    [uniqueidentifier]  NULL,
-	[Theme]                 [nvarchar](max)     NULL,
+	[User_Id]               [uniqueidentifier]  NOT NULL,
+	[SuperCollection_Id]    [uniqueidentifier]  NOT NULL,
 	[MembersAllowed]        [bit]               NOT NULL    DEFAULT (0),
     [PubliclySearchable]    [bit]               NOT NULL    DEFAULT (0),
+	[Title]                 [nvarchar](50)      NOT NULL,
+    [Path]                  [varchar](50)       NOT NULL,
+	[Theme]                 [nvarchar](max)     NULL,
     CONSTRAINT [PK_dbo.Collections] PRIMARY KEY CLUSTERED 
     (
 	    [Id] ASC
+    ),
+    CONSTRAINT [UK_dbo.Collections_Path] UNIQUE
+    (
+	    [SuperCollection_Id]    ASC,
+        [Path]                  ASC
     )
 )
 GO
@@ -323,6 +329,7 @@ GO
 --    ('201306210557399_RemoveBFSCachedFields',   CONVERT(VARBINARY(MAX), ''), 'Manual Migration'),
 --    ('201406020351501_MultipleEditors',         CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
 --    ('201408040000000_PubliclySearchable',      CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
+--    ('201408130000000_MultipleCollections',     CONVERT(VARBINARY(MAX), ''), 'Manual Migration');
 
 INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201305102053361_RemoveBetaFields',        'Manual Migration');
 GO
@@ -358,4 +365,7 @@ INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('2014060203
 GO
 
 INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201408040000000_PubliclySearchable',      'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201408130000000_MultipleCollections',     'Manual Migration');
 GO

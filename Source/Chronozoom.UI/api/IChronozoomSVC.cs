@@ -2,12 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.ServiceModel;
