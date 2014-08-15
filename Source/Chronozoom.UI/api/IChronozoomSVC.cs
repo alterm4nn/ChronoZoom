@@ -73,24 +73,40 @@ namespace Chronozoom.UI
         Timeline GetTimelines(string superCollection, string collection, string start, string end, string minspan, string commonAncestor, string maxElements, string depth);
 
         /// <summary>
-        /// Performs a search for a specific term within a collection or a superCollection.
+        /// Use to populate a drop-down list box of search scope options. Returns a select element friendly version of the SearchScope enum.
         /// </summary>
-        /// <remarks>
-        /// The syntax for search is different from other requests. The values for supercollection and collection are specified as request parameters rather than as part of the URL.
-        /// </remarks>
-        /// <param name="superCollection">Name of the supercollection to query.</param>
-        /// <param name="collection">Name of the collection to query.</param>
-        /// <param name="searchTerm">The term to search for.</param>
-        /// <returns>Search results in JSON format.</returns>
+        /// <returns>A descriptive list of all of the search scope options, along with the value to pass (which is the dictionary key.)</returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/search/scope/options")]
+        Dictionary<byte, string> SearchScopeOptions();
+
+        /// <summary>
+        /// Searches for timeline titles, exhibit titles or content item titles containing the provided search term.
+        /// Note that at least two searchTerm characters are required in order to get a result.
+        /// Should an excessive number of results be found, the results are limited to the first 25 per type. (75 max.)
+        /// </summary>
         /// <example><![CDATA[  
         /// HTTP verb: GET
-        /// URL:
-        /// http://{URL}/api/search?searchTerm={term}&supercollection={supercollection}&collection={collection}
+        /// URL: 
+        /// http://{domain}/api/search?superCollection={superCollection}&collection={collection}&searchTerm={searchTerm}&searchScope={searchScope}
         /// ]]></example>
+        /// <param name="superCollection">The currently loaded supercollection.</param>
+        /// <param name="collection">The currently loaded collection.</param>
+        /// <param name="searchTerm">The words or part of a word or words to look for.</param>
+        /// <param name="searchScope">
+        /// Specify where to search using a choice from the SearchScope enumuration list.
+        /// Choices include the current collection and all publicly viewable collections.
+        /// Use GET SearchScopeOptions to obtain a copy of the enumeration list.
+        /// </param>
+        /// <returns>
+        /// A list of search results in JSON format, including the type of result (timeline, exhibit or content item,) it's title, what collection it belongs to,
+        /// and sufficient data to navigate to each result. Results are sorted alphabetically within each type of result, with the current collection's results
+        /// appearing first when there are multiple results with the same title.
+        /// </returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        BaseJsonResult<IEnumerable<SearchResult>> Search(string superCollection, string collection, string searchTerm);
+        IEnumerable<SearchResult> Search(string superCollection, string collection, string searchTerm, byte searchScope = 1);
 
         /// <summary>
         /// Returns a list of tours for the default collection and default superCollection.

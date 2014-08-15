@@ -116,7 +116,7 @@ namespace Chronozoom.UI.Utils
 
             try
             {
-                if (target == null)                         { return "The destination timeline, \"" + intoTimelineId.ToString() + "\", where you want to copy to, does not exist."; }
+                if (target == null)                         { return "The destination timeline, \"" + intoTimelineId.ToString() + "\", where you want to paste to, does not exist."; }
 
                 if (_user == null)                          { return "In order to change a timeline, you must first be logged in."; }
 
@@ -130,12 +130,12 @@ namespace Chronozoom.UI.Utils
                     {
                         if (flat.timeline.FromYear < target.FromYear || flat.timeline.ToYear > target.ToYear)
                         {
-                            return "Unable to copy \"" + flat.timeline.Title + "\" into \"" + target.Title + "\", since " + 
+                            return "Unable to paste \"" + flat.timeline.Title + "\" into \"" + target.Title + "\", since " + 
                                    flat.timeline.Title + "'s date range exceeds that of " + target.Title + ".";
                         }
                         if (flat.timeline.FromYear == target.FromYear && flat.timeline.ToYear == target.ToYear)
                         {
-                            return "Unable to copy \"" + flat.timeline.Title + "\" into \"" + target.Title + "\", since " +
+                            return "Unable to paste \"" + flat.timeline.Title + "\" into \"" + target.Title + "\", since " +
                                    "both timelines' date ranges are identical.";
                         }
                     }
@@ -200,7 +200,7 @@ namespace Chronozoom.UI.Utils
                 }
             }
             
-            return "\"" + importContent[0].timeline.Title + "\" has been copied into \"" + target.Title + "\". " +
+            return "\"" + importContent[0].timeline.Title + "\" has been pasted into \"" + target.Title + "\". " +
                    "You may need to refresh your browser in order to see any new content.";
         }
 

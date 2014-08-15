@@ -617,27 +617,52 @@ var CZ;
         }
         Service.getTours = getTours;
 
-        // .../search
-        function getSearch(query) {
+        // .../search/scope/options
+        function getSearchScopeOptions()
+        {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath("search");
+            request.addToPath("scope");
+            request.addToPath("options");
+            return $.ajax
+            ({
+                type:       "GET",
+                cache:      true,
+                dataType:   "json",
+                url:        request.url
+            });
+        }
+        Service.getSearchScopeOptions = getSearchScopeOptions;
+
+        // .../search?superCollection={superCollection}&collection={collection}&searchTerm={searchTerm}&searchScope={searchScope}
+        function getSearch(query, scope)
+        {
+            if (scope !== parseInt(scope))  scope = 1;
+            if (scope < 1)                  scope = 1;
+
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("Search");
 
-            var data = {
-                searchTerm: query,
-                supercollection: CZ.Service.superCollectionName,
-                collection: CZ.Service.collectionName
+            var data =
+            {
+                supercollection:    CZ.Service.superCollectionName,
+                collection:         CZ.Service.collectionName,
+                searchTerm:         query,
+                searchScope:        scope
             };
 
             console.log("[GET] " + request.url);
 
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: request.url,
-                data: data
+            return $.ajax
+            ({
+                type:           "GET",
+                cache:          false,
+                contentType:    "application/json",
+                dataType:       "json",
+                url:            request.url,
+                data:           data
             });
         }
         Service.getSearch = getSearch;

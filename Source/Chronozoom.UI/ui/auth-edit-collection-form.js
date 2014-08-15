@@ -27,6 +27,7 @@ var CZ;
                 this.activeCollectionTheme = jQuery.extend(true, {}, formInfo.collectionTheme);
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.kioskmodeInput = formInfo.kioskmodeInput;
+                this.chkPublic  = container.find(formInfo.chkPublic);
                 this.chkEditors = container.find(formInfo.chkEditors);
                 this.btnEditors = container.find(formInfo.btnEditors);
 
@@ -85,7 +86,8 @@ var CZ;
 
                     var collectionData = {
                         theme: JSON.stringify(_this.collectionTheme),
-                        MembersAllowed: $(_this.chkEditors).prop('checked')
+                        PubliclySearchable: $(_this.chkPublic ).prop('checked'),
+                        MembersAllowed:     $(_this.chkEditors).prop('checked')
                     };
 
                     CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, collectionData).always(function () {
@@ -119,6 +121,7 @@ var CZ;
                     } else {
                         $(_this.kioskmodeInput).prop('checked', themeFromDb.kioskMode);
                     }
+                    $(_this.chkPublic ).prop('checked', data.PubliclySearchable);
                     $(_this.chkEditors).prop('checked', data.MembersAllowed);
                     _this.renderManageEditorsButton();
                 });

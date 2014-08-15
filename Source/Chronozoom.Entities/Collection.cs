@@ -20,6 +20,7 @@ namespace Chronozoom.Entities
         {
             this.Id = Guid.NewGuid();       // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
             this.MembersAllowed = false;
+            this.PubliclySearchable = true;
         }
 
         /// <summary>
@@ -64,5 +65,13 @@ namespace Chronozoom.Entities
         /// </summary>
         [DataMember]
         public virtual Collection<Member> Members { get; set; }
+
+        /// <summary>
+        /// On/Off switch for allowing the collection to appear in search results for
+        /// people who do not have edit rights and are not currently viewing the collection.
+        /// </summary>
+        [DataMember]
+        [Column(TypeName = "bit")]
+        public bool PubliclySearchable { get; set; }
     }
 }

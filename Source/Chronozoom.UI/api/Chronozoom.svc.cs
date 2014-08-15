@@ -29,6 +29,7 @@ using System.ServiceModel.Description;
 using System.Text.RegularExpressions;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using System.ComponentModel;
 
 namespace Chronozoom.UI
 {
@@ -116,6 +117,13 @@ namespace Chronozoom.UI
             _erroneouscontentItemIndex.Add(id);
         }
 
+    }
+
+    public enum SearchScope : byte
+    {
+        CurrentCollection           = 1,    // default
+        AllMyCollections            = 2,
+        AllSearchableCollections    = 3
     }
 
     public class TourResult
@@ -212,8 +220,11 @@ namespace Chronozoom.UI
             return new ThumbnailGenerator(thumbnailStorage);
         });
 
-        // The Maximum number of elements retured in a Search
-        private const int MaxSearchLimit = 50;
+        // The Maximum number of elements retured in each section of a search (searches have 3 sections)
+        private const int MaxSearchLimit = 25;
+
+        // The user name associated with existing pre-loaded collections that come with ChronoZoom
+        private static string _baseCollectionsUserName = ConfigurationManager.AppSettings["BaseCollectionsAdministrator"];
 
         // Is default progressive load enabled?
         private static Lazy<bool> _progressiveLoadEnabled = new Lazy<bool>(() =>
@@ -370,37 +381,344 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<byte, string> SearchScopeOptions()
+        {
+            Dictionary<byte, string> rv = new Dictionary<byte,string>();
+
+            foreach (SearchScope scope in (SearchScope[]) Enum.GetValues(typeof(SearchScope)))
+            {
+                rv.Add
+                (
+                    (byte) scope,
+                    System.Text.RegularExpressions.Regex.Replace(scope.ToString(), "[A-Z]", " $0").Trim()   // changes enum name to a displayable description with spaces before each capital letter
+                );
+            }
+
+            return rv;
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public BaseJsonResult<IEnumerable<SearchResult>> Search(string superCollection, string collection, string searchTerm)
+        public IEnumerable<SearchResult> Search(string superCollection, string collection, string searchTerm, byte searchScope = 1)
         {
+            // only search if search term provided
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                Trace.TraceEvent(TraceEventType.Warning, 0, "Search called with null search term");
+                return null;
+            }
+
+            searchTerm = searchTerm.Trim().ToUpper();
+
+            // only search if at least two characters provided
+            if (searchTerm.Length < 2)
+            {
+                Trace.TraceEvent(TraceEventType.Warning, 0, "Search called with less than two characters in the search term");
+                return null;
+            }
+
             return ApiOperation(delegate(User user, Storage storage)
             {
-                if (string.IsNullOrWhiteSpace(searchTerm))
+                List<SearchResult> rv    = new List<SearchResult>();
+
+                Guid currentCollectionId = CollectionIdOrDefault(storage, superCollection, collection);
+
+                List<Timeline>      timelines;
+                List<Exhibit>       exhibits;
+                List<ContentItem>   content;
+
+                switch ((SearchScope) searchScope)
                 {
-                    Trace.TraceEvent(TraceEventType.Warning, 0, "Search called with null search term");
-                    return null;
+                    /*
+                    case SearchScope.AllCollections:
+                        
+                        timelines = storage.Timelines
+                                    .Include("Collection.User")
+                                    .Where(t => t.Title.ToUpper().Contains(searchTerm))
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(t => t.Title)
+                                    .ThenByDescending(t => t.Collection.Id == currentCollectionId)
+                                    .ToList();
+                        
+                        exhibits  = storage.Exhibits
+                                    .Include("Collection.User")
+                                    .Where(e => e.Title.ToUpper().Contains(searchTerm))
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(e => e.Title)
+                                    .ThenByDescending(e => e.Collection.Id == currentCollectionId)
+                                    .ToList();
+                        
+                        content   = storage.ContentItems
+                                    .Include("Collection.User")
+                                    .Where
+                                    (c =>
+                                        c.Title.ToUpper().Contains(searchTerm) ||
+                                        c.Caption.ToUpper().Contains(searchTerm)
+                                    )
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(c => c.Title)
+                                    .ThenByDescending(c => c.Collection.Id == currentCollectionId)
+                                    .ToList();
+                        
+                        break;
+                    */
+
+                    case SearchScope.AllSearchableCollections:
+                        if (user == null)
+                        {
+                            timelines = storage.Timelines
+                                        .Include("Collection.User")
+                                        .Where
+                                        (t =>
+                                            t.Title.ToUpper().Contains(searchTerm)
+                                            && t.Collection.PubliclySearchable
+                                        )
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(t => t.Title)
+                                        .ThenByDescending(t => t.Collection.Id == currentCollectionId)
+                                        .ToList();
+
+                            exhibits = storage.Exhibits
+                                        .Include("Collection.User")
+                                        .Where
+                                        (e =>
+                                            e.Title.ToUpper().Contains(searchTerm)
+                                            && e.Collection.PubliclySearchable
+                                        )
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(e => e.Title)
+                                        .ThenByDescending(e => e.Collection.Id == currentCollectionId)
+                                        .ToList();
+
+                            content = storage.ContentItems
+                                        .Include("Collection.User")
+                                        .Where
+                                        (c =>
+                                            (
+                                                c.Title.ToUpper().Contains(searchTerm) ||
+                                                c.Caption.ToUpper().Contains(searchTerm)
+                                            )
+                                            && c.Collection.PubliclySearchable
+                                        )
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(c => c.Title)
+                                        .ThenByDescending(c => c.Collection.Id == currentCollectionId)
+                                        .ToList();
+                        }
+                        else
+                        {
+                            timelines = storage.Timelines
+                                        .Include("Collection.User")
+                                        .Where
+                                        (t =>
+                                            t.Title.ToUpper().Contains(searchTerm)
+                                            &&
+                                            (
+                                                t.Collection.PubliclySearchable ||
+                                                t.Collection.User.Id == user.Id
+                                            )
+                                        )
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(t => t.Title)
+                                        .ThenByDescending(t => t.Collection.Id == currentCollectionId)
+                                        .ToList();
+
+                            exhibits = storage.Exhibits
+                                        .Include("Collection.User")
+                                        .Where
+                                        (e =>
+                                            e.Title.ToUpper().Contains(searchTerm)
+                                            &&
+                                            (
+                                                e.Collection.PubliclySearchable ||
+                                                e.Collection.User.Id == user.Id
+                                            )
+                                        )
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(e => e.Title)
+                                        .ThenByDescending(e => e.Collection.Id == currentCollectionId)
+                                        .ToList();
+
+                            content = storage.ContentItems
+                                        .Include("Collection.User")
+                                        .Where
+                                        (c =>
+                                            (
+                                                c.Title.ToUpper().Contains(searchTerm) ||
+                                                c.Caption.ToUpper().Contains(searchTerm)
+                                            )
+                                            &&
+                                            (
+                                                c.Collection.PubliclySearchable ||
+                                                c.Collection.User.Id == user.Id
+                                            )
+                                        )
+                                        .Take(MaxSearchLimit)
+                                        .OrderBy(c => c.Title)
+                                        .ThenByDescending(c => c.Collection.Id == currentCollectionId)
+                                        .ToList();
+                        }
+                        break;
+                        
+                    case SearchScope.AllMyCollections:
+
+                        if (user == null) return null; // if not logged in then provide empty list
+
+                        timelines = storage.Timelines
+                                    .Include("Collection.User")
+                                    .Where(t => t.Title.ToUpper().Contains(searchTerm) && t.Collection.User.Id == user.Id)
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(t => t.Title)
+                                    .ThenByDescending(t => t.Collection.Id == currentCollectionId)
+                                    .ToList();
+
+                        exhibits  = storage.Exhibits
+                                    .Include("Collection.User")
+                                    .Where(e => e.Title.ToUpper().Contains(searchTerm) && e.Collection.User.Id == user.Id)
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(e => e.Title)
+                                    .ThenByDescending(e => e.Collection.Id == currentCollectionId)
+                                    .ToList();
+
+                        content   = storage.ContentItems
+                                    .Include("Collection.User")
+                                    .Where
+                                    (c =>
+                                        (
+                                            c.Title.ToUpper().Contains(searchTerm) ||
+                                            c.Caption.ToUpper().Contains(searchTerm)
+                                        )
+                                        && c.Collection.User.Id == user.Id
+                                    )
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(c => c.Title)
+                                    .ThenByDescending(c => c.Collection.Id == currentCollectionId)
+                                    .ToList();
+
+                        break;
+
+                    default: // SearchScope.CurrentCollection
+
+                        timelines = storage.Timelines
+                                    .Include("Collection.User")
+                                    .Where(t => t.Title.ToUpper().Contains(searchTerm) && t.Collection.Id == currentCollectionId)
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(t => t.Title)
+                                    .ThenByDescending(t => t.Collection.Id == currentCollectionId)
+                                    .ToList();
+
+                        exhibits  = storage.Exhibits
+                                    .Include("Collection.User")
+                                    .Where(e => e.Title.ToUpper().Contains(searchTerm) && e.Collection.Id == currentCollectionId)
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(e => e.Title)
+                                    .ThenByDescending(e => e.Collection.Id == currentCollectionId)
+                                    .ToList();
+
+                        content   = storage.ContentItems
+                                    .Include("Collection.User")
+                                    .Where
+                                    (c =>
+                                        (
+                                            c.Title.ToUpper().Contains(searchTerm) ||
+                                            c.Caption.ToUpper().Contains(searchTerm)
+                                        )
+                                        && c.Collection.Id == currentCollectionId
+                                    )
+                                    .Take(MaxSearchLimit)
+                                    .OrderBy(c => c.Title)
+                                    .ThenByDescending(c => c.Collection.Id == currentCollectionId)
+                                    .ToList();
+
+                        break;
                 }
 
-                Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
-                searchTerm = searchTerm.ToUpperInvariant();
+                rv.AddRange(timelines.Select(t => new SearchResult
+                {
+                    Id              = t.Id,
+                    ObjectType      = ObjectType.Timeline,
+                    Title           = t.Title,
+                    UserName        = t.Collection.User.DisplayName,
+                    CollectionName  = t.Collection.Title,
+                    ReplacementURL  = (t.Collection.Id == currentCollectionId ? null : Search_GetTimelinePath(t))
+                }));
 
-                var timelines = storage.Timelines.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).Take(MaxSearchLimit).ToList();
-                var searchResults = timelines.Select(timeline => new SearchResult { Id = timeline.Id, Title = timeline.Title, ObjectType = ObjectType.Timeline }).ToList();
+                rv.AddRange(exhibits.Select(e => new SearchResult
+                {
+                    Id              = e.Id,
+                    ObjectType      = ObjectType.Exhibit,
+                    Title           = e.Title,
+                    UserName        = e.Collection.User.DisplayName,
+                    CollectionName  = e.Collection.Title,
+                    ReplacementURL = (e.Collection.Id == currentCollectionId ? null : Search_GetExhibitPath(storage, e))
+                }));
 
-                var exhibits = storage.Exhibits.Where(_ => _.Title.ToUpper().Contains(searchTerm) && _.Collection.Id == collectionId).Take(MaxSearchLimit).ToList();
-                searchResults.AddRange(exhibits.Select(exhibit => new SearchResult { Id = exhibit.Id, Title = exhibit.Title, ObjectType = ObjectType.Exhibit }));
+                rv.AddRange(content.Select(c => new SearchResult
+                {
+                    Id              = c.Id,
+                    ObjectType      = ObjectType.ContentItem,
+                    Title           = c.Title,
+                    UserName        = c.Collection.User.DisplayName,
+                    CollectionName  = c.Collection.Title,
+                    ReplacementURL = (c.Collection.Id == currentCollectionId ? null : Search_GetContentPath(storage, c))
+                }));
 
-                var contentItems = storage.ContentItems.Where(_ =>
-                    (_.Title.ToUpper().Contains(searchTerm) || _.Caption.ToUpper().Contains(searchTerm))
-                     && _.Collection.Id == collectionId
-                    ).Take(MaxSearchLimit).ToList();
-                searchResults.AddRange(contentItems.Select(contentItem => new SearchResult { Id = contentItem.Id, Title = contentItem.Title, ObjectType = ObjectType.ContentItem }));
-
-                Trace.TraceInformation("Search called for search term {0}", searchTerm);
-                return new BaseJsonResult<IEnumerable<SearchResult>>(searchResults);
+                return rv; 
             });
+        }
+
+        private string Search_GetTimelinePath(Timeline timeline)
+        {
+            string rv = "/";
+
+            // insert supercollection and collection into path
+            if (timeline.Collection.User.DisplayName == (_baseCollectionsUserName).ToString() && timeline.Collection.Title == "Cosmos")
+            {
+                // use shortened URL for curated Cosmos collection (default collection for site)
+                rv += "#";
+            }
+            else
+            {
+                // use full URL that includes supercollection name (user name) and collection name
+                rv +=   HttpUtility.UrlPathEncode(timeline.Collection.User.DisplayName) + "/" +
+                        HttpUtility.UrlPathEncode(timeline.Collection.Title)            + "/#";
+            }
+
+            // insert all ancestor timeline ids and current timeline id into path
+            List<Guid> timelines = TimelineExtensions.Ancestors(timeline);
+            if (timelines.Count > 0)
+            {
+                timelines.Reverse();
+                rv += "/t" + string.Join("/t", timelines.ToArray());
+            }
+
+            return rv;
+        }
+
+        private string Search_GetExhibitPath(Storage storage, Exhibit exhibit)
+        {
+            Guid[]   searchTerm = new Guid[] { exhibit.Id };
+            Timeline timeline   = storage.Timelines.Where(t => t.Exhibits.Any(te => searchTerm.Contains(te.Id))).FirstOrDefault();
+
+            return Search_GetTimelinePath(timeline) + "/e" + exhibit.Id;
+        }
+
+        private string Search_GetContentPath(Storage storage, ContentItem content)
+        {
+            Guid[] searchTerm;
+            
+            searchTerm = new Guid[] { content.Id };
+            Exhibit exhibit = storage.Exhibits.Where(e => e.ContentItems.Any(ec => searchTerm.Contains(ec.Id))).FirstOrDefault();
+
+            searchTerm = new Guid[] { exhibit.Id };
+            Timeline timeline = storage.Timelines.Where(t => t.Exhibits.Any(te => searchTerm.Contains(te.Id))).FirstOrDefault();
+
+            return Search_GetTimelinePath(timeline) + "/e" + exhibit.Id + "/" + content.Id;
         }
 
         /// <summary>
@@ -843,8 +1161,9 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
 
-                collection.Theme            = collectionRequest.Theme;
-                collection.MembersAllowed   = collectionRequest.MembersAllowed;
+                collection.Theme                = collectionRequest.Theme;
+                collection.PubliclySearchable   = collectionRequest.PubliclySearchable;
+                collection.MembersAllowed       = collectionRequest.MembersAllowed;
 
                 storage.SaveChanges();
                 return collection.Id;

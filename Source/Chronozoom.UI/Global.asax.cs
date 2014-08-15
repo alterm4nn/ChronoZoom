@@ -106,10 +106,14 @@ namespace Chronozoom.UI
                     string populatedContentAdmin = ConfigurationManager.AppSettings["BaseCollectionsAdministrator"].ToString();
                     using (Utils.PopulateDbFromJSON populator = new Utils.PopulateDbFromJSON())
                     {
+                        populator.LoadDataFromDump("ChronoZoom",    "Cosmos",           "beta-get.json",            "beta-gettours.json",           false,  populatedContentAdmin);
+                        populator.LoadDataFromDump("ChronoZoom",    "AIDS Timeline",    "aidstimeline-get.json",    "aidstimeline-gettours.json",   false,  populatedContentAdmin);
+                        /*
                         populator.LoadDataFromDump("Beta Content",  "Beta Content",     "beta-get.json",            "beta-gettours.json",           false,  populatedContentAdmin);
                         populator.LoadDataFromDump("Sandbox",       "Sandbox",          "beta-get.json",            null,                           true,   null);
                         populator.LoadDataFromDump("Sandbox",       "Extensions",       "extensions-get.json",      null,                           true,   null);
                         populator.LoadDataFromDump("AIDS Timeline", "AIDS Timeline",    "aidstimeline-get.json",    "aidstimeline-gettours.json",   false,  populatedContentAdmin);
+                        */
                     }
                 }
             }

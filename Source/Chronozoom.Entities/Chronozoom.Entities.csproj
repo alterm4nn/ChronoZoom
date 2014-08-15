@@ -166,6 +166,7 @@
     <Content Include="SQL\ManualMigration\201406020351501_MultipleEditors.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="SQL\ManualMigration\201408040000000_PubliclySearchable.sql" />
     <Content Include="SQL\ManualMigration\CreateEntireSchema.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

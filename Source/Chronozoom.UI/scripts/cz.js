@@ -401,7 +401,8 @@ var CZ;
                         exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
                         exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
                         exhibitBorderColorInput: $(".cz-form-exhibit-border"),
-                        chkEditors: "#cz-form-multiuser-enable",
+                        chkPublic:  '#cz-form-public-search',
+                        chkEditors: '#cz-form-multiuser-enable',
                         btnEditors: '#cz-form-multiuser-manage'
                     });
                     form.show();
