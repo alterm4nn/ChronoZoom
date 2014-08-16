@@ -1,9 +1,13 @@
--- tighten-up schema so required fields are not null and field lengths are not crazy since they are used in URLs --
--- a recent copy of the chronozoom.com production database was examined to ensure that it fits these adjustments --
+-- Tighten-up schema so required fields are not null and field lengths are not crazy since they are used in URLs.
+-- A recent copy of the chronozoom.com production database was examined to ensure that it fits these adjustments.
 
-DROP INDEX [IX_User_Id]             ON [dbo].[SuperCollections];
-DROP INDEX [IX_User_Id]             ON [dbo].[Collections];
-DROP INDEX [IX_SuperCollection_Id]  ON [dbo].[Collections];
+BEGIN TRY
+    DROP INDEX [IX_User_Id]             ON [dbo].[SuperCollections];
+    DROP INDEX [IX_User_Id]             ON [dbo].[Collections];
+    DROP INDEX [IX_SuperCollection_Id]  ON [dbo].[Collections];
+END TRY
+BEGIN CATCH
+END CATCH
 GO
 
 ALTER TABLE [Users]             ALTER COLUMN [DisplayName]          NVARCHAR(50)        NOT NULL;
@@ -32,7 +36,17 @@ CREATE NONCLUSTERED INDEX [IX_SuperCollection_Id]   ON [dbo].[Collections]
 GO
 
 
--- Add path field to collection, including unique constrainst amongst other collections belonging to the same supercollection.
+-- Fix "____" user display name, supercollection name and collection name (if present.)
+-- This user has no exhibits/content so OK to rename as long as we inform user of new name.
+-- User's email address is learn.cz.demo@gmail.com.
+
+UPDATE [Users]              SET DisplayName = 'LearnCZ' WHERE DisplayName   = '____';
+UPDATE [SuperCollections]   SET Title       = 'LearnCZ' WHERE Title         = '____';
+UPDATE [Collections]        SET Title       = 'LearnCZ' WHERE Title         = '____';
+GO
+
+
+-- Add path field to collection, including unique constraint amongst other collections belonging to the same supercollection.
 -- Will hold part of the URL used to distinguish this collection from other collections belonging to the same supercollection.
 -- Additionally add default collection indicator since users can have more than one collection.
 
@@ -62,6 +76,21 @@ UPDATE [Collections]
     );
 GO
 
+ALTER TABLE [Collections]       ALTER COLUMN [Path]                 VARCHAR(50)         NOT NULL;
+ALTER TABLE [Collections]       WITH CHECK
+ADD
+    CONSTRAINT [UK_dbo.Collections_Title] UNIQUE
+    (
+	    [SuperCollection_Id]    ASC,
+        [Title]                 ASC
+    ),
+    CONSTRAINT [UK_dbo.Collections_Path]  UNIQUE
+    (
+	    [SuperCollection_Id]    ASC,
+        [Path]                  ASC
+    );
+GO
+
 
 -- Remove existing URL unfriendly chars from supercollection names too.
 -- User display names can have unfriendly chars in them and supercollection name will be the equivalent to the path field.
@@ -87,15 +116,37 @@ UPDATE [SuperCollections]
 GO
 
 
-ALTER TABLE [Collections]       ALTER COLUMN [Path]                 VARCHAR(50)         NOT NULL;
-ALTER TABLE [Collections]       WITH CHECK
-ADD
-    CONSTRAINT [UK_dbo.Collections_Path] UNIQUE
-    (
-	    [SuperCollection_Id]    ASC,
-        [Path]                  ASC
-    );
+-- enforce unique constraints for users' display name and supercollections' title --
+
+IF NOT EXISTS(SELECT DisplayName FROM [Users]       WITH (NOLOCK) GROUP BY DisplayName  HAVING COUNT(*) > 1)
+    ALTER TABLE     [dbo].[Users]                   WITH CHECK
+    ADD CONSTRAINT  [UK_dbo.Users_DisplayName]      UNIQUE (DisplayName ASC);
+
+IF NOT EXISTS(SELECT Title FROM [SuperCollections]  WITH (NOLOCK) GROUP BY Title        HAVING COUNT(*) > 1)
+    ALTER TABLE     [dbo].[SuperCollections]        WITH CHECK
+    ADD CONSTRAINT  [UK_dbo.SuperCollections_Title] UNIQUE (Title ASC);
+
 GO
+
+
+-- Make every collection the default collection for it's supercollection if the collection is the only collection in the supercollection.
+
+UPDATE  [Collections]
+SET     [Default] = 1
+WHERE   SuperCollection_Id NOT IN
+(
+    SELECT SuperCollection_Id FROM [Collections] WITH (NOLOCK) GROUP BY SuperCollection_Id HAVING COUNT(*) > 1
+);
+
+
+-- Make 'cosmos' the default collection in the 'chronozoom' supercollection.
+
+UPDATE  [Collections]
+SET     [Default] = 1
+WHERE   Id =
+(
+    SELECT TOP 1 Collection_Id From [Timelines] WITH (NOLOCK) WHERE Id = '00000000-0000-0000-0000-000000000000'
+);
 
 
 -- note transformation completed --
