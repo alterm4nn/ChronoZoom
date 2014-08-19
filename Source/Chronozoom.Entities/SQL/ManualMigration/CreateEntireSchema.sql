@@ -58,6 +58,7 @@ CREATE TABLE [dbo].[Collections]
 	[Id]                    [uniqueidentifier]  NOT NULL,
 	[User_Id]               [uniqueidentifier]  NOT NULL,
 	[SuperCollection_Id]    [uniqueidentifier]  NOT NULL,
+    [Default]               [bit]               NOT NULL    DEFAULT (0),
 	[MembersAllowed]        [bit]               NOT NULL    DEFAULT (0),
     [PubliclySearchable]    [bit]               NOT NULL    DEFAULT (0),
 	[Title]                 [nvarchar](50)      NOT NULL,

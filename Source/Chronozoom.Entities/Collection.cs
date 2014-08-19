@@ -43,15 +43,17 @@ namespace Chronozoom.Entities
         /// The title of the collection.
         /// </summary>
         [DataMember]
+        [Required]
         [MaxLength(50)]
         [Column(TypeName = "nvarchar")]
         public string Title { get; set; }
 
         /// <summary>
         /// URL-sanitized version of title, which will be used as part of a URL path.
-        /// Only Aa-Zz and 0-9 are allowed. This should be unique per supercollection.
+        /// Only a-z and 0-9 are allowed. This should be unique per supercollection.
         /// </summary>
         [DataMember]
+        [Required]
         [MaxLength(50)]
         [Column(TypeName = "varchar")]
         public string Path { get; set; }
@@ -60,6 +62,7 @@ namespace Chronozoom.Entities
         /// The user ID for the collection owner.
         /// </summary>
         [DataMember]
+        [Required]
         public User User { get; set; }
 
         /// <summary>
@@ -69,6 +72,8 @@ namespace Chronozoom.Entities
         public string Theme { get; set; }
 
         /// <summary>SuperCollection for this collection</summary>
+        [DataMember]
+        [Required]
         public SuperCollection SuperCollection { get; set; }
 
         /// <summary>

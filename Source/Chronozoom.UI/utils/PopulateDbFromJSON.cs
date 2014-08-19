@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using Chronozoom.Entities;
 
 namespace Chronozoom.UI.Utils
@@ -26,76 +27,101 @@ namespace Chronozoom.UI.Utils
             public T d { get; set; }
         }
 
-        // constructor
+        #region constructor
+
         public PopulateDbFromJSON()
         {
             _jsonDirectory = AppDomain.CurrentDomain.BaseDirectory + @"Dumps\";
         }
 
-        public void LoadDataFromDump(string superCollectionName, string collectionName, string getFileName, string getToursFileName, bool replaceGuids, string contentAdminId)
+        #endregion
+
+        #region destructor
+
+        public void Dispose()
         {
-            SuperCollection superCollection = _storage.SuperCollections.Find(CollectionIdFromText(superCollectionName));
-            bool createCollection = true;
-
-            if (superCollection != null)
-            {
-                _storage.Entry(superCollection).Collection(_ => _.Collections).Load();
-                createCollection = superCollection.Collections.All(candidate => candidate.Title != collectionName);
-            }
-
-            if (superCollection == null || createCollection)
-            {
-                Collection collection = LoadCollections(superCollectionName, collectionName, contentAdminId);
-                using (Stream getData = File.OpenRead(_jsonDirectory + getFileName))
-                using (Stream getToursData = getToursFileName == null ? null : File.OpenRead(_jsonDirectory + getToursFileName))
-                {
-                    LoadData(getData, getToursData, collection, replaceGuids);
-                }
-
-                _storage.SaveChanges();
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        #region Private Methods descended from LoadDataFromDump
-
-        private Collection LoadCollections(string superCollectionName, string collectionName, string userId)
+        public virtual void Dispose(bool disposing)
         {
-            User user = (userId == null
-                             ? _storage.Users.FirstOrDefault(candidate => candidate.NameIdentifier == null)
-                             : _storage.Users.FirstOrDefault(candidate => candidate.NameIdentifier == userId)) ??
-                        new User { Id = Guid.NewGuid(), NameIdentifier = userId, DisplayName = userId ?? _defaultUser };
-
-            // load collection
-            var collection = new Collection
+            if (disposing)
             {
-                Title = collectionName,
-                Id = CollectionIdFromSuperCollection(superCollectionName, collectionName),
-                User = user
-            };
+                // free any managed resources
+                _storage.Dispose();
+                _md5Hasher.Dispose();
+            }
+            // free any native resources
+        }
 
-            // load supercollection
-            SuperCollection superCollection = _storage.SuperCollections.FirstOrDefault(candidate => candidate.Title == superCollectionName);
+        #endregion
 
+        #region public methods
+
+        public void LoadDataFromDump(string curatorDisplayName, string collectionTitle, string collectionDumpFile, string toursDumpFile, bool curatorsDefaultCollection = true, bool replaceGUIDs = false)
+        {
+            // remove any excess spaces from display names
+            curatorDisplayName  = curatorDisplayName.Trim();
+            collectionTitle     = collectionTitle.Trim();
+
+            // generate equivalent path names (uniqueness is assumed)
+            string superCollectionPath  = Regex.Replace(curatorDisplayName, @"[^A-Za-z0-9]+", "").ToLower();    // Aa-Zz and 0-9 only, converted to lower case.
+            string collectionPath       = Regex.Replace(collectionTitle,    @"[^A-Za-z0-9]+", "").ToLower();    // Aa-Zz and 0-9 only, converted to lower case.
+
+            // get curator's user record or create if doesn't exist
+            User user = _storage.Users.Where(u => u.DisplayName == curatorDisplayName).FirstOrDefault();
+            if (user == null)
+            {
+                user = new User
+                {
+                    Id                  = Guid.NewGuid(),
+                    DisplayName         = curatorDisplayName,
+                    IdentityProvider    = "Populated from JSON"
+                };
+                _storage.Users.Add(user);
+            }
+
+            // get curator's supercollection record or create if doesn't exist
+            SuperCollection superCollection = _storage.SuperCollections.Include("Collections").Where(s => s.Title == superCollectionPath).FirstOrDefault();
             if (superCollection == null)
             {
                 superCollection = new SuperCollection
                 {
-                    Title = superCollectionName,
-                    Id = CollectionIdFromText(superCollectionName),
-                    User = user
+                    Id                  = Guid.NewGuid(),
+                    Title               = superCollectionPath,
+                    User                = user,
+                    Collections         = new System.Collections.ObjectModel.Collection<Collection>()
                 };
                 _storage.SuperCollections.Add(superCollection);
             }
 
-            if (superCollection.Collections == null)
+            // create new collection
+            Collection collection = new Collection
             {
-                superCollection.Collections = new System.Collections.ObjectModel.Collection<Collection>();
-            }
-
+                Id                      = Guid.NewGuid(),
+                Default                 = curatorsDefaultCollection,
+                Title                   = collectionTitle,
+                Path                    = collectionPath,
+                SuperCollection         = superCollection,
+                User                    = user
+            };
             superCollection.Collections.Add(collection);
 
-            return collection;
+            // populate collection from json files
+            using (Stream jsonTimelines =                                File.OpenRead(_jsonDirectory + collectionDumpFile))
+            using (Stream jsonTours     = toursDumpFile == null ? null : File.OpenRead(_jsonDirectory + toursDumpFile))
+            {
+                LoadData(jsonTimelines, jsonTours, collection, replaceGUIDs);
+            }
+
+            // commit db changes
+            _storage.SaveChanges();
         }
+
+        #endregion
+
+        #region private methods
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Incremental change, will refactor later if the import process is kept")]
@@ -207,24 +233,6 @@ namespace Chronozoom.UI.Utils
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Lowercase is URL friendly")]
-        private static Guid CollectionIdFromSuperCollection(string supercollection, string collection)
-        {
-            return CollectionIdFromText(string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}|{1}",
-                supercollection.ToLower(CultureInfo.InvariantCulture),
-                collection.ToLower(CultureInfo.InvariantCulture)));
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Justification = "Lowercase is URL friendly")]
-        private static Guid CollectionIdFromText(string value)
-        {
-            value       = value.Replace(' ', '-'); // replace with URL friendly representation
-            byte[] data = _md5Hasher.ComputeHash(Encoding.Default.GetBytes(value.ToLowerInvariant()));
-            return new Guid(data);
-        }
-
         public static void MigrateInPlace(Timeline timeline)
         {
             int subtreeSize = 1;
@@ -267,21 +275,5 @@ namespace Chronozoom.UI.Utils
 
         #endregion
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // free any managed resources
-                _storage.Dispose();
-                _md5Hasher.Dispose();
-            }
-            // free any native resources
-        }
     }
 }
