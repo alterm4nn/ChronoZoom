@@ -23,6 +23,8 @@ using System.Text.RegularExpressions;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.ComponentModel;
+using System.Data.Entity.Validation;
+using EntityFramework.Extensions;
 
 namespace Chronozoom.UI
 {
@@ -147,14 +149,17 @@ namespace Chronozoom.UI
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public partial class ChronozoomSVC : IChronozoomSVC
     {
-        private static readonly StorageCache Cache = new StorageCache();
-        private static readonly TraceSource Trace = new TraceSource("Service", SourceLevels.All) { Listeners = { Global.SignalRTraceListener } };
-        private static MD5 _md5Hasher = MD5.Create();
-        private const decimal _minYear = -13700000000;
-        private const decimal _maxYear = 9999;
-        private const int _defaultDepth = 30;
-        private static Guid _defaultSuperCollectionId = Guid.Empty;
-        private const string _sandboxSuperCollectionName = "Sandbox";
+        private static  readonly StorageCache   Cache                       = new StorageCache();
+        private static  readonly TraceSource    Trace                       = new TraceSource("Service", SourceLevels.All) { Listeners = { Global.SignalRTraceListener } };
+        private static  readonly string         _baseCollectionsUserName    = ConfigurationManager.AppSettings["BaseCollectionsAdministrator"].Trim();
+        private static  readonly string         _defaultSuperCollectionName = ConfigurationManager.AppSettings["DefaultSuperCollection"      ].Trim();
+        private static  MD5                     _md5Hasher                  = MD5.Create();
+        private static  Guid                    _defaultCollectionId        = Guid.Empty;
+        private const   string                  _sandboxSuperCollectionName = "sandbox";
+        private const   decimal                 _minYear                    = -13700000000;
+        private const   decimal                 _maxYear                    = 9999;
+        private const   int                     _defaultDepth               = 30;
+        private const   int                     _maxSearchLimit             = 25;   // max # elements retured per section of a search (searches have 3 sections)
 
         // The default number of max elements returned by the API
         private static Lazy<int> _maxElements = new Lazy<int>(() =>
@@ -210,12 +215,6 @@ namespace Chronozoom.UI
 
             return new ThumbnailGenerator(thumbnailStorage);
         });
-
-        // The Maximum number of elements retured in each section of a search (searches have 3 sections)
-        private const int MaxSearchLimit = 25;
-
-        // The user name associated with existing pre-loaded collections that come with ChronoZoom
-        private static string _baseCollectionsUserName = ConfigurationManager.AppSettings["BaseCollectionsAdministrator"];
 
         // Is default progressive load enabled?
         private static Lazy<bool> _progressiveLoadEnabled = new Lazy<bool>(() =>
@@ -319,7 +318,11 @@ namespace Chronozoom.UI
                 Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
 
                 // getTimelines for origin collection may be cached
-                if (superCollection == null || CanCacheGetTimelines(storage, user, collectionId))
+                if
+                (
+                    superCollection == null
+                    || (superCollection == _defaultSuperCollectionName && collection == null)
+                    || CanCacheGetTimelines(storage, user, collectionId))
                 {
                     Timeline cachedTimeline = GetCachedGetTimelines(collectionId, start, end, minspan, commonAncestor, maxElements, depth);
                     if (cachedTimeline != null)
@@ -329,12 +332,12 @@ namespace Chronozoom.UI
                 }
 
                 // initialize filters
-                decimal startTime = string.IsNullOrWhiteSpace(start) ? _minYear : decimal.Parse(start, CultureInfo.InvariantCulture);
-                decimal endTime = string.IsNullOrWhiteSpace(end) ? _maxYear : decimal.Parse(end, CultureInfo.InvariantCulture);
-                decimal span = string.IsNullOrWhiteSpace(minspan) ? 0 : decimal.Parse(minspan, CultureInfo.InvariantCulture);
-                Guid lcaParsed = string.IsNullOrWhiteSpace(commonAncestor) ? Guid.Empty : Guid.Parse(commonAncestor);
-                int maxElementsParsed = string.IsNullOrWhiteSpace(maxElements) ? _maxElements.Value : int.Parse(maxElements, CultureInfo.InvariantCulture);
-                int depthParsed = string.IsNullOrWhiteSpace(depth) ? _defaultDepth : int.Parse(depth, CultureInfo.InvariantCulture);
+                decimal startTime       = string.IsNullOrWhiteSpace(start)          ? _minYear              : decimal.Parse(start,      CultureInfo.InvariantCulture);
+                decimal endTime         = string.IsNullOrWhiteSpace(end)            ? _maxYear              : decimal.Parse(end,        CultureInfo.InvariantCulture);
+                decimal span            = string.IsNullOrWhiteSpace(minspan)        ? 0                     : decimal.Parse(minspan,    CultureInfo.InvariantCulture);
+                Guid lcaParsed          = string.IsNullOrWhiteSpace(commonAncestor) ? Guid.Empty            : Guid.Parse(commonAncestor);
+                int maxElementsParsed   = string.IsNullOrWhiteSpace(maxElements)    ? _maxElements.Value    : int.Parse(maxElements,    CultureInfo.InvariantCulture);
+                int depthParsed         = string.IsNullOrWhiteSpace(depth)          ? _defaultDepth         : int.Parse(depth,          CultureInfo.InvariantCulture);
 
                 IEnumerable<Timeline> timelines = null;
                 if (!_progressiveLoadEnabled.Value || !string.IsNullOrWhiteSpace(depth))
@@ -360,7 +363,7 @@ namespace Chronozoom.UI
                     timeline = timelines.FirstOrDefault();
 
                 // Cache getTimeline only for origin collection
-                if (superCollection == null)
+                if (superCollection == null || (superCollection == _defaultSuperCollectionName && collection == null))
                 {
                     CacheGetTimelines(timeline, collectionId, start, end, minspan, commonAncestor, maxElements, depth);
                 }
@@ -429,7 +432,7 @@ namespace Chronozoom.UI
                         timelines = storage.Timelines
                                     .Include("Collection.User")
                                     .Where(t => t.Title.ToUpper().Contains(searchTerm))
-                                    .Take(MaxSearchLimit)
+                                    .Take(_maxSearchLimit)
                                     .OrderBy(t => t.Title)
                                     .ThenByDescending(t => t.Collection.Id == currentCollectionId)
                                     .ToList();
@@ -437,7 +440,7 @@ namespace Chronozoom.UI
                         exhibits  = storage.Exhibits
                                     .Include("Collection.User")
                                     .Where(e => e.Title.ToUpper().Contains(searchTerm))
-                                    .Take(MaxSearchLimit)
+                                    .Take(_maxSearchLimit)
                                     .OrderBy(e => e.Title)
                                     .ThenByDescending(e => e.Collection.Id == currentCollectionId)
                                     .ToList();
@@ -449,7 +452,7 @@ namespace Chronozoom.UI
                                         c.Title.ToUpper().Contains(searchTerm) ||
                                         c.Caption.ToUpper().Contains(searchTerm)
                                     )
-                                    .Take(MaxSearchLimit)
+                                    .Take(_maxSearchLimit)
                                     .OrderBy(c => c.Title)
                                     .ThenByDescending(c => c.Collection.Id == currentCollectionId)
                                     .ToList();
@@ -467,7 +470,7 @@ namespace Chronozoom.UI
                                             t.Title.ToUpper().Contains(searchTerm)
                                             && t.Collection.PubliclySearchable
                                         )
-                                        .Take(MaxSearchLimit)
+                                        .Take(_maxSearchLimit)
                                         .OrderBy(t => t.Title)
                                         .ThenByDescending(t => t.Collection.Id == currentCollectionId)
                                         .ToList();
@@ -479,7 +482,7 @@ namespace Chronozoom.UI
                                             e.Title.ToUpper().Contains(searchTerm)
                                             && e.Collection.PubliclySearchable
                                         )
-                                        .Take(MaxSearchLimit)
+                                        .Take(_maxSearchLimit)
                                         .OrderBy(e => e.Title)
                                         .ThenByDescending(e => e.Collection.Id == currentCollectionId)
                                         .ToList();
@@ -494,7 +497,7 @@ namespace Chronozoom.UI
                                             )
                                             && c.Collection.PubliclySearchable
                                         )
-                                        .Take(MaxSearchLimit)
+                                        .Take(_maxSearchLimit)
                                         .OrderBy(c => c.Title)
                                         .ThenByDescending(c => c.Collection.Id == currentCollectionId)
                                         .ToList();
@@ -512,7 +515,7 @@ namespace Chronozoom.UI
                                                 t.Collection.User.Id == user.Id
                                             )
                                         )
-                                        .Take(MaxSearchLimit)
+                                        .Take(_maxSearchLimit)
                                         .OrderBy(t => t.Title)
                                         .ThenByDescending(t => t.Collection.Id == currentCollectionId)
                                         .ToList();
@@ -528,7 +531,7 @@ namespace Chronozoom.UI
                                                 e.Collection.User.Id == user.Id
                                             )
                                         )
-                                        .Take(MaxSearchLimit)
+                                        .Take(_maxSearchLimit)
                                         .OrderBy(e => e.Title)
                                         .ThenByDescending(e => e.Collection.Id == currentCollectionId)
                                         .ToList();
@@ -547,7 +550,7 @@ namespace Chronozoom.UI
                                                 c.Collection.User.Id == user.Id
                                             )
                                         )
-                                        .Take(MaxSearchLimit)
+                                        .Take(_maxSearchLimit)
                                         .OrderBy(c => c.Title)
                                         .ThenByDescending(c => c.Collection.Id == currentCollectionId)
                                         .ToList();
@@ -561,7 +564,7 @@ namespace Chronozoom.UI
                         timelines = storage.Timelines
                                     .Include("Collection.User")
                                     .Where(t => t.Title.ToUpper().Contains(searchTerm) && t.Collection.User.Id == user.Id)
-                                    .Take(MaxSearchLimit)
+                                    .Take(_maxSearchLimit)
                                     .OrderBy(t => t.Title)
                                     .ThenByDescending(t => t.Collection.Id == currentCollectionId)
                                     .ToList();
@@ -569,7 +572,7 @@ namespace Chronozoom.UI
                         exhibits  = storage.Exhibits
                                     .Include("Collection.User")
                                     .Where(e => e.Title.ToUpper().Contains(searchTerm) && e.Collection.User.Id == user.Id)
-                                    .Take(MaxSearchLimit)
+                                    .Take(_maxSearchLimit)
                                     .OrderBy(e => e.Title)
                                     .ThenByDescending(e => e.Collection.Id == currentCollectionId)
                                     .ToList();
@@ -584,7 +587,7 @@ namespace Chronozoom.UI
                                         )
                                         && c.Collection.User.Id == user.Id
                                     )
-                                    .Take(MaxSearchLimit)
+                                    .Take(_maxSearchLimit)
                                     .OrderBy(c => c.Title)
                                     .ThenByDescending(c => c.Collection.Id == currentCollectionId)
                                     .ToList();
@@ -596,7 +599,7 @@ namespace Chronozoom.UI
                         timelines = storage.Timelines
                                     .Include("Collection.User")
                                     .Where(t => t.Title.ToUpper().Contains(searchTerm) && t.Collection.Id == currentCollectionId)
-                                    .Take(MaxSearchLimit)
+                                    .Take(_maxSearchLimit)
                                     .OrderBy(t => t.Title)
                                     .ThenByDescending(t => t.Collection.Id == currentCollectionId)
                                     .ToList();
@@ -604,7 +607,7 @@ namespace Chronozoom.UI
                         exhibits  = storage.Exhibits
                                     .Include("Collection.User")
                                     .Where(e => e.Title.ToUpper().Contains(searchTerm) && e.Collection.Id == currentCollectionId)
-                                    .Take(MaxSearchLimit)
+                                    .Take(_maxSearchLimit)
                                     .OrderBy(e => e.Title)
                                     .ThenByDescending(e => e.Collection.Id == currentCollectionId)
                                     .ToList();
@@ -619,7 +622,7 @@ namespace Chronozoom.UI
                                         )
                                         && c.Collection.Id == currentCollectionId
                                     )
-                                    .Take(MaxSearchLimit)
+                                    .Take(_maxSearchLimit)
                                     .OrderBy(c => c.Title)
                                     .ThenByDescending(c => c.Collection.Id == currentCollectionId)
                                     .ToList();
@@ -711,7 +714,7 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
@@ -722,7 +725,18 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
+        public BaseJsonResult<IEnumerable<Tour>> GetTours(string superCollection)
+        {
+            return GetTours(superCollection, "");
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
@@ -940,73 +954,207 @@ namespace Chronozoom.UI
             });
         }
 
+        /// <summary>
+        ///  Creates the supercollection and default collection if they do not exist for the specified user.
+        /// </summary>
+        /// <param name="storage"></param>
+        /// <param name="user"></param>
+        /// <returns>Returns a URL pointing to the user's supercollection and default collection.</returns>
         private static Uri EnsurePersonalCollection(Storage storage, User user)
         {
-            SuperCollection superCollection = storage.SuperCollections.Where(candidate => candidate.User.NameIdentifier == user.NameIdentifier).FirstOrDefault();
+            bool dbChanged = false;
+
+            SuperCollection superCollection =
+                storage.SuperCollections
+                .Where(s => s.User.Id == user.Id)
+                .Include("Collections")
+                .FirstOrDefault();
+
+            Collection defaultCollection    = superCollection   == null ? null :
+                storage.Collections
+                .Where(c => c.SuperCollection.Id == superCollection.Id && c.Default == true)
+                .FirstOrDefault();
+
+            Timeline rootTimeline           = defaultCollection == null ? null :
+                storage.Timelines
+              //.Where(t => t.Collection.Id == defaultCollection.Id && TimelineExtensions.Ancestors(t).Count == 0)
+                .Where(t => t.Collection.Id == defaultCollection.Id) // doesn't confirm is root but adequate to show has timelines
+                .FirstOrDefault();
+
             if (superCollection == null)
             {
-                // Create the personal superCollection
-                superCollection = new SuperCollection();
-                superCollection.Title = user.DisplayName;
-                superCollection.Id = CollectionIdFromText(user.DisplayName);
-                superCollection.User = user;
-                superCollection.Collections = new Collection<Collection>();
-
-                // Create the personal collection
-                Collection personalCollection = new Collection();
-                personalCollection.Title = user.DisplayName;
-                personalCollection.Id = CollectionIdFromSuperCollection(superCollection.Title, personalCollection.Title);
-                personalCollection.User = user;
-
-                superCollection.Collections.Add(personalCollection);
+                // supercollection doesn't exist so create it
+                superCollection = new SuperCollection
+                {
+                    Id              = Guid.NewGuid(),
+                    Title           = Regex.Replace(user.DisplayName.Trim(), @"[^A-Za-z0-9]+", "").ToLower(),
+                    User            = user,
+                    Collections     = new System.Collections.ObjectModel.Collection<Collection>()
+                };
                 storage.SuperCollections.Add(superCollection);
-                storage.Collections.Add(personalCollection);
-                storage.SaveChanges();
-
-                Trace.TraceInformation("Personal collection saved.");
+                dbChanged = true;
             }
 
-            return new Uri(string.Format(
-                CultureInfo.InvariantCulture,
-                @"{0}/{1}/",
-                FriendlyUrl.FriendlyUrlEncode(superCollection.Title),
-                FriendlyUrl.FriendlyUrlEncode(superCollection.Title)), UriKind.Relative);
+            if (defaultCollection == null)
+            {
+                // default collection doesn't exist so create it
+                defaultCollection = new Collection
+                {
+                    Id              = Guid.NewGuid(),
+                    Default         = true,
+                    Title           = user.DisplayName,
+                    Path            = Regex.Replace(user.DisplayName.Trim(), @"[^A-Za-z0-9]+", "").ToLower(),
+                    SuperCollection = superCollection,
+                    User            = user
+                };
+                superCollection.Collections.Add(defaultCollection);
+                dbChanged = true;
+            }
+
+            if (rootTimeline == null)
+            {
+                // root timeline doesn't exist so create it
+                rootTimeline = new Timeline
+                {
+                    Id              = Guid.NewGuid(),
+                    Depth           = 0,
+                    Title           = user.DisplayName,
+                    FromYear        = 1950,
+                    ToYear          = 9999,
+                    ForkNode        = 0,
+                    Collection      = defaultCollection,
+                    SubtreeSize     = 0
+                };
+                storage.Timelines.Add(rootTimeline);
+                dbChanged = true;
+            }
+
+            // commit any db changes
+            if (dbChanged) storage.SaveChanges();
+
+            // return url
+            return new Uri
+            (
+                string.Format
+                (
+                    CultureInfo.InvariantCulture,
+                    @"{0}/{1}/",
+                    FriendlyUrl.FriendlyUrlEncode(superCollection.Title),
+                    FriendlyUrl.FriendlyUrlEncode(defaultCollection.Path)
+                ),
+                UriKind.Relative
+            );
         }
 
-        private static Guid CollectionIdOrDefault(Storage storage, string superCollectionName, string collectionName)
+        public Guid CollectionIdOrDefault(Storage storage, string superCollectionName, string collectionPath)
         {
+            Collection  collection;
+
             if (string.IsNullOrEmpty(superCollectionName))
             {
-                if (_defaultSuperCollectionId != Guid.Empty)
-                    return _defaultSuperCollectionId;
+                // no supercollection specified so use default supercollection's default collection
+                superCollectionName = _defaultSuperCollectionName;
+                collectionPath      = "";
+            }
 
-                string defaultSuperCollection = ConfigurationManager.AppSettings["DefaultSuperCollection"];
-                SuperCollection superCollection = storage.SuperCollections.Where(candidate => candidate.Title == defaultSuperCollection).FirstOrDefault();
-                if (superCollection == null)
-                    superCollection = storage.SuperCollections.FirstOrDefault();
+            if (superCollectionName == _defaultSuperCollectionName && collectionPath == "" && _defaultCollectionId != Guid.Empty)
+            {
+                // we're looking up the default supercollection's default collection and that info is cached already
+                return _defaultCollectionId;
+            }
 
-                storage.Entry(superCollection).Collection(_ => _.Collections).Load();
-
-                _defaultSuperCollectionId = superCollection.Collections.FirstOrDefault().Id;
-                return _defaultSuperCollectionId;
+            if (string.IsNullOrEmpty(collectionPath))
+            {
+                // no collection specified so use default collection for specified supercollection
+                collection =
+                    storage.Collections
+                    .Where
+                    (c =>
+                        c.SuperCollection.Title == superCollectionName &&
+                        c.Default               == true
+                    )
+                    .FirstOrDefault();
             }
             else
             {
-                if (string.IsNullOrEmpty(collectionName))
-                    collectionName = superCollectionName;
-
-                return CollectionIdFromSuperCollection(superCollectionName, collectionName);
+                // collection specified so look it up within the specified supercollection
+                collection =
+                    storage.Collections
+                    .Where
+                    (c =>
+                        c.SuperCollection.Title == superCollectionName &&
+                        c.Path                  == collectionPath
+                    )
+                    .FirstOrDefault();
             }
+
+            if (collection == null)
+            {
+                // we were unable to find the requested collection
+
+                if (superCollectionName == _defaultSuperCollectionName && collectionPath == "")
+                {
+                    // the collection we could not find is the default supercollection's collection
+                    // this should not occur unless the database has an issue or web.config is not set up correctly
+                    throw new ConfigurationErrorsException("Unable to locate the default supercollection's default collection.");
+                }
+
+                //// so return the default supercollection's default collection
+                //return CollectionIdOrDefault(storage, _defaultSuperCollectionName, "");
+
+                // indicate that collection could not be found
+                return Guid.Empty;
+            }
+
+            if (superCollectionName == _defaultSuperCollectionName && collection.Default)
+            {
+                // we were looking up the default supercollection's collection so lets cache it for future use
+                _defaultCollectionId = collection.Id;
+            }
+
+            return collection.Id;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
-        private static Guid CollectionIdFromSuperCollection(string superCollection, string collection)
+        private static Guid CollectionIdFromSuperCollection(string superCollectionName, string collectionName)
         {
-            return CollectionIdFromText(string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}|{1}",
-                superCollection.ToLower(CultureInfo.InvariantCulture),
-                collection.ToLower(CultureInfo.InvariantCulture)));
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Collection collection;
+
+                // if superCollectionName is missing then use default superCollection
+                if (string.IsNullOrEmpty(superCollectionName))
+                {
+                    superCollectionName = _defaultSuperCollectionName;
+                }
+
+                // if collectionName is missing
+                if (string.IsNullOrEmpty(collectionName))
+                {
+                    // then look up default collection for the specified supercollection
+                    collection = storage.Collections.Where(c => c.SuperCollection.Title == superCollectionName && c.Default).FirstOrDefault();
+                }
+                else
+                {
+                    // else look up named collection
+                    collection = storage.Collections.Where(c => c.SuperCollection.Title == superCollectionName && c.Path == collectionName).FirstOrDefault();
+                }
+                
+                // if collection was found then return the collection id
+                if (collection != null) return collection.Id;
+
+                // couldn't find collection so generate a new guid from hash of names provided (no idea why)
+                return CollectionIdFromText
+                (
+                    string.Format
+                    (
+                        CultureInfo.InvariantCulture,
+                        "{0}|{1}",
+                        superCollectionName.Trim().ToLower(CultureInfo.InvariantCulture),
+                        collectionName.Trim().ToLower(CultureInfo.InvariantCulture)
+                    )
+                );
+            });
         }
 
         // Replace with URL friendly representations. For instance, converts space to '-'.
@@ -1037,47 +1185,112 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
         /// </summary>
-        public Guid PostCollection(string superCollectionName, string collectionName, Collection collectionRequest)
+        public Boolean PostCollection(string superCollectionPath, string newCollectionPath, Collection newCollectionData)
         {
+            // abort if appropriate parameters have not been provided
+            if (superCollectionPath == null) return false;
+            if (newCollectionPath   == null) return false;
+            if (newCollectionData   == null) return false;
+
+            superCollectionPath = Regex.Replace(superCollectionPath.Trim(), @"[^A-Za-z0-9]+", "").ToLower(); 
+            newCollectionPath   = Regex.Replace(newCollectionPath.Trim(),   @"[^A-Za-z0-9]+", "").ToLower(); 
+
+            if (superCollectionPath == "") return false;
+            if (newCollectionPath   == "") return false;
+
             return ApiOperation(delegate(User user, Storage storage)
             {
-                Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
+                // abort if not currently logged in
+                if (user == null) return false;
 
-                Guid returnValue = Guid.Empty;
+                // get supercollection - abort if can't find
+                SuperCollection superCollection = storage.SuperCollections.Where(s => s.Title == superCollectionPath).Include("User").Include("Collections").FirstOrDefault();
+                if (superCollection == null) return false;
 
-                if (collectionRequest == null)
+                // abort if currently logged in user is not the supercollection owner
+                if (user.Id != superCollection.User.Id) return false;
+
+                // abort if supercollection has an existing collection with the same path
+                Collection collection = storage.Collections.Where(c => c.SuperCollection.Id == superCollection.Id && c.Path == newCollectionPath).FirstOrDefault();
+                if (collection != null) return false;
+
+                // get the full user record as delegated user doesn't return display name which is required when creating new collection
+                User fullUser = storage.Users.Where(u => u.Id == user.Id).First();
+
+                // set up creation of new collection
+                collection = new Collection
                 {
-                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.RequestBodyEmpty);
-                    return Guid.Empty;
+                    Id                  = CollectionIdFromSuperCollection(superCollectionPath, newCollectionPath),
+                    SuperCollection     = superCollection,
+                    Default             = newCollectionData.Default,
+                    Path                = newCollectionPath,
+                    Title               = newCollectionData.Title,
+                    Theme               = newCollectionData.Theme,
+                    MembersAllowed      = newCollectionData.MembersAllowed,
+                    Members             = newCollectionData.Members,
+                    PubliclySearchable  = newCollectionData.PubliclySearchable,
+                    User                = fullUser
+                };
+                if (string.IsNullOrEmpty(collection.Title)) collection.Title = newCollectionPath;
+                superCollection.Collections.Add(collection);
+
+                // if this new collection is the default
+                if (newCollectionData.Default)
+                {
+                    // set any previous default collection to non-default
+                    Collection oldDefaultCollection = storage.Collections.Where(c => c.SuperCollection.Id == collection.SuperCollection.Id && c.Default && c.Id != collection.Id).FirstOrDefault();
+                    if (oldDefaultCollection != null) oldDefaultCollection.Default = false;
                 }
 
-                Guid superCollectionId = CollectionIdFromText(superCollectionName);
-                SuperCollection superCollection = RetrieveSuperCollection(storage, superCollectionId);
-                if (user == null || superCollection.User == null || superCollection.User.NameIdentifier != user.NameIdentifier)
+                // set up creation of root timeline
+                Timeline rootTimeline = new Timeline
                 {
-                    // No ACS so treat as an anonymous user who cannot add or modify a collection.
-                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                    return Guid.Empty;
+                    Id          = Guid.NewGuid(),
+                    Depth       = 0,
+                    Title       = collection.Title,
+                    FromYear    = 1950,
+                    ToYear      = 9999,
+                    ForkNode    = 0,
+                    Collection  = collection,
+                    SubtreeSize = 0
+                };
+                storage.Timelines.Add(rootTimeline);
+
+                // commit changes
+                try
+                {
+                    storage.SaveChanges();
+                }
+                catch (DbEntityValidationException dbEx)
+                {
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                        }
+                    }
+                    return false;
                 }
 
-                Guid collectionGuid = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                Collection collection = RetrieveCollection(storage, collectionGuid);
-                if (collection == null)
-                {
-                    collection = new Collection { Id = collectionGuid, Title = collectionName, User = user };
-                    storage.Collections.Add(collection);
-                    returnValue = collectionGuid;
-                }
-
-                storage.SaveChanges();
-                return returnValue;
+                // report success
+                return true;
             });
         }
 
+        
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public Guid PutCollection(string superCollectionName, Collection collectionRequest)
+        {
+            return PutCollection(superCollectionName, "", collectionRequest);
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         public Guid PutCollection(string superCollectionName, string collectionName, Collection collectionRequest)
         {
@@ -1085,9 +1298,33 @@ namespace Chronozoom.UI
             {
                 Trace.TraceInformation("Put Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
 
+                collectionRequest.Title = collectionRequest.Title.Trim();
+
+                if (collectionRequest.Title != collection.Title)
+                {
+                    // collection title has changed so we'll also change title of root timeline
+                    Timeline rootInfo = GetTimelines(superCollectionName, collectionName, null, null, null, null, null, "1");
+                    if (rootInfo != null)
+                    {
+                        Timeline rootTimeline = storage.Timelines.Where(t => t.Id == rootInfo.Id).First();
+                        rootTimeline.Title = collectionRequest.Title;
+                    }
+                }
+
+                collection.Title                = collectionRequest.Title;
+                collection.Path                 = Regex.Replace(collectionRequest.Path, @"[^A-Za-z0-9]+", "").ToLower();
                 collection.Theme                = collectionRequest.Theme;
                 collection.PubliclySearchable   = collectionRequest.PubliclySearchable;
                 collection.MembersAllowed       = collectionRequest.MembersAllowed;
+
+                if (collectionRequest.Default)
+                {
+                    // set previous default collection to non-default
+                    Collection oldDefaultCollection = storage.Collections.Where(c => c.SuperCollection.Id == collection.SuperCollection.Id && c.Default && c.Id != collection.Id).FirstOrDefault();
+                    if (oldDefaultCollection != null) oldDefaultCollection.Default = false;
+                    // before changing this collection to be the new default
+                    collection.Default = true;
+                }
 
                 storage.SaveChanges();
                 return collection.Id;
@@ -1095,35 +1332,81 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
         /// </summary>
-        public void DeleteCollection(string superCollectionName, string collectionName)
+        public Boolean DeleteCollection(string superCollectionPath, string collectionPath)
         {
-            ApiOperation(delegate(User user, Storage storage)
+            return ApiOperation(delegate(User user, Storage storage)
             {
-                Trace.TraceInformation("Delete Collection {0} from user {1} in superCollection {2}", collectionName, user, superCollectionName);
+                // obtain collection (within current context)
+                Guid       collectionId = CollectionIdOrDefault(storage, superCollectionPath, collectionPath);
+                Collection collection   = storage.Collections.Where(c => c.Id == collectionId).FirstOrDefault();
 
-                Guid collectionId = CollectionIdFromSuperCollection(superCollectionName, collectionName);
-                Collection collection = RetrieveCollection(storage, collectionId);
-                if (collection == null)
+                // if collection can't be found then abort
+                if (collection == null) return false;
+
+                // if collection is default collection then abort
+                if (collection.Default) return false;
+
+                // if user is not authorized to edit collection then abort
+                if (!UserIsMember(collection.Id.ToString())) return false;
+
+                // delete any tours for this collection
+                List<Tour> tours = storage.Tours.Where(t => t.Collection.Id == collection.Id).ToList();
+                foreach (Tour tour in tours)
                 {
-                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
-                    return;
+                    DeleteBookmarks(storage, tour);
+                    storage.Tours.Remove(tour);
                 }
 
-                if (user == null || collection.User.NameIdentifier != user.NameIdentifier)
-                {
-                    SetStatusCode(HttpStatusCode.Unauthorized, ErrorDescription.UnauthorizedUser);
-                    return;
-                }
+                // delete any editors associated with this collection (uses EF.Extended for batch delete)
+                storage.Members.Where(m => m.Collection.Id == collection.Id).Delete();
 
+                // delete any existing root timeline for this collection (set up for cascading deletes)
+                Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollectionPath, collectionPath, null, null, null, null, null, "1");
+                if (timeline != null) storage.DeleteTimeline(timeline.Id);
+
+                // delete this collection
                 storage.Collections.Remove(collection);
-                storage.SaveChanges();
+
+                // commit changes
+                try
+                {
+                    storage.SaveChanges();
+                }
+                catch (DbEntityValidationException dbEx)
+                {
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                        }
+                    }
+                    return false;
+                }
+
+                // report success
+                return true;
             });
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public Guid PutTimeline(string superCollectionName, TimelineRaw timelineRequest)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Collection collection = storage.Collections.Where(c => c.SuperCollection.Title == superCollectionName && c.Default).FirstOrDefault();
+                if (collection == null) return Guid.Empty;
+
+                return PutTimeline(superCollectionName, collection.Path, timelineRequest);
+            });
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         public Guid PutTimeline(string superCollectionName, string collectionName, TimelineRaw timelineRequest)
         {
@@ -1225,7 +1508,19 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public void DeleteTimeline(string superCollectionName, Timeline timelineRequest)
+        {
+            ApiOperation(delegate(User user, Storage storage)
+            {
+                Collection collection = storage.Collections.Where(c => c.SuperCollection.Title == superCollectionName && c.Default).FirstOrDefault();
+                if (collection != null) DeleteTimeline(superCollectionName, collection.Path, timelineRequest);
+            });
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         public void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest)
         {
@@ -1275,7 +1570,27 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public PutExhibitResult PutExhibit(string superCollectionName, ExhibitRaw exhibitRequest)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Collection collection = storage.Collections.Where(c => c.SuperCollection.Title == superCollectionName && c.Default).FirstOrDefault();
+                if (collection == null)
+                {
+                    PutExhibitResult notFound = new PutExhibitResult();
+                    notFound.errorMessage = "Unable to find the collection in which this exhibit should be placed.";
+                    notFound.ErrCIAdd(0);
+                    return notFound;
+                }
+
+                return PutExhibit(superCollectionName, collection.Path, exhibitRequest);
+            });
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest)
@@ -1590,8 +1905,21 @@ namespace Chronozoom.UI
             return newContentItemGuid;
         }
 
+
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public void DeleteExhibit(string superCollectionName, Exhibit exhibitRequest)
+        {
+            ApiOperation(delegate(User user, Storage storage)
+            {
+                Collection collection = storage.Collections.Where(c => c.SuperCollection.Title == superCollectionName && c.Default).FirstOrDefault();
+                if (collection != null) DeleteExhibit(superCollectionName, collection.Path, exhibitRequest);
+            });
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         public void DeleteExhibit(string superCollectionName, string collectionName, Exhibit exhibitRequest)
         {
@@ -1628,7 +1956,21 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public Guid PutContentItem(string superCollectionName, ContentItemRaw contentItemRequest)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Collection collection = storage.Collections.Where(c => c.SuperCollection.Title == superCollectionName && c.Default).FirstOrDefault();
+                if (collection == null) return Guid.Empty;
+
+                return PutContentItem(superCollectionName, collection.Path, contentItemRequest);
+            });
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         public Guid PutContentItem(string superCollectionName, string collectionName, ContentItemRaw contentItemRequest)
         {
@@ -1762,9 +2104,22 @@ namespace Chronozoom.UI
             });
         }
 
-        /// <summary>
-        /// Documentation under IChronozoomSVC
-        /// </summary>
+        public TourResult PutTour(string superCollectionName, Tour tourRequest)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Collection collection = storage.Collections.Where(c => c.SuperCollection.Title == superCollectionName && c.Default).FirstOrDefault();
+                if (collection == null)
+                {
+                    TourResult notFound = new TourResult();
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return notFound;
+                }
+
+                return PutTour(superCollectionName, collection.Path, tourRequest);
+            });
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public TourResult PutTour(string superCollectionName, string collectionName, Tour tourRequest)
         {
@@ -1816,7 +2171,26 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public TourResult PutTour2(string superCollectionName, Tour tourRequest)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Collection collection = storage.Collections.Where(c => c.SuperCollection.Title == superCollectionName && c.Default).FirstOrDefault();
+                if (collection == null)
+                {
+                    TourResult notFound = new TourResult();
+                    SetStatusCode(HttpStatusCode.NotFound, ErrorDescription.CollectionNotFound);
+                    return notFound;
+                }
+
+                return PutTour2(superCollectionName, collection.Path, tourRequest);
+            });
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public TourResult PutTour2(string superCollectionName, string collectionName, Tour tourRequest)
@@ -1996,9 +2370,14 @@ namespace Chronozoom.UI
             return newBookmarkGuid;
         }
 
-        /// <summary>
-        /// Documentation under IChronozoomSVC
-        /// </summary>
+        /// <summary>Documented under IChronozoomSVC</summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        public void DeleteTour(string superCollectionName, Tour tourRequest)
+        {
+            DeleteTour(superCollectionName, "", tourRequest);
+        }
+                                                
+        /// <summary>Documented under IChronozoomSVC</summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         public void DeleteTour(string superCollectionName, string collectionName, Tour tourRequest)
         {
@@ -2178,18 +2557,11 @@ namespace Chronozoom.UI
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
-                // Skip the sandbox collection since it's currently a test-only collection
-                List<SuperCollection> superCollections = storage.SuperCollections.Where(candidate => candidate.Title != _sandboxSuperCollectionName).ToList();
-
-                foreach (SuperCollection superCollection in superCollections)
-                {
-                    if (string.CompareOrdinal(superCollection.Title, _sandboxSuperCollectionName) == 0)
-                        continue;
-
-                    storage.Entry(superCollection).Collection(x => x.Collections).Load();
-                }
-
-                return superCollections;
+                return storage.SuperCollections
+                    .Where(s => s.Title != _sandboxSuperCollectionName) // skip the sandbox collection since it's currently a test-only collection
+                    .Include("Collections")
+                    .OrderBy(s => s.Title)
+                    .ToList();
             });
         }
 
@@ -2198,23 +2570,28 @@ namespace Chronozoom.UI
         /// </summary>
         public IEnumerable<Collection> GetCollections(string superCollectionName)
         {
+            superCollectionName = Regex.Replace(superCollectionName.Trim(), @"[^A-Za-z0-9]+", "").ToLower();
+
             return ApiOperation(delegate(User user, Storage storage)
             {
-                Guid superCollectionId = CollectionIdFromText(superCollectionName);
-                SuperCollection superCollection = storage.SuperCollections.FirstOrDefault(candidate => candidate.Id == superCollectionId);
-
-                if (superCollection == null)
-                {
-                    return null;
-                }
-
-                storage.Entry(superCollection).Collection(x => x.Collections).Load();
-                return superCollection.Collections;
+                return storage.Collections
+                    .Where(c => c.SuperCollection.Title == superCollectionName)
+                    .OrderByDescending(c => c.Default)
+                    .ThenBy(c => c.Title)
+                    .ToList();
             });
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public Collection GetCollection(string superCollection)
+        {
+            return GetCollection(superCollection, "");
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         public Collection GetCollection(string superCollection, string collection)
         {
@@ -2223,6 +2600,51 @@ namespace Chronozoom.UI
                 Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
                 Collection rv = storage.Collections.Where(c => c.Id == collectionId).FirstOrDefault();
                 return rv;
+            });
+        }
+
+        /// <summary>Documented under IChronozoomSVC</summary>
+        public Boolean IsUniqueCollectionName(string proposedCollectionName)
+        {
+            return IsUniqueCollectionName("", "", proposedCollectionName);
+        }
+
+        /// <summary>Documented under IChronozoomSVC</summary>
+        public Boolean IsUniqueCollectionName(string superCollection, string proposedCollectionName)
+        {
+            return IsUniqueCollectionName(superCollection, "", proposedCollectionName);
+        }
+
+        /// <summary>Documented under IChronozoomSVC</summary>
+        public Boolean IsUniqueCollectionName(string superCollection, string existingCollectionPath, string proposedCollectionName)
+        {
+            string proposedCollectionPath;
+
+            if (string.IsNullOrEmpty(superCollection        ))  superCollection         = "";
+            if (string.IsNullOrEmpty(existingCollectionPath ))  existingCollectionPath  = "";
+            if (string.IsNullOrEmpty(proposedCollectionName ))  return false;
+
+            superCollection         = superCollection       .Trim().ToLower();
+            existingCollectionPath  = existingCollectionPath.Trim().ToLower();
+            proposedCollectionName  = proposedCollectionName.Trim();
+            proposedCollectionPath  = Regex.Replace(proposedCollectionName, @"[^A-Za-z0-9]+", "").ToLower(); // Aa-Zz and 0-9 only, converted to lower case.
+
+            if (proposedCollectionPath == "") return false;
+
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Guid existingCollectionId = CollectionIdOrDefault(storage, superCollection, existingCollectionPath);
+                if (existingCollectionId == Guid.Empty) return true;
+
+                int found = storage.Collections.Where
+                (c =>
+                    c.SuperCollection.Title == superCollection &&
+                    c.Id != existingCollectionId &&
+                    (c.Title == proposedCollectionName || c.Path == proposedCollectionPath)
+                )
+                .Count();
+
+                return (found == 0);
             });
         }
 
@@ -2281,6 +2703,28 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public bool UserCanEdit(string superCollection)
+        {
+            return UserCanEdit(superCollection, "");
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public bool UserCanEdit(string superCollection, string collection)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                if (user == null) return false;
+
+                Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
+                return UserIsMember(collectionId.ToString());
+            });
+        }
+
+        /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
         public bool UserIsMember(string collectionId)
@@ -2301,34 +2745,36 @@ namespace Chronozoom.UI
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
         /// </summary>
-        public bool UserCanEdit(string superCollection, string collection)
+        public IEnumerable<User> GetMembers(string superCollection)
         {
-            return ApiOperation(delegate(User user, Storage storage)
-            {
-                if (user == null) return false;
-
-                Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
-                return UserIsMember(collectionId.ToString());
-            });
+            return GetMembers(superCollection, "");
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documented under IChronozoomSVC
         /// </summary>
-        public IEnumerable<Member> GetMembers(string superCollection, string collection)
+        public IEnumerable<User> GetMembers(string superCollection, string collection)
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
                 Guid collectionId    = CollectionIdOrDefault(storage, superCollection, collection);
-                List<Member> members = storage.Members.Where(m => m.Collection.Id == collectionId).Include(m => m.User).OrderBy(m => m.User.DisplayName).ToList();
+                List<User> members = storage.Members.Where(m => m.Collection.Id == collectionId).Include(m => m.User).OrderBy(m => m.User.DisplayName).Select(m => m.User).ToList();
                 return members;
             });
         }
 
         /// <summary>
-        /// Documentation under IChronozoomSVC
+        /// Documente under IChronozoomSVC
+        /// </summary>
+        public bool PutMembers(string superCollection, IEnumerable<Guid> userIds)
+        {
+            return PutMembers(superCollection, "", userIds);
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
         /// </summary>
         public bool PutMembers(string superCollection, string collection, IEnumerable<Guid> userIds)
         {
@@ -2545,8 +2991,7 @@ namespace Chronozoom.UI
             }
             else
             {
-              //return collection.User.NameIdentifier == user.NameIdentifier;   // <-- old code - only author can edit collection
-                return Instance.UserIsMember(collection.Id.ToString());         // <-- new code - author or editor can edit collection
+                return Instance.UserIsMember(collection.Id.ToString());
             }
         }
 
@@ -2554,14 +2999,17 @@ namespace Chronozoom.UI
         {
             Collection collection = storage.Collections.Find(collectionId);
             if (collection != null)
+            {
+                storage.Entry(collection).Reference("SuperCollection").Load();
                 storage.Entry(collection).Reference("User").Load();
+            }
             return collection;
         }
 
         private static SuperCollection RetrieveSuperCollection(Storage storage, Guid superCollectionId)
         {
             SuperCollection superCollection = storage.SuperCollections.Find(superCollectionId);
-            storage.Entry(superCollection).Reference("User").Load();
+            if (superCollection != null) storage.Entry(superCollection).Reference("User").Load();
             return superCollection;
         }
 

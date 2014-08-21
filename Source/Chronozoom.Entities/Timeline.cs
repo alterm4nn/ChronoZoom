@@ -26,6 +26,7 @@ namespace Chronozoom.Entities
         /// </summary>
         public Timeline()
         {
+            this.Id = Guid.NewGuid();   // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
             this.FromIsCirca = false;
             this.ToIsCirca   = false;
         }

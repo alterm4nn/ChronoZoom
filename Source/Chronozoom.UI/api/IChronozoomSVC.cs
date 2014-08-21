@@ -43,6 +43,16 @@ namespace Chronozoom.UI
         [WebInvoke(Method = "PUT", UriTemplate = "/import/timeline/{intoTimelineId}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         String ImportTimelines(string intoTimelineId, List<Utils.ExportImport.FlatTimeline> newTimelineTree);
 
+        /// <summary>Not directly used by JavaScript client so not exposed as an OperationContract method.</summary>
+        /// <param name="storage"></param>
+        /// <param name="superCollectionName">The title of the desired supercollection. Leaving blank returns the default supercollection's default collection id.</param>
+        /// <param name="collectionPath">
+        /// The path of the desired collection belonging the the aforementioned supercollection.
+        /// If the supercollection title is provided, but the collection title is left blank, then the id of the default collection belonging to the desired supercollection is returned.
+        /// </param>
+        /// <returns>The GUID id of the desired collection if it exists in the db, or an empty GUID if it can't be found.</returns>
+        Guid CollectionIdOrDefault(Storage storage, string superCollectionName, string collectionPath);
+
         /// <summary>
         /// Returns timeline data within a specified range of years from a collection or a superCollection.
         /// </summary>
@@ -80,7 +90,9 @@ namespace Chronozoom.UI
         /// Should an excessive number of results be found, the results are limited to the first 25 per type. (75 max.)
         /// </summary>
         /// <example>
-        /// GET: {domain}/api/search?superCollection={superCollection}&collection={collection}&searchTerm={searchTerm}&searchScope={searchScope}
+        /// <![CDATA[ 
+        ///     GET: {domain}/api/search?superCollection={superCollection}&collection={collection}&searchTerm={searchTerm}&searchScope={searchScope}
+        /// ]]>
         /// </example>
         /// <param name="superCollection">The currently loaded supercollection.</param>
         /// <param name="collection">The currently loaded collection.</param>
@@ -116,7 +128,24 @@ namespace Chronozoom.UI
         BaseJsonResult<IEnumerable<Tour>> GetDefaultTours();
 
         /// <summary>
-        /// Returns a list of tours for a given collection or superCollection.
+        /// Returns a list of tours for a specified supercollection's default collection.
+        /// </summary>
+        /// <param name="superCollection">Name of the superCollection to query.</param>
+        /// <returns>A list of tours in JSON format.</returns>
+        /// <example><![CDATA[  
+        /// HTTP verb: GET
+        /// URL: 
+        /// http://{URL}/api/{supercollection}/{collection}/tours
+        /// ]]></example>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
+        [OperationContract(Name = "GetToursDefaultCollection")]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/tours")]
+        BaseJsonResult<IEnumerable<Tour>> GetTours(string superCollection);
+
+        /// <summary>
+        /// Returns a list of tours for a specified collection.
         /// </summary>
         /// <param name="superCollection">Name of the superCollection to query.</param>
         /// <param name="collection">Name of the collection to query.</param>
@@ -129,7 +158,7 @@ namespace Chronozoom.UI
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
-        [OperationContract]
+        [OperationContract(Name = "GetToursSpecificCollection")]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/tours")]
         BaseJsonResult<IEnumerable<Tour>> GetTours(string superCollection, string collection);
 
@@ -207,43 +236,41 @@ namespace Chronozoom.UI
         [WebInvoke(Method = "GET", UriTemplate = "/user?name={name}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         User GetUser(string name);
 
-
         /// <summary>
-        /// Creates a new collection using the specified name.
+        /// Creates a new collection with the provided data for an existing supercollection.
         /// </summary>
         /// <remarks>
-        /// If a collection of the specified name does not exist then a new collection is created. 
-        /// The title field can't be modified because it is part of the URL (the URL can be indexed).
+        /// User (owner) should not to be provided. The supercollection's owner will be used, which must be the currently logged in user.
+        /// The collection's SuperCollection field in the request body also need not be provided since this will be derived from the URL.
+        /// The collection's Path            field in the request body also need not be provided since this will be derived from the URL.
+        /// Various request body fields that have default values need not be provided unless one wishes to override them.
         /// </remarks>
-        /// <param name="superCollectionName">The name of the parent supercollection.</param>
-        /// <param name="collectionName">The name of the collection to create.</param>
-        /// <param name="collectionRequest">[Collection](#collection) data in JSON format.</param>
-        /// <returns></returns>
+        /// <param name="superCollectionPath">The title of the parent supercollection.</param>
+        /// <param name="newCollectionPath">The path for the new collection, which must be unique.</param>
+        /// <param name="newCollectionData">All of the other necessary collection object data needed to create the new collection.</param>
+        /// <returns>True/False based on if the collection was successfully created or not.</returns>
         /// <example><![CDATA[  
         /// HTTP verb: POST
         /// URL:
-        /// http://{URL}/api/{supercollection}/{collection}
+        /// http://{URL}/api/{superCollectionPath}/{newCollectionPath}
         ///
         /// Request body:
         /// {
-        ///      id: "{id}",
-        ///      title: "{title}"
+        ///      Title: "{title}"
         /// }
         /// ]]></example>
         [OperationContract]
-        [WebInvoke(Method = "POST", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        Guid PostCollection(string superCollectionName, string collectionName, Collection collectionRequest);
+        [WebInvoke(Method = "POST", UriTemplate = "/{superCollectionPath}/{newCollectionPath}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Boolean PostCollection(string superCollectionPath, string newCollectionPath, Collection newCollectionData);
 
         /// <summary>
         /// Modifies an existing collection.
         /// </summary>
         /// <remarks>
-        /// If the collection exists and the authenticated user is the author then the collection is modified. 
+        /// If the collection exists and the user is authorized then the collection is modified. 
         /// If no author is registered then the authenticated user is set as the author. 
-        /// The title field can't be modified because it is part of the URL (the URL can be indexed).
         /// </remarks>
-        /// <param name="superCollectionName">The name of the parent supercollection.</param>
-        /// <param name="collectionName">The name of the collection to create.</param>
+        /// <param name="superCollectionName">The name of the parent supercollection whose default collection will be modified.</param>
         /// <param name="collectionRequest">[Collection](#collection) data in JSON format.</param>
         /// <returns></returns>
         /// <example><![CDATA[  
@@ -257,24 +284,79 @@ namespace Chronozoom.UI
         ///      title: "{title}"
         /// }
         /// ]]></example>
-        [OperationContract]
+        [OperationContract(Name = "PutCollection_DefaultCollection")]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Guid PutCollection(string superCollectionName, Collection collectionRequest);
+
+        /// <summary>
+        /// Modifies an existing collection.
+        /// </summary>
+        /// <remarks>
+        /// If the collection exists and the user is authorized then the collection is modified. 
+        /// If no author is registered then the authenticated user is set as the author. 
+        /// </remarks>
+        /// <param name="superCollectionName">The name of the parent supercollection.</param>
+        /// <param name="collectionName">The current path name of the collection.</param>
+        /// <param name="collectionRequest">[Collection](#collection) data in JSON format.</param>
+        /// <returns></returns>
+        /// <example><![CDATA[  
+        /// HTTP verb: PUT
+        /// URL:
+        /// http://{URL}/api/{supercollection}/{collection}
+        ///
+        /// Request body:
+        /// {
+        ///      id: "{id}",
+        ///      title: "{title}"
+        /// }
+        /// ]]></example>
+        [OperationContract(Name = "PutCollection_NamedCollection")]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         Guid PutCollection(string superCollectionName, string collectionName, Collection collectionRequest);
 
+
         /// <summary>
-        /// Deletes the specified collection.
+        /// Deletes the specified collection only if
+        /// 1) that collection is not the default collection within its supercollection, and
+        /// 2) the user has rights to edit the collection (is owner or has editor membership.)
+        /// Deletion includes deletion of related collateral entities such as tours and favorites.
         /// </summary>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
-        /// <param name="collectionName">The name of the collection to delete.</param>
-        /// <returns>HTTP response code.</returns>
-        /// <example><![CDATA[  
-        /// HTTP verb: DELETE
-        /// URL:
-        /// http://{URL}/api/{supercollection}/{collection}
-        /// ]]></example>
+        /// <param name="superCollectionPath">The collection's supercollection path (part of the URL.)</param>
+        /// <param name="collectionPath">The collection's path (part of the URL.)</param>
+        /// <returns>True if successfully deleted or collection specified does not exist, and false for all other circumstances.</returns>
         [OperationContract]
-        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
-        void DeleteCollection(string superCollectionName, string collectionName);
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionPath}/{collectionPath}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Boolean DeleteCollection(string superCollectionPath, string collectionPath);
+
+        /// <summary>
+        /// Creates or updates the timeline in a given supercollection's default collection. 
+        /// </summary>
+        /// <remarks>
+        /// If an ID is specified but the collection does not exist, the request will fail ("not found" status).
+        /// If an ID is not specified, a new timeline will be added to the collection. 
+        /// For a new timeline, if the parent is not defined the root timeline will be set as the parent.
+        /// If the timeline with the specified identifier exists, then the existing timeline is updated.
+        /// </remarks>
+        /// <param name="superCollectionName">The supercollection.</param>
+        /// <param name="timelineRequest">[Timeline](#timeline) data in JSON format.</param>
+        /// <returns>HTTP status code.</returns>
+        /// <example><![CDATA[  
+        /// HTTP verb: PUT
+        /// URL:
+        /// http://{URL}/api/{supercollection}/timeline
+        ///
+        /// Request body:
+        /// {
+        ///      ParentTimelineId: "ff5214e1-1bf4-4af5-8835-96cff2ce2cfd",
+        ///      Regime: null - optional,
+        ///      end: -377.945205,
+        ///      start: -597.542466,
+        ///      title: "Timeline Title"
+        /// }
+        /// ]]></example>
+        [OperationContract(Name = "PutTimeline_DefaultCollection")]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Guid PutTimeline(string superCollectionName, TimelineRaw timelineRequest);
 
         /// <summary>
         /// Creates or updates the timeline in a given collection. 
@@ -285,7 +367,7 @@ namespace Chronozoom.UI
         /// For a new timeline, if the parent is not defined the root timeline will be set as the parent.
         /// If the timeline with the specified identifier exists, then the existing timeline is updated.
         /// </remarks>
-        /// <param name="superCollectionName">The parent collection.</param>
+        /// <param name="superCollectionName">The supcollection.</param>
         /// <param name="collectionName">The name of the collection to update.</param>
         /// <param name="timelineRequest">[Timeline](#timeline) data in JSON format.</param>
         /// <returns>HTTP status code.</returns>
@@ -303,14 +385,33 @@ namespace Chronozoom.UI
         ///      title: "Timeline Title"
         /// }
         /// ]]></example>
-        [OperationContract]
+        [OperationContract(Name = "PutTimeline_NamedCollection")]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         Guid PutTimeline(string superCollectionName, string collectionName, TimelineRaw timelineRequest);
 
         /// <summary>
         /// Deletes the timeline with the specified ID.
         /// </summary>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
+        /// <param name="superCollectionName">The name of the supercollection whose default collection will be used.</param>
+        /// <param name="timelineRequest">The request in JSON format.</param>
+        /// <example><![CDATA[  
+        /// HTTP verb: DELETE
+        /// URL:
+        /// http://{URL}/api/{supercollection}/timeline
+        ///
+        /// Request body:
+        /// {
+        ///      id: "0123456789"
+        /// }
+        /// ]]></example>
+        [OperationContract(Name = "DeleteTimeline_DefaultCollection")]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void DeleteTimeline(string superCollectionName, Timeline timelineRequest);
+
+        /// <summary>
+        /// Deletes the timeline with the specified ID.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the supercollection to which the collection belongs.</param>
         /// <param name="collectionName">The name of the collection from which the timeline should be deleted.</param>
         /// <param name="timelineRequest">The request in JSON format.</param>
         /// <example><![CDATA[  
@@ -323,12 +424,14 @@ namespace Chronozoom.UI
         ///      id: "0123456789"
         /// }
         /// ]]></example>
-        [OperationContract]
+        [OperationContract(Name = "DeleteTimeline_NamedCollection")]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/timeline", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void DeleteTimeline(string superCollectionName, string collectionName, Timeline timelineRequest);
-        
+
         /// <summary>
-        /// Creates or updates the exhibit and its content items in a given collection. If the collection does not exist, then the command will fail. Prior to running this command, you will need to create the associated content items.
+        /// Creates or updates the exhibit and its content items in a given collection.
+        /// If the collection does not exist, then the command will fail.
+        /// Prior to running this command, you will need to create the associated content items.
         /// </summary>
         /// <remarks>
         /// If an exhibit id is not specified, a new exhibit is added to the collection. 
@@ -338,7 +441,42 @@ namespace Chronozoom.UI
         /// Otherwise, the exhibit is added to the specified parent timeline. 
         /// If an invalid parent timeline is specified then the request will fail. 
         /// </remarks>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
+        /// <param name="superCollectionName">The name of the supercollection, whose default collection will be used.</param>
+        /// <param name="exhibitRequest">[Exhibit](#exhibit) data in JSON format.</param>
+        /// <returns>[Exhibit](#exhibit) data in JSON format.</returns>
+        /// <example><![CDATA[  
+        /// HTTP verb: PUT
+        /// URL:
+        /// http://{URL}/api/{supercollection}/exhibit
+        ///
+        /// Request body:
+        /// {
+        ///     ParentTimelineId: "123456"
+        ///     id: "0123456789",
+        ///     title: "Mars Exploration",
+        ///     contentItems: "{contentItems}" 
+        ///     time: 565
+        /// }
+        /// ]]></example>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [OperationContract(Name = "PutExhibit_DefaultCollection")]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        PutExhibitResult PutExhibit(string superCollectionName, ExhibitRaw exhibitRequest);
+        
+        /// <summary>
+        /// Creates or updates the exhibit and its content items in a given collection.
+        /// If the collection does not exist, then the command will fail.
+        /// Prior to running this command, you will need to create the associated content items.
+        /// </summary>
+        /// <remarks>
+        /// If an exhibit id is not specified, a new exhibit is added to the collection. 
+        /// If the ID for an existing exhibit is specified then the exhibit will be updated. 
+        /// If the exhibit ID to be updated does not exist a "not found" status is returned. 
+        /// If the parent timeline is not specified the exhibit is added to the root timeline. 
+        /// Otherwise, the exhibit is added to the specified parent timeline. 
+        /// If an invalid parent timeline is specified then the request will fail. 
+        /// </remarks>
+        /// <param name="superCollectionName">The name of the supercollection to which the collection belongs.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="exhibitRequest">[Exhibit](#exhibit) data in JSON format.</param>
         /// <returns>[Exhibit](#exhibit) data in JSON format.</returns>
@@ -357,14 +495,33 @@ namespace Chronozoom.UI
         /// }
         /// ]]></example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
-        [OperationContract]
+        [OperationContract(Name = "PutExhibit_NamedCollection")]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         PutExhibitResult PutExhibit(string superCollectionName, string collectionName, ExhibitRaw exhibitRequest);
 
         /// <summary>
         /// Deletes the specified exhibit from the specified collection.
         /// </summary>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
+        /// <param name="superCollectionName">The name of the supercollection whose default collection will be modified.</param>
+        /// <param name="exhibitRequest">The exhibit request data in JSON format.</param>
+        /// <example><![CDATA[  
+        /// HTTP verb: DELETE
+        /// URL:
+        /// http://{URL}/api/{supercollection}/{collection}/exhibit
+        ///
+        /// Request body:
+        /// {
+        ///      id: "0123456789"
+        /// }
+        /// ]]></example>
+        [OperationContract(Name = "DeleteExhibit_DefaultCollection")]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void DeleteExhibit(string superCollectionName, Exhibit exhibitRequest);
+
+        /// <summary>
+        /// Deletes the specified exhibit from the specified collection.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the supercollection to which the collection belongs.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="exhibitRequest">The exhibit request data in JSON format.</param>
         /// <example><![CDATA[  
@@ -377,14 +534,36 @@ namespace Chronozoom.UI
         ///      id: "0123456789"
         /// }
         /// ]]></example>
-        [OperationContract]
+        [OperationContract(Name = "DeleteExhibit_NamedCollection")]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/exhibit", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void DeleteExhibit(string superCollectionName, string collectionName, Exhibit exhibitRequest);
 
         /// <summary>
         /// Creates or updates the content item in a given collection. If the collection does not exist the request will fail.
         /// </summary>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
+        /// <param name="superCollectionName">The name of the supercollection whose default collection will be used.</param>
+        /// <param name="contentItemRequest">[ContentItem](#contentitem) data in JSON format.</param>
+        /// <returns></returns>
+        /// <example><![CDATA[  
+        /// HTTP verb: PUT
+        /// URL:
+        /// http://{URL}/api/{supercollection}/contentitem
+        ///              
+        /// Request body:
+        /// {
+        ///     id: "0123456789",
+        ///     title: "The Outer Planets",
+        ///     uri: "http://www.example.com/images/planets.png"
+        /// }
+        /// ]]></example>
+        [OperationContract(Name = "PutContentItem_DefaultCollection")]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        Guid PutContentItem(string superCollectionName, ContentItemRaw contentItemRequest);
+
+        /// <summary>
+        /// Creates or updates the content item in a given collection. If the collection does not exist the request will fail.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the supercollection to which the collection belongs.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="contentItemRequest">[ContentItem](#contentitem) data in JSON format.</param>
         /// <returns></returns>
@@ -400,7 +579,7 @@ namespace Chronozoom.UI
         ///     uri: "http://www.example.com/images/planets.png"
         /// }
         /// ]]></example>
-        [OperationContract]
+        [OperationContract(Name = "PutContentItem_NamedCollection")]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/contentitem", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         Guid PutContentItem(string superCollectionName, string collectionName, ContentItemRaw contentItemRequest);
 
@@ -428,7 +607,11 @@ namespace Chronozoom.UI
         [WebInvoke(Method = "POST", UriTemplate = "/{superCollectionName}/{collectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         TourResult PostTour(string superCollectionName, string collectionName, Tour tourRequest);
 
-        [OperationContract]
+        [OperationContract(Name = "PutTour_DefaultCollection")]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        TourResult PutTour(string superCollectionName, Tour tourRequest);
+
+        [OperationContract(Name = "PutTour_NamedCollection")]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         TourResult PutTour(string superCollectionName, string collectionName, Tour tourRequest);
 
@@ -446,7 +629,38 @@ namespace Chronozoom.UI
         /// The sequence ids of the bookmarks are automatically generated based on the order they are received.
         /// If an invalid tour Id, bookmark Id or bookmark sequence Id is specified then the request will fail. 
         /// </remarks>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
+        /// <param name="superCollectionName">The name of the supercollection whose default collection will be used.</param>
+        /// <param name="tourRequest">The tour data in JSON format.</param>
+        /// <returns>A list of guids of the tour guid followed by bookmark guids in JSON format.</returns>
+        /// <example><![CDATA[  
+        /// HTTP verb: PUT
+        /// URL:
+        /// http://{URL}/api/{supercollection}/{collection}/tour2
+        ///
+        /// Request body:
+        /// {
+        ///          
+        /// }
+        /// ]]></example>
+        [OperationContract(Name = "PutTour2_DefaultCollection")]
+        [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/tour2", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        TourResult PutTour2(string superCollectionName, Tour tourRequest);
+
+        /// <summary>
+        /// Creates or updates a tour with bookmark support.
+        /// </summary>
+        /// <remarks>
+        /// All bookmarks in a tour must belong to the same collection and the user must have permission
+        /// to modify that collection. Supported operations include:
+        /// To Create a new tour, do not specify a tour id or bookmark ids for the new entities to be created.
+        /// To modify an existing tour, specify the tour id and any of the tour fields (id, description, audio) that need to be modified.
+        /// If a tour id is specified and it does not exist, a "not found" status is returned.
+        /// If a tour id is specified and it exists, any specified fields are updated. 
+        /// Delete all existing bookmarks and add bookmarks defined in the bookmarks JSON object to the tour.
+        /// The sequence ids of the bookmarks are automatically generated based on the order they are received.
+        /// If an invalid tour Id, bookmark Id or bookmark sequence Id is specified then the request will fail. 
+        /// </remarks>
+        /// <param name="superCollectionName">The name of the supercollection to which the collection belongs.</param>
         /// <param name="collectionName">The name of the collection to modify.</param>
         /// <param name="tourRequest">The tour data in JSON format.</param>
         /// <returns>A list of guids of the tour guid followed by bookmark guids in JSON format.</returns>
@@ -460,27 +674,46 @@ namespace Chronozoom.UI
         ///          
         /// }
         /// ]]></example>
-        [OperationContract]
+        [OperationContract(Name = "PutTour2_NamedCollection")]
         [WebInvoke(Method = "PUT", UriTemplate = "/{superCollectionName}/{collectionName}/tour2", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         TourResult PutTour2(string superCollectionName, string collectionName, Tour tourRequest);
 
         /// <summary>
         /// Deletes the specified tour.
         /// </summary>
-        /// <param name="superCollectionName">The name of the parent collection.</param>
-        /// <param name="collectionName">The name of the collection to modify.</param>
-        /// <param name="tourRequest">The tour ID in JSON format.</param>
+        /// <param name="superCollectionName">The name of the supercollection. Its default collection will be the one that is modified</param>
+        /// <param name="tourRequest">The tour ID as an integer (in JSON format.)</param>
         /// <example><![CDATA[  
         /// HTTP verb: DELETE
         /// URL:
-        /// http://{URL}/api/{supercollection}/{collection}/tour2
+        /// http://{URL}/api/{supercollection}/tour
         ///
         /// Request body:
         /// {
         ///     id: "5c07b2bf-65e1-45e1-a9cd-792a7767d685"
         /// }
         /// ]]></example>
-        [OperationContract]
+        [OperationContract(Name = "DeleteTour_DefaultCollection")]
+        [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        void DeleteTour(string superCollectionName, Tour tourRequest);
+
+        /// <summary>
+        /// Deletes the specified tour.
+        /// </summary>
+        /// <param name="superCollectionName">The name of the supercollection.</param>
+        /// <param name="collectionName">The path name of the collection to modify.</param>
+        /// <param name="tourRequest">The tour ID as an integer (in JSON format.)</param>
+        /// <example><![CDATA[  
+        /// HTTP verb: DELETE
+        /// URL:
+        /// http://{URL}/api/{supercollection}/{collection}/tour
+        ///
+        /// Request body:
+        /// {
+        ///     id: "5c07b2bf-65e1-45e1-a9cd-792a7767d685"
+        /// }
+        /// ]]></example>
+        [OperationContract(Name = "DeleteTour_NamedCollection")]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{superCollectionName}/{collectionName}/tour", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         void DeleteTour(string superCollectionName, string collectionName, Tour tourRequest);
 
@@ -539,7 +772,7 @@ namespace Chronozoom.UI
         string GetContentPath(string superCollection, string collection, string reference);
         
         /// <summary>
-        /// Retrieve the list of all supercollections.
+        /// Retrieve the list of all supercollections apart from the sandbox.
         /// </summary>
         /// <example><![CDATA[  
         /// HTTP verb: GET
@@ -567,12 +800,45 @@ namespace Chronozoom.UI
         /// <summary>
         /// Returns core data for a single collection, including owner and theme. Members and timelines are not included.
         /// </summary>
+        /// <param name="superCollection">Name of the super collection. The super collection's default collection will be used.</param>
+        /// <returns></returns>
+        [OperationContract(Name = "GetCollection_DefaultCollection")]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/data")]
+        Collection GetCollection(string superCollection);
+
+        /// <summary>
+        /// Returns core data for a single collection, including owner and theme. Members and timelines are not included.
+        /// </summary>
         /// <param name="superCollection">Name of the super collection.</param>
         /// <param name="collection">Name of the collection.</param>
         /// <returns></returns>
-        [OperationContract]
+        [OperationContract(Name = "GetCollection_NamedCollection")]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/data")]
         Collection GetCollection(string superCollection, string collection);
+
+        /// <summary>
+        /// Checks if a proposed collection name and path are unique within the specified supercollection.
+        /// The existing collection name (which is specified here) is not included in the uniqueness check.
+        /// </summary>
+        /// <param name="superCollection">Part of the URL. Can be left blank, which indicates to use the default supercollection.</param>
+        /// <param name="existingCollectionPath">Part of the URL. Can be left blank, which indicates to exclude the default collection from the comparison.</param>
+        /// <param name="proposedCollectionName">The proposed displayable name, a human friendly title including spaces and other non-URL friendly characters.</param>
+        /// <returns>
+        /// Returns true or false depending on if the proposed collection name and the resultant proposed collection path
+        /// (which is derived from collection name) are both unique within the specified supercollection.
+        /// Also returns false (as an override) if resultant collection path will be empty.
+        /// </returns>
+        [OperationContract(Name = "IsUniqueCollectionName_NamedCollection")]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{existingCollectionPath}/isuniquecollectionname?new={proposedCollectionName}")]
+        Boolean IsUniqueCollectionName(string superCollection, string existingCollectionPath, string proposedCollectionName);
+
+        [OperationContract(Name = "IsUniqueCollectionName_DefaultCollection")]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/isuniquecollectionname?new={proposedCollectionName}")]
+        Boolean IsUniqueCollectionName(string superCollection, string proposedCollectionName);
+
+        [OperationContract(Name = "IsUniqueCollectionName_DefaultEverything")]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/isuniquecollectionname?new={proposedCollectionName}")]
+        Boolean IsUniqueCollectionName(string proposedCollectionName);
 
         /// <summary>
         /// Returns a list of users whose display names match the partial display name provided as a parameter.
@@ -603,6 +869,17 @@ namespace Chronozoom.UI
         bool UserIsMember(string collectionId);
 
         /// <summary>
+        /// Returns true/false depending on if the currently logged in user has a membership to the specified supercollection's default collection, or is the collection owner.
+        /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
+        /// An overload to the more efficient UserIsMember(string collectionId) for when the collectionId GUID is not already known.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection.</param>
+        /// <returns></returns>
+        [OperationContract(Name = "UserCanEdit_DefaultCollection")]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/canedit")]
+        bool UserCanEdit(string superCollection);
+
+        /// <summary>
         /// Returns true/false depending on if the currently logged in user has a membership to the specified collection or is the collection owner.
         /// i.e. Does the user have editing rights to the collection, even if not the owner. Anon user will always return false.
         /// An overload to the more efficient UserIsMember(string collectionId) for when the collectionId GUID is not already known.
@@ -610,9 +887,19 @@ namespace Chronozoom.UI
         /// <param name="superCollection">Name of the super collection.</param>
         /// <param name="collection">Name of the collection.</param>
         /// <returns></returns>
-        [OperationContract]
+        [OperationContract(Name = "UserCanEdit_NamedCollection")]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/canedit")]
         bool UserCanEdit(string superCollection, string collection);
+
+        /// <summary>
+        /// Returns a list of members and their user records who have editing rights to the specified collection.
+        /// Does not necesssarily include owner in list.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection whose default collection will be examined.</param>
+        /// <returns></returns>
+        [OperationContract(Name = "GetMembers_DefaultCollection")]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/members")]
+        IEnumerable<User> GetMembers(string superCollection);
 
         /// <summary>
         /// Returns a list of members and their user records who have editing rights to the specified collection.
@@ -621,9 +908,20 @@ namespace Chronozoom.UI
         /// <param name="superCollection">Name of the super collection.</param>
         /// <param name="collection">Name of the collection.</param>
         /// <returns></returns>
-        [OperationContract]
+        [OperationContract(Name = "GetMembers_NamedCollection")]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/members")]
-        IEnumerable<Member> GetMembers(string superCollection, string collection);
+        IEnumerable<User> GetMembers(string superCollection, string collection);
+
+        /// <summary>
+        /// Sets the entire list of users who have editing rights to the specified collection.
+        /// Note that this list is not an append list but the entire list, which replaces any existing list.
+        /// </summary>
+        /// <param name="superCollection">Name of the super collection whose default collection will be used.</param>
+        /// <param name="userIds">A list of all of the user ids which are to be given editing rights.</param>
+        /// <returns>Success or failure Boolean. Will fail if submitting user is not the owner or not in the pre-existing editors' list.</returns>
+        [OperationContract(Name = "PutMembers_DefaultCollection")]
+        [WebInvoke(Method = "PUT", ResponseFormat = WebMessageFormat.Json, RequestFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/members")]
+        bool PutMembers(string superCollection, IEnumerable<Guid> userIds);
 
         /// <summary>
         /// Sets the entire list of users who have editing rights to the specified collection.
@@ -633,7 +931,7 @@ namespace Chronozoom.UI
         /// <param name="collection">Name of the collection.</param>
         /// <param name="userIds">A list of all of the user ids which are to be given editing rights.</param>
         /// <returns>Success or failure Boolean. Will fail if submitting user is not the owner or not in the pre-existing editors' list.</returns>
-        [OperationContract]
+        [OperationContract(Name = "PutMembers_NamedCollection")]
         [WebInvoke(Method = "PUT", ResponseFormat = WebMessageFormat.Json, RequestFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/members")]
         bool PutMembers(string superCollection, string collection, IEnumerable<Guid> userIds);
 
@@ -722,6 +1020,17 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/editabletimelines?includeMine={includeMine}")]
         Collection<TimelineShortcut> GetEditableTimelines(bool includeMine = false);
+
+        /// <summary>
+        /// Returns collections that the current user can edit, usually excluding those owned by the current user.
+        /// i.e. Can provide a list of other people's collections that the current user has edit rights on.
+        /// Has option to also include those owned by current user in addition to edit rights on others.
+        /// </summary>
+        /// <param name="includeMine">Boolean. Defaults to false. Whether or not to include current user's collections.</param>
+        /// <returns>A list of timeline shortcuts. Each shortcut includes the author, image URL, collection URL and title.</returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/editablecollections?includeMine={includeMine}")]
+        List<TimelineShortcut> GetEditableCollections(bool includeMine = false);
 
         #endregion
 

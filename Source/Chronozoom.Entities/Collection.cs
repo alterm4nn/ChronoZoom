@@ -69,6 +69,7 @@ namespace Chronozoom.Entities
         /// The theme (i.e. space, blue, etc) associated to this collection.
         /// </summary>
         [DataMember(Name="theme")]
+        //[DataMember]
         public string Theme { get; set; }
 
         /// <summary>SuperCollection for this collection</summary>
@@ -96,5 +97,19 @@ namespace Chronozoom.Entities
         [DataMember]
         [Column(TypeName = "bit")]
         public bool PubliclySearchable { get; set; }
+    }
+
+    /// <summary>
+    /// The Collection.Theme text field is actually a compressed JSON object comprising of the following.
+    /// </summary>
+    public class Theme
+    {
+        public string backgroundUrl         { get; set; }
+        public string backgroundColor       { get; set; }
+        public string timelineColor         { get; set; }
+        public string timelineStrokeStyle   { get; set; }
+        public string infoDotfillColor      { get; set; }
+        public string infoDotBorderColor    { get; set; }
+        public Boolean kioskMode            { get; set; }
     }
 }

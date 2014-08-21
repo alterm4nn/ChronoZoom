@@ -34,6 +34,27 @@ body
     -ms-touch-action: none;
 }
 
+.small
+{
+    color: #666;
+    font-size: 0.7em;
+}
+
+fieldset
+{
+    border: 2px #c7c7c7 solid;
+    legend
+    {
+        color: #666;
+    }
+}
+
+.field-block
+{
+    display: block;
+    width: 100%;
+}
+
 a
 {
     color: #fff;
@@ -434,13 +455,26 @@ div.preview
     font-family: Arial;
 }
 
-    .contentItemDescription .text
+.contentItemDescription .text
+{
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: inherit;
+}
+
+.tri-button-block
+{
+    button
     {
-        position: relative;
-        overflow-x: hidden;
-        overflow-y: auto;
-        height: inherit;
+        min-width:   110px;
+        margin-right: 10px;
     }
+}
+.tri-button-block button:last-child
+{
+    margin-right: 0px;
+}
 
 /***********************************************************
 
@@ -654,7 +688,6 @@ div.preview
     background-color: #abc;
     white-space: nowrap;
 }
-
 
 
 
@@ -1184,6 +1217,12 @@ img.fallbackBackground
 .center
 {
     text-align: center !important;
+}
+
+.centerblock
+{
+    display: inline-block;
+    margin: 0px auto;
 }
 
 .justify

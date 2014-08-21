@@ -14,6 +14,7 @@ using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using System.Text.RegularExpressions;
 
 namespace Chronozoom.UI
 {
@@ -144,65 +145,72 @@ namespace Chronozoom.UI
         private static bool PageIsDynamic(Uri pageUrl, out PageInformation pageInformation)
         {
             pageInformation = new PageInformation();
-            if (pageUrl.Segments.Length <= 1 ||
-                pageUrl.ToString().EndsWith("default.ashx", StringComparison.OrdinalIgnoreCase))
-                return false;
 
-            string superCollection = string.Empty;
-            if (pageUrl.Segments.Length >= 2)
-                superCollection = pageUrl.Segments[1].Split('/')[0];
-
-            string collection = superCollection;
-            if (pageUrl.Segments.Length >= 3)
-                collection = pageUrl.Segments[2].Split('/')[0];
-
-            if (IsSuperCollectionPresent(superCollection))
+            // if the home page was specified
+            if
+            (
+                pageUrl.Segments.Length == 1 ||
+                pageUrl.ToString().EndsWith("default.ashx", StringComparison.OrdinalIgnoreCase)
+            )
             {
+                // then exit reporting page is not dynamic
+                return false;
+            }
 
-                Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollection, collection, null, null, null, null, null, "1");
-                if (timeline != null)
+            // home page was not specified so ascertain the superCollection title and collection Path from the URL
+            string superCollectionSegment =
+                Regex.Replace(pageUrl.Segments[1].Trim(), @"[^A-Za-z0-9]+", "").ToLower();
+
+            string collectionSegment = pageUrl.Segments.Length < 3 ? "" :
+                Regex.Replace(pageUrl.Segments[2].Trim(), @"[^A-Za-z0-9]+", "").ToLower();
+
+            // try to look up collection id
+            Guid collectionId = ChronozoomSVC.Instance.CollectionIdOrDefault(_storage, superCollectionSegment, collectionSegment);
+
+            // if collection id could not be found
+            if (collectionId == Guid.Empty)
+            {
+                // if collection segment was specified (and also the supercollection segment)
+                if (collectionSegment != "")
                 {
+                    // redirect to the default collection for the specified supercollection
+                    HttpContext.Current.Response.Redirect("/" + superCollectionSegment + "#");
+                    return false;
+                }
 
-                    pageInformation.Title = timeline.Title;
+                // otherwise redirect to the default supercollection's default collection
+                HttpContext.Current.Response.Redirect("/#");
+                return false;
+            }
 
-                    foreach (Exhibit exhibit in timeline.Exhibits)
+            // collection id was found so try to get root timeline and its accoutriments
+            Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollectionSegment, collectionSegment, null, null, null, null, null, "1");
+            if (timeline == null)
+            {
+                // a timeline for this collection could not be found so exit reporting page is not dynamic
+                return false;
+            }
+
+            // timeline was found so populate page contents and report page is dynamic
+            pageInformation.Title = timeline.Title;
+
+            foreach (Exhibit exhibit in timeline.Exhibits)
+            {
+                foreach (ContentItem contentItem in exhibit.ContentItems)
+                {
+                    if (contentItem.Uri.ToString().EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
                     {
-                        foreach (ContentItem contentItem in exhibit.ContentItems)
-                        {
-                            if (contentItem.Uri.ToString().EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
-                            {
-                                pageInformation.Images.Add(contentItem.Uri);
-                            }
-                        }
+                        pageInformation.Images.Add(contentItem.Uri);
                     }
-
-                    return true;
                 }
             }
 
-            return false;
-
+            return true;
         }
 
         /// <summary>
-        /// Validates if a supercollection is present.
+        /// Not referenced by CZ but still required for DefaultHttpHandler.
         /// </summary>
-        /// <param name="superCollection"></param>
-        /// <returns>Boolean value</returns>
-        public static bool IsSuperCollectionPresent(string superCollection)
-        {
-            string _superCollection = FriendlyUrl.FriendlyUrlDecode( superCollection);
-            if (_storage.SuperCollections.Any(candidate => candidate.Title.ToLower() == _superCollection ))
-            {
-                return true;
-            }
-            else
-            {
-                HttpContext.Current.Response.Redirect("/");
-                return false;
-            }
-        }
-
         public bool IsReusable
         {
             get

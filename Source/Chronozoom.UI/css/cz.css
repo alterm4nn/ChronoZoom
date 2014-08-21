@@ -119,7 +119,7 @@ input.error {
 ***********************************************************/
 .cz-medialist {
   padding: 5px;
-  border: solid 2px #c7c7c7;
+  border: solid 1px #d5d5d5;
   background-color: #e9e9e9;
 }
 .cz-medialist-item {
@@ -663,6 +663,29 @@ iframe[sutra=picker] + div {
   background-image: url(/images/arrow-left-hover.png);
   cursor: pointer;
 }
+.add-icon {
+  float: right;
+  width: 36px;
+  height: 36px;
+  background-image: url(/images/add.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 19px 0;
+  margin-right: 15px;
+  cursor: pointer;
+}
+.add-icon:hover {
+  background-image: url(/images/add-hover.png);
+  cursor: pointer;
+}
+.add-icon.active {
+  background-image: url(/images/add.png);
+  cursor: pointer;
+}
+.add-icon.active:hover {
+  background-image: url(/images/add-hover.png);
+  cursor: pointer;
+}
 .FavoriteTimelinesBlock {
   color: #fff;
 }
@@ -824,6 +847,7 @@ iframe[sutra=picker] + div {
   .tweet-meta-title {
     display: none;
   }
+  .add-icon,
   .list-view-icon {
     display: none;
   }
@@ -870,6 +894,7 @@ iframe[sutra=picker] + div {
   .tweet-avatar-icon {
     display: none;
   }
+  .add-icon,
   .list-view-icon {
     display: block;
   }
@@ -977,6 +1002,7 @@ iframe[sutra=picker] + div {
   .FTTiles {
     overflow: hidden;
   }
+  .add-icon,
   .list-view-icon {
     display: block;
   }
@@ -1131,6 +1157,20 @@ body {
   background-color: #232323;
   font-family: 'Segoe UI', Helvetica, Arial, 'Trebuchet MS', San Serif;
   -ms-touch-action: none;
+}
+.small {
+  color: #666;
+  font-size: 0.7em;
+}
+fieldset {
+  border: 2px #c7c7c7 solid;
+}
+fieldset legend {
+  color: #666;
+}
+.field-block {
+  display: block;
+  width: 100%;
 }
 a {
   color: #fff;
@@ -1432,6 +1472,13 @@ div.preview {
   overflow-x: hidden;
   overflow-y: auto;
   height: inherit;
+}
+.tri-button-block button {
+  min-width: 110px;
+  margin-right: 10px;
+}
+.tri-button-block button:last-child {
+  margin-right: 0px;
 }
 /***********************************************************
 
@@ -2088,6 +2135,10 @@ img.fallbackBackground {
 }
 .center {
   text-align: center !important;
+}
+.centerblock {
+  display: inline-block;
+  margin: 0px auto;
 }
 .justify {
   text-align: justify;

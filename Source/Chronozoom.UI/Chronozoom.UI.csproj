@@ -63,6 +63,9 @@
     <Content Include="css\media.css">
       <DependentUpon>media.less</DependentUpon>
     </Content>
+    <Content Include="css\media.min.css">
+      <DependentUpon>media.less</DependentUpon>
+    </Content>
     <Content Include="css\start-page.css">
       <DependentUpon>start-page.less</DependentUpon>
     </Content>
@@ -94,6 +97,8 @@
     <Content Include="css\cz.css.map">
       <DependentUpon>cz.less</DependentUpon>
     </Content>
+    <Content Include="images\add-hover.png" />
+    <Content Include="images\add.png" />
     <Content Include="images\copy.svg" />
     <Content Include="images\paste.svg" />
     <Content Include="scripts\authoring-ui.min.js">
@@ -453,6 +458,10 @@
     <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.Extended, Version=5.0.0.0, Culture=neutral, PublicKeyToken=05b7e29bdd433584, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.Extended.5.0.0.73\lib\net45\EntityFramework.Extended.dll</HintPath>
     </Reference>
     <Reference Include="Hammock.ClientProfile">
       <HintPath>..\..\External\TweetSharp\Hammock.ClientProfile.dll</HintPath>
@@ -982,7 +991,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>False</AutoAssignPort>
-          <DevelopmentServerPort>4949</DevelopmentServerPort>
+          <DevelopmentServerPort>80</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://chronozoom.localhost/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

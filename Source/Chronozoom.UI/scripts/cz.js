@@ -169,13 +169,15 @@ var CZ;
             
             return true;
             */
-            // can't edit if no profile, no display name, no supercollection or no collection
-            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName || !CZ.Service.collectionName) {
+            // can't edit if no profile, no display name or no supercollection
+            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName)
+            {
                 return false;
             }
 
             // override - anyone can edit the sandbox
-            if (CZ.Service.superCollectionName.toLowerCase() === "sandbox" && CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
+            if (CZ.Service.superCollectionName.toLowerCase() === "sandbox")
+            {
                 return true;
             }
 
@@ -290,14 +292,18 @@ var CZ;
                 window.location.href = '/';
             });
 
-            // if URL has a supercollection and collection then
+            // if URL has a supercollection
             // check if current user has edit permissions before continuing with load
             // since other parts of load need to know if can display edit buttons etc.
-            if (CZ.Service.superCollectionName === undefined || CZ.Service.collectionName === undefined) {
+            if (CZ.Service.superCollectionName === undefined)
+            {
                 CZ.Service.canEdit = false;
                 finishLoad();
-            } else {
-                CZ.Service.getCanEdit().done(function (result) {
+            }
+            else
+            {
+                CZ.Service.getCanEdit().done(function (result)
+                {
                     CZ.Service.canEdit = (result === true);
                     finishLoad();
                 });
@@ -389,8 +395,12 @@ var CZ;
                         activationSource: $(".header-icon.edit-icon"),
                         navButton: ".cz-form-nav",
                         closeButton: ".cz-form-close-btn > .cz-form-btn",
+                        deleteButton: '.cz-form-delete',
                         titleTextblock: ".cz-form-title",
                         saveButton: ".cz-form-save",
+                        errorMessage: '.cz-form-errormsg',
+                        collectionName: '#cz-collection-name',
+                        collectionPath: '#cz-collection-path',
                         collectionTheme: CZ.Settings.theme,
                         backgroundInput: $(".cz-form-collection-background"),
                         kioskmodeInput: $(".cz-form-collection-kioskmode"),
@@ -401,6 +411,7 @@ var CZ;
                         exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
                         exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
                         exhibitBorderColorInput: $(".cz-form-exhibit-border"),
+                        chkDefault: '#cz-form-collection-default',
                         chkPublic:  '#cz-form-public-search',
                         chkEditors: '#cz-form-multiuser-enable',
                         btnEditors: '#cz-form-multiuser-manage'
@@ -713,11 +724,21 @@ var CZ;
 
             CZ.Settings.applyTheme(null, CZ.Service.superCollectionName != null);
 
-            // If not the root URL.
-            if (CZ.Service.superCollectionName) {
-                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+            // If not the default supercollection's default collection then look up the appropriate collection's theme
+            if (CZ.Service.superCollectionName)
+            {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response)
+                {
                     $(response).each(function (index) {
-                        if (response[index] && response[index].Title.toLowerCase() === CZ.Service.collectionName.toLowerCase()) {
+                        if 
+                        (
+                            response[index] &&
+                            (
+                                (response[index].Default && ((typeof CZ.Service.collectionName) === 'undefined')) ||
+                                (response[index].Path === CZ.Service.collectionName)
+                            )
+                        )
+                        {
                             var themeData = null;
                             try  {
                                 themeData = JSON.parse(response[index].theme);
