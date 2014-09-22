@@ -94,11 +94,11 @@ var CZ;
                 if (CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
                     $("<option></option>", {
                         value: "skydrive-image",
-                        text: " Skydrive Image "
+                        text: " OneDrive Image "
                     }).appendTo(this.mediaTypeInput);
                     $("<option></option>", {
                         value: "skydrive-document",
-                        text: " Skydrive Document "
+                        text: " OneDrive Document "
                     }).appendTo(this.mediaTypeInput);
                 }
 

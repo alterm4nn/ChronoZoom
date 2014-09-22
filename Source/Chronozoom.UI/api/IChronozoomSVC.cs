@@ -89,11 +89,11 @@ namespace Chronozoom.UI
         /// Note that at least two searchTerm characters are required in order to get a result.
         /// Should an excessive number of results be found, the results are limited to the first 25 per type. (75 max.)
         /// </summary>
-        /// <example>
-        /// <![CDATA[ 
-        ///     GET: {domain}/api/search?superCollection={superCollection}&collection={collection}&searchTerm={searchTerm}&searchScope={searchScope}
-        /// ]]>
-        /// </example>
+        /// <example><![CDATA[  
+        /// HTTP verb: GET
+        /// URL: 
+        /// http://{domain}/api/search?superCollection={superCollection}&collection={collection}&searchTerm={searchTerm}&searchScope={searchScope}
+        /// ]]></example>
         /// <param name="superCollection">The currently loaded supercollection.</param>
         /// <param name="collection">The currently loaded collection.</param>
         /// <param name="searchTerm">The words or part of a word or words to look for.</param>
