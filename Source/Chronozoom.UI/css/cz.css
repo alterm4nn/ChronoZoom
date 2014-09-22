@@ -711,7 +711,7 @@ iframe[sutra=picker] + div {
   text-align: center;
 }
 .box {
-  visibility: visible important!;
+  visibility: visible !important;
 }
 .tweet-message-link {
   text-decoration: none;
@@ -2193,7 +2193,7 @@ img.fallbackBackground {
 ***********************************************************/
 .cz-form {
   position: absolute;
-  z-index: 100000001;
+  z-index: 2000;
   display: none;
   cursor: default;
 }

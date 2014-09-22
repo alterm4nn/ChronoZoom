@@ -24,6 +24,7 @@ var CZ;
                 this.saveButton             = container.find(formInfo.saveButton);
                 this.deleteButton           = container.find(formInfo.deleteButton);
                 this.errorMessage           = container.find(formInfo.errorMessage);
+                this.colorPickers           = container.find('.cz-color-picker');
                 this.collectionName         = container.find(formInfo.collectionName);
                 this.collectionPath         = container.find(formInfo.collectionPath);
                 this.originalPath           = this.collectionPath;
@@ -171,7 +172,7 @@ var CZ;
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
-                this.kioskmodeInput.prop('checked', false); // temp default to false for now until fix in place that loads theme from db (full fix implemented in MultiUser branch)
+                this.kioskmodeInput.prop('checked', false);
 
                 if (!this.collectionTheme.timelineColor) this.collectionTheme.timelineColor = CZ.Settings.timelineColorOverride;
                 this.timelineBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineColor));
@@ -181,6 +182,13 @@ var CZ;
                 this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
+
+                this.colorPickers.spectrum(); // see http://bgrins.github.io/spectrum
+                $.each(this.colorPickers, function (index, value)
+                {
+                    var $this = $(this);
+                    $this.next().find('.sp-preview').attr('title', $this.attr('title'));
+                });
 
                 CZ.Service.getCollection().done(function (data)
                 {
@@ -295,25 +303,35 @@ var CZ;
                 }
             };
 
-            FormEditCollection.prototype.updateCollectionTheme = function (clearError) {
-                this.collectionTheme = {
-                    backgroundUrl: this.backgroundInput.val(),
-                    backgroundColor: "#232323",
-                    timelineColor: this.rgbaFromColor(this.timelineBackgroundColorInput.val(), this.timelineBackgroundOpacityInput.val()),
-                    timelineStrokeStyle: this.timelineBorderColorInput.val(),
-                    infoDotFillColor: this.rgbaFromColor(this.exhibitBackgroundColorInput.val(), this.exhibitBackgroundOpacityInput.val()),
-                    infoDotBorderColor: this.exhibitBorderColorInput.val(),
-                    kioskMode: this.kioskmodeInput.prop("checked")
+            FormEditCollection.prototype.updateCollectionTheme = function (clearError)
+            {
+                this.collectionTheme =
+                {
+                    backgroundUrl:          this.backgroundInput.val(),
+                    backgroundColor:        "#232323",
+                    kioskMode:              this.kioskmodeInput.prop("checked"),
+                    /*
+                    // native color picker:
+                    timelineColor:          this.rgbaFromColor(this.timelineBackgroundColorInput.val(), this.timelineBackgroundOpacityInput.val()),
+                    timelineStrokeStyle:    this.timelineBorderColorInput.val(),
+                    infoDotFillColor:       this.rgbaFromColor(this.exhibitBackgroundColorInput.val(),  this.exhibitBackgroundOpacityInput.val()),
+                    infoDotBorderColor:     this.exhibitBorderColorInput.val()
+                    */
+                    // spectrum color picker:
+                    timelineColor:          this.rgbaFromColor(this.timelineBackgroundColorInput.spectrum('get').toHexString(), this.timelineBackgroundOpacityInput.val()),
+                    timelineStrokeStyle:    this.timelineBorderColorInput.spectrum('get').toHexString(),
+                    infoDotFillColor:       this.rgbaFromColor(this.exhibitBackgroundColorInput.spectrum( 'get').toHexString(), this.exhibitBackgroundOpacityInput.val()),
+                    infoDotBorderColor:     this.exhibitBorderColorInput.spectrum( 'get').toHexString()
                 };
 
-                // If the input holds an rgba color, update the textbox with new alpha value
-                if (this.colorIsRgb(this.timelineBackgroundColorInput.val())) {
+                // if input has rgba color then update textbox with new alpha
+                if (this.colorIsRgb(this.timelineBackgroundColorInput.val()))
+                {
                     this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
                     this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
                 }
 
-                if (clearError)
-                    this.backgroundInput.hideError();
+                if (clearError) this.backgroundInput.hideError();
 
                 this.updateCollectionThemeFromTheme(this.collectionTheme);
             };
