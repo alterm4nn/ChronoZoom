@@ -24,7 +24,8 @@ var CZ;
                 this.saveButton             = container.find(formInfo.saveButton);
                 this.deleteButton           = container.find(formInfo.deleteButton);
                 this.errorMessage           = container.find(formInfo.errorMessage);
-                this.colorPickers           = container.find('.cz-color-picker');
+                this.colorPickers           = container.find('input[type="color"]');
+                this.rangePickers           = container.find('.cz-form-range');
                 this.collectionName         = container.find(formInfo.collectionName);
                 this.collectionPath         = container.find(formInfo.collectionPath);
                 this.originalPath           = this.collectionPath;
@@ -170,6 +171,19 @@ var CZ;
                 var _this = this;
                 this.saveButton.prop('disabled', false);
 
+                // see http://refreshless.com/nouislider
+                this.rangePickers.noUiSlider
+                ({
+                    connect:    'lower',
+                    start:      0.5,
+                    step:       0.05,
+                    range:
+                    {
+                        'min':  0,
+                        'max':  1
+                    }
+                });
+
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
                 this.kioskmodeInput.prop('checked', false);
@@ -183,7 +197,8 @@ var CZ;
                 this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
                 this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
 
-                this.colorPickers.spectrum(); // see http://bgrins.github.io/spectrum
+                // see http://bgrins.github.io/spectrum
+                this.colorPickers.spectrum();
                 $.each(this.colorPickers, function (index, value)
                 {
                     var $this = $(this);

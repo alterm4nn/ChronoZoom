@@ -53,6 +53,7 @@
     <script type="text/javascript" src="/scripts/external/jquery.autonumeric-1.9.24.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
     <script type="text/javascript" src="/scripts/external/spectrum/spectrum.min.js"></script>
+    <script type="text/javascript" src="/scripts/external/nouislider/jquery.nouislider.min.js"></script>
     <script type="text/javascript">
 
         function AddCSS(path)
@@ -88,6 +89,7 @@
 
         AddCSS('/css/cz.css');
         AddCSS('/scripts/external/spectrum/spectrum.css');
+        AddCSS('/scripts/external/nouislider/jquery.nouislider.css');
 
         if (!Modernizr.canvas)
         {
@@ -117,7 +119,6 @@
             AddScript("/scripts/uiloader.js");
             AddScript("/scripts/dates.js");
             AddScript("/scripts/media.js");
-            AddScript('/scripts/external/spectrum/spectrum.js');
             AddScript("/scripts/plugins/error-plugin.js");
             AddScript("/scripts/plugins/utility-plugins.js");
             AddScript("/scripts/extensions/extensions.js");
