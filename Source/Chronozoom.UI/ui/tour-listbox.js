@@ -68,7 +68,9 @@ var CZ;
 
                 var self = this;
                 var thumbUrl = this.data.thumbnailUrl;
-                this.iconImg.attr("src", this.data.icon || "/images/Temp-Thumbnail2.png");
+                this.iconImg
+                    .attr("src", this.data.icon || "/images/Temp-Thumbnail2.png")
+                    .css('cursor', 'pointer');
                 var img = new Image();
                 img.onload = function () {
                     self.iconImg.replaceWith(img);
@@ -85,7 +87,8 @@ var CZ;
                 else
                     this.descrTextblock.hide();
 
-                this.container.find("#takeTour").click(function (e) {
+                this.container.find("#takeTour, img").click(function (e)
+                {
                     parent.TakeTour(context);
                 });
 
