@@ -389,7 +389,7 @@ var CZ;
                     }
                 });
 
-                $("#editCollectionButton").click(function () {
+                $("#editCollectionButton img").click(function () {
                     closeAllForms();
                     var form = new CZ.UI.FormEditCollection(forms[19], {
                         activationSource: $(".header-icon.edit-icon"),
@@ -612,7 +612,7 @@ var CZ;
                     }
 
                     if (CZ.Authoring.isEnabled && IsFeatureEnabled(_featureMap, "CollectionsAuthoring")) {
-                        $("#editCollectionButton").show();
+                        $('#editCollectionButton .hidden').removeClass('hidden');
                     }
 
                     //retrieving the data
@@ -628,6 +628,22 @@ var CZ;
                             } else {
                                 CZ.Authoring.showMessageWindow("Looks like this collection is empty. Come back later when author will fill it with content.", "Collection is empty :(");
                             }
+                        }
+                    });
+
+                    // get the collection title
+                    CZ.Service.getCollection().done(function (collection)
+                    {
+                        if (collection != null) CZ.Common.collectionTitle = collection.Title || '';
+                        $('#editCollectionButton .title').text(CZ.Common.collectionTitle);
+                        if (collection.Title != '')
+                        {
+                            $('#breadcrumbs-table tr').prepend
+                            (
+                                '<td><div class="breadcrumb-link nocursor">' +
+                                    CZ.Common.collectionTitle + ':&nbsp; '   +
+                                '</div></td>'
+                            );
                         }
                     });
                 });

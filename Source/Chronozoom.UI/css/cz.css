@@ -2992,16 +2992,26 @@ a {
 .root-cloak-bottom.visible {
   display: block;
 }
+.nocursor {
+  cursor: default;
+}
 #editCollectionButton {
   position: absolute;
-  width: 50px;
-  height: 50px;
+  margin: -40px 0px 0px 20px;
   z-index: 100;
-  margin-top: -50px;
+}
+#editCollectionButton .image {
+  margin-right: 10px;
 }
 #editCollectionButton > img {
-  width: 50px;
   height: 50px;
+  width: 50px;
+}
+#editCollectionButton .title {
+  color: #e9e9e9;
+  font-size: 16px;
+  font-weight: bold;
+  vertical-align: top;
 }
 #embedItemDiv {
   pointer-events: none;
