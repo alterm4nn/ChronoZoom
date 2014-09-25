@@ -253,12 +253,13 @@ namespace Chronozoom.Entities.Properties {
         ///ALTER TABLE [Collections] ADD [PubliclySearchable] BIT NOT NULL DEFAULT (0);
         ///GO
         ///
+        ///
         ///-- Default is that all existing collections are not publicly searchable, and
         ///-- new collections when created will be publicly searchable, (publicly searchable set to true in code at creation.)
-        ///-- However, we need a special exception to make Cosmos&apos; collection publicly searchable, if it already exists:
-        ///UPDATE  [Collections]
-        ///SET     PubliclySearchable = 1
-        ///WHERE   Id I [rest of string was truncated]&quot;;.
+        ///-- However, we need a special exception to make the Cosmos&apos; collection publicly searchable, if it already exists:
+        ///
+        ///DECLARE @CollectionId AS UNIQUEIDENTIFIER =
+        ///    (SELECT TO [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _201408040000000_PubliclySearchable {
             get {
@@ -267,16 +268,47 @@ namespace Chronozoom.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to -- tighten-up schema so required fields are not null and lengths are not crazy since they&apos;re used in URLs --
-        ///-- chronozoom.com production database was examined on 2014-08-13 to ensure that it fits these adjustments --
+        ///   Looks up a localized string similar to -- Tighten-up schema so required fields are not null and field lengths are not crazy since they are used in URLs.
+        ///-- A recent copy of the chronozoom.com production database was examined to ensure that it fits these adjustments.
         ///
-        ///ALTER TABLE [Users]             ALTER COLUMN [DisplayName]          NVARCHAR(50)        NOT NULL;
-        ///ALTER TABLE [SuperCollections]  ALTER COLUMN [Title]                NVARCHAR(50)        NOT NULL;
-        ///ALTER TABLE [SuperCollections]  ALTER COLUMN [User_Id]              UNIQUEIDENTIFIER    NOT  [rest of string was truncated]&quot;;.
+        ///BEGIN TRY
+        ///    DROP INDEX [IX_User_Id]             ON [dbo].[SuperCollections];
+        ///    DROP INDEX [IX_User_Id]             ON [dbo].[Collections];
+        ///    DROP INDEX [IX_SuperCollection_Id]  ON [dbo].[Collections];
+        ///END TRY
+        ///BEGIN CATCH
+        ///END CATCH
+        ///GO
+        ///
+        ///ALTER TABLE [Users]            [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _201408130000000_MultipleCollections {
             get {
                 return ResourceManager.GetString("_201408130000000_MultipleCollections", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -- Change all existing PubliclySearchable entries to false
+        ///-- then change Cosmos and AIDS Timeline to true, and also
+        ///-- change all collections with featured timelines to true.
+        ///
+        ///UPDATE [Collections] SET PubliclySearchable = 0;
+        ///
+        ///UPDATE [Collections] SET PubliclySearchable = 1 WHERE Id IN
+        ///(
+        ///    SELECT      c.Id
+        ///    FROM        Collections AS c
+        ///    LEFT JOIN   Users       AS u ON u.Id = c.User_Id
+        ///    WHERE
+        ///        u.DisplayName = &apos;ChronoZoom&apos;
+        ///    AND
+        ///    (
+        ///        c.Path = &apos;cosmos&apos; OR c.Path = &apos;a [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _201409250000000_PubliclySearchableChange {
+            get {
+                return ResourceManager.GetString("_201409250000000_PubliclySearchableChange", resourceCulture);
             }
         }
         
@@ -286,10 +318,10 @@ namespace Chronozoom.Entities.Properties {
         ///CREATE TABLE [dbo].[Users]
         ///(
         ///	[Id]                [uniqueidentifier]      NOT NULL,
-        ///	[DisplayName]       [nvarchar](4000)        NULL,
-        ///	[Email]             [nvarchar](4000)        NULL,
-        ///	[NameIdentifier]    [nvarchar](4000)        NULL,
-        ///	[IdentityProvider]  [nvarchar](4000)        NULL,
+        ///	[DisplayName]       [nvarchar](50)          NOT NULL,
+        ///	[Email]             [varchar](100)          NULL,
+        ///	[IdentityProvider]  [varchar](25)           NULL,
+        ///	[NameIdentifier]    [varchar](150)          NULL,
         ///    CONSTRAINT [PK_dbo.Users] PRIMARY KEY CLUSTERED
         ///    (
         ///        [Id] ASC
@@ -302,7 +334,7 @@ namespace Chronozoom.Entities.Properties {
         ///
         ///CREATE TABLE [dbo].[Bitmasks]
         ///(
-        ///	[Id]                [int] IDENTITY(1,1)     NOT NULL, [rest of string was truncated]&quot;;.
+        ///	[Id]                [int] IDENTITY(1,1)     NOT N [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CreateEntireSchema {
             get {

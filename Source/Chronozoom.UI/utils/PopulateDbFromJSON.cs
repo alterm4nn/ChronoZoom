@@ -101,6 +101,7 @@ namespace Chronozoom.UI.Utils
             {
                 Id                      = Guid.NewGuid(),
                 Default                 = curatorsDefaultCollection,
+                PubliclySearchable      = true,
                 Title                   = collectionTitle,
                 Path                    = collectionPath,
                 SuperCollection         = superCollection,
