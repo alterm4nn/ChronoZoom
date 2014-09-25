@@ -183,6 +183,9 @@ namespace Chronozoom.UI
                 return false;
             }
 
+            // set page title to collection title (must be server-side and not through JS for SEO purposes)
+            pageInformation.Title = (ChronozoomSVC.Instance.GetCollection(superCollectionSegment)).Title;
+
             // collection id was found so try to get root timeline and its accoutriments
             Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollectionSegment, collectionSegment, null, null, null, null, null, "1");
             if (timeline == null)
@@ -191,9 +194,7 @@ namespace Chronozoom.UI
                 return false;
             }
 
-            // timeline was found so populate page contents and report page is dynamic
-            pageInformation.Title = timeline.Title;
-
+            // timeline was found so populate rest of page contents and report page is dynamic
             foreach (Exhibit exhibit in timeline.Exhibits)
             {
                 foreach (ContentItem contentItem in exhibit.ContentItems)

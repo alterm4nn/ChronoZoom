@@ -631,20 +631,11 @@ var CZ;
                         }
                     });
 
-                    // get the collection title
+                    // get and display the collection title
                     CZ.Service.getCollection().done(function (collection)
                     {
                         if (collection != null) CZ.Common.collectionTitle = collection.Title || '';
                         $('#editCollectionButton .title').text(CZ.Common.collectionTitle);
-                        if (collection.Title != '')
-                        {
-                            $('#breadcrumbs-table tr').prepend
-                            (
-                                '<td><div class="breadcrumb-link nocursor">' +
-                                    CZ.Common.collectionTitle + ':&nbsp; '   +
-                                '</div></td>'
-                            );
-                        }
                     });
                 });
 
