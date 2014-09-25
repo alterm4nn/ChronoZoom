@@ -184,7 +184,7 @@ namespace Chronozoom.UI
             }
 
             // set page title to collection title (must be server-side and not through JS for SEO purposes)
-            pageInformation.Title = (ChronozoomSVC.Instance.GetCollection(superCollectionSegment)).Title;
+            pageInformation.Title = (ChronozoomSVC.Instance.GetCollection(superCollectionSegment, collectionSegment)).Title;
 
             // collection id was found so try to get root timeline and its accoutriments
             Timeline timeline = ChronozoomSVC.Instance.GetTimelines(superCollectionSegment, collectionSegment, null, null, null, null, null, "1");

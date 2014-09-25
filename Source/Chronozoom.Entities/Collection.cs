@@ -21,7 +21,7 @@ namespace Chronozoom.Entities
             this.Id                 = Guid.NewGuid();   // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
             this.Default            = false;
             this.MembersAllowed     = false;
-            this.PubliclySearchable = true;
+            this.PubliclySearchable = false;
         }
 
         /// <summary>

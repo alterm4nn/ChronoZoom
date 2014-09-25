@@ -308,7 +308,7 @@ var CZ;
                         return;
                     }
 
-                    CZ.Service.postCollection(newPath, { Title: newName, PubliclySearchable: true }).done(function (success)
+                    CZ.Service.postCollection(newPath, { Title: newName }).done(function (success)
                     {
                         if (success)
                         {
