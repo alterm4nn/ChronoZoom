@@ -81,6 +81,7 @@
     <Content Include="css\_vars.css">
       <DependentUpon>_vars.less</DependentUpon>
     </Content>
+    <Content Include="cz.merged.js" />
     <Content Include="dumps\extensions\GaribaldiTourJSON.js" />
     <Content Include="dumps\extensions\narrative.js" />
     <Content Include="dumps\extensions\rin-sample.js" />
@@ -469,6 +470,7 @@
     <Content Include="scripts\external\nouislider\jquery.nouislider.min.js.map">
       <DependentUpon>jquery.nouislider.js</DependentUpon>
     </Content>
+    <Content Include="Merge.cmd" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -1045,6 +1047,10 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>call "$(ProjectDir)Merge.cmd"
+</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
