@@ -250,6 +250,7 @@
     <Content Include="scripts\virtual-canvas.min.js.map">
       <DependentUpon>virtual-canvas.js</DependentUpon>
     </Content>
+    <Content Include="scripts\voice.js" />
     <Content Include="ui\auth-edit-collection-editors.min.js">
       <DependentUpon>auth-edit-collection-editors.js</DependentUpon>
     </Content>

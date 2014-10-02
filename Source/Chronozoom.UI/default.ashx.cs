@@ -24,6 +24,7 @@ namespace Chronozoom.UI
         public string AirbrakeProjectKey        { get; private set; }
         public string AirbrakeEnvironmentName   { get; private set; }
         public string OneDriveClientID          { get; private set; }
+        public bool   SpeechInputEnabled        { get; private set; }
         public string CSSFileVersion            { get; private set; }
         public string JSFileVersion             { get; private set; }
         public string SchemaVersion             { get; private set; }
@@ -45,6 +46,8 @@ namespace Chronozoom.UI
             AirbrakeProjectKey      = ConfigurationManager.AppSettings["AirbrakeProjectKey"];
             AirbrakeEnvironmentName = ConfigurationManager.AppSettings["AirbrakeEnvironmentName"];  if (AirbrakeEnvironmentName == "") AirbrakeEnvironmentName = "development";
             OneDriveClientID        = ConfigurationManager.AppSettings["OneDriveClientID"];
+
+            SpeechInputEnabled      = (("" + ConfigurationManager.AppSettings["SpeechInputEnabled"]).Trim().ToLower() == "true");
 
             CSSFileVersion = GetFileVersion("/css/cz.min.css");
             JSFileVersion  = GetFileVersion();
@@ -271,6 +274,7 @@ namespace Chronozoom.UI
                 "airbrakeProjectKey: \""        + pageInformation.AirbrakeProjectKey        + "\", " +
                 "airbrakeEnvironmentName: \""   + pageInformation.AirbrakeEnvironmentName   + "\", " +
                 "onedriveClientId: \""          + pageInformation.OneDriveClientID          + "\", " +
+                "speechInputEnabled: "          + pageInformation.SpeechInputEnabled.ToString().ToLower() + ", " +
                 "cssFileVersion: \""            + pageInformation.CSSFileVersion            + "\", " +
                 "jsFileVersion: \""             + pageInformation.JSFileVersion             + "\", " +
                 "schemaVersion: \""             + pageInformation.SchemaVersion             + "\", " +
