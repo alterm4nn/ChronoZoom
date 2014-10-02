@@ -274,6 +274,65 @@ var CZ;
         }
         StartPage.PlayIntroTour = PlayIntroTour;
 
+        function addCollection()
+        {
+            CZ.Authoring.hideMessageWindow();
+
+            var newName = prompt("What name would you like for your new collection?\nNote: The name must be unique among your collections.", '') || '';
+            newName     = $.trim(newName);
+            
+            var newPath = newName.replace(/[^a-zA-Z0-9]/g, '');
+            if (newPath === '') return;
+
+            if (newPath.length > 50)
+            {
+                CZ.Authoring.showMessageWindow
+                (
+                    "The name of your new collection must be no more than 50 characters in length.",
+                    "Unable to Create Collection"
+                );
+                return;
+            }
+
+            CZ.Service.getCollection().done(function (currentCollection)
+            {
+                CZ.Service.isUniqueCollectionName(newName).done(function (isUniqueCollectionName)
+                {
+                    if (!isUniqueCollectionName || newPath === currentCollection.Path)
+                    {
+                        CZ.Authoring.showMessageWindow
+                        (
+                            "Sorry your new collection name is not unique enough. Please try a different name.",
+                            "Unable to Create Collection"
+                        );
+                        return;
+                    }
+
+                    CZ.Service.postCollection(newPath, { Title: newName }).done(function (success)
+                    {
+                        if (success)
+                        {
+                            window.location =
+                            (
+                                window.location.protocol + '//' + window.location.host + '/' + CZ.Service.superCollectionName + '/' + newPath
+                            )
+                            .toLowerCase();
+                        }
+                        else
+                        {
+                            CZ.Authoring.showMessageWindow
+                            (
+                                "An unexpected error occured.",
+                                "Unable to Create Collection"
+                            );
+                        }
+                    });
+
+                });
+            });
+        }
+        StartPage.addCollection = addCollection;
+
         function listFlip(name) {
             if ('block' != document.getElementById(name + '-list').style.display) {
                 document.getElementById(name + '-list').style.display = 'block';
@@ -760,6 +819,7 @@ var CZ;
                     console.log("[ERROR] getUserTimelines");
                 });
                 */
+                /*
                 CZ.Service.getEditableTimelines(true).then(function (response)
                 {
                     var timelines = response ? response : [];
@@ -768,6 +828,17 @@ var CZ;
                 }, function (error)
                 {
                     console.log("[ERROR] getEditableTimelines");
+                });
+                */
+                CZ.Service.getEditableCollections(true).then(function (response)
+                {
+                    var myCollections = response ? response : [];
+                    fillMyTimelines(    myCollections);
+                    fillMyTimelinesList(myCollections);
+                },
+                function (error)
+                {
+                    console.log("[ERROR] getEditableCollections");
                 });
             });
 

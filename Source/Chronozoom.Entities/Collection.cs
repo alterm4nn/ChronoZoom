@@ -18,9 +18,10 @@ namespace Chronozoom.Entities
         /// </summary>
         public Collection()
         {
-            this.Id = Guid.NewGuid();       // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
-            this.MembersAllowed = false;
-            this.PubliclySearchable = true;
+            this.Id                 = Guid.NewGuid();   // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
+            this.Default            = false;
+            this.MembersAllowed     = false;
+            this.PubliclySearchable = false;
         }
 
         /// <summary>
@@ -31,26 +32,49 @@ namespace Chronozoom.Entities
         public Guid Id { get; set; }
 
         /// <summary>
+        /// Indicates if the collection is the default collection for the indicated supercollection.
+        /// There should be only one default collection per supercollection.
+        /// </summary>
+        [DataMember]
+        [Column(TypeName = "bit")]
+        public bool Default { get; set; }
+
+        /// <summary>
         /// The title of the collection.
         /// </summary>
         [DataMember]
-        [MaxLength(4000)]
+        [Required]
+        [MaxLength(50)]
         [Column(TypeName = "nvarchar")]
         public string Title { get; set; }
+
+        /// <summary>
+        /// URL-sanitized version of title, which will be used as part of a URL path.
+        /// Only a-z and 0-9 are allowed. This should be unique per supercollection.
+        /// </summary>
+        [DataMember]
+        [Required]
+        [MaxLength(50)]
+        [Column(TypeName = "varchar")]
+        public string Path { get; set; }
 
         /// <summary>
         /// The user ID for the collection owner.
         /// </summary>
         [DataMember]
+        [Required]
         public User User { get; set; }
 
         /// <summary>
         /// The theme (i.e. space, blue, etc) associated to this collection.
         /// </summary>
         [DataMember(Name="theme")]
+        //[DataMember]
         public string Theme { get; set; }
 
         /// <summary>SuperCollection for this collection</summary>
+        [DataMember]
+        [Required]
         public SuperCollection SuperCollection { get; set; }
 
         /// <summary>
@@ -73,5 +97,19 @@ namespace Chronozoom.Entities
         [DataMember]
         [Column(TypeName = "bit")]
         public bool PubliclySearchable { get; set; }
+    }
+
+    /// <summary>
+    /// The Collection.Theme text field is actually a compressed JSON object comprising of the following.
+    /// </summary>
+    public class Theme
+    {
+        public string backgroundUrl         { get; set; }
+        public string backgroundColor       { get; set; }
+        public string timelineColor         { get; set; }
+        public string timelineStrokeStyle   { get; set; }
+        public string infoDotfillColor      { get; set; }
+        public string infoDotBorderColor    { get; set; }
+        public Boolean kioskMode            { get; set; }
     }
 }

@@ -22,6 +22,9 @@ namespace Chronozoom.Entities
             }
         }
 
+        /// <summary></summary>
+        /// <param name="descendant"></param>
+        /// <returns>A list of all ancestor timelines which also includes the current timeline.</returns>
         public static List<Guid> Ancestors(this Timeline descendant)
         {
             List<Guid> rv = new List<Guid>();

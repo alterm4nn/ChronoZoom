@@ -34,6 +34,27 @@ body
     -ms-touch-action: none;
 }
 
+.small
+{
+    color: #666;
+    font-size: 0.7em;
+}
+
+fieldset
+{
+    border: 2px #c7c7c7 solid;
+    legend
+    {
+        color: #666;
+    }
+}
+
+.field-block
+{
+    display: block;
+    width: 100%;
+}
+
 a
 {
     color: #fff;
@@ -434,13 +455,26 @@ div.preview
     font-family: Arial;
 }
 
-    .contentItemDescription .text
+.contentItemDescription .text
+{
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: inherit;
+}
+
+.tri-button-block
+{
+    button
     {
-        position: relative;
-        overflow-x: hidden;
-        overflow-y: auto;
-        height: inherit;
+        min-width:   110px;
+        margin-right: 10px;
     }
+}
+.tri-button-block button:last-child
+{
+    margin-right: 0px;
+}
 
 /***********************************************************
 
@@ -654,7 +688,6 @@ div.preview
     background-color: #abc;
     white-space: nowrap;
 }
-
 
 
 
@@ -1186,6 +1219,12 @@ img.fallbackBackground
     text-align: center !important;
 }
 
+.centerblock
+{
+    display: inline-block;
+    margin: 0px auto;
+}
+
 .justify
 {
     text-align: justify;
@@ -1258,7 +1297,7 @@ img.fallbackBackground
 .cz-form
 {
     position: absolute;
-    z-index: 100000001;
+    z-index: 2000;
     display: none;
     cursor: default;
 }
@@ -2259,16 +2298,32 @@ a
   right: 0;
 }
 
-#editCollectionButton {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    z-index: 100;
-    margin-top: -50px;
+.nocursor
+{
+    cursor: default;
 }
-#editCollectionButton > img {
-    width: 50px;
+
+#editCollectionButton
+{
+    position: absolute;
+    margin: -40px 0px 0px 20px;
+    z-index: 100;
+}
+#editCollectionButton .image
+{
+    margin-right: 10px;
+}
+#editCollectionButton > img
+{
     height: 50px;
+    width: 50px;
+}
+#editCollectionButton .title
+{
+    color: #e9e9e9;
+    font-size: 16px;
+    font-weight: bold;
+    vertical-align: top;
 }
 
 // Prevent SkyDrive clicks

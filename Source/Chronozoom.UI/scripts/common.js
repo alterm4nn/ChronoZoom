@@ -45,8 +45,9 @@ var CZ;
         Common.hashHandle = true;
         var tourNotParsed = undefined;
 
-        Common.supercollection = "";
-        Common.collection = "";
+        Common.supercollection  = '';
+        Common.collection       = '';
+        Common.collectionTitle  = '';
 
         // Initial Content contains the identifier (e.g. ID or Title) of the content that should be loaded initially.
         Common.initialContent = null;
