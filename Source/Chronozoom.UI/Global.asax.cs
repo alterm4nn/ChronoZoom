@@ -90,12 +90,8 @@ namespace Chronozoom.UI
             RouteTable.Routes.MapHubs();
             RegisterRoutes(RouteTable.Routes);
 
-            /* Not using bundling as has issues merging CZ scripts. Bundling does have a few known gotchas, including comment on last line of a .js file commenting out a code line in next .js file.
-             * Instead we use enable minification and .map creation in Web Essentials (a VS extension.)
-             * 
             BundleTable.EnableOptimizations = true; // enables bundling for debug mode
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            */
 
             Trace.TraceInformation("Checking Db Schema");
             using (Entities.ManualMigrationCheck check = new Entities.ManualMigrationCheck())
@@ -103,17 +99,10 @@ namespace Chronozoom.UI
                 if (check.NewInstall)
                 {
                     Trace.TraceInformation("New Install - Populating Initial Db Content");
-                    string populatedContentAdmin = ConfigurationManager.AppSettings["BaseCollectionsAdministrator"].ToString();
                     using (Utils.PopulateDbFromJSON populator = new Utils.PopulateDbFromJSON())
                     {
-                        populator.LoadDataFromDump("ChronoZoom",    "Cosmos",           "beta-get.json",            "beta-gettours.json",           false,  populatedContentAdmin);
-                        populator.LoadDataFromDump("ChronoZoom",    "AIDS Timeline",    "aidstimeline-get.json",    "aidstimeline-gettours.json",   false,  populatedContentAdmin);
-                        /*
-                        populator.LoadDataFromDump("Beta Content",  "Beta Content",     "beta-get.json",            "beta-gettours.json",           false,  populatedContentAdmin);
-                        populator.LoadDataFromDump("Sandbox",       "Sandbox",          "beta-get.json",            null,                           true,   null);
-                        populator.LoadDataFromDump("Sandbox",       "Extensions",       "extensions-get.json",      null,                           true,   null);
-                        populator.LoadDataFromDump("AIDS Timeline", "AIDS Timeline",    "aidstimeline-get.json",    "aidstimeline-gettours.json",   false,  populatedContentAdmin);
-                        */
+                        populator.LoadDataFromDump("ChronoZoom",    "Cosmos",           "beta-get.json",            "beta-gettours.json",           true,   false);
+                        populator.LoadDataFromDump("ChronoZoom",    "AIDS Timeline",    "aidstimeline-get.json",    "aidstimeline-gettours.json",   false,  false);
                     }
                 }
             }

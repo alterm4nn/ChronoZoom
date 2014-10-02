@@ -10,41 +10,38 @@ using System.Threading.Tasks;
 
 namespace Chronozoom.Entities
 {
-    /// <summary>
-    /// A registered user.
-    /// </summary>
     [DataContract]
     public class User
     {
         /// <summary>
-        /// The ID of the user.
+        /// Constructor used to set default values.
         /// </summary>
+        public User()
+        {
+            this.Id = Guid.NewGuid();   // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
+        }
+
         [Key]
         [DataMember(EmitDefaultValue=false)]
         public Guid Id { get; set; }
 
-        /// <summary>
-        /// The display name of the user.
-        /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        [MaxLength(4000)]
+        [Required]
+        [MaxLength(50)]
         [Column(TypeName = "nvarchar")]
         public string DisplayName { get; set; }
 
-        /// <summary>
-        /// The email address of the user.
-        /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        [MaxLength(4000)]
-        [Column(TypeName = "nvarchar")]
+        [MaxLength(100)]
+        [Column(TypeName = "varchar")]
         public string Email { get; set; }
 
-        [MaxLength(4000)]
-        [Column(TypeName = "nvarchar")]
-        public string NameIdentifier { get; set; }
-
-        [MaxLength(4000)]
-        [Column(TypeName = "nvarchar")]
+        [MaxLength(25)]
+        [Column(TypeName = "varchar")]
         public string IdentityProvider { get; set; }
+
+        [MaxLength(150)]
+        [Column(TypeName = "varchar")]
+        public string NameIdentifier { get; set; }
     }
 }

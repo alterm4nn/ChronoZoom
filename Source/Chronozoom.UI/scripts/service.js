@@ -206,18 +206,17 @@ var CZ;
         */
         // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
         function getTimelines(r, sc, c) {
-            if (typeof sc === "undefined") { sc = Service.superCollectionName; }
-            if (typeof c === "undefined") { c = Service.collectionName; }
+            if (typeof sc === "undefined") sc = Service.superCollectionName;
+            if (typeof  c === "undefined")  c = Service.collectionName;
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath("gettimelines");
             request.addParameter("supercollection", sc);
             request.addParameter("collection", c);
             request.addParameters(r);
-
             console.log("[GET] " + request.url);
-
-            return $.ajax({
+            return $.ajax
+            ({
                 type: "GET",
                 cache: false,
                 dataType: "json",
@@ -229,6 +228,23 @@ var CZ;
         /**
         * Information Retrieval.
         */
+
+        // .../supercollections
+        function getSuperCollections()
+        {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath("supercollections");
+            return $.ajax
+            ({
+                type:       "GET",
+                cache:      false,
+                dataType:   "json",
+                url:        request.url
+            });
+        }
+        Service.getSuperCollections = getSuperCollections;
+
         // .../{superCollectionName}/collections
         function getCollections(superCollectionName) {
             CZ.Authoring.resetSessionTimer();
@@ -245,23 +261,47 @@ var CZ;
         }
         Service.getCollections = getCollections;
 
+        // .../{supercollection}/data
         // .../{supercollection}/{collection}/data
-        function getCollection() {
+        function getCollection()
+        {
             CZ.Authoring.resetSessionTimer();
-
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("data");
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
+            return $.ajax
+            ({
+                type:       "GET",
+                cache:      false,
+                dataType:   "json",
+                url:        request.url
             });
         }
         Service.getCollection = getCollection;
+
+        // .../isuniquecollectionname?new={proposedCollectionName}
+        // .../{supercollection}/isuniquecollectionname?new={proposedCollectionName}
+        // .../{supercollection}/{existingCollectionPath}/isuniquecollectionname?new={proposedCollectionName}
+        function isUniqueCollectionName(proposedCollectionName)
+        {
+            if (typeof proposedCollectionName === 'undefined') return false;
+
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            if (typeof Service.superCollectionName  !== 'undefined') request.addToPath(Service.superCollectionName);
+            if (typeof Service.collectionName       !== 'undefined') request.addToPath(Service.collectionName);
+            request.addToPath('isuniquecollectionname');
+            request.addParameter('new', encodeURIComponent(proposedCollectionName));
+            return $.ajax
+            ({
+                type:       "GET",
+                cache:      false,
+                dataType:   "json",
+                url:        request.url
+            });
+        }
+        Service.isUniqueCollectionName = isUniqueCollectionName;
 
         // .../exhibit/{exhibitId}/lastupdate
         function getExhibitLastUpdate(exhibitId) {
@@ -298,34 +338,36 @@ var CZ;
         }
         Service.findUsers = findUsers;
 
-        // .../{supercollection}/{collection}/canedit
-        function getCanEdit() {
+        // .../{supercollection}/{collection}/canedit or
+        // .../{supercollection}/canedit for default collection beneath supercollection
+        function getCanEdit()
+        {
             CZ.Authoring.resetSessionTimer();
-
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("canedit");
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
+            return $.ajax
+            ({
+                type:       "GET",
+                cache:      false,
+                dataType:   "json",
+                url:        request.url
             });
         }
         Service.getCanEdit = getCanEdit;
 
+        // .../{supercollection}/members
         // .../{supercollection}/{collection}/members
-        function getMembers() {
+        function getMembers()
+        {
             CZ.Authoring.resetSessionTimer();
-
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("members");
-
-            return $.ajax({
+            return $.ajax
+            ({
                 type: "GET",
                 cache: false,
                 dataType: "json",
@@ -334,16 +376,17 @@ var CZ;
         }
         Service.getMembers = getMembers;
 
+        // .../{supercollection}/members
         // .../{supercollection}/{collection}/members
-        function putMembers(superCollectionName, collectionName, userIds) {
+        function putMembers(superCollectionName, collectionName, userIds)
+        {
             CZ.Authoring.resetSessionTimer();
-
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
-            request.addToPath(collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(collectionName);
             request.addToPath("members");
-
-            return $.ajax({
+            return $.ajax
+            ({
                 type: "PUT",
                 cache: false,
                 contentType: "application/json",
@@ -393,17 +436,40 @@ var CZ;
         }
         Service.postData = postData;
 
-        /**
-        * Information Modification.
-        */
+        // .../{superCollectionPath}/{newCollectionPath}
+        function postCollection(newCollectionPath, newCollectionData)
+        {
+            if (typeof newCollectionPath === 'undefined') return false;
+            if (typeof newCollectionData === 'undefined') return false;
+
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            request.addToPath(newCollectionPath);
+
+            return $.ajax
+            ({
+                type:           'POST',
+                cache:          false,
+                contentType:    'application/json',
+                dataType:       'json',
+                url:            request.url,
+                data:           JSON.stringify(newCollectionData)
+            });
+        }
+        Service.postCollection = postCollection;
+
+        // .../{supercollection}/
         // .../{supercollection}/{collection}
-        function putCollection(superCollectionName, collectionName, c) {
+        function putCollection(superCollectionName, collectionName, c)
+        {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(superCollectionName);
-            request.addToPath(collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(collectionName);
 
-            return $.ajax({
+            return $.ajax
+            ({
                 type: "PUT",
                 cache: false,
                 contentType: "application/json",
@@ -414,29 +480,32 @@ var CZ;
         }
         Service.putCollection = putCollection;
 
-        // .../{supercollection}/{collection}
-        function deleteCollection(c) {
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath(Service.superCollectionName);
-            request.addToPath(c.name);
+        // .../{supercollection}/{collection} 
+        function deleteCollection()
+        {
+            if (typeof Service.collectionName === 'undefined') return false;
 
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url,
-                data: JSON.stringify(c)
-            });
-        }
-        Service.deleteCollection = deleteCollection;
-
-        // .../{supercollection}/{collection}/timeline
-        function putTimeline(t) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
+            return $.ajax
+            ({
+                type:           "DELETE",
+                cache:          false,
+                contentType:    "application/json",
+                url: request.url
+            });
+        }
+        Service.deleteCollection = deleteCollection
+
+        // .../{supercollection}/{collection}/timeline or 
+        // .../{supercollection}/timeline for default collection
+        function putTimeline(t) {
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("timeline");
 
             console.log("[PUT] " + request.url);
@@ -452,12 +521,13 @@ var CZ;
         }
         Service.putTimeline = putTimeline;
 
+        // .../{supercollection}/timeline
         // .../{supercollection}/{collection}/timeline
         function deleteTimeline(t) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("timeline");
 
             console.log("[DELETE] " + request.url);
@@ -472,12 +542,14 @@ var CZ;
         }
         Service.deleteTimeline = deleteTimeline;
 
+        // .../{supercollection}/exhibit
         // .../{supercollection}/{collection}/exhibit
-        function putExhibit(e) {
+        function putExhibit(e)
+        {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("exhibit");
 
             console.log("[PUT] " + request.url);
@@ -493,12 +565,13 @@ var CZ;
         }
         Service.putExhibit = putExhibit;
 
+        // .../{supercollection}/exhibit
         // .../{supercollection}/{collection}/exhibit
         function deleteExhibit(e) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("exhibit");
 
             console.log("[DELETE] " + request.url);
@@ -513,12 +586,13 @@ var CZ;
         }
         Service.deleteExhibit = deleteExhibit;
 
+        // .../{supercollection}/contentitem
         // .../{supercollection}/{collection}/contentitem
         function putContentItem(ci) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("contentitem");
 
             console.log("[PUT] " + request.url);
@@ -554,13 +628,14 @@ var CZ;
         }
         Service.deleteContentItem = deleteContentItem;
 
+        // .../{supercollection}/tour
         // .../{supercollection}/{collection}/tour
-        // Creates or updates a tour
-        function putTour2(t) {
+        function putTour2(t)
+        {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("tour2");
 
             console.log("[PUT] " + request.url);
@@ -576,17 +651,14 @@ var CZ;
         }
         Service.putTour2 = putTour2;
 
+        // .../{supercollection}/tour
         // .../{supercollection}/{collection}/tour
-        // Deletes a tour
         function deleteTour(tourId) {
             CZ.Authoring.resetSessionTimer();
             var request = new Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("tour");
-
-            console.log("[DELETE] " + request.url);
-
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -598,12 +670,14 @@ var CZ;
         }
         Service.deleteTour = deleteTour;
 
-        // .../{supercollection}/{collection}/tours
-        function getTours() {
+        // .../{supercollection}/{collection}/tours or
+        // .../{supercollection}/tours for default collection
+        function getTours()
+        {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath(Service.superCollectionName);
-            request.addToPath(Service.collectionName);
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("tours");
 
             console.log("[GET] " + request.url);
@@ -948,10 +1022,26 @@ var CZ;
                 cache: false,
                 dataType: 'json',
                 url: request.url
-                //url: _isLocalHost ? _dumpTimelinesUrl : request.url
             });
         }
         Service.getEditableTimelines = getEditableTimelines;
+
+        function getEditableCollections(includeMine)
+        {
+            if (typeof includeMine !== 'boolean') { includeMine = false; }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath('editablecollections');
+            request.addParameter('includeMine', includeMine);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                dataType:   'json',
+                url:        request.url
+            });
+        }
+        Service.getEditableCollections = getEditableCollections;
 
         function getUserFavorites() {
             var result = "";
