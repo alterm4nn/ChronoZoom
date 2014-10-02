@@ -160,4 +160,10 @@
   <data name="_201408040000000_PubliclySearchable" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\SQL\ManualMigration\201408040000000_PubliclySearchable.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="_201408130000000_MultipleCollections" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201408130000000_MultipleCollections.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="_201409250000000_PubliclySearchableChange" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201409250000000_PubliclySearchableChange.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

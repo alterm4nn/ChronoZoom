@@ -5,7 +5,9 @@ using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Collections.Generic;
-
+using Newtonsoft.Json;
+using System.Web;
+using System.Data.Entity.Validation;
 
 namespace Chronozoom.UI
 {
@@ -62,10 +64,82 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documented under IChronozoomSVC
         /// </summary>
-        /// <param name="includeMine"></param>
-        /// <returns></returns>
+        public List<TimelineShortcut> GetEditableCollections(bool includeMine = false)
+        {
+            Trace.TraceInformation("GetEditableCollections");
+            return ApiOperation<List<TimelineShortcut>>(delegate(User user, Storage storage)
+            {
+                List<TimelineShortcut> editable;
+
+                // get data
+                if (includeMine)
+                {
+                    // Collections where others can edit and user is in edit list, or user is collection owner.
+                    editable =  storage.Collections
+                                .Where(c => c.User.Id == user.Id || (c.Members.Any(m => m.User.Id == user.Id) && c.MembersAllowed))
+                                .Include("SuperCollection")
+                                .Include("User")
+                                .OrderByDescending(c => c.User.Id == user.Id)
+                                .ThenBy(c => c.User.DisplayName).ThenBy(c => c.Title)
+                                .ToList()
+                                .Select
+                                (c => new TimelineShortcut
+                                    {
+                                        Title       = c.Title,
+                                        Author      = c.User.DisplayName,
+                                        ImageUrl    = c.Theme,
+                                        TimelineUrl = ('/' + c.SuperCollection.Title + '/' + c.Path).ToLower()
+                                    }
+                                )
+                                .ToList();
+                }
+                else
+                {
+                    // Collections where others can edit and user is in edit list, but user is not collection owner.
+                    editable =  storage.Collections
+                                .Where(c => c.Members.Any(m => m.User.Id == user.Id) && c.MembersAllowed && c.User.Id != user.Id)
+                                .Include("SuperCollection")
+                                .Include("User")
+                                .OrderBy(c => c.User.DisplayName).ThenBy(c => c.Title)
+                                .ToList()
+                                .Select
+                                ( c => new TimelineShortcut
+                                    {
+                                        Title       = c.Title,
+                                        Author      = c.User.DisplayName,
+                                        ImageUrl    = c.Theme,
+                                        TimelineUrl = ('/' + c.SuperCollection.Title + '/' + c.Path).ToLower()
+                                    }
+                                )
+                                .ToList();
+                }
+
+                // extract background image (packed in theme as embedded json)
+                for (int loop = 1; loop <= editable.Count(); loop++)
+                {
+                    if (editable[loop - 1].ImageUrl == null)
+                    {
+                        editable[loop - 1].ImageUrl = "/images/background.jpg"; // OK here since is UI project but consider web.config
+                    }
+                    else
+                    {
+                        editable[loop - 1].ImageUrl = JsonConvert.DeserializeObject<Theme>(editable[loop - 1].ImageUrl).backgroundUrl;
+                    }
+                }
+
+                // return final result
+                return editable;
+            });
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
         public Collection<TimelineShortcut> GetEditableTimelines(bool includeMine = false)
         {
+            // TODO: remove this quick test:
+            List<TimelineShortcut> test = GetEditableCollections(includeMine);
+
             Trace.TraceInformation("GetEditableTimelines");
             return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
             {
@@ -94,7 +168,7 @@ namespace Chronozoom.UI
 
                 foreach (Collection collection in collections)
                 {
-                    Collection<TimelineShortcut> collectionTimelines = GetUserTimelines(collection.SuperCollection.Title, collection.Title);
+                    Collection<TimelineShortcut> collectionTimelines = GetUserTimelines(collection.SuperCollection.Title, collection.Path);
                     foreach (TimelineShortcut collectionTimeline in collectionTimelines)
                     {
                         rv.Add(collectionTimeline);

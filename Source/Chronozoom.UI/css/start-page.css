@@ -341,6 +341,29 @@ input.error {
   background-image: url(/images/arrow-left-hover.png);
   cursor: pointer;
 }
+.add-icon {
+  float: right;
+  width: 36px;
+  height: 36px;
+  background-image: url(/images/add.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 19px 0;
+  margin-right: 15px;
+  cursor: pointer;
+}
+.add-icon:hover {
+  background-image: url(/images/add-hover.png);
+  cursor: pointer;
+}
+.add-icon.active {
+  background-image: url(/images/add.png);
+  cursor: pointer;
+}
+.add-icon.active:hover {
+  background-image: url(/images/add-hover.png);
+  cursor: pointer;
+}
 .FavoriteTimelinesBlock {
   color: #fff;
 }
@@ -366,7 +389,7 @@ input.error {
   text-align: center;
 }
 .box {
-  visibility: visible important!;
+  visibility: visible !important;
 }
 .tweet-message-link {
   text-decoration: none;
@@ -502,6 +525,7 @@ input.error {
   .tweet-meta-title {
     display: none;
   }
+  .add-icon,
   .list-view-icon {
     display: none;
   }
@@ -548,6 +572,7 @@ input.error {
   .tweet-avatar-icon {
     display: none;
   }
+  .add-icon,
   .list-view-icon {
     display: block;
   }
@@ -655,6 +680,7 @@ input.error {
   .FTTiles {
     overflow: hidden;
   }
+  .add-icon,
   .list-view-icon {
     display: block;
   }

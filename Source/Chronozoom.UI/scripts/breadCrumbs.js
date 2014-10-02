@@ -312,7 +312,10 @@ var CZ;
         // Handles click over breadcrumb link.
         // @param   timelineID          (string) id of timeline to navigate.
         // @param   breadCrumbLinkID    (string) id of table element which breadcrumb link was cliked.
-        function clickOverBreadCrumb(timelineID, breadCrumbLinkID) {
+        function clickOverBreadCrumb(timelineID, breadCrumbLinkID)
+        {
+            if (!timelineID) return;
+
             CZ.Search.goToSearchResult(timelineID); // start EllipticalZoom to element
 
             var selector = "#bc_" + breadCrumbLinkID;

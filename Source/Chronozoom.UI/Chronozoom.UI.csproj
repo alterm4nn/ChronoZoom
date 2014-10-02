@@ -63,6 +63,9 @@
     <Content Include="css\media.css">
       <DependentUpon>media.less</DependentUpon>
     </Content>
+    <Content Include="css\media.min.css">
+      <DependentUpon>media.less</DependentUpon>
+    </Content>
     <Content Include="css\start-page.css">
       <DependentUpon>start-page.less</DependentUpon>
     </Content>
@@ -78,6 +81,7 @@
     <Content Include="css\_vars.css">
       <DependentUpon>_vars.less</DependentUpon>
     </Content>
+    <Content Include="cz.merged.js" />
     <Content Include="dumps\extensions\GaribaldiTourJSON.js" />
     <Content Include="dumps\extensions\narrative.js" />
     <Content Include="dumps\extensions\rin-sample.js" />
@@ -94,6 +98,8 @@
     <Content Include="css\cz.css.map">
       <DependentUpon>cz.less</DependentUpon>
     </Content>
+    <Content Include="images\add-hover.png" />
+    <Content Include="images\add.png" />
     <Content Include="images\copy.svg" />
     <Content Include="images\paste.svg" />
     <Content Include="scripts\authoring-ui.min.js">
@@ -154,6 +160,30 @@
     <Content Include="scripts\external\audiojs\audiojs\audiojs.swf" />
     <Content Include="scripts\external\audiojs\audiojs\player-graphics.gif" />
     <Content Include="scripts\external\jquery.autonumeric-1.9.24.min.js" />
+    <Content Include="scripts\external\nouislider\jquery.nouislider.all.js" />
+    <Content Include="scripts\external\nouislider\jquery.nouislider.all.min.js">
+      <DependentUpon>jquery.nouislider.all.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\external\nouislider\jquery.nouislider.css" />
+    <Content Include="scripts\external\nouislider\jquery.nouislider.js" />
+    <Content Include="scripts\external\nouislider\jquery.nouislider.min.css">
+      <DependentUpon>jquery.nouislider.css</DependentUpon>
+    </Content>
+    <Content Include="scripts\external\nouislider\jquery.nouislider.min.js">
+      <DependentUpon>jquery.nouislider.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\external\nouislider\jquery.nouislider.pips.css" />
+    <Content Include="scripts\external\nouislider\jquery.nouislider.pips.min.css">
+      <DependentUpon>jquery.nouislider.pips.css</DependentUpon>
+    </Content>
+    <Content Include="scripts\external\spectrum\spectrum.css" />
+    <Content Include="scripts\external\spectrum\spectrum.js" />
+    <Content Include="scripts\external\spectrum\spectrum.min.css">
+      <DependentUpon>spectrum.css</DependentUpon>
+    </Content>
+    <Content Include="scripts\external\spectrum\spectrum.min.js">
+      <DependentUpon>spectrum.js</DependentUpon>
+    </Content>
     <Content Include="scripts\gestures.min.js">
       <DependentUpon>gestures.js</DependentUpon>
     </Content>
@@ -430,6 +460,17 @@
     <Content Include="ui\tourstop-listbox.min.js.map">
       <DependentUpon>tourstop-listbox.js</DependentUpon>
     </Content>
+    <Content Include="scripts\external\spectrum\spectrum.min.js.map">
+      <DependentUpon>spectrum.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\external\nouislider\README.md" />
+    <Content Include="scripts\external\nouislider\jquery.nouislider.all.min.js.map">
+      <DependentUpon>jquery.nouislider.all.js</DependentUpon>
+    </Content>
+    <Content Include="scripts\external\nouislider\jquery.nouislider.min.js.map">
+      <DependentUpon>jquery.nouislider.js</DependentUpon>
+    </Content>
+    <Content Include="Merge.cmd" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -453,6 +494,10 @@
     <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.Extended, Version=5.0.0.0, Culture=neutral, PublicKeyToken=05b7e29bdd433584, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.Extended.5.0.0.73\lib\net45\EntityFramework.Extended.dll</HintPath>
     </Reference>
     <Reference Include="Hammock.ClientProfile">
       <HintPath>..\..\External\TweetSharp\Hammock.ClientProfile.dll</HintPath>
@@ -1002,6 +1047,10 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>call "$(ProjectDir)Merge.cmd"
+</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

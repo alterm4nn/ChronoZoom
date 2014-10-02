@@ -23,7 +23,7 @@ var CZ;
                     } else {
                         $('#tblDelEditors tbody').html('');
                         data.forEach(function (member) {
-                            $('#tblDelEditors tbody').append('<tr data-id="' + member.User.Id + '">' + '<td class="delete" title="Remove Editor"></td>' + '<td title="' + member.User.DisplayName + '">' + member.User.DisplayName + '</td>' + '</tr>');
+                            $('#tblDelEditors tbody').append('<tr data-id="' + member.Id + '">' + '<td class="delete" title="Remove Editor"></td>' + '<td title="' + member.DisplayName + '">' + member.DisplayName + '</td>' + '</tr>');
                         });
                     }
                 });

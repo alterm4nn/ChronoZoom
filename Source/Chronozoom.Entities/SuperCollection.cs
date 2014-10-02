@@ -1,10 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright company="Outercurve Foundation">
-//   Copyright (c) 2013, The Outercurve Foundation
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -20,6 +14,14 @@ namespace Chronozoom.Entities
     public class SuperCollection
     {
         /// <summary>
+        /// Constructor used to set default values.
+        /// </summary>
+        public SuperCollection()
+        {
+            this.Id = Guid.NewGuid();   // Don't use [DatabaseGenerated(DatabaseGeneratedOption.Identity)] on Id
+        }
+
+        /// <summary>
         /// The ID of the supercollection.
         /// </summary>
         [Key]
@@ -27,17 +29,20 @@ namespace Chronozoom.Entities
         public Guid Id { get; set; }
 
         /// <summary>
-        /// The title of the supercollection.
+        /// The path from the web root to the the supercollection.  Title must therefore have a globally unique value.
+        /// Is programmatically derived as a URL-sanitized version of user's display name using a-z and 0-9 only.
         /// </summary>
         [DataMember]
-        [MaxLength(4000)]
-        [Column(TypeName = "nvarchar")]
+        [Required]
+        [MaxLength(50)]
+        [Column(TypeName = "varchar")]
         public string Title { get; set; }
 
         /// <summary>
         /// The user who owns the supercollection.
         /// </summary>
         [DataMember]
+        [Required]
         public User User { get; set; }
 
         /// <summary>
