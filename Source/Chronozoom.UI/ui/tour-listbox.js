@@ -87,7 +87,7 @@ var CZ;
                 else
                     this.descrTextblock.hide();
 
-                this.container.find("#takeTour, img").click(function (e)
+                this.container.find("#takeTour, .cz-contentitem-listitem-icon").click(function (e)
                 {
                     parent.TakeTour(context);
                 });
