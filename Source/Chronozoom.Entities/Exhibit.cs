@@ -19,6 +19,7 @@ namespace Chronozoom.Entities
         public Exhibit()
         {
             this.UpdatedTime = DateTime.UtcNow; // Must be set on creation else we'd need to store as datetime2, which isn't supported in CE.
+            this.IsCirca = false;
         }
 
         /// <summary>
@@ -46,6 +47,14 @@ namespace Chronozoom.Entities
         /// </summary>
         [DataMember(Name = "time")]
         public decimal Year { get; set; }
+        
+        /// <summary>
+        /// If true, the exhibit date is circa/approximate.
+        /// Default is false.
+        /// </summary>
+        [DataMember]
+        [Column(TypeName = "bit")]
+        public bool IsCirca { get; set; }
 
         /// <summary>
         /// The user who last updated this exhibit.

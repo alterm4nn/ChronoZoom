@@ -40,7 +40,9 @@ var CZ;
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
                     start: CZ.Dates.getDecimalYearFromCoordinate(t.x),
+                    FromIsCirca: t.FromIsCirca,
                     end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
+                    ToIsCirca: typeof t.endDate !== 'undefined' ? t.ToIsCirca: false,
                     title: t.title,
                     Regime: t.regime
                 };
@@ -52,6 +54,7 @@ var CZ;
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
                     time: e.infodotDescription.date,
+                    IsCirca: e.infodotDescription.isCirca,
                     title: e.title,
                     description: undefined,
                     contentItems: undefined
@@ -69,6 +72,7 @@ var CZ;
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
                     time: e.infodotDescription.date,
+                    IsCirca: e.infodotDescription.isCirca,
                     title: e.title,
                     description: undefined,
                     contentItems: mappedContentItems

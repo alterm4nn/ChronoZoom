@@ -143,6 +143,7 @@ CREATE TABLE [dbo].[Exhibits]
 	[Depth]             [int]                   NOT NULL,
 	[Title]             [nvarchar](200)         NULL,
 	[Year]              [decimal](18, 7)        NOT NULL,
+    [IsCirca]           [bit]                   NOT NULL        DEFAULT (0),
 	[Collection_Id]     [uniqueidentifier]      NULL,
 	[Timeline_Id]       [uniqueidentifier]      NULL,
     [UpdatedBy_Id]      [uniqueidentifier]      NULL,

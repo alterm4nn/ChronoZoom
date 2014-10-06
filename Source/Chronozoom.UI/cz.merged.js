@@ -2926,6 +2926,9 @@ var CZ;
 
             this.endDate = timelineinfo.endDate;
 
+            this.FromIsCirca = timelineinfo.FromIsCirca || false;
+            this.ToIsCirca   = timelineinfo.ToIsCirca   || false;
+
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
             var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : CZ.Settings.timelineHeaderSize * timelineinfo.height;
@@ -6189,6 +6192,8 @@ var CZ;
                 strokeStyle: tlColor,
                 regime: timeline.Regime,
                 endDate: timeline.endDate,
+                FromIsCirca: timeline.FromIsCirca || false,
+                ToIsCirca: timeline.ToIsCirca || false,
                 opacity: 0
             });
 
@@ -9317,7 +9322,9 @@ var CZ;
                     id: t.guid,
                     ParentTimelineId: t.parent.guid,
                     start: CZ.Dates.getDecimalYearFromCoordinate(t.x),
+                    FromIsCirca: t.FromIsCirca,
                     end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
+                    ToIsCirca: typeof t.endDate !== 'undefined' ? t.ToIsCirca: false,
                     title: t.title,
                     Regime: t.regime
                 };
@@ -9329,6 +9336,7 @@ var CZ;
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
                     time: e.infodotDescription.date,
+                    IsCirca: e.IsCirca,
                     title: e.title,
                     description: undefined,
                     contentItems: undefined
@@ -9346,6 +9354,7 @@ var CZ;
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
                     time: e.infodotDescription.date,
+                    IsCirca: e.IsCirca,
                     title: e.title,
                     description: undefined,
                     contentItems: mappedContentItems
@@ -14240,6 +14249,9 @@ var CZ;
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
 
+                $(_this.startDate.circaSelector).find('input').prop('checked', this.timeline.FromIsCirca);
+                $(_this.endDate.circaSelector  ).find('input').prop('checked', this.timeline.ToIsCirca);
+
                 this.saveButton.click(function (event) {
                     _this.errorMessage.empty();
                     var isDataValid = false;
@@ -14259,6 +14271,9 @@ var CZ;
                     } else {
                         _this.errorMessage.empty();
                         var self = _this;
+
+                        _this.timeline.FromIsCirca  = $(_this.startDate.circaSelector).find('input').is(':checked');
+                        _this.timeline.ToIsCirca    = $(_this.endDate.circaSelector  ).find('input').is(':checked');
 
                         _this.saveButton.prop('disabled', true);
                         CZ.Authoring.updateTimeline(_this.timeline, {
@@ -14396,6 +14411,7 @@ var CZ;
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
+                    $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.IsCirca || false);
 
                     this.closeButton.show();
                     this.createArtifactButton.show();
@@ -14433,6 +14449,7 @@ var CZ;
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
+                    $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.IsCirca || false);
 
                     this.closeButton.show();
                     this.createArtifactButton.show();
@@ -14473,6 +14490,7 @@ var CZ;
                     this.exhibit.title = this.titleInput.val() || "";
                     this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
                     this.exhibit.infodotDescription = { date: this.datePicker.getDate() };
+                    this.exhibit.IsCirca = $(this.datePicker.circaSelector).find('input').is(':checked');
                     var newContentItem = {
                         title: "",
                         uri: "",
@@ -14521,6 +14539,7 @@ var CZ;
                     height: this.exhibit.height,
                     width: this.exhibit.width,
                     infodotDescription: { date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()) },
+                    IsCirca: $(this.datePicker.circaSelector).find('input').is(':checked'),
                     contentItems: this.exhibit.contentItems || [],
                     type: "infodot"
                 };

@@ -821,6 +821,9 @@ var CZ;
 
             this.endDate = timelineinfo.endDate;
 
+            this.FromIsCirca = timelineinfo.FromIsCirca || false;
+            this.ToIsCirca   = timelineinfo.ToIsCirca   || false;
+
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
             var headerSize = timelineinfo.titleRect ? timelineinfo.titleRect.height : CZ.Settings.timelineHeaderSize * timelineinfo.height;
@@ -2342,6 +2345,7 @@ var CZ;
             this.hasContentItems = false;
             this.infodotDescription = infodotDescription;
             this.title = infodotDescription.title;
+            this.isCirca = infodotDescription.isCirca;
             this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
 
             contentItems.sort(function (a, b) {
