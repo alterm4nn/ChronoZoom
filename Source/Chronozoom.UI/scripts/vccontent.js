@@ -1217,6 +1217,11 @@ var CZ;
                 var p = viewport2d.pointVirtualToScreen(xc, yc);
                 var radp = viewport2d.widthVirtualToScreen(rad);
 
+                if (this.settings.showCirca && ctx.setLineDash)
+                {
+                    ctx.setLineDash([6, 3]);
+                }
+
                 ctx.globalAlpha = opacity;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, radp, 0, Math.PI * 2, true);
@@ -1233,9 +1238,15 @@ var CZ;
                         ctx.lineWidth = 1;
                     ctx.stroke();
                 }
+
                 if (this.settings.fillStyle) {
                     ctx.fillStyle = this.settings.fillStyle;
                     ctx.fill();
+                }
+
+                if (ctx.setLineDash)
+                {
+                    ctx.setLineDash([]);
                 }
             };
 
@@ -2334,9 +2345,20 @@ var CZ;
         @param vh   (number) height of a bounding box in virtual space
         @param infodotDescription  ({title})
         */
-        function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
+        function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDescription)
+        {
             this.base = CanvasCircle;
-            this.base(vc, layerid, id, time, vyc, radv, { strokeStyle: CZ.Settings.infoDotBorderColor, lineWidth: CZ.Settings.infoDotBorderWidth * radv, fillStyle: CZ.Settings.infoDotFillColor, isLineWidthVirtual: true });
+            this.base
+            (
+                vc, layerid, id, time, vyc, radv,
+                {
+                    strokeStyle: CZ.Settings.infoDotBorderColor,
+                    lineWidth: CZ.Settings.infoDotBorderWidth * radv,
+                    fillStyle: CZ.Settings.infoDotFillColor,
+                    isLineWidthVirtual: true,
+                    showCirca: infodotDescription.isCirca
+                }
+            );
             this.guid = infodotDescription.guid;
             this.type = 'infodot';
 

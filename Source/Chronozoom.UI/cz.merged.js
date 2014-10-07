@@ -4450,6 +4450,7 @@ var CZ;
             this.hasContentItems = false;
             this.infodotDescription = infodotDescription;
             this.title = infodotDescription.title;
+            this.isCirca = infodotDescription.isCirca;
             this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
 
             contentItems.sort(function (a, b) {
@@ -6214,6 +6215,7 @@ var CZ;
                         guid: childInfodot.id,
                         title: childInfodot.title,
                         date: childInfodot.time,
+                        isCirca: childInfodot.IsCirca,
                         opacity: 1
                     });
                 });
@@ -9336,7 +9338,7 @@ var CZ;
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
                     time: e.infodotDescription.date,
-                    IsCirca: e.IsCirca,
+                    IsCirca: e.infodotDescription.isCirca,
                     title: e.title,
                     description: undefined,
                     contentItems: undefined
@@ -9354,7 +9356,7 @@ var CZ;
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
                     time: e.infodotDescription.date,
-                    IsCirca: e.IsCirca,
+                    IsCirca: e.infodotDescription.isCirca,
                     title: e.title,
                     description: undefined,
                     contentItems: mappedContentItems
@@ -14411,7 +14413,7 @@ var CZ;
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-                    $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.IsCirca || false);
+                    $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.infodotDescription.isCirca || false);
 
                     this.closeButton.show();
                     this.createArtifactButton.show();
@@ -14449,7 +14451,7 @@ var CZ;
 
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-                    $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.IsCirca || false);
+                    $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.infodotDescription.isCirca || false);
 
                     this.closeButton.show();
                     this.createArtifactButton.show();
@@ -14489,8 +14491,12 @@ var CZ;
                 if (this.exhibit.contentItems.length < CZ.Settings.infodotMaxContentItemsCount) {
                     this.exhibit.title = this.titleInput.val() || "";
                     this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
-                    this.exhibit.infodotDescription = { date: this.datePicker.getDate() };
-                    this.exhibit.IsCirca = $(this.datePicker.circaSelector).find('input').is(':checked');
+                    this.exhibit.infodotDescription =
+                    {
+                        date: this.datePicker.getDate(),
+                        isCirca: $(this.datePicker.circaSelector).find('input').is(':checked')
+                    };
+                  //this.exhibit.IsCirca = $(this.datePicker.circaSelector).find('input').is(':checked');
                     var newContentItem = {
                         title: "",
                         uri: "",
@@ -14538,8 +14544,12 @@ var CZ;
                     y: exhibit_y,
                     height: this.exhibit.height,
                     width: this.exhibit.width,
-                    infodotDescription: { date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()) },
-                    IsCirca: $(this.datePicker.circaSelector).find('input').is(':checked'),
+                    infodotDescription:
+                    {
+                        date:    CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()),
+                        isCirca: $(this.datePicker.circaSelector).find('input').is(':checked')
+                    },
+                  //IsCirca: $(this.datePicker.circaSelector).find('input').is(':checked'),
                     contentItems: this.exhibit.contentItems || [],
                     type: "infodot"
                 };
