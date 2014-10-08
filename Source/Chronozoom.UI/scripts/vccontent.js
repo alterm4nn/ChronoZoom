@@ -753,25 +753,33 @@ var CZ;
                             p2.y -= lineWidth2;
                         }
 
-                        if (p.x > 0) {
+                        if (p.x > 0)
+                        {
+                            if (this.settings.showFromCirca && ctx.setLineDash) ctx.setLineDash([6, 3]);
                             ctx.beginPath();
                             ctx.moveTo(p.x, top - lineWidth2);
                             ctx.lineTo(p.x, bottom + lineWidth2);
                             ctx.stroke();
+                            if (ctx.setLineDash) ctx.setLineDash([]);
                         }
-                        if (p.y > 0) {
+                        if (p.y > 0)
+                        {
                             ctx.beginPath();
                             ctx.moveTo(left - lineWidth2, p.y);
                             ctx.lineTo(right + lineWidth2, p.y);
                             ctx.stroke();
                         }
-                        if (p2.x < viewport2d.width) {
+                        if (p2.x < viewport2d.width)
+                        {
+                            if (this.settings.showToCirca && ctx.setLineDash) ctx.setLineDash([6, 3]);
                             ctx.beginPath();
                             ctx.moveTo(p2.x, top - lineWidth2);
                             ctx.lineTo(p2.x, bottom + lineWidth2);
                             ctx.stroke();
+                            if (ctx.setLineDash) ctx.setLineDash([]);
                         }
-                        if (p2.y < viewport2d.height) {
+                        if (p2.y < viewport2d.height)
+                        {
                             ctx.beginPath();
                             ctx.moveTo(left - lineWidth2, p2.y);
                             ctx.lineTo(right + lineWidth2, p2.y);
@@ -823,6 +831,9 @@ var CZ;
 
             this.FromIsCirca = timelineinfo.FromIsCirca || false;
             this.ToIsCirca   = timelineinfo.ToIsCirca   || false;
+
+            this.settings.showFromCirca = this.FromIsCirca;
+            this.settings.showToCirca   = this.ToIsCirca;
 
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
