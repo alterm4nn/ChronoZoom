@@ -108,8 +108,8 @@ namespace Chronozoom.UI
 
         private static readonly Lazy<string> _mainPage = new Lazy<string>(() =>
             {
-                PageInformation pageInforamtion = new PageInformation();
-                return GenerateDefaultPage(pageInforamtion);
+                PageInformation pageInformation = new PageInformation();
+                return GenerateDefaultPage(pageInformation);
             });
 
         private static Lazy<string> _hostPath = new Lazy<string>(() =>

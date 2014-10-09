@@ -753,25 +753,33 @@ var CZ;
                             p2.y -= lineWidth2;
                         }
 
-                        if (p.x > 0) {
+                        if (p.x > 0)
+                        {
+                            if (this.settings.showFromCirca && ctx.setLineDash) ctx.setLineDash([6, 3]);
                             ctx.beginPath();
                             ctx.moveTo(p.x, top - lineWidth2);
                             ctx.lineTo(p.x, bottom + lineWidth2);
                             ctx.stroke();
+                            if (ctx.setLineDash) ctx.setLineDash([]);
                         }
-                        if (p.y > 0) {
+                        if (p.y > 0)
+                        {
                             ctx.beginPath();
                             ctx.moveTo(left - lineWidth2, p.y);
                             ctx.lineTo(right + lineWidth2, p.y);
                             ctx.stroke();
                         }
-                        if (p2.x < viewport2d.width) {
+                        if (p2.x < viewport2d.width)
+                        {
+                            if (this.settings.showToCirca && ctx.setLineDash) ctx.setLineDash([6, 3]);
                             ctx.beginPath();
                             ctx.moveTo(p2.x, top - lineWidth2);
                             ctx.lineTo(p2.x, bottom + lineWidth2);
                             ctx.stroke();
+                            if (ctx.setLineDash) ctx.setLineDash([]);
                         }
-                        if (p2.y < viewport2d.height) {
+                        if (p2.y < viewport2d.height)
+                        {
                             ctx.beginPath();
                             ctx.moveTo(left - lineWidth2, p2.y);
                             ctx.lineTo(right + lineWidth2, p2.y);
@@ -820,6 +828,12 @@ var CZ;
             this.type = 'timeline';
 
             this.endDate = timelineinfo.endDate;
+
+            this.FromIsCirca = timelineinfo.FromIsCirca || false;
+            this.ToIsCirca   = timelineinfo.ToIsCirca   || false;
+
+            this.settings.showFromCirca = this.FromIsCirca;
+            this.settings.showToCirca   = this.ToIsCirca;
 
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
@@ -1214,6 +1228,11 @@ var CZ;
                 var p = viewport2d.pointVirtualToScreen(xc, yc);
                 var radp = viewport2d.widthVirtualToScreen(rad);
 
+                if (this.settings.showCirca && ctx.setLineDash)
+                {
+                    ctx.setLineDash([6, 3]);
+                }
+
                 ctx.globalAlpha = opacity;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, radp, 0, Math.PI * 2, true);
@@ -1230,9 +1249,15 @@ var CZ;
                         ctx.lineWidth = 1;
                     ctx.stroke();
                 }
+
                 if (this.settings.fillStyle) {
                     ctx.fillStyle = this.settings.fillStyle;
                     ctx.fill();
+                }
+
+                if (ctx.setLineDash)
+                {
+                    ctx.setLineDash([]);
                 }
             };
 
@@ -2331,9 +2356,20 @@ var CZ;
         @param vh   (number) height of a bounding box in virtual space
         @param infodotDescription  ({title})
         */
-        function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDescription) {
+        function CanvasInfodot(vc, layerid, id, time, vyc, radv, contentItems, infodotDescription)
+        {
             this.base = CanvasCircle;
-            this.base(vc, layerid, id, time, vyc, radv, { strokeStyle: CZ.Settings.infoDotBorderColor, lineWidth: CZ.Settings.infoDotBorderWidth * radv, fillStyle: CZ.Settings.infoDotFillColor, isLineWidthVirtual: true });
+            this.base
+            (
+                vc, layerid, id, time, vyc, radv,
+                {
+                    strokeStyle: CZ.Settings.infoDotBorderColor,
+                    lineWidth: CZ.Settings.infoDotBorderWidth * radv,
+                    fillStyle: CZ.Settings.infoDotFillColor,
+                    isLineWidthVirtual: true,
+                    showCirca: infodotDescription.isCirca
+                }
+            );
             this.guid = infodotDescription.guid;
             this.type = 'infodot';
 
@@ -2342,6 +2378,7 @@ var CZ;
             this.hasContentItems = false;
             this.infodotDescription = infodotDescription;
             this.title = infodotDescription.title;
+            this.isCirca = infodotDescription.isCirca;
             this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
 
             contentItems.sort(function (a, b) {
