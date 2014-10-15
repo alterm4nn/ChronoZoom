@@ -2876,7 +2876,8 @@ var CZ;
                         }
                         if (p2.x < viewport2d.width)
                         {
-                            if (this.settings.showToCirca && ctx.setLineDash) ctx.setLineDash([6, 3]);
+                            if (this.settings.showToCirca  && ctx.setLineDash) ctx.setLineDash([6, 3]);
+                            if (this.settings.showInfinite && ctx.setLineDash) ctx.setLineDash([1, 3]);
                             ctx.beginPath();
                             ctx.moveTo(p2.x, top - lineWidth2);
                             ctx.lineTo(p2.x, bottom + lineWidth2);
@@ -2939,6 +2940,7 @@ var CZ;
 
             this.settings.showFromCirca = this.FromIsCirca;
             this.settings.showToCirca   = this.ToIsCirca;
+            this.settings.showInfinite = (timelineinfo.endDate == 9999);
 
             var width = timelineinfo.timeEnd - timelineinfo.timeStart;
 
