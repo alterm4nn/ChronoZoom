@@ -2884,6 +2884,7 @@ a {
 .cz-contentitem-listitem-icon {
   width: 15%;
   display: inline-block;
+  cursor: pointer;
 }
 .cz-contentitem-listitem-icon > img {
   width: 100%;

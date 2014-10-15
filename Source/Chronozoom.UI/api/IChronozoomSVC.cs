@@ -13,7 +13,7 @@ namespace Chronozoom.UI
 {
     [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "SVC")]
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Chronozoom")]
-    [ServiceContract(Namespace = "")]
+    [ServiceContract(Namespace = "Chronozoom.UI.IChronozoomSVC")]
     public interface IChronozoomSVC
     {
         /// <summary>

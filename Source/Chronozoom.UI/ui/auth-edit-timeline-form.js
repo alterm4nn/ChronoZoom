@@ -68,6 +68,9 @@ var CZ;
                     this.endDate.setDate(this.timeline.x + this.timeline.width, true);
                 }
 
+                $(_this.startDate.circaSelector).find('input').prop('checked', this.timeline.FromIsCirca);
+                $(_this.endDate.circaSelector  ).find('input').prop('checked', this.timeline.ToIsCirca);
+
                 this.saveButton.click(function (event) {
                     _this.errorMessage.empty();
                     var isDataValid = false;
@@ -87,6 +90,9 @@ var CZ;
                     } else {
                         _this.errorMessage.empty();
                         var self = _this;
+
+                        _this.timeline.FromIsCirca  = $(_this.startDate.circaSelector).find('input').is(':checked');
+                        _this.timeline.ToIsCirca    = $(_this.endDate.circaSelector  ).find('input').is(':checked');
 
                         _this.saveButton.prop('disabled', true);
                         CZ.Authoring.updateTimeline(_this.timeline, {

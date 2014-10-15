@@ -147,6 +147,7 @@ namespace Chronozoom.UI
 
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
+    [ServiceBehavior(MaxItemsInObjectGraph = 99999)]
     public partial class ChronozoomSVC : IChronozoomSVC
     {
         private static  readonly StorageCache   Cache                       = new StorageCache();
@@ -1446,7 +1447,9 @@ namespace Chronozoom.UI
                     Guid newTimelineGuid = Guid.NewGuid();
                     Timeline newTimeline = new Timeline { Id = newTimelineGuid, Title = timelineRequest.Title, Regime = timelineRequest.Regime };
                     newTimeline.FromYear = timelineRequest.FromYear;
+                    newTimeline.FromIsCirca = timelineRequest.FromIsCirca;
                     newTimeline.ToYear = timelineRequest.ToYear;
+                    newTimeline.ToIsCirca = timelineRequest.ToIsCirca;
                     newTimeline.Collection = collection;
 
                     // Update parent timeline.
@@ -1499,7 +1502,9 @@ namespace Chronozoom.UI
                     updateTimeline.Title = timelineRequest.Title;
                     updateTimeline.Regime = timelineRequest.Regime;
                     updateTimeline.FromYear = timelineRequest.FromYear;
+                    updateTimeline.FromIsCirca = timelineRequest.FromIsCirca;
                     updateTimeline.ToYear = timelineRequest.ToYear;
+                    updateTimeline.ToIsCirca = timelineRequest.ToIsCirca;
                     returnValue = updateTimelineGuid;
                 }
                 storage.SaveChanges();
@@ -1636,6 +1641,7 @@ namespace Chronozoom.UI
                     Exhibit newExhibit      = new Exhibit { Id = newExhibitGuid };
                     newExhibit.Title        = exhibitRequest.Title;
                     newExhibit.Year         = exhibitRequest.Year;
+                    newExhibit.IsCirca      = exhibitRequest.IsCirca;
                     newExhibit.Collection   = collection;
                     newExhibit.Depth        = parentTimeline.Depth + 1;
                     newExhibit.UpdatedBy    = storage.Users.Where(u => user.Id == user.Id).FirstOrDefault();
@@ -1683,6 +1689,7 @@ namespace Chronozoom.UI
                     // Update the exhibit fields
                     updateExhibit.Title         = exhibitRequest.Title;
                     updateExhibit.Year          = exhibitRequest.Year;
+                    updateExhibit.IsCirca       = exhibitRequest.IsCirca;
                     updateExhibit.UpdatedBy     = storage.Users.Where(u => user.Id == user.Id).FirstOrDefault();
                     updateExhibit.UpdatedTime   = DateTime.UtcNow;  // force timestamp update even if no changes have been made since save is still requested and someone else could've edited in meantime
                     returnValue.ExhibitId       = exhibitRequest.Id;

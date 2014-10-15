@@ -449,6 +449,8 @@ var CZ;
                 strokeStyle: tlColor,
                 regime: timeline.Regime,
                 endDate: timeline.endDate,
+                FromIsCirca: timeline.FromIsCirca || false,
+                ToIsCirca: timeline.ToIsCirca || false,
                 opacity: 0
             });
 
@@ -469,6 +471,7 @@ var CZ;
                         guid: childInfodot.id,
                         title: childInfodot.title,
                         date: childInfodot.time,
+                        isCirca: childInfodot.IsCirca,
                         opacity: 1
                     });
                 });
