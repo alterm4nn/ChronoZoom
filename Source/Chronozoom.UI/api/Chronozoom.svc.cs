@@ -147,6 +147,7 @@ namespace Chronozoom.UI
 
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
+    [ServiceBehavior(MaxItemsInObjectGraph = 99999)]
     public partial class ChronozoomSVC : IChronozoomSVC
     {
         private static  readonly StorageCache   Cache                       = new StorageCache();
