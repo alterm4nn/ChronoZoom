@@ -21,6 +21,8 @@ namespace Chronozoom.UI
     public class PageInformation
     {
         public string AnalyticsServiceId        { get; private set; }
+        public bool   AirbrakeTrackServer       { get; private set; }
+        public bool   AirbrakeTrackClient       { get; private set; }
         public string AirbrakeProjectId         { get; private set; }
         public string AirbrakeProjectKey        { get; private set; }
         public string AirbrakeEnvironmentName   { get; private set; }
@@ -44,9 +46,11 @@ namespace Chronozoom.UI
         public PageInformation()
         {
             AnalyticsServiceId      = ConfigurationManager.AppSettings["AnalyticsServiceId"];
-            AirbrakeProjectId       = ConfigurationManager.AppSettings["AirbrakeProjectId"];
-            AirbrakeProjectKey      = ConfigurationManager.AppSettings["AirbrakeProjectKey"];
-            AirbrakeEnvironmentName = ConfigurationManager.AppSettings["AirbrakeEnvironmentName"];  if (AirbrakeEnvironmentName == "") AirbrakeEnvironmentName = "development";
+            AirbrakeTrackServer     = ConfigurationManager.AppSettings["AirbrakeTrackServer"].ToLower() == "true" ? true : false;
+            AirbrakeTrackClient     = ConfigurationManager.AppSettings["AirbrakeTrackClient"].ToLower() == "true" ? true : false;
+            AirbrakeProjectId       = AirbrakeTrackClient ? ConfigurationManager.AppSettings["AirbrakeProjectId" ] : "";
+            AirbrakeProjectKey      = AirbrakeTrackClient ? ConfigurationManager.AppSettings["AirbrakeProjectKey"] : "";
+            AirbrakeEnvironmentName = ConfigurationManager.AppSettings["AirbrakeEnvironmentName"]; if (AirbrakeEnvironmentName == "") AirbrakeEnvironmentName = "development";
             OneDriveClientID        = ConfigurationManager.AppSettings["OneDriveClientID"];
             UseMergedJSFiles        = ConfigurationManager.AppSettings["UseMergedJavaScriptFiles"   ].ToLower() == "true" ? true : false;
             UseMinifiedJSFiles      = ConfigurationManager.AppSettings["UseMinifiedJavaScriptFiles" ].ToLower() == "true" ? true : false;
@@ -278,6 +282,8 @@ namespace Chronozoom.UI
             XElement scriptNode = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:script[@id='constants']", xmlNamespaceManager);
             scriptNode.Value = "var constants = { " +
                 "analyticsId: \""               + pageInformation.AnalyticsServiceId                        + "\", " +
+                "airbrakeTrackServer: "         + pageInformation.AirbrakeTrackServer.ToString().ToLower()  + ", "   +
+                "airbrakeTrackClient: "         + pageInformation.AirbrakeTrackClient.ToString().ToLower()  + ", "   +
                 "airbrakeProjectId: \""         + pageInformation.AirbrakeProjectId                         + "\", " +
                 "airbrakeProjectKey: \""        + pageInformation.AirbrakeProjectKey                        + "\", " +
                 "airbrakeEnvironmentName: \""   + pageInformation.AirbrakeEnvironmentName                   + "\", " +
