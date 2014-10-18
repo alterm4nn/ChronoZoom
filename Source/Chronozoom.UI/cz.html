@@ -10,7 +10,7 @@
         function initAirbrake(client)
         {
             client.setProject(constants.airbrakeProjectId, constants.airbrakeProjectKey);
-            client.setEnvironmentName(constants.airbrakeEnvironmentName);
+            client.setEnvironmentName(constants.airbrakeEnvironment + ' (JS)');
         }
     </script>
     <script type="text/javascript">
@@ -39,7 +39,7 @@
     </script>
     <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="/scripts/external/airbrake-shim.js"></script>
-    <script type="text/javascript" src="//code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/ui/1.10.2/jquery-ui.min.js"></script>
     <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.0.6-development-only.js"></script>
     <script type="text/javascript" src="//js.live.net/v5.0/wl.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
