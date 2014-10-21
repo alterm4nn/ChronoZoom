@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.IdentityModel.Web;
+using System.Configuration;
 using System.ServiceModel.Activation;
 using System.Web;
 using System.Web.Compilation;
@@ -10,8 +12,7 @@ using System.Web.Routing;
 using System.Web.UI;
 using Chronozoom.Entities;
 using OuterCurve;
-using Microsoft.IdentityModel.Web;
-using System.Configuration;
+using SharpBrake;
 
 namespace Chronozoom.UI
 {
@@ -132,6 +133,8 @@ namespace Chronozoom.UI
 
         public void Application_Error(object sender, EventArgs e)
         {
+            Exception lastError = Server.GetLastError();
+            if (ConfigurationManager.AppSettings["Airbrake.TrackServer"].ToLower() == "true") lastError.SendToAirbrake();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
