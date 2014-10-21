@@ -20,16 +20,18 @@ namespace Chronozoom.UI
 {
     public class PageInformation
     {
-        public string AnalyticsServiceId        { get; private set; }
-        public string AirbrakeProjectId         { get; private set; }
-        public string AirbrakeProjectKey        { get; private set; }
-        public string AirbrakeEnvironmentName   { get; private set; }
-        public string OneDriveClientID          { get; private set; }
-        public bool   UseMergedJSFiles          { get; private set; }
-        public bool   UseMinifiedJSFiles        { get; private set; }
-        public string CSSFileVersion            { get; private set; }
-        public string JSFileVersion             { get; private set; }
-        public string SchemaVersion             { get; private set; }
+        public string AnalyticsServiceId    { get; private set; }
+        public bool   AirbrakeTrackServer   { get; private set; }
+        public bool   AirbrakeTrackClient   { get; private set; }
+        public string AirbrakeProjectId     { get; private set; }
+        public string AirbrakeProjectKey    { get; private set; }
+        public string AirbrakeEnvironment   { get; private set; }
+        public string OneDriveClientID      { get; private set; }
+        public bool   UseMergedJSFiles      { get; private set; }
+        public bool   UseMinifiedJSFiles    { get; private set; }
+        public string CSSFileVersion        { get; private set; }
+        public string JSFileVersion         { get; private set; }
+        public string SchemaVersion         { get; private set; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string Title { get; set; }
@@ -43,17 +45,18 @@ namespace Chronozoom.UI
         // constructor
         public PageInformation()
         {
-            AnalyticsServiceId      = ConfigurationManager.AppSettings["AnalyticsServiceId"];
-            AirbrakeProjectId       = ConfigurationManager.AppSettings["AirbrakeProjectId"];
-            AirbrakeProjectKey      = ConfigurationManager.AppSettings["AirbrakeProjectKey"];
-            AirbrakeEnvironmentName = ConfigurationManager.AppSettings["AirbrakeEnvironmentName"];  if (AirbrakeEnvironmentName == "") AirbrakeEnvironmentName = "development";
-            OneDriveClientID        = ConfigurationManager.AppSettings["OneDriveClientID"];
-            UseMergedJSFiles        = ConfigurationManager.AppSettings["UseMergedJavaScriptFiles"   ].ToLower() == "true" ? true : false;
-            UseMinifiedJSFiles      = ConfigurationManager.AppSettings["UseMinifiedJavaScriptFiles" ].ToLower() == "true" ? true : false;
-            CSSFileVersion          = GetFileVersion("/css/cz.min.css");
-            JSFileVersion           = GetFileVersion("/cz.merged.js");
-            SchemaVersion           = GetLastSchemaUpdate();
-            Images                  = new List<string>();
+            AnalyticsServiceId  = ConfigurationManager.AppSettings["AnalyticsServiceId"];
+            AirbrakeTrackClient = ConfigurationManager.AppSettings["Airbrake.TrackClient"       ].ToLower() == "true" ? true : false;
+            AirbrakeProjectId   = AirbrakeTrackClient ? ConfigurationManager.AppSettings["Airbrake.ProjectId"   ] : "";
+            AirbrakeProjectKey  = AirbrakeTrackClient ? ConfigurationManager.AppSettings["Airbrake.ApiKey"      ] : "";
+            AirbrakeEnvironment = ConfigurationManager.AppSettings["Airbrake.Environment"]; if (AirbrakeEnvironment == "") AirbrakeEnvironment = "development";
+            OneDriveClientID    = ConfigurationManager.AppSettings["OneDriveClientID"];
+            UseMergedJSFiles    = ConfigurationManager.AppSettings["UseMergedJavaScriptFiles"   ].ToLower() == "true" ? true : false;
+            UseMinifiedJSFiles  = ConfigurationManager.AppSettings["UseMinifiedJavaScriptFiles" ].ToLower() == "true" ? true : false;
+            CSSFileVersion      = GetFileVersion("/css/cz.min.css");
+            JSFileVersion       = GetFileVersion("/cz.merged.js");
+            SchemaVersion       = GetLastSchemaUpdate();
+            Images              = new List<string>();
         }
 
         /// <summary>
@@ -277,17 +280,18 @@ namespace Chronozoom.UI
         {
             XElement scriptNode = pageRoot.XPathSelectElement("/xhtml:html/xhtml:head/xhtml:script[@id='constants']", xmlNamespaceManager);
             scriptNode.Value = "var constants = { " +
-                "analyticsId: \""               + pageInformation.AnalyticsServiceId                        + "\", " +
-                "airbrakeProjectId: \""         + pageInformation.AirbrakeProjectId                         + "\", " +
-                "airbrakeProjectKey: \""        + pageInformation.AirbrakeProjectKey                        + "\", " +
-                "airbrakeEnvironmentName: \""   + pageInformation.AirbrakeEnvironmentName                   + "\", " +
-                "onedriveClientId: \""          + pageInformation.OneDriveClientID                          + "\", " +
-                "useMergedJSFiles: "            + pageInformation.UseMergedJSFiles.ToString(  ).ToLower()   +   ", " +
-                "useMinifiedJSFiles: "          + pageInformation.UseMinifiedJSFiles.ToString().ToLower()   +   ", " +
-                "cssFileVersion: \""            + pageInformation.CSSFileVersion                            + "\", " +
-                "jsFileVersion: \""             + pageInformation.JSFileVersion                             + "\", " +
-                "schemaVersion: \""             + pageInformation.SchemaVersion                             + "\", " +
-                "environment: \""               + CurrentEnvironment.ToString()                             + "\"  " +
+                "analyticsId: \""           + pageInformation.AnalyticsServiceId                        + "\", " +
+                "airbrakeTrackClient: "     + pageInformation.AirbrakeTrackClient.ToString().ToLower()  + ", "   +
+                "airbrakeProjectId: \""     + pageInformation.AirbrakeProjectId                         + "\", " +
+                "airbrakeProjectKey: \""    + pageInformation.AirbrakeProjectKey                        + "\", " +
+                "airbrakeEnvironment: \""   + pageInformation.AirbrakeEnvironment                       + "\", " +
+                "onedriveClientId: \""      + pageInformation.OneDriveClientID                          + "\", " +
+                "useMergedJSFiles: "        + pageInformation.UseMergedJSFiles.ToString(  ).ToLower()   +   ", " +
+                "useMinifiedJSFiles: "      + pageInformation.UseMinifiedJSFiles.ToString().ToLower()   +   ", " +
+                "cssFileVersion: \""        + pageInformation.CSSFileVersion                            + "\", " +
+                "jsFileVersion: \""         + pageInformation.JSFileVersion                             + "\", " +
+                "schemaVersion: \""         + pageInformation.SchemaVersion                             + "\", " +
+                "environment: \""           + CurrentEnvironment.ToString()                             + "\"  " +
                 "};";
 
             if (!string.IsNullOrEmpty(pageInformation.Title))
