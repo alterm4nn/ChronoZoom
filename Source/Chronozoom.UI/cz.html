@@ -128,6 +128,7 @@
                     AddScript("/scripts/uiloader.js");
                     AddScript("/scripts/dates.js");
                     AddScript("/scripts/media.js");
+                    AddScript("/scripts/menus.js");
                     AddScript("/scripts/plugins/error-plugin.js");
                     AddScript("/scripts/plugins/utility-plugins.js");
                     AddScript("/scripts/extensions/extensions.js");
@@ -189,6 +190,43 @@
                 </li>
             </ul>
         </div>
+        <!-- new menus -->
+        <ul id="mnu">
+            <!-- Keep this three tier example for potential future use - chevron class is required -->
+            <!--
+            <li class="active">(Example)
+                <ul>
+                    <li>Three Tier Menu<span class="chevron">&#9654;</span>
+                        <ul>
+                            <li>Sub-Choice #1</li>
+                            <li>Sub-Choice #2</li>
+                            <li>Sub-Choice #3</li>
+                        </ul>
+                    </li>
+                    <li>Main Choice #2</li>
+                    <li>Main Choice #3</li>
+                </ul>
+            </li>
+            -->
+            <li id="mnuView" class="active">View
+                <ul>
+                    <li id="mnuViewTours">Guided Tours</li>
+                    <li id="mnuViewSeries" title="Time Series (Charts)">Time Series</li>
+                </ul>
+            </li>
+            <li id="mnuCurate">Curate
+                <ul>
+                    <li id="mnuCreateTimeline">Create Timeline</li>
+                    <li id="mnuCreateExhibit" >Create Exhibit</li>
+                    <li id="mnuCreateTour"    >Create Tour</li>
+                    <li id="mnuEditTours"     >Edit   Tours</li>
+                </ul>
+            </li>
+            <li id="mnuMine">My Collections</li>
+            <li id="mnuSearch"  title="Search ChronoZoom" ><img src="/images/search-icon.png"  alt="" /></li>
+            <li id="mnuProfile" title="Register / Sign In"><img src="/images/profile-icon.png" alt="" /></li>
+        </ul>
+        <!-- old menus -->
         <div class="fright navigation header-icons elements-kiosk-hide">
             <ul>
                 <li class=" fright">
@@ -212,7 +250,6 @@
                 <li class="fright">
                     <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
                 </li>
-
                 <li class="fright">
                     <div class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
                 </li>
