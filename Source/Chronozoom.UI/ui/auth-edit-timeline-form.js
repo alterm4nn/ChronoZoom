@@ -128,6 +128,8 @@ var CZ;
             };
 
             FormEditTimeline.prototype.show = function () {
+                CZ.Menus.isDisabled = true;
+                CZ.Menus.Refresh();
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "left",
@@ -141,6 +143,8 @@ var CZ;
                 var _this = this;
                 this.errorMessage.empty();
 
+                CZ.Menus.isDisabled = false;
+                CZ.Menus.Refresh();
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "left",

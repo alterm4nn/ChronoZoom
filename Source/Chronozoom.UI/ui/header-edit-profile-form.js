@@ -122,6 +122,8 @@ var CZ;
             };
 
             FormEditProfile.prototype.show = function () {
+                CZ.Menus.isDisabled = true;
+                CZ.Menus.Refresh();
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "right",
@@ -132,6 +134,8 @@ var CZ;
             };
 
             FormEditProfile.prototype.close = function () {
+                CZ.Menus.isDisabled = false;
+                CZ.Menus.Refresh();
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "right",

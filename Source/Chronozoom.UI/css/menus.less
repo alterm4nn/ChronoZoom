@@ -1,13 +1,13 @@
 ﻿/* level 1 */
 #mnu
 {
-    color: #efefef;
+    color: #eee;
     display: inline;
     float: right;
+    position: relative;
     margin: 3px 0 3px 0;
     padding: 0;
-    position: relative;
-    z-index: 2000;
+    z-index: 2100;
 }
 #mnu > li
 {
@@ -31,6 +31,11 @@
 {
     background-color: #0464a2;
 }
+#mnu.disabled > li
+{
+    background: transparent !important;
+    cursor: not-allowed !important;
+}
 
 /* level 2 */
 #mnu > li > ul
@@ -42,7 +47,7 @@
     padding: 0;
     border: solid 2px #0464a2;
     border-radius: 0 8px 8px 8px;
-    z-index: 2000;
+    z-index: 2100;
 }
 #mnu > li > ul > li
 {

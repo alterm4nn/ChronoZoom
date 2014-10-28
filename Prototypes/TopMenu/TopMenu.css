@@ -104,6 +104,7 @@ button[data-active="true"]
 #mnu.disabled > li
 {
     background: transparent !important;
+    cursor: not-allowed !important;
 }
 /* level 2 */
 #mnu > li > ul

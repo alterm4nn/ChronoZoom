@@ -217,14 +217,21 @@ var CZ;
             CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;
             CZ.Settings.infoDotBorderColor = themeSettings.infoDotBorderColor;
 
-            if (themeSettings.kioskMode) {
+            CZ.Menus.isHidden = (themeSettings.kioskMode == true);
+            CZ.Menus.Refresh();
+
+            if (themeSettings.kioskMode)
+            {
                 $(".elements-kiosk-hide").hide();
-                $(".elements-kiosk-disable").on("click", function (e) {
+                $(".elements-kiosk-disable").on("click", function (e)
+                {
                     e.preventDefault();
                 });
                 CZ.Settings.infodotBibliographyHeight = 0;
                 CZ.Settings.contentItemSourceHeight = 0;
-            } else {
+            }
+            else
+            {
                 $('.elements-kiosk-hide').show();
                 $(".elements-kiosk-disable").off("click");
                 CZ.Settings.infodotBibliographyHeight = 10.0 / 489;
