@@ -12685,8 +12685,8 @@ var CZ;
                 }
                 else
                 {
-                    // show my collections overlay
-                    CZ.StartPage.show();
+                    // show my collections overlay (with preference for display of My Collections if viewing Cosmos)
+                    CZ.StartPage.show(true);
                 }
             });
 
@@ -19085,7 +19085,8 @@ var CZ;
         }
         StartPage.TwitterLayout = TwitterLayout;
 
-        function show() {
+        function show(preferPersonalizedLayout)
+        {
             // Hide regimes.
             $(".header-regimes").invisible();
 
@@ -19094,6 +19095,9 @@ var CZ;
 
             // Hide all forms.
             CZ.HomePageViewModel.closeAllForms();
+
+            // Choose which columns to display
+            Layout(preferPersonalizedLayout);
 
             // Show home page.
             $("#start-page").fadeIn();
@@ -19208,6 +19212,29 @@ var CZ;
             }
         }
         StartPage.initialize = initialize;
+
+        function Layout(preferPersonalizedLayout)
+        {
+            if 
+            (
+                (!preferPersonalizedLayout  &&  CZ.Settings.isCosmosCollection) ||
+                (!CZ.Authoring.isEnabled    && !CZ.Settings.isAuthorized)
+            )
+            {
+                $('#WelcomeBlock'           ).attr('data-toggle', 'show');
+                $('#MyTimelinesBlock'       ).attr('data-toggle', 'hide');
+                $('#FavoriteTimelinesBlock' ).attr('data-toggle', 'hide');
+                $('#TwitterBlock'           ).attr('data-toggle', 'show');
+            }
+            else
+            {
+                $('#WelcomeBlock'           ).attr('data-toggle', 'hide');
+                $('#MyTimelinesBlock'       ).attr('data-toggle', 'show');
+                $('#FavoriteTimelinesBlock' ).attr('data-toggle', 'hide');
+                $('#TwitterBlock'           ).attr('data-toggle', 'show');
+            }
+        }
+
     })(CZ.StartPage || (CZ.StartPage = {}));
     var StartPage = CZ.StartPage;
 })(CZ || (CZ = {}));
@@ -19440,9 +19467,6 @@ var CZ;
                 window.location.href = '/';
             });
 
-            $('.header-regimes'    ).visible();
-            $('.header-breadcrumbs').visible();
-
             // if URL has a supercollection
             // check if current user has edit permissions before continuing with load
             // since other parts of load need to know if can display edit buttons etc.
@@ -19466,7 +19490,13 @@ var CZ;
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
-                CZ.Settings.isCosmosCollection = (CZ.Service.superCollectionName === 'chronozoom' && CZ.Service.collectionName === 'Cosmos');
+                CZ.Settings.isCosmosCollection =
+                (
+                    (CZ.Service.superCollectionName === 'ChronoZoom' || typeof CZ.Service.superCollectionName == 'undefined') &&
+                    (CZ.Service.collectionName      === 'Cosmos'     || typeof CZ.Service.collectionName      == 'undefined')
+                );
+
+                if (CZ.Settings.isCosmosCollection) $('.header-regimes').show();
 
                 CZ.Menus.isEditor = CZ.Service.canEdit;
                 CZ.Menus.Refresh();
@@ -19757,21 +19787,6 @@ var CZ;
                 {
                     CZ.Menus.isSignedIn = CZ.Settings.isAuthorized;
                     CZ.Menus.Refresh();
-
-                    if 
-                    (
-                        CZ.Settings.isCosmosCollection ||
-                        (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized)
-                    )
-                    {
-                        $("#WelcomeBlock").attr("data-toggle", "show");
-                        $("#TwitterBlock").attr("data-toggle", "show");
-                    }
-                    else
-                    {
-                        $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
-                        $("#MyTimelinesBlock"      ).attr("data-toggle", "show");
-                    }
 
                     if (CZ.Authoring.isEnabled) $('#editCollectionButton .hidden').removeClass('hidden');
 
