@@ -728,10 +728,8 @@ var CZ;
                 CZ.Search.onSearchClicked();
 
             if (Tours.isTourWindowVisible) {
-                $(".tour-icon").removeClass("active");
                 $("#tours").hide('slide', {}, 'slow');
             } else {
-                $(".tour-icon").addClass("active");
                 $("#tours").show('slide', {}, 'slow');
             }
             Tours.isTourWindowVisible = !Tours.isTourWindowVisible;

@@ -238,8 +238,8 @@
                 }
                 else
                 {
-                    // show my collections overlay
-                    CZ.StartPage.show();
+                    // show my collections overlay (with preference for display of My Collections if viewing Cosmos)
+                    CZ.StartPage.show(true);
                 }
             });
 

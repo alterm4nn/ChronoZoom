@@ -139,7 +139,7 @@ input.error {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-image: url('../images/default-tile.png');
+  background-image: url('/images/default-tile.png');
 }
 .tile-photo:hover {
   cursor: pointer;
@@ -284,7 +284,7 @@ input.error {
 }
 .WelcomeBlock .welcome-box-1 {
   margin-top: 3px;
-  text-align: bottom;
+  vertical-align: bottom;
 }
 .WelcomeBlock .welcome-box-1 h1 {
   font-size: 34px;

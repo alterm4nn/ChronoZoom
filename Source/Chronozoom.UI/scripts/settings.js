@@ -5,13 +5,11 @@ var CZ;
         Settings.isAuthorized = false;
         Settings.userSuperCollectionName = "";
         Settings.userCollectionName = "";
+        Settings.isCosmosCollection = false;
 
         Settings.favoriteTimelines = [];
 
         Settings.czDataSource = 'db';
-
-        // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
-        Settings.czVersion = "main";
 
         Settings.ellipticalZoomZoomoutFactor = 0.5;
         Settings.ellipticalZoomDuration = 9000;

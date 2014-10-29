@@ -18,10 +18,8 @@ var CZ;
                 CZ.Tours.onTourClicked();
 
             if (Search.isSearchWindowVisible) {
-                $(".search-icon").removeClass("active");
                 $("#search").hide('slide', {}, 'slow');
             } else {
-                $(".search-icon").addClass("active");
                 $("#search").show('slide', {}, 'slow', function () {
                     $("#searchTextBox").focus();
                 });

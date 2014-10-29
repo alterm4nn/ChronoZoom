@@ -5,13 +5,11 @@ var CZ;
         Settings.isAuthorized = false;
         Settings.userSuperCollectionName = "";
         Settings.userCollectionName = "";
+        Settings.isCosmosCollection = false;
 
         Settings.favoriteTimelines = [];
 
         Settings.czDataSource = 'db';
-
-        // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
-        Settings.czVersion = "main";
 
         Settings.ellipticalZoomZoomoutFactor = 0.5;
         Settings.ellipticalZoomDuration = 9000;
@@ -7426,10 +7424,8 @@ var CZ;
                 CZ.Search.onSearchClicked();
 
             if (Tours.isTourWindowVisible) {
-                $(".tour-icon").removeClass("active");
                 $("#tours").hide('slide', {}, 'slow');
             } else {
-                $(".tour-icon").addClass("active");
                 $("#tours").show('slide', {}, 'slow');
             }
             Tours.isTourWindowVisible = !Tours.isTourWindowVisible;
@@ -7626,10 +7622,8 @@ var CZ;
                 CZ.Tours.onTourClicked();
 
             if (Search.isSearchWindowVisible) {
-                $(".search-icon").removeClass("active");
                 $("#search").hide('slide', {}, 'slow');
             } else {
-                $(".search-icon").addClass("active");
                 $("#search").show('slide', {}, 'slow', function () {
                     $("#searchTextBox").focus();
                 });
@@ -18644,7 +18638,7 @@ var CZ;
             }
 
             CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
-                activationSource: $(".tour-icon"),
+                activationSource: $(),
                 navButton: ".cz-form-nav",
                 closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
                 titleTextblock: ".cz-tour-form-title",
@@ -19092,15 +19086,6 @@ var CZ;
         StartPage.TwitterLayout = TwitterLayout;
 
         function show() {
-            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
-            $(".home-icon").addClass("active");
-
-            // Disable buttons: save click handlers and remove them.
-            $disabledButtons.attr("disabled", "disabled").each(function (i, el) {
-                var events = $(el).data("events");
-                $(el).data("onclick", events && events.click && events.click[0]);
-            }).off();
-
             // Hide regimes.
             $(".header-regimes").invisible();
 
@@ -19125,16 +19110,9 @@ var CZ;
         }
 
         function hide() {
-            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
-            $(".home-icon").removeClass("active");
-
-            // Enable buttons: add saved handlers.
-            $disabledButtons.removeAttr("disabled").each(function (i, el) {
-                $(el).click($(el).data("onclick"));
-            });
-
             // Show regimes if necessary.
-            if (_isRegimesVisible) {
+            if (_isRegimesVisible)
+            {
                 $(".header-regimes").visible();
             }
 
@@ -19150,16 +19128,6 @@ var CZ;
             // Is regimes visible initially?
             _isRegimesVisible = $(".header-regimes").is(":visible");
 
-            // Toggle for home button.
-            $(".home-icon").click(function () {
-                if ($("#start-page").is(":visible")) {
-                    hide();
-                } else {
-                    show();
-                }
-            });
-
-            // TODO: Replace with current user.
             CZ.Service.getUserFeatured().done(function (response) {
                 // Show the newest featured timelines first.
                 var timelines = response ? response.reverse() : [];
@@ -19312,88 +19280,7 @@ var CZ;
             "#auth-edit-collection-editors": "/ui/auth-edit-collection-editors.html"
         };
 
-        (function (FeatureActivation) {
-            FeatureActivation[FeatureActivation["Enabled"] = 0] = "Enabled";
-            FeatureActivation[FeatureActivation["Disabled"] = 1] = "Disabled";
-            FeatureActivation[FeatureActivation["RootCollection"] = 2] = "RootCollection";
-            FeatureActivation[FeatureActivation["NotRootCollection"] = 3] = "NotRootCollection";
-            FeatureActivation[FeatureActivation["NotProduction"] = 4] = "NotProduction";
-        })(HomePageViewModel.FeatureActivation || (HomePageViewModel.FeatureActivation = {}));
-        var FeatureActivation = HomePageViewModel.FeatureActivation;
-
         HomePageViewModel.sessionForm;
-
-        // Basic Flight-Control (Tracks the features that are enabled)
-        //
-        // FEATURES CAN ONLY BE ACTIVATED IN ROOTCOLLECTION AFTER HITTING ZERO ACTIVE BUGS.
-        //
-        // REMOVING THIS COMMENT OR BYPASSING THIS CHECK MAY BRING YOU BAD KARMA, ITS TRUE.
-        //
-        var _featureMap = [
-            {
-                Name: "Login",
-                Activation: 0 /* Enabled */,
-                JQueryReference: "#login-panel"
-            },
-            {
-                Name: "Search",
-                Activation: 0 /* Enabled */,
-                JQueryReference: "#search-button"
-            },
-            {
-                Name: "Tours",
-                Activation: 0 /* Enabled */,
-                JQueryReference: "#tours-index"
-            },
-            {
-                Name: "Authoring",
-                Activation: 0 /* Enabled */,
-                JQueryReference: ".header-icon.edit-icon"
-            },
-            {
-                Name: "TourAuthoring",
-                Activation: 0 /* Enabled */,
-                JQueryReference: ".cz-form-create-tour"
-            },
-            {
-                Name: "WelcomeScreen",
-                Activation: 2 /* RootCollection */,
-                JQueryReference: "#welcomeScreenBack"
-            },
-            {
-                Name: "Regimes",
-                Activation: 2 /* RootCollection */,
-                JQueryReference: ".header-regimes"
-            },
-            {
-                Name: "TimeSeries",
-                Activation: 0 /* Enabled */
-            },
-            {
-                Name: "ManageCollections",
-                Activation: 1 /* Disabled */,
-                JQueryReference: "#collections_button"
-            },
-            {
-                Name: "BreadCrumbs",
-                Activation: 0 /* Enabled */,
-                JQueryReference: ".header-breadcrumbs"
-            },
-            {
-                Name: "Skydrive",
-                Activation: 0 /* Enabled */
-            },
-            {
-                Name: "StartPage",
-                Activation: 0 /* Enabled */,
-                JQueryReference: ".header-icon.home-icon"
-            },
-            {
-                Name: "CollectionsAuthoring",
-                Activation: 0 /* Enabled */
-            }
-        ];
-
         HomePageViewModel.rootCollection;
 
         function UserCanEditCollection(profile) {
@@ -19417,7 +19304,7 @@ var CZ;
         function InitializeToursUI(profile, forms)
         {
             CZ.Tours.tourCaptionFormContainer = forms[16];
-            var allowEditing = IsFeatureEnabled(_featureMap, "TourAuthoring") && UserCanEditCollection(profile);
+            var allowEditing =UserCanEditCollection(profile);
 
             var onTakeTour = function (tour)
             {
@@ -19426,7 +19313,7 @@ var CZ;
                 (
                     CZ.Tours.tourCaptionFormContainer,
                     {
-                        activationSource: $(".tour-icon"),
+                        activationSource: $(),
                         navButton: ".cz-form-nav",
                         closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
                         titleTextblock: ".cz-tour-form-title",
@@ -19440,7 +19327,6 @@ var CZ;
                     }
                 );
                 CZ.Tours.tourCaptionForm.show();
-
                 CZ.Tours.removeActiveTour();
                 CZ.Tours.activateTour(tour, undefined);
             };
@@ -19452,13 +19338,13 @@ var CZ;
                 // canEdit true         = edit rights rendering
                 if (typeof canEdit == 'undefined') canEdit = allowEditing;
 
-                CZ.StartPage.hide();
 
                 if (canEdit && CZ.Tours.tours)
                 {
                     if (CZ.Tours.tours.length === 0)
                     {
                         // if there are no tours to show and user has tour editing rights, lets fire off the add a tour dialog instead
+                        CZ.StartPage.hide();
                         CZ.HomePageViewModel.closeAllForms();
                         CZ.Authoring.UI.createTour();
                         return;
@@ -19472,30 +19358,28 @@ var CZ;
                 }
                 else
                 {
-                    if (!$("#start-page").is(":visible"))
-                    {
-                        closeAllForms();
-                        var form = new CZ.UI.FormToursList
-                        (
-                            forms[9],
+                    CZ.StartPage.hide();
+                    closeAllForms();
+                    var form = new CZ.UI.FormToursList
+                    (
+                        forms[9],
+                        {
+                            activationSource: $(this),
+                            navButton: ".cz-form-nav",
+                            closeButton: ".cz-form-close-btn > .cz-form-btn",
+                            titleTextblock: ".cz-form-title",
+                            tourTemplate: forms[10],
+                            tours: CZ.Tours.tours,
+                            takeTour: onTakeTour,
+                            editTour: canEdit ? function (tour)
                             {
-                                activationSource: $(this),
-                                navButton: ".cz-form-nav",
-                                closeButton: ".cz-form-close-btn > .cz-form-btn",
-                                titleTextblock: ".cz-form-title",
-                                tourTemplate: forms[10],
-                                tours: CZ.Tours.tours,
-                                takeTour: onTakeTour,
-                                editTour: canEdit ? function (tour)
-                                {
-                                    if (CZ.Authoring.showEditTourForm) CZ.Authoring.showEditTourForm(tour);
-                                }
-                                : null,
-                                createTour: ".cz-form-create-tour"
+                                if (CZ.Authoring.showEditTourForm) CZ.Authoring.showEditTourForm(tour);
                             }
-                        );
-                        form.show();
-                    }
+                            : null,
+                            createTour: ".cz-form-create-tour"
+                        }
+                    );
+                    form.show();
                 }
             };
 
@@ -19541,23 +19425,23 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
-
-            // apply features
-            ApplyFeatureActivation();
-
+            
             // register ChronoZoom extensions
             CZ.Extensions.registerExtensions();
 
             // register ChronoZoom media pickers
-            CZ.Media.SkyDriveMediaPicker.isEnabled = IsFeatureEnabled(_featureMap, "Skydrive");
+            CZ.Media.SkyDriveMediaPicker.isEnabled = true;
             CZ.Media.initialize();
             CZ.Common.initialize();
 
             // hook logo click
-            $('.header-logo').click(function () {
-                //$('.home-icon').trigger('click');
+            $('.header-logo').click(function ()
+            {
                 window.location.href = '/';
             });
+
+            $('.header-regimes'    ).visible();
+            $('.header-breadcrumbs').visible();
 
             // if URL has a supercollection
             // check if current user has edit permissions before continuing with load
@@ -19582,6 +19466,8 @@ var CZ;
             CZ.UILoader.loadAll(_uiMap).done(function () {
                 var forms = arguments;
 
+                CZ.Settings.isCosmosCollection = (CZ.Service.superCollectionName === 'chronozoom' && CZ.Service.collectionName === 'Cosmos');
+
                 CZ.Menus.isEditor = CZ.Service.canEdit;
                 CZ.Menus.Refresh();
 
@@ -19600,7 +19486,7 @@ var CZ;
                         (
                             timeSeriesDataFormDiv,
                             {
-                                activationSource: $("#timeSeries_button"),
+                                activationSource: $(),
                                 closeButton: ".cz-form-close-btn > .cz-form-btn"
                             }
                         );
@@ -19619,31 +19505,6 @@ var CZ;
                         }
                     }
                 };
-
-                $(".header-icon.edit-icon").click(function () {
-                    var editForm = getFormById("#header-edit-form");
-                    if (editForm === false) {
-                        closeAllForms();
-                        var form = new CZ.UI.FormHeaderEdit(forms[0], {
-                            activationSource: $(this),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            createTimeline: ".cz-form-create-timeline",
-                            createExhibit: ".cz-form-create-exhibit",
-                            createTour: ".cz-form-create-tour"
-                        });
-                        form.show();
-                        ApplyFeatureActivation();
-                    } else {
-                        if (editForm.isFormVisible) {
-                            editForm.close();
-                        } else {
-                            closeAllForms();
-                            editForm.show();
-                        }
-                    }
-                });
 
                 CZ.HomePageViewModel.panelToggleSearch = function ()
                 {
@@ -19685,7 +19546,7 @@ var CZ;
                 $("#editCollectionButton img").click(function () {
                     closeAllForms();
                     var form = new CZ.UI.FormEditCollection(forms[19], {
-                        activationSource: $(".header-icon.edit-icon"),
+                        activationSource: $(),
                         navButton: ".cz-form-nav",
                         closeButton: ".cz-form-close-btn > .cz-form-btn",
                         deleteButton: '.cz-form-delete',
@@ -19741,7 +19602,7 @@ var CZ;
                     showEditTourForm: function (tour) {
                         CZ.Tours.removeActiveTour();
                         var form = new CZ.UI.FormEditTour(forms[7], {
-                            activationSource: $(".header-icon.edit-icon"),
+                            activationSource: $(),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
@@ -19759,7 +19620,7 @@ var CZ;
                         CZ.Authoring.hideMessageWindow();
                         CZ.Authoring.mode = "createTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(".header-icon.edit-icon"),
+                            activationSource: $(),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
@@ -19776,7 +19637,7 @@ var CZ;
                     showCreateRootTimelineForm: function (timeline) {
                         CZ.Authoring.mode = "createRootTimeline";
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(".header-icon.edit-icon"),
+                            activationSource: $(),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
@@ -19792,7 +19653,7 @@ var CZ;
                     },
                     showEditTimelineForm: function (timeline) {
                         var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(".header-icon.edit-icon"),
+                            activationSource: $(),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
@@ -19809,7 +19670,7 @@ var CZ;
                     showCreateExhibitForm: function (exhibit) {
                         CZ.Authoring.hideMessageWindow();
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
-                            activationSource: $(".header-icon.edit-icon"),
+                            activationSource: $(),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
@@ -19827,7 +19688,7 @@ var CZ;
                     },
                     showEditExhibitForm: function (exhibit) {
                         var form = new CZ.UI.FormEditExhibit(forms[2], {
-                            activationSource: $(".header-icon.edit-icon"),
+                            activationSource: $(),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
@@ -19845,7 +19706,7 @@ var CZ;
                     },
                     showEditContentItemForm: function (ci, e, prevForm, noAnimation) {
                         var form = new CZ.UI.FormEditCI(forms[3], {
-                            activationSource: $(".header-icon.edit-icon"),
+                            activationSource: $(),
                             prevForm: prevForm,
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
@@ -19869,7 +19730,7 @@ var CZ;
                 });
 
                 HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
-                    activationSource: $("#header-session-expired-form"),
+                    activationSource: $(),
                     navButton: ".cz-form-nav",
                     closeButton: ".cz-form-close-btn > .cz-form-btn",
                     titleTextblock: ".cz-form-title",
@@ -19897,20 +19758,22 @@ var CZ;
                     CZ.Menus.isSignedIn = CZ.Settings.isAuthorized;
                     CZ.Menus.Refresh();
 
-                    if (!CZ.Authoring.isEnabled)
-                        $('.edit-icon').hide(); // hide create icon if don't have edit rights
-
-                    if (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized) {
+                    if 
+                    (
+                        CZ.Settings.isCosmosCollection ||
+                        (!CZ.Authoring.isEnabled && !CZ.Settings.isAuthorized)
+                    )
+                    {
                         $("#WelcomeBlock").attr("data-toggle", "show");
                         $("#TwitterBlock").attr("data-toggle", "show");
-                    } else {
+                    }
+                    else
+                    {
                         $("#FavoriteTimelinesBlock").attr("data-toggle", "show");
-                        $("#MyTimelinesBlock").attr("data-toggle", "show");
+                        $("#MyTimelinesBlock"      ).attr("data-toggle", "show");
                     }
 
-                    if (CZ.Authoring.isEnabled && IsFeatureEnabled(_featureMap, "CollectionsAuthoring")) {
-                        $('#editCollectionButton .hidden').removeClass('hidden');
-                    }
+                    if (CZ.Authoring.isEnabled) $('#editCollectionButton .hidden').removeClass('hidden');
 
                     //retrieving the data
                     CZ.Common.loadData().then(function (response) {
@@ -19940,7 +19803,7 @@ var CZ;
                 (
                     forms[6],
                     {
-                        activationSource: $("#login-panel"),
+                        activationSource: $(),
                         navButton: ".cz-form-nav",
                         closeButton: ".cz-form-close-btn > .cz-form-btn",
                         titleTextblock: ".cz-form-title",
@@ -19965,7 +19828,7 @@ var CZ;
                 (
                     forms[5],
                     {
-                        activationSource: $("#login-panel"),
+                        activationSource: $(),
                         navButton: ".cz-form-nav",
                         closeButton: ".cz-form-close-btn > .cz-form-btn",
                         titleTextblock: ".cz-form-title",
@@ -19979,7 +19842,7 @@ var CZ;
                         profilePanel: "#profile-panel",
                         loginPanelLogin: "#profile-panel.auth-panel-login",
                         context: "",
-                        allowRedirect: IsFeatureEnabled(_featureMap, "Authoring")
+                        allowRedirect: true
                     }
                 );
                 CZ.HomePageViewModel.panelToggleProfile = function ()
@@ -19995,41 +19858,36 @@ var CZ;
                     }
                 };
 
-                if (IsFeatureEnabled(_featureMap, "Login")) {
-                    CZ.Service.getProfile().done(function (data) {
-                        //Not authorized
-                        if (data == "") {
-                            $("#login-panel").show();
-                        } else if (data != "" && data.DisplayName == null) {
-                            $("#login-panel").hide();
-                            $("#profile-panel").show();
-                            $("#profile-panel input#username").focus();
-
-                            if (!profileForm.isFormVisible) {
-                                closeAllForms();
-                                profileForm.show();
-                            } else {
-                                profileForm.close();
-                            }
-                        } else {
-                            CZ.Settings.userSuperCollectionName = data.DisplayName;
-                            CZ.Settings.userCollectionName = data.DisplayName;
-                            $("#login-panel").hide();
-                            $("#profile-panel").show();
-                            $(".auth-panel-login").html(data.DisplayName);
-                        }
-
-                        InitializeToursUI(data, forms);
-                    }).fail(function (error) {
+                CZ.Service.getProfile().done(function (data) {
+                    //Not authorized
+                    if (data == "") {
                         $("#login-panel").show();
+                    } else if (data != "" && data.DisplayName == null) {
+                        $("#login-panel").hide();
+                        $("#profile-panel").show();
+                        $("#profile-panel input#username").focus();
+                        if (!profileForm.isFormVisible) {
+                            closeAllForms();
+                            profileForm.show();
+                        } else {
+                            profileForm.close();
+                        }
+                    } else {
+                        CZ.Settings.userSuperCollectionName = data.DisplayName;
+                        CZ.Settings.userCollectionName = data.DisplayName;
+                        $("#login-panel").hide();
+                        $("#profile-panel").show();
+                        $(".auth-panel-login").html(data.DisplayName);
+                    }
 
-                        InitializeToursUI(null, forms);
-                    });
-                }
+                    InitializeToursUI(data, forms);
+                }).fail(function (error) {
+                    $("#login-panel").show();
 
-                if (IsFeatureEnabled(_featureMap, "StartPage")) {
-                    CZ.StartPage.initialize();
-                }
+                    InitializeToursUI(null, forms);
+                });
+
+                CZ.StartPage.initialize();
             });
 
             CZ.Service.getServiceInformation().then(function (response) {
@@ -20276,14 +20134,6 @@ var CZ;
             }
         }
 
-        function IsFeatureEnabled(featureMap, featureName) {
-            var feature = $.grep(featureMap, function (e) {
-                return e.Name === featureName;
-            });
-            return feature[0].IsEnabled;
-        }
-        HomePageViewModel.IsFeatureEnabled = IsFeatureEnabled;
-
         function closeAllForms() {
             $('.cz-major-form').each(function (i, f) {
                 var form = $(f).data('form');
@@ -20435,42 +20285,7 @@ var CZ;
             }
         }
         HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
-
-        function ApplyFeatureActivation() {
-            for (var idxFeature = 0; idxFeature < _featureMap.length; idxFeature++) {
-                var feature = _featureMap[idxFeature];
-
-                if (feature.IsEnabled === undefined) {
-                    var enabled = true;
-                    if (feature.Activation === 1 /* Disabled */) {
-                        enabled = false;
-                    }
-
-                    if (feature.Activation === 3 /* NotRootCollection */ && HomePageViewModel.rootCollection) {
-                        enabled = false;
-                    }
-
-                    if (feature.Activation === 2 /* RootCollection */ && !HomePageViewModel.rootCollection) {
-                        enabled = false;
-                    }
-
-                    if (feature.Activation === 4 /* NotProduction */ && (constants && constants.environment && constants.environment === "Production")) {
-                        enabled = false;
-                    }
-
-                    _featureMap[idxFeature].IsEnabled = enabled;
-                }
-
-                if (feature.JQueryReference) {
-                    if (!_featureMap[idxFeature].IsEnabled) {
-                        $(feature.JQueryReference).css("display", "none");
-                    } else if (!_featureMap[idxFeature].HasBeenActivated) {
-                        _featureMap[idxFeature].HasBeenActivated = true;
-                        $(feature.JQueryReference).css("display", "block");
-                    }
-                }
-            }
-        }
+        
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));
