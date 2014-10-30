@@ -10357,6 +10357,8 @@ var CZ;
             var request = new Service.Request(_serviceUrl);
             request.addToPath('editablecollections');
             request.addParameter('includeMine', includeMine);
+            request.addParameter('currentSuperCollection', Service.superCollectionName);
+            request.addParameter('currentCollection', Service.collectionName);
             return $.ajax
             ({
                 type:       'GET',
@@ -18927,7 +18929,7 @@ var CZ;
             var layout = CZ.StartPage.tileLayout[4];
             for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
                 var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
+                var timelineUrl = timeline.CurrentCollection ? '' : timeline.TimelineUrl;
                 var $startPage = $("#start-page");
                 var $tile = $template.clone(true, true);
                 var $tileImage = $tile.find(".boxInner .tile-photo img");
@@ -18937,7 +18939,7 @@ var CZ;
                 // Set appearance and click handler.
                 // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "my" + i).click(timelineUrl, function (event) {
-                    window.location.href = event.data;
+                    if (event.data != '') window.location.href = event.data;
                     hide();
                 }).invisible();
 
@@ -18982,8 +18984,8 @@ var CZ;
 
             for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
                 var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-
+                var timelineUrl = timeline.CurrentCollection ? '' : timeline.TimelineUrl;
+                
                 var $timelineListItem = $(template).clone(true, true).appendTo(target);
                 var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
 
@@ -18992,7 +18994,7 @@ var CZ;
 
                 $timelineListItem.attr("id", "lmy" + idx + "i" + i);
                 $timelineListItem.click(timelineUrl, function (event) {
-                    window.location.href = event.data;
+                    if (event.data != '') window.location.href = event.data;
                     hide();
                 });
 
@@ -19245,8 +19247,8 @@ var CZ;
             {
                 $('#WelcomeBlock'           ).attr('data-toggle', 'hide');
                 $('#MyTimelinesBlock'       ).attr('data-toggle', 'show');
-                $('#FavoriteTimelinesBlock' ).attr('data-toggle', 'hide');
-                $('#TwitterBlock'           ).attr('data-toggle', 'show');
+                $('#FavoriteTimelinesBlock' ).attr('data-toggle', 'show');
+                $('#TwitterBlock'           ).attr('data-toggle', 'hide');
             }
         }
 

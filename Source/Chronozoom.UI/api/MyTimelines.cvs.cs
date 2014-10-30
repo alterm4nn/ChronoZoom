@@ -64,7 +64,7 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documented under IChronozoomSVC
         /// </summary>
-        public List<TimelineShortcut> GetEditableCollections(bool includeMine = false)
+        public List<TimelineShortcut> GetEditableCollections(string currentSuperCollection = "", string currentCollection = "", bool includeMine = false)
         {
             Trace.TraceInformation("GetEditableCollections");
             return ApiOperation<List<TimelineShortcut>>(delegate(User user, Storage storage)
@@ -85,10 +85,15 @@ namespace Chronozoom.UI
                                 .Select
                                 (c => new TimelineShortcut
                                     {
-                                        Title       = c.Title,
-                                        Author      = c.User.DisplayName,
-                                        ImageUrl    = c.Theme,
-                                        TimelineUrl = ('/' + c.SuperCollection.Title + '/' + c.Path).ToLower()
+                                        Title               = c.Title,
+                                        Author              = c.User.DisplayName,
+                                        ImageUrl            = c.Theme,
+                                        TimelineUrl         = ('/' + c.SuperCollection.Title + '/' + c.Path).ToLower(),
+                                        CurrentCollection   =
+                                        (
+                                            c.SuperCollection.Title == currentSuperCollection &&
+                                            c.Path                  == currentCollection
+                                        )
                                     }
                                 )
                                 .ToList();
@@ -105,10 +110,15 @@ namespace Chronozoom.UI
                                 .Select
                                 ( c => new TimelineShortcut
                                     {
-                                        Title       = c.Title,
-                                        Author      = c.User.DisplayName,
-                                        ImageUrl    = c.Theme,
-                                        TimelineUrl = ('/' + c.SuperCollection.Title + '/' + c.Path).ToLower()
+                                        Title               = c.Title,
+                                        Author              = c.User.DisplayName,
+                                        ImageUrl            = c.Theme,
+                                        TimelineUrl         = ('/' + c.SuperCollection.Title + '/' + c.Path).ToLower(),
+                                        CurrentCollection   =
+                                        (
+                                            c.SuperCollection.Title == currentSuperCollection &&
+                                            c.Path                  == currentCollection
+                                        )
                                     }
                                 )
                                 .ToList();
@@ -137,9 +147,6 @@ namespace Chronozoom.UI
         /// </summary>
         public Collection<TimelineShortcut> GetEditableTimelines(bool includeMine = false)
         {
-            // TODO: remove this quick test:
-            List<TimelineShortcut> test = GetEditableCollections(includeMine);
-
             Trace.TraceInformation("GetEditableTimelines");
             return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
             {
