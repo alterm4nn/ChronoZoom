@@ -384,6 +384,8 @@ var CZ;
             };
 
             FormEditCollection.prototype.show = function () {
+                CZ.Menus.isDisabled = true;
+                CZ.Menus.Refresh();
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "left",
@@ -395,6 +397,8 @@ var CZ;
 
             FormEditCollection.prototype.close = function () {
                 var _this = this;
+                CZ.Menus.isDisabled = false;
+                CZ.Menus.Refresh();
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "left",

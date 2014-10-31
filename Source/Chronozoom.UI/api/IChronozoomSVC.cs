@@ -1027,10 +1027,12 @@ namespace Chronozoom.UI
         /// Has option to also include those owned by current user in addition to edit rights on others.
         /// </summary>
         /// <param name="includeMine">Boolean. Defaults to false. Whether or not to include current user's collections.</param>
-        /// <returns>A list of timeline shortcuts. Each shortcut includes the author, image URL, collection URL and title.</returns>
+        /// <param name="currentSuperCollection">The current supercollection's name. Used to help identify if returned timeline is in current collection.</param>
+        /// <param name="currentCollection">The current collection's name. Used to help identify if returned timeline is in current collection.</param>
+        /// <returns>A list of timeline shortcuts. Each shortcut includes the title, author, image URL, collection URL and a boolean flag indicating if the timeline is in the current collection.</returns>
         [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/editablecollections?includeMine={includeMine}")]
-        List<TimelineShortcut> GetEditableCollections(bool includeMine = false);
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/editablecollections?currentSuperCollection={currentSuperCollection}&currentCollection={currentCollection}&includeMine={includeMine}")]
+        List<TimelineShortcut> GetEditableCollections(string currentSuperCollection = "", string currentCollection = "", bool includeMine = false);
 
         #endregion
 

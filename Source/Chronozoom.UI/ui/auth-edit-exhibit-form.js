@@ -359,6 +359,8 @@ var CZ;
                 CZ.Authoring.isActive = true;
                 this.activationSource.addClass("active");
                 this.errorMessage.hide();
+                CZ.Menus.isDisabled = true;
+                CZ.Menus.Refresh();
                 _super.prototype.show.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",
@@ -387,6 +389,8 @@ var CZ;
                     }
                 }
 
+                CZ.Menus.isDisabled = false;
+                CZ.Menus.Refresh();
                 _super.prototype.close.call(this, noAnimation ? undefined : {
                     effect: "slide",
                     direction: "left",

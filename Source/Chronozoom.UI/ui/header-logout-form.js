@@ -16,14 +16,16 @@ var CZ;
                 _super.call(this, container, formInfo);
             }
             FormLogoutProfile.prototype.show = function () {
+                CZ.Menus.isDisabled = true;
+                CZ.Menus.Refresh();
                 _super.prototype.show.call(this);
-
                 this.activationSource.addClass("active");
             };
 
             FormLogoutProfile.prototype.close = function () {
+                CZ.Menus.isDisabled = false;
+                CZ.Menus.Refresh();
                 _super.prototype.close.call(this);
-
                 this.activationSource.removeClass("active");
             };
             return FormLogoutProfile;

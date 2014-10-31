@@ -58,7 +58,7 @@ var CZ;
                     rolandData = result;
                 },
                 error: function (xhr) {
-                    alert("Error fetching timeSeries Data: " + xhr.responseText);
+                    alert("Error fetching time series data: " + xhr.responseText);
                 }
             });
 

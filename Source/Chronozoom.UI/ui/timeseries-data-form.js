@@ -31,7 +31,7 @@ var CZ;
                             preloadedlist = result.d;
                         },
                         error: function (xhr) {
-                            alert("Error fetching pre-loaded timeseries list: " + xhr.responseText);
+                            alert("Error fetching pre-loaded time series chart: " + xhr.responseText);
                         }
                     });
 
@@ -67,7 +67,7 @@ var CZ;
                                     data = result;
                                 },
                                 error: function (xhr) {
-                                    alert("Error fetching timeSeries Data: " + xhr.responseText);
+                                    alert("Error fetching time series data: " + xhr.responseText);
                                 }
                             });
 

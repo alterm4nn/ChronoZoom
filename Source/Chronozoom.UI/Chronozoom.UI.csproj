@@ -66,6 +66,12 @@
     <Content Include="css\media.min.css">
       <DependentUpon>media.less</DependentUpon>
     </Content>
+    <Content Include="css\menus.css">
+      <DependentUpon>menus.less</DependentUpon>
+    </Content>
+    <Content Include="css\menus.min.css">
+      <DependentUpon>menus.less</DependentUpon>
+    </Content>
     <Content Include="css\start-page.css">
       <DependentUpon>start-page.less</DependentUpon>
     </Content>
@@ -103,6 +109,8 @@
     <Content Include="images\add.png" />
     <Content Include="images\copy.svg" />
     <Content Include="images\paste.svg" />
+    <Content Include="images\profile-icon-green.png" />
+    <Content Include="images\profile-icon-yellow.png" />
     <Content Include="scripts\authoring-ui.min.js">
       <DependentUpon>authoring-ui.js</DependentUpon>
     </Content>
@@ -203,6 +211,7 @@
     <Content Include="scripts\media.min.js.map">
       <DependentUpon>media.js</DependentUpon>
     </Content>
+    <Content Include="scripts\menus.js" />
     <Content Include="scripts\plugins\error-plugin.min.js">
       <DependentUpon>error-plugin.js</DependentUpon>
     </Content>
@@ -472,6 +481,7 @@
       <DependentUpon>jquery.nouislider.js</DependentUpon>
     </Content>
     <Content Include="Merge.cmd" />
+    <Content Include="css\menus.less" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />

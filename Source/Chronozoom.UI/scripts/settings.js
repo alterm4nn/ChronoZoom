@@ -5,13 +5,11 @@ var CZ;
         Settings.isAuthorized = false;
         Settings.userSuperCollectionName = "";
         Settings.userCollectionName = "";
+        Settings.isCosmosCollection = false;
 
         Settings.favoriteTimelines = [];
 
         Settings.czDataSource = 'db';
-
-        // configures whether we should use Chronozoom.svc (directly accesses the database) ['db'], or ChronozoomRelay.svc (using HTTP GET) ['relay'], or saved as local file ResponseDump.txt ['dump'].
-        Settings.czVersion = "main";
 
         Settings.ellipticalZoomZoomoutFactor = 0.5;
         Settings.ellipticalZoomDuration = 9000;
@@ -217,14 +215,21 @@ var CZ;
             CZ.Settings.infoDotFillColor = themeSettings.infoDotFillColor;
             CZ.Settings.infoDotBorderColor = themeSettings.infoDotBorderColor;
 
-            if (themeSettings.kioskMode) {
+            CZ.Menus.isHidden = (themeSettings.kioskMode == true);
+            CZ.Menus.Refresh();
+
+            if (themeSettings.kioskMode)
+            {
                 $(".elements-kiosk-hide").hide();
-                $(".elements-kiosk-disable").on("click", function (e) {
+                $(".elements-kiosk-disable").on("click", function (e)
+                {
                     e.preventDefault();
                 });
                 CZ.Settings.infodotBibliographyHeight = 0;
                 CZ.Settings.contentItemSourceHeight = 0;
-            } else {
+            }
+            else
+            {
                 $('.elements-kiosk-hide').show();
                 $(".elements-kiosk-disable").off("click");
                 CZ.Settings.infodotBibliographyHeight = 10.0 / 489;

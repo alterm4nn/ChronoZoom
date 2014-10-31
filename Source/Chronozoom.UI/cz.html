@@ -59,110 +59,111 @@
         $(document).ready(function ()
         {
 
-        function AddCSS(path)
-        {
-            var link    = document.createElement('link');
-            link.type   = 'text/css';
-            link.rel    = 'stylesheet';
-            if (!constants.environment || constants.environment == 'Localhost')
+            function AddCSS(path)
             {
-                link.href = path                             + '?v=' + constants.cssFileVersion;    // developer - use standard .css files
+                var link    = document.createElement('link');
+                link.type   = 'text/css';
+                link.rel    = 'stylesheet';
+                if (!constants.environment || constants.environment == 'Localhost')
+                {
+                    link.href = path                             + '?v=' + constants.cssFileVersion;    // developer - use standard .css files
+                }
+                else
+                {
+                    link.href = path.replace('.css', '.min.css') + '?v=' + constants.cssFileVersion;    // test/prod - use minified .css files
+                }
+                document.getElementsByTagName('head')[0].appendChild(link);
+            }
+
+            function AddScript(path)
+            {
+                var script  = document.createElement("script");
+                script.type = "text/javascript";
+                if (!constants.useMinifiedJSFiles)
+                {
+                    script.src = path                           + '?v=' + constants.jsFileVersion;      // use standard .js files
+                }
+                else
+                {
+                    script.src = path.replace('.js', '.min.js') + '?v=' + constants.jsFileVersion;      // use minified .js files
+                }
+                document.getElementsByTagName("head")[0].appendChild(script);
+            }
+
+            AddCSS('/css/cz.css');
+            AddCSS('/scripts/external/spectrum/spectrum.css');
+            AddCSS('/scripts/external/nouislider/jquery.nouislider.css');
+
+            if (!Modernizr.canvas)
+            {
+                window.location = "/fallback.html";
             }
             else
             {
-                link.href = path.replace('.css', '.min.css') + '?v=' + constants.cssFileVersion;    // test/prod - use minified .css files
+                if (constants.useMergedJSFiles)
+                {
+                    AddScript("/cz.merged.js");
+                }
+                else
+                {
+                    AddScript("/scripts/settings.js");
+                    AddScript("/scripts/common.js");
+                    AddScript("/scripts/viewport.js");
+                    AddScript("/scripts/viewport-animation.js");
+                    AddScript("/scripts/gestures.js");
+                    AddScript("/scripts/virtual-canvas.js");
+                    AddScript("/scripts/vccontent.js");
+                    AddScript("/scripts/viewport-controller.js");
+                    AddScript("/scripts/urlnav.js");
+                    AddScript("/scripts/layout.js");
+                    AddScript("/scripts/tours.js");
+                    AddScript("/scripts/search.js");
+                    AddScript("/scripts/bibliography.js");
+                    AddScript("/scripts/breadcrumbs.js");
+                    AddScript("/scripts/authoring.js");
+                    AddScript("/scripts/authoring-ui.js");
+                    AddScript("/scripts/service.js");
+                    AddScript("/scripts/data.js");
+                    AddScript("/scripts/timescale.js");
+                    AddScript("/scripts/uiloader.js");
+                    AddScript("/scripts/dates.js");
+                    AddScript("/scripts/media.js");
+                    AddScript("/scripts/menus.js");
+                    AddScript("/scripts/plugins/error-plugin.js");
+                    AddScript("/scripts/plugins/utility-plugins.js");
+                    AddScript("/scripts/extensions/extensions.js");
+                    AddScript("/scripts/extensions/rinplayer.js");
+                    AddScript("/ui/controls/datepicker.js");
+                    AddScript("/ui/controls/listboxbase.js");
+                    AddScript("/ui/controls/formbase.js");
+                    AddScript("/ui/controls/medialist.js");
+                    AddScript("/ui/media/bing-mediapicker.js");
+                    AddScript("/ui/media/skydrive-mediapicker.js");
+                    AddScript("/ui/contentitem-listbox.js");
+                    AddScript("/ui/auth-edit-timeline-form.js");
+                    AddScript("/ui/auth-edit-exhibit-form.js");
+                    AddScript("/ui/auth-edit-contentitem-form.js");
+                    AddScript("/ui/auth-edit-tour-form.js");
+                    AddScript("/ui/auth-edit-collection-form.js");
+                    AddScript("/ui/auth-edit-collection-editors.js");
+                    AddScript("/ui/header-edit-form.js");
+                    AddScript("/ui/header-edit-profile-form.js");
+                    AddScript("/ui/header-login-form.js");
+                    AddScript("/ui/header-logout-form.js");
+                    AddScript("/ui/header-search-form.js");
+                    AddScript("/ui/timeseries-data-form.js");
+                    AddScript("/ui/timeseries-graph-form.js");
+                    AddScript("/ui/tour-listbox.js");
+                    AddScript("/ui/tourslist-form.js");
+                    AddScript("/ui/tourstop-listbox.js");
+                    AddScript("/ui/tour-caption-form.js");
+                    AddScript("/ui/message-window.js");
+                    AddScript("/ui/header-session-expired-form.js");
+                    AddScript("/ui/mediapicker-form.js");
+                    AddScript("/ui/start-page.js");
+                    AddScript("/scripts/cz.js");
+                }
             }
-            document.getElementsByTagName('head')[0].appendChild(link);
-        }
-
-        function AddScript(path)
-        {
-            var script  = document.createElement("script");
-            script.type = "text/javascript";
-            if (!constants.useMinifiedJSFiles)
-            {
-                script.src = path                           + '?v=' + constants.jsFileVersion;      // use standard .js files
-            }
-            else
-            {
-                script.src = path.replace('.js', '.min.js') + '?v=' + constants.jsFileVersion;      // use minified .js files
-            }
-            document.getElementsByTagName("head")[0].appendChild(script);
-        }
-
-        AddCSS('/css/cz.css');
-        AddCSS('/scripts/external/spectrum/spectrum.css');
-        AddCSS('/scripts/external/nouislider/jquery.nouislider.css');
-
-        if (!Modernizr.canvas)
-        {
-            window.location = "/fallback.html";
-        }
-        else
-        {
-            if (constants.useMergedJSFiles)
-            {
-                AddScript("/cz.merged.js");
-            }
-            else
-            {
-                AddScript("/scripts/settings.js");
-                AddScript("/scripts/common.js");
-                AddScript("/scripts/viewport.js");
-                AddScript("/scripts/viewport-animation.js");
-                AddScript("/scripts/gestures.js");
-                AddScript("/scripts/virtual-canvas.js");
-                AddScript("/scripts/vccontent.js");
-                AddScript("/scripts/viewport-controller.js");
-                AddScript("/scripts/urlnav.js");
-                AddScript("/scripts/layout.js");
-                AddScript("/scripts/tours.js");
-                AddScript("/scripts/search.js");
-                AddScript("/scripts/bibliography.js");
-                AddScript("/scripts/breadcrumbs.js");
-                AddScript("/scripts/authoring.js");
-                AddScript("/scripts/authoring-ui.js");
-                AddScript("/scripts/service.js");
-                AddScript("/scripts/data.js");
-                AddScript("/scripts/timescale.js");
-                AddScript("/scripts/uiloader.js");
-                AddScript("/scripts/dates.js");
-                AddScript("/scripts/media.js");
-                AddScript("/scripts/plugins/error-plugin.js");
-                AddScript("/scripts/plugins/utility-plugins.js");
-                AddScript("/scripts/extensions/extensions.js");
-                AddScript("/scripts/extensions/rinplayer.js");
-                AddScript("/ui/controls/datepicker.js");
-                AddScript("/ui/controls/listboxbase.js");
-                AddScript("/ui/controls/formbase.js");
-                AddScript("/ui/controls/medialist.js");
-                AddScript("/ui/media/bing-mediapicker.js");
-                AddScript("/ui/media/skydrive-mediapicker.js");
-                AddScript("/ui/contentitem-listbox.js");
-                AddScript("/ui/auth-edit-timeline-form.js");
-                AddScript("/ui/auth-edit-exhibit-form.js");
-                AddScript("/ui/auth-edit-contentitem-form.js");
-                AddScript("/ui/auth-edit-tour-form.js");
-                AddScript("/ui/auth-edit-collection-form.js");
-                AddScript("/ui/auth-edit-collection-editors.js");
-                AddScript("/ui/header-edit-form.js");
-                AddScript("/ui/header-edit-profile-form.js");
-                AddScript("/ui/header-login-form.js");
-                AddScript("/ui/header-logout-form.js");
-                AddScript("/ui/header-search-form.js");
-                AddScript("/ui/timeseries-data-form.js");
-                AddScript("/ui/timeseries-graph-form.js");
-                AddScript("/ui/tour-listbox.js");
-                AddScript("/ui/tourslist-form.js");
-                AddScript("/ui/tourstop-listbox.js");
-                AddScript("/ui/tour-caption-form.js");
-                AddScript("/ui/message-window.js");
-                AddScript("/ui/header-session-expired-form.js");
-                AddScript("/ui/mediapicker-form.js");
-                AddScript("/ui/start-page.js");
-                AddScript("/scripts/cz.js");
-            }
-        }
 
         });
     </script>
@@ -189,41 +190,41 @@
                 </li>
             </ul>
         </div>
-        <div class="fright navigation header-icons elements-kiosk-hide">
+        <ul id="mnu">
+            <!-- Keep this three tier example for potential future use - chevron class is required -->
+            <!--
+            <li class="active">(Example)
             <ul>
-                <li class=" fright">
-                    <div style="display: none" id="profile-panel" data-enabled="true" title="Signed on">
-                        <label for="edit_profile_button" class="auth-panel-login"></label>
-                        <div id="edit_profile_button" class="header-icon profile-icon"></div>
-                    </div>
+                    <li>Three Tier Menu<span class="chevron">&#9654;</span>
+                        <ul>
+                            <li>Sub-Choice #1</li>
+                            <li>Sub-Choice #2</li>
+                            <li>Sub-Choice #3</li>
+                        </ul>
                 </li>
-                <li class="fright">
-                    <div style="display: none" id="login-panel" title="Sign in to ChronoZoom" data-enabled="true">
-                        <label for="login-button" class="header-icon-label"></label>
-                        <div id="login-button" class="header-icon profile-icon"></div>
-                    </div>
+                    <li>Main Choice #2</li>
+                    <li>Main Choice #3</li>
+                </ul>
                 </li>
-                <li class="fright">
-                    <div class="header-icon edit-icon" title="Create Your Events" data-enabled="true"></div>
+            -->
+            <li id="mnuView" class="active">View
+                <ul>
+                    <li id="mnuViewTours">Guided Tours</li>
+                    <li id="mnuViewSeries" title="Time Series Charts">Time Series</li>
+                </ul>
                 </li>
-                <li class="fright">
-                    <div id="timeSeries_button" class="header-icon timeSeries-icon" title="Show/Hide Time Series" data-enabled="true"></div>
+            <li id="mnuCurate">Create
+                <ul>
+                    <li id="mnuCreateTimeline">Create Timeline</li>
+                    <li id="mnuCreateExhibit" >Create Exhibit</li>
+                    <li id="mnuCreateTour"    >Create Tour</li>
+                    <li id="mnuEditTours"     >Edit   Tours</li>
+                </ul>
                 </li>
-                <li class="fright">
-                    <div style="display: none" id="collections_button" class="header-icon view-icon" title="View Collections" data-enabled="false"></div>
-                </li>
-
-                <li class="fright">
-                    <div class="header-icon search-icon" title="Search ChronoZoom" data-enabled="true"></div>
-                </li>
-                <li class="fright">
-                    <div id="tours_index" class="header-icon tour-icon" title="Take a Guided Tour" data-enabled="true"></div>
-                </li>
-                <li class="fright">
-                    <div id="home_button" class="header-icon home-icon" title="View Home Screen" data-enabled="true"></div>
-                </li>
+            <li id="mnuMine">My Collections</li>
+            <li id="mnuSearch"  title="Search ChronoZoom" ><img src="/images/search-icon.png"  alt="" /></li>
+            <li id="mnuProfile" title="Register / Sign In"><img src="/images/profile-icon.png" alt="" /></li>
             </ul>
-        </div>
     </header>
     <nav>
         <div class="fleft header-breadcrumbs">

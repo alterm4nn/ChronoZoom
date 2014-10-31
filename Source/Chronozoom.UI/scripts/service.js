@@ -1037,6 +1037,8 @@ var CZ;
             var request = new Service.Request(_serviceUrl);
             request.addToPath('editablecollections');
             request.addParameter('includeMine', includeMine);
+            request.addParameter('currentSuperCollection', Service.superCollectionName);
+            request.addParameter('currentCollection', Service.collectionName);
             return $.ajax
             ({
                 type:       'GET',

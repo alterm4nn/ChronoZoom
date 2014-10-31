@@ -119,7 +119,7 @@ var CZ;
                 $("#leftLegend").css("left", screenLeft + 30);
                 $("#leftLegend").css("max-width", maxLegendWidth + "px");
 
-                $("#timeSeriesChartHeader").text("TimeSeries Chart");
+                $("#timeSeriesChartHeader").text("Time Series Chart");
             };
 
             LineChart.prototype.drawDataSet = function (dataSet, screenLeft, screenRight, verticalPadding, plotLeft, plotRight, plotTop, plotBottom) {

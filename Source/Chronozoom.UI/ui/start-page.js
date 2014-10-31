@@ -256,7 +256,7 @@ var CZ;
             }
 
             CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
-                activationSource: $(".tour-icon"),
+                activationSource: $(),
                 navButton: ".cz-form-nav",
                 closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
                 titleTextblock: ".cz-tour-form-title",
@@ -530,7 +530,7 @@ var CZ;
             var layout = CZ.StartPage.tileLayout[4];
             for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
                 var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
+                var timelineUrl = timeline.CurrentCollection ? '' : timeline.TimelineUrl;
                 var $startPage = $("#start-page");
                 var $tile = $template.clone(true, true);
                 var $tileImage = $tile.find(".boxInner .tile-photo img");
@@ -540,7 +540,7 @@ var CZ;
                 // Set appearance and click handler.
                 // Initially the tile is hidden. Show it on image load.
                 $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "my" + i).click(timelineUrl, function (event) {
-                    window.location.href = event.data;
+                    if (event.data != '') window.location.href = event.data;
                     hide();
                 }).invisible();
 
@@ -585,8 +585,8 @@ var CZ;
 
             for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
                 var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-
+                var timelineUrl = timeline.CurrentCollection ? '' : timeline.TimelineUrl;
+                
                 var $timelineListItem = $(template).clone(true, true).appendTo(target);
                 var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
 
@@ -595,7 +595,7 @@ var CZ;
 
                 $timelineListItem.attr("id", "lmy" + idx + "i" + i);
                 $timelineListItem.click(timelineUrl, function (event) {
-                    window.location.href = event.data;
+                    if (event.data != '') window.location.href = event.data;
                     hide();
                 });
 
@@ -703,16 +703,8 @@ var CZ;
         }
         StartPage.TwitterLayout = TwitterLayout;
 
-        function show() {
-            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
-            $(".home-icon").addClass("active");
-
-            // Disable buttons: save click handlers and remove them.
-            $disabledButtons.attr("disabled", "disabled").each(function (i, el) {
-                var events = $(el).data("events");
-                $(el).data("onclick", events && events.click && events.click[0]);
-            }).off();
-
+        function show(preferPersonalizedLayout)
+        {
             // Hide regimes.
             $(".header-regimes").invisible();
 
@@ -721,6 +713,9 @@ var CZ;
 
             // Hide all forms.
             CZ.HomePageViewModel.closeAllForms();
+
+            // Choose which columns to display
+            Layout(preferPersonalizedLayout);
 
             // Show home page.
             $("#start-page").fadeIn();
@@ -737,16 +732,9 @@ var CZ;
         }
 
         function hide() {
-            var $disabledButtons = $(".tour-icon, .timeSeries-icon, .edit-icon");
-            $(".home-icon").removeClass("active");
-
-            // Enable buttons: add saved handlers.
-            $disabledButtons.removeAttr("disabled").each(function (i, el) {
-                $(el).click($(el).data("onclick"));
-            });
-
             // Show regimes if necessary.
-            if (_isRegimesVisible) {
+            if (_isRegimesVisible)
+            {
                 $(".header-regimes").visible();
             }
 
@@ -762,16 +750,6 @@ var CZ;
             // Is regimes visible initially?
             _isRegimesVisible = $(".header-regimes").is(":visible");
 
-            // Toggle for home button.
-            $(".home-icon").click(function () {
-                if ($("#start-page").is(":visible")) {
-                    hide();
-                } else {
-                    show();
-                }
-            });
-
-            // TODO: Replace with current user.
             CZ.Service.getUserFeatured().done(function (response) {
                 // Show the newest featured timelines first.
                 var timelines = response ? response.reverse() : [];
@@ -852,6 +830,29 @@ var CZ;
             }
         }
         StartPage.initialize = initialize;
+
+        function Layout(preferPersonalizedLayout)
+        {
+            if 
+            (
+                (!preferPersonalizedLayout  &&  CZ.Settings.isCosmosCollection) ||
+                (!CZ.Authoring.isEnabled    && !CZ.Settings.isAuthorized)
+            )
+            {
+                $('#WelcomeBlock'           ).attr('data-toggle', 'show');
+                $('#MyTimelinesBlock'       ).attr('data-toggle', 'hide');
+                $('#FavoriteTimelinesBlock' ).attr('data-toggle', 'hide');
+                $('#TwitterBlock'           ).attr('data-toggle', 'show');
+            }
+            else
+            {
+                $('#WelcomeBlock'           ).attr('data-toggle', 'hide');
+                $('#MyTimelinesBlock'       ).attr('data-toggle', 'show');
+                $('#FavoriteTimelinesBlock' ).attr('data-toggle', 'show');
+                $('#TwitterBlock'           ).attr('data-toggle', 'hide');
+            }
+        }
+
     })(CZ.StartPage || (CZ.StartPage = {}));
     var StartPage = CZ.StartPage;
 })(CZ || (CZ = {}));
