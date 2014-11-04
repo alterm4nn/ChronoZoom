@@ -12555,11 +12555,13 @@ var CZ;
 
             if (Menus.isEditor)
             {
-                $('#mnuCurate').removeClass('active').addClass('active');
+                $('#mnuCurate').show();                                     // if Curate can be hidden
+              //$('#mnuCurate').removeClass('active').addClass('active');   // if keeping Curate visible
             }
             else
             {
-                $('#mnuCurate').removeClass('active');
+                $('#mnuCurate').hide();                                     // if Curate can be hidden
+              //$('#mnuCurate').removeClass('active');                      // if keeping Curate visible
             }
         }
         Menus.Refresh = Refresh;
@@ -12675,7 +12677,7 @@ var CZ;
                 CZ.HomePageViewModel.panelToggleTimeSeries();
             });
 
-            $('#mnuCurate').click(function (event)
+            $('#mnuCurate').hide().click(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (!Menus.isSignedIn)

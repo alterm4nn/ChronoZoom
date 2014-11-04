@@ -60,7 +60,7 @@ $(document).ready(function()
 
 
     // primary menu ui
-
+    
     $('#mnu').children('li')
 
         .mouseenter(function(event)
@@ -148,7 +148,7 @@ $(document).ready(function()
         $('#status').text('View Time Series Panel');
     });
 
-    $('#mnuCurate').click(function(event)
+    $('#mnuCurate').hide().click(function(event)
     {
         if (isDisabled) return;
         if (!isSignedIn)
@@ -163,7 +163,13 @@ $(document).ready(function()
             }
         }
     });
-
+    
+    $('#mnuCreateCollection').click(function(event)
+    {
+        event.stopPropagation();
+        $('#status').text('Create Collection Dialog');
+    });
+    
     $('#mnuCreateTimeline').click(function(event)
     {
         event.stopPropagation();
@@ -265,10 +271,12 @@ function mnuRefresh()
 
     if (isEditor)
     {
-        $('#mnuCurate').removeClass('active').addClass('active');
+        $('#mnuCurate').show();                                     // if Curate can be hidden
+      //$('#mnuCurate').removeClass('active').addClass('active');   // if keeping Curate visible
     }
     else
     {
-        $('#mnuCurate').removeClass('active');
+        $('#mnuCurate').hide();                                     // if Curate can be hidden
+      //$('#mnuCurate').removeClass('active');                      // if keeping Curate visible
     }
 }
