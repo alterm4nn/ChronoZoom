@@ -111,7 +111,7 @@
                     // hide
                     $(this).children('ul').slideUp(slideUpSpeed);
                 })
-                .on('tap click', function (event)
+                .on('touchstart', function (event)
                 {
                     // if has secondary menu then sticky toggle for touch events
                     if ($(this).children('ul').length === 1)
