@@ -4728,7 +4728,7 @@ var CZ;
                         editButton.onmouseenter = function ()
                         {
                             this.vc.element.css('cursor', 'pointer');
-                            this.vc.element.attr('title', 'Edit Exhibit');
+                            this.vc.element.attr('title', 'Edit Exhibit or Add Artifact');
                             infodot.settings.strokeStyle = "yellow";
                         };
 
