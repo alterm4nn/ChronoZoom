@@ -212,6 +212,9 @@
       <DependentUpon>media.js</DependentUpon>
     </Content>
     <Content Include="scripts\menus.js" />
+    <Content Include="scripts\menus.min.js">
+      <DependentUpon>menus.js</DependentUpon>
+    </Content>
     <Content Include="scripts\plugins\error-plugin.min.js">
       <DependentUpon>error-plugin.js</DependentUpon>
     </Content>
@@ -482,6 +485,9 @@
     </Content>
     <Content Include="Merge.cmd" />
     <Content Include="css\menus.less" />
+    <Content Include="scripts\menus.min.js.map">
+      <DependentUpon>menus.js</DependentUpon>
+    </Content>
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />

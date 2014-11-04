@@ -209,6 +209,14 @@
                 }
             });
 
+            $('#mnuCreateCollection').click(function (event)
+            {
+                event.stopPropagation();
+                // show create collection dialog
+                CZ.HomePageViewModel.closeAllForms();
+                CZ.StartPage.addCollection();
+            });
+
             $('#mnuCreateTimeline').click(function (event)
             {
                 event.stopPropagation();
