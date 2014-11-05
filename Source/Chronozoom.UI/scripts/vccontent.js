@@ -2635,7 +2635,7 @@ var CZ;
                     var biblWidth = titleWidth / 3;
                     var bibl = addText(contentItem, layerid, id + "__bibliography", time - biblWidth / 2, biblBottom - biblHeight, biblBottom - biblHeight / 2, biblHeight, "Bibliography", {
                         fontName: CZ.Settings.contentItemHeaderFontName,
-                        fillStyle: CZ.Settings.timelineBorderColor,
+                        fillStyle: CZ.Settings.contentItemHeaderFontColor,
                         textBaseline: 'middle',
                         textAlign: 'center',
                         opacity: 1
@@ -2650,7 +2650,6 @@ var CZ;
                     {
                         this.vc.element.css('cursor', 'pointer');
                         this.vc.element.attr('title', 'View Links, Sources and Attributions');
-                        this.settings.fillStyle = CZ.Settings.infoDotHoveredBorderColor;
                         this.vc.requestInvalidate();
                         this.vc.element.css('cursor', 'pointer');
                     };
@@ -2658,7 +2657,6 @@ var CZ;
                     {
                         this.vc.element.css('cursor', 'default');
                         this.vc.element.attr('title', '');
-                        this.settings.fillStyle = CZ.Settings.infoDotBorderColor;
                         this.vc.requestInvalidate();
                         this.vc.element.css('cursor', 'default');
                     };
