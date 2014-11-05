@@ -2988,6 +2988,7 @@ a {
   z-index: 100;
 }
 #editCollectionButton .image {
+  cursor: pointer;
   margin-right: 10px;
 }
 #editCollectionButton > img {

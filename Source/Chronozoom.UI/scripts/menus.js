@@ -68,11 +68,13 @@
 
             if (Menus.isEditor)
             {
-                $('#mnuCurate').removeClass('active').addClass('active');
+                $('#mnuCurate').show();                                     // if Curate can be hidden
+              //$('#mnuCurate').removeClass('active').addClass('active');   // if keeping Curate visible
             }
             else
             {
-                $('#mnuCurate').removeClass('active');
+                $('#mnuCurate').hide();                                     // if Curate can be hidden
+              //$('#mnuCurate').removeClass('active');                      // if keeping Curate visible
             }
         }
         Menus.Refresh = Refresh;
@@ -111,7 +113,7 @@
                     // hide
                     $(this).children('ul').slideUp(slideUpSpeed);
                 })
-                .on('tap click', function (event)
+                .on('touchstart', function (event)
                 {
                     // if has secondary menu then sticky toggle for touch events
                     if ($(this).children('ul').length === 1)
@@ -188,7 +190,7 @@
                 CZ.HomePageViewModel.panelToggleTimeSeries();
             });
 
-            $('#mnuCurate').click(function (event)
+            $('#mnuCurate').hide().click(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (!Menus.isSignedIn)
@@ -207,6 +209,14 @@
                         );
                     }
                 }
+            });
+
+            $('#mnuCreateCollection').click(function (event)
+            {
+                event.stopPropagation();
+                // show create collection dialog
+                CZ.HomePageViewModel.closeAllForms();
+                CZ.StartPage.addCollection();
             });
 
             $('#mnuCreateTimeline').click(function (event)

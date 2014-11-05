@@ -1058,7 +1058,7 @@ var CZ;
                 type: "GET",
                 cache: false,
                 dataType: "json",
-                url: _isLocalHost ? _dumpTimelinesUrl : request.url
+                url: request.url
             });
         }
         Service.getUserFavorites = getUserFavorites;

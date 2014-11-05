@@ -146,7 +146,9 @@ var CZ;
                 this.captionTextarea.css("opacity", 0);
             };
 
-            FormTourCaption.prototype.showBookmark = function (bookmark) {
+            FormTourCaption.prototype.showBookmark = function (bookmark)
+            {
+                bookmark.text = bookmark.text || '';
                 this.captionTextarea.html(marked(bookmark.text));
                 this.bookmarksCount.text("Slide " + bookmark.number + " of " + this.tour.bookmarks.length);
                 this.captionTextarea.stop();

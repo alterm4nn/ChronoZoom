@@ -3145,11 +3145,15 @@ var CZ;
 
                     this.favoriteBtn.onmousehover = function (event)
                     {
+                        this.vc.element.css('cursor', 'pointer');
+                        this.vc.element.attr('title', 'Add to or Remove from Favorites');
                         this.parent.settings.strokeStyle = "yellow";
                     }
 
                     this.favoriteBtn.onmouseunhover = function (event)
                     {
+                        this.vc.element.css('cursor', 'default');
+                        this.vc.element.attr('title', '');
                         this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                     }
 
@@ -3171,11 +3175,15 @@ var CZ;
 
                     this.pasteButton.onmousehover = function (event)
                     {
+                        this.vc.element.css('cursor', 'pointer');
+                        this.vc.element.attr('title', 'Paste Timeline');
                         this.parent.settings.strokeStyle = "yellow";
                     }
 
                     this.pasteButton.onmouseunhover = function (event)
                     {
+                        this.vc.element.css('cursor', 'default');
+                        this.vc.element.attr('title', '');
                         this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                     }
 
@@ -3220,11 +3228,15 @@ var CZ;
 
                     this.copyButton.onmousehover = function (event)
                     {
+                        this.vc.element.css('cursor', 'pointer');
+                        this.vc.element.attr('title', 'Copy Timeline');
                         this.parent.settings.strokeStyle = "yellow";
                     }
 
                     this.copyButton.onmouseunhover = function (event)
                     {
+                        this.vc.element.css('cursor', 'default');
+                        this.vc.element.attr('title', '');
                         this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                     }
 
@@ -3260,11 +3272,17 @@ var CZ;
                         return true;
                     };
 
-                    this.editButton.onmousehover = function () {
+                    this.editButton.onmousehover = function ()
+                    {
+                        this.vc.element.css('cursor', 'pointer');
+                        this.vc.element.attr('title', 'Edit Timeline');
                         this.parent.settings.strokeStyle = "yellow";
                     };
 
-                    this.editButton.onmouseunhover = function () {
+                    this.editButton.onmouseunhover = function ()
+                    {
+                        this.vc.element.css('cursor', 'default');
+                        this.vc.element.attr('title', '');
                         this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
                     };
 
@@ -4302,18 +4320,21 @@ var CZ;
             });
             this.reactsOnMouse = true;
 
-            this.onmouseenter = function (e) {
+            this.onmouseenter = function (e)
+            {
                 rect.settings.strokeStyle = CZ.Settings.contentItemBoundingHoveredBoxBorderColor;
                 this.vc.currentlyHoveredContentItem = this;
                 this.vc.requestInvalidate();
             };
 
-            this.onmouseleave = function (e) {
+            this.onmouseleave = function (e)
+            {
                 rect.settings.strokeStyle = CZ.Settings.contentItemBoundingBoxBorderColor;
                 this.vc.currentlyHoveredContentItem = null;
                 this.isMouseIn = false;
                 this.vc.requestInvalidate();
             };
+
             this.onmouseclick = function (e) {
                 return zoomToElementHandler(this, e, 1.0);
             };
@@ -4423,10 +4444,14 @@ var CZ;
                         };
 
                         editButton.onmouseenter = function () {
+                            this.vc.element.css('cursor', 'pointer');
+                            this.vc.element.attr('title', 'Edit Artifact');
                             rect.settings.strokeStyle = "yellow";
                         };
 
                         editButton.onmouseleave = function () {
+                            this.vc.element.css('cursor', 'default');
+                            this.vc.element.attr('title', '');
                             rect.settings.strokeStyle = CZ.Settings.contentItemBoundingHoveredBoxBorderColor;
                         };
                     }
@@ -4692,6 +4717,7 @@ var CZ;
                         var editButton = VCContent.addImage(infodot, layerid, id + "__edit", time - imageSize / 2, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/edit.svg");
 
                         editButton.reactsOnMouse = true;
+
                         editButton.onmouseclick = function () {
                             CZ.Authoring.isActive = true;
                             CZ.Authoring.mode = "editExhibit";
@@ -4699,11 +4725,17 @@ var CZ;
                             return true;
                         };
 
-                        editButton.onmouseenter = function () {
+                        editButton.onmouseenter = function ()
+                        {
+                            this.vc.element.css('cursor', 'pointer');
+                            this.vc.element.attr('title', 'Edit Exhibit or Add Artifact');
                             infodot.settings.strokeStyle = "yellow";
                         };
 
-                        editButton.onmouseleave = function () {
+                        editButton.onmouseleave = function ()
+                        {
+                            this.vc.element.css('cursor', 'default');
+                            this.vc.element.attr('title', '');
                             infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
                         };
                     }
@@ -4724,12 +4756,18 @@ var CZ;
                         CZ.Bibliography.showBibliography({ infodot: infodotDescription, contentItems: infodot.contentItems }, contentItem, id + "__bibliography");
                         return true;
                     };
-                    bibl.onmouseenter = function (pv, e) {
+                    bibl.onmouseenter = function (pv, e)
+                    {
+                        this.vc.element.css('cursor', 'pointer');
+                        this.vc.element.attr('title', 'View Links, Sources and Attributions');
                         this.settings.fillStyle = CZ.Settings.infoDotHoveredBorderColor;
                         this.vc.requestInvalidate();
                         this.vc.element.css('cursor', 'pointer');
                     };
-                    bibl.onmouseleave = function (pv, e) {
+                    bibl.onmouseleave = function (pv, e)
+                    {
+                        this.vc.element.css('cursor', 'default');
+                        this.vc.element.attr('title', '');
                         this.settings.fillStyle = CZ.Settings.infoDotBorderColor;
                         this.vc.requestInvalidate();
                         this.vc.element.css('cursor', 'default');
@@ -10378,7 +10416,7 @@ var CZ;
                 type: "GET",
                 cache: false,
                 dataType: "json",
-                url: _isLocalHost ? _dumpTimelinesUrl : request.url
+                url: request.url
             });
         }
         Service.getUserFavorites = getUserFavorites;
@@ -12517,11 +12555,13 @@ var CZ;
 
             if (Menus.isEditor)
             {
-                $('#mnuCurate').removeClass('active').addClass('active');
+                $('#mnuCurate').show();                                     // if Curate can be hidden
+              //$('#mnuCurate').removeClass('active').addClass('active');   // if keeping Curate visible
             }
             else
             {
-                $('#mnuCurate').removeClass('active');
+                $('#mnuCurate').hide();                                     // if Curate can be hidden
+              //$('#mnuCurate').removeClass('active');                      // if keeping Curate visible
             }
         }
         Menus.Refresh = Refresh;
@@ -12560,7 +12600,7 @@ var CZ;
                     // hide
                     $(this).children('ul').slideUp(slideUpSpeed);
                 })
-                .on('tap click', function (event)
+                .on('touchstart', function (event)
                 {
                     // if has secondary menu then sticky toggle for touch events
                     if ($(this).children('ul').length === 1)
@@ -12637,7 +12677,7 @@ var CZ;
                 CZ.HomePageViewModel.panelToggleTimeSeries();
             });
 
-            $('#mnuCurate').click(function (event)
+            $('#mnuCurate').hide().click(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (!Menus.isSignedIn)
@@ -12656,6 +12696,14 @@ var CZ;
                         );
                     }
                 }
+            });
+
+            $('#mnuCreateCollection').click(function (event)
+            {
+                event.stopPropagation();
+                // show create collection dialog
+                CZ.HomePageViewModel.closeAllForms();
+                CZ.StartPage.addCollection();
             });
 
             $('#mnuCreateTimeline').click(function (event)
@@ -18123,7 +18171,9 @@ var CZ;
                 this.captionTextarea.css("opacity", 0);
             };
 
-            FormTourCaption.prototype.showBookmark = function (bookmark) {
+            FormTourCaption.prototype.showBookmark = function (bookmark)
+            {
+                bookmark.text = bookmark.text || '';
                 this.captionTextarea.html(marked(bookmark.text));
                 this.bookmarksCount.text("Slide " + bookmark.number + " of " + this.tour.bookmarks.length);
                 this.captionTextarea.stop();
