@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Overlay Prototype</title>
+    <link   type="text/css"       href="Overlay.css" rel="stylesheet" />
+    <script type="text/javascript" src="jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="Overlay.js"></script>
+</head>
+<body>
+    <header>
+        <img src="images/chronozoom.png" alt="" />
+        <ul id="mnu">
+            <li id="mnuMine">My Collections</li>
+        </ul>
+    </header>
+    <main>
+        <div class="wrapper">
+            <div class="content">
+                <p>
+                    Lorem ipsum dolor sit amet, tyro sed esse haec puella est amet coram me. Sanctae memoriam mortuum sufficeret rex Dionysiadi rex cum suam non solutionem innocentem vis hominem armatis exanimem scientiam pervenisset. Quid facilisis ex hic puella eius ad per sanctus singulos domum reginae discessisse convivium meum festinus pervenissem filia navem. A lenoni nutrix cum obiectum aliquip ipsa Invitamus me missam canticis in modo compungi mulierem volutpat cum! Eo debeas ait Cumque ego quod ait. Concursus male habitu rubor virginitatem sunt forma ait in fuerat construeret in modo compungi mulierem volutpat cum autem illud huius. Neptune reddens pater unica Tharsia filiam in! Verenam operibus furiam conclusoque sponte profundo Solodorum ait. Postera eius non coepit cognitionis huius dulcis a a a a his carpens introivit dic gubernius eum. Pedes Dianae feminis introeunte instat manu certas parturiens a lenoni vero diam nostra paupercula possunt autem quod ait. Mirantur deo agili est cum magna. Ite in deinde plectrum anni ipsa mihi. Tyrium coniugem Jesu Dionysiadem tuos ratio omnes. Quoque luctare non ait mea vero cum obiectum aliquip ipsa mihi.
+                </p>
+                <p>
+                    Opto in deinde vero diam nostra praedicabilium subsannio. Athenagoram rigorem nisl cum obiectum ait regem Ardalio. Quantum infirmitatis rex Dionysiadi suo Proiciens te. Contremuit Miscetur vulnus fertur Lorem post iactavit ad per animum pares terris quod eam sed. Patriam Theophilum vinum ad quia illum. Pone melius resultat iuvenis est Apollonius ut diem finito convocatis secessit civitatis ut sua. Patris Tyrius nos capitur illam eam eos vero cum autem illud meae sit in fuerat eum. Tempor in modo cavendum es est Apollonius mihi servitute meam celaveritis ac ea communia vestes. Illos eos Communicatio mihi quidditas mihi Tyrum reverteretur. Verena sui in rei finibus veteres hoc!
+                </p>
+            </div>
+            <div id="overlay">
+                <div id="overlay-content-padding">
+                    <div class="overlay-list">
+                        <div class="overlay-list-title">Welcome to ChronoZoom!</div>
+                        <p>
+                            Use ChronoZoom to get a perspective of the extensive scale of time and historical events relative to what happened around the world. Become an author yourself! Simply log on with your social networking credentials to record your unique perspective or tell a story that needs to be told.
+                        </p>
+                        <a href="javascript:$('#mnuMine').trigger('click');" title="An overview of some of the main features of ChronoZoom">
+                            <img src="images/icon_right_arrow.png" alt="" />
+                            Introductory Tour
+                        </a>
+                        <a href="javascript:$('#mnuMine').trigger('click');" title="Explore history from the Big Bang to the present day">
+                            <img src="images/icon_right_arrow.png" alt="" />
+                            Explore Big History
+                        </a>
+                        <div class="overlay-list-title">New Teacher Resources</div>
+                        <p>
+                            ChronoZoom is an educational tool for teachers and students who want to put historical events in perspective. A great many resources have been created already in ChronoZoom for your enjoyment and enlightenment.
+                        </p>
+                        <a href="http://join.chronozoom.com/teach/" target="_blank" title="ChronoZoom's Curriculum and Teaching Resources">
+                            <img src="images/icon_right_arrow.png" alt="" />
+                            Resources &amp; Curriculum
+                        </a>
+                    </div>
+                    <div class="overlay-list">
+                        <div class="overlay-list-title">Featured Collections</div>
+                        <div class="overlay-tile big-history" title="View Collection">
+                            <div class="overlay-tile-title">Cosmos</div>
+                            <div class="ellipsis help" title="Name of Curator">ChronoZoom</div>
+                        </div>
+                        <div class="overlay-tile" title="View Collection">
+                            <div class="overlay-tile-title">Samuel Pepys</div>
+                            <div class="ellipsis help" title="Name of Curator">NeilCresswell</div>
+                        </div>
+                        <div class="overlay-tile" title="View Collection">
+                            <div class="overlay-tile-title">Earth and Planetary Sciences</div>
+                            <div class="ellipsis help" title="Name of Curator">BigHistoryLabs</div>
+                        </div>
+                        <div class="overlay-tile" title="View Collection">
+                            <div class="overlay-tile-title">Commercial Aviation</div>
+                            <div class="ellipsis help" title="Name of Curator">Aviation</div>
+                        </div>
+                        <div class="overlay-tile" title="View Collection">
+                            <div class="overlay-tile-title">European History</div>
+                            <div class="ellipsis help" title="Name of Curator">MrBond</div>
+                        </div>
+                        <div class="overlay-tile" title="View Collection">
+                            <div class="overlay-tile-title">Chile</div>
+                            <div class="ellipsis help" title="Name of Curator">Chile</div>
+                        </div>
+                    </div>
+                    <div class="overlay-list">
+                        <div class="overlay-list-title">Recently Updated Exhibits</div>
+                        <div class="overlay-tile" title="View Exhibit: Move to Bath" style="background-image: url(images/tile-custom-bath.jpg);">
+                            <div class="overlay-tile-title">Move to Bath</div>
+                            1800 CE
+                            <div class="overlay-tile-note help" title="Name of Collection">Jane Austen</div>
+                            <div class="ellipsis help" title="Name of Curator">JaneAustenSociety</div>
+                        </div>
+                        <div class="overlay-tile" title="View Exhibit: Fire of London" style="background-image: url(images/tile-custom-fire.jpg);">
+                            <div class="overlay-tile-title">Fire of London</div>
+                            1666 CE
+                            <div class="overlay-tile-note help" title="Name of Collection">Samuel Pepys</div>
+                            <div class="ellipsis help" title="Name of Curator">NeilCresswell</div>
+                        </div>
+                        <!-- test overflows and that long titles and notes fit on tile -->
+                        <!--
+                        <div class="overlay-tile" title="View Exhibit: Test Exhibit #2">
+                            <div class="overlay-tile-title">Test Exhibit #2 Test Exhibit #2 Test Exhibit #2 Test Exhibit #2</div>
+                            1987 CE
+                            <div class="overlay-tile-note help" title="Name of Collection">Neil Cresswell's Default Collection Neil Cresswell's Default Collection</div>
+                            <div class="ellipsis help" title="Name of Curator">NeilCresswellNeilCresswell</div>
+                        </div>
+                        -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        Footer goes here&hellip;
+    </footer>
+</body>
+</html>

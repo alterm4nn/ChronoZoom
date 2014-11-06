@@ -4,57 +4,86 @@ using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
-
+using System.Collections.Generic;
+using System.Configuration;
+using Newtonsoft.Json;
 
 namespace Chronozoom.UI
 {
     public partial class ChronozoomSVC
     {
-        public Collection<TimelineShortcut> GetUserFavorites()
+        public IEnumerable<Tile> GetUserFavorites(string currentSuperCollection = "", string currentCollection = "")
         {
-            return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
+            currentCollection               = currentCollection      == null ? "" : currentCollection.ToLower();
+            currentSuperCollection          = currentSuperCollection == null ? "" : currentSuperCollection.ToLower();
+            string defaultSuperCollection   = (ConfigurationManager.AppSettings["DefaultSuperCollection"]).ToLower();
+            
+            List<Tile> tiles                = new List<Tile>();
+
+            return ApiOperation(delegate(User user, Storage storage)
             {
 #if RELEASE
-                if (user == null)
-                {
-                    return null;
-                }
+                if (user == null) return tiles;
 #endif
-
-                Guid userId = user == null || user.Id == null ? Guid.Empty : user.Id;
-                var cacheKey = string.Format(CultureInfo.InvariantCulture, "UserFavorites - {0}", userId);
+                Guid userId     = (user == null || user.Id == null) ? Guid.Empty : user.Id;
+                var cacheKey    = string.Format(CultureInfo.InvariantCulture, "UserFavorites - {0}", userId);
                 if (Cache.Contains(cacheKey))
                 {
-                    return (Collection<TimelineShortcut>)Cache.Get(cacheKey);
+                    return (List<Tile>) Cache.Get(cacheKey);
                 }
 
                 var triple = storage.GetTriplet(String.Format("czusr:{0}", user != null ? user.Id : Guid.Empty), "czpred:favorite").FirstOrDefault();
-                if (triple == null)
-                    return null;
+                if (triple == null) return tiles;
 
-                var elements = new Collection<TimelineShortcut>();
                 foreach (var t in triple.Objects)
                 {
                     var objName = TripleName.Parse(t.Object);
                     if (objName.Prefix == "cztimeline")
                     {
-                        var g = new Guid(objName.Name);
-                        var timeline = storage.Timelines.Where(x => x.Id == g)
-                            .Include("Collection")
+                        Timeline timeline = storage.Timelines
+                            .Where(item => item.Id == new Guid(objName.Name))
                             .Include("Collection.User")
                             .Include("Collection.SuperCollection")
-                            .Include("Exhibits")
-                            .Include("Exhibits.ContentItems")
                             .FirstOrDefault();
 
                         if (timeline != null)
-                            elements.Add(storage.GetTimelineShortcut(timeline));
+                        {
+                            List<Guid> ancestorTimelines = TimelineExtensions.Ancestors(timeline);
+
+                            ancestorTimelines.Reverse();
+
+                            tiles.Add(new Tile
+                            {
+                                CollectionName      = timeline.Collection.Title,
+                                CuratorName         = timeline.Collection.User.DisplayName,
+                                Link                = GetURLPath(timeline.Collection, defaultSuperCollection) + "#"
+                                                      + "/t" + string.Join("/t", ancestorTimelines.ToArray()),
+                                Type                = "t",
+                                Title               = timeline.Title,
+                                CustomBackground    = GetTileBackgroundImage(timeline.Collection.Theme),
+                                IsCosmosCollection  = (timeline.Collection.SuperCollection.Title.ToLower() == "chronozoom" && timeline.Collection.Path == "cosmos"),
+                                IsCurrentCollection =
+                                (
+                                    (
+                                        timeline.Collection.SuperCollection.Title == currentSuperCollection ||
+                                        ((currentSuperCollection == "") && (timeline.Collection.SuperCollection.Title == defaultSuperCollection))
+                                    )
+                                    &&
+                                    (
+                                        timeline.Collection.Path == currentCollection ||
+                                        ((currentCollection == "") && timeline.Collection.Default)
+                                    )
+                                )
+                            });
+                        }
                     }
                 }
 
-                Cache.Add(cacheKey, elements);
+                tiles = tiles.OrderBy(t => t.CollectionName).ThenBy(t => t.Title).ToList();
 
-                return elements;
+                Cache.Add(cacheKey, tiles);
+
+                return tiles;
             });
         }
 
@@ -114,6 +143,18 @@ namespace Chronozoom.UI
                     TripleName.Parse("czpred:favorite"),
                     TripleName.Parse(String.Format("cztimeline:{0}", favoriteGUID)));
             });
+        }
+
+        private string GetTileBackgroundImage(string theme)
+        {
+            if (theme == null)
+            {
+                return "";
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<Theme>(theme).backgroundUrl;
+            }
         }
     }
 }

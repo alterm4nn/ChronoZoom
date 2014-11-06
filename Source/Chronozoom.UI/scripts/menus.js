@@ -176,6 +176,46 @@
              * Menu Item Hooks *
              *******************/
 
+            $('#mnuTestOverlayHome').click(function (event)
+            {
+                // TODO: remove this temp test once new overlay is deployed
+                event.stopPropagation();
+                if (CZ.Settings.isCosmosCollection)
+                {
+                    CZ.StartPage.hide();
+                    CZ.Overlay.Hide();
+                    CZ.Overlay.Show(false);
+                }
+                else
+                {
+                    CZ.Authoring.showMessageWindow
+                    (
+                        'Please navigate to the home page first.',
+                        'Unable to Show Overlay'
+                    );
+                }
+            });
+
+            $('#mnuTestOverlayMine').click(function (event)
+            {
+                // TODO: remove this temp test once new overlay is deployed
+                event.stopPropagation();
+                if (Menus.isSignedIn)
+                {
+                    CZ.StartPage.hide();
+                    CZ.Overlay.Hide();
+                    CZ.Overlay.Show(true);
+                }
+                else
+                {
+                    CZ.Authoring.showMessageWindow
+                    (
+                        'Please log in first.',
+                        'Unable to Show Overlay'
+                    );
+                }
+            });
+
             $('#mnuViewTours').click(function (event)
             {
                 event.stopPropagation();
@@ -216,7 +256,7 @@
                 event.stopPropagation();
                 // show create collection dialog
                 CZ.HomePageViewModel.closeAllForms();
-                CZ.StartPage.addCollection();
+                AddCollection();
             });
 
             $('#mnuCreateTimeline').click(function (event)
@@ -260,11 +300,13 @@
                 {
                     // toggle display of register / log in pane
                     CZ.HomePageViewModel.panelToggleLogin();
+                    //CZ.Overlay.Show(); // TODO: switch this in once working
                 }
                 else
                 {
                     // show my collections overlay (with preference for display of My Collections if viewing Cosmos)
                     CZ.StartPage.show(true);
+                    //CZ.Overlay.Show(true); // TODO: switch this in once working
                 }
             });
 
@@ -291,6 +333,71 @@
             });
 
         });
+
+
+        /***********
+         * Helpers *
+         ***********/
+
+        this.AddCollection =
+        function AddCollection()
+        {
+            CZ.Authoring.hideMessageWindow();
+
+            var newName = prompt("What name would you like for your new collection?\nNote: The name must be unique among your collections.", '') || '';
+            newName     = $.trim(newName);
+
+            var newPath = newName.replace(/[^a-zA-Z0-9]/g, '');
+            if (newPath === '') return;
+
+            if (newPath.length > 50)
+            {
+                CZ.Authoring.showMessageWindow
+                (
+                    "The name of your new collection must be no more than 50 characters in length.",
+                    "Unable to Create Collection"
+                );
+                return;
+            }
+
+            CZ.Service.getCollection().done(function (currentCollection)
+            {
+                CZ.Service.isUniqueCollectionName(newName).done(function (isUniqueCollectionName)
+                {
+                    if (!isUniqueCollectionName || newPath === currentCollection.Path)
+                    {
+                        CZ.Authoring.showMessageWindow
+                        (
+                            "Sorry your new collection name is not unique enough. Please try a different name.",
+                            "Unable to Create Collection"
+                        );
+                        return;
+                    }
+
+                    CZ.Service.postCollection(newPath, { Title: newName }).done(function (success)
+                    {
+                        if (success)
+                        {
+                            window.location =
+                            (
+                                window.location.protocol + '//' + window.location.host + '/' + CZ.Service.superCollectionName + '/' + newPath
+                            )
+                            .toLowerCase();
+                        }
+                        else
+                        {
+                            CZ.Authoring.showMessageWindow
+                            (
+                                "An unexpected error occured.",
+                                "Unable to Create Collection"
+                            );
+                        }
+                    });
+
+                });
+            });
+
+        };
 
 
 

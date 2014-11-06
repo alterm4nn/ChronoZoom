@@ -93,7 +93,7 @@ var CZ;
             CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing =UserCanEditCollection(profile);
 
-            var onTakeTour = function (tour)
+            CZ.Tours.takeTour = function(tour)
             {
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption
@@ -157,7 +157,7 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             tourTemplate: forms[10],
                             tours: CZ.Tours.tours,
-                            takeTour: onTakeTour,
+                            takeTour: CZ.Tours.takeTour,
                             editTour: canEdit ? function (tour)
                             {
                                 if (CZ.Authoring.showEditTourForm) CZ.Authoring.showEditTourForm(tour);
@@ -662,6 +662,7 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
 
+                CZ.Overlay.Initialize(); // TODO
                 CZ.StartPage.initialize();
             });
 

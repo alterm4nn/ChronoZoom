@@ -760,6 +760,7 @@ var CZ;
                 fillFeaturedTimelinesList(timelines);
             });
 
+            /* TODO: commented out as switched to different code for overlay.js
             CZ.Service.getUserFavorites().then(function (response) {
                 var timelines = response ? response.reverse() : [];
 
@@ -782,6 +783,7 @@ var CZ;
             }, function (error) {
                 console.log("[ERROR] getUserFavorites");
             });
+            */
 
             CZ.Service.getProfile().done(function (data) {
                 if ((data !== "") && (data.DisplayName !== null)) {

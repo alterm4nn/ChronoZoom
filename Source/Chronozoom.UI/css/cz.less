@@ -4,6 +4,7 @@
 @import "datepicker";
 @import "media";
 @import "menus";
+@import "overlay";
 @import "timescale";
 @import "start-page";
 
@@ -155,7 +156,7 @@ div.preview
     background-repeat: no-repeat;
     background-position: center;
     background-image: url('/images/chronozoom.png');
-    margin-left: 10px;
+    margin-left: 3px;
     cursor: pointer;
 }
 
@@ -2156,6 +2157,18 @@ a
   bottom: @footerHeight;
   left: 0;
   right: 0;
+}
+
+.ellipsis
+{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.help
+{
+    cursor: help;
 }
 
 .nocursor

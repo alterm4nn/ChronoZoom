@@ -1,0 +1,38 @@
+[
+    {
+        "Title":        "Big Bang to Present Day",
+        "Curator":      "ChronoZoom",
+        "Background":   "/images/tile-bighistory.jpg",
+        "Link":         "/#/t00000000-0000-0000-0000-000000000000@x=0"
+    },
+    {
+        "Title":        "A 30 Year History of AIDS",
+        "Curator":      "ChronoZoomer",
+        "Background":   "/featured/tile-aidsquilt.jpg",
+        "Link":         "/chronozoomer#/t39e69fbe-6857-42cd-bd77-e12624ced37b/t3220d102-53dd-4c0e-9349-abaa38dfdd66"
+    },
+    {
+        "Title":        "CERN",
+        "Curator":      "European Organization for Nuclear Research",
+        "Background":   "/featured/tile-cern.jpg",
+        "Link":         "/cern/#/t29b28831-5999-46ae-a724-636d23eb1e99"
+    },
+    {
+        "Title":        "Chinese History of Medicine",
+        "Curator":      "Lori Guidos",
+        "Background":   "/featured/tile-chinesemedicine.jpg",
+        "Link":         "/loriguidos#/tb2e64574-ab32-4689-8dd1-e3ab6d96ce6d"
+    },
+    {
+        "Title":        "Earth Environments",
+        "Curator":      "Big History Labs",
+        "Background":   "/featured/tile-environment.jpg",
+        "Link":         "/bighistorylabs#/t65834e9d-8fd8-43dd-b7f8-80ef42059f74/tc9908dba-0442-4650-bde6-47e21844215e"
+    },
+    {
+        "Title":        "The French Revolution",
+        "Curator":      "Antonia Avila",
+        "Background":   "/featured/tile-frenchrevolution.jpg",
+        "Link":         "/antoniaavila#/t14135f31-b806-484c-ba2b-4b95b8c08bf0"
+    }
+]

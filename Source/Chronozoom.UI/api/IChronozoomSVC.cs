@@ -949,8 +949,8 @@ namespace Chronozoom.UI
 
         #region Favorites
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/userfavorites", ResponseFormat = WebMessageFormat.Json)]
-        Collection<TimelineShortcut> GetUserFavorites();
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/userfavorites?currentSuperCollection={currentSuperCollection}&currentCollection={currentCollection}")]
+        IEnumerable<Tile> GetUserFavorites(string currentSuperCollection = "", string currentCollection = "");
 
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/userfavorites/{favoriteGUID}", ResponseFormat = WebMessageFormat.Json)]
@@ -1033,6 +1033,18 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/editablecollections?currentSuperCollection={currentSuperCollection}&currentCollection={currentCollection}&includeMine={includeMine}")]
         List<TimelineShortcut> GetEditableCollections(string currentSuperCollection = "", string currentCollection = "", bool includeMine = false);
+
+        /// <summary>
+        /// Provides a list of the exhibits that have been updated most recently.
+        /// Only includes exhibits that belongs to a publicly searchable collection.
+        /// Only includes exhibits that have an image as their main content item.
+        /// TODO: When there are more public collections, limit results to no more than one per collection.
+        /// </summary>
+        /// <param name="quantity">Maximum number of records to return.</param>
+        /// <returns>List of exhibits in a tile format.</returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/recentlyupdatedexhibits?quantity={quantity}")]
+        IEnumerable<Tile> GetRecentlyUpdatedExhibits(int quantity = 6);
 
         #endregion
 

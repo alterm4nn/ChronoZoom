@@ -10392,9 +10392,9 @@ var CZ;
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath('editablecollections');
-            request.addParameter('includeMine', includeMine);
-            request.addParameter('currentSuperCollection', Service.superCollectionName);
-            request.addParameter('currentCollection', Service.collectionName);
+            request.addParameter('includeMine',             includeMine);
+            request.addParameter('currentSuperCollection',  Service.superCollectionName);
+            request.addParameter('currentCollection',       Service.collectionName);
             return $.ajax
             ({
                 type:       'GET',
@@ -10405,20 +10405,42 @@ var CZ;
         }
         Service.getEditableCollections = getEditableCollections;
 
-        function getUserFavorites() {
-            var result = "";
+        function getRecentlyUpdatedExhibits(quantity)
+        {
+            if (typeof quantity != 'integer') quantity = 6;
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath('recentlyupdatedexhibits');
+            request.addParameter('quantity', quantity);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                dataType:   'json',
+                url:        request.url
+            });
+        }
+        Service.getRecentlyUpdatedExhibits = getRecentlyUpdatedExhibits;
+
+        function getUserFavorites()
+        {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("userfavorites");
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
+            request.addParameter('currentSuperCollection',  Service.superCollectionName);
+            request.addParameter('currentCollection',       Service.collectionName);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                dataType:   'json',
+                url:        request.url
             });
         }
         Service.getUserFavorites = getUserFavorites;
-        function deleteUserFavorite(guid) {
+
+        function deleteUserFavorite(guid)
+        {
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -12661,6 +12683,46 @@ var CZ;
              * Menu Item Hooks *
              *******************/
 
+            $('#mnuTestOverlayHome').click(function (event)
+            {
+                // TODO: remove this temp test once new overlay is deployed
+                event.stopPropagation();
+                if (CZ.Settings.isCosmosCollection)
+                {
+                    CZ.StartPage.hide();
+                    CZ.Overlay.Hide();
+                    CZ.Overlay.Show(false);
+                }
+                else
+                {
+                    CZ.Authoring.showMessageWindow
+                    (
+                        'Please navigate to the home page first.',
+                        'Unable to Show Overlay'
+                    );
+                }
+            });
+
+            $('#mnuTestOverlayMine').click(function (event)
+            {
+                // TODO: remove this temp test once new overlay is deployed
+                event.stopPropagation();
+                if (Menus.isSignedIn)
+                {
+                    CZ.StartPage.hide();
+                    CZ.Overlay.Hide();
+                    CZ.Overlay.Show(true);
+                }
+                else
+                {
+                    CZ.Authoring.showMessageWindow
+                    (
+                        'Please log in first.',
+                        'Unable to Show Overlay'
+                    );
+                }
+            });
+
             $('#mnuViewTours').click(function (event)
             {
                 event.stopPropagation();
@@ -12701,7 +12763,7 @@ var CZ;
                 event.stopPropagation();
                 // show create collection dialog
                 CZ.HomePageViewModel.closeAllForms();
-                CZ.StartPage.addCollection();
+                AddCollection();
             });
 
             $('#mnuCreateTimeline').click(function (event)
@@ -12745,11 +12807,13 @@ var CZ;
                 {
                     // toggle display of register / log in pane
                     CZ.HomePageViewModel.panelToggleLogin();
+                    //CZ.Overlay.Show(); // TODO: switch this in once working
                 }
                 else
                 {
                     // show my collections overlay (with preference for display of My Collections if viewing Cosmos)
                     CZ.StartPage.show(true);
+                    //CZ.Overlay.Show(true); // TODO: switch this in once working
                 }
             });
 
@@ -12776,6 +12840,71 @@ var CZ;
             });
 
         });
+
+
+        /***********
+         * Helpers *
+         ***********/
+
+        this.AddCollection =
+        function AddCollection()
+        {
+            CZ.Authoring.hideMessageWindow();
+
+            var newName = prompt("What name would you like for your new collection?\nNote: The name must be unique among your collections.", '') || '';
+            newName     = $.trim(newName);
+
+            var newPath = newName.replace(/[^a-zA-Z0-9]/g, '');
+            if (newPath === '') return;
+
+            if (newPath.length > 50)
+            {
+                CZ.Authoring.showMessageWindow
+                (
+                    "The name of your new collection must be no more than 50 characters in length.",
+                    "Unable to Create Collection"
+                );
+                return;
+            }
+
+            CZ.Service.getCollection().done(function (currentCollection)
+            {
+                CZ.Service.isUniqueCollectionName(newName).done(function (isUniqueCollectionName)
+                {
+                    if (!isUniqueCollectionName || newPath === currentCollection.Path)
+                    {
+                        CZ.Authoring.showMessageWindow
+                        (
+                            "Sorry your new collection name is not unique enough. Please try a different name.",
+                            "Unable to Create Collection"
+                        );
+                        return;
+                    }
+
+                    CZ.Service.postCollection(newPath, { Title: newName }).done(function (success)
+                    {
+                        if (success)
+                        {
+                            window.location =
+                            (
+                                window.location.protocol + '//' + window.location.host + '/' + CZ.Service.superCollectionName + '/' + newPath
+                            )
+                            .toLowerCase();
+                        }
+                        else
+                        {
+                            CZ.Authoring.showMessageWindow
+                            (
+                                "An unexpected error occured.",
+                                "Unable to Create Collection"
+                            );
+                        }
+                    });
+
+                });
+            });
+
+        };
 
 
 
@@ -19207,6 +19336,7 @@ var CZ;
                 fillFeaturedTimelinesList(timelines);
             });
 
+            /* TODO: commented out as switched to different code for overlay.js
             CZ.Service.getUserFavorites().then(function (response) {
                 var timelines = response ? response.reverse() : [];
 
@@ -19229,6 +19359,7 @@ var CZ;
             }, function (error) {
                 console.log("[ERROR] getUserFavorites");
             });
+            */
 
             CZ.Service.getProfile().done(function (data) {
                 if ((data !== "") && (data.DisplayName !== null)) {
@@ -19303,7 +19434,462 @@ var CZ;
     })(CZ.StartPage || (CZ.StartPage = {}));
     var StartPage = CZ.StartPage;
 })(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
+var CZ;
+(function (CZ) {
+    (function (Overlay) {
+
+
+        /**********************
+         * Private Properties *
+         **********************/
+        
+        var initialized     = false;
+        var quantity        = (screen.width >= 1800 || screen.height >= 1800) ? 9 : 6;      // how many tiles to display in featured or recent lists
+        var defaultImages   = ['/images/background.jpg',   '/images/default-tile.png'];     // use the default tile background if these are provided by API
+        var brightImages    = ['/images/tile-default.jpg', '/images/tile-bighistory.jpg'];  // do not darken the background for tiles with these images
+        var cosmosImage     = '/images/tile-bighistory.jpg';
+        var $overlay        = $('#overlay');
+        var $listWelcome;
+        var $listCollections;
+        var $listFeatured;
+        var $listUpdated;
+        var $listFavorites;
+        var $templates;
+        var $templateCollection;
+        var $templateFeatured;
+        var $templateTimeline;
+        var $templateExhibit;
+        var $templateNoFavorite;
+        var $templateMarkPublic;
+
+
+
+        /******************
+         * Public Methods *
+         ******************/
+
+        function Initialize()
+        {
+            $overlay.load('/ui/overlay.html', function ()
+            {
+                $listWelcome        = $overlay.find('#listWelcome');
+                $listCollections    = $overlay.find('#listCollections');
+                $listFeatured       = $overlay.find('#listFeatured');
+                $listUpdated        = $overlay.find('#listUpdated');
+                $listFavorites      = $overlay.find('#listFavorites');
+                $templateCollection = $overlay.find('#tileCollection').html();
+                $templateFeatured   = $overlay.find('#tileFeatured'  ).html();
+                $templateTimeline   = $overlay.find('#tileTimeline'  ).html();
+                $templateExhibit    = $overlay.find('#tileExhibit'   ).html();
+                $templateNoFavorite = $overlay.find('#msgNoFavorite' ).html();
+                $templateMarkPublic = $overlay.find('#msgMarkPublic' ).html();
+
+                if (isInCosmos('/' + window.location.hash))
+                {
+                    $('#introTourLink').show();
+                }
+
+                $('.overlay-list')
+                    .mouseenter(function (event)
+                    {
+                        $(this).find('.hint').removeClass('hidden');
+                    })
+                    .mouseleave(function (event)
+                    {
+                        $(this).find('.hint').addClass('hidden');
+                    })
+                ;
+
+                initialized = true;
+                populateFeatured(); // never changes during page lifecycle and shown in all views
+            });
+        }
+        Overlay.Initialize = Initialize;
+
+
+        function Hide()
+        {
+            if (CZ.Settings.isCosmosCollection)
+            {
+                $('.header-regimes' ).visible();
+            }
+            $('.header-breadcrumbs' ).visible();
+
+            $overlay.fadeOut();
+        }
+        Overlay.Hide = Hide;
+
+
+        function Show(preferPersonalizedLayout)
+        {
+            CZ.HomePageViewModel.closeAllForms();
+            $('.header-regimes'     ).invisible();
+            $('.header-breadcrumbs' ).invisible();
+
+            if (initialized)
+            {
+                layout(preferPersonalizedLayout);
+            }
+
+            $overlay.fadeIn();
+        }
+        Overlay.Show = Show;
+
+
+        function ExploreBigHistory()
+        {
+            var urlParts = window.location.href.replace('//', '').toLowerCase().split('/');
+
+            Hide();
+
+            if (urlParts[1] == '#')
+            {
+                // cosmos supercollection - expand out to full view
+                $('#regime-link-cosmos').trigger('click');
+            }
+            else
+            {
+                // a different supercollection - switch to cosmos
+                window.location.href = '/#/cosmos';
+            }
+        }
+        Overlay.ExploreBigHistory = ExploreBigHistory;
+
+
+        function ExploreIntroTour()
+        {
+            if (CZ.Tours.tours.length > 0)
+            {
+                Hide();
+                CZ.Tours.takeTour(CZ.Tours.tours[0]);
+            }
+        }
+        Overlay.ExploreIntroTour = ExploreIntroTour;
+
+
+
+        /*******************
+         * Private Methods *
+         *******************/
+
+        function layout(preferPersonalizedLayout)
+        {
+            if
+            (
+                (typeof CZ.Authoring === 'undefined') ||
+                (typeof CZ.Settings  === 'undefined') ||
+                (!preferPersonalizedLayout  &&  CZ.Settings.isCosmosCollection) ||
+                (!CZ.Authoring.isEnabled    && !CZ.Settings.isAuthorized)
+            )
+            {
+                // home page view
+
+                populateUpdated();
+
+                $listCollections.hide();
+                $listFavorites.hide();
+
+                $listWelcome.show();
+                $listFeatured.show();
+                $listUpdated.show();
+            }
+            else
+            {
+                // my collections view
+
+                populateCollections();
+                populateFavorites();
+
+                $listWelcome.hide();
+                $listUpdated.hide();
+
+                $listCollections.show();
+                $listFeatured.show();
+                $listFavorites.show();
+            }
+        }
+
+
+        function populateFeatured()
+        {
+            $.getJSON(constants.featuredContentList, function (response)
+            {
+                var json    = response ? response : [];
+                var $list   = $('<div></div>');
+
+                $.each(json, function (index, item)
+                {
+                    if (index < quantity)
+                    {
+                        var tile =  $templateFeatured
+                                    .replace(new RegExp('{{contentTitle}}', 'g'),   simpleClean(item.Title))
+                                    .replace(           '{{collectionCurator}}',    item.Curator)
+                                    .replace(           '{{contentBackground}}',    item.Background)
+                                    .replace(           '{{contentURL}}',           item.Link)
+                        ;
+                        $list.append(tile);
+                    }
+                });
+
+                $listFeatured.find('.overlay-tile').off('click').remove();
+                $listFeatured
+                    .append($list.html())
+                    .find('.overlay-tile').click(function (event)
+                    {
+                        if ($(this).attr('data-url') != '')
+                        {
+                            window.location.href = $(this).attr('data-url');
+                        }
+                        Hide();
+                    })
+                ;
+
+                loadCustomBackgrounds($listFeatured, false);
+            })
+            .fail(function ()
+            {
+                console.log('[ERROR] CZ.Overlay:populateFeatured');
+            });
+        }
+
+
+        function populateUpdated()
+        {
+            CZ.Service.getRecentlyUpdatedExhibits(quantity).then(function (response)
+            {
+                var json        = response ? response : [];
+                var $list       = $('<div></div>');
+                var msg         = $templateMarkPublic;
+
+                $.each(json, function (index, item)
+                {
+                    var year =  CZ.Dates.convertCoordinateToYear(item.Year);
+                    var tile =  $templateExhibit
+                                .replace(           '{{collectionTitle}}',      simpleClean(item.CollectionName))
+                                .replace(           '{{collectionCurator}}',    item.CuratorName)
+                                .replace(           '{{exhibitImage}}',         item.CustomBackground)
+                                .replace(new RegExp('{{exhibitTitle}}', 'g'),   simpleClean(item.Title))
+                                .replace(           '{{exhibitYear}}',          year.year + '&nbsp;' + year.regime)
+                                .replace(           '{{exhibitURL}}',           item.Link)
+                    ;
+                    $list.append(tile);
+                });
+
+                if (json.length < quantity || quantity > 6) $list.append(msg);
+
+                $listUpdated.find('.overlay-list-note').remove(); // msg
+                $listUpdated.find('.overlay-tile').off('click').remove();
+                $listUpdated
+                    .append($list.html())
+                    .find('.overlay-tile')
+                        .click(function (event)
+                        {
+                            if ($(this).attr('data-url') != '')
+                            {
+                                window.location.href = $(this).attr('data-url');
+                            }
+                            Hide();
+                        })
+                ;
+
+                loadCustomBackgrounds($listUpdated, true);
+            },
+            function (error)
+            {
+                console.log('[ERROR] CZ.Overlay:populateUpdated');
+            });
+        }
+
+
+        function populateCollections()
+        {
+            CZ.Service.getEditableCollections(true).then(function (response)
+            {
+                var json         = response ? response : [];
+                var $list        = $('<div></div>');
+
+                $.each(json, function (index, item)
+                {
+                    var url     = item.TimelineUrl  || '';
+                    var image   = item.ImageUrl     || '';
+
+                    if (hasDefaultBackground(image))        image   = '';
+                    if (image === '' && isInCosmos(url))    image   = cosmosImage;
+                    if (item.CurrentCollection)             url     = '';
+
+                    var tile =  $templateCollection
+                                .replace(           '{{collectionURL}}',            url)
+                                .replace(           '{{collectionBackground}}',     image)
+                                .replace(new RegExp('{{collectionTitle}}', 'g'),    simpleClean(item.Title) || '')
+                                .replace(           '{{collectionCurator}}',        item.Author             || '')
+                    ;
+                    $list.append(tile);
+                });
+
+                $listCollections.find('.overlay-tile').off('click').remove();
+                $listCollections
+                    .append($list.html())
+                    .find('.overlay-tile').click(function (event)
+                    {
+                        if ($(this).attr('data-url') != '')
+                        {
+                            window.location.href = $(this).attr('data-url');
+                        }
+                        Hide();
+                    })
+                ;
+
+                loadCustomBackgrounds($listCollections, true);
+            },
+            function (error)
+            {
+                console.log('[ERROR] CZ.Overlay:populateCollections');
+            });
+        }
+
+
+        function populateFavorites()
+        {
+            CZ.Service.getUserFavorites().then(function (response)
+            {
+                var json         = response ? response : [];
+                var $list        = $('<div></div>');
+
+                $.each(json, function (index, item)
+                {
+                    var image   = item.CustomBackground || '';
+
+                    if (hasDefaultBackground(image))    image   = '';
+                    if (item.IsCosmosCollection)        image   = cosmosImage;
+
+                    var tile =  $templateTimeline
+                                .replace(new RegExp('{{timelineTitle}}', 'g'),  simpleClean(item.Title)             || '')
+                                .replace(           '{{timelineURL}}',          item.Link                           || '')
+                                .replace(           '{{collectionBackground}}', image)
+                                .replace(           '{{collectionTitle}}',      simpleClean(item.CollectionName)    || '')
+                                .replace(           '{{collectionCurator}}',    item.CuratorName                    || '')
+                    ;
+                    $list.append(tile);
+                });
+
+                if (json.length === 0)
+                {
+                    var tile =  $templateTimeline
+                                .replace(new RegExp('{{timelineTitle}}', 'g'),  'Big Bang to Present Day')
+                                .replace(           '{{timelineURL}}',          '/#/t00000000-0000-0000-0000-000000000000@x=0')
+                                .replace(           '{{collectionBackground}}', cosmosImage)
+                                .replace(           '{{collectionTitle}}',      'Cosmos')
+                                .replace(           '{{collectionCurator}}',    'ChronoZoom')
+                    ;
+                    var msg  = $templateNoFavorite;
+                    $list
+                        .append(tile)
+                        .append(msg)
+                    ;
+                }
+
+                $listFavorites.find('.overlay-list-note').remove(); // msg
+                $listFavorites.find('.overlay-tile').off('click').remove();
+                $listFavorites
+                    .append($list.html())
+                    .find('.overlay-tile').click(function (event)
+                    {
+                        if ($(this).attr('data-url') != '')
+                        {
+                            window.location.href = $(this).attr('data-url');
+                        }
+                        Hide();
+                    })
+                ;
+
+                loadCustomBackgrounds($listFavorites);
+            },
+            function (error)
+            {
+                console.log('[ERROR] CZ.Overlay:populateFavorites');
+            });
+        }
+
+
+        this.hasBrightBackground =
+        function hasBrightBackground(imageURL)
+        {
+            if (typeof imageURL != 'string') return true;
+
+            return $.inArray(imageURL.toLowerCase(), brightImages) > -1;
+        };
+
+        this.hasDefaultBackground =
+        function hasDefaultBackground(imageURL)
+        {
+            if (typeof imageURL != 'string') return true;
+
+            return $.inArray(imageURL.toLowerCase(), defaultImages) > -1;
+        };
+
+
+        this.isInCosmos =
+        function isInCosmos(url)
+        {
+            if (typeof url != 'string') return false;
+
+            var path    = url.toLowerCase().split('#')[0];
+            var matches = ['/', '/chronozoom', '/chronozoom/', '/chronozoom/cosmos', '/chronozoom/cosmos/'];
+
+            return $.inArray(path, matches) > -1;
+        };
+
+
+        function loadCustomBackgrounds($list, darken)
+        {
+            // Instead of loading a custom background image when a new tile is created and added to the DOM,
+            // the background image is changed shortly after, so a cached common image is shown while custom
+            // image is potentially loaded for the first time.
+            darken = (darken === true) || false;
+
+            $list.find('.overlay-tile:not([data-image=""])').each(function (index, tile)
+            {
+                var $tile = $(tile);
+
+                if ($tile.attr('data-image') || '' != '')
+                {
+                    if (darken && !hasBrightBackground($tile.attr('data-image')))
+                    {
+                        // use rgba gradient to darken provided custom background image
+                        $tile
+                        .css('background', 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)), url(' + $tile.attr('data-image') + ')')
+                        .css('background-size', 'cover') // do not combine with .css('background') call - this way browser will recalc scale
+                        .attr('data-image', '');
+                    }
+                    else
+                    {
+                        // embed provided custom background image as is without darkening
+                        $tile
+                        .css('background', '#445 url(' + $tile.attr('data-image') + ')')
+                        .css('background-size', 'cover') // do not combine with .css('background') call - this way browser will recalc scale
+                        .attr('data-image', '');
+                    }
+                }
+            });
+        }
+
+
+        function simpleClean(title)
+        {
+            // DB has collection, timeline and exhibit titles containing double quotes and "<" and ">".
+            // Double quotes breaks rendering in title attributes, and "<" or ">" in elements, so this
+            // function replaces them. It is NOT a substitute for a full cleansing for XSS, etc.
+            if (typeof title === 'undefined') return '';
+            return title
+                    .replace(new RegExp('<', 'g'), "&lt;")
+                    .replace(new RegExp('>', 'g'), "&gt;")
+                    .replace(new RegExp('"', 'g'), "&quot;");
+        }
+
+
+    })(CZ.Overlay || (CZ.Overlay = {}));
+    var Overlay = CZ.Overlay;
+})(CZ || (CZ = {}));/// <reference path='settings.ts'/>
 /// <reference path='common.ts'/>
 /// <reference path='timescale.ts'/>
 /// <reference path='viewport-controller.ts'/>
@@ -19398,7 +19984,7 @@ var CZ;
             CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing =UserCanEditCollection(profile);
 
-            var onTakeTour = function (tour)
+            CZ.Tours.takeTour = function(tour)
             {
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption
@@ -19462,7 +20048,7 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             tourTemplate: forms[10],
                             tours: CZ.Tours.tours,
-                            takeTour: onTakeTour,
+                            takeTour: CZ.Tours.takeTour,
                             editTour: canEdit ? function (tour)
                             {
                                 if (CZ.Authoring.showEditTourForm) CZ.Authoring.showEditTourForm(tour);
@@ -19967,6 +20553,7 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
 
+                CZ.Overlay.Initialize(); // TODO
                 CZ.StartPage.initialize();
             });
 

@@ -102,6 +102,7 @@
     <Compile Include="Member.cs" />
     <Compile Include="ContentItem.cs" />
     <Compile Include="Exhibit.cs" />
+    <Compile Include="Tile.cs" />
     <Compile Include="TimelineShortcut.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1036,9 +1036,9 @@ var CZ;
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath('editablecollections');
-            request.addParameter('includeMine', includeMine);
-            request.addParameter('currentSuperCollection', Service.superCollectionName);
-            request.addParameter('currentCollection', Service.collectionName);
+            request.addParameter('includeMine',             includeMine);
+            request.addParameter('currentSuperCollection',  Service.superCollectionName);
+            request.addParameter('currentCollection',       Service.collectionName);
             return $.ajax
             ({
                 type:       'GET',
@@ -1049,20 +1049,42 @@ var CZ;
         }
         Service.getEditableCollections = getEditableCollections;
 
-        function getUserFavorites() {
-            var result = "";
+        function getRecentlyUpdatedExhibits(quantity)
+        {
+            if (typeof quantity != 'integer') quantity = 6;
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath('recentlyupdatedexhibits');
+            request.addParameter('quantity', quantity);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                dataType:   'json',
+                url:        request.url
+            });
+        }
+        Service.getRecentlyUpdatedExhibits = getRecentlyUpdatedExhibits;
+
+        function getUserFavorites()
+        {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("userfavorites");
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
+            request.addParameter('currentSuperCollection',  Service.superCollectionName);
+            request.addParameter('currentCollection',       Service.collectionName);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                dataType:   'json',
+                url:        request.url
             });
         }
         Service.getUserFavorites = getUserFavorites;
-        function deleteUserFavorite(guid) {
+
+        function deleteUserFavorite(guid)
+        {
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
