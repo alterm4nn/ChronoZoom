@@ -14633,11 +14633,11 @@ var CZ;
 
                     // Other cases are covered by datepicker
                     if (!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
-                        _this.titleInput.showError("Title can't be empty");
+                        _this.titleInput.showError("Title cannot be empty");
                     }
 
                     if (!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
-                        _this.errorMessage.text('Time interval should no less than one day');
+                        _this.errorMessage.text('Time interval cannot be less than one day');
                     }
 
                     if (!isDataValid) {
