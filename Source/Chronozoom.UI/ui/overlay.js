@@ -34,39 +34,37 @@ var CZ;
 
         function Initialize()
         {
-            $overlay.load('/ui/overlay.html', function ()
+            $listWelcome        = $overlay.find('#listWelcome');
+            $listCollections    = $overlay.find('#listCollections');
+            $listFeatured       = $overlay.find('#listFeatured');
+            $listUpdated        = $overlay.find('#listUpdated');
+            $listFavorites      = $overlay.find('#listFavorites');
+            $templateCollection = $overlay.find('#tileCollection').html();
+            $templateFeatured   = $overlay.find('#tileFeatured'  ).html();
+            $templateTimeline   = $overlay.find('#tileTimeline'  ).html();
+            $templateExhibit    = $overlay.find('#tileExhibit'   ).html();
+            $templateNoFavorite = $overlay.find('#msgNoFavorite' ).html();
+            $templateMarkPublic = $overlay.find('#msgMarkPublic' ).html();
+
+            if (isInCosmos(window.location.pathname))
             {
-                $listWelcome        = $overlay.find('#listWelcome');
-                $listCollections    = $overlay.find('#listCollections');
-                $listFeatured       = $overlay.find('#listFeatured');
-                $listUpdated        = $overlay.find('#listUpdated');
-                $listFavorites      = $overlay.find('#listFavorites');
-                $templateCollection = $overlay.find('#tileCollection').html();
-                $templateFeatured   = $overlay.find('#tileFeatured'  ).html();
-                $templateTimeline   = $overlay.find('#tileTimeline'  ).html();
-                $templateExhibit    = $overlay.find('#tileExhibit'   ).html();
-                $templateNoFavorite = $overlay.find('#msgNoFavorite' ).html();
-                $templateMarkPublic = $overlay.find('#msgMarkPublic' ).html();
+                $('#introTourLink').removeClass('hidden');
+            }
 
-                if (isInCosmos('/' + window.location.hash))
+            $('.overlay-list')
+                .mouseenter(function (event)
                 {
-                    $('#introTourLink').show();
-                }
+                    $(this).find('.hint').removeClass('hidden');
+                })
+                .mouseleave(function (event)
+                {
+                    $(this).find('.hint').addClass('hidden');
+                })
+            ;
 
-                $('.overlay-list')
-                    .mouseenter(function (event)
-                    {
-                        $(this).find('.hint').removeClass('hidden');
-                    })
-                    .mouseleave(function (event)
-                    {
-                        $(this).find('.hint').addClass('hidden');
-                    })
-                ;
+            initialized = true;
 
-                initialized = true;
-                populateFeatured(); // never changes during page lifecycle and shown in all views
-            });
+            populateFeatured(); // never changes during page lifecycle and shown in all views
         }
         Overlay.Initialize = Initialize;
 
@@ -114,7 +112,7 @@ var CZ;
             else
             {
                 // a different supercollection - switch to cosmos
-                window.location.href = '/#/cosmos';
+                window.location.href = '/#/t00000000-0000-0000-0000-000000000000@x=0';
             }
         }
         Overlay.ExploreBigHistory = ExploreBigHistory;
@@ -406,9 +404,6 @@ var CZ;
 
         function loadCustomBackgrounds($list, darken)
         {
-            // Instead of loading a custom background image when a new tile is created and added to the DOM,
-            // the background image is changed shortly after, so a cached common image is shown while custom
-            // image is potentially loaded for the first time.
             darken = (darken === true) || false;
 
             $list.find('.overlay-tile:not([data-image=""])').each(function (index, tile)

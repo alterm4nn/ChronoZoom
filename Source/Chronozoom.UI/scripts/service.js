@@ -100,7 +100,6 @@ var CZ;
 
         // Testing options.
         var _isLocalHost = constants.environment === "Localhost";
-        var _dumpTweetsUrl = "/dumps/home/tweets.json";
         var _dumpTimelinesUrl = "/dumps/home/timelines.json";
         var _testLogin = false;
 
@@ -218,7 +217,6 @@ var CZ;
             request.addParameter("supercollection", sc);
             request.addParameter("collection", c);
             request.addParameters(r);
-            console.log("[GET] " + request.url);
             return $.ajax
             ({
                 type: "GET",
@@ -511,9 +509,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("timeline");
-
-            console.log("[PUT] " + request.url);
-
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -533,9 +528,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("timeline");
-
-            console.log("[DELETE] " + request.url);
-
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -555,9 +547,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("exhibit");
-
-            console.log("[PUT] " + request.url);
-
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -577,9 +566,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("exhibit");
-
-            console.log("[DELETE] " + request.url);
-
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -598,9 +584,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("contentitem");
-
-            console.log("[PUT] " + request.url);
-
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -619,9 +602,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("contentitem");
-
-            console.log("[DELETE] " + request.url);
-
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -641,9 +621,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("tour2");
-
-            console.log("[PUT] " + request.url);
-
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -683,9 +660,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("tours");
-
-            console.log("[GET] " + request.url);
-
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -730,9 +704,6 @@ var CZ;
                 searchTerm:         query,
                 searchScope:        scope
             };
-
-            console.log("[GET] " + request.url);
-
             return $.ajax
             ({
                 type:           "GET",
@@ -757,9 +728,6 @@ var CZ;
                 top: top,
                 skip: skip
             };
-
-            console.log("[GET] " + request.url);
-
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -785,9 +753,6 @@ var CZ;
                 top: top,
                 skip: skip
             };
-
-            console.log("[GET] " + request.url);
-
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -816,9 +781,6 @@ var CZ;
                 top: top,
                 skip: skip
             };
-
-            console.log("[GET] " + request.url);
-
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -831,25 +793,6 @@ var CZ;
             });
         }
         Service.getBingDocuments = getBingDocuments;
-
-        // .../twitter/getRecentTweets
-        function getRecentTweets() {
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("twitter/getRecentTweets");
-
-            console.log("[GET] " + request.url);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: _isLocalHost ? _dumpTweetsUrl : request.url,
-                success: function (response) {
-                }
-            });
-        }
-        Service.getRecentTweets = getRecentTweets;
 
         // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         function getServiceInformation() {
@@ -1117,56 +1060,6 @@ var CZ;
             });
         }
         Service.putUserFavorite = putUserFavorite;
-
-        function getUserFeatured(guid) {
-            if (typeof guid === "undefined") { guid = "default"; }
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfeatured");
-            request.addToPath(guid);
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: _isLocalHost ? _dumpTimelinesUrl : request.url
-            });
-        }
-        Service.getUserFeatured = getUserFeatured;
-
-        function deleteUserFeatured(guid) {
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfeatured");
-            if (guid == "")
-                return null;
-            request.addToPath(guid);
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.deleteUserFeatured = deleteUserFeatured;
-
-        function putUserFeatured(guid) {
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfeatured");
-            if (guid == "")
-                return null;
-            request.addToPath(guid);
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.putUserFeatured = putUserFeatured;
 
         //Triples
         function putTriplet(subject, predicate, object) {

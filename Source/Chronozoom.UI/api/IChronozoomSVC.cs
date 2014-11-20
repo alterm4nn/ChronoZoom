@@ -1105,38 +1105,4 @@ namespace Chronozoom.UI
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         BaseJsonResult<IEnumerable<Bing.WebResult>> GetDocuments(string query, string doctype, string top, string skip);
     }
-
-    [ServiceContract(Namespace = "")]
-    public interface ITwitterAPI
-    {   
-        /// <summary>
-        /// Returns recent N timeline tweets of ChronoZoom Twitter account.
-        /// </summary>
-        /// <returns>Recent N timeline tweets of ChronoZoom Twitter account in JSON format.</returns>
-        /// <example><![CDATA[  
-        /// HTTP verb: GET
-        /// URL:
-        /// http://{URL}/api/twitter/getRecentTweets
-        /// 
-        /// ]]></example>
-        [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
-        BaseJsonResult<IEnumerable<TweetSharp.TwitterStatus>> GetRecentTweets();
-    }
-
-    [ServiceContract(Namespace = "")]
-    public interface IFeaturedAPI
-    {
-        [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/{featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
-        Collection<TimelineShortcut> GetUserFeatured(string featuredGUID);
-
-        [OperationContract]
-        [WebInvoke(Method = "PUT", UriTemplate = "/{featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
-        bool PutUserFeatured(string featuredGUID);
-
-        [OperationContract]
-        [WebInvoke(Method = "DELETE", UriTemplate = "/{featuredGUID}", ResponseFormat = WebMessageFormat.Json)]
-        bool DeleteUserFeatured(string featuredGUID);
-    }   
 }

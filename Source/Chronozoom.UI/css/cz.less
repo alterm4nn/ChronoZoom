@@ -6,7 +6,6 @@
 @import "menus";
 @import "overlay";
 @import "timescale";
-@import "start-page";
 
 @headerHeight:                  36px;   /* The height of the page header */
 @headerLogoWidth:               170px;  /* The width of the logo area */
@@ -2200,8 +2199,9 @@ a
     vertical-align: top;
 }
 
-// Prevent SkyDrive clicks
-#embedItemDiv {
+/* Prevent SkyDrive clicks */
+#embedItemDiv
+{
     pointer-events: none;
     cursor: default;
 }

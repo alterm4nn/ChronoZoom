@@ -176,46 +176,6 @@
              * Menu Item Hooks *
              *******************/
 
-            $('#mnuTestOverlayHome').click(function (event)
-            {
-                // TODO: remove this temp test once new overlay is deployed
-                event.stopPropagation();
-                if (CZ.Settings.isCosmosCollection)
-                {
-                    CZ.StartPage.hide();
-                    CZ.Overlay.Hide();
-                    CZ.Overlay.Show(false);
-                }
-                else
-                {
-                    CZ.Authoring.showMessageWindow
-                    (
-                        'Please navigate to the home page first.',
-                        'Unable to Show Overlay'
-                    );
-                }
-            });
-
-            $('#mnuTestOverlayMine').click(function (event)
-            {
-                // TODO: remove this temp test once new overlay is deployed
-                event.stopPropagation();
-                if (Menus.isSignedIn)
-                {
-                    CZ.StartPage.hide();
-                    CZ.Overlay.Hide();
-                    CZ.Overlay.Show(true);
-                }
-                else
-                {
-                    CZ.Authoring.showMessageWindow
-                    (
-                        'Please log in first.',
-                        'Unable to Show Overlay'
-                    );
-                }
-            });
-
             $('#mnuViewTours').click(function (event)
             {
                 event.stopPropagation();
@@ -264,7 +224,7 @@
                 event.stopPropagation();
                 // show create timeline dialog
                 CZ.HomePageViewModel.closeAllForms();
-                CZ.StartPage.hide();
+                CZ.Overlay.Hide();
                 CZ.Authoring.UI.createTimeline();
             });
 
@@ -273,7 +233,7 @@
                 event.stopPropagation();
                 // show create exhibit dialog
                 CZ.HomePageViewModel.closeAllForms();
-                CZ.StartPage.hide();
+                CZ.Overlay.Hide();
                 CZ.Authoring.UI.createExhibit();
             });
 
@@ -282,7 +242,7 @@
                 event.stopPropagation();
                 // show create tour dialog
                 CZ.HomePageViewModel.closeAllForms();
-                CZ.StartPage.hide();
+                CZ.Overlay.Hide();
                 CZ.Authoring.UI.createTour();
             });
 
@@ -300,13 +260,11 @@
                 {
                     // toggle display of register / log in pane
                     CZ.HomePageViewModel.panelToggleLogin();
-                    //CZ.Overlay.Show(); // TODO: switch this in once working
                 }
                 else
                 {
                     // show my collections overlay (with preference for display of My Collections if viewing Cosmos)
-                    CZ.StartPage.show(true);
-                    //CZ.Overlay.Show(true); // TODO: switch this in once working
+                    CZ.Overlay.Show(true);
                 }
             });
 

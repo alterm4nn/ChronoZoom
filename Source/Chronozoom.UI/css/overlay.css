@@ -82,10 +82,16 @@
 .overlay-list > a:visited {
   color: #0be;
 }
+.overlay-list > a.hidden {
+  display: none;
+}
 .overlay-list a > img {
   height: 33px;
   width: 33px;
   margin: 1px;
+}
+.overlay-list a > span {
+  vertical-align: top;
 }
 .overlay-tile {
   float: left;
