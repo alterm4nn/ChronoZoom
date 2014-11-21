@@ -18489,6 +18489,20 @@ var CZ;
                 })
             ;
 
+            $('#themePicker option:selected').attr('selected', null);
+            $('#themePicker option[value="' + localStorage.getItem('theme') + '"]').attr('selected', 'selected');
+
+            $('#themePicker').change(function (event)
+            {
+                var theme = $('#themePicker option:selected').val();
+
+                $('body')
+                .removeClass(localStorage.getItem('theme'))
+                .addClass(theme);
+
+                localStorage.setItem('theme', theme);
+            });
+
             initialized = true;
 
             populateFeatured(); // never changes during page lifecycle and shown in all views
@@ -19071,6 +19085,15 @@ var CZ;
             $(document).ajaxStop(function () {
                 $('#wait').hide();
             });
+
+            // theme
+            var theme = localStorage.getItem('theme') || '';
+            if (theme === '')
+            {
+                theme = 'theme-midnight'; // default
+                localStorage.setItem('theme', theme);
+            }
+            $('body').addClass(theme);
 
             // populate collection names from URL
             var url = CZ.UrlNav.getURL();

@@ -114,6 +114,7 @@
     <Content Include="images\paste.svg" />
     <Content Include="images\profile-icon-green.png" />
     <Content Include="images\profile-icon-yellow.png" />
+    <Content Include="images\themes\peabody-library.jpg" />
     <Content Include="images\tile-bighistory.jpg" />
     <Content Include="images\tile-default.jpg" />
     <Content Include="scripts\authoring-ui.min.js">

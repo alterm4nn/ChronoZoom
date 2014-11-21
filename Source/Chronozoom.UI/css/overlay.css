@@ -147,3 +147,65 @@
   max-height: 2em;
   overflow: hidden;
 }
+/****************
+ * Theme System *
+ ****************/
+#themePicker {
+  position: fixed;
+  bottom: 25px;
+  left: 0;
+  -webkit-border-top-right-radius: 12px;
+  -moz-border-top-right-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 1em 2em 1em 10px;
+  vertical-align: text-bottom;
+  font-size: 0.8em;
+  font-style: italic;
+  background-color: #04021e;
+  color: #bbb;
+}
+#themePicker select {
+  font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Trebuchet MS', sans-serif;
+  margin-left: 0.75em;
+  padding: 2px 5px 3px 5px;
+  border: 1px outset #444;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  outline: none;
+  background-color: #343152;
+  color: #ccc;
+}
+.theme-library #overlay {
+  background: #b28f65 url(/images/themes/peabody-library.jpg);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+.theme-library .overlay-list-title {
+  color: #fff;
+  text-shadow: 2px 2px #000;
+}
+.theme-library .overlay-list > p {
+  font-size: 18px;
+  line-height: 1.2em;
+  text-align: left;
+  color: #ddd;
+  text-shadow: 2px 2px #000;
+}
+.theme-library .overlay-tile {
+  opacity: 1;
+}
+.theme-library .overlay-tile:hover {
+  border-color: #b28f65;
+  -webkit-box-shadow: 3px 3px 10px #dedea2;
+  -moz-box-shadow: 3px 3px 10px #dedea2;
+  box-shadow: 3px 3px 10px #dedea2;
+}
+.theme-library #themePicker {
+  padding-right: 1em;
+  background: #b28f65;
+  color: #000;
+  opacity: 0.6;
+}

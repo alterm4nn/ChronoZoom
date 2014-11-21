@@ -195,6 +195,15 @@ var CZ;
                 $('#wait').hide();
             });
 
+            // theme
+            var theme = localStorage.getItem('theme') || '';
+            if (theme === '')
+            {
+                theme = 'theme-midnight'; // default
+                localStorage.setItem('theme', theme);
+            }
+            $('body').addClass(theme);
+
             // populate collection names from URL
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;

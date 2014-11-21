@@ -62,6 +62,20 @@ var CZ;
                 })
             ;
 
+            $('#themePicker option:selected').attr('selected', null);
+            $('#themePicker option[value="' + localStorage.getItem('theme') + '"]').attr('selected', 'selected');
+
+            $('#themePicker').change(function (event)
+            {
+                var theme = $('#themePicker option:selected').val();
+
+                $('body')
+                .removeClass(localStorage.getItem('theme'))
+                .addClass(theme);
+
+                localStorage.setItem('theme', theme);
+            });
+
             initialized = true;
 
             populateFeatured(); // never changes during page lifecycle and shown in all views
