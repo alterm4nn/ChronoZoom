@@ -1,0 +1,139 @@
+/*
+    The initial/default theme is Midnight Blue, (.theme-midnight,) which should not
+    have any styling here, since the default styling, without applying any specific
+    theme styles, is Midnight Blue.
+
+    The only entries here should be for anything that differs from the default theme.
+*/
+
+
+
+.theme-library
+{
+    #overlay
+    {
+        background: #111 url(/images/themes/peabody-library.jpg);
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    #overlay .glass
+    {
+        &::after
+        {
+          /*background: rgba(26, 24, 17, 0.5);  - lighter alternative with touch of cream */
+            background: rgba(0, 0, 0, 0.5);
+        }
+        padding: 8px 15px 1px 10px;
+    }
+
+    .overlay-list-title
+    {
+        color: #fff;
+        text-shadow: 2px 2px #000;
+    }
+
+    #listWelcome p,
+    .overlay-list-note
+    {
+        color: #bbb;
+        text-shadow: 2px 2px #000;
+    }
+    .overlay-list-note.glass
+    {
+        margin-top: 5px;
+    }
+
+    #overlay .triangle-in-circle,
+    #listWelcome a,
+    #listWelcome a:hover,
+    #listWelcome a:visited
+    {
+        border-color:   #e2d99c;
+        color:          #e2d99c;
+        text-shadow: 1px 1px 20px #111;
+    }
+
+    .overlay-tile
+    {
+        opacity: 1;
+        &:hover
+        {
+            border-color: #b28f65;
+            -webkit-box-shadow: 3px 3px 10px #dedea2;
+            -moz-box-shadow:    3px 3px 10px #dedea2;
+            box-shadow:         3px 3px 10px #dedea2;
+        }
+    }
+
+    #themePicker
+    {
+        background: #b28f65;
+        color: #000;
+        opacity: 0.6;
+    }
+
+    footer
+    {
+        background-color: #353023;
+        border-color: #2a2519;
+    }
+}
+
+
+
+.theme-rosette
+{
+    #overlay
+    {
+        background: #120305 url(/images/themes/rosette-nebula.jpg);
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    .overlay-list-note
+    {
+        color: #ddd;
+        text-shadow: 2px 2px #000;
+    }
+    .overlay-list-note.glass
+    {
+        margin-top: 5px;
+        &::after
+        {
+            background: rgba(32, 12, 15, 0.8);
+        }
+        padding: 8px 15px 1px 10px;
+        color: #bbb;
+    }
+
+    #overlay .triangle-in-circle,
+    #listWelcome a,
+    #listWelcome a:hover,
+    #listWelcome a:visited
+    {
+        border-color:   #f80;
+        color:          #f80;
+        text-shadow: 1px 1px 20px #f90;
+    }
+
+    #themePicker
+    {
+        background: #3a1218;
+        opacity: 0.8;
+        select
+        {
+            background-color: #4f3135;
+        }
+    }
+
+    footer
+    {
+        background-color: #200c0f;
+        border-color: #170306;
+    }
+}

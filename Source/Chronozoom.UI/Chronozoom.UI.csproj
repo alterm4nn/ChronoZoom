@@ -78,6 +78,12 @@
     <Content Include="css\overlay.min.css">
       <DependentUpon>overlay.less</DependentUpon>
     </Content>
+    <Content Include="css\themes.css">
+      <DependentUpon>themes.less</DependentUpon>
+    </Content>
+    <Content Include="css\themes.min.css">
+      <DependentUpon>themes.less</DependentUpon>
+    </Content>
     <Content Include="css\_colors.css">
       <DependentUpon>_colors.less</DependentUpon>
     </Content>
@@ -114,7 +120,9 @@
     <Content Include="images\paste.svg" />
     <Content Include="images\profile-icon-green.png" />
     <Content Include="images\profile-icon-yellow.png" />
+    <Content Include="images\select.png" />
     <Content Include="images\themes\peabody-library.jpg" />
+    <Content Include="images\themes\rosette-nebula.jpg" />
     <Content Include="images\tile-bighistory.jpg" />
     <Content Include="images\tile-default.jpg" />
     <Content Include="scripts\authoring-ui.min.js">
@@ -498,6 +506,7 @@
     </Content>
     <Content Include="css\overlay.less" />
     <Content Include="featured\featured.json" />
+    <Content Include="css\themes.less" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />

@@ -23,6 +23,38 @@
     padding: 10px;
 }
 
+#overlay .glass
+{
+    &::after
+    {
+        position:   absolute;
+        top:        0;
+        left:       0;
+        right:      0;
+        bottom:     0;
+        -webkit-border-radius:  12px;
+        -moz-border-radius:     12px;
+        border-radius:          12px;
+        content:    "";
+        /*
+            use this here for a glass effect in themes if the theme has an image as a background:
+            background: rgba(0, 0, 0, 0.5);
+        */
+        z-index:    -1;
+    }
+
+    position:   relative;
+    /*
+        use this here with the glass effect in themes if the theme has an image as a background:
+        padding: 10px;
+    */
+
+    p:first-child
+    {
+        margin-top: 0px;
+    }
+}
+
 .overlay-list
 {
     float: left;
@@ -68,13 +100,6 @@
     width: auto;
 }
 
-.overlay-list > p
-{
-    font-size: 14px;
-    text-align: justify;
-    color: #ccc;
-}
-
 .overlay-list a
 {
     white-space: nowrap;
@@ -87,7 +112,39 @@
     opacity: 1;
 }
 
-.overlay-list > a
+#overlay .triangle-in-circle
+{
+    display:                inline-block;
+    border:                 solid 2px #0be;
+    -webkit-border-radius:  50%;
+    -moz-border-radius:     50%;
+    border-radius:          50%;
+    width:                  1em;
+    height:                 1em;
+    line-height:            1em;
+    margin:                 0.15em 0.2em 0 0;
+    padding:                0.2em;
+    text-align:             center;
+    vertical-align:         top;
+    opacity:                0.8;
+    -moz-transform:         rotage(270deg);
+    -ms-transform:          rotate(270deg);
+    -webkit-transform:      rotate(270deg);
+    transform:              rotate(270deg);
+    &::after
+    {
+        content: "\25bc";
+    }
+}
+
+#listWelcome p
+{
+    font-size: 14px;
+    text-align: justify;
+    color: #ccc;
+}
+
+#listWelcome a
 {
     display: block;
     position: relative;
@@ -98,7 +155,6 @@
     color: #0be;
     text-decoration: none;
     text-shadow: 1px 1px 20px #1cf;
-    opacity: 0.8;
     margin-bottom: 1em;
 
     &:hover,
@@ -107,19 +163,12 @@
         color: #0be;
     }
 }
-.overlay-list > a.hidden
+#listWelcome a.hidden
 {
     display: none;
 }
 
-.overlay-list a > img
-{
-    height: 33px;
-    width: 33px;
-    margin: 1px;
-}
-
-.overlay-list a > span
+#listWelcome a > span
 {
     vertical-align: top;
 }
@@ -187,12 +236,6 @@
     overflow: hidden;
 }
 
-
-
-/****************
- * Theme System *
- ****************/
-
 #themePicker
 {
     position: fixed;
@@ -201,7 +244,7 @@
     -webkit-border-top-right-radius:12px;
     -moz-border-top-right-radius:   12px;
     border-top-right-radius:        12px;
-    padding: 1em 2em 1em 10px;
+    padding: 1em 1em 1em 10px;
     vertical-align: text-bottom;
     font-size: 0.8em;
     font-style: italic;
@@ -211,6 +254,7 @@
     select
     {
         font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Trebuchet MS', sans-serif;
+        font-style: normal;
         margin-left: 0.75em;
         padding: 2px 5px 3px 5px;
         border: 1px outset #444;
@@ -223,49 +267,23 @@
     }
 }
 
-.theme-library
+/*
+    Following uses custom select chevron instead of browser default,
+    which can be a large and ugly grey button on some browsers. The
+    one browser deliberately excluded is Firefox since the method
+    used to hide the default chevron seems to change each release.
+*/
+#themePicker select
 {
-    #overlay
+    padding-right:      20px;
+    background-image:   url(/images/select.png);
+    background-repeat:  no-repeat;
+    background-position: top right;
+    background-size:    contain;
+    appearance: none;
+    -webkit-appearance: none;                   /* Chrome and Safari */
+    &::-ms-expand                               /* IE */
     {
-        background: #b28f65 url(/images/themes/peabody-library.jpg);
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-size: cover;
-    }
-
-    .overlay-list-title
-    {
-        color: #fff;
-        text-shadow: 2px 2px #000;
-    }
-
-    .overlay-list > p
-    {
-        font-size: 18px;
-        line-height: 1.2em;
-        text-align: left;
-        color: #ddd;
-        text-shadow: 2px 2px #000;
-    }
-
-    .overlay-tile
-    {
-        opacity: 1;
-        &:hover
-        {
-            border-color: #b28f65;
-            -webkit-box-shadow: 3px 3px 10px #dedea2;
-            -moz-box-shadow:    3px 3px 10px #dedea2;
-            box-shadow:         3px 3px 10px #dedea2;
-        }
-    }
-
-    #themePicker
-    {
-        padding-right: 1em;
-        background: #b28f65;
-        color: #000;
-        opacity: 0.6;
+        display: none;
     }
 }

@@ -358,6 +358,32 @@ iframe[sutra=picker] + div {
 #overlay-content-padding {
   padding: 10px;
 }
+#overlay .glass {
+  position: relative;
+  /*
+        use this here with the glass effect in themes if the theme has an image as a background:
+        padding: 10px;
+    */
+}
+#overlay .glass::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  content: "";
+  /*
+            use this here for a glass effect in themes if the theme has an image as a background:
+            background: rgba(0, 0, 0, 0.5);
+        */
+  z-index: -1;
+}
+#overlay .glass p:first-child {
+  margin-top: 0px;
+}
 .overlay-list {
   float: left;
   width: 33%;
@@ -392,11 +418,6 @@ iframe[sutra=picker] + div {
   height: 1em;
   width: auto;
 }
-.overlay-list > p {
-  font-size: 14px;
-  text-align: justify;
-  color: #ccc;
-}
 .overlay-list a {
   white-space: nowrap;
   overflow: hidden;
@@ -406,7 +427,34 @@ iframe[sutra=picker] + div {
 .overlay-list a:hover {
   opacity: 1;
 }
-.overlay-list > a {
+#overlay .triangle-in-circle {
+  display: inline-block;
+  border: solid 2px #0be;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  line-height: 1em;
+  margin: 0.15em 0.2em 0 0;
+  padding: 0.2em;
+  text-align: center;
+  vertical-align: top;
+  opacity: 0.8;
+  -moz-transform: rotage(270deg);
+  -ms-transform: rotate(270deg);
+  -webkit-transform: rotate(270deg);
+  transform: rotate(270deg);
+}
+#overlay .triangle-in-circle::after {
+  content: "\25bc";
+}
+#listWelcome p {
+  font-size: 14px;
+  text-align: justify;
+  color: #ccc;
+}
+#listWelcome a {
   display: block;
   position: relative;
   height: 33px;
@@ -416,22 +464,16 @@ iframe[sutra=picker] + div {
   color: #0be;
   text-decoration: none;
   text-shadow: 1px 1px 20px #1cf;
-  opacity: 0.8;
   margin-bottom: 1em;
 }
-.overlay-list > a:hover,
-.overlay-list > a:visited {
+#listWelcome a:hover,
+#listWelcome a:visited {
   color: #0be;
 }
-.overlay-list > a.hidden {
+#listWelcome a.hidden {
   display: none;
 }
-.overlay-list a > img {
-  height: 33px;
-  width: 33px;
-  margin: 1px;
-}
-.overlay-list a > span {
+#listWelcome a > span {
   vertical-align: top;
 }
 .overlay-tile {
@@ -488,9 +530,6 @@ iframe[sutra=picker] + div {
   max-height: 2em;
   overflow: hidden;
 }
-/****************
- * Theme System *
- ****************/
 #themePicker {
   position: fixed;
   bottom: 25px;
@@ -498,7 +537,7 @@ iframe[sutra=picker] + div {
   -webkit-border-top-right-radius: 12px;
   -moz-border-top-right-radius: 12px;
   border-top-right-radius: 12px;
-  padding: 1em 2em 1em 10px;
+  padding: 1em 1em 1em 10px;
   vertical-align: text-bottom;
   font-size: 0.8em;
   font-style: italic;
@@ -507,6 +546,7 @@ iframe[sutra=picker] + div {
 }
 #themePicker select {
   font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Trebuchet MS', sans-serif;
+  font-style: normal;
   margin-left: 0.75em;
   padding: 2px 5px 3px 5px;
   border: 1px outset #444;
@@ -517,38 +557,24 @@ iframe[sutra=picker] + div {
   background-color: #343152;
   color: #ccc;
 }
-.theme-library #overlay {
-  background: #b28f65 url(/images/themes/peabody-library.jpg);
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
+/*
+    Following uses custom select chevron instead of browser default,
+    which can be a large and ugly grey button on some browsers. The
+    one browser deliberately excluded is Firefox since the method
+    used to hide the default chevron seems to change each release.
+*/
+#themePicker select {
+  padding-right: 20px;
+  background-image: url(/images/select.png);
+  background-repeat: no-repeat;
+  background-position: top right;
+  background-size: contain;
+  appearance: none;
+  -webkit-appearance: none;
+  /* Chrome and Safari */
 }
-.theme-library .overlay-list-title {
-  color: #fff;
-  text-shadow: 2px 2px #000;
-}
-.theme-library .overlay-list > p {
-  font-size: 18px;
-  line-height: 1.2em;
-  text-align: left;
-  color: #ddd;
-  text-shadow: 2px 2px #000;
-}
-.theme-library .overlay-tile {
-  opacity: 1;
-}
-.theme-library .overlay-tile:hover {
-  border-color: #b28f65;
-  -webkit-box-shadow: 3px 3px 10px #dedea2;
-  -moz-box-shadow: 3px 3px 10px #dedea2;
-  box-shadow: 3px 3px 10px #dedea2;
-}
-.theme-library #themePicker {
-  padding-right: 1em;
-  background: #b28f65;
-  color: #000;
-  opacity: 0.6;
+#themePicker select::-ms-expand {
+  display: none;
 }
 .cz-timescale {
   padding-bottom: 0px;
@@ -674,6 +700,7 @@ iframe[sutra=picker] + div {
   -ms-user-select: none;
   user-select: none;
 }
+/* The main background color for the page */
 /* The height of the page header */
 /* The width of the logo area */
 /* The width of the tour player area */
@@ -683,7 +710,6 @@ iframe[sutra=picker] + div {
 /* The breadcrumbs scroller area */
 /* The height of the page footer */
 /* The width of the footers links area */
-/* The main background color for the page */
 html,
 body {
   margin: 0;
@@ -1344,7 +1370,12 @@ footer {
   width: 100%;
   height: 25px;
   bottom: 0px;
-  background: #232323;
+  background-color: #2a283a;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  border-top: solid 1px #131432;
+  border-bottom: solid 1px #131432;
 }
 #footer ul {
   overflow: hidden;
@@ -1359,17 +1390,19 @@ footer {
   margin-right: 10px;
   margin-left: 10px;
   height: 100%;
-  color: #FFF;
+  color: #ddd;
   white-space: nowrap;
   line-height: 25px;
 }
 .footer-link:hover {
   cursor: pointer;
+  text-shadow: 1px 1px 20px #fff;
 }
 .footer-links {
   height: 25px;
   width: 350px;
-  color: #AAA;
+  color: #aaa;
+  bottom: 1px;
 }
 .footer-credits {
   height: 25px;
@@ -1377,7 +1410,8 @@ footer {
   width: -moz-calc(100% - 350px);
   width: -webkit-calc(100% - 350px);
   width: -o-calc(100% - 350px);
-  color: #AAA;
+  color: #aaa;
+  bottom: 1px;
 }
 .footer-credits ul {
   margin-top: 4px;
@@ -1390,10 +1424,14 @@ footer {
 }
 .footer-link-credits img {
   margin-bottom: 3px;
+  opacity: 0.8;
+}
+.footer-link-credits img:hover {
+  opacity: 1;
 }
 .footer-text {
   margin-left: 6px;
-  color: #AAA;
+  color: #aaa;
 }
 /***********************************************************
 
@@ -2469,4 +2507,102 @@ a {
 #embedItemDiv {
   pointer-events: none;
   cursor: default;
+}
+/* this import must always be last line as themes are overrides */
+/*
+    The initial/default theme is Midnight Blue, (.theme-midnight,) which should not
+    have any styling here, since the default styling, without applying any specific
+    theme styles, is Midnight Blue.
+
+    The only entries here should be for anything that differs from the default theme.
+*/
+.theme-library #overlay {
+  background: #111111 url(/images/themes/peabody-library.jpg);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+.theme-library #overlay .glass {
+  padding: 8px 15px 1px 10px;
+}
+.theme-library #overlay .glass::after {
+  /*background: rgba(26, 24, 17, 0.5);  - lighter alternative with touch of cream */
+  background: rgba(0, 0, 0, 0.5);
+}
+.theme-library .overlay-list-title {
+  color: #fff;
+  text-shadow: 2px 2px #000;
+}
+.theme-library #listWelcome p,
+.theme-library .overlay-list-note {
+  color: #bbb;
+  text-shadow: 2px 2px #000;
+}
+.theme-library .overlay-list-note.glass {
+  margin-top: 5px;
+}
+.theme-library #overlay .triangle-in-circle,
+.theme-library #listWelcome a,
+.theme-library #listWelcome a:hover,
+.theme-library #listWelcome a:visited {
+  border-color: #e2d99c;
+  color: #e2d99c;
+  text-shadow: 1px 1px 20px #111;
+}
+.theme-library .overlay-tile {
+  opacity: 1;
+}
+.theme-library .overlay-tile:hover {
+  border-color: #b28f65;
+  -webkit-box-shadow: 3px 3px 10px #dedea2;
+  -moz-box-shadow: 3px 3px 10px #dedea2;
+  box-shadow: 3px 3px 10px #dedea2;
+}
+.theme-library #themePicker {
+  background: #b28f65;
+  color: #000;
+  opacity: 0.6;
+}
+.theme-library footer {
+  background-color: #353023;
+  border-color: #2a2519;
+}
+.theme-rosette #overlay {
+  background: #120305 url(/images/themes/rosette-nebula.jpg);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+.theme-rosette .overlay-list-note {
+  color: #ddd;
+  text-shadow: 2px 2px #000;
+}
+.theme-rosette .overlay-list-note.glass {
+  margin-top: 5px;
+  padding: 8px 15px 1px 10px;
+  color: #bbb;
+}
+.theme-rosette .overlay-list-note.glass::after {
+  background: rgba(32, 12, 15, 0.8);
+}
+.theme-rosette #overlay .triangle-in-circle,
+.theme-rosette #listWelcome a,
+.theme-rosette #listWelcome a:hover,
+.theme-rosette #listWelcome a:visited {
+  border-color: #f80;
+  color: #f80;
+  text-shadow: 1px 1px 20px #f90;
+}
+.theme-rosette #themePicker {
+  background: #3a1218;
+  opacity: 0.8;
+}
+.theme-rosette #themePicker select {
+  background-color: #4f3135;
+}
+.theme-rosette footer {
+  background-color: #200c0f;
+  border-color: #170306;
 }
