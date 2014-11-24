@@ -6,8 +6,6 @@
     The only entries here should be for anything that differs from the default theme.
 */
 
-
-
 .theme-library
 {
     #overlay
@@ -82,7 +80,99 @@
     }
 }
 
+.theme-parchment
+{
+    #overlay
+    {
+        background: #dca url(/images/themes/parchment.jpg);
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
 
+    .overlay-list-title
+    {
+        color: #684b45;
+        border-bottom-color: #684b45;
+    }
+
+    .overlay-list-note,
+    .overlay-list-note.small
+    {
+        color: #543737;
+    }
+
+    #listWelcome
+    {
+        p
+        {
+            font-family:    'Arizonia', 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Trebuchet MS', sans-serif;
+            font-size:      1.4em;
+            line-height:    0.9em;
+            margin-bottom:  0.5em;
+            padding-top:    0.2em;
+            color:          #270d0f;
+            text-align:     left;
+            &:first-letter
+            {
+                font-family:    'Edwardian Script ITC', 'Brush Script MT', 'Arizonia', cursive;
+                font-size:      2em;
+                font-weight:    bold;
+                margin:         0 0.15em 0 -0.15em;
+            }
+            &:first-line
+            {
+                line-height:    100%;
+            }
+        }
+        a
+        {
+            margin-bottom:  0.5em;
+            letter-spacing: 1px;
+        }
+    }
+
+    #overlay .triangle-in-circle
+    {
+        position:       relative;
+        top:            0.15em;
+        margin:         0.1em 0.15em 0.1em 0.15em;
+        box-shadow:     -1px 1px 1px #4f3831;
+        background-color: #cfb072;
+        &:hover
+        {
+            background-color: ##efcb82;
+        }
+    }
+
+    #overlay .triangle-in-circle,
+    #listWelcome a,
+    #listWelcome a:hover,
+    #listWelcome a:visited
+    {
+        border-color:   #a52600;
+        color:          #a52600;
+        text-shadow:    1px 1px 1px #93373a;
+    }
+
+    #themePicker
+    {
+        background: #dca;
+        color:      #684b45;
+        opacity:    0.8;
+        select
+        {
+            background-color: #4f3135;
+        }
+    }
+    
+    footer
+    {
+        background-color: #2d1d20;
+        border-color: #1f1617;
+    }
+}
 
 .theme-rosette
 {

@@ -1,3 +1,14 @@
+﻿/*
+    Taken from @import url(http://fonts.googleapis.com/css?family=Arizonia);
+    We don't need extended face so following font-face source is only 18KB.
+*/
+@font-face {
+  font-family: 'Arizonia';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Arizonia'), local('Arizonia-Regular'), url(http://fonts.gstatic.com/s/arizonia/v6/PwrsyFTYH2Wmsvpn0dx4sxTbgVql8nDJpwnrE27mub0.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
 /* Height of input element */
 /* Font-size of error message */
 /* Error messages */
@@ -2568,6 +2579,73 @@ a {
   background-color: #353023;
   border-color: #2a2519;
 }
+.theme-parchment #overlay {
+  background: #ddccaa url(/images/themes/parchment.jpg);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+.theme-parchment .overlay-list-title {
+  color: #684b45;
+  border-bottom-color: #684b45;
+}
+.theme-parchment .overlay-list-note,
+.theme-parchment .overlay-list-note.small {
+  color: #543737;
+}
+.theme-parchment #listWelcome p {
+  font-family: 'Arizonia', 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Trebuchet MS', sans-serif;
+  font-size: 1.4em;
+  line-height: 0.9em;
+  margin-bottom: 0.5em;
+  padding-top: 0.2em;
+  color: #270d0f;
+  text-align: left;
+}
+.theme-parchment #listWelcome p:first-letter {
+  font-family: 'Edwardian Script ITC', 'Brush Script MT', 'Arizonia', cursive;
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0 0.15em 0 -0.15em;
+}
+.theme-parchment #listWelcome p:first-line {
+  line-height: 100%;
+}
+.theme-parchment #listWelcome a {
+  margin-bottom: 0.5em;
+  letter-spacing: 1px;
+}
+.theme-parchment #overlay .triangle-in-circle {
+  position: relative;
+  top: 0.15em;
+  margin: 0.1em 0.15em 0.1em 0.15em;
+  box-shadow: -1px 1px 1px #4f3831;
+  background-color: #cfb072;
+}
+.theme-parchment #overlay .triangle-in-circle:hover {
+  background-color: ##efcb82;
+}
+.theme-parchment #overlay .triangle-in-circle,
+.theme-parchment #listWelcome a,
+.theme-parchment #listWelcome a:hover,
+.theme-parchment #listWelcome a:visited {
+  border-color: #a52600;
+  color: #a52600;
+  text-shadow: 1px 1px 1px #93373a;
+}
+.theme-parchment #themePicker {
+  background: #dca;
+  color: #684b45;
+  opacity: 0.8;
+}
+.theme-parchment #themePicker select {
+  background-color: #4f3135;
+}
+.theme-parchment footer {
+  background-color: #2d1d20;
+  border-color: #1f1617;
+}
 .theme-rosette #overlay {
   background: #120305 url(/images/themes/rosette-nebula.jpg);
   -webkit-background-size: cover;
@@ -2606,3 +2684,4 @@ a {
   background-color: #200c0f;
   border-color: #170306;
 }
+/*# sourceMappingURL=cz.css.map */

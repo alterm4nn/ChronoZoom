@@ -121,6 +121,7 @@
     <Content Include="images\profile-icon-green.png" />
     <Content Include="images\profile-icon-yellow.png" />
     <Content Include="images\select.png" />
+    <Content Include="images\themes\parchment.jpg" />
     <Content Include="images\themes\peabody-library.jpg" />
     <Content Include="images\themes\rosette-nebula.jpg" />
     <Content Include="images\tile-bighistory.jpg" />
@@ -507,6 +508,9 @@
     <Content Include="css\overlay.less" />
     <Content Include="featured\featured.json" />
     <Content Include="css\themes.less" />
+    <Content Include="css\themes.css.map">
+      <DependentUpon>themes.css</DependentUpon>
+    </Content>
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
