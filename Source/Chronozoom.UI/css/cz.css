@@ -730,6 +730,21 @@ body {
   font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Trebuchet MS', sans-serif;
   -ms-touch-action: none;
 }
+#splash {
+  position: absolute;
+  top: 35px;
+  bottom: 25px;
+  left: 0;
+  right: 0;
+  padding-top: 200px;
+  background: #232323;
+  color: #91895c;
+  font-family: Georgia, Times, 'Times New Roman', serif;
+  font-size: 2em;
+  font-style: italic;
+  text-align: center;
+  z-index: 2000;
+}
 .small {
   color: #666;
   font-size: 0.7em;
@@ -767,7 +782,7 @@ a:visited {
   overflow: hidden;
   text-align: center;
   margin-top: 100px;
-  z-index: 1000;
+  z-index: 2001;
 }
 a.help-link {
   color: #25a1ea !important;

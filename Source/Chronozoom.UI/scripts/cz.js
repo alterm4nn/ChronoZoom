@@ -672,6 +672,8 @@ var CZ;
                 {
                     CZ.Overlay.Show(); // home page overlay
                 }
+
+                $('#splash').fadeOut('slow');
             });
 
             CZ.Service.getServiceInformation().then(function (response) {

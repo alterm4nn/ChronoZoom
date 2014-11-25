@@ -62,19 +62,24 @@ var CZ;
                 })
             ;
 
-            $('#themePicker option:selected').attr('selected', null);
-            $('#themePicker option[value="' + localStorage.getItem('theme') + '"]').attr('selected', 'selected');
-
-            $('#themePicker').change(function (event)
+            if (screen.width >= 1024 || screen.height >= 768)
             {
-                var theme = $('#themePicker option:selected').val();
+                $('#themePicker option:selected').attr('selected', null);
+                $('#themePicker option[value="' + localStorage.getItem('theme') + '"]').attr('selected', 'selected');
 
-                $('body')
-                .removeClass(localStorage.getItem('theme'))
-                .addClass(theme);
+                $('#themePicker').change(function (event)
+                {
+                    var theme = $('#themePicker option:selected').val();
 
-                localStorage.setItem('theme', theme);
-            });
+                    $('body')
+                    .removeClass(localStorage.getItem('theme'))
+                    .addClass(theme);
+
+                    localStorage.setItem('theme', theme);
+                });
+
+                $('#themePicker').removeClass('hidden');
+            }
 
             initialized = true;
 
