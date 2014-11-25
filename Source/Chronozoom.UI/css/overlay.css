@@ -235,3 +235,8 @@
 #themePicker select::-ms-expand {
   display: none;
 }
+@-moz-document url-prefix()                     /* Firefox */ {
+  #themePicker select {
+    background-image: none;
+  }
+}

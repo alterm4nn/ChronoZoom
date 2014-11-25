@@ -1,4 +1,4 @@
-﻿/*
+/*
     The initial/default theme is Midnight Blue, (.theme-midnight,) which should not
     have any styling here, since the default styling, without applying any specific
     theme styles, is Midnight Blue.
@@ -57,8 +57,64 @@
   background-color: #353023;
   border-color: #2a2519;
 }
+.theme-linen #overlay {
+  background: #d1bfa7 url(/images/themes/linen.jpg);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+.theme-linen .overlay-list-title {
+  color: #684b45;
+  text-shadow: 1px 1px 1px #907975;
+  border-bottom-color: #907975;
+}
+.theme-linen .overlay-list-note,
+.theme-linen .overlay-list-note.small {
+  color: #543737;
+}
+.theme-linen #listWelcome p {
+  font-size: 16px;
+  line-height: 20px;
+  color: #270d0f;
+}
+.theme-linen #listWelcome a {
+  margin-bottom: 0.5em;
+  letter-spacing: 1px;
+}
+.theme-linen #overlay .triangle-in-circle {
+  position: relative;
+  top: 0.15em;
+  margin: 0 0.15em 0 0.15em;
+  box-shadow: -1px 1px 1px #4f3831;
+  background-color: #e8cd9e;
+}
+.theme-linen #overlay .triangle-in-circle:hover {
+  background-color: #fce4ba;
+}
+.theme-linen #overlay .triangle-in-circle,
+.theme-linen #listWelcome a,
+.theme-linen #listWelcome a:hover,
+.theme-linen #listWelcome a:visited {
+  border-color: #a52600;
+  color: #a52600;
+  color: #ca360a;
+  text-shadow: 1px 1px 1px #93373a;
+}
+.theme-linen #themePicker {
+  background: #d1bfa7;
+  color: #684b45;
+  opacity: 0.8;
+}
+.theme-linen #themePicker select {
+  background-color: #4f3135;
+}
+.theme-linen footer {
+  background-color: #2d1d20;
+  border-color: #1f1617;
+}
 .theme-parchment #overlay {
-  background: #ddccaa url(/images/themes/parchment.jpg);
+  background: #c7b283 url(/images/themes/parchment.jpg);
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -97,7 +153,7 @@
 .theme-parchment #overlay .triangle-in-circle {
   position: relative;
   top: 0.15em;
-  margin: 0.1em 0.15em 0.1em 0.15em;
+  margin: 0 0.15em 0 0.15em;
   box-shadow: -1px 1px 1px #4f3831;
   background-color: #cfb072;
 }
@@ -113,7 +169,7 @@
   text-shadow: 1px 1px 1px #93373a;
 }
 .theme-parchment #themePicker {
-  background: #dca;
+  background: #c7b283;
   color: #684b45;
   opacity: 0.8;
 }
@@ -162,4 +218,3 @@
   background-color: #200c0f;
   border-color: #170306;
 }
-/*# sourceMappingURL=themes.css.map */

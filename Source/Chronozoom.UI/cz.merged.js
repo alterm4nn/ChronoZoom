@@ -320,8 +320,7 @@ var CZ;
         // Initial Content contains the identifier (e.g. ID or Title) of the content that should be loaded initially.
         Common.initialContent = null;
 
-        /* Initialize the JQuery UI Widgets
-        */
+        // Initialize the JQuery UI Widgets
         function initialize() {
             Common.ax = $('#axis');
             Common.axis = new CZ.Timescale(Common.ax);
@@ -331,6 +330,17 @@ var CZ;
             Common.vc.virtualCanvas();
         }
         Common.initialize = initialize;
+
+        function isInCosmos(url)
+        {
+            if (typeof url != 'string') url = window.location.pathname;
+
+            var path    = url.toLowerCase().split('#')[0];
+            var matches = ['/', '/chronozoom', '/chronozoom/', '/chronozoom/cosmos', '/chronozoom/cosmos/'];
+
+            return $.inArray(path, matches) > -1;
+        }
+        Common.isInCosmos = isInCosmos;
 
         /* Calculates local offset of mouse cursor in specified jQuery element.
         @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
@@ -17778,6 +17788,7 @@ var CZ;
                     _this.onEditTour(tour);
                 } : null);
                 this.createTourBtn = this.container.find(formInfo.createTour);
+
                 if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName))
                     $("#cz-tours-list-title").text("My Tours");
                 else {
@@ -17792,8 +17803,15 @@ var CZ;
                     $("#take-tour-proposal").hide();
                     $("#tours-missed-warning").show();
                 }
+
                 if (formInfo.tours.length == 0)
                     $("#take-tour-proposal").hide();
+
+                if (CZ.Common.isInCosmos())
+                {
+                    $('#tour-cosmos').hide();
+                }
+
                 this.initialize();
             }
             FormToursList.prototype.initialize = function () {
@@ -18579,8 +18597,9 @@ var CZ;
         {
             if
             (
-                (typeof CZ.Authoring === 'undefined') ||
-                (typeof CZ.Settings  === 'undefined') ||
+                (typeof CZ.Authoring === 'undefined')   ||
+                (typeof CZ.Settings === 'undefined')    ||
+                (preferPersonalizedLayout === false)    ||
                 (!preferPersonalizedLayout  &&  CZ.Settings.isCosmosCollection) ||
                 (!CZ.Authoring.isEnabled    && !CZ.Settings.isAuthorized)
             )
@@ -19090,7 +19109,7 @@ var CZ;
             var theme = localStorage.getItem('theme') || '';
             if (theme === '')
             {
-                theme = 'theme-midnight'; // default
+                theme = 'arizona-linen'; // initial
                 localStorage.setItem('theme', theme);
             }
             $('body').addClass(theme);
@@ -19113,8 +19132,8 @@ var CZ;
             // hook logo click
             $('.header-logo').click(function ()
             {
-                window.location.href = '/';
-                //CZ.Overlay.Show();
+                //window.location.href = '/';
+                CZ.Overlay.Show(false);
             });
 
             // if URL has a supercollection

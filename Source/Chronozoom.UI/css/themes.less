@@ -80,11 +80,92 @@
     }
 }
 
+.theme-linen
+{
+    #overlay
+    {
+        background: #d1bfa7 url(/images/themes/linen.jpg);
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    .overlay-list-title
+    {
+        color: #684b45;
+        text-shadow: 1px 1px 1px #907975;
+        border-bottom-color: #907975;
+    }
+
+    .overlay-list-note,
+    .overlay-list-note.small
+    {
+        color: #543737;
+    }
+
+    #listWelcome
+    {
+        p
+        {
+            font-size: 16px;
+            line-height: 20px;
+            color: #270d0f;
+        }
+        a
+        {
+            margin-bottom:  0.5em;
+            letter-spacing: 1px;
+        }
+    }
+
+    #overlay .triangle-in-circle
+    {
+        position:           relative;
+        top:                0.15em;
+        margin:             0 0.15em 0 0.15em;
+        box-shadow:         -1px 1px 1px #4f3831;
+        background-color:   #e8cd9e;
+        &:hover
+        {
+            background-color: #fce4ba;
+        }
+    }
+
+    #overlay .triangle-in-circle,
+    #listWelcome a,
+    #listWelcome a:hover,
+    #listWelcome a:visited
+    {
+        border-color:   #a52600;
+        color:          #a52600;
+        color:          #ca360a;
+        text-shadow:    1px 1px 1px #93373a;
+    }
+
+    #themePicker
+    {
+        background: #d1bfa7;
+        color:      #684b45;
+        opacity:    0.8;
+        select
+        {
+            background-color: #4f3135;
+        }
+    }
+    
+    footer
+    {
+        background-color: #2d1d20;
+        border-color: #1f1617;
+    }
+}
+
 .theme-parchment
 {
     #overlay
     {
-        background: #dca url(/images/themes/parchment.jpg);
+        background: #c7b283 url(/images/themes/parchment.jpg);
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
@@ -137,7 +218,7 @@
     {
         position:       relative;
         top:            0.15em;
-        margin:         0.1em 0.15em 0.1em 0.15em;
+        margin:         0 0.15em 0 0.15em;
         box-shadow:     -1px 1px 1px #4f3831;
         background-color: #cfb072;
         &:hover
@@ -158,7 +239,7 @@
 
     #themePicker
     {
-        background: #dca;
+        background: #c7b283;
         color:      #684b45;
         opacity:    0.8;
         select

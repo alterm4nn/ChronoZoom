@@ -121,6 +121,8 @@
     <Content Include="images\profile-icon-green.png" />
     <Content Include="images\profile-icon-yellow.png" />
     <Content Include="images\select.png" />
+    <Content Include="images\themes\linen-light.jpg" />
+    <Content Include="images\themes\linen.jpg" />
     <Content Include="images\themes\parchment.jpg" />
     <Content Include="images\themes\peabody-library.jpg" />
     <Content Include="images\themes\rosette-nebula.jpg" />

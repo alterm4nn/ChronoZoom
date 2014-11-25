@@ -199,7 +199,7 @@ var CZ;
             var theme = localStorage.getItem('theme') || '';
             if (theme === '')
             {
-                theme = 'theme-midnight'; // default
+                theme = 'arizona-linen'; // initial
                 localStorage.setItem('theme', theme);
             }
             $('body').addClass(theme);
@@ -222,8 +222,8 @@ var CZ;
             // hook logo click
             $('.header-logo').click(function ()
             {
-                window.location.href = '/';
-                //CZ.Overlay.Show();
+                //window.location.href = '/';
+                CZ.Overlay.Show(false);
             });
 
             // if URL has a supercollection

@@ -152,8 +152,9 @@ var CZ;
         {
             if
             (
-                (typeof CZ.Authoring === 'undefined') ||
-                (typeof CZ.Settings  === 'undefined') ||
+                (typeof CZ.Authoring === 'undefined')   ||
+                (typeof CZ.Settings === 'undefined')    ||
+                (preferPersonalizedLayout === false)    ||
                 (!preferPersonalizedLayout  &&  CZ.Settings.isCosmosCollection) ||
                 (!CZ.Authoring.isEnabled    && !CZ.Settings.isAuthorized)
             )
