@@ -19110,11 +19110,11 @@ var CZ;
                 $('#wait').hide();
             });
 
-            // theme
+            // overlay & general wrapper theme
             var theme = localStorage.getItem('theme') || '';
             if (theme === '')
             {
-                theme = 'arizona-linen'; // initial
+                theme = 'theme-linen'; // initial
                 localStorage.setItem('theme', theme);
             }
             $('body').addClass(theme);
