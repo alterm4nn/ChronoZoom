@@ -26,6 +26,7 @@ namespace Chronozoom.UI
         public string AirbrakeProjectId     { get; private set; }
         public string AirbrakeProjectKey    { get; private set; }
         public string AirbrakeEnvironment   { get; private set; }
+        public string FeaturedContentList   { get; private set; }
         public string OneDriveClientID      { get; private set; }
         public bool   UseMergedJSFiles      { get; private set; }
         public bool   UseMinifiedJSFiles    { get; private set; }
@@ -49,7 +50,8 @@ namespace Chronozoom.UI
             AirbrakeTrackClient = ConfigurationManager.AppSettings["Airbrake.TrackClient"       ].ToLower() == "true" ? true : false;
             AirbrakeProjectId   = AirbrakeTrackClient ? ConfigurationManager.AppSettings["Airbrake.ProjectId"   ] : "";
             AirbrakeProjectKey  = AirbrakeTrackClient ? ConfigurationManager.AppSettings["Airbrake.ApiKey"      ] : "";
-            AirbrakeEnvironment = ConfigurationManager.AppSettings["Airbrake.Environment"]; if (AirbrakeEnvironment == "") AirbrakeEnvironment = "development";
+            AirbrakeEnvironment = ConfigurationManager.AppSettings["Airbrake.Environment"       ]; if (AirbrakeEnvironment == "") AirbrakeEnvironment = "development";
+            FeaturedContentList = ConfigurationManager.AppSettings["FeaturedContentListLocation"]; if (FeaturedContentList == "") FeaturedContentList = "/featured/featured.json";
             OneDriveClientID    = ConfigurationManager.AppSettings["OneDriveClientID"];
             UseMergedJSFiles    = ConfigurationManager.AppSettings["UseMergedJavaScriptFiles"   ].ToLower() == "true" ? true : false;
             UseMinifiedJSFiles  = ConfigurationManager.AppSettings["UseMinifiedJavaScriptFiles" ].ToLower() == "true" ? true : false;
@@ -285,6 +287,7 @@ namespace Chronozoom.UI
                 "airbrakeProjectId: \""     + pageInformation.AirbrakeProjectId                         + "\", " +
                 "airbrakeProjectKey: \""    + pageInformation.AirbrakeProjectKey                        + "\", " +
                 "airbrakeEnvironment: \""   + pageInformation.AirbrakeEnvironment                       + "\", " +
+                "featuredContentList: \""   + pageInformation.FeaturedContentList                       + "\", " +
                 "onedriveClientId: \""      + pageInformation.OneDriveClientID                          + "\", " +
                 "useMergedJSFiles: "        + pageInformation.UseMergedJSFiles.ToString(  ).ToLower()   +   ", " +
                 "useMinifiedJSFiles: "      + pageInformation.UseMinifiedJSFiles.ToString().ToLower()   +   ", " +

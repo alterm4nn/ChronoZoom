@@ -1,22 +1,25 @@
+@import url(http://fonts.googleapis.com/css?family=Arizonia);
 @import "_colors";
 @import "_mixins";
 @import "audio";
 @import "datepicker";
 @import "media";
 @import "menus";
+@import "overlay";
 @import "timescale";
-@import "start-page";
 
-@headerHeight:                  36px;   /* The height of the page header */
-@headerLogoWidth:               170px;  /* The width of the logo area */
-@headerTourWidth:               140px;  /* The width of the tour player area */
-@headerRegimesWidth:            420px;  /* The width of the regimes area */
-@headerBreadcrumbsHeight:       25px;   /* The height of the breadcrumbs area */
-@headerBreadcrumbsTopMargin:    8px;    /* The top margin of the bref.adcrumbs area */
-@headerBreadcrumbsScrollWidth:  25px;   /* The breadcrumbs scroller area */
-@footerHeight:                  25px;   /* The height of the page footer */
-@footerLinksWidth:              350px;  /* The width of the footers links area */
-@defaultBackgroundColor:        #232323;/* The main background color for the page */
+@defaultBackgroundColor:        #232323;    /* The main background color for the page */
+@headerHeight:                  36px;       /* The height of the page header */
+@headerLogoWidth:               170px;      /* The width of the logo area */
+@headerTourWidth:               140px;      /* The width of the tour player area */
+@headerRegimesWidth:            420px;      /* The width of the regimes area */
+@headerBreadcrumbsHeight:       25px;       /* The height of the breadcrumbs area */
+@headerBreadcrumbsTopMargin:    8px;        /* The top margin of the bref.adcrumbs area */
+@headerBreadcrumbsScrollWidth:  25px;       /* The breadcrumbs scroller area */
+@footerHeight:                  25px;       /* The height of the page footer */
+@footerLinksWidth:              350px;      /* The width of the footers links area */
+@footerBackgroundColor:         #2a283a;
+@footerBorderColor:             #131432;
 
 html, body
 {
@@ -33,6 +36,23 @@ body
     background-color: @defaultBackgroundColor;
     font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Trebuchet MS', sans-serif;
     -ms-touch-action: none;
+}
+
+#splash
+{
+    position:       absolute;
+    top:            35px;
+    bottom:         25px;
+    left:           0;
+    right:          0;
+    padding-top:    200px;
+    background:     @defaultBackgroundColor;
+    color:          #91895c;
+    font-family:    Georgia, Times, 'Times New Roman', serif;
+    font-size:      2em;
+    font-style:     italic;
+    text-align:     center;
+    z-index:        2000;
 }
 
 .small
@@ -88,7 +108,7 @@ a:visited
     overflow: hidden;
     text-align: center;
     margin-top: 100px;
-    z-index: 1000;
+    z-index: 2001;
 }
 
 a.help-link
@@ -155,7 +175,7 @@ div.preview
     background-repeat: no-repeat;
     background-position: center;
     background-image: url('/images/chronozoom.png');
-    margin-left: 10px;
+    margin-left: 3px;
     cursor: pointer;
 }
 
@@ -852,42 +872,48 @@ footer
     width: 100%;
     height: 25px;
     bottom: 0px;
-    background: @defaultBackgroundColor;
+    background-color:   @footerBackgroundColor;
+    -moz-box-sizing:    border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing:         border-box;
+    border-top:         solid 1px @footerBorderColor;
+    border-bottom:      solid 1px @footerBorderColor;
 }
 
-    #footer ul
-    {
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-    }
+#footer ul
+{
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
 
-        #footer ul li
-        {
-            height: 100%;
-        }
+#footer ul li
+{
+    height: 100%;
+}
 
 .footer-link
 {
     margin-right: 10px;
     margin-left: 10px;
     height: 100%;
-    color: #FFF;
+    color: #ddd;
     white-space: nowrap;
     line-height: 25px;
-}
-
-    .footer-link:hover
+    &:hover
     {
         cursor: pointer;
+        text-shadow: 1px 1px 20px #fff;
     }
+}
 
 .footer-links
 {
     height: @footerHeight;
     width: @footerLinksWidth;
-    color: #AAA;
+    color: #aaa;
+    bottom: 1px;
 }
 
 .footer-credits
@@ -897,13 +923,14 @@ footer
     width: -moz-calc(~"100%" - @footerLinksWidth);
     width: -webkit-calc(~"100%" - @footerLinksWidth);
     width: -o-calc(~"100%" - @footerLinksWidth);
-    color: #AAA;
+    color: #aaa;
+    bottom: 1px;
 }
 
-    .footer-credits ul
-    {
-        margin-top: 4px;
-    }
+.footer-credits ul
+{
+    margin-top: 4px;
+}
 
 .footer-link-credits, .footer-link-credits:visited, .footer-link-credits:link
 {
@@ -911,15 +938,20 @@ footer
     margin-left: 6px;
 }
 
-    .footer-link-credits img
+.footer-link-credits img
+{
+    margin-bottom: 3px;
+    opacity: 0.8;
+    &:hover
     {
-        margin-bottom: 3px;
+        opacity: 1;
     }
+}
 
 .footer-text
 {
     margin-left: 6px;
-    color: #AAA;
+    color: #aaa;
 }
 
 /***********************************************************
@@ -1515,20 +1547,29 @@ a
     bottom: 25px;
 }
 
-    .cz-tourlist-form > .cz-form-content
-    {
-        position: absolute;
-        top: 36px;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        overflow-y: auto;
-    }
+.cz-tourlist-form > .cz-form-content
+{
+    position: absolute;
+    top: 36px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+}
 
-        .cz-tourlist-form > .cz-form-content > #tours
-        {
-            display: block;
-        }
+.cz-tourlist-form > .cz-form-content > #tours
+{
+    display: block;
+}
+
+#tour-cosmos .cz-contentitem-listitem-button
+{
+    font-size: 15px;
+    &:hover
+    {
+        color: rgb(90, 210, 243);
+    }
+}
 
 /* Edit Timeline Form */
 .cz-form-timeline
@@ -2158,6 +2199,18 @@ a
   right: 0;
 }
 
+.ellipsis
+{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.help
+{
+    cursor: help;
+}
+
 .nocursor
 {
     cursor: default;
@@ -2187,8 +2240,12 @@ a
     vertical-align: top;
 }
 
-// Prevent SkyDrive clicks
-#embedItemDiv {
+/* Prevent SkyDrive clicks */
+#embedItemDiv
+{
     pointer-events: none;
     cursor: default;
 }
+
+/* this import must always be last line as themes are overrides */
+@import "themes";

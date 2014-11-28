@@ -1,0 +1,242 @@
+#overlay {
+  display: none;
+  position: absolute;
+  top: 35px;
+  bottom: 25px;
+  left: 0;
+  right: 0;
+  font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Trebuchet MS', sans-serif;
+  font-size: 16px;
+  background-color: #04021e;
+  color: #ddd;
+  cursor: default;
+  box-sizing: border-box;
+  overflow: auto;
+  z-index: 1000;
+}
+#overlay-content-padding {
+  padding: 10px;
+}
+#overlay .glass {
+  position: relative;
+  /*
+        use this here with the glass effect in themes if the theme has an image as a background:
+        padding: 10px;
+    */
+}
+#overlay .glass::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  content: "";
+  /*
+            use this here for a glass effect in themes if the theme has an image as a background:
+            background: rgba(0, 0, 0, 0.5);
+        */
+  z-index: -1;
+}
+#overlay .glass p:first-child {
+  margin-top: 0px;
+}
+.overlay-list {
+  float: left;
+  width: 33%;
+  min-width: 160px;
+  box-sizing: border-box;
+  padding-right: 25px;
+}
+.overlay-list-title {
+  font-size: 1.4em;
+  color: #fff;
+  padding-bottom: 0.3em;
+  border-bottom: solid 2px #999;
+  margin-bottom: 0.6em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: 1em;
+}
+.overlay-list > .overlay-list-title:first-child {
+  padding-top: 0;
+}
+.overlay-list-note {
+  display: inline-block;
+  width: 240px;
+  color: #ccc;
+}
+.overlay-list-note.small {
+  font-size: 12px;
+  color: #999;
+}
+.overlay-list-note img {
+  height: 1em;
+  width: auto;
+}
+.overlay-list a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+}
+.overlay-list a:hover {
+  opacity: 1;
+}
+#overlay .triangle-in-circle {
+  display: inline-block;
+  border: solid 2px #0be;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  line-height: 1em;
+  margin: 0.15em 0.2em 0 0;
+  padding: 0.2em;
+  text-align: center;
+  vertical-align: top;
+  opacity: 0.8;
+  -moz-transform: rotage(270deg);
+  -ms-transform: rotate(270deg);
+  -webkit-transform: rotate(270deg);
+  transform: rotate(270deg);
+}
+#overlay .triangle-in-circle::after {
+  content: "\25bc";
+}
+#listWelcome p {
+  font-size: 14px;
+  text-align: justify;
+  color: #ccc;
+}
+#listWelcome a {
+  display: block;
+  position: relative;
+  height: 33px;
+  line-height: 33px;
+  vertical-align: top;
+  font-size: 1.1em;
+  color: #0be;
+  text-decoration: none;
+  text-shadow: 1px 1px 20px #1cf;
+  margin-bottom: 1em;
+}
+#listWelcome a:hover,
+#listWelcome a:visited {
+  color: #0be;
+}
+#listWelcome a.hidden {
+  display: none;
+}
+#listWelcome a > span {
+  vertical-align: top;
+}
+.overlay-tile {
+  float: left;
+  box-sizing: border-box;
+  height: 150px;
+  width: 150px;
+  margin: 5px 20px 15px 0;
+  padding: 4px 6px 4px 6px;
+  border: solid 1px #222;
+  border-right-style: none;
+  border-bottom-style: none;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-box-shadow: 3px 3px 10px #444;
+  -moz-box-shadow: 3px 3px 10px #444;
+  box-shadow: 3px 3px 10px #444;
+  background: #444455 url(/images/tile-default.jpg);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  text-shadow: 2px 2px #333;
+  font-size: 0.9em;
+  overflow: hidden;
+  opacity: 0.8;
+}
+.overlay-tile:hover {
+  cursor: pointer;
+  opacity: 1;
+}
+.big-history {
+  background: #444455 url(/images/tile-bighistory.jpg);
+}
+.overlay-tile-title {
+  font-size: 1.1em;
+  line-height: 1.1em;
+  margin-bottom: 0.1em;
+  font-weight: bold;
+  color: #fff;
+  /* max 3 lines: */
+  max-height: 3.3em;
+  overflow: hidden;
+}
+.overlay-tile-note {
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  line-height: 1em;
+  margin: 0.6em 0 0.1em 0;
+  border-top: dashed 1px #666;
+  padding-top: 0.6em;
+  color: #fff;
+  /* max 2 lines: */
+  max-height: 2em;
+  overflow: hidden;
+}
+#themePicker {
+  position: fixed;
+  bottom: 25px;
+  left: 0;
+  -webkit-border-top-right-radius: 12px;
+  -moz-border-top-right-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 1em 1em 1em 10px;
+  vertical-align: text-bottom;
+  font-size: 0.8em;
+  font-style: italic;
+  background-color: #04021e;
+  color: #bbb;
+}
+#themePicker select {
+  font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Trebuchet MS', sans-serif;
+  font-style: normal;
+  margin-left: 0.75em;
+  padding: 2px 5px 3px 5px;
+  border: 1px outset #444;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  outline: none;
+  background-color: #343152;
+  color: #ccc;
+}
+/*
+    Following uses custom select chevron instead of browser default,
+    which can be a large and ugly grey button on some browsers. The
+    one browser deliberately excluded is Firefox since the method
+    used to hide the default chevron seems to change each release.
+*/
+#themePicker select {
+  padding-right: 20px;
+  background-image: url(/images/select.png);
+  background-repeat: no-repeat;
+  background-position: top right;
+  background-size: contain;
+  appearance: none;
+  -webkit-appearance: none;
+  /* Chrome and Safari */
+}
+#themePicker select::-ms-expand {
+  display: none;
+}
+@-moz-document url-prefix()                     /* Firefox */ {
+  #themePicker select {
+    background-image: none;
+  }
+}

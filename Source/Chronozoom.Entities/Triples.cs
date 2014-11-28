@@ -1,6 +1,7 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -247,31 +248,31 @@ namespace Chronozoom.Entities
             return false;
         }
 
-
-        /// <summary>
-        /// Get TimelineShortctu from Timeline
-        /// </summary>
-        /// <param name="timeline">Timeline object</param>
-        /// <returns>TimelineShortcut</returns>
         public TimelineShortcut GetTimelineShortcut(Timeline timeline)
         {
-            var ts = new TimelineShortcut()
+            string superCollectionPath  = "/" + timeline.Collection.SuperCollection.Title;
+            string collectionPath       = "/" + timeline.Collection.Path;
+            string contentPath          = "#" + GetContentPath(timeline.Collection.Id, timeline.Id, null);
+
+            if (timeline.Collection.Default)
             {
-                Title = timeline.Title
+                collectionPath = "";
+
+                if (timeline.Collection.SuperCollection.Title == ConfigurationManager.AppSettings["DefaultSuperCollection"])
+                {
+                    superCollectionPath = "/";
+                }
+            }
+
+            var timelineShortcut = new TimelineShortcut()
+            {
+                Title       = timeline.Title,
+                TimelineUrl = superCollectionPath + collectionPath + contentPath,
+                Author      = timeline.Collection.User == null ? "" : timeline.Collection.User.DisplayName,
+                ImageUrl    = GetTimelineImageUrl(timeline)
             };
 
-            if (timeline.Collection.Title == "Beta Content")
-            {
-                ts.TimelineUrl = String.Format("/#{0}", GetContentPath(timeline.Collection.Id, timeline.Id, null));
-                ts.Author = "Chronozoom";
-            }
-            else
-            {
-                ts.TimelineUrl = String.Format("/{0}/{1}/#{2}", timeline.Collection.SuperCollection.Title, timeline.Collection.Path, GetContentPath(timeline.Collection.Id, timeline.Id, null));
-                ts.Author = timeline.Collection.User != null ? timeline.Collection.User.DisplayName : ""; 
-            }
-            ts.ImageUrl = GetTimelineImageUrl(timeline);
-            return ts;
+            return timelineShortcut;
         }
 
         private static string GetTimelineImageUrl(Timeline timeline)
@@ -291,7 +292,7 @@ namespace Chronozoom.Entities
                 }
             }
 
-            return "/images/default-tile.png";
+            return "/images/tile-default.jpg";
         }
     }
 }

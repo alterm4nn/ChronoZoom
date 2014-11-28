@@ -72,11 +72,17 @@
     <Content Include="css\menus.min.css">
       <DependentUpon>menus.less</DependentUpon>
     </Content>
-    <Content Include="css\start-page.css">
-      <DependentUpon>start-page.less</DependentUpon>
+    <Content Include="css\overlay.css">
+      <DependentUpon>overlay.less</DependentUpon>
     </Content>
-    <Content Include="css\start-page.min.css">
-      <DependentUpon>start-page.less</DependentUpon>
+    <Content Include="css\overlay.min.css">
+      <DependentUpon>overlay.less</DependentUpon>
+    </Content>
+    <Content Include="css\themes.css">
+      <DependentUpon>themes.less</DependentUpon>
+    </Content>
+    <Content Include="css\themes.min.css">
+      <DependentUpon>themes.less</DependentUpon>
     </Content>
     <Content Include="css\_colors.css">
       <DependentUpon>_colors.less</DependentUpon>
@@ -94,23 +100,34 @@
     <Content Include="dumps\sample.csv" />
     <Content Include="dumps\extensions-get.json" />
     <Content Include="css\media.less" />
-    <Content Include="css\start-page.less" />
     <Content Include="css\_mixins.less" />
     <Content Include="css\_colors.less" />
     <Content Include="css\_vars.less" />
     <Content Include="dumps\rin-dump.json" />
     <Content Include="dumps\home\timelines.json" />
-    <Content Include="dumps\home\tweets.json" />
     <Content Include="css\cz.css.map">
       <DependentUpon>cz.less</DependentUpon>
     </Content>
     <Content Include="error.html" />
+    <Content Include="featured\tile-aidsquilt.jpg" />
+    <Content Include="featured\tile-cern.jpg" />
+    <Content Include="featured\tile-chinesemedicine.jpg" />
+    <Content Include="featured\tile-environment.jpg" />
+    <Content Include="featured\tile-frenchrevolution.jpg" />
     <Content Include="images\add-hover.png" />
     <Content Include="images\add.png" />
     <Content Include="images\copy.svg" />
     <Content Include="images\paste.svg" />
     <Content Include="images\profile-icon-green.png" />
     <Content Include="images\profile-icon-yellow.png" />
+    <Content Include="images\select.png" />
+    <Content Include="images\themes\linen-light.jpg" />
+    <Content Include="images\themes\linen.jpg" />
+    <Content Include="images\themes\parchment.jpg" />
+    <Content Include="images\themes\peabody-library.jpg" />
+    <Content Include="images\themes\rosette-nebula.jpg" />
+    <Content Include="images\tile-bighistory.jpg" />
+    <Content Include="images\tile-default.jpg" />
     <Content Include="scripts\authoring-ui.min.js">
       <DependentUpon>authoring-ui.js</DependentUpon>
     </Content>
@@ -431,11 +448,10 @@
     <Content Include="ui\message-window.min.js.map">
       <DependentUpon>message-window.js</DependentUpon>
     </Content>
-    <Content Include="ui\start-page.min.js">
-      <DependentUpon>start-page.js</DependentUpon>
-    </Content>
-    <Content Include="ui\start-page.min.js.map">
-      <DependentUpon>start-page.js</DependentUpon>
+    <Content Include="ui\overlay.html" />
+    <Content Include="ui\overlay.js" />
+    <Content Include="ui\overlay.min.js">
+      <DependentUpon>overlay.js</DependentUpon>
     </Content>
     <Content Include="ui\timeseries-data-form.min.js">
       <DependentUpon>timeseries-data-form.js</DependentUpon>
@@ -487,6 +503,15 @@
     <Content Include="css\menus.less" />
     <Content Include="scripts\menus.min.js.map">
       <DependentUpon>menus.js</DependentUpon>
+    </Content>
+    <Content Include="ui\overlay.min.js.map">
+      <DependentUpon>overlay.js</DependentUpon>
+    </Content>
+    <Content Include="css\overlay.less" />
+    <Content Include="featured\featured.json" />
+    <Content Include="css\themes.less" />
+    <Content Include="css\themes.css.map">
+      <DependentUpon>themes.css</DependentUpon>
     </Content>
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
@@ -668,9 +693,6 @@
     <Content Include="ACS\FederationMetadata\2007-06\FederationMetadata.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Reference Include="TweetSharp">
-      <HintPath>..\..\External\TweetSharp\TweetSharp.dll</HintPath>
-    </Reference>
     <Reference Include="WebGrease">
       <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
     </Reference>
@@ -682,16 +704,10 @@
     <Compile Include="api\Favorites.svc.cs">
       <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
-    <Compile Include="api\Featured.svc.cs">
-      <DependentUpon>chronozoom.svc</DependentUpon>
-    </Compile>
     <Compile Include="api\MyTimelines.cvs.cs">
       <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
     <Compile Include="api\Triples.svc.cs">
-      <DependentUpon>chronozoom.svc</DependentUpon>
-    </Compile>
-    <Compile Include="api\Twitter.svc.cs">
       <DependentUpon>chronozoom.svc</DependentUpon>
     </Compile>
     <Compile Include="api\errorhandler.cs" />
@@ -973,8 +989,6 @@
       <DependentUpon>cz.less</DependentUpon>
     </Content>
     <Content Include="ui\message-window.html" />
-    <Content Include="ui\start-page.html" />
-    <Content Include="ui\start-page.js" />
     <Content Include="ui\timeseries-data-form.html" />
     <Content Include="ui\timeseries-data-form.js" />
     <Content Include="ui\timeseries-graph-form.html" />
