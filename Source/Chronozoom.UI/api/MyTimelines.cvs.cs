@@ -8,23 +8,19 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Web;
 using System.Data.Entity.Validation;
+using System.Configuration;
 
 namespace Chronozoom.UI
 {
     public partial class ChronozoomSVC: IChronozoomSVC
     {
+
+
         public Collection<TimelineShortcut> GetUserTimelines(string superCollection, string Collection)
         {
             return ApiOperation<Collection<TimelineShortcut>>(delegate(User user, Storage storage)
             {
                 if (user == null) return null;
-
-//#if RELEASE
-//              if (user == null)
-//              {
-//                  return null;
-//              }
-//#endif
 
                 Timeline roottimeline = GetTimelines(superCollection, Collection, null, null, null, null, null, null);
 
@@ -61,11 +57,17 @@ namespace Chronozoom.UI
             });
         }
 
+
         /// <summary>
         /// Documented under IChronozoomSVC
         /// </summary>
         public List<TimelineShortcut> GetEditableCollections(string currentSuperCollection = "", string currentCollection = "", bool includeMine = false)
         {
+            currentSuperCollection  = currentSuperCollection == null ? "" : currentSuperCollection.ToLower();
+            currentCollection       = currentCollection      == null ? "" : currentCollection.ToLower();
+
+            string defaultSuperCollection = (ConfigurationManager.AppSettings["DefaultSuperCollection"]).ToLower();
+
             Trace.TraceInformation("GetEditableCollections");
             return ApiOperation<List<TimelineShortcut>>(delegate(User user, Storage storage)
             {
@@ -88,11 +90,18 @@ namespace Chronozoom.UI
                                         Title               = c.Title,
                                         Author              = c.User.DisplayName,
                                         ImageUrl            = c.Theme,
-                                        TimelineUrl         = ('/' + c.SuperCollection.Title + '/' + c.Path).ToLower(),
+                                        TimelineUrl         = GetURLPath(c, defaultSuperCollection),
                                         CurrentCollection   =
                                         (
-                                            c.SuperCollection.Title == currentSuperCollection &&
-                                            c.Path                  == currentCollection
+                                            (
+                                                c.SuperCollection.Title == currentSuperCollection ||
+                                                ((currentSuperCollection == "") && (c.SuperCollection.Title == defaultSuperCollection))
+                                            )
+                                            &&
+                                            (
+                                                c.Path == currentCollection ||
+                                                ((currentCollection == "") && c.Default)
+                                            )
                                         )
                                     }
                                 )
@@ -108,16 +117,23 @@ namespace Chronozoom.UI
                                 .OrderBy(c => c.User.DisplayName).ThenBy(c => c.Title)
                                 .ToList()
                                 .Select
-                                ( c => new TimelineShortcut
+                                (c => new TimelineShortcut
                                     {
                                         Title               = c.Title,
                                         Author              = c.User.DisplayName,
                                         ImageUrl            = c.Theme,
-                                        TimelineUrl         = ('/' + c.SuperCollection.Title + '/' + c.Path).ToLower(),
+                                        TimelineUrl         = GetURLPath(c, defaultSuperCollection),
                                         CurrentCollection   =
                                         (
-                                            c.SuperCollection.Title == currentSuperCollection &&
-                                            c.Path                  == currentCollection
+                                            (
+                                                c.SuperCollection.Title == currentSuperCollection ||
+                                                ((currentSuperCollection == "") && (c.SuperCollection.Title == defaultSuperCollection))
+                                            )
+                                            &&
+                                            (
+                                                c.Path == currentCollection ||
+                                                ((currentCollection == "") && c.Default)
+                                            )
                                         )
                                     }
                                 )
@@ -141,6 +157,7 @@ namespace Chronozoom.UI
                 return editable;
             });
         }
+
 
         /// <summary>
         /// Documented under IChronozoomSVC
@@ -185,5 +202,91 @@ namespace Chronozoom.UI
                 return rv;
             });
         }
+
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public IEnumerable<Tile> GetRecentlyUpdatedExhibits(int quantity = 6)
+        {
+            string defaultSuperCollection = (ConfigurationManager.AppSettings["DefaultSuperCollection"]).ToLower();
+
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                List<Tile>      tiles = new List<Tile>();
+                List<Exhibit>   exhibits;
+
+                exhibits =
+                    storage.Exhibits
+                    .Where
+                    (e =>
+                        e.Collection.PubliclySearchable &&
+                        e.ContentItems.Any
+                        (i =>
+                            i.Order     == 0 &&
+                            i.MediaType == "image"
+                        )
+                    )
+                    .Include("Collection.SuperCollection")  //  } de facto includes
+                    .Include("Collection.User")             //  } collection entity
+                    .Include("ContentItems")
+                    .OrderByDescending(e => e.UpdatedTime)
+                    .Take(quantity)
+                    .ToList();
+
+                exhibits = exhibits.OrderBy(e => e.Title).ToList();
+
+                foreach (Exhibit exhibit in exhibits)
+                {
+                    Timeline    exhibitsTimeline = storage.Timelines.Where(t => t.Exhibits.Any(e => e.Id == exhibit.Id)).First();
+                    List<Guid> ancestorTimelines = TimelineExtensions.Ancestors(exhibitsTimeline);
+
+                    ancestorTimelines.Reverse();
+                    
+                    tiles.Add(new Tile
+                    {
+                        CollectionName      = exhibit.Collection.Title,
+                        CuratorName         = exhibit.Collection.User.DisplayName,
+                        Link                = GetURLPath(exhibit.Collection, defaultSuperCollection) + "#"
+                                              + "/t" + string.Join("/t", ancestorTimelines.ToArray())
+                                              + "/e" + exhibit.Id,
+                        Type                = "e",
+                        Title               = exhibit.Title,
+                        Year                = exhibit.Year,
+                        CustomBackground    = exhibit.ContentItems.Where(i => i.Order == 0).First().Uri,
+                        IsCosmosCollection  = (exhibit.Collection.SuperCollection.Title.ToLower() == "chronozoom" && exhibit.Collection.Path == "cosmos"),
+                        IsCurrentCollection = false // we want to load the URL every link click
+                    });
+                }
+
+                return tiles;
+            });
+        }
+
+
+        /// <summary>
+        /// Returns shortest URL path to a collection.
+        /// For example, excluding the collection path from the URL if it is the default collection.
+        /// If the collection is the default collection in the default supercollection then returns "/".
+        /// </summary>
+        private string GetURLPath(Collection collection, string defaultSuperCollection)
+        {
+            string superCollectionPath  = "/" + collection.SuperCollection.Title;
+            string collectionPath       = "/" + collection.Path;
+
+            if (collection.Default)
+            {
+                collectionPath = "";
+
+                if (collection.SuperCollection.Title == defaultSuperCollection)
+                {
+                    superCollectionPath = "/";
+                }
+            }
+
+            return (superCollectionPath + collectionPath).ToLower();
+        }
+
+
     }
 }

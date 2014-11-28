@@ -30,7 +30,6 @@
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
 /// <reference path='../ui/media/skydrive-mediapicker.ts'/>
-/// <reference path='../ui/start-page.ts'/>
 /// <reference path='plugins/error-plugin.ts'/>
 /// <reference path='plugins/utility-plugins.ts'/>
 var constants;
@@ -42,8 +41,9 @@ var CZ;
     CZ.rightDataSet;
 
     (function (HomePageViewModel) {
-        // Contains mapping: CSS selector -> html file.
-        var _uiMap = {
+        // Contains mapping of jQuery selector to HTML file, which is used to initialize the various panels via CZ.UILoader.
+        var _uiMap =
+        {
             "#header-edit-form": "/ui/header-edit-form.html",
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
             "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
@@ -62,7 +62,7 @@ var CZ;
             "#header-session-expired-form": "/ui/header-session-expired-form.html",
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
-            "#start-page": "/ui/start-page.html",
+            "#overlay": "/ui/overlay.html",
             "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html",
             "#auth-edit-collection-editors": "/ui/auth-edit-collection-editors.html"
         };
@@ -70,7 +70,8 @@ var CZ;
         HomePageViewModel.sessionForm;
         HomePageViewModel.rootCollection;
 
-        function UserCanEditCollection(profile) {
+        function UserCanEditCollection(profile)
+        {
             // can't edit if no profile, no display name or no supercollection
             if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName)
             {
@@ -93,7 +94,7 @@ var CZ;
             CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing =UserCanEditCollection(profile);
 
-            var onTakeTour = function (tour)
+            CZ.Tours.takeTour = function(tour)
             {
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption
@@ -131,7 +132,7 @@ var CZ;
                     if (CZ.Tours.tours.length === 0)
                     {
                         // if there are no tours to show and user has tour editing rights, lets fire off the add a tour dialog instead
-                        CZ.StartPage.hide();
+                        CZ.Overlay.Hide();
                         CZ.HomePageViewModel.closeAllForms();
                         CZ.Authoring.UI.createTour();
                         return;
@@ -145,7 +146,7 @@ var CZ;
                 }
                 else
                 {
-                    CZ.StartPage.hide();
+                    CZ.Overlay.Hide();
                     closeAllForms();
                     var form = new CZ.UI.FormToursList
                     (
@@ -157,7 +158,7 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             tourTemplate: forms[10],
                             tours: CZ.Tours.tours,
-                            takeTour: onTakeTour,
+                            takeTour: CZ.Tours.takeTour,
                             editTour: canEdit ? function (tour)
                             {
                                 if (CZ.Authoring.showEditTourForm) CZ.Authoring.showEditTourForm(tour);
@@ -169,18 +170,6 @@ var CZ;
                     form.show();
                 }
             };
-
-            /*
-            if (CZ.Tours.tours)
-            {
-                panelShowToursList();
-            }
-            else
-            {
-                $("body").bind("toursInitialized", CZ.HomePageViewModel.panelShowToursList);
-            }
-            */
-
         }
 
         var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
@@ -206,6 +195,15 @@ var CZ;
                 $('#wait').hide();
             });
 
+            // overlay & general wrapper theme
+            var theme = localStorage.getItem('theme') || '';
+            if (theme === '')
+            {
+                theme = 'theme-linen'; // initial
+                localStorage.setItem('theme', theme);
+            }
+            $('body').addClass(theme);
+
             // populate collection names from URL
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;
@@ -224,7 +222,8 @@ var CZ;
             // hook logo click
             $('.header-logo').click(function ()
             {
-                window.location.href = '/';
+                //window.location.href = '/';
+                CZ.Overlay.Show(false);
             });
 
             // if URL has a supercollection
@@ -245,9 +244,11 @@ var CZ;
             }
         });
 
-        function finishLoad() {
+        function finishLoad()
+        {
             // only invoked after user's edit permissions are checked (AJAX callback)
-            CZ.UILoader.loadAll(_uiMap).done(function () {
+            CZ.UILoader.loadAll(_uiMap).done(function ()
+            {
                 var forms = arguments;
 
                 CZ.Settings.isCosmosCollection =
@@ -260,12 +261,13 @@ var CZ;
 
                 CZ.Menus.isEditor = CZ.Service.canEdit;
                 CZ.Menus.Refresh();
+                CZ.Overlay.Initialize();
 
                 CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
 
                 CZ.HomePageViewModel.panelToggleTimeSeries = function ()
                 {
-                    CZ.StartPage.hide();
+                    CZ.Overlay.Hide();
                     var tsForm = getFormById('#timeSeriesDataForm');
                     if (tsForm === false)
                     {
@@ -662,7 +664,16 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
 
-                CZ.StartPage.initialize();
+                if 
+                (
+                    (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
+                    window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                )
+                {
+                    CZ.Overlay.Show(); // home page overlay
+                }
+
+                $('#splash').fadeOut('slow');
             });
 
             CZ.Service.getServiceInformation().then(function (response) {

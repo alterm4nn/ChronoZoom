@@ -29,6 +29,7 @@ var CZ;
                     _this.onEditTour(tour);
                 } : null);
                 this.createTourBtn = this.container.find(formInfo.createTour);
+
                 if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName))
                     $("#cz-tours-list-title").text("My Tours");
                 else {
@@ -43,8 +44,15 @@ var CZ;
                     $("#take-tour-proposal").hide();
                     $("#tours-missed-warning").show();
                 }
+
                 if (formInfo.tours.length == 0)
                     $("#take-tour-proposal").hide();
+
+                if (CZ.Common.isInCosmos())
+                {
+                    $('#tour-cosmos').hide();
+                }
+
                 this.initialize();
             }
             FormToursList.prototype.initialize = function () {

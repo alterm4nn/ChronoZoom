@@ -320,8 +320,7 @@ var CZ;
         // Initial Content contains the identifier (e.g. ID or Title) of the content that should be loaded initially.
         Common.initialContent = null;
 
-        /* Initialize the JQuery UI Widgets
-        */
+        // Initialize the JQuery UI Widgets
         function initialize() {
             Common.ax = $('#axis');
             Common.axis = new CZ.Timescale(Common.ax);
@@ -331,6 +330,17 @@ var CZ;
             Common.vc.virtualCanvas();
         }
         Common.initialize = initialize;
+
+        function isInCosmos(url)
+        {
+            if (typeof url != 'string') url = window.location.pathname;
+
+            var path    = url.toLowerCase().split('#')[0];
+            var matches = ['/', '/chronozoom', '/chronozoom/', '/chronozoom/cosmos', '/chronozoom/cosmos/'];
+
+            return $.inArray(path, matches) > -1;
+        }
+        Common.isInCosmos = isInCosmos;
 
         /* Calculates local offset of mouse cursor in specified jQuery element.
         @param jqelement  (JQuery to Dom element) jQuery element to get local offset for.
@@ -7729,7 +7739,7 @@ var CZ;
         function goToSearchResult(resultId, elementType) {
             var element = findVCElement(CZ.Common.vc.virtualCanvas("getLayerContent"), resultId, elementType);
             var navStringElement = CZ.UrlNav.vcelementToNavString(element);
-            CZ.StartPage.hide();
+            CZ.Overlay.Hide();
             var visible = CZ.UrlNav.navStringToVisible(navStringElement, CZ.Common.vc);
             CZ.Common.controller.moveToVisible(visible);
         }
@@ -9456,7 +9466,6 @@ var CZ;
 
         // Testing options.
         var _isLocalHost = constants.environment === "Localhost";
-        var _dumpTweetsUrl = "/dumps/home/tweets.json";
         var _dumpTimelinesUrl = "/dumps/home/timelines.json";
         var _testLogin = false;
 
@@ -9574,7 +9583,6 @@ var CZ;
             request.addParameter("supercollection", sc);
             request.addParameter("collection", c);
             request.addParameters(r);
-            console.log("[GET] " + request.url);
             return $.ajax
             ({
                 type: "GET",
@@ -9867,9 +9875,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("timeline");
-
-            console.log("[PUT] " + request.url);
-
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -9889,9 +9894,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("timeline");
-
-            console.log("[DELETE] " + request.url);
-
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -9911,9 +9913,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("exhibit");
-
-            console.log("[PUT] " + request.url);
-
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -9933,9 +9932,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("exhibit");
-
-            console.log("[DELETE] " + request.url);
-
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -9954,9 +9950,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("contentitem");
-
-            console.log("[PUT] " + request.url);
-
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -9975,9 +9968,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             request.addToPath(Service.collectionName);
             request.addToPath("contentitem");
-
-            console.log("[DELETE] " + request.url);
-
             return $.ajax({
                 type: "DELETE",
                 cache: false,
@@ -9997,9 +9987,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("tour2");
-
-            console.log("[PUT] " + request.url);
-
             return $.ajax({
                 type: "PUT",
                 cache: false,
@@ -10039,9 +10026,6 @@ var CZ;
             request.addToPath(Service.superCollectionName);
             if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
             request.addToPath("tours");
-
-            console.log("[GET] " + request.url);
-
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -10086,9 +10070,6 @@ var CZ;
                 searchTerm:         query,
                 searchScope:        scope
             };
-
-            console.log("[GET] " + request.url);
-
             return $.ajax
             ({
                 type:           "GET",
@@ -10113,9 +10094,6 @@ var CZ;
                 top: top,
                 skip: skip
             };
-
-            console.log("[GET] " + request.url);
-
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -10141,9 +10119,6 @@ var CZ;
                 top: top,
                 skip: skip
             };
-
-            console.log("[GET] " + request.url);
-
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -10172,9 +10147,6 @@ var CZ;
                 top: top,
                 skip: skip
             };
-
-            console.log("[GET] " + request.url);
-
             return $.ajax({
                 type: "GET",
                 cache: false,
@@ -10187,25 +10159,6 @@ var CZ;
             });
         }
         Service.getBingDocuments = getBingDocuments;
-
-        // .../twitter/getRecentTweets
-        function getRecentTweets() {
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("twitter/getRecentTweets");
-
-            console.log("[GET] " + request.url);
-
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                contentType: "application/json",
-                dataType: "json",
-                url: _isLocalHost ? _dumpTweetsUrl : request.url,
-                success: function (response) {
-                }
-            });
-        }
-        Service.getRecentTweets = getRecentTweets;
 
         // .../{supercollection}/{collection}/structure?start=&end=&minspan=&lca=
         function getServiceInformation() {
@@ -10392,9 +10345,9 @@ var CZ;
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath('editablecollections');
-            request.addParameter('includeMine', includeMine);
-            request.addParameter('currentSuperCollection', Service.superCollectionName);
-            request.addParameter('currentCollection', Service.collectionName);
+            request.addParameter('includeMine',             includeMine);
+            request.addParameter('currentSuperCollection',  Service.superCollectionName);
+            request.addParameter('currentCollection',       Service.collectionName);
             return $.ajax
             ({
                 type:       'GET',
@@ -10405,20 +10358,42 @@ var CZ;
         }
         Service.getEditableCollections = getEditableCollections;
 
-        function getUserFavorites() {
-            var result = "";
+        function getRecentlyUpdatedExhibits(quantity)
+        {
+            if (typeof quantity != 'integer') quantity = 6;
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath('recentlyupdatedexhibits');
+            request.addParameter('quantity', quantity);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                dataType:   'json',
+                url:        request.url
+            });
+        }
+        Service.getRecentlyUpdatedExhibits = getRecentlyUpdatedExhibits;
+
+        function getUserFavorites()
+        {
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath("userfavorites");
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: request.url
+            request.addParameter('currentSuperCollection',  Service.superCollectionName);
+            request.addParameter('currentCollection',       Service.collectionName);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                dataType:   'json',
+                url:        request.url
             });
         }
         Service.getUserFavorites = getUserFavorites;
-        function deleteUserFavorite(guid) {
+
+        function deleteUserFavorite(guid)
+        {
             var result = "";
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
@@ -10451,56 +10426,6 @@ var CZ;
             });
         }
         Service.putUserFavorite = putUserFavorite;
-
-        function getUserFeatured(guid) {
-            if (typeof guid === "undefined") { guid = "default"; }
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfeatured");
-            request.addToPath(guid);
-            return $.ajax({
-                type: "GET",
-                cache: false,
-                dataType: "json",
-                url: _isLocalHost ? _dumpTimelinesUrl : request.url
-            });
-        }
-        Service.getUserFeatured = getUserFeatured;
-
-        function deleteUserFeatured(guid) {
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfeatured");
-            if (guid == "")
-                return null;
-            request.addToPath(guid);
-            return $.ajax({
-                type: "DELETE",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.deleteUserFeatured = deleteUserFeatured;
-
-        function putUserFeatured(guid) {
-            var result = "";
-            CZ.Authoring.resetSessionTimer();
-            var request = new Service.Request(_serviceUrl);
-            request.addToPath("userfeatured");
-            if (guid == "")
-                return null;
-            request.addToPath(guid);
-            return $.ajax({
-                type: "PUT",
-                cache: false,
-                contentType: "application/json",
-                url: request.url
-            });
-        }
-        Service.putUserFeatured = putUserFeatured;
 
         //Triples
         function putTriplet(subject, predicate, object) {
@@ -12701,7 +12626,7 @@ var CZ;
                 event.stopPropagation();
                 // show create collection dialog
                 CZ.HomePageViewModel.closeAllForms();
-                CZ.StartPage.addCollection();
+                AddCollection();
             });
 
             $('#mnuCreateTimeline').click(function (event)
@@ -12709,7 +12634,7 @@ var CZ;
                 event.stopPropagation();
                 // show create timeline dialog
                 CZ.HomePageViewModel.closeAllForms();
-                CZ.StartPage.hide();
+                CZ.Overlay.Hide();
                 CZ.Authoring.UI.createTimeline();
             });
 
@@ -12718,7 +12643,7 @@ var CZ;
                 event.stopPropagation();
                 // show create exhibit dialog
                 CZ.HomePageViewModel.closeAllForms();
-                CZ.StartPage.hide();
+                CZ.Overlay.Hide();
                 CZ.Authoring.UI.createExhibit();
             });
 
@@ -12727,7 +12652,7 @@ var CZ;
                 event.stopPropagation();
                 // show create tour dialog
                 CZ.HomePageViewModel.closeAllForms();
-                CZ.StartPage.hide();
+                CZ.Overlay.Hide();
                 CZ.Authoring.UI.createTour();
             });
 
@@ -12749,7 +12674,7 @@ var CZ;
                 else
                 {
                     // show my collections overlay (with preference for display of My Collections if viewing Cosmos)
-                    CZ.StartPage.show(true);
+                    CZ.Overlay.Show(true);
                 }
             });
 
@@ -12776,6 +12701,71 @@ var CZ;
             });
 
         });
+
+
+        /***********
+         * Helpers *
+         ***********/
+
+        this.AddCollection =
+        function AddCollection()
+        {
+            CZ.Authoring.hideMessageWindow();
+
+            var newName = prompt("What name would you like for your new collection?\nNote: The name must be unique among your collections.", '') || '';
+            newName     = $.trim(newName);
+
+            var newPath = newName.replace(/[^a-zA-Z0-9]/g, '');
+            if (newPath === '') return;
+
+            if (newPath.length > 50)
+            {
+                CZ.Authoring.showMessageWindow
+                (
+                    "The name of your new collection must be no more than 50 characters in length.",
+                    "Unable to Create Collection"
+                );
+                return;
+            }
+
+            CZ.Service.getCollection().done(function (currentCollection)
+            {
+                CZ.Service.isUniqueCollectionName(newName).done(function (isUniqueCollectionName)
+                {
+                    if (!isUniqueCollectionName || newPath === currentCollection.Path)
+                    {
+                        CZ.Authoring.showMessageWindow
+                        (
+                            "Sorry your new collection name is not unique enough. Please try a different name.",
+                            "Unable to Create Collection"
+                        );
+                        return;
+                    }
+
+                    CZ.Service.postCollection(newPath, { Title: newName }).done(function (success)
+                    {
+                        if (success)
+                        {
+                            window.location =
+                            (
+                                window.location.protocol + '//' + window.location.host + '/' + CZ.Service.superCollectionName + '/' + newPath
+                            )
+                            .toLowerCase();
+                        }
+                        else
+                        {
+                            CZ.Authoring.showMessageWindow
+                            (
+                                "An unexpected error occured.",
+                                "Unable to Create Collection"
+                            );
+                        }
+                    });
+
+                });
+            });
+
+        };
 
 
 
@@ -17798,6 +17788,7 @@ var CZ;
                     _this.onEditTour(tour);
                 } : null);
                 this.createTourBtn = this.container.find(formInfo.createTour);
+
                 if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName))
                     $("#cz-tours-list-title").text("My Tours");
                 else {
@@ -17812,8 +17803,15 @@ var CZ;
                     $("#take-tour-proposal").hide();
                     $("#tours-missed-warning").show();
                 }
+
                 if (formInfo.tours.length == 0)
                     $("#take-tour-proposal").hide();
+
+                if (CZ.Common.isInCosmos())
+                {
+                    $('#tour-cosmos').hide();
+                }
+
                 this.initialize();
             }
             FormToursList.prototype.initialize = function () {
@@ -18445,865 +18443,477 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../scripts/cz.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
 var CZ;
 (function (CZ) {
-    (function (StartPage) {
-        var _isRegimesVisible;
+    (function (Overlay) {
 
-        /* Dummy data in an approximate format that might be returned from a service ... */
-        StartPage.tileData = [
-            {
-                "Idx": 0,
-                "Title": "Big History is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_bighistory.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999998954347&y=-0.46459331778482354&w=3.841695822797034e-12&h=3.7430627449314544e-12"
-            },
-            {
-                "Idx": 1,
-                "Title": "CERN is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_cern.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999192440875&y=-0.4645933209201501&w=3.729306137185042e-11&h=3.633558592459924e-11"
-            },
-            {
-                "Idx": 2,
-                "Title": "Earth Science is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_earthscience.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999988061194&y=-0.46459331795948755&w=4.546120315559252e-12&h=4.4294015903520115e-12"
-            },
-            {
-                "Idx": 3,
-                "Title": "King Tut is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_kingtut.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999967062717304&y=-0.4645931999741229&w=3.5221148563086766e-10&h=3.4316868149181225e-10"
-            },
-            {
-                "Idx": 4,
-                "Title": "Napoleon is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_napoleon.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999840411981&y=-0.46459346560505227&w=5.935054278147061e-10&h=5.782675563705605e-10"
-            },
-            {
-                "Idx": 5,
-                "Title": "World War I is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_ww1.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999999485392826&y=-0.4645933221621095&w=3.314938789411939e-12&h=3.229829860746773e-12"
-            },
-            {
-                "Idx": 6,
-                "Title": "Coluseum is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_colosseum.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.49999988732590944&y=-0.4645934478931077&w=1.0069124184819225e-9&h=9.810605875309654e-10"
-            },
-            {
-                "Idx": 7,
-                "Title": "Justin Morrill is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_justin_morrill.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4999999897945675&y=-0.46459338150077905&w=1.9362194151655837e-10&h=1.8865082227261387e-10"
-            },
-            {
-                "Idx": 8,
-                "Title": "Big History 2 is my favorite course ever",
-                "Thumbnail": "../images/dummy/tile_bighistory.jpg",
-                "Author": "Some Author",
-                "URL": "http://www.chronozoom.com/#/t00000000-0000-0000-0000-000000000000@x=0.4996898109169686&y=-0.46442779133805834&w=0.0007080832576286593&h=0.0006899036738441856"
-            }
-        ];
 
-        /* ---------------- Tile Layout -------------------
-        * Depending on how the tiles need to may layed out on reformat, these classnames in this list below will change.
-        * From smallest to largest:
-        * - Three rows of tiles 1 and 2
-        * - Three rows of tiles 1 through 3
-        * - One top row of tiles 1-4, and two columns of tiles 1-4
-        * - Three columns of tiles 1-6
-        *
-        * With a different layout where uneven numbers of tiles is used there will be differences between the three sections
-        */
-        StartPage.tileLayout = [
-            {
-                "Name": "#combo0-icons",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9"
-                ]
-            },
-            {
-                "Name": "#FeaturedTimelinesBlock-tiles",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9"
-                ]
-            },
-            {
-                "Name": "#TwitterBlock-tiles",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9"
-                ]
-            },
-            {
-                "Name": "#FavoriteTimelinesBlock-tiles",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6"
-                ]
-            },
-            {
-                "Name": "#MyTimelinesBlock-tiles",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9"
-                ]
-            },
-            {
-                "Name": "#OtherEditableTimelinesBlock-tiles",
-                "Visibility": [
-                    "box",
-                    "box",
-                    "box ex3",
-                    "box ex3 ex4",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9",
-                    "box ex3 ex4 ex6 ex9"
-                ]
-            }
-        ];
+        /**********************
+         * Private Properties *
+         **********************/
+        
+        var initialized     = false;
+        var quantity        = (screen.width >= 1800 || screen.height >= 1800) ? 9 : 6;      // how many tiles to display in featured or recent lists
+        var defaultImages   = ['/images/background.jpg',   '/images/default-tile.png'];     // use the default tile background if these are provided by API
+        var brightImages    = ['/images/tile-default.jpg', '/images/tile-bighistory.jpg'];  // do not darken the background for tiles with these images
+        var cosmosImage     = '/images/tile-bighistory.jpg';
+        var $overlay        = $('#overlay');
+        var $listWelcome;
+        var $listCollections;
+        var $listFeatured;
+        var $listUpdated;
+        var $listFavorites;
+        var $templates;
+        var $templateCollection;
+        var $templateFeatured;
+        var $templateTimeline;
+        var $templateExhibit;
+        var $templateNoFavorite;
+        var $templateMarkPublic;
 
-        function resizeCrop($image, imageProps, isListView) {
-            var $startPage = $("#start-page");
 
-            // Get size of the tile.
-            var width = $image.parent().width();
-            var height = $image.parent().height();
 
-            if (isListView) {
-                width = $image.width();
-                height = $image.height();
-            }
+        /******************
+         * Public Methods *
+         ******************/
 
-            // Show start page if it's not visible to get size of the tile.
-            if (!$startPage.is(":visible")) {
-                $startPage.show();
-                width = $image.width();
-                height = $image.height();
-                $startPage.hide();
-            }
-
-            var naturalHeight = imageProps.naturalHeight;
-            var naturalWidth = imageProps.naturalWidth;
-            var ratio = naturalWidth / naturalHeight;
-            var marginTop = 0;
-            var marginLeft = 0;
-
-            // Keep aspect ratio.
-            if (naturalWidth > naturalHeight) {
-                $image.height(height);
-                $image.width(height * ratio);
-                marginLeft = ($image.width() - width) / 2;
-            } else if (naturalWidth < naturalHeight) {
-                $image.width(width);
-                $image.height(width / ratio);
-                marginTop = ($image.height() - height) / 2;
-            } else {
-                $image.width(width);
-                $image.height(height);
-            }
-
-            $image.css({
-                "margin-top": -marginTop + "px",
-                "margin-left": -marginLeft + "px"
-            });
-        }
-
-        function cloneTileTemplate(template, target, idx) {
-            for (var i = 0; i < target[idx].Visibility.length; i++) {
-                var o = $(template).clone(true, true).appendTo(target[idx].Name);
-                o.attr("class", target[idx].Visibility[i]);
-                o.attr("id", "t" + idx + "i" + i);
-                $("#t" + idx + "i" + i + " .boxInner .tile-photo img").attr("src", StartPage.tileData[i].Thumbnail).attr("alt", StartPage.tileData[i].Title);
-                $("#t" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-title").text(StartPage.tileData[i].Title);
-                $("#t" + idx + "i" + i + " .boxInner .tile-meta .tile-meta-author").text(StartPage.tileData[i].Author);
-            }
-        }
-        StartPage.cloneTileTemplate = cloneTileTemplate;
-
-        function cloneListTemplate(template, target, idx) {
-            for (var i = 0; i < StartPage.tileData.length; i++) {
-                var o = $(template).clone(true, true).appendTo(target);
-                o.attr("id", "l" + idx + "i" + i);
-                $("#l" + idx + "i" + i + " .li-title a").attr("href", StartPage.tileData[i].URL);
-                $("#l" + idx + "i" + i + " .li-title a").text(StartPage.tileData[i].Title);
-                $("#l" + idx + "i" + i + " .li-author").text(StartPage.tileData[i].Author);
-                $("#l" + idx + "i" + i + " .li-icon").text(StartPage.tileData[i].Thumbnail);
-            }
-        }
-        StartPage.cloneListTemplate = cloneListTemplate;
-
-        function cloneTweetTemplate(template, target, idx) {
-            for (var i = 0; i < target[idx].Visibility.length; i++) {
-                var o = $(template).clone(true, true).appendTo(target[idx].Name);
-                o.attr("class", target[idx].Visibility[i]);
-                o.attr("id", "m" + idx + "i" + i);
-            }
-        }
-        StartPage.cloneTweetTemplate = cloneTweetTemplate;
-
-        function PlayIntroTour() {
-            // "Introduction to ChronoZoom tour"
-            // TODO: implement search of tour by title
-            var introTour = CZ.Tours.tours[0];
-
-            // check if tours failed to load
-            if (typeof introTour === "undefined") {
-                return false;
-            }
-
-            CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption(CZ.Tours.tourCaptionFormContainer, {
-                activationSource: $(),
-                navButton: ".cz-form-nav",
-                closeButton: ".cz-tour-form-close-btn > .cz-form-btn",
-                titleTextblock: ".cz-tour-form-title",
-                contentContainer: ".cz-form-content",
-                minButton: ".cz-tour-form-min-btn > .cz-form-btn",
-                captionTextarea: ".cz-form-tour-caption",
-                tourPlayerContainer: ".cz-form-tour-player",
-                bookmarksCount: ".cz-form-tour-bookmarks-count",
-                narrationToggle: ".cz-toggle-narration",
-                context: introTour
-            });
-
-            CZ.Tours.tourCaptionForm.show();
-            CZ.Tours.activateTour(introTour, undefined);
-        }
-        StartPage.PlayIntroTour = PlayIntroTour;
-
-        function addCollection()
+        function Initialize()
         {
-            CZ.Authoring.hideMessageWindow();
+            $listWelcome        = $overlay.find('#listWelcome');
+            $listCollections    = $overlay.find('#listCollections');
+            $listFeatured       = $overlay.find('#listFeatured');
+            $listUpdated        = $overlay.find('#listUpdated');
+            $listFavorites      = $overlay.find('#listFavorites');
+            $templateCollection = $overlay.find('#tileCollection').html();
+            $templateFeatured   = $overlay.find('#tileFeatured'  ).html();
+            $templateTimeline   = $overlay.find('#tileTimeline'  ).html();
+            $templateExhibit    = $overlay.find('#tileExhibit'   ).html();
+            $templateNoFavorite = $overlay.find('#msgNoFavorite' ).html();
+            $templateMarkPublic = $overlay.find('#msgMarkPublic' ).html();
 
-            var newName = prompt("What name would you like for your new collection?\nNote: The name must be unique among your collections.", '') || '';
-            newName     = $.trim(newName);
-            
-            var newPath = newName.replace(/[^a-zA-Z0-9]/g, '');
-            if (newPath === '') return;
-
-            if (newPath.length > 50)
+            if (isInCosmos(window.location.pathname))
             {
-                CZ.Authoring.showMessageWindow
-                (
-                    "The name of your new collection must be no more than 50 characters in length.",
-                    "Unable to Create Collection"
-                );
-                return;
+                $('#introTourLink').removeClass('hidden');
             }
 
-            CZ.Service.getCollection().done(function (currentCollection)
-            {
-                CZ.Service.isUniqueCollectionName(newName).done(function (isUniqueCollectionName)
+            $('.overlay-list')
+                .mouseenter(function (event)
                 {
-                    if (!isUniqueCollectionName || newPath === currentCollection.Path)
-                    {
-                        CZ.Authoring.showMessageWindow
-                        (
-                            "Sorry your new collection name is not unique enough. Please try a different name.",
-                            "Unable to Create Collection"
-                        );
-                        return;
-                    }
+                    $(this).find('.hint').removeClass('hidden');
+                })
+                .mouseleave(function (event)
+                {
+                    $(this).find('.hint').addClass('hidden');
+                })
+            ;
 
-                    CZ.Service.postCollection(newPath, { Title: newName }).done(function (success)
-                    {
-                        if (success)
-                        {
-                            window.location =
-                            (
-                                window.location.protocol + '//' + window.location.host + '/' + CZ.Service.superCollectionName + '/' + newPath
-                            )
-                            .toLowerCase();
-                        }
-                        else
-                        {
-                            CZ.Authoring.showMessageWindow
-                            (
-                                "An unexpected error occured.",
-                                "Unable to Create Collection"
-                            );
-                        }
-                    });
+            if (screen.width >= 1024 || screen.height >= 768)
+            {
+                $('#themePicker option:selected').attr('selected', null);
+                $('#themePicker option[value="' + localStorage.getItem('theme') + '"]').attr('selected', 'selected');
 
+                $('#themePicker').change(function (event)
+                {
+                    var theme = $('#themePicker option:selected').val();
+
+                    $('body')
+                    .removeClass(localStorage.getItem('theme'))
+                    .addClass(theme);
+
+                    localStorage.setItem('theme', theme);
                 });
-            });
-        }
-        StartPage.addCollection = addCollection;
 
-        function listFlip(name) {
-            if ('block' != document.getElementById(name + '-list').style.display) {
-                document.getElementById(name + '-list').style.display = 'block';
-                document.getElementById(name + '-tiles').style.display = 'none';
-                $("#" + name).find(".list-view-icon").addClass("active");
-            } else {
-                document.getElementById(name + '-list').style.display = 'none';
-                document.getElementById(name + '-tiles').style.display = 'block';
-                $("#" + name).find(".list-view-icon").removeClass("active");
-                $(window).resize();
+                $('#themePicker').removeClass('hidden');
             }
+
+            initialized = true;
+
+            populateFeatured(); // never changes during page lifecycle and shown in all views
         }
-        StartPage.listFlip = listFlip;
+        Overlay.Initialize = Initialize;
 
-        function fillFeaturedTimelines(timelines) {
-            var $template = $("#template-tile .box");
-            var layout = CZ.StartPage.tileLayout[1];
 
-            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-                var $startPage = $("#start-page");
-                var $tile = $template.clone(true, true);
-                var $tileImage = $tile.find(".boxInner .tile-photo img");
-                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
-                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
-
-                // Set appearance and click handler.
-                // Initially the tile is hidden. Show it on image load.
-                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "featured" + i).click(timelineUrl, function (event) {
-                    window.location.href = event.data;
-                    hide();
-                }).invisible();
-
-                // Resize and crop image on load.
-                $tileImage.load($tile, function (event) {
-                    var $this = $(this);
-                    var imageProps = event.target || event.srcElement;
-
-                    // Resize and crop the image.
-                    resizeCrop($this, imageProps);
-
-                    // Resize and crop the image on window resize.
-                    $(window).resize({
-                        $image: $this,
-                        imageProps: imageProps
-                    }, function (event) {
-                        resizeCrop(event.data.$image, event.data.imageProps);
-                    });
-
-                    // Show the tile with transition.
-                    setTimeout(function () {
-                        event.data.visible();
-                    }, 0);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-
-                // Set title and author.
-                $tileTitle.text(timeline.Title.trim() || "No title :(");
-                $tileAuthor.text(timeline.Author);
+        function Hide()
+        {
+            if (CZ.Settings.isCosmosCollection)
+            {
+                $('.header-regimes' ).visible();
             }
+            $('.header-breadcrumbs' ).visible();
+
+            $overlay.fadeOut();
         }
-        StartPage.fillFeaturedTimelines = fillFeaturedTimelines;
+        Overlay.Hide = Hide;
 
-        function fillFeaturedTimelinesList(timelines) {
-            var template = "#template-timeline-list .timeline-list-item";
-            var target = "#FeaturedTimelinesBlock-list";
 
-            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
+        function Show(preferPersonalizedLayout)
+        {
+            CZ.HomePageViewModel.closeAllForms();
+            $('.header-regimes'     ).invisible();
+            $('.header-breadcrumbs' ).invisible();
 
-                var $timelineListItem = $(template).clone(true, true).appendTo(target);
-                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
-
-                var Name = "featured-list-elem" + i;
-                var idx = 1;
-
-                $timelineListItem.attr("id", "l" + idx + "i" + i);
-                $timelineListItem.click(timelineUrl, function (event) {
-                    window.location.href = event.data;
-                    hide();
-                });
-
-                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
-                $timelineListItem.attr("data-author", timeline.Author);
-
-                $timelineListItemImage.load($timelineListItemImage, function (event) {
-                    var $this = $(this);
-                    var imageProps = event.target || event.srcElement;
-
-                    // Resize and crop the image.
-                    resizeCrop($this, imageProps, true);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
+            if (initialized)
+            {
+                layout(preferPersonalizedLayout);
             }
+
+            $overlay.fadeIn();
         }
-        StartPage.fillFeaturedTimelinesList = fillFeaturedTimelinesList;
+        Overlay.Show = Show;
 
-        function fillFavoriteTimelines(timelines) {
-            var $template = $("#template-tile .box");
-            var layout = CZ.StartPage.tileLayout[3];
 
-            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-                var $startPage = $("#start-page");
-                var $tile = $template.clone(true, true);
-                var $tileImage = $tile.find(".boxInner .tile-photo img");
-                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
-                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
-
-                // Set appearance and click handler.
-                // Initially the tile is hidden. Show it on image load.
-                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "favorite" + i).click(timelineUrl, function (event) {
-                    window.location.href = event.data;
-                    hide();
-                }).invisible();
-
-                // Resize and crop image on load.
-                $tileImage.load($tile, function (event) {
-                    var $this = $(this);
-                    var imageProps = event.target || event.srcElement;
-
-                    // Resize and crop the image.
-                    resizeCrop($this, imageProps);
-
-                    // Resize and crop the image on window resize.
-                    $(window).resize({
-                        $image: $this,
-                        imageProps: imageProps
-                    }, function (event) {
-                        resizeCrop(event.data.$image, event.data.imageProps);
-                    });
-
-                    // Show the tile with transition.
-                    setTimeout(function () {
-                        event.data.visible();
-                    }, 0);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-
-                // Set title and author.
-                $tileTitle.text(timeline.Title.trim() || "No title :(");
-                $tileAuthor.text(timeline.Author);
-            }
-        }
-        StartPage.fillFavoriteTimelines = fillFavoriteTimelines;
-
-        function fillFavoriteTimelinesList(timelines) {
-            var template = "#template-timeline-list .timeline-list-item";
-            var target = "#FavoriteTimelinesBlock-list";
-
-            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.TimelineUrl;
-
-                var $timelineListItem = $(template).clone(true, true).appendTo(target);
-                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
-
-                var Name = "favorite-list-elem" + i;
-                var idx = 1;
-
-                $timelineListItem.attr("id", "lfav" + idx + "i" + i);
-                $timelineListItem.click(timelineUrl, function (event) {
-                    window.location.href = event.data;
-                    hide();
-                });
-
-                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
-                $timelineListItem.attr("data-author", timeline.Author);
-
-                $timelineListItemImage.load($timelineListItemImage, function (event) {
-                    var $this = $(this);
-                    var imageProps = event.target || event.srcElement;
-
-                    // Resize and crop the image.
-                    resizeCrop($this, imageProps, true);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-            }
-        }
-        StartPage.fillFavoriteTimelinesList = fillFavoriteTimelinesList;
-
-        function fillMyTimelines(timelines) {
-            var $template = $("#template-tile .box");
-            var layout = CZ.StartPage.tileLayout[4];
-            for (var i = 0, len = Math.min(layout.Visibility.length, timelines.length); i < len; i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.CurrentCollection ? '' : timeline.TimelineUrl;
-                var $startPage = $("#start-page");
-                var $tile = $template.clone(true, true);
-                var $tileImage = $tile.find(".boxInner .tile-photo img");
-                var $tileTitle = $tile.find(".boxInner .tile-meta .tile-meta-title");
-                var $tileAuthor = $tile.find(".boxInner .tile-meta .tile-meta-author");
-
-                // Set appearance and click handler.
-                // Initially the tile is hidden. Show it on image load.
-                $tile.appendTo(layout.Name).addClass(layout.Visibility[i]).attr("id", "my" + i).click(timelineUrl, function (event) {
-                    if (event.data != '') window.location.href = event.data;
-                    hide();
-                }).invisible();
-
-                // Resize and crop image on load.
-                $tileImage.load($tile, function (event) {
-                    var $this = $(this);
-                    $tileImage.show();
-                    var imageProps = event.target || event.srcElement;
-                    $tileImage.hide();
-
-                    // Resize and crop the image.
-                    resizeCrop($this, imageProps);
-                    $tileImage.show();
-
-                    // Resize and crop the image on window resize.
-                    $(window).resize({
-                        $image: $this,
-                        imageProps: imageProps
-                    }, function (event) {
-                        resizeCrop(event.data.$image, event.data.imageProps);
-                    });
-
-                    // Show the tile with transition.
-                    setTimeout(function () {
-                        event.data.visible();
-                    }, 0);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-
-                // Set title and author.
-                $tileTitle.text(timeline.Title.trim() || "No title :(");
-                $tileAuthor.text(timeline.Author);
-            }
-        }
-        StartPage.fillMyTimelines = fillMyTimelines;
-
-        function fillMyTimelinesList(timelines) {
-            var template = "#template-timeline-list .timeline-list-item";
-            var target = "#MyTimelinesBlock-list";
-
-            for (var i = 0; i < Math.min(StartPage.tileData.length, timelines.length); i++) {
-                var timeline = timelines[i];
-                var timelineUrl = timeline.CurrentCollection ? '' : timeline.TimelineUrl;
-                
-                var $timelineListItem = $(template).clone(true, true).appendTo(target);
-                var $timelineListItemImage = $timelineListItem.find(".timeline-li-image img");
-
-                var Name = "favorite-list-elem" + i;
-                var idx = 1;
-
-                $timelineListItem.attr("id", "lmy" + idx + "i" + i);
-                $timelineListItem.click(timelineUrl, function (event) {
-                    if (event.data != '') window.location.href = event.data;
-                    hide();
-                });
-
-                $timelineListItem.attr("data-title", timeline.Title.trim() || "No title :(");
-                $timelineListItem.attr("data-author", timeline.Author);
-
-                $timelineListItemImage.load($timelineListItemImage, function (event) {
-                    var $this = $(this);
-                    var imageProps = event.target || event.srcElement;
-
-                    // Resize and crop the image.
-                    resizeCrop($this, imageProps, true);
-                }).attr({
-                    src: timeline.ImageUrl,
-                    alt: timeline.Title
-                });
-            }
-        }
-        StartPage.fillMyTimelinesList = fillMyTimelinesList;
-
-        function startExploring() {
+        function ExploreBigHistory()
+        {
             var urlParts = window.location.href.replace('//', '').toLowerCase().split('/');
 
-            CZ.StartPage.hide();
+            Hide();
 
-            if (urlParts[1] == '#') {
+            if (urlParts[1] == '#')
+            {
                 // cosmos supercollection - expand out to full view
                 $('#regime-link-cosmos').trigger('click');
-            } else {
-                // a different supercollection - switch to cosmos
-                window.location.href = '/#/cosmos';
             }
-        }
-        StartPage.startExploring = startExploring;
-
-        function TwitterLayout(target, idx) {
-            var ListTemplate = "#template-tweet-list .tweet-list-item";
-            var ListElem = "#TwitterBlock-list";
-
-            CZ.Service.getRecentTweets().done(function (response) {
-                for (var i = 0, len = response.d.length; i < len; ++i) {
-                    var tweet = response.d[i];
-                    var text = tweet.Text;
-                    var fullname = tweet.User.Name;
-                    var username = tweet.User.ScreenName;
-                    var photo = tweet.User.ProfileImageUrl;
-                    var time = tweet.CreatedDate;
-                    var myDate = new Date(time.match(/\d+/)[0] * 1);
-                    var convertedDate = myDate.getDate() + "." + myDate.getMonth() + "." + myDate.getFullYear();
-
-                    var tweetUsernameLink = "https://twitter.com/" + username;
-                    var tweetLink = "https://twitter.com/" + username + "/statuses/" + tweet.IdStr;
-
-                    var $tweetTile = $("#m" + idx + "i" + i);
-                    var $tweetTileMeta = $tweetTile.find(".boxInner .tweet-meta");
-                    var $tileMessage = $tweetTileMeta.find(".tweet-meta-text");
-                    var $tileFullname = $tweetTileMeta.find(".tweet-meta-title");
-                    var $tileUsername = $tweetTileMeta.find(".tweet-meta-author");
-                    var $tileAvatar = $tweetTileMeta.find(".tweet-avatar-icon");
-                    var $tileDate = $tweetTileMeta.find(".tile-meta-time");
-
-                    // Show content of Tweet tile on avatar load.
-                    $tweetTileMeta.invisible(true);
-                    $tileAvatar.load($tweetTileMeta, function (event) {
-                        event.data.visible();
-                    });
-
-                    // Replace all @authors with links.
-                    text = text.replace(/(@([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
-                        href='https://twitter.com/$2'>$1</a>");
-
-                    // Replace all #tags with links.
-                    text = text.replace(/(#([A-Za-z0-9_]+))/gi, "<a class='tweet-message-link' target='blank' \
-                        href='https://twitter.com/search?q=$2&f=realtime'>$1</a>");
-
-                    // Set tweet's properties to corresponding elements.
-                    $tileMessage.html(text).attr("href", tweetLink);
-                    $tileUsername.text("@" + username).attr("href", tweetUsernameLink);
-                    $tileFullname.text(fullname);
-                    $tileDate.text(convertedDate);
-
-                    // Set avatar.
-                    $tileAvatar.attr("src", photo);
-
-                    // List View.
-                    var $tweetListItem = $(ListTemplate).clone(true, true).appendTo(ListElem);
-                    var $listItemMessage = $tweetListItem.find(".tweet-li-message");
-                    var $listItemUsername = $tweetListItem.find(".tweet-li-header .tweet-li-username");
-                    var $listItemFullname = $tweetListItem.find(".tweet-li-header .tweet-li-fullname");
-                    var $listItemAvatar = $tweetListItem.find(".tweet-li-header .tweet-li-avatar");
-                    var $listItemDate = $tweetListItem.find(".tweet-li-footer .tweet-li-date");
-
-                    $tweetListItem.attr("id", "l" + idx + "i" + i);
-                    $listItemMessage.html(text).attr("href", tweetLink);
-                    $listItemUsername.text("@" + username).attr("href", tweetUsernameLink);
-                    $listItemFullname.text(fullname);
-                    $listItemDate.text(convertedDate);
-                    $listItemAvatar.attr("src", photo);
-
-                    $("#m" + idx + "i" + i + " .boxInner .tweet-meta .tweet-meta-text").dotdotdot({
-                        watch: "window"
-                    });
-                }
-            });
-        }
-        StartPage.TwitterLayout = TwitterLayout;
-
-        function show(preferPersonalizedLayout)
-        {
-            // Hide regimes.
-            $(".header-regimes").invisible();
-
-            // Hide breadcrumbs.
-            $(".header-breadcrumbs").invisible();
-
-            // Hide all forms.
-            CZ.HomePageViewModel.closeAllForms();
-
-            // Choose which columns to display
-            Layout(preferPersonalizedLayout);
-
-            // Show home page.
-            $("#start-page").fadeIn();
-        }
-        StartPage.show = show;
-
-        function compareTimelineTitles(first, second) {
-            if (first.Title.charAt(0) < second.Title.charAt(0))
-                return -1;
-            else if (first.Title.charAt(0) > second.Title.charAt(0))
-                return 1;
             else
-                return 0;
-        }
-
-        function hide() {
-            // Show regimes if necessary.
-            if (_isRegimesVisible)
             {
-                $(".header-regimes").visible();
-            }
-
-            // Show breadcrumbs.
-            $(".header-breadcrumbs").visible();
-
-            // Hide home page.
-            $("#start-page").fadeOut();
-        }
-        StartPage.hide = hide;
-
-        function initialize() {
-            // Is regimes visible initially?
-            _isRegimesVisible = $(".header-regimes").is(":visible");
-
-            CZ.Service.getUserFeatured().done(function (response) {
-                // Show the newest featured timelines first.
-                var timelines = response ? response.reverse() : [];
-
-                timelines.sort(compareTimelineTitles);
-
-                fillFeaturedTimelines(timelines);
-                fillFeaturedTimelinesList(timelines);
-            });
-
-            CZ.Service.getUserFavorites().then(function (response) {
-                var timelines = response ? response.reverse() : [];
-
-                timelines.sort(compareTimelineTitles);
-
-                // saving guids of favorite timelines
-                timelines.forEach(function (timeline) {
-                    // timelineUrl pattern is /{collection}/{supercollection}#{/t{guid}}+/t{favorite timeline guid}
-                    // favorite timeline guid is the latest guid in url
-                    CZ.Settings.favoriteTimelines.push(timeline.TimelineUrl.split("/").pop().slice(1));
-                });
-
-                if (timelines.length === 0) {
-                    $("#FavoriteTimelinesBlock .list-view-icon").hide();
-                    $("#FavoriteTimelinesBlock-tiles").text("You don't have any favorite timelines yet." + " Click star icon of the timeline you like to save it as favorite.");
-                } else {
-                    fillFavoriteTimelines(timelines);
-                    fillFavoriteTimelinesList(timelines);
-                }
-            }, function (error) {
-                console.log("[ERROR] getUserFavorites");
-            });
-
-            CZ.Service.getProfile().done(function (data) {
-                if ((data !== "") && (data.DisplayName !== null)) {
-                    CZ.Settings.userSuperCollectionName = data.DisplayName;
-                    CZ.Settings.userCollectionName = data.DisplayName;
-                }
-                /*
-                CZ.Service.getUserTimelines(CZ.Settings.userSuperCollectionName, CZ.Settings.userCollectionName).then(function (response) {
-                    var timelines = response ? response.reverse() : [];
-                    fillMyTimelines(timelines);
-                    fillMyTimelinesList(timelines);
-                }, function (error) {
-                    console.log("[ERROR] getUserTimelines");
-                });
-                */
-                /*
-                CZ.Service.getEditableTimelines(true).then(function (response)
-                {
-                    var timelines = response ? response : [];
-                    fillMyTimelines(timelines);
-                    fillMyTimelinesList(timelines);
-                }, function (error)
-                {
-                    console.log("[ERROR] getEditableTimelines");
-                });
-                */
-                CZ.Service.getEditableCollections(true).then(function (response)
-                {
-                    var myCollections = response ? response : [];
-                    fillMyTimelines(    myCollections);
-                    fillMyTimelinesList(myCollections);
-                },
-                function (error)
-                {
-                    console.log("[ERROR] getEditableCollections");
-                });
-            });
-
-            CZ.StartPage.cloneTweetTemplate("#template-tweet .box", CZ.StartPage.tileLayout, 2); /* Tweeted Timelines */
-            CZ.StartPage.TwitterLayout(CZ.StartPage.tileLayout, 2);
-
-            // Show home page if this is a root URL of ChronoZoom and if this is not a custom collection
-            var hash = CZ.UrlNav.getURL().hash;
-            if ((!hash.path || hash.path === "/t" + CZ.Settings.guidEmpty && !hash.params) && !CZ.Service.superCollectionName) {
-                show();
+                // a different supercollection - switch to cosmos
+                window.location.href = '/#/t00000000-0000-0000-0000-000000000000@x=0';
             }
         }
-        StartPage.initialize = initialize;
+        Overlay.ExploreBigHistory = ExploreBigHistory;
 
-        function Layout(preferPersonalizedLayout)
+
+        function ExploreIntroTour()
         {
-            if 
+            if (CZ.Tours.tours.length > 0)
+            {
+                Hide();
+                CZ.Tours.takeTour(CZ.Tours.tours[0]);
+            }
+        }
+        Overlay.ExploreIntroTour = ExploreIntroTour;
+
+
+
+        /*******************
+         * Private Methods *
+         *******************/
+
+        function layout(preferPersonalizedLayout)
+        {
+            if
             (
+                (typeof CZ.Authoring === 'undefined')   ||
+                (typeof CZ.Settings === 'undefined')    ||
+                (preferPersonalizedLayout === false)    ||
                 (!preferPersonalizedLayout  &&  CZ.Settings.isCosmosCollection) ||
                 (!CZ.Authoring.isEnabled    && !CZ.Settings.isAuthorized)
             )
             {
-                $('#WelcomeBlock'           ).attr('data-toggle', 'show');
-                $('#MyTimelinesBlock'       ).attr('data-toggle', 'hide');
-                $('#FavoriteTimelinesBlock' ).attr('data-toggle', 'hide');
-                $('#TwitterBlock'           ).attr('data-toggle', 'show');
+                // home page view
+
+                populateUpdated();
+
+                $listCollections.hide();
+                $listFavorites.hide();
+
+                $listWelcome.show();
+                $listFeatured.show();
+                $listUpdated.show();
             }
             else
             {
-                $('#WelcomeBlock'           ).attr('data-toggle', 'hide');
-                $('#MyTimelinesBlock'       ).attr('data-toggle', 'show');
-                $('#FavoriteTimelinesBlock' ).attr('data-toggle', 'show');
-                $('#TwitterBlock'           ).attr('data-toggle', 'hide');
+                // my collections view
+
+                populateCollections();
+                populateFavorites();
+
+                $listWelcome.hide();
+                $listUpdated.hide();
+
+                $listCollections.show();
+                $listFeatured.show();
+                $listFavorites.show();
             }
         }
 
-    })(CZ.StartPage || (CZ.StartPage = {}));
-    var StartPage = CZ.StartPage;
-})(CZ || (CZ = {}));
-/// <reference path='settings.ts'/>
+
+        function populateFeatured()
+        {
+            $.getJSON(constants.featuredContentList, function (response)
+            {
+                var json    = response ? response : [];
+                var $list   = $('<div></div>');
+
+                $.each(json, function (index, item)
+                {
+                    if (index < quantity)
+                    {
+                        var tile =  $templateFeatured
+                                    .replace(new RegExp('{{contentTitle}}', 'g'),   simpleClean(item.Title))
+                                    .replace(           '{{collectionCurator}}',    item.Curator)
+                                    .replace(           '{{contentBackground}}',    item.Background)
+                                    .replace(           '{{contentURL}}',           item.Link)
+                        ;
+                        $list.append(tile);
+                    }
+                });
+
+                $listFeatured.find('.overlay-tile').off('click').remove();
+                $listFeatured
+                    .append($list.html())
+                    .find('.overlay-tile').click(function (event)
+                    {
+                        if ($(this).attr('data-url') != '')
+                        {
+                            window.location.href = $(this).attr('data-url');
+                        }
+                        Hide();
+                    })
+                ;
+
+                loadCustomBackgrounds($listFeatured, false);
+            })
+            .fail(function ()
+            {
+                console.log('[ERROR] CZ.Overlay:populateFeatured');
+            });
+        }
+
+
+        function populateUpdated()
+        {
+            CZ.Service.getRecentlyUpdatedExhibits(quantity).then(function (response)
+            {
+                var json        = response ? response : [];
+                var $list       = $('<div></div>');
+                var msg         = $templateMarkPublic;
+
+                $.each(json, function (index, item)
+                {
+                    var year =  CZ.Dates.convertCoordinateToYear(item.Year);
+                    var tile =  $templateExhibit
+                                .replace(           '{{collectionTitle}}',      simpleClean(item.CollectionName))
+                                .replace(           '{{collectionCurator}}',    item.CuratorName)
+                                .replace(           '{{exhibitImage}}',         item.CustomBackground)
+                                .replace(new RegExp('{{exhibitTitle}}', 'g'),   simpleClean(item.Title))
+                                .replace(           '{{exhibitYear}}',          year.year + '&nbsp;' + year.regime)
+                                .replace(           '{{exhibitURL}}',           item.Link)
+                    ;
+                    $list.append(tile);
+                });
+
+                if (json.length < quantity || quantity > 6) $list.append(msg);
+
+                $listUpdated.find('.overlay-list-note').remove(); // msg
+                $listUpdated.find('.overlay-tile').off('click').remove();
+                $listUpdated
+                    .append($list.html())
+                    .find('.overlay-tile')
+                        .click(function (event)
+                        {
+                            if ($(this).attr('data-url') != '')
+                            {
+                                window.location.href = $(this).attr('data-url');
+                            }
+                            Hide();
+                        })
+                ;
+
+                loadCustomBackgrounds($listUpdated, true);
+            },
+            function (error)
+            {
+                console.log('[ERROR] CZ.Overlay:populateUpdated');
+            });
+        }
+
+
+        function populateCollections()
+        {
+            CZ.Service.getEditableCollections(true).then(function (response)
+            {
+                var json         = response ? response : [];
+                var $list        = $('<div></div>');
+
+                $.each(json, function (index, item)
+                {
+                    var url     = item.TimelineUrl  || '';
+                    var image   = item.ImageUrl     || '';
+
+                    if (hasDefaultBackground(image))        image   = '';
+                    if (image === '' && isInCosmos(url))    image   = cosmosImage;
+                    if (item.CurrentCollection)             url     = '';
+
+                    var tile =  $templateCollection
+                                .replace(           '{{collectionURL}}',            url)
+                                .replace(           '{{collectionBackground}}',     image)
+                                .replace(new RegExp('{{collectionTitle}}', 'g'),    simpleClean(item.Title) || '')
+                                .replace(           '{{collectionCurator}}',        item.Author             || '')
+                    ;
+                    $list.append(tile);
+                });
+
+                $listCollections.find('.overlay-tile').off('click').remove();
+                $listCollections
+                    .append($list.html())
+                    .find('.overlay-tile').click(function (event)
+                    {
+                        if ($(this).attr('data-url') != '')
+                        {
+                            window.location.href = $(this).attr('data-url');
+                        }
+                        Hide();
+                    })
+                ;
+
+                loadCustomBackgrounds($listCollections, true);
+            },
+            function (error)
+            {
+                console.log('[ERROR] CZ.Overlay:populateCollections');
+            });
+        }
+
+
+        function populateFavorites()
+        {
+            CZ.Service.getUserFavorites().then(function (response)
+            {
+                var json         = response ? response : [];
+                var $list        = $('<div></div>');
+
+                $.each(json, function (index, item)
+                {
+                    var image   = item.CustomBackground || '';
+
+                    if (hasDefaultBackground(image))    image   = '';
+                    if (item.IsCosmosCollection)        image   = cosmosImage;
+
+                    var tile =  $templateTimeline
+                                .replace(new RegExp('{{timelineTitle}}', 'g'),  simpleClean(item.Title)             || '')
+                                .replace(           '{{timelineURL}}',          item.Link                           || '')
+                                .replace(           '{{collectionBackground}}', image)
+                                .replace(           '{{collectionTitle}}',      simpleClean(item.CollectionName)    || '')
+                                .replace(           '{{collectionCurator}}',    item.CuratorName                    || '')
+                    ;
+                    $list.append(tile);
+                });
+
+                if (json.length === 0)
+                {
+                    var tile =  $templateTimeline
+                                .replace(new RegExp('{{timelineTitle}}', 'g'),  'Big Bang to Present Day')
+                                .replace(           '{{timelineURL}}',          '/#/t00000000-0000-0000-0000-000000000000@x=0')
+                                .replace(           '{{collectionBackground}}', cosmosImage)
+                                .replace(           '{{collectionTitle}}',      'Cosmos')
+                                .replace(           '{{collectionCurator}}',    'ChronoZoom')
+                    ;
+                    var msg  = $templateNoFavorite;
+                    $list
+                        .append(tile)
+                        .append(msg)
+                    ;
+                }
+
+                $listFavorites.find('.overlay-list-note').remove(); // msg
+                $listFavorites.find('.overlay-tile').off('click').remove();
+                $listFavorites
+                    .append($list.html())
+                    .find('.overlay-tile').click(function (event)
+                    {
+                        if ($(this).attr('data-url') != '')
+                        {
+                            window.location.href = $(this).attr('data-url');
+                        }
+                        Hide();
+                    })
+                ;
+
+                loadCustomBackgrounds($listFavorites);
+            },
+            function (error)
+            {
+                console.log('[ERROR] CZ.Overlay:populateFavorites');
+            });
+        }
+
+
+        this.hasBrightBackground =
+        function hasBrightBackground(imageURL)
+        {
+            if (typeof imageURL != 'string') return true;
+
+            return $.inArray(imageURL.toLowerCase(), brightImages) > -1;
+        };
+
+        this.hasDefaultBackground =
+        function hasDefaultBackground(imageURL)
+        {
+            if (typeof imageURL != 'string') return true;
+
+            return $.inArray(imageURL.toLowerCase(), defaultImages) > -1;
+        };
+
+
+        this.isInCosmos =
+        function isInCosmos(url)
+        {
+            if (typeof url != 'string') return false;
+
+            var path    = url.toLowerCase().split('#')[0];
+            var matches = ['/', '/chronozoom', '/chronozoom/', '/chronozoom/cosmos', '/chronozoom/cosmos/'];
+
+            return $.inArray(path, matches) > -1;
+        };
+
+
+        function loadCustomBackgrounds($list, darken)
+        {
+            darken = (darken === true) || false;
+
+            $list.find('.overlay-tile:not([data-image=""])').each(function (index, tile)
+            {
+                var $tile = $(tile);
+
+                if ($tile.attr('data-image') || '' != '')
+                {
+                    if (darken && !hasBrightBackground($tile.attr('data-image')))
+                    {
+                        // use rgba gradient to darken provided custom background image
+                        $tile
+                        .css('background', 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)), url(' + $tile.attr('data-image') + ')')
+                        .css('background-size', 'cover') // do not combine with .css('background') call - this way browser will recalc scale
+                        .attr('data-image', '');
+                    }
+                    else
+                    {
+                        // embed provided custom background image as is without darkening
+                        $tile
+                        .css('background', '#445 url(' + $tile.attr('data-image') + ')')
+                        .css('background-size', 'cover') // do not combine with .css('background') call - this way browser will recalc scale
+                        .attr('data-image', '');
+                    }
+                }
+            });
+        }
+
+
+        function simpleClean(title)
+        {
+            // DB has collection, timeline and exhibit titles containing double quotes and "<" and ">".
+            // Double quotes breaks rendering in title attributes, and "<" or ">" in elements, so this
+            // function replaces them. It is NOT a substitute for a full cleansing for XSS, etc.
+            if (typeof title === 'undefined') return '';
+            return title
+                    .replace(new RegExp('<', 'g'), "&lt;")
+                    .replace(new RegExp('>', 'g'), "&gt;")
+                    .replace(new RegExp('"', 'g'), "&quot;");
+        }
+
+
+    })(CZ.Overlay || (CZ.Overlay = {}));
+    var Overlay = CZ.Overlay;
+})(CZ || (CZ = {}));/// <reference path='settings.ts'/>
 /// <reference path='common.ts'/>
 /// <reference path='timescale.ts'/>
 /// <reference path='viewport-controller.ts'/>
@@ -19335,7 +18945,6 @@ var CZ;
 /// <reference path='typings/jquery/jquery.d.ts'/>
 /// <reference path='extensions/extensions.ts'/>
 /// <reference path='../ui/media/skydrive-mediapicker.ts'/>
-/// <reference path='../ui/start-page.ts'/>
 /// <reference path='plugins/error-plugin.ts'/>
 /// <reference path='plugins/utility-plugins.ts'/>
 var constants;
@@ -19347,8 +18956,9 @@ var CZ;
     CZ.rightDataSet;
 
     (function (HomePageViewModel) {
-        // Contains mapping: CSS selector -> html file.
-        var _uiMap = {
+        // Contains mapping of jQuery selector to HTML file, which is used to initialize the various panels via CZ.UILoader.
+        var _uiMap =
+        {
             "#header-edit-form": "/ui/header-edit-form.html",
             "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
             "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
@@ -19367,7 +18977,7 @@ var CZ;
             "#header-session-expired-form": "/ui/header-session-expired-form.html",
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
-            "#start-page": "/ui/start-page.html",
+            "#overlay": "/ui/overlay.html",
             "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html",
             "#auth-edit-collection-editors": "/ui/auth-edit-collection-editors.html"
         };
@@ -19375,7 +18985,8 @@ var CZ;
         HomePageViewModel.sessionForm;
         HomePageViewModel.rootCollection;
 
-        function UserCanEditCollection(profile) {
+        function UserCanEditCollection(profile)
+        {
             // can't edit if no profile, no display name or no supercollection
             if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName)
             {
@@ -19398,7 +19009,7 @@ var CZ;
             CZ.Tours.tourCaptionFormContainer = forms[16];
             var allowEditing =UserCanEditCollection(profile);
 
-            var onTakeTour = function (tour)
+            CZ.Tours.takeTour = function(tour)
             {
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption
@@ -19436,7 +19047,7 @@ var CZ;
                     if (CZ.Tours.tours.length === 0)
                     {
                         // if there are no tours to show and user has tour editing rights, lets fire off the add a tour dialog instead
-                        CZ.StartPage.hide();
+                        CZ.Overlay.Hide();
                         CZ.HomePageViewModel.closeAllForms();
                         CZ.Authoring.UI.createTour();
                         return;
@@ -19450,7 +19061,7 @@ var CZ;
                 }
                 else
                 {
-                    CZ.StartPage.hide();
+                    CZ.Overlay.Hide();
                     closeAllForms();
                     var form = new CZ.UI.FormToursList
                     (
@@ -19462,7 +19073,7 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             tourTemplate: forms[10],
                             tours: CZ.Tours.tours,
-                            takeTour: onTakeTour,
+                            takeTour: CZ.Tours.takeTour,
                             editTour: canEdit ? function (tour)
                             {
                                 if (CZ.Authoring.showEditTourForm) CZ.Authoring.showEditTourForm(tour);
@@ -19474,18 +19085,6 @@ var CZ;
                     form.show();
                 }
             };
-
-            /*
-            if (CZ.Tours.tours)
-            {
-                panelShowToursList();
-            }
-            else
-            {
-                $("body").bind("toursInitialized", CZ.HomePageViewModel.panelShowToursList);
-            }
-            */
-
         }
 
         var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
@@ -19511,6 +19110,15 @@ var CZ;
                 $('#wait').hide();
             });
 
+            // overlay & general wrapper theme
+            var theme = localStorage.getItem('theme') || '';
+            if (theme === '')
+            {
+                theme = 'theme-linen'; // initial
+                localStorage.setItem('theme', theme);
+            }
+            $('body').addClass(theme);
+
             // populate collection names from URL
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;
@@ -19529,7 +19137,8 @@ var CZ;
             // hook logo click
             $('.header-logo').click(function ()
             {
-                window.location.href = '/';
+                //window.location.href = '/';
+                CZ.Overlay.Show(false);
             });
 
             // if URL has a supercollection
@@ -19550,9 +19159,11 @@ var CZ;
             }
         });
 
-        function finishLoad() {
+        function finishLoad()
+        {
             // only invoked after user's edit permissions are checked (AJAX callback)
-            CZ.UILoader.loadAll(_uiMap).done(function () {
+            CZ.UILoader.loadAll(_uiMap).done(function ()
+            {
                 var forms = arguments;
 
                 CZ.Settings.isCosmosCollection =
@@ -19565,12 +19176,13 @@ var CZ;
 
                 CZ.Menus.isEditor = CZ.Service.canEdit;
                 CZ.Menus.Refresh();
+                CZ.Overlay.Initialize();
 
                 CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
 
                 CZ.HomePageViewModel.panelToggleTimeSeries = function ()
                 {
-                    CZ.StartPage.hide();
+                    CZ.Overlay.Hide();
                     var tsForm = getFormById('#timeSeriesDataForm');
                     if (tsForm === false)
                     {
@@ -19967,7 +19579,16 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
 
-                CZ.StartPage.initialize();
+                if 
+                (
+                    (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
+                    window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                )
+                {
+                    CZ.Overlay.Show(); // home page overlay
+                }
+
+                $('#splash').fadeOut('slow');
             });
 
             CZ.Service.getServiceInformation().then(function (response) {
