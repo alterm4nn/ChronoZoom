@@ -10360,7 +10360,7 @@ var CZ;
 
         function getRecentlyUpdatedExhibits(quantity)
         {
-            if (typeof quantity != 'integer') quantity = 6;
+            if (!$.isNumeric(quantity)) quantity = 6;
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath('recentlyupdatedexhibits');
