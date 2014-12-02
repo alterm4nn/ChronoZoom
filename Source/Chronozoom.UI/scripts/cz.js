@@ -664,15 +664,35 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
 
-                if 
+                var autoTour = CZ.Tours.getAutoTourNumber();
+
+                // if a tour has been specified to auto-run then try to start tour
+                if ($.isNumeric(autoTour))
+                {
+                    setTimeout(function ()
+                    {
+                        if (CZ.Tours.tours.length > autoTour)
+                        {
+                            // tour number is valid - try to start tour
+                            CZ.Tours.takeTour(CZ.Tours.tours[autoTour]);
+                        }
+                        else
+                        {
+                            // tour number is invalid so fall back to home page overlay
+                            CZ.Overlay.Show();
+                        }
+                    },  3000);
+                }
+                else if // else if Big History collection then show home page overlay
                 (
                     (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
                     window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
                 )
                 {
-                    CZ.Overlay.Show(); // home page overlay
+                    CZ.Overlay.Show();
                 }
 
+                // remove splash screen
                 $('#splash').fadeOut('slow');
             });
 

@@ -34,5 +34,11 @@
         "Curator":      "Antonia Avila",
         "Background":   "/featured/tile-frenchrevolution.jpg",
         "Link":         "/antoniaavila#/t14135f31-b806-484c-ba2b-4b95b8c08bf0"
+    },
+    {
+        "Title":        "Introductory Tour Test",
+        "Curator":      "ChronoZoom",
+        "Background":   "/images/fallbackWalterImageDefault.jpg",
+        "Link":         "/#/t00000000-0000-0000-0000-000000000000@tour=0"
     }
 ]

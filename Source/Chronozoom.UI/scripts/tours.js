@@ -28,6 +28,29 @@ var CZ;
         Tours.tourCaptionFormContainer;
         Tours.tourCaptionForm;
 
+        // If an automatic tour is specified in the URL, it will be the only parameter after @.
+        // Function returns empty string if there is no automatic tour specified.
+        function getAutoTourNumber()
+        {
+            var urlBits = window.location.hash.split('@');
+
+            if (urlBits.length > 1)
+            {
+                urlBits = urlBits[1].split('=');
+
+                if (urlBits.length === 2)
+                {
+                    if (urlBits[0] === 'tour' && $.isNumeric(urlBits[1]))
+                    {
+                        return parseInt(urlBits[1]);
+                    }
+                }
+            }
+
+            return '';
+        }
+        Tours.getAutoTourNumber = getAutoTourNumber;
+
         /* TourBookmark represents a place in the virtual space with associated audio.
         @param url  (string) Url that contains a state of the virtual canvas
         @param caption (string) text describing the bookmark
