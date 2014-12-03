@@ -664,11 +664,55 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
 
-                var autoTour = CZ.Tours.getAutoTourNumber();
-
-                // if a tour has been specified to auto-run then try to start tour
-                if ($.isNumeric(autoTour))
+                var autoTourGUID = CZ.Tours.getAutoTourGUID();
+                if (autoTourGUID !== '')
                 {
+                    // a tour has been specified to auto-run so try to start tour
+                    // delay fudges a bit as there are a lot of different resource to load first
+                    CZ.Service.getTour(autoTourGUID).then(function (response)
+                    {
+                        setTimeout(function ()
+                        {
+                            $('#splash').fadeOut('slow');
+                            if (response !== null)
+                            {
+                                //CZ.Tours.takeTour(response);
+                                var tour = CZ.Tours.Tour//;
+                                //tour.Tour
+                                //(
+                                {
+                                    response.id,
+                                    response.name,
+                                    response.bookmarks,
+                                    null,
+                                    null,
+                                    response.category,
+                                    response.audio,
+                                    response.sequence,
+                                    response.description
+                                };
+                                //);
+                                CZ.Tours.takeTour(tour);
+                            }
+                        },  3000);
+                    });
+                }
+                else
+                {
+                    // no tour has been specified to auto-run
+                    if
+                    (   // if Big History collection then show home page overlay
+                        (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
+                        window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                    )
+                    {
+                        CZ.Overlay.Show();
+                    }
+
+                    // remove splash screen
+                    $('#splash').fadeOut('slow');
+                }
+                    /*
                     setTimeout(function ()
                     {
                         if (CZ.Tours.tours.length > autoTour)
@@ -694,6 +738,7 @@ var CZ;
 
                 // remove splash screen
                 $('#splash').fadeOut('slow');
+                */
             });
 
             CZ.Service.getServiceInformation().then(function (response) {

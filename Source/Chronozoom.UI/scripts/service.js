@@ -651,6 +651,34 @@ var CZ;
         }
         Service.deleteTour = deleteTour;
 
+        // .../{supercollection}/{collection}/tour or
+        // .../{supercollection}/tour for default collection
+        function getTour(tourGUID)
+        {
+            if (typeof tourGUID === 'undefined')
+            {
+                throw 'getTour(tourGUID) requires a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(tourGUID) == false)
+            {
+                throw 'getTour(tourGUID) has an invalid parameter. The provided parameter must be a GUID.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName); // || 'chronozoom');
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
+            request.addToPath('tour');
+            request.addParameter('guid', tourGUID);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                url:        request.url,
+                dataType:   'json'
+            });
+        }
+        Service.getTour = getTour;
+
         // .../{supercollection}/{collection}/tours or
         // .../{supercollection}/tours for default collection
         function getTours()

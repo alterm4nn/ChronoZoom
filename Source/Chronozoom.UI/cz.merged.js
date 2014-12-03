@@ -6772,26 +6772,23 @@ var CZ;
 
         // If an automatic tour is specified in the URL, it will be the only parameter after @.
         // Function returns empty string if there is no automatic tour specified.
-        function getAutoTourNumber()
+        function getAutoTourGUID()
         {
             var urlBits = window.location.hash.split('@');
 
             if (urlBits.length > 1)
             {
-                urlBits = urlBits[1].split('=');
+                urlBits = urlBits[1].split('&')[0].split('=');
 
-                if (urlBits.length === 2)
+                if (urlBits.length === 2 && urlBits[0].toLowerCase() === 'tour')
                 {
-                    if (urlBits[0] === 'tour' && $.isNumeric(urlBits[1]))
-                    {
-                        return parseInt(urlBits[1]);
-                    }
+                    return urlBits[1];
                 }
             }
 
             return '';
         }
-        Tours.getAutoTourNumber = getAutoTourNumber;
+        Tours.getAutoTourGUID = getAutoTourGUID;
 
         /* TourBookmark represents a place in the virtual space with associated audio.
         @param url  (string) Url that contains a state of the virtual canvas
@@ -10039,6 +10036,34 @@ var CZ;
             });
         }
         Service.deleteTour = deleteTour;
+
+        // .../{supercollection}/{collection}/tour or
+        // .../{supercollection}/tour for default collection
+        function getTour(tourGUID)
+        {
+            if (typeof tourGUID === 'undefined')
+            {
+                throw 'getTour(tourGUID) requires a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(tourGUID) == false)
+            {
+                throw 'getTour(tourGUID) has an invalid parameter. The provided parameter must be a GUID.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName); // || 'chronozoom');
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
+            request.addToPath('tour');
+            request.addParameter('guid', tourGUID);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                url:        request.url,
+                dataType:   'json'
+            });
+        }
+        Service.getTour = getTour;
 
         // .../{supercollection}/{collection}/tours or
         // .../{supercollection}/tours for default collection
@@ -19602,11 +19627,41 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
 
-                var autoTour = CZ.Tours.getAutoTourNumber();
-
-                // if a tour has been specified to auto-run then try to start tour
-                if ($.isNumeric(autoTour))
+                var autoTourGUID = CZ.Tours.getAutoTourGUID();
+                if (autoTourGUID !== '')
                 {
+                    // a tour has been specified to auto-run so try to start tour
+                    CZ.Service.getTour(autoTourGUID).then(function (response)
+                    {
+                        //setTimeout(function ()
+                        //{
+                            $('#splash').fadeOut('slow');
+                            if (response !== null)
+                            {
+                                CZ.Tours.takeTour(response);
+                            }
+                        //},  3000);
+                    });
+                }
+                else
+                {
+                    // no tour has been specified to auto-run
+                    if
+                    (   // if Big History collection then show home page overlay
+                        (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
+                        window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                    )
+                    {
+                        CZ.Overlay.Show();
+                        $('#splash').fadeOut('slow');
+                    }
+                    else
+                    {
+                        //custom collection so show collection after a few secs
+                        setTimeout(function () { $('#splash').fadeOut('slow'); }, 3000);
+                    }
+                }
+                    /*
                     setTimeout(function ()
                     {
                         if (CZ.Tours.tours.length > autoTour)
@@ -19632,6 +19687,7 @@ var CZ;
 
                 // remove splash screen
                 $('#splash').fadeOut('slow');
+                */
             });
 
             CZ.Service.getServiceInformation().then(function (response) {

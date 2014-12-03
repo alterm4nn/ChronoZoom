@@ -6,6 +6,12 @@
         "Link":         "/#/t00000000-0000-0000-0000-000000000000@x=0"
     },
     {
+        "Title":        "Introductory Tour Test",
+        "Curator":      "ChronoZoom",
+        "Background":   "/images/fallbackWalterImageDefault.jpg",
+        "Link":         "/#/t00000000-0000-0000-0000-000000000000@tour=cd44d92d-8af3-4c4e-ab28-bf9a9397ea27"
+    },
+    {
         "Title":        "A 30 Year History of AIDS",
         "Curator":      "ChronoZoomer",
         "Background":   "/featured/tile-aidsquilt.jpg",
@@ -34,11 +40,5 @@
         "Curator":      "Antonia Avila",
         "Background":   "/featured/tile-frenchrevolution.jpg",
         "Link":         "/antoniaavila#/t14135f31-b806-484c-ba2b-4b95b8c08bf0"
-    },
-    {
-        "Title":        "Introductory Tour Test",
-        "Curator":      "ChronoZoom",
-        "Background":   "/images/fallbackWalterImageDefault.jpg",
-        "Link":         "/#/t00000000-0000-0000-0000-000000000000@tour=0"
     }
 ]
