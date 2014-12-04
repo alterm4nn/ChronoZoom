@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
+	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
+	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
+	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
+	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
+	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
+	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
+	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
+	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
+]>
+<svg version="1.1" xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="177.758px"
+	 height="115.964px" viewBox="0 0 177.758 115.964" enable-background="new 0 0 177.758 115.964" xml:space="preserve">
+<style type="text/css">
+<![CDATA[
+]]>
+</style>
+<metadata>
+	<sfw  xmlns="&ns_sfw;">
+		<slices></slices>
+		<sliceSourceBounds  width="429.419" height="346.071" y="-266.073" x="-423.929" bottomLeftOrigin="true"></sliceSourceBounds>
+	</sfw>
+</metadata>
+<g id="Layer_12">
+	<rect x="0.268" y="0.001" fill="#FFFFFF" width="177.757" height="115.962"/>
+</g>
+<g id="Framework_and_placeholders">
+	
+		<rect x="0" y="0.001" fill="#FFFF00" stroke="#000000" stroke-width="0.0011" stroke-miterlimit="10" width="177.757" height="115.962"/>
+</g>
+<g id="A._Age_vs._redshift_trace">
+	<path fill="none" stroke="#0000FF" stroke-miterlimit="10" d="M8.977,98.629c1.381,1.744,3.491,3.96,7.75,5.848
+		s8.211,2.914,16.115,4.021c7.904,1.108,7.559,1.067,18.341,1.847c10.781,0.779,29.285,1.508,40.757,1.836s27.731,0.626,38.821,0.75
+		c11.088,0.122,38.331,0.655,46.963,0.696"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="177.725" y1="98.629" x2="8.977" y2="98.629"/>
+	
+		<line fill="none" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="171.508" y1="102.367" x2="5.277" y2="102.383"/>
+	
+		<line fill="none" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="171.508" y1="106.122" x2="5.277" y2="106.139"/>
+	
+		<line fill="none" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="171.508" y1="109.876" x2="5.277" y2="109.893"/>
+	
+		<line fill="none" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="174.025" y1="113.647" x2="5.277" y2="113.647"/>
+	<text transform="matrix(0 -1 1 0 2.6641 111.293)" font-family="'MyriadPro-Regular'" font-size="2.0598">Redshift</text>
+	<text transform="matrix(1 0 0 1 3.8613 114.1914)" font-family="'MyriadPro-Regular'" font-size="1.8309">0</text>
+	<text transform="matrix(1 0 0 1 3.8613 110.4414)" font-family="'MyriadPro-Regular'" font-size="1.8309">2</text>
+	<text transform="matrix(1 0 0 1 3.8613 106.6895)" font-family="'MyriadPro-Regular'" font-size="1.8309">4</text>
+	<text transform="matrix(1 0 0 1 3.8613 102.9395)" font-family="'MyriadPro-Regular'" font-size="1.8309">6</text>
+	<text transform="matrix(0 -1 1 0 174.9219 111.2773)" font-family="'MyriadPro-Regular'" font-size="2.0598">Redshift</text>
+	<text transform="matrix(1 0 0 1 171.9609 110.4238)" font-family="'MyriadPro-Regular'" font-size="1.8309">2</text>
+	<text transform="matrix(1 0 0 1 171.9609 106.6738)" font-family="'MyriadPro-Regular'" font-size="1.8309">4</text>
+	<text transform="matrix(1 0 0 1 171.9609 102.9229)" font-family="'MyriadPro-Regular'" font-size="1.8309">6</text>
+	<text transform="matrix(1 0 0 1 0.9287 101.832)" font-family="'MyriadPro-Regular'" font-size="3.2041">A. </text>
+	<text transform="matrix(1 0 0 1 23.0518 100.9355)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="2.7464">Age vs.</tspan><tspan x="0" y="3.297" font-family="'MyriadPro-Regular'" font-size="2.7464">   redshift</tspan></text>
+	<rect x="35.258" y="99.315" fill="#FFFF00" width="10.833" height="7.819"/>
+	<g>
+		<rect x="35.487" y="99.468" fill="none" width="10.527" height="8.583"/>
+		<text transform="matrix(1 0 0 1 35.4873 99.8574)"><tspan x="0" y="0" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">Our Universe is expanding, with the space </tspan><tspan x="0" y="0.659" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">between galaxies or between glaxy clusters </tspan><tspan x="0" y="1.318" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">gradually stretching.  The wavelength of light </tspan><tspan x="0" y="1.978" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">crossing those spaces also stretches, so that </tspan><tspan x="0" y="2.637" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">colors are shifted toward the red end of the </tspan><tspan x="0" y="3.296" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">spectrum.  Light showing more redshift </tspan><tspan x="0" y="3.955" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">comes from farther away, and shows older </tspan><tspan x="0" y="4.614" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">objects.  Since redshift can be directly </tspan><tspan x="0" y="5.273" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">measured, astronomers usually plot historical </tspan><tspan x="0" y="5.933" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">information as a function of redshift, rather </tspan><tspan x="0" y="6.592" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">than as a function of age, which must be </tspan><tspan x="0" y="7.251" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">calculated, and depends on knowing the </tspan><tspan x="0" y="7.91" fill="#FFFF00" font-family="'MyriadPro-Regular'" font-size="0.5493">values of certain numbers.</tspan></text>
+		<rect x="35.487" y="99.468" fill="none" width="10.527" height="8.583"/>
+		<text transform="matrix(1 0 0 1 35.4873 99.8574)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="0.5493">Our Universe is expanding, with the space </tspan><tspan x="0" y="0.659" font-family="'MyriadPro-Regular'" font-size="0.5493">between galaxies or between glaxy clusters </tspan><tspan x="0" y="1.318" font-family="'MyriadPro-Regular'" font-size="0.5493">gradually stretching.  The wavelength of light </tspan><tspan x="0" y="1.978" font-family="'MyriadPro-Regular'" font-size="0.5493">crossing those spaces also stretches, so that </tspan><tspan x="0" y="2.637" font-family="'MyriadPro-Regular'" font-size="0.5493">colors are shifted toward the red end of the </tspan><tspan x="0" y="3.296" font-family="'MyriadPro-Regular'" font-size="0.5493">spectrum.  Light showing more redshift </tspan><tspan x="0" y="3.955" font-family="'MyriadPro-Regular'" font-size="0.5493">comes from farther away, and shows older </tspan><tspan x="0" y="4.614" font-family="'MyriadPro-Regular'" font-size="0.5493">objects.  Since redshift can be directly </tspan><tspan x="0" y="5.273" font-family="'MyriadPro-Regular'" font-size="0.5493">measured, astronomers usually plot historical </tspan><tspan x="0" y="5.933" font-family="'MyriadPro-Regular'" font-size="0.5493">information as a function of redshift, rather </tspan><tspan x="0" y="6.592" font-family="'MyriadPro-Regular'" font-size="0.5493">than as a function of age, which must be </tspan><tspan x="0" y="7.251" font-family="'MyriadPro-Regular'" font-size="0.5493">calculated, and depends on knowing the </tspan><tspan x="0" y="7.91" font-family="'MyriadPro-Regular'" font-size="0.5493">values of certain numbers.</tspan></text>
+	</g>
+</g>
+<g id="B.__Dark_energy_and_acceleration">
+	<rect x="0" y="67.479" fill="#CFE6F9" stroke="#000000" stroke-width="0.001" width="177.75" height="31.128"/>
+	<path fill="#FFD383" d="M22.841,98.563c4.106-3.239,22.582-8.091,32.62-10.274c10.607-2.307,23.952-4.712,31.936-6.151
+		c7.984-1.439,39.691-6.74,44.254-7.46c4.562-0.72,46.106-7.203,46.106-7.203v31.089H22.841z"/>
+	<path fill="none" stroke="#000000" stroke-width="0.1" stroke-linejoin="round" d="M177.757,67.471c0,0-25.176,4.074-31.052,4.933
+		c-6.045,0.884-34.641,5.435-51.399,8.098c-16.88,2.684-37.336,6.512-49.198,9.195c-11.862,2.683-26.079,6.663-26.687,8.911h158.336
+		V67.471z"/>
+	<path fill="none" stroke="#000000" stroke-width="0.1" d="M177.501,67.446c-16.424,2.912-49.713,6.836-58.397,7.951
+		c-8.667,1.112-35.204,4.079-63.033,6.729C36.831,83.959,9.582,86.162,0,86.915"/>
+	<path fill="none" stroke="#000000" stroke-width="0.1" d="M0,93.447c28.211-5.507,52.876-8.496,69.985-10.841
+		c16.929-2.321,97.555-13.11,107.668-15.116"/>
+	<path fill="none" stroke="#000000" stroke-width="0.1" d="M57.514,98.563c2.661-3.774,13.458-7.504,19.047-9.276
+		c4.548-1.442,18.933-5.611,27.031-7.525c8.098-1.914,29.275-6.332,36.574-7.674c7.299-1.341,37.565-6.617,37.565-6.617
+		c-6.086,1.022-55.892,9.432-67.525,11.656c-11.633,2.226-33.758,7.084-46.763,10.766c-13.002,3.681-18.933,6.609-19.846,8.736"/>
+	<path fill="none" d="M77.534,94.035c4.548-1.442,18.933-5.611,27.031-7.525c6.686-1.58,27.777-6.056,36.574-7.673"/>
+	<text transform="matrix(1 0 0 1 4.5146 76.543)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="2.2886">After inflation, the expansion</tspan><tspan x="0" y="2.746" font-family="'MyriadPro-Regular'" font-size="2.2886">of the Universe either...</tspan></text>
+	<text transform="matrix(0.996 -0.0896 0.0896 0.996 30.2246 83.5215)" font-family="'MyriadPro-Regular'" font-size="2.2886">...first decelerated, then accelerated...</text>
+	<text transform="matrix(0.9798 -0.2002 0.2002 0.9798 101.3975 84.625)" font-family="'MyriadPro-Regular'" font-size="2.2886">... or has always decelerated.</text>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="95.556" y1="92.335" x2="95.556" y2="93.632"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="146.441" y1="92.335" x2="146.441" y2="93.632"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="170.389" y1="92.335" x2="170.389" y2="93.632"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.124" y1="90.888" x2="177.802" y2="90.888"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.124" y1="89.772" x2="177.802" y2="89.772"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.124" y1="88.309" x2="177.802" y2="88.309"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.124" y1="86.21" x2="177.802" y2="86.21"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.124" y1="83.04" x2="177.802" y2="83.04"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.124" y1="78.057" x2="177.802" y2="78.057"/>
+	<path fill="none" stroke="#000000" stroke-width="0.5" d="M177.611,67.456"/>
+	<path fill="none" stroke="#000000" stroke-width="0.5" d="M175.933,67.456"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.925" y1="73.816" x2="177.802" y2="73.816"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.925" y1="80.877" x2="177.802" y2="80.877"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.925" y1="84.812" x2="177.802" y2="84.812"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.925" y1="87.281" x2="177.802" y2="87.281"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.925" y1="89.139" x2="177.802" y2="89.139"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="176.925" y1="90.319" x2="177.802" y2="90.319"/>
+	<path fill="none" stroke="#000000" stroke-width="0.5" d="M177.611,98.658"/>
+	<path fill="none" stroke="#000000" stroke-width="0.5" d="M175.933,98.658"/>
+	<text transform="matrix(1 0 0 1 174.5928 83.543)" font-family="'MyriadPro-Regular'" font-size="1.8309">1</text>
+	<text transform="matrix(1 0 0 1 173.2749 78.5078)" font-family="'MyriadPro-Regular'" font-size="1.8309">0.5</text>
+	<text transform="matrix(1 0 0 1 173.2749 86.6895)" font-family="'MyriadPro-Regular'" font-size="1.8309">1.5</text>
+	<text transform="matrix(1 0 0 1 174.5928 88.6914)" font-family="'MyriadPro-Regular'" font-size="1.8309">2</text>
+	<text transform="matrix(1 0 0 1 174.5928 91.3242)" font-family="'MyriadPro-Regular'" font-size="1.8309">3</text>
+	<text transform="matrix(0 -1 1 0 171.6992 84.9248)" font-family="'MyriadPro-Regular'" font-size="1.8309">Redshift</text>
+	<text transform="matrix(1 0 0 1 176.3477 69.0664)" font-family="'MyriadPro-Regular'" font-size="1.8309">0</text>
+	<text transform="matrix(1 0 0 1 93.3384 95.252)" font-family="'MyriadPro-Regular'" font-size="1.8309">0.001</text>
+	<text transform="matrix(1 0 0 1 0.6636 95.252)" font-family="'MyriadPro-Regular'" font-size="1.8309">~0.0001</text>
+	<text transform="matrix(1 0 0 1 145.0742 95.252)" font-family="'MyriadPro-Regular'" font-size="1.8309">0.01</text>
+	<text transform="matrix(1 0 0 1 169.3447 95.252)" font-family="'MyriadPro-Regular'" font-size="1.8309">0.1</text>
+	<polyline fill="none" stroke="#000000" stroke-width="0.25" points="0.814,92.525 0.814,91.382 171.165,91.382 171.165,92.411 	"/>
+	<text transform="matrix(1 0 0 1 79.8525 90.4463)" font-family="'MyriadPro-Regular'" font-size="1.8309">Relative brightness of supernovae</text>
+	<text transform="matrix(1 0 0 1 0.9287 71.0508)" font-family="'MyriadPro-Regular'" font-size="3.2041">B. </text>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="151.802" y1="72.049" x2="147.62" y2="72.049"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="123.289" y1="76.4" x2="112.871" y2="76.4"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="127.089" y1="76.062" x2="117.661" y2="76.062"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="122.376" y1="75.037" x2="130.435" y2="75.037"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="129.675" y1="74.678" x2="124.657" y2="74.678"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="102.303" y1="79.422" x2="89.984" y2="79.422"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="93.252" y1="78.789" x2="108.689" y2="78.789"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="95.687" y1="78.909" x2="104.43" y2="78.909"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="100.628" y1="77.459" x2="105.647" y2="77.459"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="121.767" y1="77.022" x2="112.111" y2="77.022"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="110.287" y1="76.641" x2="118.422" y2="76.641"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="115.761" y1="76.193" x2="111.579" y2="76.193"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="113.859" y1="75.942" x2="122.527" y2="75.942"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="47.782" y1="82.813" x2="75.765" y2="82.813"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="68.465" y1="81.603" x2="88.234" y2="81.603"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="93.406" y1="79.825" x2="101.997" y2="79.825"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="88.388" y1="79.346" x2="99.488" y2="79.346"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="89.146" y1="78.527" x2="101.008" y2="78.527"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="96.067" y1="78.232" x2="108.385" y2="78.232"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="112.642" y1="77.884" x2="103.29" y2="77.884"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="96.144" y1="77.786" x2="107.245" y2="77.786"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="113.783" y1="77.634" x2="100.78" y2="77.634"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="102.53" y1="77.153" x2="109.449" y2="77.153"/>
+	<line fill="none" stroke="#000000" stroke-width="0.25" x1="105.496" y1="76.837" x2="118.65" y2="76.837"/>
+	<path fill="none" stroke="#000000" stroke-width="0.5" d="M177.58,98.484"/>
+	<path fill="none" stroke="#000000" stroke-width="0.5" d="M177.58,98.484"/>
+	<path fill="none" stroke="#000000" stroke-width="0.5" d="M177.58,98.484"/>
+	<path fill="none" stroke="#000000" stroke-width="0.5" d="M177.58,98.484"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="9.078" y1="98.464" x2="9.078" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="22.041" y1="98.464" x2="22.041" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="35.006" y1="98.464" x2="35.006" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="47.969" y1="98.464" x2="47.969" y2="97.482"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="60.932" y1="98.464" x2="60.932" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="73.897" y1="98.464" x2="73.897" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="86.86" y1="98.464" x2="86.86" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="99.823" y1="98.464" x2="99.823" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="112.788" y1="98.464" x2="112.788" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="125.752" y1="98.464" x2="125.752" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="138.715" y1="98.464" x2="138.715" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="151.68" y1="98.464" x2="151.68" y2="97.962"/>
+	<line fill="none" stroke="#000000" stroke-width="0.5" x1="164.643" y1="98.464" x2="164.643" y2="97.962"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="79.305" cy="81.626" r="0.344"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="91.678" cy="78.536" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="93.866" cy="79.338" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="97.557" cy="79.81" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="100.074" cy="77.449" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="101.533" cy="77.793" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="102.435" cy="78.208" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="102.02" cy="78.779" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="100.103" cy="78.923" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="105.782" cy="77.135" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="105.953" cy="77.563" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="111.704" cy="76.205" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="113.92" cy="76.677" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="114.393" cy="76.834" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="118.44" cy="76.391" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="119.184" cy="75.919" r="0.344"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="126.508" cy="75.018" r="0.344"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="146.219" cy="72.214" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="149.538" cy="72.028" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="158.334" cy="70.354" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="167.904" cy="68.967" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="165.143" cy="69.311" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="163.613" cy="69.568" r="0.344"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="164.113" cy="69.711" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="172.267" cy="68.323" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="174.269" cy="68.052" r="0.343"/>
+	<circle stroke="#000000" stroke-width="0.25" cx="169.978" cy="68.695" r="0.343"/>
+	<circle fill="#00FFFF" stroke="#000000" stroke-width="0.3" stroke-linejoin="round" cx="61.625" cy="82.828" r="0.343"/>
+	<circle fill="#00FFFF" stroke="#000000" stroke-width="0.3" stroke-linejoin="round" cx="96.508" cy="79.395" r="0.343"/>
+	<circle fill="#00FFFF" stroke="#000000" stroke-width="0.3" stroke-linejoin="round" cx="100.875" cy="78.842" r="0.343"/>
+	<circle fill="#00FFFF" stroke="#000000" stroke-width="0.3" stroke-linejoin="round" cx="104.689" cy="77.602" r="0.343"/>
+	<circle fill="#00FFFF" stroke="#000000" stroke-width="0.3" stroke-linejoin="round" cx="108.218" cy="77.85" r="0.343"/>
+	<circle fill="#00FFFF" stroke="#000000" stroke-width="0.3" stroke-linejoin="round" cx="110.43" cy="76.839" r="0.343"/>
+	<circle fill="#00FFFF" stroke="#000000" stroke-width="0.3" stroke-linejoin="round" cx="116.953" cy="77.011" r="0.343"/>
+	<circle fill="#00FFFF" stroke="#000000" stroke-width="0.3" stroke-linejoin="round" cx="122.121" cy="76.096" r="0.343"/>
+	<circle fill="#00FFFF" stroke="#000000" stroke-width="0.3" stroke-linejoin="round" cx="124.773" cy="74.665" r="0.343"/>
+	<text transform="matrix(1 0 0 1 5.293 70.9551)" font-family="'MyriadPro-Regular'" font-size="2.7464">Dark energy and accelerating expansion of the Universe</text>
+</g>
+<g id="C._Metallicity_history">
+	<polyline fill="#00FF00" stroke="#000000" stroke-width="0.001" points="0,67.596 0,48.816 177.757,48.816 177.757,67.596 	"/>
+	<circle fill="#FFFFFF" stroke="#000000" stroke-width="0.3198" cx="118.501" cy="55.006" r="0.396"/>
+	<path fill="#999999" d="M18.98,67.526c-0.26,0-0.519,0.001-0.777,0.001c-6.53,0.009-12.328-0.007-12.328-0.007
+		c2.887,0.061,4.664,0.366,9.44-0.916c4.776-1.281,13.105-3.661,18.547-4.82c5.442-1.159,27.1-4.82,38.095-5.797
+		c10.995-0.976,24.767-1.83,32.652-2.135c7.886-0.306,73.147-2.196,73.147-2.196v11.837c0,0-35.94,0.366-46.936,0.549
+		c-10.996,0.183-30.209,0.61-48.424,1.281c-18.214,0.672-41.426,1.892-47.868,2.074C31.509,67.483,25.021,67.516,18.98,67.526z"/>
+	<path fill="none" stroke="#0000FF" d="M177.682,59.874c-9.892,0.124-38.967,0.334-50.859,0.643
+		c-11.892,0.308-41.901,1.727-56.904,2.715c-15.004,0.987-34.676,3.084-38.343,3.517c-5.336,0.629-9.128,0.864-12.115,0.864"/>
+	<text transform="matrix(1 0 0 1 0.9287 52.2363)" font-family="'MyriadPro-Regular'" font-size="3.2041">C. </text>
+	<text transform="matrix(1 0 0 1 5.293 52.1074)" font-family="'MyriadPro-Regular'" font-size="2.7464">History of Metallicity</text>
+	<text transform="matrix(1 0 0 1 115.4941 57.3105)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="2.0598">The Sun</tspan><tspan x="0" y="1.646" font-family="'MyriadPro-Regular'" font-size="1.3732">   Age: 4.567 Ga;  Metallicity (Fe/H) =1, by definition</tspan></text>
+	<g>
+		<g>
+			<line fill="none" stroke="#000000" stroke-width="0.3425" x1="118.501" y1="54.609" x2="118.501" y2="50.073"/>
+			<polygon points="118.501,47.655 119.894,51.063 118.501,50.254 117.109,51.063 			"/>
+		</g>
+	</g>
+	<circle fill="#FFFFFF" stroke="#000000" stroke-width="0.5" cx="118.501" cy="55.006" r="0.648"/>
+	<g>
+		<g>
+			<line fill="none" stroke="#000000" stroke-width="0.2511" x1="88.946" y1="55.651" x2="88.946" y2="64.271"/>
+			<polygon points="88.946,66.045 87.925,63.546 88.946,64.139 89.966,63.546 			"/>
+			<polygon points="88.946,53.879 89.967,56.377 88.946,55.784 87.925,56.377 			"/>
+		</g>
+	</g>
+	<text transform="matrix(1 0 0 1 89.8042 58.0918)"><tspan x="0" y="0" font-family="'MyriadPro-It'" font-size="1.3732">range of</tspan><tspan x="0" y="1.647" font-family="'MyriadPro-It'" font-size="1.3732">uncertainty</tspan></text>
+	<polygon fill="none" points="29.651,61.697 11.838,66.617 2.035,66.617 2.149,53.381 29.651,53.382 	"/>
+	<text transform="matrix(1 0 0 1 2.1489 54.0312)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="0.9155">Immediately after the Big Bang, the matter in the Universe was </tspan><tspan x="-0.01" y="1.098" font-family="'MyriadPro-Regular'" font-size="0.9155">essentially all hydrogen and helium.  The heavier elements (which </tspan><tspan x="-0.019" y="2.196" font-family="'MyriadPro-Regular'" font-size="0.9155">astronomers call “metals”) were generated in stars by nuclear fusion and </tspan><tspan x="-0.028" y="3.295" font-family="'MyriadPro-Regular'" font-size="0.9155">spread throughout the galaxies by supernovas — by the  explosions of </tspan><tspan x="-0.038" y="4.394" font-family="'MyriadPro-Regular'" font-size="0.9155">stars that have used up most of the hydrogen fuel that powers them.  </tspan><tspan x="-0.057" y="6.591" font-family="'MyriadPro-Regular'" font-size="0.9155">As a result, the </tspan><tspan x="5.685" y="6.591" font-family="'MyriadPro-It'" font-size="0.9155">metallicity </tspan><tspan x="9.686" y="6.591" font-family="'MyriadPro-Regular'" font-size="0.9155">of the universe— the content of elements </tspan><tspan x="-0.067" y="7.689" font-family="'MyriadPro-Regular'" font-size="0.9155">heavier than helium, has gradually increased through time.  The </tspan><tspan x="-0.076" y="8.788" font-family="'MyriadPro-Regular'" font-size="0.9155">metallicity of a star is given by the ratio of the number of iron </tspan><tspan x="-0.086" y="9.887" font-family="'MyriadPro-Regular'" font-size="0.9155">atoms to hydrogen atoms, divided by the same </tspan><tspan x="-0.095" y="10.985" font-family="'MyriadPro-Regular'" font-size="0.9155">ratio in the Sun, whose Fe/H ratio is </tspan><tspan x="-0.105" y="12.084" font-family="'MyriadPro-Regular'" font-size="0.9155">defined as 1.</tspan></text>
+	<rect x="30.395" y="50.54" fill="none" width="14.325" height="8.658"/>
+	<text transform="matrix(1 0 0 1 30.3945 51.0264)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="0.6866">This graph shows an estimate of the increase in </tspan><tspan x="0" y="0.687" font-family="'MyriadPro-Regular'" font-size="0.6866">metallicity in the Universe through time, from </tspan><tspan x="0" y="1.373" font-family="'MyriadPro-Regular'" font-size="0.6866">Lineweaver, C.H., 2001, An estimate of the age </tspan><tspan x="0" y="2.06" font-family="'MyriadPro-Regular'" font-size="0.6866">distribution of terrestrial planets in the universe: </tspan><tspan x="0" y="2.746" font-family="'MyriadPro-Regular'" font-size="0.6866">quantifying metallicity as a selection effect: Icarus, </tspan><tspan x="0" y="3.434" font-family="'MyriadPro-Regular'" font-size="0.6866">v. 151, p. 307-313, Fig. 2B, with the log scale in </tspan><tspan x="0" y="4.12" font-family="'MyriadPro-Regular'" font-size="0.6866">that figure converted to a linear scale.</tspan><tspan x="0" y="5.493" font-family="'MyriadPro-Regular'" font-size="0.6866">The history of metallicity is not easy to determine, </tspan><tspan x="0" y="6.18" font-family="'MyriadPro-Regular'" font-size="0.6866">and may well be different in different parts of </tspan><tspan x="0" y="6.866" font-family="'MyriadPro-Regular'" font-size="0.6866">different galaxies; these problems are reflected in </tspan><tspan x="0" y="7.553" font-family="'MyriadPro-Regular'" font-size="0.6866">the wide range of uncertainty in this plot. </tspan></text>
+	<line stroke="#000000" stroke-width="0.2087" x1="176.772" y1="55.079" x2="177.757" y2="55.079"/>
+	<line stroke="#000000" stroke-width="0.2087" x1="176.772" y1="61.345" x2="177.757" y2="61.345"/>
+	<text transform="matrix(1 0 0 1 174.6553 55.4795)" font-family="'MyriadPro-Regular'" font-size="1.3732">1.0</text>
+	<text transform="matrix(1 0 0 1 174.6553 50.502)" font-family="'MyriadPro-Regular'" font-size="1.3732">1.5</text>
+	<text transform="matrix(1 0 0 1 174.6553 61.7148)" font-family="'MyriadPro-Regular'" font-size="1.3732">0.5</text>
+	<text transform="matrix(1 0 0 1 174.6553 66.9805)" font-family="'MyriadPro-Regular'" font-size="1.3732">0.0</text>
+	<rect x="171.966" y="59.027" fill="#999999" width="2.289" height="1.773"/>
+	<text transform="matrix(0 1 -1 0 172.6533 54.1055)" font-family="'MyriadPro-Regular'" font-size="1.8309">Metallicity</text>
+	
+		<text transform="matrix(0.9983 -0.0584 0.0584 0.9983 74.8984 62.46)" fill="#0000FF" font-family="'MyriadPro-It'" font-size="1.3732">best estimate</text>
+	<rect x="17.054" y="67.523" fill="#CFE6F9" width="11.071" height="1.002"/>
+</g>
+<g id="D._Cosmic_events">
+	<rect x="0.001" y="26.441" width="1.297" height="22.371"/>
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="1.0693" y1="37.627" x2="2.084" y2="37.627">
+		<stop  offset="0" style="stop-color:#000000"/>
+		<stop  offset="1" style="stop-color:#FFFF00"/>
+	</linearGradient>
+	<rect x="1.069" y="26.441" fill="url(#SVGID_1_)" width="1.015" height="22.371"/>
+	<text transform="matrix(1 0 0 1 7.0088 29.6113)" font-family="'MyriadPro-Regular'" font-size="2.7464">Cosmic events beyond the Milky Way Galaxy</text>
+	<text transform="matrix(1 0 0 1 2.6455 29.7178)" font-family="'MyriadPro-Regular'" font-size="3.2041">D. </text>
+	<g>
+		<line x1="8.572" y1="35.165" x2="8.572" y2="46.716"/>
+		<g>
+			<line fill="none" stroke="#000000" stroke-width="0.5978" x1="8.572" y1="35.165" x2="8.572" y2="46.716"/>
+			<polygon points="8.572,50.937 6.142,44.988 8.572,46.4 11.001,44.988 			"/>
+		</g>
+	</g>
+	<g>
+		<line x1="6.431" y1="30.904" x2="6.431" y2="46.716"/>
+		<g>
+			<line fill="none" stroke="#000000" stroke-width="0.5978" x1="6.431" y1="30.904" x2="6.431" y2="46.716"/>
+			<polygon points="6.431,50.937 4,44.988 6.431,46.4 8.86,44.988 			"/>
+		</g>
+	</g>
+	<text transform="matrix(1 0 0 1 25.9854 42.2139)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="0.9155">The earliest, most distan`t known explosion, GRB 090423. </tspan><tspan x="0" y="1.099" font-family="'MyriadPro-Regular'" font-size="0.9155">(http://antwrp.gsfc.nasa.gov/apod/ap090429.html)</tspan><tspan x="0" y="2.197" font-family="'MyriadPro-Regular'" font-size="0.9155">Seen as a gamma-ray burst, this may mark the birth of an </tspan><tspan x="0" y="3.296" font-family="'MyriadPro-Regular'" font-size="0.9155">early black hole, 13.035 billion years ago, only </tspan><tspan x="0" y="4.395" font-family="'MyriadPro-Regular'" font-size="0.9155">630 million years after the Big Bang.</tspan><tspan x="0" y="5.493" font-family="'MyriadPro-Regular'" font-size="0.9155"> </tspan></text>
+	<rect x="0.147" y="26.453" fill="none" stroke="#000000" stroke-width="0.001" width="177.61" height="22.359"/>
+	<text transform="matrix(0 1 -1 0 0.957 28.4248)"><tspan x="0" y="0" fill="#FFFFFF" font-family="'MyriadPro-Regular'" font-size="0.4577">The Dark Age, after the Big Bang,  before the first stars — no light was produced </tspan><tspan x="0" y="0.549" fill="#FFFFFF" font-family="'MyriadPro-Regular'" font-size="0.4577">    in the Universe, from about 380,000 years to 100 million years after the Big Bang.</tspan></text>
+	<text transform="matrix(1 0 0 1 2.2231 44.7598)"><tspan x="0" y="0" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="0.6866">The Big Bang</tspan><tspan x="0.233" y="0.549" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="0.4577">see details below</tspan></text>
+	<g>
+		<g>
+			<line fill="none" stroke="#FF0000" stroke-width="0.1" x1="2.321" y1="44.903" x2="0.261" y2="46.448"/>
+			<polygon fill="#FF0000" points="-0.304,46.872 0.249,45.949 0.304,46.417 0.736,46.6 			"/>
+		</g>
+	</g>
+	<rect x="9.187" y="35.31" fill="none" width="9.555" height="7.724"/>
+	<text transform="matrix(1 0 0 1 9.1865 35.7969)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="0.6866">The earliest, most distant known </tspan><tspan x="0" y="0.824" font-family="'MyriadPro-Regular'" font-size="0.6866">explosion, GRB 090423 </tspan><tspan x="0" y="1.648" font-family="'MyriadPro-Regular'" font-size="0.6866">(http://antwrp.gsfc.nasa.gov/apo</tspan><tspan x="0" y="2.472" font-family="'MyriadPro-Regular'" font-size="0.6866">d/ap090429.html).</tspan><tspan x="0" y="3.296" font-family="'MyriadPro-Regular'" font-size="0.6866">Seen as a gamma-ray burst, this </tspan><tspan x="0" y="4.12" font-family="'MyriadPro-Regular'" font-size="0.6866">may mark the birth of an early </tspan><tspan x="0" y="4.943" font-family="'MyriadPro-Regular'" font-size="0.6866">black hole, 13.035 billion years </tspan><tspan x="0" y="5.768" font-family="'MyriadPro-Regular'" font-size="0.6866">ago, only 630 million years after </tspan><tspan x="0" y="6.592" font-family="'MyriadPro-Regular'" font-size="0.6866">the Big Bang.</tspan></text>
+	<rect x="6.898" y="31.076" fill="none" width="14.876" height="3.489"/>
+	<text transform="matrix(1 0 0 1 6.8979 31.5625)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="0.6866">The oldest, most distant known galaxy  </tspan><tspan x="0" y="0.824" font-family="'MyriadPro-Regular'" font-size="0.6866">(http://antwrp.gsfc.nasa.gov/apod/ap090429.html) </tspan><tspan x="0" y="1.648" font-family="'MyriadPro-Regular'" font-size="0.6866">with a redshift of 10, appear to us as it was 13.2 </tspan><tspan x="0" y="2.472" font-family="'MyriadPro-Regular'" font-size="0.6866">billion years ago.</tspan></text>
+	<path fill="none" stroke="#FF0000" stroke-width="0.7331" d="M18.683,43.476c1.559-2.77,5.845-9.285,8.337-10.891
+		c2.492-1.606,6.855-1.968,9.348-0.964c2.105,0.849,6.505,2.73,10.984,5.551c2.805,1.767,5.607,3.333,10.594,5.822
+		c4.986,2.489,10.283,3.653,17.139,4.216c6.855,0.562,19.941,1.285,40.82,1.325"/>
+	<text transform="matrix(1 0 0 1 24.8447 36.2441)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="0.9155">Schematic history of quasar formation, from Fig 2 </tspan><tspan x="0" y="1.099" font-family="'MyriadPro-Regular'" font-size="0.9155">in Shaver et al., 1996, Decrease in the space density </tspan><tspan x="0" y="2.197" font-family="'MyriadPro-Regular'" font-size="0.9155">  of quasars at high redshift: Nature, v. 384, p. 439-441.</tspan><tspan x="0" y="4.395" font-family="'MyriadPro-Regular'" font-size="0.9155"> </tspan></text>
+</g>
+<g id="E._Milky_Way_events">
+	<polyline fill="#00FFFF" stroke="#000000" stroke-width="0.001" points="0,0.037 177.757,0.037 177.757,26.461 0,26.461 	"/>
+	<text transform="matrix(1 0 0 1 2.7593 3.8789)" font-family="'MyriadPro-Regular'" font-size="3.2041">E. </text>
+	<text transform="matrix(1 0 0 1 7.123 3.8633)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="2.7464">Cosmic events within the Milky Way</tspan><tspan x="0" y="3.296" font-family="'MyriadPro-Regular'" font-size="2.7464">      and nearby galaxies</tspan></text>
+	<text transform="matrix(1 0 0 1 80.4209 5.6719)" font-family="'MyriadPro-Regular'" font-size="1.8309">Population I Stars</text>
+	<text transform="matrix(1 0 0 1 56.7329 6.2441)" font-family="'MyriadPro-Regular'" font-size="1.8309">Population II Stars</text>
+	<text transform="matrix(1 0 0 1 7.832 16.2754)" font-family="'MyriadPro-Regular'" font-size="1.8309">Globular clusters</text>
+	<text transform="matrix(1 0 0 1 3.0645 11.8516)" font-family="'MyriadPro-Regular'" font-size="1.8309">Irregular early Milky Way galaxy</text>
+	<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="1.0693" y1="13.2344" x2="2.084" y2="13.2344">
+		<stop  offset="0" style="stop-color:#000000"/>
+		<stop  offset="1" style="stop-color:#00FFFF"/>
+	</linearGradient>
+	<rect x="1.069" y="0.008" fill="url(#SVGID_2_)" width="1.015" height="26.453"/>
+	<path fill="none" stroke="#000000" d="M0,20.396"/>
+	<path fill="none" stroke="#000000" d="M177.757,20.396"/>
+	<rect x="0" y="0.008" width="1.106" height="26.587"/>
+	<text transform="matrix(0 1 -1 0 0.9482 1.7246)"><tspan x="0" y="0" fill="#FFFFFF" font-family="'MyriadPro-Regular'" font-size="0.4577">During the he Dark Age, the Milky Way may already have existed as a concentration of gas,</tspan><tspan x="0.465" y="0.549" fill="#FFFFFF" font-family="'MyriadPro-Regular'" font-size="0.4577">but it did not yet have any stars, and was not yet organized into its barred-spiral form.</tspan></text>
+	<rect x="72.754" y="15.742" fill="none" width="36.732" height="8.238"/>
+	<text transform="matrix(1 0 0 1 72.8208 16.7168)"><tspan x="0" y="0" font-family="'MyriadPro-Regular'" font-size="1.3732">Sudden turn-on of star formation in the Larger Magellanic Cloud </tspan><tspan x="1.363" y="1.648" font-family="'MyriadPro-Regular'" font-size="1.3732">(following early  star formation and then quiescence from ~12 </tspan><tspan x="4.203" y="3.296" font-family="'MyriadPro-Regular'" font-size="1.3732">to ~5 Ga) suggests a dramatic event ~5 Ga:  Harris, J., and </tspan><tspan x="4.546" y="4.943" font-family="'MyriadPro-Regular'" font-size="1.3732">Zaritsky, D., 3009, The star formation history of the Large </tspan><tspan x="1.569" y="6.592" font-family="'MyriadPro-Regular'" font-size="1.3732">Magellanic Cloud: Astronomical Journal, v. 138, p. 1243–1260.</tspan></text>
+	<circle fill="none" stroke="#000000" stroke-width="0.5" stroke-dasharray="2,1" cx="109.507" cy="12.767" r="2.174"/>
+	<text transform="matrix(1 0 0 1 22.0986 17.1152)" font-family="'MyriadPro-Regular'" font-size="3.2041">??</text>
+	<text transform="matrix(1 0 0 1 28.2012 12.8428)" font-family="'MyriadPro-Regular'" font-size="3.2041">??</text>
+	<text transform="matrix(1 0 0 1 63.5991 9.1816)" font-family="'MyriadPro-Regular'" font-size="3.2041">??</text>
+	<text transform="matrix(1 0 0 1 83.0908 9.0283)" font-family="'MyriadPro-Regular'" font-size="3.2041">??</text>
+</g>
+<g id="X._Redshift_grid" display="none">
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="98.321" y1="-150.109" x2="98.321" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="80.803" y1="-150.109" x2="80.803" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="63.171" y1="-150.109" x2="63.171" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="54.724" y1="-150.109" x2="54.724" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="49.905" y1="-150.109" x2="49.905" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="111.842" y1="-150.109" x2="111.842" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="130.976" y1="-150.109" x2="130.976" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="159.436" y1="-150.109" x2="159.436" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="204.479" y1="-150.109" x2="204.479" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="281.354" y1="-150.109" x2="281.354" y2="89.9"/>
+	
+		<text transform="matrix(0 -1 1 0 97.8145 86.5293)" display="inline" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift   = 3</text>
+	
+		<text transform="matrix(0 -1 1 0 79.8145 82.0293)" display="inline" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift   = 4</text>
+	
+		<text transform="matrix(0 -1 1 0 66.4814 82.8633)" display="inline" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift   = 6</text>
+	
+		<text transform="matrix(0 -1 1 0 58.3145 82.8633)" display="inline" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift   = 8</text>
+	
+		<text transform="matrix(0 -1 1 0 53.1475 82.8633)" display="inline" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift   = 10</text>
+	
+		<text transform="matrix(0 -1 1 0 111.0645 88.2793)" display="inline" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift   = 2.5</text>
+	
+		<text transform="matrix(0 -1 1 0 158.4395 76.5293)" display="inline" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift = 1.5</text>
+	
+		<text transform="matrix(0 -1 1 0 203.1064 76.6973)" display="inline" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift = 1</text>
+	
+		<text transform="matrix(0 -1 1 0 280.1064 76.6973)" display="inline" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift = 0.5</text>
+	
+		<text transform="matrix(0 -1 1 0 339.8555 76.6973)" display="inline" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift = 0.25</text>
+	<text transform="matrix(0 -1 1 0 129.8145 89.4785)" display="inline"><tspan x="0" y="0" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">redshift </tspan><tspan x="4.182" y="4.8" fill="#FF0000" font-family="'MyriadPro-Regular'" font-size="4">= 2</tspan></text>
+	<line display="inline" fill="#FFFF00" stroke="#FF0000" stroke-width="0.25" x1="340.967" y1="-230.107" x2="340.967" y2="89.9"/>
+</g>
+<g id="Y._Age_grid_forward" display="none">
+	
+		<text transform="matrix(0 -1 1 0 374.2822 86.2793)" display="inline" fill="#FF00FF" font-family="'MyriadPro-Regular'" font-size="4">12 billion years old</text>
+	
+		<text transform="matrix(0 -1 1 0 428.1152 86.2793)" display="inline" fill="#FF00FF" font-family="'MyriadPro-Regular'" font-size="4">13.7 billion years old</text>
+	
+		<text transform="matrix(0 -1 1 0 317.5898 86.2793)" display="inline" fill="#FF00FF" font-family="'MyriadPro-Regular'" font-size="4">10 billion years old</text>
+	
+		<text transform="matrix(0 -1 1 0 260.8965 86.2793)" display="inline" fill="#FF00FF" font-family="'MyriadPro-Regular'" font-size="4">8 billion years old</text>
+	
+		<text transform="matrix(0 -1 1 0 204.2041 86.2793)" display="inline" fill="#FF00FF" font-family="'MyriadPro-Regular'" font-size="4">6 billion years old</text>
+	
+		<text transform="matrix(0 -1 1 0 147.5107 86.2793)" display="inline" fill="#FF00FF" font-family="'MyriadPro-Regular'" font-size="4">4 billion years old  </text>
+	
+		<text transform="matrix(0 -1 1 0 90.8184 86.2793)" display="inline" fill="#FF00FF" font-family="'MyriadPro-Regular'" font-size="4">2 billion years old</text>
+	
+		<text transform="matrix(0 -1 1 0 33.3184 86.2793)" display="inline" fill="#FF00FF" font-family="'MyriadPro-Regular'" font-size="4">Big Bang = 0 years old</text>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="403.782" y1="-230.107" x2="403.782" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="375.436" y1="-230.107" x2="375.436" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="347.089" y1="-230.107" x2="347.089" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="318.742" y1="-230.107" x2="318.742" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="262.05" y1="-150.109" x2="262.05" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="290.396" y1="-150.109" x2="290.396" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="233.703" y1="-150.109" x2="233.703" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="205.356" y1="-150.109" x2="205.356" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="177.01" y1="-150.109" x2="177.01" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="148.663" y1="-150.109" x2="148.663" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="120.316" y1="-150.109" x2="120.316" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="91.97" y1="-150.109" x2="91.97" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#FF00FF" stroke-width="0.25" x1="63.623" y1="-150.109" x2="63.623" y2="89.9"/>
+</g>
+<g id="Z._Age_grid_backward" display="none">
+	<line display="inline" fill="#FFFF00" stroke="#000000" stroke-width="0.25" x1="196.853" y1="-150.109" x2="196.853" y2="89.9"/>
+	
+		<text transform="matrix(0 -1 1 0 422.4717 83.7793)" display="inline" fill="#0000FF" font-family="'MyriadPro-Regular'" font-size="4">the present</text>
+	
+		<text transform="matrix(0 -1 1 0 365.7783 83.0293)" display="inline" fill="#0000FF" font-family="'MyriadPro-Regular'" font-size="4">2 billion years ago</text>
+	
+		<text transform="matrix(0 -1 1 0 309.0859 82.4043)" display="inline" fill="#0000FF" font-family="'MyriadPro-Regular'" font-size="4">4 billion years ago</text>
+	
+		<text transform="matrix(0 -1 1 0 252.3926 84.7793)" display="inline" fill="#0000FF" font-family="'MyriadPro-Regular'" font-size="4">6  billion years ago</text>
+	
+		<text transform="matrix(0 -1 1 0 195.7002 83.0293)" display="inline" fill="#0000FF" font-family="'MyriadPro-Regular'" font-size="4">8  billion years ago</text>
+	
+		<text transform="matrix(0 -1 1 0 139.0068 84.5293)" display="inline" fill="#0000FF" font-family="'MyriadPro-Regular'" font-size="4">10 billion years ago</text>
+	
+		<text transform="matrix(0 -1 1 0 82.3145 84.9043)" display="inline" fill="#0000FF" font-family="'MyriadPro-Regular'" font-size="4">12 billion years ago</text>
+	
+		<text transform="matrix(0 -1 1 0 33.4814 85.2793)" display="inline" fill="#0000FF" font-family="'MyriadPro-Regular'" font-size="4">13.7 billion years ago</text>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="395.278" y1="-230.107" x2="395.278" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="366.932" y1="-230.107" x2="366.932" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="338.585" y1="-230.107" x2="338.585" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="310.238" y1="-230.107" x2="310.238" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="253.546" y1="-150.109" x2="253.546" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="281.893" y1="-150.109" x2="281.893" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="225.199" y1="-150.109" x2="225.199" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="196.853" y1="-150.109" x2="196.853" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="168.506" y1="-150.109" x2="168.506" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="140.159" y1="-150.109" x2="140.159" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="111.812" y1="-150.109" x2="111.812" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="83.466" y1="-150.109" x2="83.466" y2="89.9"/>
+	<line display="inline" fill="#FFFF00" stroke="#0000FF" stroke-width="0.25" x1="55.119" y1="-150.109" x2="55.119" y2="89.9"/>
+</g>
+<g id="ZZ._Box_outlines" display="none">
+	<rect x="35.278" y="-150.109" display="inline" fill="none" stroke="#000000" width="388.347" height="240.01"/>
+</g>
+<g id="Earth_box" display="none">
+	<rect x="281.893" y="-163.353" display="inline" fill="none" width="141.732" height="106.55"/>
+	
+		<rect x="281.893" y="-163.353" display="inline" fill="none" stroke="#000000" stroke-width="0.15" width="141.732" height="106.55"/>
+</g>
+</svg>

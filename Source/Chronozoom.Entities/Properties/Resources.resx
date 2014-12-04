@@ -166,4 +166,7 @@
   <data name="_201409250000000_PubliclySearchableChange" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\SQL\ManualMigration\201409250000000_PubliclySearchableChange.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_201502100000000_AddBackgroundUrlAspectRatio" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\SQL\ManualMigration\201502100000000_AddBackgroundUrlAspectRatio.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

@@ -476,6 +476,10 @@ var CZ;
                 t.title = prop.title;
                 updateTimelineTitle(t);
 
+                // Update background URL and aspect ratio.
+                t.backgroundUrl = prop.backgroundUrl;
+                t.aspectRatio = prop.aspectRatio;
+
                 CZ.Service.putTimeline(t).then(function (success) {
                     // update ids if existing elements with returned from server
                     t.id = "t" + success;

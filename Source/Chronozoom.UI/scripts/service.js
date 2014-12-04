@@ -44,7 +44,9 @@ var CZ;
                     end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
                     ToIsCirca: typeof t.endDate !== 'undefined' ? t.ToIsCirca: false,
                     title: t.title,
-                    Regime: t.regime
+                    Regime: t.regime,
+                    backgroundUrl: t.backgroundUrl,
+                    aspectRatio: t.aspectRatio
                 };
             }
             Map.timeline = timeline;
@@ -522,7 +524,7 @@ var CZ;
         }
         Service.putCollection = putCollection;
 
-        // .../{supercollection}/{collection} 
+        // .../{supercollection}/{collection}
         function deleteCollection()
         {
             if (typeof Service.collectionName === 'undefined') return false;
@@ -541,7 +543,7 @@ var CZ;
         }
         Service.deleteCollection = deleteCollection
 
-        // .../{supercollection}/{collection}/timeline or 
+        // .../{supercollection}/{collection}/timeline or
         // .../{supercollection}/timeline for default collection
         function putTimeline(t) {
             CZ.Authoring.resetSessionTimer();

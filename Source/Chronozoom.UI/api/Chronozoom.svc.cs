@@ -1571,6 +1571,8 @@ namespace Chronozoom.UI
                     newTimeline.ToYear = timelineRequest.ToYear;
                     newTimeline.ToIsCirca = timelineRequest.ToIsCirca;
                     newTimeline.Collection = collection;
+                    newTimeline.BackgroundUrl = timelineRequest.BackgroundUrl;
+                    newTimeline.AspectRatio = timelineRequest.AspectRatio;
 
                     // Update parent timeline.
                     if (parentTimeline != null)
@@ -1625,6 +1627,8 @@ namespace Chronozoom.UI
                     updateTimeline.FromIsCirca = timelineRequest.FromIsCirca;
                     updateTimeline.ToYear = timelineRequest.ToYear;
                     updateTimeline.ToIsCirca = timelineRequest.ToIsCirca;
+                    updateTimeline.BackgroundUrl = timelineRequest.BackgroundUrl;
+                    updateTimeline.AspectRatio = timelineRequest.AspectRatio;
                     returnValue = updateTimelineGuid;
                 }
                 storage.SaveChanges();
