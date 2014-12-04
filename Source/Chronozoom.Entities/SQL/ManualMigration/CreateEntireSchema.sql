@@ -187,6 +187,8 @@ CREATE TABLE [dbo].[ContentItems]
 	[Order]             [smallint]              NULL,
 	[Collection_Id]     [uniqueidentifier]      NULL,
 	[Exhibit_Id]        [uniqueidentifier]      NULL,
+	[BackgroundUrl]     [nvarchar](2000)        NULL,
+    [AspectRatio]       [decimal](18, 7)        NULL,
     CONSTRAINT [PK_dbo.ContentItems] PRIMARY KEY CLUSTERED 
     (
 	    [Id] ASC

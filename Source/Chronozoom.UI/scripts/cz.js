@@ -210,7 +210,7 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
-            
+
             // register ChronoZoom extensions
             CZ.Extensions.registerExtensions();
 
@@ -407,10 +407,12 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
+                            mediaListContainer: ".cz-form-medialist",
+                            backgroundUrl: ".cz-form-background-url",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
-                            errorMessage: "#error-edit-timeline",
+                            errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
                         form.show();
@@ -424,10 +426,12 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
+                            mediaListContainer: ".cz-form-medialist",
+                            backgroundUrl: ".cz-form-background-url",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
-                            errorMessage: "#error-edit-timeline",
+                            errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
                         form.show();
@@ -440,10 +444,12 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
+                            mediaListContainer: ".cz-form-medialist",
+                            backgroundUrl: ".cz-form-background-url",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
-                            errorMessage: "#error-edit-timeline",
+                            errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
                         form.show();
@@ -718,7 +724,7 @@ var CZ;
                 CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response)
                 {
                     $(response).each(function (index) {
-                        if 
+                        if
                         (
                             response[index] &&
                             (
@@ -1098,7 +1104,7 @@ var CZ;
             }
         }
         HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
-        
+
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));

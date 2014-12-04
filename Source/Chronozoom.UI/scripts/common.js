@@ -217,6 +217,22 @@ var CZ;
             }
         }
 
+        // Reload the data.
+        function reloadData() {
+            return CZ.Data.getTimelines(null).then(function (response) {
+                if (!response) {
+                    return;
+                }
+
+                var root = Common.vc.virtualCanvas("getLayerContent");
+                root.beginEdit();
+                CZ.Layout.Merge(response, root);
+                root.endEdit(true);
+                Common.vc.virtualCanvas("updateViewport");
+            });
+        }
+        Common.reloadData = reloadData;
+
         //loading the data from the service
         function loadData() {
             return CZ.Data.getTimelines(null).then(function (response) {
