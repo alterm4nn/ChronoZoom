@@ -143,7 +143,7 @@ namespace Chronozoom.UI
                 // extract background image (packed in theme as embedded json)
                 for (int loop = 1; loop <= editable.Count(); loop++)
                 {
-                    if (editable[loop - 1].ImageUrl == null)
+                    if (editable[loop - 1].ImageUrl == null || editable[loop - 1].ImageUrl == "cosmos")
                     {
                         editable[loop - 1].ImageUrl = "/images/background.jpg"; // OK here since is UI project but consider web.config
                     }
