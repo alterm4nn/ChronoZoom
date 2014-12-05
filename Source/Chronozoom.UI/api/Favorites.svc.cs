@@ -22,9 +22,13 @@ namespace Chronozoom.UI
 
             return ApiOperation(delegate(User user, Storage storage)
             {
+                // TODO: Ensure following line is commented out prior to check-in. Overrides user so can test other people's favorites.
+                // user = storage.Users.Where(u => u.DisplayName == "putnamehere").FirstOrDefault();
+
 #if RELEASE
                 if (user == null) return tiles;
 #endif
+
                 Guid userId     = (user == null || user.Id == null) ? Guid.Empty : user.Id;
                 var cacheKey    = string.Format(CultureInfo.InvariantCulture, "UserFavorites - {0}", userId);
                 if (Cache.Contains(cacheKey))
@@ -147,7 +151,7 @@ namespace Chronozoom.UI
 
         private string GetTileBackgroundImage(string theme)
         {
-            if (theme == null)
+            if (theme == null || theme == "cosmos")
             {
                 return "";
             }
