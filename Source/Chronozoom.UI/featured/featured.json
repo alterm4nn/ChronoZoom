@@ -6,10 +6,10 @@
         "Link":         "/#/t00000000-0000-0000-0000-000000000000@x=0"
     },
     {
-        "Title":        "Introductory Tour Test",
-        "Curator":      "ChronoZoom",
+        "Title":        "Introductory Tour",
+        "Curator":      "Walter Alvarez",
         "Background":   "/images/fallbackWalterImageDefault.jpg",
-        "Link":         "/#/t00000000-0000-0000-0000-000000000000@tour=cd44d92d-8af3-4c4e-ab28-bf9a9397ea27"
+        "Link":         "/#/t00000000-0000-0000-0000-000000000000@auto-tour=cd44d92d-8af3-4c4e-ab28-bf9a9397ea27"
     },
     {
         "Title":        "A 30 Year History of AIDS",

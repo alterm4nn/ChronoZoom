@@ -14,6 +14,7 @@ var CZ;
 
         Tours.tours;
         Tours.tour;
+        Tours.autoTourGUID;
         Tours.tourBookmarkTransitionCompleted;
         Tours.tourBookmarkTransitionInterrupted;
 
@@ -30,6 +31,7 @@ var CZ;
 
         // If an automatic tour is specified in the URL, it will be the only parameter after @.
         // Function returns empty string if there is no automatic tour specified.
+        // Function also populate Tours.autoTourGUID if an automatic tour has been specified.
         function getAutoTourGUID()
         {
             var urlBits = window.location.hash.split('@');
@@ -38,8 +40,9 @@ var CZ;
             {
                 urlBits = urlBits[1].split('&')[0].split('=');
 
-                if (urlBits.length === 2 && urlBits[0].toLowerCase() === 'tour')
+                if (urlBits.length === 2 && urlBits[0].toLowerCase() === 'auto-tour')
                 {
+                    Tours.autoTourGUID = urlBits[1];
                     return urlBits[1];
                 }
             }
@@ -701,8 +704,6 @@ var CZ;
 
         function initializeToursUI() {
             $("#tours").hide();
-
-            // Bookmarks window
             hideBookmarks();
         }
         Tours.initializeToursUI = initializeToursUI;
@@ -858,7 +859,25 @@ var CZ;
                 var tour = new Tour(tourString.id, tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence, tourString.description);
                 Tours.tours.push(tour);
             }
+
             $("body").trigger("toursInitialized");
+
+            // if a GUID has been provided for a tour to start automatically
+            if (typeof Tours.autoTourGUID !== 'undefined')
+            {
+                // try to find the tour for the specified GUID
+                var tour = Tours.tours.filter(function (item)
+                {
+                    return item.id === Tours.autoTourGUID;
+                });
+
+                // if tour was found then render it
+                if (tour.length === 1)
+                {
+                    Tours.takeTour(tour[0]);
+                }
+            }
+
         }
         Tours.parseTours = parseTours;
 
