@@ -117,7 +117,6 @@ namespace Chronozoom.UI
         /// since a tour sequence or ordinal for the same tour can vary in future if the tours are rearranged.
         /// Consumed by cz.js which uses the results to automatically start a tour on page load.
         /// </summary>
-        /// <param name="superCollection"></param>
         /// <param name="guid">Must be a tour id that belongs to the default super-collection's default collection.</param>
         /// <returns>A single tour in JSON format, or null if the parameter/request is incorrect.</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
