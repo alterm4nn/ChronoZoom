@@ -43,7 +43,6 @@ var CZ;
         var k = 1000000000;
         Common.setNavigationStringTo;
         Common.hashHandle = true;
-        var tourNotParsed = undefined;
 
         Common.supercollection  = '';
         Common.collection       = '';

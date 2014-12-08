@@ -664,15 +664,20 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
 
-                if 
-                (
-                    (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
-                    window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                if  // if no auto-tour and Big History collection then show home page overlay
+                (   
+                    CZ.Tours.getAutoTourGUID() === ''   // <-- always check first as fn must fire
+                    &&
+                    (
+                        (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
+                        window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                    )
                 )
                 {
-                    CZ.Overlay.Show(); // home page overlay
+                    CZ.Overlay.Show();
                 }
 
+                // remove splash screen
                 $('#splash').fadeOut('slow');
             });
 

@@ -46,11 +46,6 @@ var CZ;
             $templateNoFavorite = $overlay.find('#msgNoFavorite' ).html();
             $templateMarkPublic = $overlay.find('#msgMarkPublic' ).html();
 
-            if (isInCosmos(window.location.pathname))
-            {
-                $('#introTourLink').removeClass('hidden');
-            }
-
             $('.overlay-list')
                 .mouseenter(function (event)
                 {
@@ -119,19 +114,16 @@ var CZ;
 
         function ExploreBigHistory()
         {
-            var urlParts = window.location.href.replace('//', '').toLowerCase().split('/');
-
-            Hide();
-
-            if (urlParts[1] == '#')
+            if (isInCosmos(window.location.pathname))
             {
-                // cosmos supercollection - expand out to full view
-                $('#regime-link-cosmos').trigger('click');
+                // already in the big history collection
+                Hide();                                     // hide overlay
+                $('#regime-link-cosmos').trigger('click');  // visually expand out to full view
             }
             else
             {
-                // a different supercollection - switch to cosmos
-                window.location.href = '/#/t00000000-0000-0000-0000-000000000000@x=0';
+                // switch to big history as in a different collection
+                window.location.href = '/#/t00000000-0000-0000-0000-000000000000@x=0'; // x=0 so don't start with overlay
             }
         }
         Overlay.ExploreBigHistory = ExploreBigHistory;
@@ -139,10 +131,20 @@ var CZ;
 
         function ExploreIntroTour()
         {
-            if (CZ.Tours.tours.length > 0)
+            if (isInCosmos(window.location.pathname))
             {
-                Hide();
-                CZ.Tours.takeTour(CZ.Tours.tours[0]);
+                // already in the big history collection
+                if (CZ.Tours.tours.length > 0)
+                {
+                    // at least the first tour (the one we want) has been initialized so start tour
+                    Hide();
+                    CZ.Tours.takeTour(CZ.Tours.tours[0]);
+                }
+            }
+            else
+            {
+                // switch to big history and auto-start tour
+                window.location.href = '/#/t00000000-0000-0000-0000-000000000000@auto-tour=cd44d92d-8af3-4c4e-ab28-bf9a9397ea27';
             }
         }
         Overlay.ExploreIntroTour = ExploreIntroTour;
@@ -221,6 +223,13 @@ var CZ;
                         if ($(this).attr('data-url') != '')
                         {
                             window.location.href = $(this).attr('data-url');
+                            setTimeout(function ()
+                            {
+                                // if same page and has # anchor then .href won't reload
+                                // so force reload (using cache) but delay to give .href
+                                // a chance to fire first.
+                                window.location.reload();
+                            },  200);
                         }
                         Hide();
                     })
