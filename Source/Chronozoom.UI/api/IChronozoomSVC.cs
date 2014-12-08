@@ -113,6 +113,51 @@ namespace Chronozoom.UI
         IEnumerable<SearchResult> Search(string superCollection, string collection, string searchTerm, byte searchScope = 1);
 
         /// <summary>
+        /// Provides a specified tour based on the provided GUID rather than a tour sequence or result ordinal,
+        /// since a tour sequence or ordinal for the same tour can vary in future if the tours are rearranged.
+        /// Consumed by cz.js which uses the results to automatically start a tour on page load.
+        /// </summary>
+        /// <param name="guid">Must be a tour id that belongs to the default super-collection's default collection.</param>
+        /// <returns>A single tour in JSON format, or null if the parameter/request is incorrect.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
+        [OperationContract(Name = "GetTourDefaultSuperCollection")]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/tour?guid={guid}")]
+        Tour GetTour(Guid guid);
+
+        /// <summary>
+        /// Provides a specified tour based on the provided GUID rather than a tour sequence or result ordinal,
+        /// since a tour sequence or ordinal for the same tour can vary in future if the tours are rearranged.
+        /// Consumed by cz.js which uses the results to automatically start a tour on page load.
+        /// </summary>
+        /// <param name="superCollection"></param>
+        /// <param name="guid">Must be a tour id that belongs to the specified super-collection's default collection.</param>
+        /// <returns>A single tour in JSON format, or null if the parameter/request is incorrect.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
+        [OperationContract(Name = "GetTourDefaultCollection")]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/tour?guid={guid}")]
+        Tour GetTour(string superCollection, Guid guid);
+
+        /// <summary>
+        /// Provides a specified tour based on the provided GUID rather than a tour sequence or result ordinal,
+        /// since a tour sequence or ordinal for the same tour can vary in future if the tours are rearranged.
+        /// Consumed by cz.js which uses the results to automatically start a tour on page load.
+        /// </summary>
+        /// <param name="superCollection"></param>
+        /// <param name="collection"></param>
+        /// <param name="guid">Must be a tour id that belongs to the collection.</param>
+        /// <returns>A single tour in JSON format, or null if the parameter/request is incorrect.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Not appropriate")]
+        [OperationContract(Name = "GetTourSpecificCollection")]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/{supercollection}/{collection}/tour?guid={guid}")]
+        Tour GetTour(string superCollection, string collection, Guid guid);
+
+        /// <summary>
         /// Returns a list of tours for the default collection and default superCollection.
         /// </summary>
         /// <returns>A list of tours in JSON format.</returns>

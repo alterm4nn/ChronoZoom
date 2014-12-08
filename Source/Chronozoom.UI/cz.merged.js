@@ -311,7 +311,6 @@ var CZ;
         var k = 1000000000;
         Common.setNavigationStringTo;
         Common.hashHandle = true;
-        var tourNotParsed = undefined;
 
         Common.supercollection  = '';
         Common.collection       = '';
@@ -6756,6 +6755,7 @@ var CZ;
 
         Tours.tours;
         Tours.tour;
+        Tours.autoTourGUID;
         Tours.tourBookmarkTransitionCompleted;
         Tours.tourBookmarkTransitionInterrupted;
 
@@ -6769,6 +6769,28 @@ var CZ;
 
         Tours.tourCaptionFormContainer;
         Tours.tourCaptionForm;
+
+        // If an automatic tour is specified in the URL, it will be the only parameter after @.
+        // Function returns empty string if there is no automatic tour specified.
+        // Function also populate Tours.autoTourGUID if an automatic tour has been specified.
+        function getAutoTourGUID()
+        {
+            var urlBits = window.location.hash.split('@');
+
+            if (urlBits.length > 1)
+            {
+                urlBits = urlBits[1].split('&')[0].split('=');
+
+                if (urlBits.length === 2 && urlBits[0].toLowerCase() === 'auto-tour')
+                {
+                    Tours.autoTourGUID = urlBits[1];
+                    return urlBits[1];
+                }
+            }
+
+            return '';
+        }
+        Tours.getAutoTourGUID = getAutoTourGUID;
 
         /* TourBookmark represents a place in the virtual space with associated audio.
         @param url  (string) Url that contains a state of the virtual canvas
@@ -7423,8 +7445,6 @@ var CZ;
 
         function initializeToursUI() {
             $("#tours").hide();
-
-            // Bookmarks window
             hideBookmarks();
         }
         Tours.initializeToursUI = initializeToursUI;
@@ -7580,7 +7600,25 @@ var CZ;
                 var tour = new Tour(tourString.id, tourString.name, tourBookmarks, bookmarkTransition, CZ.Common.vc, tourString.category, tourString.audio, tourString.sequence, tourString.description);
                 Tours.tours.push(tour);
             }
+
             $("body").trigger("toursInitialized");
+
+            // if a GUID has been provided for a tour to start automatically
+            if (typeof Tours.autoTourGUID !== 'undefined')
+            {
+                // try to find the tour for the specified GUID
+                var tour = Tours.tours.filter(function (item)
+                {
+                    return item.id === Tours.autoTourGUID;
+                });
+
+                // if tour was found then render it
+                if (tour.length === 1)
+                {
+                    Tours.takeTour(tour[0]);
+                }
+            }
+
         }
         Tours.parseTours = parseTours;
 
@@ -10017,6 +10055,34 @@ var CZ;
         }
         Service.deleteTour = deleteTour;
 
+        // .../{supercollection}/{collection}/tour or
+        // .../{supercollection}/tour for default collection
+        function getTour(tourGUID)
+        {
+            if (typeof tourGUID === 'undefined')
+            {
+                throw 'getTour(tourGUID) requires a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(tourGUID) == false)
+            {
+                throw 'getTour(tourGUID) has an invalid parameter. The provided parameter must be a GUID.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Service.Request(_serviceUrl);
+            request.addToPath(Service.superCollectionName); // || 'chronozoom');
+            if (typeof Service.collectionName !== 'undefined') request.addToPath(Service.collectionName);
+            request.addToPath('tour');
+            request.addParameter('guid', tourGUID);
+            return $.ajax
+            ({
+                type:       'GET',
+                cache:      false,
+                url:        request.url,
+                dataType:   'json'
+            });
+        }
+        Service.getTour = getTour;
+
         // .../{supercollection}/{collection}/tours or
         // .../{supercollection}/tours for default collection
         function getTours()
@@ -10360,7 +10426,7 @@ var CZ;
 
         function getRecentlyUpdatedExhibits(quantity)
         {
-            if (typeof quantity != 'integer') quantity = 6;
+            if (!$.isNumeric(quantity)) quantity = 6;
             CZ.Authoring.resetSessionTimer();
             var request = new Service.Request(_serviceUrl);
             request.addToPath('recentlyupdatedexhibits');
@@ -18491,11 +18557,6 @@ var CZ;
             $templateNoFavorite = $overlay.find('#msgNoFavorite' ).html();
             $templateMarkPublic = $overlay.find('#msgMarkPublic' ).html();
 
-            if (isInCosmos(window.location.pathname))
-            {
-                $('#introTourLink').removeClass('hidden');
-            }
-
             $('.overlay-list')
                 .mouseenter(function (event)
                 {
@@ -18564,19 +18625,16 @@ var CZ;
 
         function ExploreBigHistory()
         {
-            var urlParts = window.location.href.replace('//', '').toLowerCase().split('/');
-
-            Hide();
-
-            if (urlParts[1] == '#')
+            if (isInCosmos(window.location.pathname))
             {
-                // cosmos supercollection - expand out to full view
-                $('#regime-link-cosmos').trigger('click');
+                // already in the big history collection
+                Hide();                                     // hide overlay
+                $('#regime-link-cosmos').trigger('click');  // visually expand out to full view
             }
             else
             {
-                // a different supercollection - switch to cosmos
-                window.location.href = '/#/t00000000-0000-0000-0000-000000000000@x=0';
+                // switch to big history as in a different collection
+                window.location.href = '/#/t00000000-0000-0000-0000-000000000000@x=0'; // x=0 so don't start with overlay
             }
         }
         Overlay.ExploreBigHistory = ExploreBigHistory;
@@ -18584,10 +18642,20 @@ var CZ;
 
         function ExploreIntroTour()
         {
-            if (CZ.Tours.tours.length > 0)
+            if (isInCosmos(window.location.pathname))
             {
-                Hide();
-                CZ.Tours.takeTour(CZ.Tours.tours[0]);
+                // already in the big history collection
+                if (CZ.Tours.tours.length > 0)
+                {
+                    // at least the first tour (the one we want) has been initialized so start tour
+                    Hide();
+                    CZ.Tours.takeTour(CZ.Tours.tours[0]);
+                }
+            }
+            else
+            {
+                // switch to big history and auto-start tour
+                window.location.href = '/#/t00000000-0000-0000-0000-000000000000@auto-tour=cd44d92d-8af3-4c4e-ab28-bf9a9397ea27';
             }
         }
         Overlay.ExploreIntroTour = ExploreIntroTour;
@@ -18666,6 +18734,13 @@ var CZ;
                         if ($(this).attr('data-url') != '')
                         {
                             window.location.href = $(this).attr('data-url');
+                            setTimeout(function ()
+                            {
+                                // if same page and has # anchor then .href won't reload
+                                // so force reload (using cache) but delay to give .href
+                                // a chance to fire first.
+                                window.location.reload();
+                            },  200);
                         }
                         Hide();
                     })
@@ -19579,15 +19654,20 @@ var CZ;
                     InitializeToursUI(null, forms);
                 });
 
-                if 
-                (
-                    (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
-                    window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                if  // if no auto-tour and Big History collection then show home page overlay
+                (   
+                    CZ.Tours.getAutoTourGUID() === ''   // <-- always check first as fn must fire
+                    &&
+                    (
+                        (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
+                        window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                    )
                 )
                 {
-                    CZ.Overlay.Show(); // home page overlay
+                    CZ.Overlay.Show();
                 }
 
+                // remove splash screen
                 $('#splash').fadeOut('slow');
             });
 
