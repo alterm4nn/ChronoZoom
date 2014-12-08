@@ -12474,7 +12474,28 @@ var CZ;
     })(CZ.Media || (CZ.Media = {}));
     var Media = CZ.Media;
 })(CZ || (CZ = {}));
-﻿var CZ;
+﻿// The following jQuery extension is used by menus to stop click ghosting on touch-screen devices.
+// This can occur when looking for either click or touchstart events (both can fire on some touch
+// devices) without wanting to preventPropagation. Use instead of .on('click touchstart'...
+jQuery.fn.extend
+({
+    clicktouch: function (handler)
+    {
+        return this.each(function ()
+        {
+            var event = ('ontouchstart' in document) ? 'touchstart' : 'click';
+            $(this).on(event, handler);
+        });
+    }
+});
+
+
+
+/*********
+ * Menus *
+ *********/
+
+var CZ;
 (function (CZ) {
     /*
     
@@ -12608,7 +12629,7 @@ var CZ;
 
                 // *** secondary menu ***
 
-                .children('ul').children('li').click(function (event)
+                .children('ul').children('li').clicktouch(function (event)
                 {
                     event.stopPropagation();
 
@@ -12638,7 +12659,7 @@ var CZ;
 
                 // *** tertiary menu ***
 
-                .children('ul').children('li').click(function (event)
+                .children('ul').children('li').clicktouch(function (event)
                 {
                     event.stopPropagation();
 
@@ -12652,21 +12673,21 @@ var CZ;
              * Menu Item Hooks *
              *******************/
 
-            $('#mnuViewTours').click(function (event)
+            $('#mnuViewTours').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show tours list pane (hide edit options)
                 CZ.HomePageViewModel.panelShowToursList(false);
             });
 
-            $('#mnuViewSeries').click(function (event)
+            $('#mnuViewSeries').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // toggle display of time series pane
                 CZ.HomePageViewModel.panelToggleTimeSeries();
             });
 
-            $('#mnuCurate').hide().click(function (event)
+            $('#mnuCurate').hide().clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (!Menus.isSignedIn)
@@ -12687,7 +12708,7 @@ var CZ;
                 }
             });
 
-            $('#mnuCreateCollection').click(function (event)
+            $('#mnuCreateCollection').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create collection dialog
@@ -12695,7 +12716,7 @@ var CZ;
                 AddCollection();
             });
 
-            $('#mnuCreateTimeline').click(function (event)
+            $('#mnuCreateTimeline').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create timeline dialog
@@ -12704,7 +12725,7 @@ var CZ;
                 CZ.Authoring.UI.createTimeline();
             });
 
-            $('#mnuCreateExhibit').click(function (event)
+            $('#mnuCreateExhibit').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create exhibit dialog
@@ -12713,7 +12734,7 @@ var CZ;
                 CZ.Authoring.UI.createExhibit();
             });
 
-            $('#mnuCreateTour').click(function (event)
+            $('#mnuCreateTour').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create tour dialog
@@ -12722,14 +12743,14 @@ var CZ;
                 CZ.Authoring.UI.createTour();
             });
 
-            $('#mnuEditTours').click(function (event)
+            $('#mnuEditTours').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show tours list pane (with edit options)
                 CZ.HomePageViewModel.panelShowToursList(true);
             });
 
-            $('#mnuMine').click(function (event)
+            $('#mnuMine').clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (!Menus.isSignedIn)
@@ -12744,14 +12765,14 @@ var CZ;
                 }
             });
 
-            $('#mnuSearch').click(function (event)
+            $('#mnuSearch').clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 // toggle display of search pane
                 CZ.HomePageViewModel.panelToggleSearch();
             });
 
-            $('#mnuProfile').click(function (event)
+            $('#mnuProfile').clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (Menus.isSignedIn)
