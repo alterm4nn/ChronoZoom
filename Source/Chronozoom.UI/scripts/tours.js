@@ -942,6 +942,32 @@ var CZ;
             }
         }
         Tours.loadTourFromURL = loadTourFromURL;
+
+        // will use current collection's URL rather than looking up in db
+        function getAutoTourURL(context)
+        {
+            var url         = window.location.href.toLowerCase().split('#')[0] + '#@auto-tour=' + context.id;
+            var $copyarea   = $('#message-window').find('textarea');
+
+            CZ.Authoring.showMessageWindow
+            (
+                'You can use the following web address to directly link to this tour. ' +
+                'Try pressing Ctrl + C to copy it to your clipboard.',
+                context.title + ' URL'
+            );
+
+            $copyarea
+                .text(url)
+                .show()
+                .focus()
+                .select()
+            ;
+            
+            setTimeout(function () { $copyarea.select(); }, 1000); // IE fix for select()
+
+        }
+        Tours.getAutoTourURL = getAutoTourURL;
+
     })(CZ.Tours || (CZ.Tours = {}));
     var Tours = CZ.Tours;
 })(CZ || (CZ = {}));

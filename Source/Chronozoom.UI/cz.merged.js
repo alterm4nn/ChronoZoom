@@ -7685,6 +7685,32 @@ var CZ;
             }
         }
         Tours.loadTourFromURL = loadTourFromURL;
+
+        // will use current collection's URL rather than looking up in db
+        function getAutoTourURL(context)
+        {
+            var url         = window.location.href.toLowerCase().split('#')[0] + '#@auto-tour=' + context.id;
+            var $copyarea   = $('#message-window').find('textarea');
+
+            CZ.Authoring.showMessageWindow
+            (
+                'You can use the following web address to directly link to this tour. ' +
+                'Try pressing Ctrl + C to copy it to your clipboard.',
+                context.title + ' URL'
+            );
+
+            $copyarea
+                .text(url)
+                .show()
+                .focus()
+                .select()
+            ;
+            
+            setTimeout(function () { $copyarea.select(); }, 1000); // IE fix for select()
+
+        }
+        Tours.getAutoTourURL = getAutoTourURL;
+
     })(CZ.Tours || (CZ.Tours = {}));
     var Tours = CZ.Tours;
 })(CZ || (CZ = {}));
@@ -17833,17 +17859,19 @@ var CZ;
                 else
                     this.descrTextblock.hide();
 
-                this.container.find("#takeTour, .cz-contentitem-listitem-icon").click(function (e)
-                {
-                    parent.TakeTour(context);
-                });
+                this.container.find('.cz-contentitem-listitem-icon, .cz-tourslist-viewing')
+                    .click(function (e) { parent.TakeTour(context);         })
+                ;
 
-                container.find(".cz-tourslist-editing").css("display", parent.EditTour ? "inline" : "none");
-                if (parent.EditTour) {
-                    this.container.find("#editTour").click(function (e) {
-                        parent.EditTour(context);
-                    });
-                }
+                this.container.find('.cz-tourslist-editing')
+                    .css('display', parent.EditTour ? 'inline' : 'none')
+                    .click(function (e) { parent.EditTour(context);         })
+                ;
+
+                this.container.find('.cz-tourslist-linking')
+                    .click(function (e) { CZ.Tours.getAutoTourURL(context); })
+                ;
+
             }
             return TourListItem;
         })(UI.ListItemBase);
@@ -18386,6 +18414,7 @@ var CZ;
 
             MessageWindow.prototype.close = function () {
                 var _this = this;
+                this.container.find('textarea').hide();
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "left",

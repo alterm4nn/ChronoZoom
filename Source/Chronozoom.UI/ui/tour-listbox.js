@@ -87,17 +87,19 @@ var CZ;
                 else
                     this.descrTextblock.hide();
 
-                this.container.find("#takeTour, .cz-contentitem-listitem-icon").click(function (e)
-                {
-                    parent.TakeTour(context);
-                });
+                this.container.find('.cz-contentitem-listitem-icon, .cz-tourslist-viewing')
+                    .click(function (e) { parent.TakeTour(context);         })
+                ;
 
-                container.find(".cz-tourslist-editing").css("display", parent.EditTour ? "inline" : "none");
-                if (parent.EditTour) {
-                    this.container.find("#editTour").click(function (e) {
-                        parent.EditTour(context);
-                    });
-                }
+                this.container.find('.cz-tourslist-editing')
+                    .css('display', parent.EditTour ? 'inline' : 'none')
+                    .click(function (e) { parent.EditTour(context);         })
+                ;
+
+                this.container.find('.cz-tourslist-linking')
+                    .click(function (e) { CZ.Tours.getAutoTourURL(context); })
+                ;
+
             }
             return TourListItem;
         })(UI.ListItemBase);

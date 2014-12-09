@@ -40,6 +40,7 @@ var CZ;
 
             MessageWindow.prototype.close = function () {
                 var _this = this;
+                this.container.find('textarea').hide();
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "left",
