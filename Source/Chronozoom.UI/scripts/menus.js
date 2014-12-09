@@ -279,6 +279,9 @@ var CZ;
                 if (Menus.isDisabled) return;
                 if (!Menus.isSignedIn)
                 {
+                    // note that we want to show my collections after a successful log in
+                    sessionStorage.setItem('showMyCollections', 'requested');
+
                     // toggle display of register / log in pane
                     CZ.HomePageViewModel.panelToggleLogin();
                 }

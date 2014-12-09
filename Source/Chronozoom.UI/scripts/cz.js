@@ -635,50 +635,76 @@ var CZ;
                     }
                 };
 
-                CZ.Service.getProfile().done(function (data) {
-                    //Not authorized
-                    if (data == "") {
+                CZ.Service.getProfile().done(function (data)
+                {
+                    if (data == "")
+                    {
+                        // not authorized
                         $("#login-panel").show();
-                    } else if (data != "" && data.DisplayName == null) {
+                    }
+                    else if (data != "" && data.DisplayName == null)
+                    {
                         $("#login-panel").hide();
                         $("#profile-panel").show();
                         $("#profile-panel input#username").focus();
-                        if (!profileForm.isFormVisible) {
+                        if (!profileForm.isFormVisible)
+                        {
                             closeAllForms();
                             profileForm.show();
-                        } else {
+                        }
+                        else
+                        {
                             profileForm.close();
                         }
-                    } else {
+                    }
+                    else
+                    {
                         CZ.Settings.userSuperCollectionName = data.DisplayName;
-                        CZ.Settings.userCollectionName = data.DisplayName;
+                        CZ.Settings.userCollectionName      = data.DisplayName;
                         $("#login-panel").hide();
                         $("#profile-panel").show();
                         $(".auth-panel-login").html(data.DisplayName);
                     }
 
                     InitializeToursUI(data, forms);
-                }).fail(function (error) {
+                })
+                .fail(function (error)
+                {
                     $("#login-panel").show();
-
                     InitializeToursUI(null, forms);
+                })
+                .always(function ()
+                {
+                    // if my collections was requested and have logged in following request
+                    if (sessionStorage.getItem('showMyCollections') === 'requested' && CZ.Menus.isSignedIn)
+                    {
+                        // show my collections overlay
+                        CZ.Overlay.Show(true);
+                    }
+                    else
+                    {
+                        if  // if no auto-tour and collection is Big History collection
+                        (   
+                            CZ.Tours.getAutoTourGUID() === ''   // <--  Always check first as fn must fire.
+                            &&                                  //      This fn sets up tours.js's parseTours
+                            (                                   //      to auto-start a tour, if specified.
+                                (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
+                                window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                            )
+                        )
+                        {
+                            // show home page overlay
+                            CZ.Overlay.Show();
+                        }
+                    }
+                
+                    // remove any my collections queued request
+                    sessionStorage.removeItem('showMyCollections');
+
+                    // remove splash screen
+                    $('#splash').fadeOut('slow');
                 });
 
-                if  // if no auto-tour and Big History collection then show home page overlay
-                (   
-                    CZ.Tours.getAutoTourGUID() === ''   // <-- always check first as fn must fire
-                    &&
-                    (
-                        (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
-                        window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
-                    )
-                )
-                {
-                    CZ.Overlay.Show();
-                }
-
-                // remove splash screen
-                $('#splash').fadeOut('slow');
             });
 
             CZ.Service.getServiceInformation().then(function (response) {
