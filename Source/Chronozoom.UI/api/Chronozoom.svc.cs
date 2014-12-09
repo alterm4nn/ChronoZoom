@@ -2692,7 +2692,7 @@ namespace Chronozoom.UI
             return ApiOperation(delegate(User user, Storage storage)
             {
                 Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
-                Collection rv = storage.Collections.Where(c => c.Id == collectionId).FirstOrDefault();
+                Collection rv = storage.Collections.Include("User").Where(c => c.Id == collectionId).FirstOrDefault();
                 return rv;
             });
         }

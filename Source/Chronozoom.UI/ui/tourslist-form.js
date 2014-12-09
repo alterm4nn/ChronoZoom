@@ -30,10 +30,23 @@ var CZ;
                 } : null);
                 this.createTourBtn = this.container.find(formInfo.createTour);
 
-                if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName))
-                    $("#cz-tours-list-title").text("My Tours");
-                else {
-                    $("#cz-tours-list-title").text("Tours");
+                if (CZ.Settings.isAuthorized && (CZ.Settings.userDisplayName == CZ.Settings.collectionOwner))
+                {
+                    $('#cz-tours-list-title').text('My Tours');
+                }
+                else
+                {
+                    $('#cz-tours-list-title').text('Tours');
+                }
+
+                if (CZ.Settings.isAuthorized)
+                {
+                    $('tours-missed-warning').text('Share and present your timeline by creating a tour.');
+                    $("#tours-create-button").show();
+                }
+                else
+                {
+                    $('tours-missed-warning').text('There are no tours currently in this collection.');
                     $("#tours-create-button").hide();
                 }
 

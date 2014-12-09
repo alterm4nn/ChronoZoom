@@ -223,7 +223,7 @@ var CZ;
             $('.header-logo').click(function ()
             {
                 //window.location.href = '/';
-                CZ.Overlay.Show(false);
+                CZ.Overlay.Show(false);  // false = home page overlay
             });
 
             // if URL has a supercollection
@@ -534,18 +534,30 @@ var CZ;
 
                 CZ.Service.getProfile().done(function (data) {
                     //Authorized
-                    if (data != "") {
-                        CZ.Settings.isAuthorized = true;
-                        CZ.Authoring.timer = setTimeout(function () {
-                            CZ.Authoring.showSessionForm();
-                        }, (CZ.Settings.sessionTime - 60) * 1000);
+                    if (data != "")
+                    {
+                        CZ.Settings.isAuthorized    = true;
+                        CZ.Settings.userDisplayName =  data.DisplayName || "";
+                        CZ.Authoring.timer =
+                            setTimeout(function ()
+                            {
+                                CZ.Authoring.showSessionForm();
+                            }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+                    else
+                    {
+                        CZ.Settings.userDisplayName = "";
                     }
 
                     CZ.Authoring.isEnabled = UserCanEditCollection(data);
-                }).fail(function (error) {
-                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
-                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
-                }).always(function ()
+                })
+                .fail(function (error)
+                {
+                    CZ.Settings.userDisplayName = "";
+                    CZ.Authoring.isEnabled      = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized    = UserCanEditCollection(null);
+                })
+                .always(function ()
                 {
                     CZ.Menus.isSignedIn = CZ.Settings.isAuthorized;
                     CZ.Menus.Refresh();
@@ -568,10 +580,14 @@ var CZ;
                         }
                     });
 
-                    // get and display the collection title
+                    // get the collection title and owner and display the title
                     CZ.Service.getCollection().done(function (collection)
                     {
-                        if (collection != null) CZ.Common.collectionTitle = collection.Title || '';
+                        if (collection != null)
+                        {
+                            CZ.Common.collectionTitle   = collection.Title || '';
+                            CZ.Settings.collectionOwner = collection.User.DisplayName;
+                        }
                         $('#editCollectionButton .title').text(CZ.Common.collectionTitle);
                     });
                 });

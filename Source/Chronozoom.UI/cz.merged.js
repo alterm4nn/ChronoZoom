@@ -2,10 +2,12 @@
 var CZ;
 (function (CZ) {
     (function (Settings) {
-        Settings.isAuthorized = false;
-        Settings.userSuperCollectionName = "";
-        Settings.userCollectionName = "";
-        Settings.isCosmosCollection = false;
+        Settings.isAuthorized               = false;
+        Settings.userSuperCollectionName    = "";
+        Settings.userCollectionName         = "";
+        Settings.userDisplayName            = "";
+        Settings.collectionOwner            = ""; // owners' display name
+        Settings.isCosmosCollection         = false;
 
         Settings.favoriteTimelines = [];
 
@@ -12476,7 +12478,8 @@ var CZ;
 })(CZ || (CZ = {}));
 ﻿// The following jQuery extension is used by menus to stop click ghosting on touch-screen devices.
 // This can occur when looking for either click or touchstart events (both can fire on some touch
-// devices) without wanting to preventPropagation. Use instead of .on('click touchstart'...
+// devices) without wanting to preventPropagation. Use $(elements).clicktouch(... instead of
+// .on('click touchstart'... or .click(...
 jQuery.fn.extend
 ({
     clicktouch: function (handler)
@@ -17880,10 +17883,23 @@ var CZ;
                 } : null);
                 this.createTourBtn = this.container.find(formInfo.createTour);
 
-                if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName))
-                    $("#cz-tours-list-title").text("My Tours");
-                else {
-                    $("#cz-tours-list-title").text("Tours");
+                if (CZ.Settings.isAuthorized && (CZ.Settings.userDisplayName == CZ.Settings.collectionOwner))
+                {
+                    $('#cz-tours-list-title').text('My Tours');
+                }
+                else
+                {
+                    $('#cz-tours-list-title').text('Tours');
+                }
+
+                if (CZ.Settings.isAuthorized)
+                {
+                    $('tours-missed-warning').text('Share and present your timeline by creating a tour.');
+                    $("#tours-create-button").show();
+                }
+                else
+                {
+                    $('tours-missed-warning').text('There are no tours currently in this collection.');
                     $("#tours-create-button").hide();
                 }
 
@@ -19238,7 +19254,7 @@ var CZ;
             $('.header-logo').click(function ()
             {
                 //window.location.href = '/';
-                CZ.Overlay.Show(false);
+                CZ.Overlay.Show(false);  // false = home page overlay
             });
 
             // if URL has a supercollection
@@ -19549,18 +19565,30 @@ var CZ;
 
                 CZ.Service.getProfile().done(function (data) {
                     //Authorized
-                    if (data != "") {
-                        CZ.Settings.isAuthorized = true;
-                        CZ.Authoring.timer = setTimeout(function () {
-                            CZ.Authoring.showSessionForm();
-                        }, (CZ.Settings.sessionTime - 60) * 1000);
+                    if (data != "")
+                    {
+                        CZ.Settings.isAuthorized    = true;
+                        CZ.Settings.userDisplayName =  data.DisplayName || "";
+                        CZ.Authoring.timer =
+                            setTimeout(function ()
+                            {
+                                CZ.Authoring.showSessionForm();
+                            }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+                    else
+                    {
+                        CZ.Settings.userDisplayName = "";
                     }
 
                     CZ.Authoring.isEnabled = UserCanEditCollection(data);
-                }).fail(function (error) {
-                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
-                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
-                }).always(function ()
+                })
+                .fail(function (error)
+                {
+                    CZ.Settings.userDisplayName = "";
+                    CZ.Authoring.isEnabled      = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized    = UserCanEditCollection(null);
+                })
+                .always(function ()
                 {
                     CZ.Menus.isSignedIn = CZ.Settings.isAuthorized;
                     CZ.Menus.Refresh();
@@ -19583,10 +19611,14 @@ var CZ;
                         }
                     });
 
-                    // get and display the collection title
+                    // get the collection title and owner and display the title
                     CZ.Service.getCollection().done(function (collection)
                     {
-                        if (collection != null) CZ.Common.collectionTitle = collection.Title || '';
+                        if (collection != null)
+                        {
+                            CZ.Common.collectionTitle   = collection.Title || '';
+                            CZ.Settings.collectionOwner = collection.User.DisplayName;
+                        }
                         $('#editCollectionButton .title').text(CZ.Common.collectionTitle);
                     });
                 });
