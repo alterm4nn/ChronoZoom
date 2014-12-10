@@ -2,10 +2,12 @@
 var CZ;
 (function (CZ) {
     (function (Settings) {
-        Settings.isAuthorized = false;
-        Settings.userSuperCollectionName = "";
-        Settings.userCollectionName = "";
-        Settings.isCosmosCollection = false;
+        Settings.isAuthorized               = false;
+        Settings.userSuperCollectionName    = "";
+        Settings.userCollectionName         = "";
+        Settings.userDisplayName            = "";
+        Settings.collectionOwner            = ""; // owners' display name
+        Settings.isCosmosCollection         = false;
 
         Settings.favoriteTimelines = [];
 
@@ -7683,6 +7685,32 @@ var CZ;
             }
         }
         Tours.loadTourFromURL = loadTourFromURL;
+
+        // will use current collection's URL rather than looking up in db
+        function getAutoTourURL(context)
+        {
+            var url         = window.location.href.toLowerCase().split('#')[0] + '#@auto-tour=' + context.id;
+            var $copyarea   = $('#message-window').find('textarea');
+
+            CZ.Authoring.showMessageWindow
+            (
+                'You can use the following web address to directly link to this tour. ' +
+                'Try pressing Ctrl + C to copy it to your clipboard.',
+                context.title + ' URL'
+            );
+
+            $copyarea
+                .text(url)
+                .show()
+                .focus()
+                .select()
+            ;
+            
+            setTimeout(function () { $copyarea.select(); }, 1000); // IE fix for select()
+
+        }
+        Tours.getAutoTourURL = getAutoTourURL;
+
     })(CZ.Tours || (CZ.Tours = {}));
     var Tours = CZ.Tours;
 })(CZ || (CZ = {}));
@@ -12474,7 +12502,29 @@ var CZ;
     })(CZ.Media || (CZ.Media = {}));
     var Media = CZ.Media;
 })(CZ || (CZ = {}));
-﻿var CZ;
+﻿// The following jQuery extension is used by menus to stop click ghosting on touch-screen devices.
+// This can occur when looking for either click or touchstart events (both can fire on some touch
+// devices) without wanting to preventPropagation. Use $(elements).clicktouch(... instead of
+// .on('click touchstart'... or .click(...
+jQuery.fn.extend
+({
+    clicktouch: function (handler)
+    {
+        return this.each(function ()
+        {
+            var event = ('ontouchstart' in document) ? 'touchstart' : 'click';
+            $(this).on(event, handler);
+        });
+    }
+});
+
+
+
+/*********
+ * Menus *
+ *********/
+
+var CZ;
 (function (CZ) {
     /*
     
@@ -12608,7 +12658,7 @@ var CZ;
 
                 // *** secondary menu ***
 
-                .children('ul').children('li').click(function (event)
+                .children('ul').children('li').clicktouch(function (event)
                 {
                     event.stopPropagation();
 
@@ -12638,7 +12688,7 @@ var CZ;
 
                 // *** tertiary menu ***
 
-                .children('ul').children('li').click(function (event)
+                .children('ul').children('li').clicktouch(function (event)
                 {
                     event.stopPropagation();
 
@@ -12652,21 +12702,21 @@ var CZ;
              * Menu Item Hooks *
              *******************/
 
-            $('#mnuViewTours').click(function (event)
+            $('#mnuViewTours').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show tours list pane (hide edit options)
                 CZ.HomePageViewModel.panelShowToursList(false);
             });
 
-            $('#mnuViewSeries').click(function (event)
+            $('#mnuViewSeries').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // toggle display of time series pane
                 CZ.HomePageViewModel.panelToggleTimeSeries();
             });
 
-            $('#mnuCurate').hide().click(function (event)
+            $('#mnuCurate').hide().clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (!Menus.isSignedIn)
@@ -12687,7 +12737,7 @@ var CZ;
                 }
             });
 
-            $('#mnuCreateCollection').click(function (event)
+            $('#mnuCreateCollection').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create collection dialog
@@ -12695,7 +12745,7 @@ var CZ;
                 AddCollection();
             });
 
-            $('#mnuCreateTimeline').click(function (event)
+            $('#mnuCreateTimeline').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create timeline dialog
@@ -12704,7 +12754,7 @@ var CZ;
                 CZ.Authoring.UI.createTimeline();
             });
 
-            $('#mnuCreateExhibit').click(function (event)
+            $('#mnuCreateExhibit').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create exhibit dialog
@@ -12713,7 +12763,7 @@ var CZ;
                 CZ.Authoring.UI.createExhibit();
             });
 
-            $('#mnuCreateTour').click(function (event)
+            $('#mnuCreateTour').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create tour dialog
@@ -12722,18 +12772,21 @@ var CZ;
                 CZ.Authoring.UI.createTour();
             });
 
-            $('#mnuEditTours').click(function (event)
+            $('#mnuEditTours').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show tours list pane (with edit options)
                 CZ.HomePageViewModel.panelShowToursList(true);
             });
 
-            $('#mnuMine').click(function (event)
+            $('#mnuMine').clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (!Menus.isSignedIn)
                 {
+                    // note that we want to show my collections after a successful log in
+                    sessionStorage.setItem('showMyCollections', 'requested');
+
                     // toggle display of register / log in pane
                     CZ.HomePageViewModel.panelToggleLogin();
                 }
@@ -12744,14 +12797,14 @@ var CZ;
                 }
             });
 
-            $('#mnuSearch').click(function (event)
+            $('#mnuSearch').clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 // toggle display of search pane
                 CZ.HomePageViewModel.panelToggleSearch();
             });
 
-            $('#mnuProfile').click(function (event)
+            $('#mnuProfile').clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (Menus.isSignedIn)
@@ -16770,8 +16823,8 @@ var CZ;
                 _super.call(this, container, formInfo);
             }
             FormLogin.prototype.show = function () {
-              //CZ.Menus.isDisabled = true;
-              //CZ.Menus.Refresh();
+                //CZ.Menus.isDisabled = true;
+                //CZ.Menus.Refresh();
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "right",
@@ -16780,8 +16833,9 @@ var CZ;
                 this.activationSource.addClass("active");
             };
             FormLogin.prototype.close = function () {
-              //CZ.Menus.isDisabled = false;
-              //CZ.Menus.Refresh();
+                //CZ.Menus.isDisabled = false;
+                //CZ.Menus.Refresh();
+                sessionStorage.removeItem('showMyCollections');
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "right",
@@ -17805,17 +17859,19 @@ var CZ;
                 else
                     this.descrTextblock.hide();
 
-                this.container.find("#takeTour, .cz-contentitem-listitem-icon").click(function (e)
-                {
-                    parent.TakeTour(context);
-                });
+                this.container.find('.cz-contentitem-listitem-icon, .cz-tourslist-viewing')
+                    .click(function (e) { parent.TakeTour(context);         })
+                ;
 
-                container.find(".cz-tourslist-editing").css("display", parent.EditTour ? "inline" : "none");
-                if (parent.EditTour) {
-                    this.container.find("#editTour").click(function (e) {
-                        parent.EditTour(context);
-                    });
-                }
+                this.container.find('.cz-tourslist-editing')
+                    .css('display', parent.EditTour ? 'inline' : 'none')
+                    .click(function (e) { parent.EditTour(context);         })
+                ;
+
+                this.container.find('.cz-tourslist-linking')
+                    .click(function (e) { CZ.Tours.getAutoTourURL(context); })
+                ;
+
             }
             return TourListItem;
         })(UI.ListItemBase);
@@ -17855,11 +17911,22 @@ var CZ;
                 } : null);
                 this.createTourBtn = this.container.find(formInfo.createTour);
 
-                if ((CZ.Settings.isAuthorized) && (CZ.Settings.userCollectionName == CZ.Service.collectionName))
-                    $("#cz-tours-list-title").text("My Tours");
+                if (CZ.Settings.isAuthorized && (CZ.Settings.userDisplayName == CZ.Settings.collectionOwner)) {
+                    
+                }
                 else {
-                    $("#cz-tours-list-title").text("Tours");
+                    
+                }
+
+                if (CZ.Settings.isAuthorized && CZ.Authoring.isEnabled) {
+                    $('#tours-missed-warning').text('Share and present your timeline by creating a tour.');
+                    $("#tours-create-button").show();
+                    $('#cz-tours-list-title').text('My Tours');
+                }
+                else {
+                    $('#tours-missed-warning').text('There are no tours currently in this collection.');
                     $("#tours-create-button").hide();
+                    $('#cz-tours-list-title').text('Tours');
                 }
 
                 if (formInfo.tours.length != 0) {
@@ -17873,8 +17940,7 @@ var CZ;
                 if (formInfo.tours.length == 0)
                     $("#take-tour-proposal").hide();
 
-                if (CZ.Common.isInCosmos())
-                {
+                if (CZ.Common.isInCosmos()) {
                     $('#tour-cosmos').hide();
                 }
 
@@ -18345,6 +18411,7 @@ var CZ;
 
             MessageWindow.prototype.close = function () {
                 var _this = this;
+                this.container.find('textarea').hide();
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "left",
@@ -19213,7 +19280,7 @@ var CZ;
             $('.header-logo').click(function ()
             {
                 //window.location.href = '/';
-                CZ.Overlay.Show(false);
+                CZ.Overlay.Show(false);  // false = home page overlay
             });
 
             // if URL has a supercollection
@@ -19524,18 +19591,30 @@ var CZ;
 
                 CZ.Service.getProfile().done(function (data) {
                     //Authorized
-                    if (data != "") {
-                        CZ.Settings.isAuthorized = true;
-                        CZ.Authoring.timer = setTimeout(function () {
-                            CZ.Authoring.showSessionForm();
-                        }, (CZ.Settings.sessionTime - 60) * 1000);
+                    if (data != "")
+                    {
+                        CZ.Settings.isAuthorized    = true;
+                        CZ.Settings.userDisplayName =  data.DisplayName || "";
+                        CZ.Authoring.timer =
+                            setTimeout(function ()
+                            {
+                                CZ.Authoring.showSessionForm();
+                            }, (CZ.Settings.sessionTime - 60) * 1000);
+                    }
+                    else
+                    {
+                        CZ.Settings.userDisplayName = "";
                     }
 
                     CZ.Authoring.isEnabled = UserCanEditCollection(data);
-                }).fail(function (error) {
-                    CZ.Authoring.isEnabled = UserCanEditCollection(null);
-                    CZ.Settings.isAuthorized = UserCanEditCollection(null);
-                }).always(function ()
+                })
+                .fail(function (error)
+                {
+                    CZ.Settings.userDisplayName = "";
+                    CZ.Authoring.isEnabled      = UserCanEditCollection(null);
+                    CZ.Settings.isAuthorized    = UserCanEditCollection(null);
+                })
+                .always(function ()
                 {
                     CZ.Menus.isSignedIn = CZ.Settings.isAuthorized;
                     CZ.Menus.Refresh();
@@ -19558,10 +19637,14 @@ var CZ;
                         }
                     });
 
-                    // get and display the collection title
+                    // get the collection title and owner and display the title
                     CZ.Service.getCollection().done(function (collection)
                     {
-                        if (collection != null) CZ.Common.collectionTitle = collection.Title || '';
+                        if (collection != null)
+                        {
+                            CZ.Common.collectionTitle   = collection.Title || '';
+                            CZ.Settings.collectionOwner = collection.User.DisplayName;
+                        }
                         $('#editCollectionButton .title').text(CZ.Common.collectionTitle);
                     });
                 });
@@ -19625,50 +19708,76 @@ var CZ;
                     }
                 };
 
-                CZ.Service.getProfile().done(function (data) {
-                    //Not authorized
-                    if (data == "") {
+                CZ.Service.getProfile().done(function (data)
+                {
+                    if (data == "")
+                    {
+                        // not authorized
                         $("#login-panel").show();
-                    } else if (data != "" && data.DisplayName == null) {
+                    }
+                    else if (data != "" && data.DisplayName == null)
+                    {
                         $("#login-panel").hide();
                         $("#profile-panel").show();
                         $("#profile-panel input#username").focus();
-                        if (!profileForm.isFormVisible) {
+                        if (!profileForm.isFormVisible)
+                        {
                             closeAllForms();
                             profileForm.show();
-                        } else {
+                        }
+                        else
+                        {
                             profileForm.close();
                         }
-                    } else {
+                    }
+                    else
+                    {
                         CZ.Settings.userSuperCollectionName = data.DisplayName;
-                        CZ.Settings.userCollectionName = data.DisplayName;
+                        CZ.Settings.userCollectionName      = data.DisplayName;
                         $("#login-panel").hide();
                         $("#profile-panel").show();
                         $(".auth-panel-login").html(data.DisplayName);
                     }
 
                     InitializeToursUI(data, forms);
-                }).fail(function (error) {
+                })
+                .fail(function (error)
+                {
                     $("#login-panel").show();
-
                     InitializeToursUI(null, forms);
+                })
+                .always(function ()
+                {
+                    // if my collections was requested and have logged in following request
+                    if (sessionStorage.getItem('showMyCollections') === 'requested' && CZ.Menus.isSignedIn)
+                    {
+                        // show my collections overlay
+                        CZ.Overlay.Show(true);
+                    }
+                    else
+                    {
+                        if  // if no auto-tour and collection is Big History collection
+                        (   
+                            CZ.Tours.getAutoTourGUID() === ''   // <--  Always check first as fn must fire.
+                            &&                                  //      This fn sets up tours.js's parseTours
+                            (                                   //      to auto-start a tour, if specified.
+                                (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
+                                window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                            )
+                        )
+                        {
+                            // show home page overlay
+                            CZ.Overlay.Show();
+                        }
+                    }
+                
+                    // remove any my collections queued request
+                    sessionStorage.removeItem('showMyCollections');
+
+                    // remove splash screen
+                    $('#splash').fadeOut('slow');
                 });
 
-                if  // if no auto-tour and Big History collection then show home page overlay
-                (   
-                    CZ.Tours.getAutoTourGUID() === ''   // <-- always check first as fn must fire
-                    &&
-                    (
-                        (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
-                        window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
-                    )
-                )
-                {
-                    CZ.Overlay.Show();
-                }
-
-                // remove splash screen
-                $('#splash').fadeOut('slow');
             });
 
             CZ.Service.getServiceInformation().then(function (response) {

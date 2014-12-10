@@ -1459,17 +1459,28 @@ a
     width: 330px;
     height: auto;
     left: 0;
-}
 
-    .cz-message-window > .cz-form-content
+    .cz-form-content
     {
-        position: absolute;
-        top: 36px;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        overflow: hidden;
+        position: relative;
+        top: 0;
+        height: auto !important;
+        padding: 1px 15px 10px 10px;
+        background-color: #fff;
+
+        textarea
+        {
+            display: none;
+            width: 100%;
+            margin-top: 12px;
+            overflow: auto;
+            resize: none;
+            background-color: #eee;
+            border-color: #ccc;
+            outline: none;
+        }
     }
+}
 
 /* Edit Tour Form */
 .cz-form-tour-edit
@@ -1560,6 +1571,24 @@ a
 .cz-tourlist-form > .cz-form-content > #tours
 {
     display: block;
+}
+
+#tours
+{
+    .cz-contentitem-listitem-descr
+    {
+        margin-bottom: 10px;
+    }
+    .cz-contentitem-listitem-button
+    {
+        padding-right: 10px;
+        border-right: solid 1px #ccc;
+        margin-right: 10px;
+        &:last-child
+        {
+            border-right-style: none;
+        }
+    }
 }
 
 #tour-cosmos .cz-contentitem-listitem-button

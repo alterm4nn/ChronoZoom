@@ -16,8 +16,8 @@ var CZ;
                 _super.call(this, container, formInfo);
             }
             FormLogin.prototype.show = function () {
-              //CZ.Menus.isDisabled = true;
-              //CZ.Menus.Refresh();
+                //CZ.Menus.isDisabled = true;
+                //CZ.Menus.Refresh();
                 _super.prototype.show.call(this, {
                     effect: "slide",
                     direction: "right",
@@ -26,8 +26,9 @@ var CZ;
                 this.activationSource.addClass("active");
             };
             FormLogin.prototype.close = function () {
-              //CZ.Menus.isDisabled = false;
-              //CZ.Menus.Refresh();
+                //CZ.Menus.isDisabled = false;
+                //CZ.Menus.Refresh();
+                sessionStorage.removeItem('showMyCollections');
                 _super.prototype.close.call(this, {
                     effect: "slide",
                     direction: "right",

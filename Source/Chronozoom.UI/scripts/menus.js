@@ -1,4 +1,26 @@
-﻿var CZ;
+﻿// The following jQuery extension is used by menus to stop click ghosting on touch-screen devices.
+// This can occur when looking for either click or touchstart events (both can fire on some touch
+// devices) without wanting to preventPropagation. Use $(elements).clicktouch(... instead of
+// .on('click touchstart'... or .click(...
+jQuery.fn.extend
+({
+    clicktouch: function (handler)
+    {
+        return this.each(function ()
+        {
+            var event = ('ontouchstart' in document) ? 'touchstart' : 'click';
+            $(this).on(event, handler);
+        });
+    }
+});
+
+
+
+/*********
+ * Menus *
+ *********/
+
+var CZ;
 (function (CZ) {
     /*
     
@@ -132,7 +154,7 @@
 
                 // *** secondary menu ***
 
-                .children('ul').children('li').click(function (event)
+                .children('ul').children('li').clicktouch(function (event)
                 {
                     event.stopPropagation();
 
@@ -162,7 +184,7 @@
 
                 // *** tertiary menu ***
 
-                .children('ul').children('li').click(function (event)
+                .children('ul').children('li').clicktouch(function (event)
                 {
                     event.stopPropagation();
 
@@ -176,21 +198,21 @@
              * Menu Item Hooks *
              *******************/
 
-            $('#mnuViewTours').click(function (event)
+            $('#mnuViewTours').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show tours list pane (hide edit options)
                 CZ.HomePageViewModel.panelShowToursList(false);
             });
 
-            $('#mnuViewSeries').click(function (event)
+            $('#mnuViewSeries').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // toggle display of time series pane
                 CZ.HomePageViewModel.panelToggleTimeSeries();
             });
 
-            $('#mnuCurate').hide().click(function (event)
+            $('#mnuCurate').hide().clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (!Menus.isSignedIn)
@@ -211,7 +233,7 @@
                 }
             });
 
-            $('#mnuCreateCollection').click(function (event)
+            $('#mnuCreateCollection').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create collection dialog
@@ -219,7 +241,7 @@
                 AddCollection();
             });
 
-            $('#mnuCreateTimeline').click(function (event)
+            $('#mnuCreateTimeline').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create timeline dialog
@@ -228,7 +250,7 @@
                 CZ.Authoring.UI.createTimeline();
             });
 
-            $('#mnuCreateExhibit').click(function (event)
+            $('#mnuCreateExhibit').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create exhibit dialog
@@ -237,7 +259,7 @@
                 CZ.Authoring.UI.createExhibit();
             });
 
-            $('#mnuCreateTour').click(function (event)
+            $('#mnuCreateTour').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show create tour dialog
@@ -246,18 +268,21 @@
                 CZ.Authoring.UI.createTour();
             });
 
-            $('#mnuEditTours').click(function (event)
+            $('#mnuEditTours').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show tours list pane (with edit options)
                 CZ.HomePageViewModel.panelShowToursList(true);
             });
 
-            $('#mnuMine').click(function (event)
+            $('#mnuMine').clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (!Menus.isSignedIn)
                 {
+                    // note that we want to show my collections after a successful log in
+                    sessionStorage.setItem('showMyCollections', 'requested');
+
                     // toggle display of register / log in pane
                     CZ.HomePageViewModel.panelToggleLogin();
                 }
@@ -268,14 +293,14 @@
                 }
             });
 
-            $('#mnuSearch').click(function (event)
+            $('#mnuSearch').clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 // toggle display of search pane
                 CZ.HomePageViewModel.panelToggleSearch();
             });
 
-            $('#mnuProfile').click(function (event)
+            $('#mnuProfile').clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
                 if (Menus.isSignedIn)
