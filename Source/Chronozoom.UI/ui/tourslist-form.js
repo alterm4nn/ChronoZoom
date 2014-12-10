@@ -30,13 +30,6 @@ var CZ;
                 } : null);
                 this.createTourBtn = this.container.find(formInfo.createTour);
 
-                if (CZ.Settings.isAuthorized && (CZ.Settings.userDisplayName == CZ.Settings.collectionOwner)) {
-                    
-                }
-                else {
-                    
-                }
-
                 if (CZ.Settings.isAuthorized && CZ.Authoring.isEnabled) {
                     $('#tours-missed-warning').text('Share and present your timeline by creating a tour.');
                     $("#tours-create-button").show();
