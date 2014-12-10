@@ -17911,22 +17911,24 @@ var CZ;
                 } : null);
                 this.createTourBtn = this.container.find(formInfo.createTour);
 
-                if (CZ.Settings.isAuthorized && (CZ.Settings.userDisplayName == CZ.Settings.collectionOwner)) {
-                    
-                }
-                else {
-                    
-                }
-
-                if (CZ.Settings.isAuthorized && CZ.Authoring.isEnabled) {
-                    $('#tours-missed-warning').text('Share and present your timeline by creating a tour.');
-                    $("#tours-create-button").show();
+                if (CZ.Settings.isAuthorized && (CZ.Settings.userDisplayName === CZ.Settings.collectionOwner))
+                {
                     $('#cz-tours-list-title').text('My Tours');
                 }
-                else {
+                else
+                {
+                    $('#cz-tours-list-title').text('Tours');
+                }
+
+                if (CZ.Settings.isAuthorized && CZ.Authoring.isEnabled)
+                {
+                    $('#tours-missed-warning').text('Share and present your timeline by creating a tour.');
+                    $("#tours-create-button").show();
+                }
+                else
+                {
                     $('#tours-missed-warning').text('There are no tours currently in this collection.');
                     $("#tours-create-button").hide();
-                    $('#cz-tours-list-title').text('Tours');
                 }
 
                 if (formInfo.tours.length != 0) {
