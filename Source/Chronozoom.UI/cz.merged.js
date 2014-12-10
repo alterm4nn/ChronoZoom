@@ -17911,24 +17911,22 @@ var CZ;
                 } : null);
                 this.createTourBtn = this.container.find(formInfo.createTour);
 
-                if (CZ.Settings.isAuthorized && (CZ.Settings.userDisplayName == CZ.Settings.collectionOwner))
-                {
-                    $('#cz-tours-list-title').text('My Tours');
+                if (CZ.Settings.isAuthorized && (CZ.Settings.userDisplayName == CZ.Settings.collectionOwner)) {
+                    
                 }
-                else
-                {
-                    $('#cz-tours-list-title').text('Tours');
+                else {
+                    
                 }
 
-                if (CZ.Settings.isAuthorized)
-                {
-                    $('tours-missed-warning').text('Share and present your timeline by creating a tour.');
+                if (CZ.Settings.isAuthorized && CZ.Authoring.isEnabled) {
+                    $('#tours-missed-warning').text('Share and present your timeline by creating a tour.');
                     $("#tours-create-button").show();
+                    $('#cz-tours-list-title').text('My Tours');
                 }
-                else
-                {
-                    $('tours-missed-warning').text('There are no tours currently in this collection.');
+                else {
+                    $('#tours-missed-warning').text('There are no tours currently in this collection.');
                     $("#tours-create-button").hide();
+                    $('#cz-tours-list-title').text('Tours');
                 }
 
                 if (formInfo.tours.length != 0) {
@@ -17942,8 +17940,7 @@ var CZ;
                 if (formInfo.tours.length == 0)
                     $("#take-tour-proposal").hide();
 
-                if (CZ.Common.isInCosmos())
-                {
+                if (CZ.Common.isInCosmos()) {
                     $('#tour-cosmos').hide();
                 }
 
