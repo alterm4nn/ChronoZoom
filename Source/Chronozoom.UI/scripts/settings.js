@@ -2,10 +2,12 @@
 var CZ;
 (function (CZ) {
     (function (Settings) {
-        Settings.isAuthorized = false;
-        Settings.userSuperCollectionName = "";
-        Settings.userCollectionName = "";
-        Settings.isCosmosCollection = false;
+        Settings.isAuthorized               = false;
+        Settings.userSuperCollectionName    = "";
+        Settings.userCollectionName         = "";
+        Settings.userDisplayName            = "";
+        Settings.collectionOwner            = ""; // owners' display name
+        Settings.isCosmosCollection         = false;
 
         Settings.favoriteTimelines = [];
 
