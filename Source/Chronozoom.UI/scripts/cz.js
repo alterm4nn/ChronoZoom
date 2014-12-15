@@ -653,46 +653,34 @@ var CZ;
 
                 CZ.Service.getProfile().done(function (data)
                 {
-                    if (data == "")
-                    {
-                        // not authorized
-                        $("#login-panel").show();
-                    }
-                    else if (data != "" && data.DisplayName == null)
-                    {
-                        $("#login-panel").hide();
-                        $("#profile-panel").show();
-                        $("#profile-panel input#username").focus();
-                        if (!profileForm.isFormVisible)
-                        {
-                            closeAllForms();
-                            profileForm.show();
-                        }
-                        else
-                        {
-                            profileForm.close();
-                        }
-                    }
-                    else
+                    if (data !== '' && data.DisplayName != null)
                     {
                         CZ.Settings.userSuperCollectionName = data.DisplayName;
                         CZ.Settings.userCollectionName      = data.DisplayName;
-                        $("#login-panel").hide();
-                        $("#profile-panel").show();
-                        $(".auth-panel-login").html(data.DisplayName);
                     }
 
                     InitializeToursUI(data, forms);
                 })
                 .fail(function (error)
                 {
-                    $("#login-panel").show();
                     InitializeToursUI(null, forms);
                 })
                 .always(function ()
                 {
-                    // if my collections was requested and have logged in following request
-                    if (sessionStorage.getItem('showMyCollections') === 'requested' && CZ.Menus.isSignedIn)
+                    // **************************************
+                    // *** Start-Up Overlay Display Logic ***
+                    // **************************************
+
+                    // if logged in and user hasn't completed profile
+                    if (CZ.Menus.isSignedIn && CZ.Settings.userSuperCollectionName === '')
+                    {
+                        // show profile form on top of home page overlay
+                        CZ.Overlay.Show();
+                        profileForm.show();
+                        $('#username').focus();
+                    }
+                    // else if logged in and my collections was requested
+                    else if (CZ.Menus.isSignedIn && sessionStorage.getItem('showMyCollections') === 'requested')
                     {
                         // show my collections overlay
                         CZ.Overlay.Show(true);
@@ -700,7 +688,7 @@ var CZ;
                     else
                     {
                         if  // if no auto-tour and collection is Big History collection
-                        (   
+                        (
                             CZ.Tours.getAutoTourGUID() === ''   // <--  Always check first as fn must fire.
                             &&                                  //      This fn sets up tours.js's parseTours
                             (                                   //      to auto-start a tour, if specified.
@@ -713,7 +701,7 @@ var CZ;
                             CZ.Overlay.Show();
                         }
                     }
-                
+
                     // remove any my collections queued request
                     sessionStorage.removeItem('showMyCollections');
 
