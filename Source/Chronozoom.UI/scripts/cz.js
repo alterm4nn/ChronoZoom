@@ -532,66 +532,6 @@ var CZ;
                     sessionButton: "#session-button"
                 });
 
-                CZ.Service.getProfile().done(function (data) {
-                    //Authorized
-                    if (data != "")
-                    {
-                        CZ.Settings.isAuthorized    = true;
-                        CZ.Settings.userDisplayName =  data.DisplayName || "";
-                        CZ.Authoring.timer =
-                            setTimeout(function ()
-                            {
-                                CZ.Authoring.showSessionForm();
-                            }, (CZ.Settings.sessionTime - 60) * 1000);
-                    }
-                    else
-                    {
-                        CZ.Settings.userDisplayName = "";
-                    }
-
-                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
-                })
-                .fail(function (error)
-                {
-                    CZ.Settings.userDisplayName = "";
-                    CZ.Authoring.isEnabled      = UserCanEditCollection(null);
-                    CZ.Settings.isAuthorized    = UserCanEditCollection(null);
-                })
-                .always(function ()
-                {
-                    CZ.Menus.isSignedIn = CZ.Settings.isAuthorized;
-                    CZ.Menus.Refresh();
-
-                    if (CZ.Authoring.isEnabled) $('#editCollectionButton .hidden').removeClass('hidden');
-
-                    //retrieving the data
-                    CZ.Common.loadData().then(function (response) {
-                        // collection is empty
-                        if (!response) {
-                            // author should create a root timeline
-                            // TODO: store 'user' variable in CZ that is the response of getProfile()
-                            if (CZ.Authoring.isEnabled) {
-                                if (CZ.Authoring.showCreateRootTimelineForm) {
-                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
-                                }
-                            } else {
-                                CZ.Authoring.showMessageWindow("Looks like this collection is empty. Come back later when author will fill it with content.", "Collection is empty :(");
-                            }
-                        }
-                    });
-
-                    // get the collection title and owner and display the title
-                    CZ.Service.getCollection().done(function (collection)
-                    {
-                        if (collection != null)
-                        {
-                            CZ.Common.collectionTitle   = collection.Title || '';
-                            CZ.Settings.collectionOwner = collection.User.DisplayName;
-                        }
-                        $('#editCollectionButton .title').text(CZ.Common.collectionTitle);
-                    });
-                });
-
                 var loginForm = new CZ.UI.FormLogin
                 (
                     forms[6],
@@ -653,46 +593,97 @@ var CZ;
 
                 CZ.Service.getProfile().done(function (data)
                 {
-                    if (data == "")
+                    if (data !== '')
                     {
-                        // not authorized
-                        $("#login-panel").show();
-                    }
-                    else if (data != "" && data.DisplayName == null)
-                    {
-                        $("#login-panel").hide();
-                        $("#profile-panel").show();
-                        $("#profile-panel input#username").focus();
-                        if (!profileForm.isFormVisible)
+                        CZ.Settings.isAuthorized            = true;
+                        CZ.Menus.isSignedIn                 = true;
+                        CZ.Menus.Refresh();
+                        CZ.Settings.userSuperCollectionName = data.DisplayName || '';
+                        CZ.Settings.userCollectionName      = data.DisplayName || '';
+                        CZ.Settings.userDisplayName         = data.DisplayName || '';
+                        CZ.Authoring.timer                  = setTimeout(function ()
                         {
-                            closeAllForms();
-                            profileForm.show();
-                        }
-                        else
-                        {
-                            profileForm.close();
-                        }
-                    }
-                    else
-                    {
-                        CZ.Settings.userSuperCollectionName = data.DisplayName;
-                        CZ.Settings.userCollectionName      = data.DisplayName;
-                        $("#login-panel").hide();
-                        $("#profile-panel").show();
-                        $(".auth-panel-login").html(data.DisplayName);
+                            CZ.Authoring.showSessionForm();
+                        }, (CZ.Settings.sessionTime - 60) * 1000);
                     }
 
+                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
                     InitializeToursUI(data, forms);
                 })
                 .fail(function (error)
                 {
-                    $("#login-panel").show();
+                    var canEdit                 = UserCanEditCollection(null);
+                    CZ.Authoring.isEnabled      = canEdit;
+                    CZ.Settings.isAuthorized    = canEdit;
+
                     InitializeToursUI(null, forms);
                 })
                 .always(function ()
                 {
-                    // if my collections was requested and have logged in following request
-                    if (sessionStorage.getItem('showMyCollections') === 'requested' && CZ.Menus.isSignedIn)
+                    // *****************************
+                    // *** Collection Load Logic ***
+                    // *****************************
+
+                    // load the entire collection
+                    CZ.Common.loadData().then(function (response)
+                    {
+                        // if collection is empty
+                        if (!response)
+                        {
+                            // if user has edit rights
+                            if (CZ.Authoring.isEnabled)
+                            {
+                                // show a form to create the root timeline
+                                if (CZ.Authoring.showCreateRootTimelineForm)
+                                {
+                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
+                                }
+                            }
+                            else
+                            {
+                                // tell the user there is no content
+                                CZ.Authoring.showMessageWindow
+                                (
+                                    'There is no content in this collection yet. '               +
+                                    'Please click on the ChronoZoom logo, (found just above this message,) '  +
+                                    'to see some other collections that you can view.',
+                                    "Collection Has No Content"
+                                );
+                            }
+                        }
+                    });
+
+                    // get and store the collection title and owner
+                    CZ.Service.getCollection().done(function (collection)
+                    {
+                        if (collection != null)
+                        {
+                            CZ.Common.collectionTitle   = collection.Title || '';
+                            CZ.Settings.collectionOwner = collection.User.DisplayName;
+                        }
+
+                        //  set the canvas edit collection icon title
+                        $('#editCollectionButton').find('.title').text(CZ.Common.collectionTitle);
+                    });
+
+
+                    // **************************************
+                    // *** Start-Up Overlay Display Logic ***
+                    // **************************************
+
+                    // if user can edit collection then unhide the canvas edit collection icon
+                    if (CZ.Authoring.isEnabled) $('#editCollectionButton').find('.hidden').removeClass('hidden');
+
+                    // if logged in and user hasn't completed profile
+                    if (CZ.Menus.isSignedIn && CZ.Settings.userSuperCollectionName === '')
+                    {
+                        // show profile form on top of home page overlay
+                        CZ.Overlay.Show();
+                        profileForm.show();
+                        $('#username').focus();
+                    }
+                    // else if logged in and my collections was requested
+                    else if (CZ.Menus.isSignedIn && sessionStorage.getItem('showMyCollections') === 'requested')
                     {
                         // show my collections overlay
                         CZ.Overlay.Show(true);
@@ -700,7 +691,7 @@ var CZ;
                     else
                     {
                         if  // if no auto-tour and collection is Big History collection
-                        (   
+                        (
                             CZ.Tours.getAutoTourGUID() === ''   // <--  Always check first as fn must fire.
                             &&                                  //      This fn sets up tours.js's parseTours
                             (                                   //      to auto-start a tour, if specified.
@@ -713,7 +704,7 @@ var CZ;
                             CZ.Overlay.Show();
                         }
                     }
-                
+
                     // remove any my collections queued request
                     sessionStorage.removeItem('showMyCollections');
 
