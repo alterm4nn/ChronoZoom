@@ -12505,14 +12505,25 @@ var CZ;
 ﻿// The following jQuery extension is used by menus to stop click ghosting on touch-screen devices.
 // This can occur when looking for either click or touchstart events (both can fire on some touch
 // devices) without wanting to preventPropagation. Use $(elements).clicktouch(... instead of
-// .on('click touchstart'... or .click(...
+// .on('click touchstart' or similar.
 jQuery.fn.extend
 ({
     clicktouch: function (handler)
     {
         return this.each(function ()
         {
-            var event = ('ontouchstart' in document) ? 'touchstart' : 'click';
+            // touchstart       = standard touch screen event (not supported by IE.)
+            // pointerdown      = IE11+ mouse or touch screen event, other browsers adopting.
+            // mspointerdown    = IE10  mouse or touch screen event, other browsers adopting.
+            // click            = standard mouse event (not supported by some touch screens.)
+
+            var event;
+
+            if      ('ontouchstart'     in window)  event = 'touchstart'
+            else if ('onpointerdown'    in window)  event = 'pointerdown'
+            else if ('onmspointerdown'  in window)  event = 'mspointerdown'
+            else                                    event = 'click';
+
             $(this).on(event, handler);
         });
     }
