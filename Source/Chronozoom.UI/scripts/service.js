@@ -204,9 +204,26 @@ var CZ;
         }
         Service.importTimelines = importTimelines;
 
-        /**
-        * Chronozoom.svc Requests.
-        */
+        // .../getroot?supercollection=&collection=
+        function getRootTimelineId(sc, c)
+        {
+            if (typeof sc === "undefined") sc = Service.superCollectionName;
+            if (typeof  c === "undefined") c  = Service.collectionName;
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath("getroot");
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
+            return $.ajax
+            ({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getRootTimelineId = getRootTimelineId;
+
         // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
         function getTimelines(r, sc, c) {
             if (typeof sc === "undefined") sc = Service.superCollectionName;

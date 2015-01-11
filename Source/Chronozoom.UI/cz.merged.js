@@ -9636,9 +9636,26 @@ var CZ;
         }
         Service.importTimelines = importTimelines;
 
-        /**
-        * Chronozoom.svc Requests.
-        */
+        // .../getroot?supercollection=&collection=
+        function getRootTimelineId(sc, c)
+        {
+            if (typeof sc === "undefined") sc = Service.superCollectionName;
+            if (typeof  c === "undefined") c  = Service.collectionName;
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath("getroot");
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
+            return $.ajax
+            ({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getRootTimelineId = getRootTimelineId;
+
         // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
         function getTimelines(r, sc, c) {
             if (typeof sc === "undefined") sc = Service.superCollectionName;
@@ -12790,6 +12807,22 @@ var CZ;
                 CZ.HomePageViewModel.panelShowToursList(true);
             });
 
+            $('#mnuExportCollection').clicktouch(function (event)
+            {
+                event.stopPropagation();
+                // show export collection dialog
+                CZ.HomePageViewModel.closeAllForms();
+                ExportCollection();
+            });
+
+            $('#mnuImportCollection').clicktouch(function (event)
+            {
+                event.stopPropagation();
+                // show import collection dialog
+                CZ.HomePageViewModel.closeAllForms();
+                ImportCollection();
+            });
+
             $('#mnuMine').clicktouch(function (event)
             {
                 if (Menus.isDisabled) return;
@@ -12897,6 +12930,77 @@ var CZ;
 
         };
 
+
+        this.ExportCollection =
+        function ExportCollection()
+        {
+            var promiseRootId       = CZ.Service.getRootTimelineId();
+            var promiseCollection   = CZ.Service.getCollection();
+            var promiseTours        = CZ.Service.getTours();
+
+            $.when
+            (
+                promiseRootId,
+                promiseCollection,
+                promiseTours
+            )
+            .done(function(rootId, collection, tours)
+            {
+
+                CZ.Service.exportTimelines(rootId[0])
+                .done(function (timelines)
+                {
+                    var exportData =
+                    {
+                        schema:     constants.schemaVersion,
+                        collection:
+                        {
+                            Title:  collection[0].Title,
+                            theme:  collection[0].theme
+                        },
+                        timelines:  timelines,
+                        tours:      tours[0].d
+                    };
+
+                    var fileBLOB = new Blob([JSON.stringify(exportData)], { type: 'text/plain;charset=utf-8' });
+                    var fileName = 'cz.' + collection[0].Path + '.json';
+
+                    saveAs(fileBLOB, fileName);
+
+                    CZ.Authoring.showMessageWindow
+                    (
+                        'The current collection has been provided to you as a file, which you can retain as a back-up, or share with others. ' +
+                        'If you are not prompted to pick a file name, please check your downloads for a file called: "' + fileName + '".',
+                        'Collection Successfully Exported'
+                    );
+                })
+                .fail(function ()
+                {
+                    CZ.Authoring.showMessageWindow
+                    (
+                        'Sorry, we were unable to export this collection.',
+                        'Unable to Export Collection'
+                    );
+                });
+
+            })
+            .fail(function()
+            {
+                CZ.Authoring.showMessageWindow
+                (
+                    'An unexpected error occured. Please feel free to try again.',
+                    'Unable to Export Collection'
+                );
+            });
+
+        };
+
+
+        this.ImportCollection =
+        function ImportCollection()
+        {
+            // TODO
+        };
 
 
     })(CZ.Menus || (CZ.Menus = {}));

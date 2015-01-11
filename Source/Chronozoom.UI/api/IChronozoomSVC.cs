@@ -53,6 +53,17 @@ namespace Chronozoom.UI
         /// <returns>The GUID id of the desired collection if it exists in the db, or an empty GUID if it can't be found.</returns>
         Guid CollectionIdOrDefault(Storage storage, string superCollectionName, string collectionPath);
 
+        /// <summary>Returns the root timeline id for the given collection.</summary>
+        /// <param name="superCollection">The supercollection's name.</param>
+        /// <param name="collection">The collection's path.</param>
+        /// <returns>
+        /// The GUID of the root timeline if it can be found else an empty GUID.
+        /// ChronoZoom's Cosmos collection's root timeline equals an empty GUID too.
+        /// </returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        Guid GetRoot(string superCollection, string collection);
+
         /// <summary>
         /// Returns timeline data within a specified range of years from a collection or a superCollection.
         /// </summary>

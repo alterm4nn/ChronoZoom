@@ -293,9 +293,6 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documented under IChronozoomSVC
         /// </summary>
-        /// <param name="intoTimelineId"></param>
-        /// <param name="newTimelineTree"></param>
-        /// <returns></returns>
         public String ImportTimelines(string intoTimelineId, List<Utils.ExportImport.FlatTimeline> newTimelineTree)
         {
             Guid guid = new Guid(intoTimelineId);
@@ -304,6 +301,20 @@ namespace Chronozoom.UI
             {
                 return xfer.ImportTimelines(guid, newTimelineTree);
             }
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public Guid GetRoot(string superCollection, string collection)
+        {
+            return ApiOperation(delegate(User user, Storage storage)
+            {
+                Guid collectionId = CollectionIdOrDefault(storage, superCollection, collection);
+                Timeline timeline = storage.GetRootTimelines(collectionId);
+
+                return timeline == null ? new Guid() : timeline.Id;
+            });
         }
 
         /// <summary>
