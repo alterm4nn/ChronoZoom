@@ -431,6 +431,7 @@ var CZ;
                 {
                     var exportData =
                     {
+                        date:       new Date().toUTCString(),
                         schema:     constants.schemaVersion,
                         collection:
                         {

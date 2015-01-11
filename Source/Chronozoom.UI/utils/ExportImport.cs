@@ -96,6 +96,11 @@ namespace Chronozoom.UI.Utils
                 flatTimeline.parentTimelineId           = parentTimelineId;
                 flatTimeline.timeline                   = timeline;
 
+                for (int eachExhibit = 0; eachExhibit < flatTimeline.timeline.Exhibits.Count; eachExhibit++)
+                {
+                    flatTimeline.timeline.Exhibits[eachExhibit].UpdatedBy = null;
+                }
+
                 foreach (Timeline child in timeline.ChildTimelines)
                 {
                     IterateTimelineExport(timeline.Id, child.Id);
