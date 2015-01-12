@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Data.Linq;
 using System.Diagnostics;
 using System.Linq;
+//using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using Chronozoom.Entities;
 
@@ -19,8 +23,18 @@ namespace Chronozoom.UI.Utils
     public class ExportImport : IDisposable
     {
         private List<FlatTimeline>  _flatTimelines;
+        //private MD5                 _MD5Hasher;
         private Storage             _storage;
         private User                _user;
+
+        public class FlatCollection
+        {
+            public string               date        { get; set; }
+            public string               schema      { get; set; }
+            public Collection           collection  { get; set; }
+            public List<FlatTimeline>   timelines   { get; set; }
+            public List<Tour>           tours       { get; set; }
+        }
 
         public class FlatTimeline
         {
@@ -37,6 +51,9 @@ namespace Chronozoom.UI.Utils
 
             // persist user object
             _user = GetUser();
+
+            // persist md5 hasher
+            //_MD5Hasher = MD5.Create();
         }
 
         private User GetUser()
@@ -65,6 +82,7 @@ namespace Chronozoom.UI.Utils
             {
                 // free any managed resources
                 _storage.Dispose();
+                //_MD5Hasher.Dispose();
             }
             // free any native resources
         }
@@ -109,6 +127,135 @@ namespace Chronozoom.UI.Utils
                 flatTimeline.timeline.ChildTimelines    = null;
                 _flatTimelines.Add(flatTimeline);
             }
+        }
+
+        public string ImportCollection(string collectionTitle, string collectionTheme, List<FlatTimeline> timelines, List<Tour> tours)
+        {
+            int                     titleCount  = 1;
+            string                  titleAppend = "";
+            string                  path        = Regex.Replace(collectionTitle.Trim(), @"[^A-Za-z0-9]+", "").ToLower(); 
+            Guid                    newGUID;
+            Dictionary<Guid, Guid>  newGUIDs    = new Dictionary<Guid, Guid>();
+            DateTime                timestamp   = DateTime.UtcNow;
+
+            // ensure user logged in
+
+            if (_user == null) { return "In order to import a collection, you must first be logged in."; }
+
+            // ensure collection title is unique for user
+
+            while
+            (
+                _storage.Collections.Where(c => c.User.Id == _user.Id && c.Path == path + titleAppend).FirstOrDefault() != null
+            )
+            {
+                titleCount++;
+                titleAppend = "-" + titleCount;
+            }
+
+            if ((path + titleAppend).Length > 50) { return "Either the name of the collection to be imported is too long, or a collecton with this name already exists."; }
+
+            // create new collection under existing user's supercollection
+
+            SuperCollection superCollection = _storage.SuperCollections.Where(s => s.User.Id == _user.Id).Include("User").Include("Collections").FirstOrDefault();
+
+            if (superCollection == null) { return "The collection could not be imported as you are not properly logged in. Please log out then log back in again first."; }
+
+            //newGUID = CollectionIdFromText
+            //(
+            //    string.Format
+            //    (
+            //        superCollection.Title.Trim().ToLower() + "|" + path + titleAppend
+            //    )
+            //);
+
+            Collection collection = new Collection
+            {
+                //Id                  = newGUID,  // apparently this needs to be a fudge of title and path for URL rather than Guid.NewGuid()
+                Id                  = Guid.NewGuid(),
+                SuperCollection     = superCollection,
+                Default             = false,
+                Path                = path + titleAppend,
+                Title               = collectionTitle.Trim() + titleAppend,
+                Theme               = collectionTheme == "" ? null : collectionTheme,
+                MembersAllowed      = false,
+                Members             = null,
+                PubliclySearchable  = false,
+                User                = _user
+            };
+
+            superCollection.Collections.Add(collection);
+
+            // iterate through each timeline
+
+            foreach (FlatTimeline flat in timelines)
+            {
+                // replace GUIDs with new ones since we're cloning rather than moving
+
+                // keep cross-reference between old and new timelineIds so child timelines can maintain a pointer to their parents
+                newGUID = Guid.NewGuid();
+                newGUIDs.Add(flat.timeline.Id, newGUID);
+
+                flat.timeline.Id            = newGUID;
+                flat.timeline.Collection    = collection;
+
+                if (flat.parentTimelineId != null) // not root timeline
+                {
+                    flat.parentTimelineId   = newGUIDs[(Guid)flat.parentTimelineId];
+                }
+
+                // no need to keep cross-reference for exhibits or their content items but they will need new GUIDs
+                for (int eachExhibit = 0; eachExhibit < flat.timeline.Exhibits.Count; eachExhibit++)
+                {
+                    flat.timeline.Exhibits[eachExhibit].Id          = Guid.NewGuid();
+                    flat.timeline.Exhibits[eachExhibit].Collection  = collection;
+                    flat.timeline.Exhibits[eachExhibit].UpdatedBy   = _user;
+                    flat.timeline.Exhibits[eachExhibit].UpdatedTime = timestamp;
+
+                    for (int eachItem = 0; eachItem < flat.timeline.Exhibits[eachExhibit].ContentItems.Count; eachItem++)
+                    {
+                        flat.timeline.Exhibits[eachExhibit].ContentItems[eachItem].Id         = Guid.NewGuid();
+                        flat.timeline.Exhibits[eachExhibit].ContentItems[eachItem].Collection = collection;
+                    }
+                }
+
+                // add timeline to database
+
+                if (flat.parentTimelineId == null)
+                {
+                    _storage.Timelines.Add(flat.timeline);
+                }
+                else
+                {
+                    Timeline parentTimeline =
+                    _storage.Timelines.Where(t => t.Id == flat.parentTimelineId)
+                    .Include("ChildTimelines.Exhibits.ContentItems")
+                    .FirstOrDefault();
+
+                    parentTimeline.ChildTimelines.Add(flat.timeline);
+                }
+
+                // commit creations
+
+                try
+                {
+                    _storage.SaveChanges();
+                }
+                catch (DbEntityValidationException dbEx)
+                {
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                        }
+                    }
+                    return "Sorry, we were unable to fully import this collection due to an unexpected error, but it may have partially been imported. Please click on My Collections to check.";
+                }
+
+            }
+
+            return "The collection has been imported as \"" + collection.Title + "\". Please click on \"My Collections\" in order to see your new collection.";
         }
 
         public string ImportTimelines(Guid intoTimelineId, List<FlatTimeline> importContent)
@@ -208,6 +355,19 @@ namespace Chronozoom.UI.Utils
             return "\"" + importContent[0].timeline.Title + "\" has been pasted into \"" + target.Title + "\". " +
                    "You may need to refresh your browser in order to see any new content.";
         }
+
+        //private Guid CollectionIdFromText(string value)
+        //{
+        //    value = value.Replace(' ', '-');
+
+        //    byte[] data = null;
+        //    lock (_MD5Hasher)
+        //    {
+        //        data = _MD5Hasher.ComputeHash(Encoding.Default.GetBytes(value.ToLowerInvariant()));
+        //    }
+
+        //    return new Guid(data);
+        //}
 
         private bool UserIsMember(Guid collectionId)
         {

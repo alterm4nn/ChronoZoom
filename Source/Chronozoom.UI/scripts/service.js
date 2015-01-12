@@ -204,6 +204,29 @@ var CZ;
         }
         Service.importTimelines = importTimelines;
 
+        // .../import/collection
+        function importCollection(collectionTree)
+        {
+            if (typeof collectionTree !== 'string')
+            {
+                throw 'importCollection(collectionTree) missing the collectionTree parameter.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath('import');
+            request.addToPath('collection');
+            return $.ajax
+            ({
+                type:           'PUT',
+                cache:          false,
+                url:            request.url,
+                contentType:    'application/json',
+                dataType:       'json',
+                data:           collectionTree      // should already be JSON.stringified
+            });
+        }
+        Service.importCollection = importCollection;
+
         // .../getroot?supercollection=&collection=
         function getRootTimelineId(sc, c)
         {

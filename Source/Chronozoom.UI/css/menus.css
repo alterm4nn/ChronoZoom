@@ -85,4 +85,9 @@
   color: #fff;
   border-radius: 8px;
 }
+/* file import element must have visible to work yet should be hidden */
+#mnuFile {
+  opacity: 0;
+  z-index: -1;
+}
 /*# sourceMappingURL=menus.css.map */

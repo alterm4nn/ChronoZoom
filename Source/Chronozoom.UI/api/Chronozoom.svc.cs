@@ -306,6 +306,23 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documented under IChronozoomSVC
         /// </summary>
+        public String ImportCollection(Utils.ExportImport.FlatCollection collectionTree)
+        {
+            using (Utils.ExportImport xfer = new Utils.ExportImport())
+            {
+                return xfer.ImportCollection
+                (
+                    collectionTree.collection.Title,
+                    collectionTree.collection.Theme,
+                    collectionTree.timelines,
+                    collectionTree.tours
+                );
+            }
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
         public Guid GetRoot(string superCollection, string collection)
         {
             return ApiOperation(delegate(User user, Storage storage)

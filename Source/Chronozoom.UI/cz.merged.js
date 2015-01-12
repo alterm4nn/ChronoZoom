@@ -9636,6 +9636,29 @@ var CZ;
         }
         Service.importTimelines = importTimelines;
 
+        // .../import/collection
+        function importCollection(collectionTree)
+        {
+            if (typeof collectionTree !== 'string')
+            {
+                throw 'importCollection(collectionTree) missing the collectionTree parameter.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath('import');
+            request.addToPath('collection');
+            return $.ajax
+            ({
+                type:           'PUT',
+                cache:          false,
+                url:            request.url,
+                contentType:    'application/json',
+                dataType:       'json',
+                data:           collectionTree      // should already be JSON.stringified
+            });
+        }
+        Service.importCollection = importCollection;
+
         // .../getroot?supercollection=&collection=
         function getRootTimelineId(sc, c)
         {
@@ -12810,7 +12833,7 @@ var CZ;
             $('#mnuExportCollection').clicktouch(function (event)
             {
                 event.stopPropagation();
-                // show export collection dialog
+                // initiate export and inform user when complete
                 CZ.HomePageViewModel.closeAllForms();
                 ExportCollection();
             });
@@ -12818,9 +12841,12 @@ var CZ;
             $('#mnuImportCollection').clicktouch(function (event)
             {
                 event.stopPropagation();
-                // show import collection dialog
+                // prompt user to pick file then import
                 CZ.HomePageViewModel.closeAllForms();
-                ImportCollection();
+                $('#mnuFileJSON')
+                    .data('mnuItem', '#mnuImportCollection')
+                    .val('')
+                    .trigger('click');
             });
 
             $('#mnuMine').clicktouch(function (event)
@@ -12861,6 +12887,47 @@ var CZ;
                     // toggle display of register / log in pane
                     CZ.HomePageViewModel.panelToggleLogin();
                 }
+            });
+
+            $('#mnuFileJSON').on('input, change', function (event)
+            {
+                // mnuFileJSON is used for picking which file to upload
+                // and can be shared over several menu items if desired
+
+                if (this.value === '' || this.files.length < 1) return;
+
+                var json;
+
+                // setup to catch when file has finished loading OK
+                var file    = new FileReader();
+                file.onload = function (event)
+                {
+                    // tell user if invalid JSON (faster to parse client-side)
+                    try
+                    {
+                        json = $.parseJSON(file.result);
+                    }
+                    catch(error)
+                    {
+                        CZ.Authoring.showMessageWindow
+                        (
+                            "This file is not a valid .json file.",
+                            "Invalid File Format"
+                        );
+                        return;
+                    }
+
+                    // hand data off to appropriate menu item's fn
+                    switch ($('#mnuFileJSON').data('mnuItem'))
+                    {
+                        case '#mnuImportCollection':
+                            ImportCollection(file.result);
+                            break;
+                    }
+                };
+
+                // initiate the file load
+                file.readAsText(this.files[0], 'utf8');
             });
 
         });
@@ -12963,7 +13030,7 @@ var CZ;
                         tours:      tours[0].d
                     };
 
-                    var fileBLOB = new Blob([JSON.stringify(exportData)], { type: 'text/plain;charset=utf-8' });
+                    var fileBLOB = new Blob([JSON.stringify(exportData)], { type: 'application/json;charset=utf-8' });
                     var fileName = 'cz.' + collection[0].Path + '.json';
 
                     saveAs(fileBLOB, fileName);
@@ -12998,9 +13065,12 @@ var CZ;
 
 
         this.ImportCollection =
-        function ImportCollection()
+        function ImportCollection(stringifiedJSON)
         {
-            // TODO
+            CZ.Service.importCollection(stringifiedJSON).then(function (importMessage)
+            {
+                CZ.Authoring.showMessageWindow(importMessage);
+            });
         };
 
 
