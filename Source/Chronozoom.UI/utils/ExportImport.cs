@@ -133,7 +133,7 @@ namespace Chronozoom.UI.Utils
         {
             int                     titleCount  = 1;
             string                  titleAppend = "";
-            string                  path        = Regex.Replace(collectionTitle.Trim(), @"[^A-Za-z0-9]+", "").ToLower(); 
+            string                  path        = Regex.Replace(collectionTitle.Trim(), @"[^A-Za-z0-9\-]+", "").ToLower(); 
             Guid                    newGUID;
             Dictionary<Guid, Guid>  newGUIDs    = new Dictionary<Guid, Guid>();
             DateTime                timestamp   = DateTime.UtcNow;

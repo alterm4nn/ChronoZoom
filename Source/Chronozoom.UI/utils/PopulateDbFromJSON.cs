@@ -66,8 +66,8 @@ namespace Chronozoom.UI.Utils
             collectionTitle     = collectionTitle.Trim();
 
             // generate equivalent path names (uniqueness is assumed)
-            string superCollectionPath  = Regex.Replace(curatorDisplayName, @"[^A-Za-z0-9]+", "").ToLower();    // Aa-Zz and 0-9 only, converted to lower case.
-            string collectionPath       = Regex.Replace(collectionTitle,    @"[^A-Za-z0-9]+", "").ToLower();    // Aa-Zz and 0-9 only, converted to lower case.
+            string superCollectionPath  = Regex.Replace(curatorDisplayName, @"[^A-Za-z0-9\-]+", "").ToLower();  // Aa-Zz, 0-9 and hyphen only, converted to lower case.
+            string collectionPath       = Regex.Replace(collectionTitle,    @"[^A-Za-z0-9\-]+", "").ToLower();  // Aa-Zz, 0-9 and hyphen only, converted to lower case.
 
             // get curator's user record or create if doesn't exist
             User user = _storage.Users.Where(u => u.DisplayName == curatorDisplayName).FirstOrDefault();

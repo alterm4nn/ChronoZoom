@@ -946,7 +946,7 @@ var CZ;
             }, 1.0, vp, false), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
 
-            var bid = window.location.hash.match("b=([a-z0-9_]+)");
+            var bid = window.location.hash.match("b=([a-z0-9_\-]+)");
             if (bid) {
                 //bid[0] - source string
                 //bid[1] - found match

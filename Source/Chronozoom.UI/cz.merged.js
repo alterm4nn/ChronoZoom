@@ -12945,7 +12945,7 @@ var CZ;
             var newName = prompt("What name would you like for your new collection?\nNote: The name must be unique among your collections.", '') || '';
             newName     = $.trim(newName);
 
-            var newPath = newName.replace(/[^a-zA-Z0-9]/g, '');
+            var newPath = newName.replace(/[^a-zA-Z0-9\-]/g, '');
             if (newPath === '') return;
 
             if (newPath.length > 50)
@@ -16408,7 +16408,7 @@ var CZ;
                         var collectionData =
                         {
                             Title:              $.trim(_this.collectionName.val()),
-                            Path:               _this.collectionName.val().replace(/[^a-zA-Z0-9]/g, ''),
+                            Path:               _this.collectionName.val().replace(/[^a-zA-Z0-9\-]/g, ''),
                             theme:              JSON.stringify(_this.collectionTheme),
                             PubliclySearchable: $(_this.chkPublic ).prop('checked'),
                             MembersAllowed:     $(_this.chkEditors).prop('checked'),
@@ -16526,7 +16526,7 @@ var CZ;
                     (
                         window.location.protocol + '//' + window.location.host + '/' +
                         CZ.Service.superCollectionName + '/' +
-                        this.collectionName.val().replace(/[^a-zA-Z0-9]/g, '')
+                        this.collectionName.val().replace(/[^a-zA-Z0-9\-]/g, '')
                     )
                     .toLowerCase()
                 );
@@ -20191,7 +20191,7 @@ var CZ;
             }, 1.0, vp, false), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
 
-            var bid = window.location.hash.match("b=([a-z0-9_]+)");
+            var bid = window.location.hash.match("b=([a-z0-9_\-]+)");
             if (bid) {
                 //bid[0] - source string
                 //bid[1] - found match

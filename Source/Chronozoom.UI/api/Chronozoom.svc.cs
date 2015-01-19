@@ -1103,7 +1103,7 @@ namespace Chronozoom.UI
                 superCollection = new SuperCollection
                 {
                     Id              = Guid.NewGuid(),
-                    Title           = Regex.Replace(user.DisplayName.Trim(), @"[^A-Za-z0-9]+", "").ToLower(),
+                    Title           = Regex.Replace(user.DisplayName.Trim(), @"[^A-Za-z0-9\-]+", "").ToLower(),
                     User            = user,
                     Collections     = new System.Collections.ObjectModel.Collection<Collection>()
                 };
@@ -1119,7 +1119,7 @@ namespace Chronozoom.UI
                     Id              = Guid.NewGuid(),
                     Default         = true,
                     Title           = user.DisplayName,
-                    Path            = Regex.Replace(user.DisplayName.Trim(), @"[^A-Za-z0-9]+", "").ToLower(),
+                    Path            = Regex.Replace(user.DisplayName.Trim(), @"[^A-Za-z0-9\-]+", "").ToLower(),
                     SuperCollection = superCollection,
                     User            = user
                 };
@@ -1310,8 +1310,8 @@ namespace Chronozoom.UI
             if (newCollectionPath   == null) return false;
             if (newCollectionData   == null) return false;
 
-            superCollectionPath = Regex.Replace(superCollectionPath.Trim(), @"[^A-Za-z0-9]+", "").ToLower(); 
-            newCollectionPath   = Regex.Replace(newCollectionPath.Trim(),   @"[^A-Za-z0-9]+", "").ToLower(); 
+            superCollectionPath = Regex.Replace(superCollectionPath.Trim(), @"[^A-Za-z0-9\-]+", "").ToLower(); 
+            newCollectionPath   = Regex.Replace(newCollectionPath.Trim(),   @"[^A-Za-z0-9\-]+", "").ToLower(); 
 
             if (superCollectionPath == "") return false;
             if (newCollectionPath   == "") return false;
@@ -1428,7 +1428,7 @@ namespace Chronozoom.UI
                 }
 
                 collection.Title                = collectionRequest.Title;
-                collection.Path                 = Regex.Replace(collectionRequest.Path, @"[^A-Za-z0-9]+", "").ToLower();
+                collection.Path                 = Regex.Replace(collectionRequest.Path, @"[^A-Za-z0-9\-]+", "").ToLower();
                 collection.Theme                = collectionRequest.Theme;
                 collection.PubliclySearchable   = collectionRequest.PubliclySearchable;
                 collection.MembersAllowed       = collectionRequest.MembersAllowed;
@@ -2692,7 +2692,7 @@ namespace Chronozoom.UI
         /// </summary>
         public IEnumerable<Collection> GetCollections(string superCollectionName)
         {
-            superCollectionName = Regex.Replace(superCollectionName.Trim(), @"[^A-Za-z0-9]+", "").ToLower();
+            superCollectionName = Regex.Replace(superCollectionName.Trim(), @"[^A-Za-z0-9\-]+", "").ToLower();
 
             return ApiOperation(delegate(User user, Storage storage)
             {
@@ -2749,7 +2749,7 @@ namespace Chronozoom.UI
             superCollection         = superCollection       .Trim().ToLower();
             existingCollectionPath  = existingCollectionPath.Trim().ToLower();
             proposedCollectionName  = proposedCollectionName.Trim();
-            proposedCollectionPath  = Regex.Replace(proposedCollectionName, @"[^A-Za-z0-9]+", "").ToLower(); // Aa-Zz and 0-9 only, converted to lower case.
+            proposedCollectionPath  = Regex.Replace(proposedCollectionName, @"[^A-Za-z0-9\-]+", "").ToLower(); // Aa-Zz, 0-9 and hyphen only, converted to lower case.
 
             if (proposedCollectionPath == "") return false;
 

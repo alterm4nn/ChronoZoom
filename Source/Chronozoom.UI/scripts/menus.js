@@ -401,7 +401,7 @@ var CZ;
             var newName = prompt("What name would you like for your new collection?\nNote: The name must be unique among your collections.", '') || '';
             newName     = $.trim(newName);
 
-            var newPath = newName.replace(/[^a-zA-Z0-9]/g, '');
+            var newPath = newName.replace(/[^a-zA-Z0-9\-]/g, '');
             if (newPath === '') return;
 
             if (newPath.length > 50)
