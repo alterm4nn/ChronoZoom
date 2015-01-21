@@ -5,7 +5,6 @@ using System.Data.Entity.Validation;
 using System.Data.Linq;
 using System.Diagnostics;
 using System.Linq;
-//using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -23,7 +22,6 @@ namespace Chronozoom.UI.Utils
     public class ExportImport : IDisposable
     {
         private List<FlatTimeline>  _flatTimelines;
-        //private MD5                 _MD5Hasher;
         private Storage             _storage;
         private User                _user;
 
@@ -129,7 +127,7 @@ namespace Chronozoom.UI.Utils
             }
         }
 
-        public string ImportCollection(string collectionTitle, string collectionTheme, List<FlatTimeline> timelines, List<Tour> tours)
+        public string ImportCollection(Guid collectionId, string collectionTitle, string collectionTheme, List<FlatTimeline> timelines, List<Tour> tours, bool keepOldGuids = false)
         {
             int                     titleCount  = 1;
             string                  titleAppend = "";
@@ -161,18 +159,9 @@ namespace Chronozoom.UI.Utils
 
             if (superCollection == null) { return "The collection could not be imported as you are not properly logged in. Please log out then log back in again first."; }
 
-            //newGUID = CollectionIdFromText
-            //(
-            //    string.Format
-            //    (
-            //        superCollection.Title.Trim().ToLower() + "|" + path + titleAppend
-            //    )
-            //);
-
             Collection collection = new Collection
             {
-                //Id                  = newGUID,  // apparently this needs to be a fudge of title and path for URL rather than Guid.NewGuid()
-                Id                  = Guid.NewGuid(),
+                Id                  = keepOldGuids ? collectionId : Guid.NewGuid(),
                 SuperCollection     = superCollection,
                 Default             = false,
                 Path                = path + titleAppend,
@@ -190,31 +179,49 @@ namespace Chronozoom.UI.Utils
 
             foreach (FlatTimeline flat in timelines)
             {
-                // replace GUIDs with new ones since we're cloning rather than moving
-
                 // keep cross-reference between old and new timelineIds so child timelines can maintain a pointer to their parents
-                newGUID = Guid.NewGuid();
-                newGUIDs.Add(flat.timeline.Id, newGUID);
-
-                flat.timeline.Id            = newGUID;
-                flat.timeline.Collection    = collection;
-
-                if (flat.parentTimelineId != null) // not root timeline
+                if (!keepOldGuids)
                 {
-                    flat.parentTimelineId   = newGUIDs[(Guid)flat.parentTimelineId];
+                    newGUID = Guid.NewGuid();
+                    newGUIDs.Add(flat.timeline.Id, newGUID);
+                    flat.timeline.Id = newGUID;
+
+                    if (flat.parentTimelineId != null) // not root timeline
+                    {
+                        flat.parentTimelineId = newGUIDs[(Guid)flat.parentTimelineId];
+                    }
                 }
 
-                // no need to keep cross-reference for exhibits or their content items but they will need new GUIDs
+                flat.timeline.Collection = collection;
+
+                // iterate through each exhibit in the timeline  - change last updated to now with current user
+                
                 for (int eachExhibit = 0; eachExhibit < flat.timeline.Exhibits.Count; eachExhibit++)
                 {
-                    flat.timeline.Exhibits[eachExhibit].Id          = Guid.NewGuid();
+                    // also keep cross-references for exhibits if new GUIDs are assigned
+                    if (!keepOldGuids)
+                    {
+                        newGUID = Guid.NewGuid();
+                        newGUIDs.Add(flat.timeline.Exhibits[eachExhibit].Id, newGUID);
+                        flat.timeline.Exhibits[eachExhibit].Id      = newGUID;
+                    }
+
                     flat.timeline.Exhibits[eachExhibit].Collection  = collection;
                     flat.timeline.Exhibits[eachExhibit].UpdatedBy   = _user;
                     flat.timeline.Exhibits[eachExhibit].UpdatedTime = timestamp;
 
+                    // iterate through each content item in the exhibit
+
                     for (int eachItem = 0; eachItem < flat.timeline.Exhibits[eachExhibit].ContentItems.Count; eachItem++)
                     {
-                        flat.timeline.Exhibits[eachExhibit].ContentItems[eachItem].Id         = Guid.NewGuid();
+                        // also keep cross-references for content items if new GUIDs are assigned
+                        if (!keepOldGuids)
+                        {
+                            newGUID = Guid.NewGuid();
+                            newGUIDs.Add(flat.timeline.Exhibits[eachExhibit].ContentItems[eachItem].Id, newGUID);
+                            flat.timeline.Exhibits[eachExhibit].ContentItems[eachItem].Id     = newGUID;
+                        }
+
                         flat.timeline.Exhibits[eachExhibit].ContentItems[eachItem].Collection = collection;
                     }
                 }
@@ -355,19 +362,6 @@ namespace Chronozoom.UI.Utils
             return "\"" + importContent[0].timeline.Title + "\" has been pasted into \"" + target.Title + "\". " +
                    "You may need to refresh your browser in order to see any new content.";
         }
-
-        //private Guid CollectionIdFromText(string value)
-        //{
-        //    value = value.Replace(' ', '-');
-
-        //    byte[] data = null;
-        //    lock (_MD5Hasher)
-        //    {
-        //        data = _MD5Hasher.ComputeHash(Encoding.Default.GetBytes(value.ToLowerInvariant()));
-        //    }
-
-        //    return new Guid(data);
-        //}
 
         private bool UserIsMember(Guid collectionId)
         {

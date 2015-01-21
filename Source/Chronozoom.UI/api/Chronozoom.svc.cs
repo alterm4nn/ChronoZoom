@@ -312,10 +312,12 @@ namespace Chronozoom.UI
             {
                 return xfer.ImportCollection
                 (
+                    collectionTree.collection.Id,
                     collectionTree.collection.Title,
                     collectionTree.collection.Theme,
                     collectionTree.timelines,
-                    collectionTree.tours
+                    collectionTree.tours,
+                    false
                 );
             }
         }
