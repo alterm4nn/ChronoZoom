@@ -9217,8 +9217,9 @@ var CZ;
                     var vimeoEmbed = /player.vimeo.com\/video\/([0-9]+)/i;
 
                     if (youtube.test(ci.uri)) {
-                        var youtubeVideoId = ci.uri.match(youtube)[1];
-                        ci.uri = "http://www.youtube.com/embed/" + youtubeVideoId;
+                        var youtubeVideoId  = ci.uri.match(youtube)[1];
+                        var youtubeAutoPlay = ci.uri.indexOf('autoplay=1') > 0 ? '?autoplay=1' : '';
+                        ci.uri = "http://www.youtube.com/embed/" + youtubeVideoId + youtubeAutoPlay;
                     } else if (vimeo.test(ci.uri)) {
                         var vimeoVideoId = ci.uri.match(vimeo)[1];
                         ci.uri = "http://player.vimeo.com/video/" + vimeoVideoId;
