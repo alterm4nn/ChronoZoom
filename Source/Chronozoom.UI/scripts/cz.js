@@ -226,22 +226,16 @@ var CZ;
                 CZ.Overlay.Show(false);  // false = home page overlay
             });
 
-            // if URL has a supercollection
+            // ensure we have a supercollection for getCanEdit and other API calls.
+            if (typeof CZ.Service.superCollectionName === 'undefined' && CZ.Common.isInCosmos()) CZ.Service.superCollectionName = 'chronozoom';
+
             // check if current user has edit permissions before continuing with load
             // since other parts of load need to know if can display edit buttons etc.
-            if (CZ.Service.superCollectionName === undefined)
+            CZ.Service.getCanEdit().done(function (result)
             {
-                CZ.Service.canEdit = false;
+                CZ.Service.canEdit = (result === true);
                 finishLoad();
-            }
-            else
-            {
-                CZ.Service.getCanEdit().done(function (result)
-                {
-                    CZ.Service.canEdit = (result === true);
-                    finishLoad();
-                });
-            }
+            });
         });
 
         function finishLoad()
@@ -251,12 +245,7 @@ var CZ;
             {
                 var forms = arguments;
 
-                CZ.Settings.isCosmosCollection =
-                (
-                    (CZ.Service.superCollectionName === 'ChronoZoom' || typeof CZ.Service.superCollectionName == 'undefined') &&
-                    (CZ.Service.collectionName      === 'Cosmos'     || typeof CZ.Service.collectionName      == 'undefined')
-                );
-
+                CZ.Settings.isCosmosCollection = CZ.Common.isInCosmos();
                 if (CZ.Settings.isCosmosCollection) $('.header-regimes').show();
 
                 CZ.Menus.isEditor = CZ.Service.canEdit;

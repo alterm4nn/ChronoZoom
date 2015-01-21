@@ -317,7 +317,8 @@ namespace Chronozoom.UI
                     collectionTree.collection.Theme,
                     collectionTree.timelines,
                     collectionTree.tours,
-                    false
+                    false,
+                    null
                 );
             }
         }

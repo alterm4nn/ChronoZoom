@@ -13013,7 +13013,7 @@ var CZ;
             (
                 "Exporting a collection lets you save an entire collection to a file on your PC, which you can keep as a backup or share with others. " +
                 "The collection's name, background, colors, timelines, exhibits, content items and tours are all included. If you've granted edit rights " +
-                "to other people, please note that the list of editors is not included. For this reason, when you import a previously exported collection, " +
+                "to other people, please note that the list of editors is not included. When you import a previously exported collection, " +
                 "it will always be imported as a new unpublished collection, which you can then edit and publish when you are ready.",
                 "Exporting & Importing Collections"
             );
@@ -19493,22 +19493,16 @@ var CZ;
                 CZ.Overlay.Show(false);  // false = home page overlay
             });
 
-            // if URL has a supercollection
+            // ensure we have a supercollection for getCanEdit and other API calls.
+            if (typeof CZ.Service.superCollectionName === 'undefined' && CZ.Common.isInCosmos()) CZ.Service.superCollectionName = 'chronozoom';
+
             // check if current user has edit permissions before continuing with load
             // since other parts of load need to know if can display edit buttons etc.
-            if (CZ.Service.superCollectionName === undefined)
+            CZ.Service.getCanEdit().done(function (result)
             {
-                CZ.Service.canEdit = false;
+                CZ.Service.canEdit = (result === true);
                 finishLoad();
-            }
-            else
-            {
-                CZ.Service.getCanEdit().done(function (result)
-                {
-                    CZ.Service.canEdit = (result === true);
-                    finishLoad();
-                });
-            }
+            });
         });
 
         function finishLoad()
@@ -19518,12 +19512,7 @@ var CZ;
             {
                 var forms = arguments;
 
-                CZ.Settings.isCosmosCollection =
-                (
-                    (CZ.Service.superCollectionName === 'ChronoZoom' || typeof CZ.Service.superCollectionName == 'undefined') &&
-                    (CZ.Service.collectionName      === 'Cosmos'     || typeof CZ.Service.collectionName      == 'undefined')
-                );
-
+                CZ.Settings.isCosmosCollection = CZ.Common.isInCosmos();
                 if (CZ.Settings.isCosmosCollection) $('.header-regimes').show();
 
                 CZ.Menus.isEditor = CZ.Service.canEdit;

@@ -127,7 +127,7 @@ namespace Chronozoom.UI.Utils
             }
         }
 
-        public string ImportCollection(Guid collectionId, string collectionTitle, string collectionTheme, List<FlatTimeline> timelines, List<Tour> tours, bool keepOldGuids = false)
+        public string ImportCollection(Guid collectionId, string collectionTitle, string collectionTheme, List<FlatTimeline> timelines, List<Tour> tours, bool keepOldGuids = false, User userOverride = null)
         {
             int                     titleCount  = 1;
             string                  titleAppend = "";
@@ -137,16 +137,17 @@ namespace Chronozoom.UI.Utils
             Guid                    newGUID;
             Dictionary<Guid, Guid>  newGUIDs    = new Dictionary<Guid, Guid>();
             DateTime                timestamp   = DateTime.UtcNow;
+            User                    user        = userOverride == null ? _user : userOverride;
 
-            // ensure user logged in
+            // ensure user logged in or provided in override
 
-            if (_user == null) { return "In order to import a collection, you must first be logged in."; }
+            if (user == null) { return "In order to import a collection, you must first be logged in."; }
 
             // ensure collection title is unique for user
 
             while
             (
-                _storage.Collections.Where(c => c.User.Id == _user.Id && c.Path == path + titleAppend).FirstOrDefault() != null
+                _storage.Collections.Where(c => c.User.Id == user.Id && c.Path == path + titleAppend).FirstOrDefault() != null
             )
             {
                 titleCount++;
@@ -157,7 +158,7 @@ namespace Chronozoom.UI.Utils
 
             // create new collection under existing user's supercollection
 
-            SuperCollection superCollection = _storage.SuperCollections.Where(s => s.User.Id == _user.Id).Include("User").Include("Collections").FirstOrDefault();
+            SuperCollection superCollection = _storage.SuperCollections.Where(s => s.User.Id == user.Id).Include("User").Include("Collections").FirstOrDefault();
 
             if (superCollection == null) { return "The collection could not be imported as you are not properly logged in. Please log out then log back in again first."; }
 
@@ -172,7 +173,7 @@ namespace Chronozoom.UI.Utils
                 MembersAllowed      = false,
                 Members             = null,
                 PubliclySearchable  = false,
-                User                = _user
+                User                = user
             };
 
             superCollection.Collections.Add(collection);
@@ -209,7 +210,7 @@ namespace Chronozoom.UI.Utils
                     }
 
                     flat.timeline.Exhibits[eachExhibit].Collection  = collection;
-                    flat.timeline.Exhibits[eachExhibit].UpdatedBy   = _user;
+                    flat.timeline.Exhibits[eachExhibit].UpdatedBy   = user;
                     flat.timeline.Exhibits[eachExhibit].UpdatedTime = timestamp;
 
                     // iterate through each content item in the exhibit
