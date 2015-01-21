@@ -12823,6 +12823,13 @@ var CZ;
                 CZ.Authoring.UI.createTour();
             });
 
+            $('#mnuExportAbout').clicktouch(function (event)
+            {
+                event.stopPropagation();
+                // show quick information regarding exports
+                ExportInformation();
+            });
+
             $('#mnuEditTours').clicktouch(function (event)
             {
                 event.stopPropagation();
@@ -12995,6 +13002,20 @@ var CZ;
                 });
             });
 
+        };
+
+
+        this.ExportInformation =
+        function ExportInformation()
+        {
+            CZ.Authoring.showMessageWindow
+            (
+                "Exporting a collection lets you save an entire collection to a file on your PC, which you can keep as a backup or share with others. " +
+                "The collection's name, background, colors, timelines, exhibits, content items and tours are all included. If you've granted edit rights " +
+                "to other people, please note that the list of editors is not included. For this reason, when you import a previously exported collection, " +
+                "it will always be imported as a new unpublished collection, which you can then edit and publish when you are ready.",
+                "Exporting & Importing Collections"
+            );
         };
 
 

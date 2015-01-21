@@ -132,6 +132,8 @@ namespace Chronozoom.UI.Utils
             int                     titleCount  = 1;
             string                  titleAppend = "";
             string                  path        = Regex.Replace(collectionTitle.Trim(), @"[^A-Za-z0-9\-]+", "").ToLower(); 
+            string                  type;
+            Guid                    GUID;
             Guid                    newGUID;
             Dictionary<Guid, Guid>  newGUIDs    = new Dictionary<Guid, Guid>();
             DateTime                timestamp   = DateTime.UtcNow;
@@ -258,6 +260,73 @@ namespace Chronozoom.UI.Utils
                         }
                     }
                     return "Sorry, we were unable to fully import this collection due to an unexpected error, but it may have partially been imported. Please click on My Collections to check.";
+                }
+
+            }
+
+            // iterate through each tour
+
+            foreach (Tour tour in tours)
+            {
+                tour.Collection = collection;
+
+                // if using new GUIDs, create new ids for tour components and replace url guid parts using old to new GUID mapping
+                if (!keepOldGuids)
+                {
+                    tour.Id = Guid.NewGuid();
+
+                    // iterate through each tour stop
+
+                    for (int eachBookmark = 0; eachBookmark < tour.Bookmarks.Count; eachBookmark++)
+                    {
+                        tour.Bookmarks[eachBookmark].Id = Guid.NewGuid();
+
+                        // breakdown each tour stop url segment into parts
+                        string[] parts = tour.Bookmarks[eachBookmark].Url.Split('/');
+
+                        // iterate through each part, replacing the GUID fraction of the part with the new GUID that was mapped earlier during the timelines population
+                        for (int eachPart = 1; eachPart < parts.Length; eachPart++)
+                        {
+                            if (parts[eachPart].Length == 37)
+                            {
+                                // part has two components
+                                type = parts[eachPart].Substring(0, 1);         // first character in part is type
+                                GUID = new Guid(parts[eachPart].Remove(0, 1));  // rest of part is GUID
+                            }
+                            else
+                            {
+                                // part has one component
+                                type = "";
+                                GUID = new Guid(parts[eachPart]);               // entire part is GUID
+                            }
+
+                            GUID = newGUIDs[GUID];                              // lookup the earlier mapped GUID
+                            parts[eachPart] = type + GUID.ToString();           // and replace the old GUID with mapped
+                        }
+
+                        // rejoin all the tour stop url segment parts back together
+                        tour.Bookmarks[eachBookmark].Url = String.Join("/", parts);
+                    }
+                }
+
+                // add the tour
+                _storage.Tours.Add(tour);
+
+                // commit tour to database
+                try
+                {
+                    _storage.SaveChanges();
+                }
+                catch (DbEntityValidationException dbEx)
+                {
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                        }
+                    }
+                    return "We imported all of the timelines, exhibits and content items but we wre unable to fully import tours. Please click on My Collections to check.";
                 }
 
             }
