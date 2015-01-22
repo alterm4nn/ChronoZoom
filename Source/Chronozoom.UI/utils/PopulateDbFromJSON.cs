@@ -1,42 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 using Chronozoom.Entities;
+using Newtonsoft.Json;
 
 namespace Chronozoom.UI.Utils
 {
     public class PopulateDbFromJSON : IDisposable
     {
-        private const    string     _defaultUser    = "anonymous";
         private readonly string     _jsonDirectory;
-        private const int           _maxTimelines   = 10000;            // max # to import
-        private static readonly MD5 _md5Hasher      = MD5.Create();
         private Storage             _storage        = new Storage();
+        private ExportImport        _commonImport   = new ExportImport();
 
-        [DataContract]
-        private class BaseJsonResult<T>
-        {
-            [DataMember]
-            public T d { get; set; }
-        }
-
-        #region constructor
+        #region constructor and destructor
 
         public PopulateDbFromJSON()
         {
             _jsonDirectory = AppDomain.CurrentDomain.BaseDirectory + @"Dumps\";
         }
-
-        #endregion
-
-        #region destructor
 
         public void Dispose()
         {
@@ -49,8 +31,8 @@ namespace Chronozoom.UI.Utils
             if (disposing)
             {
                 // free any managed resources
+                _commonImport.Dispose();
                 _storage.Dispose();
-                _md5Hasher.Dispose();
             }
             // free any native resources
         }
@@ -59,11 +41,26 @@ namespace Chronozoom.UI.Utils
 
         #region public methods
 
-        public void LoadDataFromDump(string curatorDisplayName, string collectionTitle, string collectionDumpFile, string toursDumpFile, bool curatorsDefaultCollection = true, bool replaceGUIDs = false)
+        /// <summary>
+        /// It's possible to feed files created by the Export Collection menu item to this function.
+        /// This function uses the same mechanism as the Import Collection menu item, the only differences being:
+        /// 1) Instead of using the currently logged in user, we use the curatorDisplayName.
+        /// 2) If this user doesn't exist, we create the user.
+        /// 3) If the user doesn't have a supercollection, we create the supercollection.
+        /// 4) We can define if the collection is the default collection here. (A pre-existing default collection for the user must not exist.)
+        /// This function can therefore be used to seed the database with the Cosmos collection or other collections when the database is first created.
+        /// </summary>
+        public void ImportCollection(string curatorDisplayName, string collectionTitle, string jsonFile, bool curatorsDefaultCollection = true, bool forcePublic = true, bool keepOldGUIDs = true)
         {
+            bool dirty                  = false;
+
+            // parse json file contents first in case invalid flat collection
+            string jsonStringified      = File.ReadAllText(_jsonDirectory + jsonFile);
+            ExportImport.FlatCollection collectionTree = JsonConvert.DeserializeObject<ExportImport.FlatCollection>(jsonStringified);
+
             // remove any excess spaces from display names
-            curatorDisplayName  = curatorDisplayName.Trim();
-            collectionTitle     = collectionTitle.Trim();
+            curatorDisplayName          = curatorDisplayName.Trim();
+            collectionTitle             = collectionTitle.Trim();
 
             // generate equivalent path names (uniqueness is assumed)
             string superCollectionPath  = Regex.Replace(curatorDisplayName, @"[^A-Za-z0-9\-]+", "").ToLower();  // Aa-Zz, 0-9 and hyphen only, converted to lower case.
@@ -80,6 +77,7 @@ namespace Chronozoom.UI.Utils
                     IdentityProvider    = "Populated from JSON"
                 };
                 _storage.Users.Add(user);
+                dirty = true;
             }
 
             // get curator's supercollection record or create if doesn't exist
@@ -94,184 +92,28 @@ namespace Chronozoom.UI.Utils
                     Collections         = new System.Collections.ObjectModel.Collection<Collection>()
                 };
                 _storage.SuperCollections.Add(superCollection);
+                dirty = true;
             }
 
-            // create new collection
-            Collection collection = new Collection
-            {
-                Id                      = Guid.NewGuid(),
-                Default                 = curatorsDefaultCollection,
-                PubliclySearchable      = true,
-                Title                   = collectionTitle,
-                Path                    = collectionPath,
-                SuperCollection         = superCollection,
-                User                    = user
-            };
-            superCollection.Collections.Add(collection);
+            // commit any user or supercollection creations to db
+            if (dirty) _storage.SaveChanges();
 
-            // populate collection from json files
-            using (Stream jsonTimelines =                                File.OpenRead(_jsonDirectory + collectionDumpFile))
-            using (Stream jsonTours     = toursDumpFile == null ? null : File.OpenRead(_jsonDirectory + toursDumpFile))
-            {
-                LoadData(jsonTimelines, jsonTours, collection, replaceGUIDs);
-            }
-
-            // commit db changes
-            _storage.SaveChanges();
-        }
-
-        #endregion
-
-        #region private methods
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Incremental change, will refactor later if the import process is kept")]
-        private void LoadData(Stream dataTimelines, Stream dataTours, Collection collection, bool replaceGuids)
-        {
-            var timelines = new DataContractJsonSerializer(typeof(IList<Timeline>)).ReadObject(dataTimelines) as IList<Timeline>;
-
-            _storage.Collections.Add(collection);
-
-            int importedTimelinesCount = 0;
-
-            // associate each timeline with the root collection
-            TraverseTimelines(timelines, timeline =>
-            {
-                if (++importedTimelinesCount < _maxTimelines)
-                {
-                    timeline.Collection = collection;
-
-                    foreach (Exhibit exhibit in timeline.Exhibits)
-                    {
-                        exhibit.Collection  = collection;
-                        exhibit.UpdatedTime = DateTime.UtcNow;
-
-                        if (exhibit.ContentItems != null)
-                        {
-                            foreach (ContentItem contentItem in exhibit.ContentItems)
-                            {
-                                contentItem.Collection = collection;
-                            }
-                        }
-                    }
-                }
-                else if (timeline.ChildTimelines != null)
-                {
-                    timeline.ChildTimelines.Clear();
-                }
-            });
-
-            if (replaceGuids)
-            {
-                // replace GUIDs to ensure multiple collections can be imported
-                TraverseTimelines(timelines, timeline =>
-                {
-                    timeline.Id = Guid.NewGuid();
-
-                    if (timeline.Exhibits != null)
-                    {
-                        foreach (Exhibit exhibit in timeline.Exhibits)
-                        {
-                            exhibit.Id = Guid.NewGuid();
-
-                            if (exhibit.ContentItems != null)
-                            {
-                                foreach (ContentItem contentItem in exhibit.ContentItems)
-                                {
-                                    contentItem.Id = Guid.NewGuid();
-                                }
-                            }
-                        }
-                    }
-                }
-                );
-            }
-
-            if (timelines != null)
-            {
-                foreach (var timeline in timelines)
-                {
-                    if (replaceGuids) timeline.Id = Guid.NewGuid();
-                    timeline.Collection = collection;
-                    timeline.Depth = -1; // this denotes no migration has been applied to current timeline
-                    timeline.ForkNode = Storage.ForkNode((long)timeline.FromYear, (long)timeline.ToYear);
-                }
-
-                foreach (var timeline in timelines) // note: timeline objects in "timelines" are ordered by depth already since they are parsed from a nested-JSON file 
-                {
-                    if (timeline.Depth == -1)
-                    {
-                        timeline.Depth = 0;
-                        MigrateInPlace(timeline);
-                    }
-                    _storage.Timelines.Add(timeline);
-                }
-            }
-            _storage.SaveChanges();
-
-            if (dataTours != null)
-            {
-                var bjrTours =
-                    new DataContractJsonSerializer(typeof(BaseJsonResult<IEnumerable<Tour>>)).ReadObject(dataTours) as
-                    BaseJsonResult<IEnumerable<Tour>>;
-
-                if (bjrTours != null)
-                    foreach (var tour in bjrTours.d)
-                    {
-                        if (replaceGuids) tour.Id = Guid.NewGuid();
-                        tour.Collection = collection;
-
-                        if (tour.Bookmarks != null && replaceGuids)
-                        {
-                            foreach (var bookmark in tour.Bookmarks)
-                            {
-                                bookmark.Id = Guid.NewGuid();
-                            }
-                        }
-                        _storage.Tours.Add(tour);
-                    }
-                _storage.SaveChanges();
-            }
-        }
-
-        public static void MigrateInPlace(Timeline timeline)
-        {
-            int subtreeSize = 1;
-            if (timeline.Exhibits != null)
-            {
-                foreach (var exhibit in timeline.Exhibits)
-                {
-                    subtreeSize++;
-                    exhibit.Depth = timeline.Depth + 1;
-                    if (exhibit.ContentItems != null)
-                    {
-                        foreach (ContentItem contentItem in exhibit.ContentItems)
-                        {
-                            contentItem.Depth = exhibit.Depth + 1;
-                        }
-                        subtreeSize += exhibit.ContentItems.Count();
-                    }
-                }
-            }
-
-            if (timeline.ChildTimelines != null)
-            {
-                foreach (var child in timeline.ChildTimelines)
-                {
-                    child.Depth = timeline.Depth + 1;
-                    MigrateInPlace(child);
-                    subtreeSize += child.SubtreeSize;
-                }
-            }
-            timeline.SubtreeSize = subtreeSize;
-        }
-
-        private static void TraverseTimelines(IEnumerable<Timeline> timelines, TraverseOperation operation)
-        {
-            foreach (Timeline timeline in timelines)
-            {
-                timeline.Traverse(operation);
-            }
+            // use the standard export/import mechanism to import collection
+            Console.WriteLine
+            (
+                _commonImport.ImportCollection
+                (
+                    collectionId:           collectionTree.collection.Id,
+                    collectionTitle:        collectionTitle,
+                    collectionTheme:        collectionTree.collection.Theme,
+                    timelines:              collectionTree.timelines,
+                    tours:                  collectionTree.tours,
+                    makeDefault:            curatorsDefaultCollection,
+                    forcePublic:            forcePublic,
+                    keepOldGuids:           keepOldGUIDs,
+                    forceUserDisplayName:   curatorDisplayName
+                )
+            );
         }
 
         #endregion

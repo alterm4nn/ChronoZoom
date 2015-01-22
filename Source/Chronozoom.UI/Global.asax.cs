@@ -102,8 +102,8 @@ namespace Chronozoom.UI
                     Trace.TraceInformation("New Install - Populating Initial Db Content");
                     using (Utils.PopulateDbFromJSON populator = new Utils.PopulateDbFromJSON())
                     {
-                        populator.LoadDataFromDump("ChronoZoom",    "Cosmos",           "beta-get.json",            "beta-gettours.json",           true,   false);
-                        populator.LoadDataFromDump("ChronoZoom",    "AIDS Timeline",    "aidstimeline-get.json",    "aidstimeline-gettours.json",   false,  false);
+                        populator.ImportCollection("ChronoZoom", "Cosmos",        "cz.cosmos.json",       true,  true, true);
+                        populator.ImportCollection("ChronoZoom", "AIDS Timeline", "cz.aidstimeline.json", false, true, true);
                     }
                 }
             }

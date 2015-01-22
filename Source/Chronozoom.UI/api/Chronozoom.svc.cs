@@ -312,13 +312,15 @@ namespace Chronozoom.UI
             {
                 return xfer.ImportCollection
                 (
-                    collectionTree.collection.Id,
-                    collectionTree.collection.Title,
-                    collectionTree.collection.Theme,
-                    collectionTree.timelines,
-                    collectionTree.tours,
-                    false,
-                    null
+                    collectionId:           collectionTree.collection.Id,
+                    collectionTitle:        collectionTree.collection.Title,
+                    collectionTheme:        collectionTree.collection.Theme,
+                    timelines:              collectionTree.timelines,
+                    tours:                  collectionTree.tours,
+                    makeDefault:            false,  // }
+                    forcePublic:            false,  // } only set when
+                    keepOldGuids:           false,  // } seeding database
+                    forceUserDisplayName:   null    // }
                 );
             }
         }

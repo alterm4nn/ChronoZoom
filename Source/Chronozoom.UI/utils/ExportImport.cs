@@ -21,23 +21,23 @@ namespace Chronozoom.UI.Utils
 
     public class ExportImport : IDisposable
     {
-        private List<FlatTimeline>  _flatTimelines;
-        private Storage             _storage;
-        private User                _user;
+        private List<FlatTimeline>      _flatTimelines;
+        private Storage                 _storage;
+        private User                    _user;
 
         public class FlatCollection
         {
-            public string               date        { get; set; }
-            public string               schema      { get; set; }
-            public Collection           collection  { get; set; }
-            public List<FlatTimeline>   timelines   { get; set; }
-            public List<Tour>           tours       { get; set; }
+            public string               date                { get; set; }
+            public string               schema              { get; set; }
+            public Collection           collection          { get; set; }
+            public List<FlatTimeline>   timelines           { get; set; }
+            public List<Tour>           tours               { get; set; }
         }
 
         public class FlatTimeline
         {
-            public Guid?    parentTimelineId { get; set; }
-            public Timeline timeline         { get; set; }
+            public Guid?                parentTimelineId    { get; set; }
+            public Timeline             timeline            { get; set; }
         }
 
         #region "Constructor/Destructor"
@@ -49,23 +49,27 @@ namespace Chronozoom.UI.Utils
 
             // persist user object
             _user = GetUser();
-
-            // persist md5 hasher
-            //_MD5Hasher = MD5.Create();
         }
 
         private User GetUser()
         {
-            Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
-            if (claimsIdentity == null || !claimsIdentity.IsAuthenticated)  { return null; }
+            try // may not have a context if class instantiated during start-up for initial db seeding
+            {
+                Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
+                if (claimsIdentity          == null || !claimsIdentity.IsAuthenticated) { return null; }
 
-            Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-            if (nameIdentifierClaim == null)                                { return null; }
+                Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                if (nameIdentifierClaim     == null)                                    { return null; }
 
-            Microsoft.IdentityModel.Claims.Claim identityProviderClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("identityprovider", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-            if (identityProviderClaim == null)                              { return null; }
+                Microsoft.IdentityModel.Claims.Claim identityProviderClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("identityprovider", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                if (identityProviderClaim   == null)                                    { return null; }
 
-            return _storage.Users.Where(u => u.NameIdentifier == nameIdentifierClaim.Value).FirstOrDefault();
+                return _storage.Users.Where(u => u.NameIdentifier == nameIdentifierClaim.Value).FirstOrDefault();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public void Dispose()
@@ -80,7 +84,6 @@ namespace Chronozoom.UI.Utils
             {
                 // free any managed resources
                 _storage.Dispose();
-                //_MD5Hasher.Dispose();
             }
             // free any native resources
         }
@@ -127,7 +130,11 @@ namespace Chronozoom.UI.Utils
             }
         }
 
-        public string ImportCollection(Guid collectionId, string collectionTitle, string collectionTheme, List<FlatTimeline> timelines, List<Tour> tours, bool keepOldGuids = false, User userOverride = null)
+        public string ImportCollection
+        (
+            Guid collectionId, string collectionTitle, string collectionTheme, List<FlatTimeline> timelines, List<Tour> tours,
+            bool makeDefault = false, bool forcePublic = false, bool keepOldGuids = false, string forceUserDisplayName = null
+        )
         {
             int                     titleCount  = 1;
             string                  titleAppend = "";
@@ -137,11 +144,11 @@ namespace Chronozoom.UI.Utils
             Guid                    newGUID;
             Dictionary<Guid, Guid>  newGUIDs    = new Dictionary<Guid, Guid>();
             DateTime                timestamp   = DateTime.UtcNow;
-            User                    user        = userOverride == null ? _user : userOverride;
+            User                    user        = _user;
 
             // ensure user logged in or provided in override
-
-            if (user == null) { return "In order to import a collection, you must first be logged in."; }
+            if (forceUserDisplayName != null) user = _storage.Users.Where(u => u.DisplayName == forceUserDisplayName).FirstOrDefault();
+            if (user == null)               { return "In order to import a collection, you must first be logged in."; }
 
             // ensure collection title is unique for user
 
@@ -166,13 +173,13 @@ namespace Chronozoom.UI.Utils
             {
                 Id                  = keepOldGuids ? collectionId : Guid.NewGuid(),
                 SuperCollection     = superCollection,
-                Default             = false,
+                Default             = makeDefault,
                 Path                = path + titleAppend,
                 Title               = collectionTitle.Trim() + titleAppend,
                 Theme               = collectionTheme == "" ? null : collectionTheme,
                 MembersAllowed      = false,
                 Members             = null,
-                PubliclySearchable  = false,
+                PubliclySearchable  = forcePublic,
                 User                = user
             };
 
