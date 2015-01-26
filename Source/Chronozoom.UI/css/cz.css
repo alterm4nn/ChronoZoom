@@ -2020,6 +2020,13 @@ a {
 #tours .cz-contentitem-listitem-button:last-child {
   border-right-style: none;
 }
+#tours .cz-contentitem-listitem-button img.cz-share {
+  height: 1em;
+  width: auto;
+  text-decoration: none;
+  position: relative;
+  bottom: -1px;
+}
 #tour-cosmos .cz-contentitem-listitem-button {
   font-size: 15px;
 }
