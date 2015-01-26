@@ -50,7 +50,7 @@ namespace Chronozoom.UI
         /// Permissions and creatorship history are not imported, just content, so the new collection will default to being unpublished.
         /// Currently provided tours are ignored. Only the collection customization, it's timelines, exhibits and content items are imported.
         /// </summary>
-        /// <param name="collection">Must be a structure created by CZ.Menus.ExportCollection, provided as a JSON.stringify string.</param>
+        /// <param name="collectionTree">Must be a structure created by CZ.Menus.ExportCollection, provided as a JSON.stringify string.</param>
         /// <returns>A success or general error message.</returns>
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/import/collection", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
