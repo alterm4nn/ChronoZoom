@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Data.Linq;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using Chronozoom.Entities;
 
@@ -18,14 +21,23 @@ namespace Chronozoom.UI.Utils
 
     public class ExportImport : IDisposable
     {
-        private List<FlatTimeline>  _flatTimelines;
-        private Storage             _storage;
-        private User                _user;
+        private List<FlatTimeline>      _flatTimelines;
+        private Storage                 _storage;
+        private User                    _user;
+
+        public class FlatCollection
+        {
+            public string               date                { get; set; }
+            public string               schema              { get; set; }
+            public Collection           collection          { get; set; }
+            public List<FlatTimeline>   timelines           { get; set; }
+            public List<Tour>           tours               { get; set; }
+        }
 
         public class FlatTimeline
         {
-            public Guid?    parentTimelineId { get; set; }
-            public Timeline timeline         { get; set; }
+            public Guid?                parentTimelineId    { get; set; }
+            public Timeline             timeline            { get; set; }
         }
 
         #region "Constructor/Destructor"
@@ -41,16 +53,23 @@ namespace Chronozoom.UI.Utils
 
         private User GetUser()
         {
-            Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
-            if (claimsIdentity == null || !claimsIdentity.IsAuthenticated)  { return null; }
+            try // may not have a context if class instantiated during start-up for initial db seeding
+            {
+                Microsoft.IdentityModel.Claims.ClaimsIdentity claimsIdentity = HttpContext.Current.User.Identity as Microsoft.IdentityModel.Claims.ClaimsIdentity;
+                if (claimsIdentity          == null || !claimsIdentity.IsAuthenticated) { return null; }
 
-            Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-            if (nameIdentifierClaim == null)                                { return null; }
+                Microsoft.IdentityModel.Claims.Claim nameIdentifierClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("nameidentifier", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                if (nameIdentifierClaim     == null)                                    { return null; }
 
-            Microsoft.IdentityModel.Claims.Claim identityProviderClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("identityprovider", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-            if (identityProviderClaim == null)                              { return null; }
+                Microsoft.IdentityModel.Claims.Claim identityProviderClaim = claimsIdentity.Claims.Where(candidate => candidate.ClaimType.EndsWith("identityprovider", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                if (identityProviderClaim   == null)                                    { return null; }
 
-            return _storage.Users.Where(u => u.NameIdentifier == nameIdentifierClaim.Value).FirstOrDefault();
+                return _storage.Users.Where(u => u.NameIdentifier == nameIdentifierClaim.Value).FirstOrDefault();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public void Dispose()
@@ -96,6 +115,11 @@ namespace Chronozoom.UI.Utils
                 flatTimeline.parentTimelineId           = parentTimelineId;
                 flatTimeline.timeline                   = timeline;
 
+                for (int eachExhibit = 0; eachExhibit < flatTimeline.timeline.Exhibits.Count; eachExhibit++)
+                {
+                    flatTimeline.timeline.Exhibits[eachExhibit].UpdatedBy = null;
+                }
+
                 foreach (Timeline child in timeline.ChildTimelines)
                 {
                     IterateTimelineExport(timeline.Id, child.Id);
@@ -104,6 +128,218 @@ namespace Chronozoom.UI.Utils
                 flatTimeline.timeline.ChildTimelines    = null;
                 _flatTimelines.Add(flatTimeline);
             }
+        }
+
+        public string ImportCollection
+        (
+            Guid collectionId, string collectionTitle, string collectionTheme, List<FlatTimeline> timelines, List<Tour> tours,
+            bool makeDefault = false, bool forcePublic = false, bool keepOldGuids = false, string forceUserDisplayName = null
+        )
+        {
+            int                     titleCount  = 1;
+            string                  titleAppend = "";
+            string                  path        = Regex.Replace(collectionTitle.Trim(), @"[^A-Za-z0-9\-]+", "").ToLower(); 
+            string                  type;
+            Guid                    GUID;
+            Guid                    newGUID;
+            Dictionary<Guid, Guid>  newGUIDs    = new Dictionary<Guid, Guid>();
+            DateTime                timestamp   = DateTime.UtcNow;
+            User                    user        = _user;
+
+            // ensure user logged in or provided in override
+            if (forceUserDisplayName != null) user = _storage.Users.Where(u => u.DisplayName == forceUserDisplayName).FirstOrDefault();
+            if (user == null)               { return "In order to import a collection, you must first be logged in."; }
+
+            // ensure collection title is unique for user
+
+            while
+            (
+                _storage.Collections.Where(c => c.User.Id == user.Id && c.Path == path + titleAppend).FirstOrDefault() != null
+            )
+            {
+                titleCount++;
+                titleAppend = "-" + titleCount;
+            }
+
+            if ((path + titleAppend).Length > 50) { return "Either the name of the collection to be imported is too long, or a collecton with this name already exists."; }
+
+            // create new collection under existing user's supercollection
+
+            SuperCollection superCollection = _storage.SuperCollections.Where(s => s.User.Id == user.Id).Include("User").Include("Collections").FirstOrDefault();
+
+            if (superCollection == null) { return "The collection could not be imported as you are not properly logged in. Please log out then log back in again first."; }
+
+            Collection collection = new Collection
+            {
+                Id                  = keepOldGuids ? collectionId : Guid.NewGuid(),
+                SuperCollection     = superCollection,
+                Default             = makeDefault,
+                Path                = path + titleAppend,
+                Title               = collectionTitle.Trim() + titleAppend,
+                Theme               = collectionTheme == "" ? null : collectionTheme,
+                MembersAllowed      = false,
+                Members             = null,
+                PubliclySearchable  = forcePublic,
+                User                = user
+            };
+
+            superCollection.Collections.Add(collection);
+
+            // iterate through each timeline
+
+            foreach (FlatTimeline flat in timelines)
+            {
+                // keep cross-reference between old and new timelineIds so child timelines can maintain a pointer to their parents
+                if (!keepOldGuids)
+                {
+                    newGUID = Guid.NewGuid();
+                    newGUIDs.Add(flat.timeline.Id, newGUID);
+                    flat.timeline.Id = newGUID;
+
+                    if (flat.parentTimelineId != null) // not root timeline
+                    {
+                        flat.parentTimelineId = newGUIDs[(Guid)flat.parentTimelineId];
+                    }
+                }
+
+                flat.timeline.Collection = collection;
+
+                // iterate through each exhibit in the timeline  - change last updated to now with current user
+                
+                for (int eachExhibit = 0; eachExhibit < flat.timeline.Exhibits.Count; eachExhibit++)
+                {
+                    // also keep cross-references for exhibits if new GUIDs are assigned
+                    if (!keepOldGuids)
+                    {
+                        newGUID = Guid.NewGuid();
+                        newGUIDs.Add(flat.timeline.Exhibits[eachExhibit].Id, newGUID);
+                        flat.timeline.Exhibits[eachExhibit].Id      = newGUID;
+                    }
+
+                    flat.timeline.Exhibits[eachExhibit].Collection  = collection;
+                    flat.timeline.Exhibits[eachExhibit].UpdatedBy   = user;
+                    flat.timeline.Exhibits[eachExhibit].UpdatedTime = timestamp;
+
+                    // iterate through each content item in the exhibit
+
+                    for (int eachItem = 0; eachItem < flat.timeline.Exhibits[eachExhibit].ContentItems.Count; eachItem++)
+                    {
+                        // also keep cross-references for content items if new GUIDs are assigned
+                        if (!keepOldGuids)
+                        {
+                            newGUID = Guid.NewGuid();
+                            newGUIDs.Add(flat.timeline.Exhibits[eachExhibit].ContentItems[eachItem].Id, newGUID);
+                            flat.timeline.Exhibits[eachExhibit].ContentItems[eachItem].Id     = newGUID;
+                        }
+
+                        flat.timeline.Exhibits[eachExhibit].ContentItems[eachItem].Collection = collection;
+                    }
+                }
+
+                // add timeline to database
+
+                if (flat.parentTimelineId == null)
+                {
+                    _storage.Timelines.Add(flat.timeline);
+                }
+                else
+                {
+                    Timeline parentTimeline =
+                    _storage.Timelines.Where(t => t.Id == flat.parentTimelineId)
+                    .Include("ChildTimelines.Exhibits.ContentItems")
+                    .FirstOrDefault();
+
+                    parentTimeline.ChildTimelines.Add(flat.timeline);
+                }
+
+                // commit creations
+
+                try
+                {
+                    _storage.SaveChanges();
+                }
+                catch (DbEntityValidationException dbEx)
+                {
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                        }
+                    }
+                    return "Sorry, we were unable to fully import this collection due to an unexpected error, but it may have partially been imported. Please click on My Collections to check.";
+                }
+
+            }
+
+            // iterate through each tour
+
+            foreach (Tour tour in tours)
+            {
+                tour.Collection = collection;
+
+                // if using new GUIDs, create new ids for tour components and replace url guid parts using old to new GUID mapping
+                if (!keepOldGuids)
+                {
+                    tour.Id = Guid.NewGuid();
+
+                    // iterate through each tour stop
+
+                    for (int eachBookmark = 0; eachBookmark < tour.Bookmarks.Count; eachBookmark++)
+                    {
+                        tour.Bookmarks[eachBookmark].Id = Guid.NewGuid();
+
+                        // breakdown each tour stop url segment into parts
+                        string[] parts = tour.Bookmarks[eachBookmark].Url.Split('/');
+
+                        // iterate through each part, replacing the GUID fraction of the part with the new GUID that was mapped earlier during the timelines population
+                        for (int eachPart = 1; eachPart < parts.Length; eachPart++)
+                        {
+                            if (parts[eachPart].Length == 37)
+                            {
+                                // part has two components
+                                type = parts[eachPart].Substring(0, 1);         // first character in part is type
+                                GUID = new Guid(parts[eachPart].Remove(0, 1));  // rest of part is GUID
+                            }
+                            else
+                            {
+                                // part has one component
+                                type = "";
+                                GUID = new Guid(parts[eachPart]);               // entire part is GUID
+                            }
+
+                            GUID = newGUIDs[GUID];                              // lookup the earlier mapped GUID
+                            parts[eachPart] = type + GUID.ToString();           // and replace the old GUID with mapped
+                        }
+
+                        // rejoin all the tour stop url segment parts back together
+                        tour.Bookmarks[eachBookmark].Url = String.Join("/", parts);
+                    }
+                }
+
+                // add the tour
+                _storage.Tours.Add(tour);
+
+                // commit tour to database
+                try
+                {
+                    _storage.SaveChanges();
+                }
+                catch (DbEntityValidationException dbEx)
+                {
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                        }
+                    }
+                    return "We imported all of the timelines, exhibits and content items but we wre unable to fully import tours. Please click on My Collections to check.";
+                }
+
+            }
+
+            return "The collection has been imported as \"" + collection.Title + "\". Please click on \"My Collections\" in order to see your new collection.";
         }
 
         public string ImportTimelines(Guid intoTimelineId, List<FlatTimeline> importContent)

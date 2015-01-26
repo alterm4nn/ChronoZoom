@@ -43,6 +43,19 @@ namespace Chronozoom.UI
         [WebInvoke(Method = "PUT", UriTemplate = "/import/timeline/{intoTimelineId}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         String ImportTimelines(string intoTimelineId, List<Utils.ExportImport.FlatTimeline> newTimelineTree);
 
+        /// <summary>
+        /// For importing a collection from a file provided by the user as a new collection under the existing user, with new GUIDs.
+        /// If the user is not logged in as a valid user then the import will not proceed.
+        /// If the collection title already exists for the current user then the import still goes ahead but with a new collection title.
+        /// Permissions and creatorship history are not imported, just content, so the new collection will default to being unpublished.
+        /// Currently provided tours are ignored. Only the collection customization, it's timelines, exhibits and content items are imported.
+        /// </summary>
+        /// <param name="collectionTree">Must be a structure created by CZ.Menus.ExportCollection, provided as a JSON.stringify string.</param>
+        /// <returns>A success or general error message.</returns>
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/import/collection", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        String ImportCollection(Utils.ExportImport.FlatCollection collectionTree);
+
         /// <summary>Not directly used by JavaScript client so not exposed as an OperationContract method.</summary>
         /// <param name="storage"></param>
         /// <param name="superCollectionName">The title of the desired supercollection. Leaving blank returns the default supercollection's default collection id.</param>
@@ -52,6 +65,17 @@ namespace Chronozoom.UI
         /// </param>
         /// <returns>The GUID id of the desired collection if it exists in the db, or an empty GUID if it can't be found.</returns>
         Guid CollectionIdOrDefault(Storage storage, string superCollectionName, string collectionPath);
+
+        /// <summary>Returns the root timeline id for the given collection.</summary>
+        /// <param name="superCollection">The supercollection's name.</param>
+        /// <param name="collection">The collection's path.</param>
+        /// <returns>
+        /// The GUID of the root timeline if it can be found else an empty GUID.
+        /// ChronoZoom's Cosmos collection's root timeline equals an empty GUID too.
+        /// </returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        Guid GetRoot(string superCollection, string collection);
 
         /// <summary>
         /// Returns timeline data within a specified range of years from a collection or a superCollection.

@@ -1,4 +1,4 @@
-/* level 1 */
+﻿/* level 1 */
 #mnu {
   color: #eee;
   display: inline;
@@ -45,6 +45,9 @@
   list-style-type: none;
   padding: 5px 8px 5px 8px;
 }
+#mnu > li > ul > li.hr {
+  border-top: solid 2px #0464a2;
+}
 #mnu > li > ul > li:first-child {
   border-top-right-radius: 6px;
 }
@@ -82,3 +85,9 @@
   color: #fff;
   border-radius: 8px;
 }
+/* file import element must have visible to work yet should be hidden */
+#mnuFile {
+  opacity: 0;
+  z-index: -1;
+}
+/*# sourceMappingURL=menus.css.map */

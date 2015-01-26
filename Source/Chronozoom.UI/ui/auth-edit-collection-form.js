@@ -122,7 +122,7 @@ var CZ;
                         var collectionData =
                         {
                             Title:              $.trim(_this.collectionName.val()),
-                            Path:               _this.collectionName.val().replace(/[^a-zA-Z0-9]/g, ''),
+                            Path:               _this.collectionName.val().replace(/[^a-zA-Z0-9\-]/g, ''),
                             theme:              JSON.stringify(_this.collectionTheme),
                             PubliclySearchable: $(_this.chkPublic ).prop('checked'),
                             MembersAllowed:     $(_this.chkEditors).prop('checked'),
@@ -240,7 +240,7 @@ var CZ;
                     (
                         window.location.protocol + '//' + window.location.host + '/' +
                         CZ.Service.superCollectionName + '/' +
-                        this.collectionName.val().replace(/[^a-zA-Z0-9]/g, '')
+                        this.collectionName.val().replace(/[^a-zA-Z0-9\-]/g, '')
                     )
                     .toLowerCase()
                 );

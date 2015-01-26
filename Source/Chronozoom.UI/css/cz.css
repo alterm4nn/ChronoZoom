@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=Arizonia);
+﻿@import url(http://fonts.googleapis.com/css?family=Arizonia);
 /* Height of input element */
 /* Font-size of error message */
 /* Error messages */
@@ -303,6 +303,9 @@ iframe[sutra=picker] + div {
   list-style-type: none;
   padding: 5px 8px 5px 8px;
 }
+#mnu > li > ul > li.hr {
+  border-top: solid 2px #0464a2;
+}
 #mnu > li > ul > li:first-child {
   border-top-right-radius: 6px;
 }
@@ -339,6 +342,11 @@ iframe[sutra=picker] + div {
   background-color: #0464a2;
   color: #fff;
   border-radius: 8px;
+}
+/* file import element must have visible to work yet should be hidden */
+#mnuFile {
+  opacity: 0;
+  z-index: -1;
 }
 #overlay {
   display: none;
@@ -2776,3 +2784,4 @@ a {
   background-color: #200c0f;
   border-color: #170306;
 }
+/*# sourceMappingURL=cz.css.map */
