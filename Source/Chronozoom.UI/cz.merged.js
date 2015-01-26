@@ -9637,9 +9637,49 @@ var CZ;
         }
         Service.importTimelines = importTimelines;
 
-        /**
-        * Chronozoom.svc Requests.
-        */
+        // .../import/collection
+        function importCollection(collectionTree)
+        {
+            if (typeof collectionTree !== 'string')
+            {
+                throw 'importCollection(collectionTree) missing the collectionTree parameter.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath('import');
+            request.addToPath('collection');
+            return $.ajax
+            ({
+                type:           'PUT',
+                cache:          false,
+                url:            request.url,
+                contentType:    'application/json',
+                dataType:       'json',
+                data:           collectionTree      // should already be JSON.stringified
+            });
+        }
+        Service.importCollection = importCollection;
+
+        // .../getroot?supercollection=&collection=
+        function getRootTimelineId(sc, c)
+        {
+            if (typeof sc === "undefined") sc = Service.superCollectionName;
+            if (typeof  c === "undefined") c  = Service.collectionName;
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath("getroot");
+            request.addParameter("supercollection", sc);
+            request.addParameter("collection", c);
+            return $.ajax
+            ({
+                type: "GET",
+                cache: false,
+                dataType: "json",
+                url: request.url
+            });
+        }
+        Service.getRootTimelineId = getRootTimelineId;
+
         // .../gettimelines?supercollection=&collection=&start=&end=&minspan=&lca=
         function getTimelines(r, sc, c) {
             if (typeof sc === "undefined") sc = Service.superCollectionName;
@@ -12784,11 +12824,37 @@ var CZ;
                 CZ.Authoring.UI.createTour();
             });
 
+            $('#mnuExportAbout').clicktouch(function (event)
+            {
+                event.stopPropagation();
+                // show quick information regarding exports
+                ExportInformation();
+            });
+
             $('#mnuEditTours').clicktouch(function (event)
             {
                 event.stopPropagation();
                 // show tours list pane (with edit options)
                 CZ.HomePageViewModel.panelShowToursList(true);
+            });
+
+            $('#mnuExportCollection').clicktouch(function (event)
+            {
+                event.stopPropagation();
+                // initiate export and inform user when complete
+                CZ.HomePageViewModel.closeAllForms();
+                ExportCollection();
+            });
+
+            $('#mnuImportCollection').clicktouch(function (event)
+            {
+                event.stopPropagation();
+                // prompt user to pick file then import
+                CZ.HomePageViewModel.closeAllForms();
+                $('#mnuFileJSON')
+                    .data('mnuItem', '#mnuImportCollection')
+                    .val('')
+                    .trigger('click');
             });
 
             $('#mnuMine').clicktouch(function (event)
@@ -12831,6 +12897,47 @@ var CZ;
                 }
             });
 
+            $('#mnuFileJSON').on('input, change', function (event)
+            {
+                // mnuFileJSON is used for picking which file to upload
+                // and can be shared over several menu items if desired
+
+                if (this.value === '' || this.files.length < 1) return;
+
+                var json;
+
+                // setup to catch when file has finished loading OK
+                var file    = new FileReader();
+                file.onload = function (event)
+                {
+                    // tell user if invalid JSON (faster to parse client-side)
+                    try
+                    {
+                        json = $.parseJSON(file.result);
+                    }
+                    catch(error)
+                    {
+                        CZ.Authoring.showMessageWindow
+                        (
+                            "This file is not a valid .json file.",
+                            "Invalid File Format"
+                        );
+                        return;
+                    }
+
+                    // hand data off to appropriate menu item's fn
+                    switch ($('#mnuFileJSON').data('mnuItem'))
+                    {
+                        case '#mnuImportCollection':
+                            ImportCollection(file.result);
+                            break;
+                    }
+                };
+
+                // initiate the file load
+                file.readAsText(this.files[0], 'utf8');
+            });
+
         });
 
 
@@ -12846,7 +12953,7 @@ var CZ;
             var newName = prompt("What name would you like for your new collection?\nNote: The name must be unique among your collections.", '') || '';
             newName     = $.trim(newName);
 
-            var newPath = newName.replace(/[^a-zA-Z0-9]/g, '');
+            var newPath = newName.replace(/[^a-zA-Z0-9\-]/g, '');
             if (newPath === '') return;
 
             if (newPath.length > 50)
@@ -12898,6 +13005,95 @@ var CZ;
 
         };
 
+
+        this.ExportInformation =
+        function ExportInformation()
+        {
+            CZ.Authoring.showMessageWindow
+            (
+                "Exporting a collection lets you save an entire collection to a file on your PC, which you can keep as a backup or share with others. " +
+                "The collection's name, background, colors, timelines, exhibits, content items and tours are all included. If you've granted edit rights " +
+                "to other people, please note that the list of editors is not included. When you import a previously exported collection, " +
+                "it will always be imported as a new unpublished collection, which you can then edit and publish when you are ready.",
+                "Exporting & Importing Collections"
+            );
+        };
+
+
+        this.ExportCollection =
+        function ExportCollection()
+        {
+            var promiseRootId       = CZ.Service.getRootTimelineId();
+            var promiseCollection   = CZ.Service.getCollection();
+            var promiseTours        = CZ.Service.getTours();
+
+            $.when
+            (
+                promiseRootId,
+                promiseCollection,
+                promiseTours
+            )
+            .done(function(rootId, collection, tours)
+            {
+
+                CZ.Service.exportTimelines(rootId[0])
+                .done(function (timelines)
+                {
+                    var exportData =
+                    {
+                        date:       new Date().toUTCString(),
+                        schema:     constants.schemaVersion,
+                        collection:
+                        {
+                            Title:  collection[0].Title,
+                            theme:  collection[0].theme
+                        },
+                        timelines:  timelines,
+                        tours:      tours[0].d
+                    };
+
+                    var fileBLOB = new Blob([JSON.stringify(exportData)], { type: 'application/json;charset=utf-8' });
+                    var fileName = 'cz.' + collection[0].Path + '.json';
+
+                    saveAs(fileBLOB, fileName);
+
+                    CZ.Authoring.showMessageWindow
+                    (
+                        'The current collection has been provided to you as a file, which you can retain as a back-up, or share with others. ' +
+                        'If you are not prompted to pick a file name, please check your downloads for a file called: "' + fileName + '".',
+                        'Collection Successfully Exported'
+                    );
+                })
+                .fail(function ()
+                {
+                    CZ.Authoring.showMessageWindow
+                    (
+                        'Sorry, we were unable to export this collection.',
+                        'Unable to Export Collection'
+                    );
+                });
+
+            })
+            .fail(function()
+            {
+                CZ.Authoring.showMessageWindow
+                (
+                    'An unexpected error occured. Please feel free to try again.',
+                    'Unable to Export Collection'
+                );
+            });
+
+        };
+
+
+        this.ImportCollection =
+        function ImportCollection(stringifiedJSON)
+        {
+            CZ.Service.importCollection(stringifiedJSON).then(function (importMessage)
+            {
+                CZ.Authoring.showMessageWindow(importMessage);
+            });
+        };
 
 
     })(CZ.Menus || (CZ.Menus = {}));
@@ -16234,7 +16430,7 @@ var CZ;
                         var collectionData =
                         {
                             Title:              $.trim(_this.collectionName.val()),
-                            Path:               _this.collectionName.val().replace(/[^a-zA-Z0-9]/g, ''),
+                            Path:               _this.collectionName.val().replace(/[^a-zA-Z0-9\-]/g, ''),
                             theme:              JSON.stringify(_this.collectionTheme),
                             PubliclySearchable: $(_this.chkPublic ).prop('checked'),
                             MembersAllowed:     $(_this.chkEditors).prop('checked'),
@@ -16352,7 +16548,7 @@ var CZ;
                     (
                         window.location.protocol + '//' + window.location.host + '/' +
                         CZ.Service.superCollectionName + '/' +
-                        this.collectionName.val().replace(/[^a-zA-Z0-9]/g, '')
+                        this.collectionName.val().replace(/[^a-zA-Z0-9\-]/g, '')
                     )
                     .toLowerCase()
                 );
@@ -19297,22 +19493,16 @@ var CZ;
                 CZ.Overlay.Show(false);  // false = home page overlay
             });
 
-            // if URL has a supercollection
+            // ensure we have a supercollection for getCanEdit and other API calls.
+            if (typeof CZ.Service.superCollectionName === 'undefined' && CZ.Common.isInCosmos()) CZ.Service.superCollectionName = 'chronozoom';
+
             // check if current user has edit permissions before continuing with load
             // since other parts of load need to know if can display edit buttons etc.
-            if (CZ.Service.superCollectionName === undefined)
+            CZ.Service.getCanEdit().done(function (result)
             {
-                CZ.Service.canEdit = false;
+                CZ.Service.canEdit = (result === true);
                 finishLoad();
-            }
-            else
-            {
-                CZ.Service.getCanEdit().done(function (result)
-                {
-                    CZ.Service.canEdit = (result === true);
-                    finishLoad();
-                });
-            }
+            });
         });
 
         function finishLoad()
@@ -19322,12 +19512,7 @@ var CZ;
             {
                 var forms = arguments;
 
-                CZ.Settings.isCosmosCollection =
-                (
-                    (CZ.Service.superCollectionName === 'ChronoZoom' || typeof CZ.Service.superCollectionName == 'undefined') &&
-                    (CZ.Service.collectionName      === 'Cosmos'     || typeof CZ.Service.collectionName      == 'undefined')
-                );
-
+                CZ.Settings.isCosmosCollection = CZ.Common.isInCosmos();
                 if (CZ.Settings.isCosmosCollection) $('.header-regimes').show();
 
                 CZ.Menus.isEditor = CZ.Service.canEdit;
@@ -20017,7 +20202,7 @@ var CZ;
             }, 1.0, vp, false), true);
             CZ.Common.updateAxis(CZ.Common.vc, CZ.Common.ax);
 
-            var bid = window.location.hash.match("b=([a-z0-9_]+)");
+            var bid = window.location.hash.match("b=([a-z0-9_\-]+)");
             if (bid) {
                 //bid[0] - source string
                 //bid[1] - found match

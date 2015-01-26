@@ -166,10 +166,10 @@ namespace Chronozoom.UI
 
             // home page was not specified so ascertain the superCollection title and collection Path from the URL
             string superCollectionSegment =
-                Regex.Replace(pageUrl.Segments[1].Trim(), @"[^A-Za-z0-9]+", "").ToLower();
+                Regex.Replace(pageUrl.Segments[1].Trim(), @"[^A-Za-z0-9\-]+", "").ToLower();
 
             string collectionSegment = pageUrl.Segments.Length < 3 ? "" :
-                Regex.Replace(pageUrl.Segments[2].Trim(), @"[^A-Za-z0-9]+", "").ToLower();
+                Regex.Replace(pageUrl.Segments[2].Trim(), @"[^A-Za-z0-9\-]+", "").ToLower();
 
             // try to look up collection id
             Guid collectionId = ChronozoomSVC.Instance.CollectionIdOrDefault(_storage, superCollectionSegment, collectionSegment);

@@ -73,6 +73,7 @@
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
     <script type="text/javascript" src="/scripts/external/spectrum/spectrum.min.js"></script>
     <script type="text/javascript" src="/scripts/external/nouislider/jquery.nouislider.min.js"></script>
+    <script type="text/javascript" src="/scripts/external/FileSaver.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function ()
         {
@@ -234,16 +235,22 @@
             <li id="mnuCurate" class="active">Create
                 <ul>
                     <li id="mnuCreateCollection">Create Collection</li>
-                    <li id="mnuCreateTimeline"  >Create Timeline</li>
-                    <li id="mnuCreateExhibit"   >Create Exhibit</li>
-                    <li id="mnuCreateTour"      >Create Tour</li>
-                    <li id="mnuEditTours"       >Edit   Tours</li>
+                    <li id="mnuCreateTimeline">Create Timeline</li>
+                    <li id="mnuCreateExhibit">Create Exhibit</li>
+                    <li id="mnuCreateTour">Create Tour</li>
+                    <li id="mnuEditTours">Edit   Tours</li>
+                    <li id="mnuExportAbout"      title="What's included in exports" class="hr">About Exports</li>
+                    <li id="mnuExportCollection" title="Backup collection to file"            >Export Collection</li>
+                    <li id="mnuImportCollection" title="Restore collection from file"         >Import Collection</li>
                 </ul>
             </li>
             <li id="mnuMine">My Collections</li>
             <li id="mnuSearch"  title="Search ChronoZoom" ><img src="/images/search-icon.png"  alt="" /></li>
             <li id="mnuProfile" title="Register / Sign In"><img src="/images/profile-icon.png" alt="" /></li>
         </ul>
+        <div id="mnuFile">
+            <input id="mnuFileJSON" type="file" accept=".json,application/json" value="" />
+        </div>
     </header>
     <nav>
         <div class="fleft header-breadcrumbs">

@@ -50,7 +50,7 @@ namespace Chronozoom.Entities
 
         /// <summary>
         /// URL-sanitized version of title, which will be used as part of a URL path.
-        /// Only a-z and 0-9 are allowed. This should be unique per supercollection.
+        /// Only a-z, 0-9 and hyphen are allowed. This should be unique per supercollection.
         /// </summary>
         [DataMember]
         [Required]

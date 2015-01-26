@@ -56,8 +56,8 @@ namespace Chronozoom.Entities
             get { return prefix; }
         }
 
-        private static readonly Regex _prefixReg = new Regex(@"^([a-z0-9_]+):([a-z0-9_\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex _namespaceReg = new Regex(@"^http://(?:www.)*chronozoom.com/([a-z0-9]+)#([a-z0-9\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex _prefixReg = new Regex(@"^([a-z0-9_\-]+):([a-z0-9_\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex _namespaceReg = new Regex(@"^http://(?:www.)*chronozoom.com/([a-z0-9\-]+)#([a-z0-9\-]*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>Parses string as full triple name</summary>
         /// <param name="name">String with full triple name</param>

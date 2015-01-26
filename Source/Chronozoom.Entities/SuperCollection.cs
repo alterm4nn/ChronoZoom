@@ -30,7 +30,7 @@ namespace Chronozoom.Entities
 
         /// <summary>
         /// The path from the web root to the the supercollection.  Title must therefore have a globally unique value.
-        /// Is programmatically derived as a URL-sanitized version of user's display name using a-z and 0-9 only.
+        /// Is programmatically derived as a URL-sanitized version of user's display name using a-z, 0-9 and hyphen only.
         /// </summary>
         [DataMember]
         [Required]
