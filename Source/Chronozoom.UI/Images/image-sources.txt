@@ -1,0 +1,4 @@
+Include Sources of Newly Added Images
+-------------------------------------
+icon_facebook.svg:  http://www.freepik.com/free-icons
+icon_twitter.svg:   http://www.freepik.com/free-icons

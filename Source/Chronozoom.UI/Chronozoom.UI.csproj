@@ -117,6 +117,8 @@
     <Content Include="images\add-hover.png" />
     <Content Include="images\add.png" />
     <Content Include="images\copy.svg" />
+    <Content Include="images\icon_facebook.svg" />
+    <Content Include="images\icon_twitter.svg" />
     <Content Include="images\paste.svg" />
     <Content Include="images\profile-icon-green.png" />
     <Content Include="images\profile-icon-yellow.png" />
@@ -807,7 +809,6 @@
     <Content Include="images\home-icon.png" />
     <Content Include="images\icon_home.png" />
     <Content Include="images\icon_right_arrow.png" />
-    <Content Include="images\icon_twitter.png" />
     <Content Include="images\media\bing-import-50x150.png" />
     <Content Include="images\media\bing-import-50x50.png" />
     <Content Include="images\media\SkyDrive-Import-50X150.png" />
