@@ -97,8 +97,11 @@ var CZ;
                 ;
 
                 this.container.find('.cz-tourslist-linking')
-                    .click(function (e) { CZ.Tours.getAutoTourURL(context); })
+                    .click(function (e) { CZ.Tours.showAutoTourURL(context); })
                 ;
+
+              //this.container.find('.cz-tourslist-like-fb').attr('href', CZ.Tours.getFacebookURL(context));
+                this.container.find('.cz-tourslist-like-tw').attr('href', CZ.Tours.getTwitterURL( context));
 
             }
             return TourListItem;

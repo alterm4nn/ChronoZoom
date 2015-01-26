@@ -943,10 +943,11 @@ var CZ;
         }
         Tours.loadTourFromURL = loadTourFromURL;
 
-        // will use current collection's URL rather than looking up in db
-        function getAutoTourURL(context)
+        // will use current collection's URL rather than looking up in db for remaining fn
+
+        function showAutoTourURL(context)
         {
-            var url         = window.location.href.toLowerCase().split('#')[0] + '#@auto-tour=' + context.id;
+            var url         = getAutoTourURL(context);
             var $copyarea   = $('#message-window').find('textarea');
 
             CZ.Authoring.showMessageWindow
@@ -966,7 +967,27 @@ var CZ;
             setTimeout(function () { $copyarea.select(); }, 1000); // IE fix for select()
 
         }
+        Tours.showAutoTourURL = showAutoTourURL;
+
+        function getAutoTourURL(context)
+        {
+            return window.location.href.toLowerCase().split('#')[0] + '#@auto-tour=' + context.id;
+        }
         Tours.getAutoTourURL = getAutoTourURL;
+
+        function getFacebookURL(context)
+        {
+            return "http://www.facebook.com/sharer.php?u="  + encodeURIComponent(getAutoTourURL(context));
+        }
+        Tours.getFacebookURL = getFacebookURL;
+
+        function getTwitterURL(context)
+        {
+            // see https://dev.twitter.com/web/tweet-button
+            return "http://twitter.com/share?url="          + encodeURIComponent(getAutoTourURL(context)) +
+                   "&hashtags=chronozoom&text="             + encodeURIComponent(context.title + ' - '  );
+        }
+        Tours.getTwitterURL = getTwitterURL;
 
     })(CZ.Tours || (CZ.Tours = {}));
     var Tours = CZ.Tours;
