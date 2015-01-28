@@ -19032,18 +19032,27 @@ var CZ;
                     .append($list.html())
                     .find('.overlay-tile').click(function (event)
                     {
-                        if ($(this).attr('data-url') != '')
+                        var newURL = $(this).attr('data-url');
+
+                        if (newURL != '')
                         {
-                            window.location.href = $(this).attr('data-url');
-                            setTimeout(function ()
+                            window.location.href = newURL;
+
+                            if
+                            (
+                                window.location.pathname === newURL.split('#')[0] &&
+                                (window.location.hash.length > 1 || newURL.indexOf('#') > -1)
+                            )
                             {
-                                // if same page and has # anchor then .href won't reload
-                                // so force reload (using cache) but delay to give .href
-                                // a chance to fire first.
-                                window.location.reload();
-                            },  200);
+                                setTimeout(function ()
+                                {
+                                    // if same page and has # anchor then .href won't reload
+                                    // so force reload (using cache) but delay to give .href
+                                    // a chance to fire first.
+                                    window.location.reload();
+                                },  200);
+                            }
                         }
-                        Hide();
                     })
                 ;
 
