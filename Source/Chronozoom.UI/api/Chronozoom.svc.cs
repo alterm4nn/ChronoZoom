@@ -2822,7 +2822,7 @@ namespace Chronozoom.UI
                 Exhibit exhibit  = storage.Exhibits.Where(e => e.Id == exhibitGUID).Include("UpdatedBy").FirstOrDefault();
                 if (exhibit != null)
                 {
-                    rv = exhibit.UpdatedTime.ToString("yyyy/MM/dd HH:mm:ss") + "|" + exhibit.UpdatedBy.DisplayName;
+                    rv = exhibit.UpdatedTime.ToString("yyyy/MM/dd HH:mm:ss") + (exhibit.UpdatedBy != null ? "|" + exhibit.UpdatedBy.DisplayName : "");
                 }
 
                 return rv;
