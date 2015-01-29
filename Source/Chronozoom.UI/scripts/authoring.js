@@ -778,35 +778,48 @@ var CZ;
                             isValid = false;
                         }
                     }
-                } else if (ci.mediaType.toLowerCase() === "skydrive-document") {
-                    // Skydrive embed link
-                    var skydrive = /(onedrive|skydrive)\.live\.com\/embed/;
+                }
+                else if (ci.mediaType.toLowerCase() === "skydrive-document")
+                {
+                    var onedriveDownload = /(onedrive|skydrive)\.live\.com\/download/;
+                    var onedriveEmbed    = /(onedrive|skydrive)\.live\.com\/embed/;
 
-                    if (!skydrive.test(ci.uri)) {
-                        alert("This is not a OneDrive embed link.");
-                        isValid = false;
-                    }
-                } else if (ci.mediaType.toLowerCase() === "skydrive-image") {
-                    // uri pattern is - {url} {width} {height}
-                    var splited = ci.uri.split(' ');
-
-                    // Skydrive embed link
-                    var skydrive = /(onedrive|skydrive)\.live\.com\/embed/;
-
-                    // validate width
-                    var width = /[0-9]/;
-
-                    // validate height
-                    var height = /[0-9]/;
-
-                    if (!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
-                        if (mediaInput) {
-                            mediaInput.showError("This is not a OneDrive embed link.");
-                        }
-
+                    if (!onedriveDownload.test(ci.uri) && !onedriveEmbed.test(ci.uri))
+                    {
+                        alert("This is not a valid OneDrive link.");
                         isValid = false;
                     }
                 }
+                else if (ci.mediaType.toLowerCase() === "skydrive-image")
+                {
+                    // OneDrive embed image uri pattern is - {url} {width} {height}
+                    var split = ci.uri.split(' ');
+
+                    if (split.length > 1)
+                    {
+                        // OneDrive embed link
+                        var onedrive = /(onedrive|skydrive)\.live\.com\/embed/;
+                        var width    = /[0-9]/;
+                        var height   = /[0-9]/;
+
+                        if (!onedrive.test(split[0]) || !width.test(split[1]) || !height.test(split[2]))
+                        {
+                            if (mediaInput) mediaInput.showError("This is not a valid OneDrive embed link.");
+                            isValid = false;
+                        }
+                    }
+                    else
+                    {
+                        // OneDrive download link
+                        var onedrive = /(onedrive|skydrive)\.live\.com\/download/;
+                        if (!onedrive.test(ci.uri))
+                        {
+                            alert("This is not a valid OneDrive download link.");
+                            isValid = false;
+                        }
+                    }
+                }
+
                 if (!isValid)
                     return false;
                 i++;
