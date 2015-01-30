@@ -89,9 +89,21 @@ var CZ;
                 var uri = src;
 
                 if (mediaType === "skydrive-image") {
-                    var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
-                    var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
-                    uri += ' ' + width + ' ' + height;
+                    //var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    //var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    //uri += ' ' + width + ' ' + height;
+
+                    // convert embed uri into download uri
+                    var qs = uri.split('?')[1].split('&');
+                    var pair, resid, authkey;
+
+                    qs.forEach(function (item)
+                    {
+                        pair = item.split('=');
+                        if (pair.length === 2 && pair[0] === 'resid'  ) resid   = pair[1];
+                        if (pair.length === 2 && pair[0] === 'authkey') authkey = pair[1];
+                    });
+                    uri = 'https://onedrive.live.com/download?resid=' + resid + '&authkey=' + authkey;
                 }
 
                 var mediaInfo = {

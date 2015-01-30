@@ -222,7 +222,7 @@ var CZ;
             return VCContent.addChild(element, new CanvasSkydriveDocumentItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
 
-        /* Adds a embed skydrive image as a child of the given virtual canvas element.
+        /* Adds a embed OneDrive image as a child of the given virtual canvas element.
         @param element   (CanvasElement) Parent element, whose children is to be new element.
         @param layerid   (any type) id of the layer for this element
         @param id   (any type) id of an element
@@ -234,7 +234,16 @@ var CZ;
         @param z (number) z-index
         */
         VCContent.addSkydriveImage = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
-            return VCContent.addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+            if (embededSource.indexOf('https://onedrive.live.com/download?resid=') === 0)
+            {
+                // OneDrive image is not actually embedded but is a direct download link so treat as a normal image
+                return VCContent.addImage(element, layerid, id, vx, vy, vw, vh, embededSource, null);
+            }
+            else
+            {
+                // OneDrive image is embedded in a OneDrive page
+                return VCContent.addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+            }
         };
 
         /*  Adds a text element as a child of the given virtual canvas element.

@@ -2343,7 +2343,7 @@ var CZ;
             return VCContent.addChild(element, new CanvasSkydriveDocumentItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
         };
 
-        /* Adds a embed skydrive image as a child of the given virtual canvas element.
+        /* Adds a embed OneDrive image as a child of the given virtual canvas element.
         @param element   (CanvasElement) Parent element, whose children is to be new element.
         @param layerid   (any type) id of the layer for this element
         @param id   (any type) id of an element
@@ -2355,7 +2355,16 @@ var CZ;
         @param z (number) z-index
         */
         VCContent.addSkydriveImage = function (element, layerid, id, embededSource, vx, vy, vw, vh, z) {
-            return VCContent.addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+            if (embededSource.indexOf('https://onedrive.live.com/download?resid=') === 0)
+            {
+                // OneDrive image is not actually embedded but is a direct download link so treat as a normal image
+                return VCContent.addImage(element, layerid, id, vx, vy, vw, vh, embededSource, null);
+            }
+            else
+            {
+                // OneDrive image is embedded in a OneDrive page
+                return VCContent.addChild(element, new CanvasSkydriveImageItem(element.vc, layerid, id, embededSource, vx, vy, vw, vh, z), false);
+            }
         };
 
         /*  Adds a text element as a child of the given virtual canvas element.
@@ -9267,35 +9276,48 @@ var CZ;
                             isValid = false;
                         }
                     }
-                } else if (ci.mediaType.toLowerCase() === "skydrive-document") {
-                    // Skydrive embed link
-                    var skydrive = /(onedrive|skydrive)\.live\.com\/embed/;
+                }
+                else if (ci.mediaType.toLowerCase() === "skydrive-document")
+                {
+                    var onedriveDownload = /(onedrive|skydrive)\.live\.com\/download/;
+                    var onedriveEmbed    = /(onedrive|skydrive)\.live\.com\/embed/;
 
-                    if (!skydrive.test(ci.uri)) {
-                        alert("This is not a OneDrive embed link.");
-                        isValid = false;
-                    }
-                } else if (ci.mediaType.toLowerCase() === "skydrive-image") {
-                    // uri pattern is - {url} {width} {height}
-                    var splited = ci.uri.split(' ');
-
-                    // Skydrive embed link
-                    var skydrive = /(onedrive|skydrive)\.live\.com\/embed/;
-
-                    // validate width
-                    var width = /[0-9]/;
-
-                    // validate height
-                    var height = /[0-9]/;
-
-                    if (!skydrive.test(splited[0]) || !width.test(splited[1]) || !height.test(splited[2])) {
-                        if (mediaInput) {
-                            mediaInput.showError("This is not a OneDrive embed link.");
-                        }
-
+                    if (!onedriveDownload.test(ci.uri) && !onedriveEmbed.test(ci.uri))
+                    {
+                        alert("This is not a valid OneDrive link.");
                         isValid = false;
                     }
                 }
+                else if (ci.mediaType.toLowerCase() === "skydrive-image")
+                {
+                    // OneDrive embed image uri pattern is - {url} {width} {height}
+                    var split = ci.uri.split(' ');
+
+                    if (split.length > 1)
+                    {
+                        // OneDrive embed link
+                        var onedrive = /(onedrive|skydrive)\.live\.com\/embed/;
+                        var width    = /[0-9]/;
+                        var height   = /[0-9]/;
+
+                        if (!onedrive.test(split[0]) || !width.test(split[1]) || !height.test(split[2]))
+                        {
+                            if (mediaInput) mediaInput.showError("This is not a valid OneDrive embed link.");
+                            isValid = false;
+                        }
+                    }
+                    else
+                    {
+                        // OneDrive download link
+                        var onedrive = /(onedrive|skydrive)\.live\.com\/download/;
+                        if (!onedrive.test(ci.uri))
+                        {
+                            alert("This is not a valid OneDrive download link.");
+                            isValid = false;
+                        }
+                    }
+                }
+
                 if (!isValid)
                     return false;
                 i++;
@@ -14678,9 +14700,21 @@ var CZ;
                 var uri = src;
 
                 if (mediaType === "skydrive-image") {
-                    var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
-                    var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
-                    uri += ' ' + width + ' ' + height;
+                    //var width = parseFloat(response.embed_html.match(/width="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    //var height = parseFloat(response.embed_html.match(/height="[0-9]+"/)[0].match(/[0-9]+/)[0]);
+                    //uri += ' ' + width + ' ' + height;
+
+                    // convert embed uri into download uri
+                    var qs = uri.split('?')[1].split('&');
+                    var pair, resid, authkey;
+
+                    qs.forEach(function (item)
+                    {
+                        pair = item.split('=');
+                        if (pair.length === 2 && pair[0] === 'resid'  ) resid   = pair[1];
+                        if (pair.length === 2 && pair[0] === 'authkey') authkey = pair[1];
+                    });
+                    uri = 'https://onedrive.live.com/download?resid=' + resid + '&authkey=' + authkey;
                 }
 
                 var mediaInfo = {
