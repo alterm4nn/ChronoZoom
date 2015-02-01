@@ -119,6 +119,7 @@
     <Content Include="images\copy.svg" />
     <Content Include="images\icon_facebook.svg" />
     <Content Include="images\icon_twitter.svg" />
+    <Content Include="images\icon_twitter_canvas.svg" />
     <Content Include="images\paste.svg" />
     <Content Include="images\profile-icon-green.png" />
     <Content Include="images\profile-icon-yellow.png" />

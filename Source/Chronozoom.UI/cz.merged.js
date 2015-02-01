@@ -3121,9 +3121,42 @@ var CZ;
                 var btnX = this.x + this.width - 1.0 * this.titleObject.height;
                 var btnY = this.titleObject.y + 0.15 * this.titleObject.height;
 
+                // initialize tweet button
+                this.tweetBtn = VCContent.addImage(this, layerid, id + "__tweet", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/icon_twitter.svg");
+                this.tweetBtn.reactsOnMouse = true;
+
+                this.tweetBtn.onmouseclick = function (event)
+                {
+                    // TODO
+                    alert(_this.parent.title + _this.parent.guid);
+                }
+
+                this.tweetBtn.onmousehover = function (event)
+                {
+                    this.vc.element.css('cursor', 'pointer');
+                    this.vc.element.attr('title', 'Share on Twitter');
+                    this.parent.settings.strokeStyle = "yellow";
+                }
+
+                this.tweetBtn.onmouseunhover = function (event)
+                {
+                    this.vc.element.css('cursor', 'default');
+                    this.vc.element.attr('title', '');
+                    this.parent.settings.strokeStyle = timelineinfo.strokeStyle ? timelineinfo.strokeStyle : CZ.Settings.timelineBorderColor;
+                }
+
+                this.tweetBtn.onRemove = function (event)
+                {
+                    this.onmousehover = undefined;
+                    this.onmouseunhover = undefined;
+                    this.onmouseclick = undefined;
+                }
+
                 // initialize add favorite button if user is logged in
                 if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0)
                 {
+                    btnX -= this.titleObject.height;
+
                     this.favoriteBtn = VCContent.addImage(this, layerid, id + "__favorite", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/star.svg");
                     this.favoriteBtn.reactsOnMouse = true;
 
