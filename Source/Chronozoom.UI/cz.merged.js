@@ -3132,6 +3132,7 @@ var CZ;
                         // see https://dev.twitter.com/web/tweet-button for tweet options and http://to.ly/api_info.php for URL shortener options
                         // please note window.open inside a jQuery .ajax call won't be permittd by pop-up blockers unless the call is synchronous
 
+                        var shortURL        = null;
                         var timelineURL     = '';
 
                         // build timeline link url
@@ -3139,22 +3140,32 @@ var CZ;
                         timelineURL = window.location.origin + window.location.pathname + '#' + timelineURL;
 
                         // get short version of url since timelines can be very deep
-                        timelineURL = $.ajax
+                        shortURL = $.ajax
                         ({
-                            async:      false,  // <-- synchronous
+                            async:      false,  // <--  synchronous
+                            timeout:    5000,   //      with 5 sec timeout
                             type:       'GET',
                             url:        'http://to.ly/api.php?json=1&longurl=' + encodeURIComponent(timelineURL) + '&callback=?'
                         })
                         .responseText;
 
-                        timelineURL = JSON.parse(timelineURL.slice(2, -1)).shorturl;
+                        if (shortURL !== null)
+                        {
+                            try
+                            {
+                                shortURL    = JSON.parse(shortURL.slice(2, -1)).shorturl;
+                                timelineURL = shortURL;
+                            }
+                            catch (error) {}
+                        }
 
-                        // open new window/tab with tweet info outside of the .ajax call
+                        // open new window/tab with tweet info outside of the .ajax call to avoid blockers
                         window.open
                         (
                             'http://twitter.com/share?url=' + encodeURIComponent(timelineURL) +
-                               '&hashtags=chronozoom&text=' + encodeURIComponent(this.parent.title + ' - ')
+                                '&hashtags=chronozoom&text=' + encodeURIComponent(this.parent.title + ' - ')
                         );
+
 
                         function iteratePath(timeline)
                         {
