@@ -3121,9 +3121,87 @@ var CZ;
                 var btnX = this.x + this.width - 1.0 * this.titleObject.height;
                 var btnY = this.titleObject.y + 0.15 * this.titleObject.height;
 
+                // initialize tweet button - including for anon user
+                if (typeof this.tweetBtn === "undefined" && this.titleObject.width !== 0)
+                {
+                    this.tweetBtn = VCContent.addImage(this, layerid, id + "__tweet", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/icon_twitter_canvas.svg");
+                    this.tweetBtn.reactsOnMouse = true;
+
+                    this.tweetBtn.onmouseclick = function (event)
+                    {
+                        // see https://dev.twitter.com/web/tweet-button for tweet options and http://to.ly/api_info.php for URL shortener options
+                        // please note window.open inside a jQuery .ajax call won't be permittd by pop-up blockers unless the call is synchronous
+
+                        var shortURL        = null;
+                        var timelineURL     = '';
+
+                        // build timeline link url
+                        iteratePath(this.parent);
+                        timelineURL = window.location.origin + window.location.pathname + '#' + timelineURL;
+
+                        // get short version of url since timelines can be very deep
+                        shortURL = $.ajax
+                        ({
+                            async:      false,  // <--  synchronous
+                            timeout:    5000,   //      with 5 sec timeout
+                            type:       'GET',
+                            url:        'http://to.ly/api.php?json=1&longurl=' + encodeURIComponent(timelineURL) + '&callback=?'
+                        })
+                        .responseText;
+
+                        if (shortURL !== null)
+                        {
+                            try
+                            {
+                                shortURL    = JSON.parse(shortURL.slice(2, -1)).shorturl;
+                                timelineURL = shortURL;
+                            }
+                            catch (error) {}
+                        }
+
+                        // open new window/tab with tweet info outside of the .ajax call to avoid blockers
+                        window.open
+                        (
+                            'http://twitter.com/share?url=' + encodeURIComponent(timelineURL) +
+                                '&hashtags=chronozoom&text=' + encodeURIComponent(this.parent.title + ' - ')
+                        );
+
+
+                        function iteratePath(timeline)
+                        {
+                            if (timeline.id !== '__root__')
+                            {
+                                timelineURL = '/' + timeline.id + timelineURL;
+                                iteratePath(timeline.parent);
+                            }
+                        }
+                    };
+
+                    this.tweetBtn.onmousehover = function (event)
+                    {
+                        this.vc.element.css('cursor', 'pointer');
+                        this.vc.element.attr('title', 'Share on Twitter');
+                    };
+
+                    this.tweetBtn.onmouseunhover = function (event)
+                    {
+                        this.vc.element.css('cursor', 'default');
+                        this.vc.element.attr('title', '');
+                    };
+
+                    this.tweetBtn.onRemove = function (event)
+                    {
+                        this.onmousehover = undefined;
+                        this.onmouseunhover = undefined;
+                        this.onmouseclick = undefined;
+                    };
+                }
+
                 // initialize add favorite button if user is logged in
                 if (CZ.Settings.isAuthorized === true && typeof this.favoriteBtn === "undefined" && this.titleObject.width !== 0)
                 {
+                    btnX -= this.titleObject.height;
+
                     this.favoriteBtn = VCContent.addImage(this, layerid, id + "__favorite", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/star.svg");
                     this.favoriteBtn.reactsOnMouse = true;
 
@@ -3241,7 +3319,7 @@ var CZ;
                 // initialize copy timeline button - including for anon user
                 if (typeof this.copyButton === "undefined" && this.titleObject.width !== 0)
                 {
-                    if (typeof this.favoriteBtn !== "undefined") btnX -= this.titleObject.height;
+                    btnX -= this.titleObject.height;
 
                     this.copyButton = VCContent.addImage(this, layerid, id + "__copy", btnX, btnY, 0.7 * this.titleObject.height, 0.7 * this.titleObject.height, "/images/copy.svg");
                     this.copyButton.reactsOnMouse = true;
