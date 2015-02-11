@@ -44,6 +44,7 @@ var CZ;
                         link.css("float", "left");
                         link.css("width", "140px");
                         link.css("cursor", "pointer");
+                        link.css("white-space", "nowrap");
                         link.text(preloaded.name);
 
                         var div = $("<span></span>").addClass("cz-form-preloadedrecord").appendTo(li);
