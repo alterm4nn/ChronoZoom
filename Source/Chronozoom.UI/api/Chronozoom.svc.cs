@@ -1894,31 +1894,60 @@ namespace Chronozoom.UI
             string contentitemURI = contentitem.Uri;
             error = "";
 
-            // Custom validation for Skydrive images
+            // Custom validation for OneDrive images
             if (contentitem.MediaType == "skydrive-image")
             {
-                // Parse url parameters. url pattern is - {url} {width} {height}
-                var splited = contentitem.Uri.Split(' ');
-
-                // Not enough parameters in url
-                if (splited.Length != 3)
+                if (contentitem.Uri == null || contentitem.Uri.Length < 60)
                 {
                     SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
                     error = ErrorDescription.InvalidContentItemUrl;
-
                     return false;
                 }
 
-                contentitemURI = splited[0];
-
-                // Validate width and height are numbers
-                int value;
-                if (!Int32.TryParse(splited[1], out value) || !Int32.TryParse(splited[2], out value))
+                if (contentitem.Uri.Substring(0, 41) == "https://onedrive.live.com/download?resid=")
                 {
-                    SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
-                    error = ErrorDescription.InvalidContentItemUrl;
+                    // OneDrive download link
+                    string[] querystrings = contentitem.Uri.Split('?')[1].Split('&');
+                    if (querystrings.Length != 2)
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                        error = ErrorDescription.InvalidContentItemUrl;
+                        return false;
+                    }
+                    if (querystrings[1].Substring(0, 8) != "authkey=")
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                        error = ErrorDescription.InvalidContentItemUrl;
+                        return false;
+                    }
+                }
+                else
+                {
+                    // OneDrive embed link
 
-                    return false;
+                    // Parse url parameters. url pattern is - {url} {width} {height}
+                    var split = contentitem.Uri.Split(' ');
+
+                    // Not enough parameters in url
+                    if (split.Length != 3)
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                        error = ErrorDescription.InvalidContentItemUrl;
+
+                        return false;
+                    }
+
+                    contentitemURI = split[0];
+
+                    // Validate width and height are numbers
+                    int value;
+                    if (!Int32.TryParse(split[1], out value) || !Int32.TryParse(split[2], out value))
+                    {
+                        SetStatusCode(HttpStatusCode.BadRequest, ErrorDescription.InvalidContentItemUrl);
+                        error = ErrorDescription.InvalidContentItemUrl;
+
+                        return false;
+                    }
                 }
             }
 
