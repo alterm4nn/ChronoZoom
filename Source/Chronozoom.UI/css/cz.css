@@ -2058,20 +2058,18 @@ a {
   vertical-align: bottom;
   padding-right: 2px;
   padding-left: 2px;
-  height: 22px;
   overflow: hidden;
   text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
-  float: left;
   width: 160px;
   white-space: nowrap;
 }
 a.cz-form-preloadedrecord {
   color: #0464a2;
   font-size: 16px;
-  float: left;
   width: 160px;
   cursor: pointer;
+  display: inline-block;
 }
 a.cz-form-preloadedrecord:hover {
   color: #0464a2;
