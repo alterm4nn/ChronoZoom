@@ -140,6 +140,49 @@ var CZ;
         }
 
         /**
+        * The main function to test a timeline on intersections if it has manually selected height.
+        * It calculate the neccessary height which must be added to place timeline.
+        * @param  {Object} tp       An estimated parent timeline.
+        * @param  {Object} tc       An estimated child timeline. This one will be tested.
+        * @param  {Boolean} editmode If true, it doesn't take into account edited timeline.
+        * @return {Number}          A necessary value.
+        */
+        function necessarySupplement(tp, tc, editmode) {
+            var usedY = [];
+
+            if (editmode && Authoring.selectedTimeline.parent.children) {
+                Authoring.selectedTimeline.parent.children.forEach(function (ael) {
+                    if (ael.offsetY === null) {
+                        if (!(tc.x >= ael.x + ael.width
+                            || ael.x >= tc.x + tc.width)) {
+                            if ((ael.y !== tc.y) && (ael.height !== tc.height))
+                                usedY.push({ top: ael.y + ael.height, bottom: ael.y });
+                        }
+                    }
+                });
+            }
+
+            var locMin = tc.y;
+            var locMax = Number.MIN_VALUE
+
+            //Finding the area of intersection
+            usedY.forEach(function (ael) {
+                if (!((ael.top <= (tc.y))
+                    || (tc.y + tc.height <= ael.bottom))) {
+                    arranged = false;
+                    if (ael.top > locMax)
+                        locMax = ael.top;
+                }
+            });
+            
+            if (locMax > locMin)
+                return (locMax - locMin) * (1.001 / (Math.max(tc.offsetY,
+                                100.0 - tc.offsetY - tc.Height) / 100));
+            else
+                return 0;
+        }
+
+        /**
         * The main function to test an exhibit on intersections.
         * First of all it tests on inclusion in parent timeline.
         * Then it tests a timeline on intersection with each parent's child.
@@ -226,6 +269,7 @@ var CZ;
             var descr = e.infodotDescription;
             descr.opacity = 1;
             descr.title = e.title;
+            descr.offsetY = e.offsetY;
             descr.guid = e.guid;
             var parent = e.parent;
             var radv = e.outerRad;
@@ -251,7 +295,9 @@ var CZ;
                 regime: _hovered.regime,
                 gradientFillStyle: _hovered.settings.gradientFillStyle,
                 lineWidth: _hovered.settings.lineWidth,
-                strokeStyle: _hovered.settings.gradientFillStyle
+                strokeStyle: _hovered.settings.gradientFillStyle,
+                offsetY: null,
+                Height: null
             });
         }
         Authoring.createNewTimeline = createNewTimeline;
@@ -264,6 +310,7 @@ var CZ;
             CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
             return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [], {
                 title: "Exhibit Title",
+                offsetY: null,
                 date: _circleCur.x + _circleCur.r,
                 guid: undefined
             });
@@ -451,14 +498,11 @@ var CZ;
                 y: t.y,
                 width: prop.end === 9999 ? Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start) : Number(prop.end - prop.start),
                 height: t.height,
+                offsetY: prop.offsetY,
+                Height: prop.Height,
                 type: "rectangle"
             };
-
-            if (checkTimelineIntersections(t.parent, temp, true)) {
-                t.x = temp.x;
-                t.width = temp.width;
-                t.endDate = prop.end;
-
+            if (prop.offsetY === null) {
                 // Decrease height if possible to make better aspect ratio.
                 // Source: layout.js, LayoutTimeline method.
                 // NOTE: it won't cause intersection errors since height decreases
@@ -472,33 +516,58 @@ var CZ;
                     ]);
                 }
 
-                // Update title.
-                t.title = prop.title;
-                updateTimelineTitle(t);
+            } else {
+                temp.height = t.parent.height * prop.Height/100;
+                //We can make a new global constant if we need
+                if ((necessarySupplement(t.parent, temp, true) + t.parent.height) * prop.Height/100
+                    > t.width / CZ.Settings.timelineMinAspect * 3) {
+                    var text = 'Timeline will intersect other content or parent timeline will be too tall. ';
+                    text += 'Please, enter a smaller height or remove a part of a content in the parent timeline.';
+                    deffered.reject(text);
+                    return deffered.promise();
+                }
+                //A hack to ignore vertical intersections
+                temp.height = 0;
+            }
+
+            if (!checkTimelineIntersections(t.parent, temp, true)) {
+                deffered.reject('Timeline intersects with parent timeline or other siblings');
+                return deffered.promise();
+            }
+
+            t.x = temp.x;
+            t.width = temp.width;
+            t.endDate = prop.end;
+
+            // Update title.
+            t.title = prop.title;
+            updateTimelineTitle(t);
 
                 // Update background URL and aspect ratio.
                 t.backgroundUrl = prop.backgroundUrl;
                 t.aspectRatio = prop.aspectRatio;
 
-                CZ.Service.putTimeline(t).then(function (success) {
-                    // update ids if existing elements with returned from server
-                    t.id = "t" + success;
-                    t.guid = success;
-                    t.titleObject.id = "t" + success + "__header__";
+            // Manual offset and height
+            // In the case of automatic selection, it will be null
+            t.offsetY = prop.offsetY;
+            t.Height = prop.Height;
 
-                    if (!t.parent.guid) {
-                        // Root timeline, refresh page
-                        document.location.reload(true);
-                    } else {
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    }
-                    deffered.resolve(t);
-                }, function (error) {
-                    deffered.reject(error);
-                });
-            } else {
-                deffered.reject('Timeline intersects with parent timeline or other siblings');
-            }
+            CZ.Service.putTimeline(t).then(function (success) {
+                // update ids if existing elements with returned from server
+                t.id = "t" + success;
+                t.guid = success;
+                t.titleObject.id = "t" + success + "__header__";
+
+                if (!t.parent.guid) {
+                    // Root timeline, refresh page
+                    document.location.reload(true);
+                } else {
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                }
+                deffered.resolve(t);
+            }, function (error) {
+                deffered.reject(error);
+            });
 
             return deffered.promise();
         }

@@ -46,6 +46,8 @@ var CZ;
                     title: t.title,
                     Regime: t.regime,
                     backgroundUrl: t.backgroundUrl,
+                    Height: t.Height,
+                    offsetY: t.offsetY,
                     aspectRatio: t.aspectRatio
                 };
             }
@@ -58,6 +60,7 @@ var CZ;
                     time: e.infodotDescription.date,
                     IsCirca: e.infodotDescription.isCirca,
                     title: e.title,
+                    offsetY: e.offsetY,
                     description: undefined,
                     contentItems: undefined
                 };
@@ -69,13 +72,13 @@ var CZ;
                 $(e.contentItems).each(function (contentItemIndex, contentItem) {
                     mappedContentItems.push(Map.contentItem(contentItem));
                 });
-
                 return {
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
                     time: e.infodotDescription.date,
                     IsCirca: e.infodotDescription.isCirca,
                     title: e.title,
+                    offsetY: e.offsetY,
                     description: undefined,
                     contentItems: mappedContentItems
                 };

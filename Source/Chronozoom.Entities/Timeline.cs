@@ -104,6 +104,9 @@ namespace Chronozoom.Entities
         [DataMember]
         public decimal? Height { get; set; }
 
+        [DataMember(Name = "offsetY")]
+        public decimal? OffsetY { get; set; }
+
         /// <summary>
         /// The URL of background image.
         /// </summary>
@@ -154,6 +157,7 @@ namespace Chronozoom.Entities
             ToYear = t.ToYear;
             ToIsCirca = t.ToIsCirca;
             ForkNode = t.ForkNode;
+            OffsetY = t.OffsetY;
             Height = t.Height;
             BackgroundUrl = t.BackgroundUrl;
             AspectRatio = t.AspectRatio;

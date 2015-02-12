@@ -1570,9 +1570,12 @@ namespace Chronozoom.UI
                     newTimeline.FromIsCirca = timelineRequest.FromIsCirca;
                     newTimeline.ToYear = timelineRequest.ToYear;
                     newTimeline.ToIsCirca = timelineRequest.ToIsCirca;
+                    newTimeline.OffsetY = timelineRequest.OffsetY;
+                    newTimeline.Height = timelineRequest.Height;
                     newTimeline.Collection = collection;
                     newTimeline.BackgroundUrl = timelineRequest.BackgroundUrl;
                     newTimeline.AspectRatio = timelineRequest.AspectRatio;
+                    
 
                     // Update parent timeline.
                     if (parentTimeline != null)
@@ -1629,6 +1632,8 @@ namespace Chronozoom.UI
                     updateTimeline.ToIsCirca = timelineRequest.ToIsCirca;
                     updateTimeline.BackgroundUrl = timelineRequest.BackgroundUrl;
                     updateTimeline.AspectRatio = timelineRequest.AspectRatio;
+                    updateTimeline.Height = timelineRequest.Height;
+                    updateTimeline.OffsetY = timelineRequest.OffsetY;
                     returnValue = updateTimelineGuid;
                 }
                 storage.SaveChanges();
@@ -1766,6 +1771,7 @@ namespace Chronozoom.UI
                     newExhibit.Title        = exhibitRequest.Title;
                     newExhibit.Year         = exhibitRequest.Year;
                     newExhibit.IsCirca      = exhibitRequest.IsCirca;
+                    newExhibit.OffsetY      = exhibitRequest.OffsetY;
                     newExhibit.Collection   = collection;
                     newExhibit.Depth        = parentTimeline.Depth + 1;
                     newExhibit.UpdatedBy    = storage.Users.Where(u => user.Id == user.Id).FirstOrDefault();
@@ -1814,6 +1820,7 @@ namespace Chronozoom.UI
                     updateExhibit.Title         = exhibitRequest.Title;
                     updateExhibit.Year          = exhibitRequest.Year;
                     updateExhibit.IsCirca       = exhibitRequest.IsCirca;
+                    updateExhibit.OffsetY       = exhibitRequest.OffsetY;
                     updateExhibit.UpdatedBy     = storage.Users.Where(u => user.Id == user.Id).FirstOrDefault();
                     updateExhibit.UpdatedTime   = DateTime.UtcNow;  // force timestamp update even if no changes have been made since save is still requested and someone else could've edited in meantime
                     returnValue.ExhibitId       = exhibitRequest.Id;

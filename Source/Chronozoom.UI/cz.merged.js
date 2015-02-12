@@ -2985,6 +2985,9 @@ var CZ;
             this.backgroundUrl = timelineinfo.backgroundUrl || "";
             this.aspectRatio = timelineinfo.aspectRatio || null;
 
+            this.offsetY = timelineinfo.offsetY;
+            this.Height = timelineinfo.Height;
+
             this.settings.showFromCirca = this.FromIsCirca;
             this.settings.showToCirca   = this.ToIsCirca;
             this.settings.showInfinite = (timelineinfo.endDate == 9999);
@@ -4720,6 +4723,7 @@ var CZ;
             this.infodotDescription = infodotDescription;
             this.title = infodotDescription.title;
             this.isCirca = infodotDescription.isCirca;
+            this.offsetY = infodotDescription.offsetY;
             this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
 
             contentItems.sort(function (a, b) {
@@ -6096,6 +6100,9 @@ var CZ;
             var timelineWidth = timeline.right - timeline.left;
             timeline.width = timelineWidth;
 
+            //Set content margin
+            timeline.heightEps = parentWidth * CZ.Settings.timelineContentMargin;
+
             //If child timeline has fixed aspect ratio, calculate its height according to it
             if (timeline.AspectRatio && !timeline.height) {
                 timeline.height = timelineWidth / timeline.AspectRatio;
@@ -6109,6 +6116,9 @@ var CZ;
                     } else if (timeline.height && tl.Height) {
                         //If Child timeline has height in percentage of parent, calculate it before layout pass
                         tl.height = Math.min(timeline.height * tl.Height, (tl.right - tl.left) * CZ.Settings.timelineMinAspect);
+                        if (tl.offsetY!==null && tl.Height) {
+                            tl.height = timeline.height * tl.Height;
+                        }
                     }
 
                     //Calculate layout for each child timeline
@@ -6151,44 +6161,31 @@ var CZ;
             //Now positioning child content and title
             var exhibitSize = CalcInfodotSize(timeline);
 
+            timeline.realY = 0;
+
             //Layout only timelines to check that they fit into parent timeline
-            var tlRes = LayoutChildTimelinesOnly(timeline);
+            var tlRes = LayoutChildTimelinesOnly(timeline, null, headerPercent);
 
+            var hFlag = (timeline.Height & timeline.offsetY) ? true : false;
             //First layout iteration of full content (taking Sequence in account)
-            var res = LayoutContent(timeline, exhibitSize);
-            if (timeline.height) {
-                var titleObject = GenerateTitleObject(timeline.height, timeline, measureContext);
+            var res = LayoutContent(timeline, exhibitSize, hFlag, timeline.height,
+                headerPercent, exhibitSize);
 
+            if (timeline.height) {
                 if (timeline.exhibits instanceof Array) {
                     if (timeline.exhibits.length > 0 && (tlRes.max - tlRes.min) < timeline.height) {
-                        while ((res.max - res.min) > (timeline.height - titleObject.bboxHeight) && exhibitSize > timelineWidth / 20.0) {
+                        while ((res.max - res.min) > timeline.height && exhibitSize > timelineWidth / 20.0) {
                             exhibitSize /= 1.5;
-                            res = LayoutContent(timeline, exhibitSize);
+                            res = LayoutContent(timeline, exhibitSize, hFlag, timeline.height, headerPercent);
                         }
                     }
                 }
 
-                if ((res.max - res.min) > (timeline.height - titleObject.bboxHeight)) {
+                if ((res.max - res.min) > timeline.height) {
                     //console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.title);
-                    var contentHeight = res.max - res.min;
-                    var fullHeight = contentHeight / (1 - headerPercent);
-                    var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
-                    timeline.height = fullHeight;
-                } else {
-                    //var scale = (timeline.height - titleObject.bboxHeight) / (res.max - res.min);
-                    //if (scale > 1) {
-                    //    timeline.timelines.forEach(function (tl) {
-                    //        tl.realY *= scale;
-                    //        if (!tl.AspectRatio)
-                    //            Scale(tl, scale, measureContext);
-                    //    });
-                    //    timeline.exhibits.forEach(function (eb) {
-                    //        eb.realY *= scale;
-                    //    });
-                    //}
+                    timeline.height = res.max - res.min;
                 }
 
-                timeline.titleRect = titleObject;
             } else {
                 var min = res.min;
                 var max = res.max;
@@ -6197,16 +6194,14 @@ var CZ;
                 var minHeight = timelineWidth / minAspect;
 
                 //Measure title
-                var contentHeight = Math.max((1 - headerPercent) * minHeight, max - min);
-                var fullHeight = contentHeight / (1 - headerPercent);
-                var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
-                timeline.titleRect = titleObject;
-                timeline.height = fullHeight;
-            }
+                var contentHeight = Math.max(minHeight, max - min);
+                timeline.height = contentHeight;
+             }
 
-            timeline.heightEps = parentWidth * CZ.Settings.timelineContentMargin;
-            timeline.realHeight = timeline.height + 2 * timeline.heightEps;
-            timeline.realY = 0;
+            if (timeline.Height & timeline.offsetY)
+                timeline.realHeight = timeline.height;
+            else
+                timeline.realHeight = timeline.height + 2 * timeline.heightEps;
 
             if (timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (infodot) {
@@ -6221,9 +6216,10 @@ var CZ;
             }
         }
 
+
         function PositionContent(contentArray, arrangedArray, intersectionFunc) {
             contentArray.forEach(function (el) {
-                var usedY = new Array();
+                var usedY = [];
 
                 arrangedArray.forEach(function (ael) {
                     if (intersectionFunc(el, ael)) {
@@ -6235,17 +6231,20 @@ var CZ;
 
                 if (usedY.length > 0) {
                     //Find free segments
-                    var segmentPoints = new Array();
+                    var segmentPoints = [];
                     usedY.forEach(function (segment) {
                         segmentPoints.push({ type: "bottom", value: segment.bottom });
                         segmentPoints.push({ type: "top", value: segment.top });
                     });
 
+                    segmentPoints.push({ type: "bottom", value: 0 });
+                    segmentPoints.push({ type: "top", value: 0 });
+
                     segmentPoints.sort(function (l, r) {
                         return l.value - r.value;
                     });
 
-                    var freeSegments = new Array();
+                    var freeSegments = [];
                     var count = 0;
                     for (i = 0; i < segmentPoints.length - 1; i++) {
                         if (segmentPoints[i].type == "top")
@@ -6266,7 +6265,6 @@ var CZ;
                             break;
                         }
                     }
-                    ;
 
                     if (!foundPlace) {
                         y = segmentPoints[segmentPoints.length - 1].value;
@@ -6274,21 +6272,189 @@ var CZ;
                 }
 
                 el.realY = y;
+
                 arrangedArray.push(el);
             });
+
         }
 
-        function LayoutContent(timeline, exhibitSize) {
+        function PositionContentAutoManual(manualArray, sequencedArray,
+            unsequencedArray, arrangedArray, tlHFlag, tlHeight, headerPercent, infodotSize) {
+            var arranged = false;
+
+            var max;
+            var tempArrArray;
+            var arrangedManually = 0;
+
+            while (!arranged) {
+                tempArrArray = [];
+
+                //We do so if we are sure that the manual objects do not intersect. 
+                //Otherwise, we need to pass a temporary array to PositionContent separately
+                tempArrArray = tempArrArray.concat(arrangedArray);
+
+                PositionContent(sequencedArray, tempArrArray, function (el, ael) {
+                    return el.left < ael.right;
+                });
+
+                PositionContent(unsequencedArray, tempArrArray, function (el, ael) {
+                    return !(el.left >= ael.right || ael.left >= el.right);
+                });
+
+                if (arrangedArray.length) {
+                    tempArrArray = tempArrArray.slice(arrangedArray.length);
+                }
+
+
+                
+                max = (tlHeight!=undefined)? tlHeight:Number.MIN_VALUE;
+
+                tempArrArray.forEach(function (element) {
+                   if ((element.realY + element.realHeight) > max)
+                       max = element.realY + element.realHeight;
+                });
+
+               
+                if (!tlHFlag)
+                    max = max / (1 - headerPercent);
+
+                if (arrangedArray.length) {
+                    var tmax;
+                    if (arrangedArray[0].Height == undefined)
+                        tmax = arrangedArray[0].realY / arrangedArray[0].offsetY * 100 + arrangedArray[0].realHeight/2;
+                    else
+                        tmax = arrangedArray[0].realY / arrangedArray[0].offsetY * 100;
+                    if (tmax > max)
+                        max = tmax;
+                }
+                arranged = true;
+                
+                for (; ((arrangedManually < manualArray.length) && (arranged == true)) ; arrangedManually++) {
+                    var usedY = [];
+                    tempArrArray.forEach(function (ael) {
+                        if (!(manualArray[arrangedManually].left >= ael.right
+                            || ael.left >= manualArray[arrangedManually].right)) {
+                            usedY.push({ top: ael.realY + ael.realHeight, bottom: ael.realY });
+                        }
+                    });
+
+                    //First try
+                    if (manualArray[arrangedManually].Height === undefined)
+                        max -= infodotSize;
+                    manualArray[arrangedManually].realY = max * manualArray[arrangedManually].offsetY / 100;
+                    if (manualArray[arrangedManually].offsetY !== null && manualArray[arrangedManually].Height) {
+                        manualArray[arrangedManually].height = max * manualArray[arrangedManually].Height;
+                        manualArray[arrangedManually].realHeight = max * manualArray[arrangedManually].Height;
+                    }
+                    if (manualArray[arrangedManually].Height === undefined)
+                        max += infodotSize;
+
+                    //realY
+                    var locMin = manualArray[arrangedManually].realY;
+                    var locMax = Number.MIN_VALUE
+
+                    //Finding the area of intersection
+                    usedY.forEach(function (ael) {
+                        if (!((ael.top <= (manualArray[arrangedManually].realY))
+                            || (manualArray[arrangedManually].realY + manualArray[arrangedManually].realHeight <= ael.bottom))) {
+                            arranged = false;
+                            if (ael.top > locMax)
+                                locMax = ael.top;
+                        }
+                    });
+
+                    //Adding the area size multiplayed by worse case coefficient
+                    if (arranged === false) {
+                        if (manualArray[arrangedManually].Height == undefined)
+                            max += (locMax - locMin + infodotSize) * (1.001 / (Math.max(manualArray[arrangedManually].offsetY, 100.0 - manualArray[arrangedManually].offsetY) / 100));
+                        else
+                            max += (locMax - locMin) * (1.001 / (Math.max(manualArray[arrangedManually].offsetY,
+                                100.0 - manualArray[arrangedManually].offsetY - manualArray[arrangedManually].Height*100) / 100));
+                        arrangedArray.forEach(function (ael) {
+                            if (ael.offsetY !== null && ael.Height) {
+                                ael.realY = max * ael.offsetY / 100;
+                                ael.height = max * ael.Height;
+                                ael.realHeight = ael.height;
+                            }
+                            else {
+                                ael.realY = max * ael.offsetY / 100 - infodotSize/2;
+                            }
+                        });
+                    }
+
+                    if (manualArray[arrangedManually].offsetY !== null && manualArray[arrangedManually].Height) {
+                        manualArray[arrangedManually].realY = max * manualArray[arrangedManually].offsetY / 100;
+                        manualArray[arrangedManually].height = max * manualArray[arrangedManually].Height;
+                        manualArray[arrangedManually].realHeight = max * manualArray[arrangedManually].Height;
+                    } else {
+                        manualArray[arrangedManually].realY = max * manualArray[arrangedManually].offsetY / 100 - infodotSize/2;
+                    }
+
+                    arrangedArray.push(manualArray[arrangedManually]);
+                }
+
+                //Check that all exhibits are in their timeline
+                for (var i = 0; i < arrangedArray.length; i++){
+                    if (arrangedArray[i].realY < 0)
+                        arrangedArray[i].realY = 0;
+                    if (arrangedArray[i].realY + arrangedArray[i].realHeight > max)
+                        arrangedArray[i].realY = max - arrangedArray[i].realHeight;
+                }
+            }
+
+            if (arrangedArray.length) {
+                max = Number.MIN_VALUE;
+                for (var i = 0; i < arrangedArray.length; i++) {
+                    var tmax;
+                    if (arrangedArray[i].Height === undefined) {
+                        if (arrangedArray[i].offsetY === 0)
+                            tmax = 0;
+                        else
+                            tmax = (arrangedArray[i].realY + arrangedArray[i].realHeight / 2 )/ arrangedArray[i].offsetY * 100;
+                        if (arrangedArray[i].realY + arrangedArray[i].realHeight > tmax)
+                            tmax = arrangedArray[i].realY + arrangedArray[i].realHeight;
+                    }
+                    else {
+                        if (arrangedArray[i].offsetY === 0)
+                            tmax = 0;
+                        else
+                            tmax = arrangedArray[i].realY / arrangedArray[i].offsetY * 100;
+                    }
+                    if (max < tmax)
+                        max = tmax;
+                }
+            }
+                
+            for (var i = 0; i < tempArrArray.length; i++) {
+                arrangedArray.push(tempArrArray[i]);
+            }
+
+            return max;
+        }
+
+        function LayoutContent(timeline, exhibitSize, tlHFlag, tlHeight, headerPercent) {
             //Prepare arrays for ordered and unordered content
-            var sequencedContent = new Array();
-            var unsequencedContent = new Array();
+            var sequencedContent = [];
+            var unsequencedContent = [];
+            var manualContent = [];
+
+            //Prepare measure arrays
+            var arrangedElements = [];
+
 
             if (timeline.timelines instanceof Array) {
                 timeline.timelines.forEach(function (tl) {
-                    if (tl.Sequence)
-                        sequencedContent.push(tl);
-                    else
-                        unsequencedContent.push(tl);
+                    //if y-offset of timeline is user-defined calculate realY
+                    //else prepare it to auto-calculation
+                    if (tl.offsetY != null) {
+                        manualContent.push(tl);
+                    }
+                    else {
+                        if (tl.Sequence)
+                            sequencedContent.push(tl);
+                        else
+                            unsequencedContent.push(tl);
+                    }
                 });
             }
 
@@ -6309,10 +6475,17 @@ var CZ;
                         eb.isDeposed = true;
                     }
 
-                    if (eb.Sequence)
-                        sequencedContent.push(eb);
-                    else
-                        unsequencedContent.push(eb);
+                    //if y-offset of exhibit is user-defined calculate realY
+                    //else prepare it to auto-calculation
+                    if (eb.offsetY != null) {
+                        manualContent.push(eb);
+                    }
+                    else {
+                        if (eb.Sequence)
+                            sequencedContent.push(eb);
+                        else
+                            unsequencedContent.push(eb);
+                    }
                 });
             }
 
@@ -6320,52 +6493,55 @@ var CZ;
                 return l.Sequence - r.Sequence;
             });
 
-            //Prepare measure arrays
-            var arrangedElements = new Array();
-
-            PositionContent(sequencedContent, arrangedElements, function (el, ael) {
-                return el.left < ael.right;
-            });
-            PositionContent(unsequencedContent, arrangedElements, function (el, ael) {
-                return !(el.left >= ael.right || ael.left >= el.right);
-            });
+            var max = PositionContentAutoManual(manualContent, sequencedContent,
+                unsequencedContent, arrangedElements, tlHFlag, tlHeight, headerPercent, exhibitSize)
 
             var min = Number.MAX_VALUE;
-            var max = Number.MIN_VALUE;
-
-            arrangedElements.forEach(function (element) {
-                if (element.realY < min)
-                    min = element.realY;
-                if ((element.realY + element.realHeight) > max)
-                    max = element.realY + element.realHeight;
-            });
-
-            if (arrangedElements.length == 0) {
-                max = 0;
-                min = 0;
+            
+            for (var i = 0; i < arrangedElements.length; i++) {
+                if ((arrangedElements[i].realY) < min)
+                    min = arrangedElements[i].realY;
             }
+            
+            if (manualContent.length != 0)
+                min = 0;
 
-            return { max: max, min: min };
+            return { min: min, max: max };
         }
 
-        function LayoutChildTimelinesOnly(timeline) {
-            var arrangedElements = new Array();
+        function LayoutChildTimelinesOnly(timeline, tlHFlag, headerPercent) {
+
+            //Prepare measure arrays
+            var arrangedElements = [];
+            var autoContent = [];
+            var manualContent = [];
+
             if (timeline.timelines instanceof Array) {
-                PositionContent(timeline.timelines, arrangedElements, function (el, ael) {
-                    return !(el.left >= ael.right || ael.left >= el.right);
+                timeline.timelines.forEach(function (tl) {
+                    //if y-offset of timeline is user-defined calculate realY
+                    //else prepare it to auto-calculation
+                    if (tl.offsetY != null) {
+                        manualContent.push(tl);
+                    }
+                    else {
+                        autoContent.push(tl);
+                    }
                 });
+
+                PositionContentAutoManual(manualContent, [], autoContent,
+                    arrangedElements, tlHFlag, timeline.height, headerPercent);
             }
 
             var min = Number.MAX_VALUE;
             var max = Number.MIN_VALUE;
 
-            arrangedElements.forEach(function (element) {
-                if (element.realY < min)
-                    min = element.realY;
-                if ((element.realY + element.realHeight) > max)
-                    max = element.realY + element.realHeight;
-            });
-
+            for (var i = 0; i < arrangedElements.length; i++) {
+                if (arrangedElements[i].realY < min)
+                    min = arrangedElements[i].realY;
+                if ((arrangedElements[i].realY + arrangedElements[i].realHeight) > max)
+                    max = arrangedElements[i].realY + arrangedElements[i].realHeight;
+            }
+            
             if (arrangedElements.length == 0) {
                 max = 0;
                 min = 0;
@@ -6397,8 +6573,11 @@ var CZ;
             }
         }
 
-        function Arrange(timeline) {
-            timeline.y = timeline.realY + timeline.heightEps;
+        function Arrange(timeline, measureContext) {
+            if (timeline.offsetY!==null && timeline.Height) 
+                timeline.y = timeline.realY;
+            else
+                timeline.y = timeline.realY + timeline.heightEps;
 
             if (timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (infodot) {
@@ -6408,10 +6587,26 @@ var CZ;
 
             if (timeline.timelines instanceof Array) {
                 timeline.timelines.forEach(function (tl) {
+                    if (tl.offsetY !== null && tl.Height) {
+                        var exhibitSize = CalcInfodotSize(timeline);
+                        var headerPercent = CZ.Settings.timelineHeaderSize + 2 * CZ.Settings.timelineHeaderMargin;
+                        var res = LayoutContent(tl, exhibitSize, true, tl.height,
+                            headerPercent);
+                        while ((res.max - res.min) > timeline.height && exhibitSize > timeline.width / 20.0) {
+                            exhibitSize /= 1.5;
+                            res = LayoutContent(timeline, exhibitSize, true, tl.height, headerPercent);
+                        }
+                    }    
                     tl.realY += timeline.y;
-                    Arrange(tl);
+
+                    tl.height = Math.max(tl.height, CZ.Settings.timelineMinAspect/4 * (tl.right - tl.left));
+                    tl.height = Math.min(tl.height, (tl.right - tl.left)*3 / CZ.Settings.timelineMinAspect);
+                        
+                    Arrange(tl, measureContext);
                 });
             }
+            var titleObject = GenerateTitleObject(timeline.height, timeline, measureContext);
+            timeline.titleRect = titleObject;
         }
 
         function CalcInfodotSize(timeline) {
@@ -6464,7 +6659,9 @@ var CZ;
                 ToIsCirca: timeline.ToIsCirca || false,
                 opacity: 0,
                 backgroundUrl: timeline.backgroundUrl,
-                aspectRatio: timeline.aspectRatio
+                aspectRatio: timeline.aspectRatio,
+                offsetY: timeline.offsetY,
+                Height: timeline.Height
             });
 
             //Creating Infodots
@@ -6483,6 +6680,7 @@ var CZ;
                         isBuffered: false,
                         guid: childInfodot.id,
                         title: childInfodot.title,
+                        offsetY: childInfodot.offsetY,
                         date: childInfodot.time,
                         isCirca: childInfodot.IsCirca,
                         opacity: 1
@@ -6560,13 +6758,12 @@ var CZ;
             if (timeline) {
                 //Transform timeline start and end dates
                 Prepare(timeline);
-
                 //Measure child content for each timiline in tree
                 var measureContext = document.createElement("canvas").getContext('2d');
                 LayoutTimeline(timeline, 0, measureContext);
 
                 //Calculating final placement of the data
-                Arrange(timeline);
+                Arrange(timeline, measureContext);
 
                 //Load timline to Virtual Canvas
                 LoadTimeline(root, timeline);
@@ -6583,7 +6780,7 @@ var CZ;
         // and returns a corresponding scenegraph (x, y, width, height)
         // todo: remove dependency on virtual canvas (vc)
         function generateLayout(tmd, tsg) {
-            try  {
+            try {
                 if (!tmd.AspectRatio)
                     tmd.height = tsg.height;
                 var root = new CZ.VCContent.CanvasRootElement(tsg.vc, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
@@ -8811,6 +9008,49 @@ var CZ;
         }
 
         /**
+        * The main function to test a timeline on intersections if it has manually selected height.
+        * It calculate the neccessary height which must be added to place timeline.
+        * @param  {Object} tp       An estimated parent timeline.
+        * @param  {Object} tc       An estimated child timeline. This one will be tested.
+        * @param  {Boolean} editmode If true, it doesn't take into account edited timeline.
+        * @return {Number}          A necessary value.
+        */
+        function necessarySupplement(tp, tc, editmode) {
+            var usedY = [];
+
+            if (editmode && Authoring.selectedTimeline.parent.children) {
+                Authoring.selectedTimeline.parent.children.forEach(function (ael) {
+                    if (ael.offsetY === null) {
+                        if (!(tc.x >= ael.x + ael.width
+                            || ael.x >= tc.x + tc.width)) {
+                            if ((ael.y !== tc.y) && (ael.height !== tc.height))
+                                usedY.push({ top: ael.y + ael.height, bottom: ael.y });
+                        }
+                    }
+                });
+            }
+
+            var locMin = tc.y;
+            var locMax = Number.MIN_VALUE
+
+            //Finding the area of intersection
+            usedY.forEach(function (ael) {
+                if (!((ael.top <= (tc.y))
+                    || (tc.y + tc.height <= ael.bottom))) {
+                    arranged = false;
+                    if (ael.top > locMax)
+                        locMax = ael.top;
+                }
+            });
+            
+            if (locMax > locMin)
+                return (locMax - locMin) * (1.001 / (Math.max(tc.offsetY,
+                                100.0 - tc.offsetY - tc.Height) / 100));
+            else
+                return 0;
+        }
+
+        /**
         * The main function to test an exhibit on intersections.
         * First of all it tests on inclusion in parent timeline.
         * Then it tests a timeline on intersection with each parent's child.
@@ -8897,6 +9137,7 @@ var CZ;
             var descr = e.infodotDescription;
             descr.opacity = 1;
             descr.title = e.title;
+            descr.offsetY = e.offsetY;
             descr.guid = e.guid;
             var parent = e.parent;
             var radv = e.outerRad;
@@ -8922,7 +9163,9 @@ var CZ;
                 regime: _hovered.regime,
                 gradientFillStyle: _hovered.settings.gradientFillStyle,
                 lineWidth: _hovered.settings.lineWidth,
-                strokeStyle: _hovered.settings.gradientFillStyle
+                strokeStyle: _hovered.settings.gradientFillStyle,
+                offsetY: null,
+                Height: null
             });
         }
         Authoring.createNewTimeline = createNewTimeline;
@@ -8935,6 +9178,7 @@ var CZ;
             CZ.VCContent.removeChild(_hovered, "newExhibitCircle");
             return CZ.VCContent.addInfodot(_hovered, "layerInfodots", undefined, _circleCur.x + _circleCur.r, _circleCur.y + _circleCur.r, _circleCur.r, [], {
                 title: "Exhibit Title",
+                offsetY: null,
                 date: _circleCur.x + _circleCur.r,
                 guid: undefined
             });
@@ -9122,14 +9366,11 @@ var CZ;
                 y: t.y,
                 width: prop.end === 9999 ? Number(CZ.Dates.getCoordinateFromDecimalYear(prop.end) - prop.start) : Number(prop.end - prop.start),
                 height: t.height,
+                offsetY: prop.offsetY,
+                Height: prop.Height,
                 type: "rectangle"
             };
-
-            if (checkTimelineIntersections(t.parent, temp, true)) {
-                t.x = temp.x;
-                t.width = temp.width;
-                t.endDate = prop.end;
-
+            if (prop.offsetY === null) {
                 // Decrease height if possible to make better aspect ratio.
                 // Source: layout.js, LayoutTimeline method.
                 // NOTE: it won't cause intersection errors since height decreases
@@ -9143,33 +9384,58 @@ var CZ;
                     ]);
                 }
 
-                // Update title.
-                t.title = prop.title;
-                updateTimelineTitle(t);
+            } else {
+                temp.height = t.parent.height * prop.Height/100;
+                //We can make a new global constant if we need
+                if ((necessarySupplement(t.parent, temp, true) + t.parent.height) * prop.Height/100
+                    > t.width / CZ.Settings.timelineMinAspect * 3) {
+                    var text = 'Timeline will intersect other content or parent timeline will be too tall. ';
+                    text += 'Please, enter a smaller height or remove a part of a content in the parent timeline.';
+                    deffered.reject(text);
+                    return deffered.promise();
+                }
+                //A hack to ignore vertical intersections
+                temp.height = 0;
+            }
+
+            if (!checkTimelineIntersections(t.parent, temp, true)) {
+                deffered.reject('Timeline intersects with parent timeline or other siblings');
+                return deffered.promise();
+            }
+
+            t.x = temp.x;
+            t.width = temp.width;
+            t.endDate = prop.end;
+
+            // Update title.
+            t.title = prop.title;
+            updateTimelineTitle(t);
 
                 // Update background URL and aspect ratio.
                 t.backgroundUrl = prop.backgroundUrl;
                 t.aspectRatio = prop.aspectRatio;
 
-                CZ.Service.putTimeline(t).then(function (success) {
-                    // update ids if existing elements with returned from server
-                    t.id = "t" + success;
-                    t.guid = success;
-                    t.titleObject.id = "t" + success + "__header__";
+            // Manual offset and height
+            // In the case of automatic selection, it will be null
+            t.offsetY = prop.offsetY;
+            t.Height = prop.Height;
 
-                    if (!t.parent.guid) {
-                        // Root timeline, refresh page
-                        document.location.reload(true);
-                    } else {
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    }
-                    deffered.resolve(t);
-                }, function (error) {
-                    deffered.reject(error);
-                });
-            } else {
-                deffered.reject('Timeline intersects with parent timeline or other siblings');
-            }
+            CZ.Service.putTimeline(t).then(function (success) {
+                // update ids if existing elements with returned from server
+                t.id = "t" + success;
+                t.guid = success;
+                t.titleObject.id = "t" + success + "__header__";
+
+                if (!t.parent.guid) {
+                    // Root timeline, refresh page
+                    document.location.reload(true);
+                } else {
+                    CZ.Common.vc.virtualCanvas("requestInvalidate");
+                }
+                deffered.resolve(t);
+            }, function (error) {
+                deffered.reject(error);
+            });
 
             return deffered.promise();
         }
@@ -9699,6 +9965,8 @@ var CZ;
                     title: t.title,
                     Regime: t.regime,
                     backgroundUrl: t.backgroundUrl,
+                    Height: t.Height,
+                    offsetY: t.offsetY,
                     aspectRatio: t.aspectRatio
                 };
             }
@@ -9711,6 +9979,7 @@ var CZ;
                     time: e.infodotDescription.date,
                     IsCirca: e.infodotDescription.isCirca,
                     title: e.title,
+                    offsetY: e.offsetY,
                     description: undefined,
                     contentItems: undefined
                 };
@@ -9722,13 +9991,13 @@ var CZ;
                 $(e.contentItems).each(function (contentItemIndex, contentItem) {
                     mappedContentItems.push(Map.contentItem(contentItem));
                 });
-
                 return {
                     id: e.guid,
                     ParentTimelineId: e.parent.guid,
                     time: e.infodotDescription.date,
                     IsCirca: e.infodotDescription.isCirca,
                     title: e.title,
+                    offsetY: e.offsetY,
                     description: undefined,
                     contentItems: mappedContentItems
                 };
@@ -15136,7 +15405,10 @@ var CZ;
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.backgroundUrl = container.find(formInfo.backgroundUrl);
+                this.offsetInput = container.find(formInfo.topBoundInput);
+                this.bottomOffsetInput = container.find(formInfo.bottomBoundInput);
                 this.titleInput = container.find(formInfo.titleInput);
+                this.offsetLabels = container.find(formInfo.offsetLabels);
                 this.errorMessage = container.find(formInfo.errorMessage);
 
                 this.timeline = formInfo.context;
@@ -15166,11 +15438,20 @@ var CZ;
                     this.deleteButton.show();
                     this.titleTextblock.text("Edit Timeline");
                     this.saveButton.text("Update Timeline");
+                    //Root timeline
+                    if (!this.timeline.parent.guid) {
+                        this.offsetInput.hide();
+                        this.bottomOffsetInput.hide();
+                        this.offsetLabels.hide();
+                    }
                 } else if (CZ.Authoring.mode === "createRootTimeline") {
                     this.deleteButton.hide();
                     this.closeButton.hide();
                     this.titleTextblock.text("Create Root Timeline");
                     this.saveButton.text("Create Timeline");
+                    this.offsetInput.hide();
+                    this.bottomOffsetInput.hide();
+                    this.offsetLabels.hide();
                 } else {
                     console.log("Unexpected authoring mode in timeline form.");
                     this.close();
@@ -15190,9 +15471,18 @@ var CZ;
                 }
 
                 $(_this.startDate.circaSelector).find('input').prop('checked', this.timeline.FromIsCirca);
-                $(_this.endDate.circaSelector  ).find('input').prop('checked', this.timeline.ToIsCirca);
+                $(_this.endDate.circaSelector).find('input').prop('checked', this.timeline.ToIsCirca);
 
-                this.saveButton.click(function () {
+                if (_this.timeline.offsetY === null) {
+                    _this.offsetInput.val("");
+                    _this.bottomOffsetInput.val("");
+                }
+                else {
+                    _this.offsetInput.val(_this.timeline.offsetY);
+                    _this.bottomOffsetInput.val(_this.timeline.offsetY + _this.timeline.Height * 100);
+                }
+
+                this.saveButton.click(function (event) {
                     _this.errorMessage.empty();
                     var isDataValid = false;
                     var backgroundImage;
@@ -15206,30 +15496,68 @@ var CZ;
 
                     if (!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
                         _this.errorMessage.text('Time interval cannot be less than one day');
+                        isDataValid = false;
                     }
 
-                    function onDataValid () {
+                    if (!/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(_this.offsetInput.val())
+                        || !/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(_this.bottomOffsetInput.val())) {
+                        _this.errorMessage.text("Please enter vertical position in percents or clear the input to select auto mode. For example \"0\", \"100\", \"45\" or \"75.85\"");
+                        isDataValid = false;
+                    } else {
+
+                        if (!(((_this.offsetInput.val() === "") === (_this.bottomOffsetInput.val() === "")))) {
+                            _this.errorMessage.text("To select auto mode clear both fields.");
+                            isDataValid = false;
+                        }
+
+                        if (_this.offsetInput.val() !== "") {
+                            if (Number(_this.offsetInput.val()) < 0
+                                || Number(_this.bottomOffsetInput.val()) < 0
+                                || Number(_this.offsetInput.val()) > 100
+                                || Number(_this.bottomOffsetInput.val()) > 100) {
+                                _this.errorMessage.text("Vertical position must be less than of equal to 100% but more than or equal to 0%");
+                                isDataValid = false;
+                            }
+
+                            if (Number(_this.offsetInput.val()) >= Number(_this.bottomOffsetInput.val())) {
+                                _this.errorMessage.text("Top position must be less then bottom position");
+                                isDataValid = false;
+                            }
+                        }
+                    }
+
+                    function onDataValid() {
+
                         _this.errorMessage.empty();
                         var self = _this;
                         var aspectRatio = backgroundImage ? backgroundImage.width / backgroundImage.height : null;
                         var isAspectRatioChanged = aspectRatio !== _this.timeline.aspectRatio;
+                        var isBoundaryChanged = ((Number(_this.offsetInput.val()) !== _this.timeline.offsetY) 
+                            || (Number(_this.bottomOffsetInput.val()) !== (_this.timeline.offsetY + _this.timeline.Height*100)));
 
-                        _this.timeline.FromIsCirca  = $(_this.startDate.circaSelector).find('input').is(':checked');
-                        _this.timeline.ToIsCirca    = $(_this.endDate.circaSelector  ).find('input').is(':checked');
+                        _this.timeline.FromIsCirca = $(_this.startDate.circaSelector).find('input').is(':checked');
+                        _this.timeline.ToIsCirca = $(_this.endDate.circaSelector).find('input').is(':checked');
 
                         _this.saveButton.prop('disabled', true);
+
+                        var _offset = (_this.offsetInput.val() === "") ? null : Number(_this.offsetInput.val());
+                        var _Height = (_this.bottomOffsetInput.val() === "") ?
+                            null : (Number(_this.bottomOffsetInput.val()) - Number(_this.offsetInput.val()));
+
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
                             start: _this.startDate.getDate(),
                             end: _this.endDate.getDate(),
                             backgroundUrl: backgroundUrl,
-                            aspectRatio: aspectRatio
+                            aspectRatio: aspectRatio,
+                            offsetY: _offset,
+                            Height: _Height,
                         }).then(function () {
                             self.isCancel = false;
                             self.close();
 
-                            // If aspect ratio has changed, then we need to redraw layout.
-                            if (isAspectRatioChanged) {
+                            // If aspect ratio or boundary have changed, then we need to redraw layout.
+                            if (isAspectRatioChanged || isBoundaryChanged) {
                                 CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
                                 CZ.Common.reloadData().done(function () {
                                     self.timeline = CZ.Common.vc.virtualCanvas("findElement", self.timeline.id);
@@ -15242,6 +15570,7 @@ var CZ;
 
                             //Move to new created timeline
                             self.timeline.onmouseclick();
+
                         }, function (error) {
                             if (error !== undefined && error !== null) {
                                 self.errorMessage.text(error).show().delay(7000).fadeOut();
@@ -15254,7 +15583,7 @@ var CZ;
                         });
                     }
 
-                    function onDataInvalid () {
+                    function onDataInvalid() {
                         var self = _this;
                         self.errorMessage.empty();
                         self.errorMessage.text("Please, set a correct URL for background image.").show().delay(7000).fadeOut();
@@ -15262,6 +15591,7 @@ var CZ;
                     }
 
                     if (!isDataValid) {
+                        _this.errorMessage.show().delay(7000).fadeOut();
                         return;
                     } else if (backgroundUrl !== "") {
                         backgroundImage = new Image();
@@ -15355,6 +15685,7 @@ var CZ;
                 this.titleTextblock = container.find(formInfo.titleTextblock);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.datePicker = new CZ.UI.DatePicker(container.find(formInfo.datePicker));
+                this.offsetInput = container.find(formInfo.offsetInput);
                 this.createArtifactButton = container.find(formInfo.createArtifactButton);
                 this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), formInfo.contentItemsTemplate, formInfo.context.contentItems);
                 this.errorMessage = container.find(formInfo.errorMessage);
@@ -15381,13 +15712,6 @@ var CZ;
                 var _this = this;
                 this.saveButton.prop('disabled', false);
 
-                this.titleInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.datePicker.datePicker.change(function () {
-                    _this.isModified = true;
-                });
-
                 if (this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("Create Exhibit");
@@ -15395,7 +15719,8 @@ var CZ;
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.infodotDescription.isCirca || false);
-
+                    this.offsetInput.val("");
+                
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -15429,10 +15754,14 @@ var CZ;
                     CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
                         _this.saveButton.data('lastUpdate', data);
                     });
-
+                    
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.infodotDescription.isCirca || false);
+                    if (this.exhibit.offsetY == null)
+                        this.offsetInput.val("");
+                    else
+                        this.offsetInput.val(this.exhibit.offsetY);
 
                     this.closeButton.show();
                     this.createArtifactButton.show();
@@ -15465,6 +15794,17 @@ var CZ;
                 } else {
                     console.log("Unexpected authoring mode in exhibit form.");
                 }
+
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.datePicker.datePicker.change(function () {
+                    _this.isModified = true;
+                });
+                this.offsetInput.change(function () {
+                    _this.isModified = true;
+                });
+
             };
 
             FormEditExhibit.prototype.onCreateArtifact = function () {
@@ -15499,7 +15839,7 @@ var CZ;
                     });
                 }
             };
-
+  
             FormEditExhibit.prototype.onSave = function () {
                 var _this = this;
                 var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
@@ -15519,12 +15859,18 @@ var CZ;
                     exhibit_y = this.exhibit.parent.y;
                 }
 
+                if (this.offsetInput.val() != "")
+                    this.exhibit.offsetY = Number(this.offsetInput.val());
+                else
+                    this.exhibit.offsetY = null;
+
                 var newExhibit = {
                     title: this.titleInput.val() || "",
                     x: exhibit_x,
                     y: exhibit_y,
                     height: this.exhibit.height,
                     width: this.exhibit.width,
+                    offsetY: this.exhibit.offsetY,
                     infodotDescription:
                     {
                         date:    CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()),
@@ -15543,7 +15889,12 @@ var CZ;
                     this.errorMessage.text("Exhibit intersects other elemenets");
                 }
 
-                if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems)
+                    && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true)
+                    && this.exhibit.contentItems.length >= 1
+                    && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount
+                    && /(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(this.offsetInput.val())) {
+                    
                     if (this.mode === "editExhibit") {
                         // edit mode - see if someone else has saved edit since we loaded it
                         CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
@@ -15585,6 +15936,12 @@ var CZ;
                     this.errorMessage.text("Cannot create exhibit without artifacts.").show().delay(7000).fadeOut(function () {
                         return self.errorMessage.text(origMsg);
                     });
+                } else if (!/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(this.offsetInput.val())) {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Please enter vertical position in percents or select auto mode. For example \"0\", \"100\", \"45\" or \"75.85\"").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
                 } else {
                     this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
@@ -15593,13 +15950,26 @@ var CZ;
             FormEditExhibit.prototype.onSave_PerformSave = function (newExhibit) {
                 var _this = this;
                 this.saveButton.prop('disabled', true);
-
+                
                 CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                     _this.isCancel = false;
                     _this.isModified = false;
                     _this.close();
                     _this.exhibit.id = arguments[0].id;
                     _this.exhibit.onmouseclick();
+
+                    // If offset has changed, then we need to redraw layout.
+                    var isOffsetChanged = (Number(_this.offsetInput.val()) !== _this.exhibitCopy.offsetY);
+                    if (isOffsetChanged) {
+                        CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
+                        CZ.Common.reloadData().done(function () {
+                            _this.exhibit = CZ.Common.vc.virtualCanvas("findElement", _this.exhibit.id);
+                            _this.exhibit.animation = null;
+
+                            //Move to new created exhibit
+                            _this.exhibit.onmouseclick();
+                        });
+                    }
                 }, function (error) {
                     var errorMessage = JSON.parse(error.responseText).errorMessage;
                     if (errorMessage !== "") {
@@ -19681,6 +20051,7 @@ var CZ;
 
         function UserCanEditCollection(profile)
         {
+
             // can't edit if no profile, no display name or no supercollection
             if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName)
             {
@@ -19781,7 +20152,7 @@ var CZ;
             };
         }
 
-        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
+        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, offsetY:null, Height:null, children: [], parent: { guid: null } };
 
         $(document).ready(function () {
             // ensures there will be no 'console is undefined' errors
@@ -20021,6 +20392,9 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            offsetLabels: ".cz-form-offset-label",
+                            topBoundInput: ".cz-form-item-offset",
+                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
                             errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
@@ -20040,6 +20414,9 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            offsetLabels: ".cz-form-offset-label",
+                            topBoundInput: ".cz-form-item-top-bound-offset",
+                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
                             errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
@@ -20058,6 +20435,9 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            offsetLabels: ".cz-form-offset-label",
+                            topBoundInput: ".cz-form-item-top-bound-offset",
+                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
                             errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
@@ -20071,6 +20451,7 @@ var CZ;
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
                             titleInput: ".cz-form-item-title",
+                            offsetInput: ".cz-form-item-offset",
                             datePicker: ".cz-form-time",
                             createArtifactButton: ".cz-form-create-artifact",
                             contentItemsListBox: ".cz-listbox",
@@ -20089,6 +20470,8 @@ var CZ;
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
                             titleInput: ".cz-form-item-title",
+                            offsetInput: ".cz-form-item-offset",
+                            offsetCheckbox: ".cz-form-item-offset-checkbox",
                             datePicker: ".cz-form-time",
                             createArtifactButton: ".cz-form-create-artifact",
                             contentItemsListBox: ".cz-listbox",
