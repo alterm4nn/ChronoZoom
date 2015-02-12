@@ -42,7 +42,7 @@ var CZ;
                         link.css("color", "#0464a2");
                         link.css("font-size", "16px");
                         link.css("float", "left");
-                        link.css("width", "140px");
+                        link.css("width", "160px");
                         link.css("cursor", "pointer");
                         link.text(preloaded.name);
 
