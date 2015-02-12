@@ -44,11 +44,15 @@ var CZ;
                     end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
                     ToIsCirca: typeof t.endDate !== 'undefined' ? t.ToIsCirca: false,
                     title: t.title,
+<<<<<<< HEAD
                     Regime: t.regime,
                     backgroundUrl: t.backgroundUrl,
+                    aspectRatio: t.aspectRatio
+=======
                     Height: t.Height,
                     offsetY: t.offsetY,
-                    aspectRatio: t.aspectRatio
+                    Regime: t.regime
+>>>>>>> Timeline manual offset
                 };
             }
             Map.timeline = timeline;

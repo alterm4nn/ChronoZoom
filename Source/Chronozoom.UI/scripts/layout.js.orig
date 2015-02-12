@@ -630,10 +630,13 @@ var CZ;
                 FromIsCirca: timeline.FromIsCirca || false,
                 ToIsCirca: timeline.ToIsCirca || false,
                 opacity: 0,
+<<<<<<< HEAD
                 backgroundUrl: timeline.backgroundUrl,
-                aspectRatio: timeline.aspectRatio,
+                aspectRatio: timeline.aspectRatio
+=======
                 offsetY: timeline.offsetY,
                 Height: timeline.Height
+>>>>>>> Timeline manual offset
             });
 
             //Creating Infodots
@@ -730,6 +733,7 @@ var CZ;
             if (timeline) {
                 //Transform timeline start and end dates
                 Prepare(timeline);
+
                 //Measure child content for each timiline in tree
                 var measureContext = document.createElement("canvas").getContext('2d');
                 LayoutTimeline(timeline, 0, measureContext);

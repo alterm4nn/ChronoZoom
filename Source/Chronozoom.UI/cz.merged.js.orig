@@ -6658,10 +6658,13 @@ var CZ;
                 FromIsCirca: timeline.FromIsCirca || false,
                 ToIsCirca: timeline.ToIsCirca || false,
                 opacity: 0,
+<<<<<<< HEAD
                 backgroundUrl: timeline.backgroundUrl,
-                aspectRatio: timeline.aspectRatio,
+                aspectRatio: timeline.aspectRatio
+=======
                 offsetY: timeline.offsetY,
                 Height: timeline.Height
+>>>>>>> Timeline manual offset
             });
 
             //Creating Infodots
@@ -6758,6 +6761,7 @@ var CZ;
             if (timeline) {
                 //Transform timeline start and end dates
                 Prepare(timeline);
+
                 //Measure child content for each timiline in tree
                 var measureContext = document.createElement("canvas").getContext('2d');
                 LayoutTimeline(timeline, 0, measureContext);
@@ -9384,6 +9388,33 @@ var CZ;
                     ]);
                 }
 
+<<<<<<< HEAD
+                // Update title.
+                t.title = prop.title;
+                updateTimelineTitle(t);
+
+                // Update background URL and aspect ratio.
+                t.backgroundUrl = prop.backgroundUrl;
+                t.aspectRatio = prop.aspectRatio;
+
+                CZ.Service.putTimeline(t).then(function (success) {
+                    // update ids if existing elements with returned from server
+                    t.id = "t" + success;
+                    t.guid = success;
+                    t.titleObject.id = "t" + success + "__header__";
+
+                    if (!t.parent.guid) {
+                        // Root timeline, refresh page
+                        document.location.reload(true);
+                    } else {
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+                    deffered.resolve(t);
+                }, function (error) {
+                    deffered.reject(error);
+                });
+=======
+>>>>>>> Timeline manual offset
             } else {
                 temp.height = t.parent.height * prop.Height/100;
                 //We can make a new global constant if we need
@@ -9410,10 +9441,6 @@ var CZ;
             // Update title.
             t.title = prop.title;
             updateTimelineTitle(t);
-
-                // Update background URL and aspect ratio.
-                t.backgroundUrl = prop.backgroundUrl;
-                t.aspectRatio = prop.aspectRatio;
 
             // Manual offset and height
             // In the case of automatic selection, it will be null
@@ -9963,11 +9990,15 @@ var CZ;
                     end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
                     ToIsCirca: typeof t.endDate !== 'undefined' ? t.ToIsCirca: false,
                     title: t.title,
+<<<<<<< HEAD
                     Regime: t.regime,
                     backgroundUrl: t.backgroundUrl,
+                    aspectRatio: t.aspectRatio
+=======
                     Height: t.Height,
                     offsetY: t.offsetY,
-                    aspectRatio: t.aspectRatio
+                    Regime: t.regime
+>>>>>>> Timeline manual offset
                 };
             }
             Map.timeline = timeline;
@@ -15403,10 +15434,13 @@ var CZ;
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
+<<<<<<< HEAD
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.backgroundUrl = container.find(formInfo.backgroundUrl);
+=======
                 this.offsetInput = container.find(formInfo.topBoundInput);
                 this.bottomOffsetInput = container.find(formInfo.bottomBoundInput);
+>>>>>>> Timeline manual offset
                 this.titleInput = container.find(formInfo.titleInput);
                 this.offsetLabels = container.find(formInfo.offsetLabels);
                 this.errorMessage = container.find(formInfo.errorMessage);
@@ -15449,8 +15483,8 @@ var CZ;
                     this.closeButton.hide();
                     this.titleTextblock.text("Create Root Timeline");
                     this.saveButton.text("Create Timeline");
-                    this.offsetInput.hide();
-                    this.bottomOffsetInput.hide();
+                    //this.offsetInput.hide();
+                    //this.bottomOffsetInput.hide();
                     this.offsetLabels.hide();
                 } else {
                     console.log("Unexpected authoring mode in timeline form.");
@@ -15471,18 +15505,22 @@ var CZ;
                 }
 
                 $(_this.startDate.circaSelector).find('input').prop('checked', this.timeline.FromIsCirca);
-                $(_this.endDate.circaSelector).find('input').prop('checked', this.timeline.ToIsCirca);
+                $(_this.endDate.circaSelector  ).find('input').prop('checked', this.timeline.ToIsCirca);
 
+<<<<<<< HEAD
+                this.saveButton.click(function () {
+=======
                 if (_this.timeline.offsetY === null) {
                     _this.offsetInput.val("");
                     _this.bottomOffsetInput.val("");
-                }
+                } 
                 else {
                     _this.offsetInput.val(_this.timeline.offsetY);
-                    _this.bottomOffsetInput.val(_this.timeline.offsetY + _this.timeline.Height * 100);
+                    _this.bottomOffsetInput.val(_this.timeline.offsetY + _this.timeline.Height*100);
                 }
 
                 this.saveButton.click(function (event) {
+>>>>>>> Timeline manual offset
                     _this.errorMessage.empty();
                     var isDataValid = false;
                     var backgroundImage;
@@ -15496,9 +15534,8 @@ var CZ;
 
                     if (!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
                         _this.errorMessage.text('Time interval cannot be less than one day');
-                        isDataValid = false;
                     }
-
+                    
                     if (!/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(_this.offsetInput.val())
                         || !/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(_this.bottomOffsetInput.val())) {
                         _this.errorMessage.text("Please enter vertical position in percents or clear the input to select auto mode. For example \"0\", \"100\", \"45\" or \"75.85\"");
@@ -15526,38 +15563,39 @@ var CZ;
                         }
                     }
 
-                    function onDataValid() {
-
+                    function onDataValid () {
                         _this.errorMessage.empty();
                         var self = _this;
                         var aspectRatio = backgroundImage ? backgroundImage.width / backgroundImage.height : null;
                         var isAspectRatioChanged = aspectRatio !== _this.timeline.aspectRatio;
-                        var isBoundaryChanged = ((Number(_this.offsetInput.val()) !== _this.timeline.offsetY) 
-                            || (Number(_this.bottomOffsetInput.val()) !== (_this.timeline.offsetY + _this.timeline.Height*100)));
 
-                        _this.timeline.FromIsCirca = $(_this.startDate.circaSelector).find('input').is(':checked');
-                        _this.timeline.ToIsCirca = $(_this.endDate.circaSelector).find('input').is(':checked');
-
+                        _this.timeline.FromIsCirca  = $(_this.startDate.circaSelector).find('input').is(':checked');
+                        _this.timeline.ToIsCirca    = $(_this.endDate.circaSelector  ).find('input').is(':checked');
+ 
                         _this.saveButton.prop('disabled', true);
-
+                        
                         var _offset = (_this.offsetInput.val() === "") ? null : Number(_this.offsetInput.val());
-                        var _Height = (_this.bottomOffsetInput.val() === "") ?
+                        var _Height = (_this.bottomOffsetInput.val() === "") ? 
                             null : (Number(_this.bottomOffsetInput.val()) - Number(_this.offsetInput.val()));
-
+                        
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
                             start: _this.startDate.getDate(),
                             end: _this.endDate.getDate(),
+<<<<<<< HEAD
                             backgroundUrl: backgroundUrl,
-                            aspectRatio: aspectRatio,
-                            offsetY: _offset,
-                            Height: _Height,
+                            aspectRatio: aspectRatio
                         }).then(function () {
+=======
+                            offsetY: _offset,
+                            Height: _Height, 
+                        }).then(function (success) {
+>>>>>>> Timeline manual offset
                             self.isCancel = false;
                             self.close();
 
-                            // If aspect ratio or boundary have changed, then we need to redraw layout.
-                            if (isAspectRatioChanged || isBoundaryChanged) {
+                            // If aspect ratio has changed, then we need to redraw layout.
+                            if (isAspectRatioChanged) {
                                 CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
                                 CZ.Common.reloadData().done(function () {
                                     self.timeline = CZ.Common.vc.virtualCanvas("findElement", self.timeline.id);
@@ -15570,7 +15608,8 @@ var CZ;
 
                             //Move to new created timeline
                             self.timeline.onmouseclick();
-
+                            
+                            document.location.reload(true);
                         }, function (error) {
                             if (error !== undefined && error !== null) {
                                 self.errorMessage.text(error).show().delay(7000).fadeOut();
@@ -15583,7 +15622,7 @@ var CZ;
                         });
                     }
 
-                    function onDataInvalid() {
+                    function onDataInvalid () {
                         var self = _this;
                         self.errorMessage.empty();
                         self.errorMessage.text("Please, set a correct URL for background image.").show().delay(7000).fadeOut();
@@ -15591,7 +15630,6 @@ var CZ;
                     }
 
                     if (!isDataValid) {
-                        _this.errorMessage.show().delay(7000).fadeOut();
                         return;
                     } else if (backgroundUrl !== "") {
                         backgroundImage = new Image();
@@ -15894,7 +15932,6 @@ var CZ;
                     && this.exhibit.contentItems.length >= 1
                     && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount
                     && /(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(this.offsetInput.val())) {
-                    
                     if (this.mode === "editExhibit") {
                         // edit mode - see if someone else has saved edit since we loaded it
                         CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
@@ -15958,18 +15995,7 @@ var CZ;
                     _this.exhibit.id = arguments[0].id;
                     _this.exhibit.onmouseclick();
 
-                    // If offset has changed, then we need to redraw layout.
-                    var isOffsetChanged = (Number(_this.offsetInput.val()) !== _this.exhibitCopy.offsetY);
-                    if (isOffsetChanged) {
-                        CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
-                        CZ.Common.reloadData().done(function () {
-                            _this.exhibit = CZ.Common.vc.virtualCanvas("findElement", _this.exhibit.id);
-                            _this.exhibit.animation = null;
-
-                            //Move to new created exhibit
-                            _this.exhibit.onmouseclick();
-                        });
-                    }
+                    document.location.reload(true);
                 }, function (error) {
                     var errorMessage = JSON.parse(error.responseText).errorMessage;
                     if (errorMessage !== "") {
@@ -20052,6 +20078,9 @@ var CZ;
         function UserCanEditCollection(profile)
         {
 
+            CZ.Service.CollectionName = "cosmos";
+            CZ.Service.SuperCollectionName = "chronozoom";
+            return true;
             // can't edit if no profile, no display name or no supercollection
             if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName)
             {
@@ -20392,9 +20421,12 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+<<<<<<< HEAD
+=======
                             offsetLabels: ".cz-form-offset-label",
                             topBoundInput: ".cz-form-item-offset",
                             bottomBoundInput: ".cz-form-item-bottom-bound-offset",
+>>>>>>> Timeline manual offset
                             errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
@@ -20414,9 +20446,12 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+<<<<<<< HEAD
+=======
                             offsetLabels: ".cz-form-offset-label",
                             topBoundInput: ".cz-form-item-top-bound-offset",
                             bottomBoundInput: ".cz-form-item-bottom-bound-offset",
+>>>>>>> Timeline manual offset
                             errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
@@ -20435,9 +20470,12 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+<<<<<<< HEAD
+=======
                             offsetLabels: ".cz-form-offset-label",
                             topBoundInput: ".cz-form-item-top-bound-offset",
                             bottomBoundInput: ".cz-form-item-bottom-bound-offset",
+>>>>>>> Timeline manual offset
                             errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
