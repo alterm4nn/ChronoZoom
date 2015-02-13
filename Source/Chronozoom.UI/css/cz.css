@@ -2076,10 +2076,12 @@ span.cz-form-preloadedrecord {
   font-size: 9pt;
   width: auto;
   color: #000000;
+  padding-bottom: 1px;
 }
 a.cz-form-preloadedrecord.time-series-link {
   font-size: 9pt;
   width: auto;
+  padding-bottom: 1px;
 }
 #existingTimeSeries a.cz-form-btn {
   height: 22px;
