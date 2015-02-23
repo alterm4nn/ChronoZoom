@@ -172,17 +172,20 @@ var CZ;
                 this.saveButton.prop('disabled', false);
 
                 // see http://refreshless.com/nouislider
-                this.rangePickers.noUiSlider
-                ({
-                    connect:    'lower',
-                    start:      0.5,
-                    step:       0.05,
-                    range:
-                    {
-                        'min':  0,
-                        'max':  1
-                    }
-                });
+                if (!this.rangePickers.hasClass('noUi-target'))
+                {
+                    this.rangePickers.noUiSlider
+                    ({
+                        connect:    'lower',
+                        start:      0.5,
+                        step:       0.05,
+                        range:
+                        {
+                            'min':  0,
+                            'max':  1
+                        }
+                    });
+                }
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);

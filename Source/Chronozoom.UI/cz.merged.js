@@ -16118,6 +16118,7 @@ var CZ;
 
                 this.tourTitleInput = this.container.find(".cz-form-tour-title");
                 this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
+                this.tourAudioPicker = this.container.find('.cz-medialist-item-icon');
                 this.tourAudioInput = this.container.find('#cz-form-tour-audio');
                 this.tourAudioControls = this.container.find('.audiojs');
                 this.clean();
@@ -16232,6 +16233,51 @@ var CZ;
                 }
 
                 var self = this;
+
+                // ensure Windows Live API initialized for OneDrive
+                WL.init
+                ({
+                    client_id:      CZ.Settings.WLAPIClientID,
+                    redirect_uri:   CZ.Settings.WLAPIRedirectUrl
+                });
+
+                // OneDrive audio picker - see https://msdn.microsoft.com/en-us/library/jj219328.aspx
+                this.tourAudioPicker.click(function (event)
+                {
+                    WL.login
+                    ({
+                        scope: ['wl.skydrive', 'wl.signin']
+                    })
+                    .then
+                    (
+                        function(response)
+                        {
+                            WL.fileDialog
+                            ({
+                                mode:   'open',
+                                select: 'single'
+                            })
+                            .then
+                            (
+                                function (response)
+                                {
+                                    var file = response.data.files[0];
+                                    if (file.type === 'audio' && file.name.toLowerCase().match('\.mp3$'))
+                                    {
+                                        _this.tourAudioInput.val(file.source);
+                                        _this.renderAudioControls();
+                                    }
+                                    else
+                                    {
+                                        // Don't use CZ.Authoring.showMessageWindow to warn as
+                                        // currently not noticeable on top of Edit Tour pane.
+                                        alert('Sorry, you need to pick an MP3 file.');
+                                    }
+                                }
+                            );
+                        }
+                    );
+                });
 
                 this.renderAudioControls();
                 this.tourAudioInput.on('change input', function (event) {
@@ -16613,17 +16659,20 @@ var CZ;
                 this.saveButton.prop('disabled', false);
 
                 // see http://refreshless.com/nouislider
-                this.rangePickers.noUiSlider
-                ({
-                    connect:    'lower',
-                    start:      0.5,
-                    step:       0.05,
-                    range:
-                    {
-                        'min':  0,
-                        'max':  1
-                    }
-                });
+                if (!this.rangePickers.hasClass('noUi-target'))
+                {
+                    this.rangePickers.noUiSlider
+                    ({
+                        connect:    'lower',
+                        start:      0.5,
+                        step:       0.05,
+                        range:
+                        {
+                            'min':  0,
+                            'max':  1
+                        }
+                    });
+                }
 
                 this.backgroundInput.val(this.collectionTheme.backgroundUrl);
                 this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);

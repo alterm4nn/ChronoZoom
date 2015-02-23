@@ -1,4 +1,4 @@
-/***********************************************************
+﻿/***********************************************************
 
                         Media List
       
@@ -92,7 +92,6 @@ a.cz-bing-result-description:hover {
 }
 /* SkyDrive Media Picker */
 iframe[sutra=picker] {
-  opacity: 0;
   z-index: 100000003 !important;
 }
 iframe[sutra=picker] + div {
@@ -141,3 +140,4 @@ iframe[sutra=picker] + div {
   background-color: #212121;
   color: #fff;
 }
+/*# sourceMappingURL=media.css.map */
