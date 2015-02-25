@@ -365,7 +365,7 @@
                     <a class="footer-link" target="_blank" href="http://chronozoom.tumblr.com/notices">Notices</a>
                 </li>
                 <li class="fright">
-                    <a class="footer-link" href="mailto:chronozoom@microsoft.com?subject=Feedback">Feedback</a>
+                    <a class="footer-link" id="maillist"   href="mailto:mail@list?subject=Feedback">Feedback</a>
                 </li>
                 <li class="fright">
                     <a class="footer-link" target="_blank" href="https://github.com/alterm4nn/ChronoZoom/wiki">Help</a>
@@ -373,5 +373,12 @@
             </ul>
         </div>
     </footer>
+    <script type="text/javascript">
+        // obfuscate real email address to prevent harvesting by crawlers
+        document.getElementById("maillist").href =
+        document.getElementById("maillist").href
+            .replace('mail@', 'chronozoom@')
+            .replace('@list', '@timeapps.com');
+    </script>
 </body>
 </html>

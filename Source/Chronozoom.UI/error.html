@@ -59,8 +59,15 @@
         <p>
             What would you like to do now?
         </p>
-        <a class="btn" href="javascript:window.history.go(-1);"                         >Go back to the last page you were on</a>
-        <a class="btn" href="/"                                                         >Go to the ChronoZoom home page</a>
-        <a class="btn" href="mailto:chronozoom@microsoft.com?subject=ChronoZoom%20Error">Contact ChronoZoom with feedback</a>
+        <a               class="btn" href="javascript:window.history.go(-1);"          >Go back to the last page you were on</a>
+        <a               class="btn" href="/"                                          >Go to the ChronoZoom home page</a>
+        <a id="maillist" class="btn" href="mailto:mail@list?subject=ChronoZoom%20Error">Contact ChronoZoom with feedback</a>
+        <script type="text/javascript">
+            // obfuscate real email address to prevent harvesting by crawlers
+            document.getElementById("maillist").href =
+            document.getElementById("maillist").href
+                .replace('mail@', 'chronozoom@')
+                .replace('@list', '@timeapps.com');
+        </script>
     </body>
 </html>
