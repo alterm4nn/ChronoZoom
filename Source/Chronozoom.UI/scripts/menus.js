@@ -1,7 +1,7 @@
 ﻿// The following jQuery extension is used by menus to stop click ghosting on touch-screen devices.
 // This can occur when looking for either click or touchstart events (both can fire on some touch
 // devices) without wanting to preventPropagation. Use $(elements).clicktouch(... instead of
-// .on('click touchstart' or similar.
+// .on('click touchstart' or similar. See https://patrickhlauke.github.io/touch/tests/results/.
 jQuery.fn.extend
 ({
     clicktouch: function (handler)
@@ -19,6 +19,13 @@ jQuery.fn.extend
             else if ('onpointerdown'    in window)  event = 'pointerdown'
             else if ('onmspointerdown'  in window)  event = 'mspointerdown'
             else                                    event = 'click';
+
+            // if Chrome under Windows then always override with click event.
+            // See https://trello.com/c/3QjK5OlK/226-chrome-on-w8-1-touchscreen-bug.
+            if (Boolean(window.chrome) && navigator.platform.indexOf('Win32') > -1)
+            {
+                event = 'click';
+            }
 
             $(this).on(event, handler);
         });
