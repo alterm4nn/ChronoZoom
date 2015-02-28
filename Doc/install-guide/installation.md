@@ -276,10 +276,16 @@ Please make sure that you've installed [Visual Studio 2013 Update 4](http://www.
 
 Then, for web work, please install [Web Essential 2013 for Update 4](https://visualstudiogallery.msdn.microsoft.com/56633663-6799-41d7-9df7-0f2a504ca361).
 
+##### ASP.NET MVC
+
+Once Visual Studio is installed, and you're fully patched up-to-date,
+you will need to [install ASP.NET MVC 4](http://www.asp.net/mvc/mvc4) too, if it isn't already present,
+then ensure that you update again to bring it up to the latest version.
+
 ##### Configuring Web Essentials
 
 Please find the Web Essentials section under the Tools -> Options Menu
-and edit so that:
+in Visual Studio and edit so that:
 
 * LESS files are automatically compiled each time you save an edit:
 
@@ -611,7 +617,9 @@ strings which need to be placed in web.config.
 8.  Copy the contents (a compressed JSON string) on to your clipboard.
 
 9.	Paste the contents into an editor that has a tool for formatting JSON.
-	There are JSON formatting plugins for most IDEs, including Visual Studio.
+	There are JSON formatting plugins for most IDEs, including Visual Studio,
+    or you can use an online service such as [JSONLint](http://jsonlint.com/).
+
 	An alternative, free, very fast edit tool is [Notepad++](http://notepad-plus-plus.org/), which once
 	installed, has a plugin called "JSON Viewer" which can be added via
 	Notepad++'s plugin manager.
@@ -771,14 +779,87 @@ reason you don't use the default key is that it can never be changed or deleted.
 This option only needs configuring if users will be logging in to ChronoZoom.
 
 When logged in ChronoZoom users add content, they have the option of using
-their OneDrive account to select an image they've stored there, to be used
-as the image for some new content.
+their OneDrive account to select an image or audio file that they've stored
+there, to be used in some new content.
 
 In order to use OneDrive in ChronoZoom, you'll need to [register your web
 site application to use the OneDrive SDK](https://msdn.microsoft.com/en-us/library/dn659751.aspx).
 
 Each domain name would have it's own registration. You can then review
 the [list of application keys](https://account.live.com/developers/applications/index), and select the appropriate value to use.
+
+There is one catch that can be particularly troublesome for local development,
+if you want to use/test OneDrive interaction: You need to set up the Redirect
+URL in the registration created above to point to the domain of your web site,
+which for local development work is typically http://localhost:4949. However,
+the web screens at live.com where you create/edit your entry will NOT allow:
+
+1. "localhost" as the domain name. A dot is required such as "cz.localhost".
+2. A port to be specified. Port 80 (via http) or 443 (via https) is assumed.
+
+This in turn means that you have to change your Visual Studio project to
+use a different domain name than localhost, and to use port 80 instead of
+another port when locally running in debug mode. This is easier to do in
+Visual Studio 2012 but requires some workarounds for Visual Studio 2013, plus
+you need to ensure that if you use IIS, that it either does not use port 80
+on 127.0.0.1 or you stop the IIS service first with `net stop w3svc`, meaning
+you'll need local admin rights on your development box. Don't forget all the
+other changes too such as to the ACS settings and throughout web.config.
+
+We recommend, if you have to do this, to use http://chronozoom.localhost/
+instead of http://locahost:4949/.
+
+###### Switching to use chronozoom.localhost:
+
+1. Edit your hosts file to add an entry for chronozoom.localhost.
+   Your hosts file is typically located here:
+
+   `c:\windows\system32\drivers\etc\hosts`
+
+   You can't use Notepad since it always appends a .txt to the file name, and
+   the file name should just be "hosts". You can use a free editor such as
+   [Notepad++](http://notepad-plus-plus.org/) instead to add the following line to the file:
+
+   `127.0.0.1 chronozoom.localhost`
+
+2. For Visual Studio 2012, edit the Chronozoom.UI.csproj file in the project,
+   look for `>4949<` and replace that with `>80<`. If you edit your web.config file
+   and ACS settings to match the new domain and port, you should now be ready to
+   use http://chroozoom.localhost/.
+
+3. For Visual Studio 2013, you'll need to do the same as VS2012 shown in step 2,
+   but additionally edit the appropriate lines in your csproj file as follows:
+
+   ```
+   <UseIISExpress>true</UseIISExpress>
+   <UseIIS>True</UseIIS>
+   <DevelopmentServerPort>80</DevelopmentServerPort>
+   <IISUrl>http://chronozoom.localhost:80/</IISUrl>
+   ```
+
+   You'll also need to edit your IIS Express configuration file. Do this first
+   if you are using the Visual Studio menus to edit your csproj file rather 
+   than with a text editor. Your IIS Express file is located beneath your
+   My Documents folder:
+
+   `My Documents \ IISExpress \ config \ applicationhost.config`
+
+   Look for the `<sites>` section and add something like the following,
+   adjusting the site id # as appropriate, or edit the existing site entry
+   if you previously used IIS Express for ChronoZoom:
+
+	```
+    <site name="Chronozoom.UI" id="2">
+        <application path="/" applicationPool="Clr4IntegratedAppPool">
+            <virtualDirectory path="/" physicalPath="C:\Work\ChronoZoom\ChronoZoom\Source\Chronozoom.UI" />
+        </application>
+        <bindings>
+            <binding protocol="http" bindingInformation="*:80:chronozoom.localhost" />
+        </bindings>
+    </site>
+	```
+   The physical path should match the path you set up on your PC for the
+   Chronozoom.UI project code.
 
 ##### AnalyticsServiceId
 
