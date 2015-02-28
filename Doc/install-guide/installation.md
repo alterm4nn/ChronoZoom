@@ -776,7 +776,9 @@ reason you don't use the default key is that it can never be changed or deleted.
 
 ##### OneDriveClientID
 
-This option only needs configuring if users will be logging in to ChronoZoom.
+This option only needs configuring if users will be logging in to ChronoZoom
+and will be using OneDrive. It is recommended that developers only set this
+up for local development if they have some specific OneDrive work to implement.
 
 When logged in ChronoZoom users add content, they have the option of using
 their OneDrive account to select an image or audio file that they've stored
