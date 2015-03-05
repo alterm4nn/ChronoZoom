@@ -775,7 +775,6 @@
     <Content Include="images\credits\msr.png" />
     <Content Include="images\credits\msu.png" />
     <Content Include="images\credits\ucb.png" />
-    <Content Include="images\credits\uw.png" />
     <Content Include="images\default-tile.png" />
     <Content Include="images\dummy\icon_create.png" />
     <Content Include="images\dummy\icon_down_arrow.png" />
