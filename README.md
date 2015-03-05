@@ -12,7 +12,7 @@ Community
 
 * [Mailing List for Developers](https://groups.google.com/d/forum/chronozoom-dev)
 * [Skype General Chat](skype:?chat&blob=BHGGx-O6KF-_wx3bsy9BG9xACOfhtqAkBxo1_ajRCIW1PO0ZbU87MJt0ZhM)
-* IRC: `#ChronoZoom` channel on Freenode
+* IRC: `#ChronoZoom` channel on Freenode.org
 * [Documentation](https://github.com/alterm4nn/ChronoZoom/wiki)
 * [File a Bug](https://github.com/alterm4nn/ChronoZoom/issues)
 
@@ -43,7 +43,6 @@ ChronoZoom is built and maintained by a growing community, with the support of:
 
 * University of California Berkeley
 * Moscow State University
-* University of Washington
 * Microsoft Research
 
 License
