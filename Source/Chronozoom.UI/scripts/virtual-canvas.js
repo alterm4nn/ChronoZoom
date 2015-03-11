@@ -9,7 +9,7 @@ var CZ;
         /*  Defines a Virtual Canvas widget (based on jQuery ui).
         @remarks The widget renders different objects defined in a virtual space within a <div> element.
         The widget allows to update current visible region, i.e. perform panning and zooming.
-        
+
         Technically, the widget uses a <canvas> element to render most types of objects; some of elements
         can be positioned using CSS on a top of the canvas.
         The widget is split into layers, each layer corresponds to a <div> within a root <div> element.
