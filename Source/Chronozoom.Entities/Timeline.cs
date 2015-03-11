@@ -60,7 +60,7 @@ namespace Chronozoom.Entities
         /// The regime in which the timeline should occur.
         /// </summary>
         [DataMember]
-        [MaxLength(4000)]
+        [MaxLength(200)]
         [Column(TypeName = "nvarchar")]
         public string Regime { get; set; }
 

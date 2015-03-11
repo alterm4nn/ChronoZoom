@@ -311,11 +311,15 @@ namespace Chronozoom.Entities.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to -- Add BackgroundUrl and AspectRatio optional columns
-        ///-- to Timelines table.
+        ///-- to Timelines table. Change maximum size of Regime field.
         ///
         ///ALTER TABLE [dbo].[Timelines]
-        ///    ADD [BackgroundUrl] NCHAR (2000)    NULL,
-        ///        [AspectRatio]   DECIMAL (18, 7) NULL;
+        ///    ADD [BackgroundUrl] NVARCHAR (2000)  NULL,
+        ///        [AspectRatio]   DECIMAL  (18, 7) NULL;
+        ///GO
+        ///
+        ///ALTER TABLE [dbo].[Timelines]
+        ///    ALTER COLUMN [Regime] NVARCHAR (200) NULL;
         ///GO
         ///
         ///INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
@@ -330,15 +334,38 @@ namespace Chronozoom.Entities.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to -- FIX DATA TYPES OF TIMELINE STRING COLUMNS
+        ///-- TO AVOID LARGE ROW SIZE.
+        ///
+        ///ALTER TABLE [dbo].[Timelines]
+        ///    ALTER COLUMN [BackgroundUrl] NVARCHAR (2000)  NULL;
+        ///GO
+        ///
+        ///ALTER TABLE [dbo].[Timelines]
+        ///    ALTER COLUMN [Regime] NVARCHAR (200) NULL;
+        ///GO
+        ///
+        ///INSERT INTO [MigrationHistory] (MigrationId, ProductVersion)
+        ///VALUES
+        ///    (&apos;201503110000000_FixTimelineFields&apos;, &apos;Manual Migration&apos;);
+        ///GO.
+        /// </summary>
+        internal static string _201503110000000_FixTimelineFields {
+            get {
+                return ResourceManager.GetString("_201503110000000_FixTimelineFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to -- Users --
         ///
         ///CREATE TABLE [dbo].[Users]
         ///(
-        ///	[Id]                [uniqueidentifier]      NOT NULL,
-        ///	[DisplayName]       [nvarchar](50)          NOT NULL,
-        ///	[Email]             [varchar](100)          NULL,
-        ///	[IdentityProvider]  [varchar](25)           NULL,
-        ///	[NameIdentifier]    [varchar](150)          NULL,
+        ///    [Id]                [uniqueidentifier]      NOT NULL,
+        ///    [DisplayName]       [nvarchar](50)          NOT NULL,
+        ///    [Email]             [varchar](100)          NULL,
+        ///    [IdentityProvider]  [varchar](25)           NULL,
+        ///    [NameIdentifier]    [varchar](150)          NULL,
         ///    CONSTRAINT [PK_dbo.Users] PRIMARY KEY CLUSTERED
         ///    (
         ///        [Id] ASC
@@ -351,7 +378,7 @@ namespace Chronozoom.Entities.Properties {
         ///
         ///CREATE TABLE [dbo].[Bitmasks]
         ///(
-        ///	[Id]                [int] IDENTITY(1,1)     NOT N [rest of string was truncated]&quot;;.
+        ///    [Id]                [int] IDENT [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CreateEntireSchema {
             get {
