@@ -105,6 +105,20 @@ namespace Chronozoom.Entities
         public decimal? Height { get; set; }
 
         /// <summary>
+        /// The URL of background image.
+        /// </summary>
+        [DataMember(Name = "backgroundUrl")]
+        [MaxLength(4000)]
+        [Column(TypeName = "nvarchar")]
+        public string BackgroundUrl { get; set; }
+
+        /// <summary>
+        /// The aspect ratio of the timeline: width / height.
+        /// </summary>
+        [DataMember(Name = "aspectRatio")]
+        public decimal? AspectRatio { get; set; }
+
+        /// <summary>
         /// The collection of child timelines belonging to the timeline.
         /// </summary>
         [DataMember(Name = "timelines")]
@@ -141,6 +155,8 @@ namespace Chronozoom.Entities
             ToIsCirca = t.ToIsCirca;
             ForkNode = t.ForkNode;
             Height = t.Height;
+            BackgroundUrl = t.BackgroundUrl;
+            AspectRatio = t.AspectRatio;
         }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores", Justification = "Needs to match storage column name")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ID", Justification = "Needs to match storage column name")]

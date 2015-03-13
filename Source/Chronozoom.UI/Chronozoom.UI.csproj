@@ -124,6 +124,14 @@
     <Content Include="images\profile-icon-green.png" />
     <Content Include="images\profile-icon-yellow.png" />
     <Content Include="images\select.png" />
+    <Content Include="images\svg\Cosmos.svg" />
+    <Content Include="images\svg\Earth-and-Life.svg" />
+    <Content Include="images\svg\Human.svg" />
+    <Content Include="images\svg\Pre-History.svg" />
+    <Content Include="images\svg\temp.svg" />
+    <Content Include="images\svg\sahara.svg" />
+    <Content Include="images\svg\solar.svg" />
+    <Content Include="images\svg\earth.svg" />
     <Content Include="images\themes\linen-light.jpg" />
     <Content Include="images\themes\linen.jpg" />
     <Content Include="images\themes\parchment.jpg" />

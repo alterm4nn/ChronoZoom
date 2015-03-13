@@ -487,6 +487,22 @@ var CZ;
             }
         }
 
+        // Reload the data.
+        function reloadData() {
+            return CZ.Data.getTimelines(null).then(function (response) {
+                if (!response) {
+                    return;
+                }
+
+                var root = Common.vc.virtualCanvas("getLayerContent");
+                root.beginEdit();
+                CZ.Layout.Merge(response, root);
+                root.endEdit(true);
+                Common.vc.virtualCanvas("updateViewport");
+            });
+        }
+        Common.reloadData = reloadData;
+
         //loading the data from the service
         function loadData() {
             return CZ.Data.getTimelines(null).then(function (response) {
@@ -1397,7 +1413,7 @@ var CZ;
         /*  Defines a Virtual Canvas widget (based on jQuery ui).
         @remarks The widget renders different objects defined in a virtual space within a <div> element.
         The widget allows to update current visible region, i.e. perform panning and zooming.
-        
+
         Technically, the widget uses a <canvas> element to render most types of objects; some of elements
         can be positioned using CSS on a top of the canvas.
         The widget is split into layers, each layer corresponds to a <div> within a root <div> element.
@@ -2453,6 +2469,7 @@ var CZ;
                 if (element.onIsRenderedChanged)
                     element.onIsRenderedChanged();
             }
+
             element.render(ctx, visibleBox_v, viewport2d, sz, opacity);
 
             var children = element.children;
@@ -2544,6 +2561,7 @@ var CZ;
             }
             element.children = [];
         }
+        VCContent.clear = clear;
         ;
 
         /* Finds and returns a child element with given id (no recursion)
@@ -2946,6 +2964,8 @@ var CZ;
         @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the rectangle appearance
         */
         function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo) {
+            var self = this;
+
             this.base = CanvasRectangle;
             this.base(vc, layerid, id, vx, vy, vw, vh);
             this.guid = timelineinfo.guid;
@@ -2962,6 +2982,8 @@ var CZ;
 
             this.FromIsCirca = timelineinfo.FromIsCirca || false;
             this.ToIsCirca   = timelineinfo.ToIsCirca   || false;
+            this.backgroundUrl = timelineinfo.backgroundUrl || "";
+            this.aspectRatio = timelineinfo.aspectRatio || null;
 
             this.settings.showFromCirca = this.FromIsCirca;
             this.settings.showToCirca   = this.ToIsCirca;
@@ -2996,6 +3018,13 @@ var CZ;
 
             this.tooltipEnabled = true; //enable tooltips to timelines
             this.tooltipIsShown = false; // indicates whether tooltip is shown or not
+
+            // Initialize background image for the timeline.
+            if (self.backgroundUrl) {
+                self.backgroundImg = new BackgroundImage(self.vc, layerid, id + "__background__", self.backgroundUrl, self.x, self.y, self.width, self.height);
+                self.settings.gradientOpacity = 0;
+                self.settings.fillStyle = undefined;
+            }
 
             this.onmouseclick = function (e) {
                 return zoomToElementHandler(this, e, 1.0);
@@ -3114,8 +3143,13 @@ var CZ;
                     this.settings.gradientOpacity = Math.min(1, Math.max(0, this.settings.gradientOpacity + this.settings.hoverAnimationDelta));
                 }
 
+                // Rendering background.
+                if (typeof self.backgroundImg !== "undefined") {
+                    self.backgroundImg.render(ctx, visibleBox, viewport2d, size_p, 1.0);
+                }
+
                 //rendering itself
-                this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
+                self.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
 
                 // positioning of last bottom right timeline button - will render buttons moving from right to left
                 var btnX = this.x + this.width - 1.0 * this.titleObject.height;
@@ -4346,6 +4380,78 @@ var CZ;
             self.requestDZI();
 
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+
+       /**
+        * Background image for a timeline.
+        * @param vc      Virtual canvas.
+        * @param layerid Name of rendering layer of virtual canvas.
+        * @param id      ID of an element.
+        * @param src     Image source.
+        * @param vx      x of left top corner in virtual space.
+        * @param vy      y of left top corner in virtual space.
+        * @param vw      width of an image in virtual space.
+        * @param vh      height of an image in virtual space.
+        */
+        function BackgroundImage(vc, layerid, id, src, vx, vy, vw, vh) {
+            var self = this;
+            self.base = CanvasElement;
+            self.base(vc, layerid, id, vx, vy, vw, vh);
+
+            var onload = function () {
+                self.vc.requestInvalidate();
+            };
+
+            self.img = new Image();
+            self.img.addEventListener("load", onload, false);
+            self.img.src = src;
+
+            self.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                if (!self.img.complete) return;
+
+                var ptl = viewport2d.pointVirtualToScreen(self.x, self.y),
+                    pbr = viewport2d.pointVirtualToScreen(self.x + self.width, self.y + self.height),
+                    tw = pbr.x - ptl.x,
+                    th = pbr.y - ptl.y,
+                    iw = self.img.width,
+                    ih = self.img.height,
+                    vpw = viewport2d.width,
+                    vph = viewport2d.height,
+                    tiwr = tw / iw,
+                    tihr = th / ih,
+                    sxl = Math.floor(Math.max(0, -ptl.x) / tiwr),
+                    syt = Math.floor(Math.max(0, -ptl.y) / tihr),
+                    sxr = Math.floor(Math.max(0, pbr.x - vpw) / tiwr),
+                    syb = Math.floor(Math.max(0, pbr.y - vph) / tihr),
+                    sx = sxl,
+                    sy = syt,
+                    sw = iw - sxl - sxr,
+                    sh = ih - syt - syb,
+                    vx = sxl > 0 ? sxl * tiwr + ptl.x : ptl.x,
+                    vy = syt > 0 ? syt * tihr + ptl.y : ptl.y,
+                    vw = sw * tiwr,
+                    vh = sh * tihr;
+
+                ctx.globalAlpha = opacity;
+
+                // NOTE: A special case when the image starts twitching.
+                if (sw === 1 && sh === 1) {
+                    vx = Math.max(0, ptl.x);
+                    vy = Math.max(0, ptl.y);
+                    vw = Math.min(vpw, pbr.x) - vx;
+                    vh = Math.min(vph, pbr.y) - vy;
+                }
+
+                if (self.img.naturalWidth && self.img.naturalHeight) {
+                    ctx.drawImage(self.img, sx, sy, sw, sh, vx, vy, vw, vh);
+                }
+            };
+
+            self.onRemove = function () {
+                self.img.removeEventListener("load", onload, false);
+            };
+
+            self.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
 
         /*******************************************************************************************************/
@@ -5982,20 +6088,7 @@ var CZ;
         }
 
         function GenerateAspect(timeline) {
-            if (timeline.ID == CZ.Settings.cosmosTimelineID) {
-                timeline.AspectRatio = 10;
-            }
-            /*
-            else if (timeline.ID == earthTimelineID) {
-            timeline.AspectRatio = 1.0;
-            } else if (timeline.ID == lifeTimelineID) {
-            timeline.AspectRatio = 47.0 / 22.0;
-            } else if (timeline.ID == prehistoryTimelineID) {
-            timeline.AspectRatio = 37.0 / 11.0;
-            } else if (timeline.ID == humanityTimelineID) {
-            timeline.AspectRatio = 55.0 / 4.0;
-            }
-            */
+            timeline.AspectRatio = timeline.aspectRatio || 10;
         }
 
         function LayoutTimeline(timeline, parentWidth, measureContext) {
@@ -6369,7 +6462,9 @@ var CZ;
                 endDate: timeline.endDate,
                 FromIsCirca: timeline.FromIsCirca || false,
                 ToIsCirca: timeline.ToIsCirca || false,
-                opacity: 0
+                opacity: 0,
+                backgroundUrl: timeline.backgroundUrl,
+                aspectRatio: timeline.aspectRatio
             });
 
             //Creating Infodots
@@ -6810,7 +6905,7 @@ var CZ;
 
             if (src && dest) {
                 if (dest.id === "__root__") {
-                    src.AspectRatio = 10;
+                    src.AspectRatio = src.aspectRatio || 10;
                     var t = generateLayout(src, dest);
                     convertRelativeToAbsoluteCoords(t, 0);
                     dest.children.push(t);
@@ -9052,6 +9147,10 @@ var CZ;
                 t.title = prop.title;
                 updateTimelineTitle(t);
 
+                // Update background URL and aspect ratio.
+                t.backgroundUrl = prop.backgroundUrl;
+                t.aspectRatio = prop.aspectRatio;
+
                 CZ.Service.putTimeline(t).then(function (success) {
                     // update ids if existing elements with returned from server
                     t.id = "t" + success;
@@ -9598,7 +9697,9 @@ var CZ;
                     end: typeof t.endDate !== 'undefined' ? t.endDate : CZ.Dates.getDecimalYearFromCoordinate(t.x + t.width),
                     ToIsCirca: typeof t.endDate !== 'undefined' ? t.ToIsCirca: false,
                     title: t.title,
-                    Regime: t.regime
+                    Regime: t.regime,
+                    backgroundUrl: t.backgroundUrl,
+                    aspectRatio: t.aspectRatio
                 };
             }
             Map.timeline = timeline;
@@ -10076,7 +10177,7 @@ var CZ;
         }
         Service.putCollection = putCollection;
 
-        // .../{supercollection}/{collection} 
+        // .../{supercollection}/{collection}
         function deleteCollection()
         {
             if (typeof Service.collectionName === 'undefined') return false;
@@ -10095,7 +10196,7 @@ var CZ;
         }
         Service.deleteCollection = deleteCollection
 
-        // .../{supercollection}/{collection}/timeline or 
+        // .../{supercollection}/{collection}/timeline or
         // .../{supercollection}/timeline for default collection
         function putTimeline(t) {
             CZ.Authoring.resetSessionTimer();
@@ -15033,6 +15134,8 @@ var CZ;
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
+                this.backgroundUrl = container.find(formInfo.backgroundUrl);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
 
@@ -15049,6 +15152,11 @@ var CZ;
             }
             FormEditTimeline.prototype.initialize = function () {
                 var _this = this;
+
+                this.mediaInput = {};
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.mediaInput, this);
+                this.mediaList.container.find("[title='skydrive']").hide(); // Background Images doesn't support iframes.
+
                 this.saveButton.prop('disabled', false);
                 if (CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
@@ -15073,6 +15181,7 @@ var CZ;
 
                 this.titleInput.val(this.timeline.title);
                 this.startDate.setDate(this.timeline.x, true);
+                this.backgroundUrl.val(this.timeline.backgroundUrl || "");
 
                 if (this.timeline.endDate === 9999) {
                     this.endDate.setDate(this.timeline.endDate, true);
@@ -15083,9 +15192,11 @@ var CZ;
                 $(_this.startDate.circaSelector).find('input').prop('checked', this.timeline.FromIsCirca);
                 $(_this.endDate.circaSelector  ).find('input').prop('checked', this.timeline.ToIsCirca);
 
-                this.saveButton.click(function (event) {
+                this.saveButton.click(function () {
                     _this.errorMessage.empty();
                     var isDataValid = false;
+                    var backgroundImage;
+                    var backgroundUrl = _this.backgroundUrl.val().trim();
                     isDataValid = CZ.Authoring.validateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
 
                     // Other cases are covered by datepicker
@@ -15097,11 +15208,11 @@ var CZ;
                         _this.errorMessage.text('Time interval cannot be less than one day');
                     }
 
-                    if (!isDataValid) {
-                        return;
-                    } else {
+                    function onDataValid () {
                         _this.errorMessage.empty();
                         var self = _this;
+                        var aspectRatio = backgroundImage ? backgroundImage.width / backgroundImage.height : null;
+                        var isAspectRatioChanged = aspectRatio !== _this.timeline.aspectRatio;
 
                         _this.timeline.FromIsCirca  = $(_this.startDate.circaSelector).find('input').is(':checked');
                         _this.timeline.ToIsCirca    = $(_this.endDate.circaSelector  ).find('input').is(':checked');
@@ -15110,10 +15221,24 @@ var CZ;
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
                             start: _this.startDate.getDate(),
-                            end: _this.endDate.getDate()
-                        }).then(function (success) {
+                            end: _this.endDate.getDate(),
+                            backgroundUrl: backgroundUrl,
+                            aspectRatio: aspectRatio
+                        }).then(function () {
                             self.isCancel = false;
                             self.close();
+
+                            // If aspect ratio has changed, then we need to redraw layout.
+                            if (isAspectRatioChanged) {
+                                CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
+                                CZ.Common.reloadData().done(function () {
+                                    self.timeline = CZ.Common.vc.virtualCanvas("findElement", self.timeline.id);
+                                    self.timeline.animation = null;
+
+                                    //Move to new created timeline
+                                    self.timeline.onmouseclick();
+                                });
+                            }
 
                             //Move to new created timeline
                             self.timeline.onmouseclick();
@@ -15128,6 +15253,24 @@ var CZ;
                             _this.saveButton.prop('disabled', false);
                         });
                     }
+
+                    function onDataInvalid () {
+                        var self = _this;
+                        self.errorMessage.empty();
+                        self.errorMessage.text("Please, set a correct URL for background image.").show().delay(7000).fadeOut();
+                        self.backgroundUrl.val("");
+                    }
+
+                    if (!isDataValid) {
+                        return;
+                    } else if (backgroundUrl !== "") {
+                        backgroundImage = new Image();
+                        backgroundImage.addEventListener("load", onDataValid, false);
+                        backgroundImage.addEventListener("error", onDataInvalid, false);
+                        backgroundImage.src = backgroundUrl;
+                    } else {
+                        onDataValid();
+                    }
                 });
 
                 this.deleteButton.click(function (event) {
@@ -15137,6 +15280,10 @@ var CZ;
                         _this.close();
                     }
                 });
+            };
+
+            FormEditTimeline.prototype.updateMediaInfo = function () {
+                this.backgroundUrl.val(this.mediaInput.uri || "");
             };
 
             FormEditTimeline.prototype.show = function () {
@@ -15165,6 +15312,7 @@ var CZ;
                         _this.endDate.remove();
                         _this.startDate.remove();
                         _this.titleInput.hideError();
+                        _this.mediaList.remove();
                     }
                 });
 
@@ -19671,7 +19819,7 @@ var CZ;
             CZ.Service.superCollectionName = url.superCollectionName;
             CZ.Service.collectionName = url.collectionName;
             CZ.Common.initialContent = url.content;
-            
+
             // register ChronoZoom extensions
             CZ.Extensions.registerExtensions();
 
@@ -19868,10 +20016,12 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
+                            mediaListContainer: ".cz-form-medialist",
+                            backgroundUrl: ".cz-form-background-url",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
-                            errorMessage: "#error-edit-timeline",
+                            errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
                         form.show();
@@ -19885,10 +20035,12 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
+                            mediaListContainer: ".cz-form-medialist",
+                            backgroundUrl: ".cz-form-background-url",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
-                            errorMessage: "#error-edit-timeline",
+                            errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
                         form.show();
@@ -19901,10 +20053,12 @@ var CZ;
                             titleTextblock: ".cz-form-title",
                             startDate: ".cz-form-time-start",
                             endDate: ".cz-form-time-end",
+                            mediaListContainer: ".cz-form-medialist",
+                            backgroundUrl: ".cz-form-background-url",
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
-                            errorMessage: "#error-edit-timeline",
+                            errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
                         form.show();
@@ -20179,7 +20333,7 @@ var CZ;
                 CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response)
                 {
                     $(response).each(function (index) {
-                        if 
+                        if
                         (
                             response[index] &&
                             (
@@ -20559,7 +20713,7 @@ var CZ;
             }
         }
         HomePageViewModel.updateTimeSeriesChart = updateTimeSeriesChart;
-        
+
     })(CZ.HomePageViewModel || (CZ.HomePageViewModel = {}));
     var HomePageViewModel = CZ.HomePageViewModel;
 })(CZ || (CZ = {}));

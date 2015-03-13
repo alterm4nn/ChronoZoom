@@ -64,20 +64,7 @@ var CZ;
         }
 
         function GenerateAspect(timeline) {
-            if (timeline.ID == CZ.Settings.cosmosTimelineID) {
-                timeline.AspectRatio = 10;
-            }
-            /*
-            else if (timeline.ID == earthTimelineID) {
-            timeline.AspectRatio = 1.0;
-            } else if (timeline.ID == lifeTimelineID) {
-            timeline.AspectRatio = 47.0 / 22.0;
-            } else if (timeline.ID == prehistoryTimelineID) {
-            timeline.AspectRatio = 37.0 / 11.0;
-            } else if (timeline.ID == humanityTimelineID) {
-            timeline.AspectRatio = 55.0 / 4.0;
-            }
-            */
+            timeline.AspectRatio = timeline.aspectRatio || 10;
         }
 
         function LayoutTimeline(timeline, parentWidth, measureContext) {
@@ -451,7 +438,9 @@ var CZ;
                 endDate: timeline.endDate,
                 FromIsCirca: timeline.FromIsCirca || false,
                 ToIsCirca: timeline.ToIsCirca || false,
-                opacity: 0
+                opacity: 0,
+                backgroundUrl: timeline.backgroundUrl,
+                aspectRatio: timeline.aspectRatio
             });
 
             //Creating Infodots
@@ -892,7 +881,7 @@ var CZ;
 
             if (src && dest) {
                 if (dest.id === "__root__") {
-                    src.AspectRatio = 10;
+                    src.AspectRatio = src.aspectRatio || 10;
                     var t = generateLayout(src, dest);
                     convertRelativeToAbsoluteCoords(t, 0);
                     dest.children.push(t);

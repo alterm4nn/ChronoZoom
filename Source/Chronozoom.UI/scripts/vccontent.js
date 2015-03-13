@@ -332,6 +332,7 @@ var CZ;
                 if (element.onIsRenderedChanged)
                     element.onIsRenderedChanged();
             }
+
             element.render(ctx, visibleBox_v, viewport2d, sz, opacity);
 
             var children = element.children;
@@ -423,6 +424,7 @@ var CZ;
             }
             element.children = [];
         }
+        VCContent.clear = clear;
         ;
 
         /* Finds and returns a child element with given id (no recursion)
@@ -825,6 +827,8 @@ var CZ;
         @param settings  ({strokeStyle,lineWidth,fillStyle}) Parameters of the rectangle appearance
         */
         function CanvasTimeline(vc, layerid, id, vx, vy, vw, vh, settings, timelineinfo) {
+            var self = this;
+
             this.base = CanvasRectangle;
             this.base(vc, layerid, id, vx, vy, vw, vh);
             this.guid = timelineinfo.guid;
@@ -841,6 +845,8 @@ var CZ;
 
             this.FromIsCirca = timelineinfo.FromIsCirca || false;
             this.ToIsCirca   = timelineinfo.ToIsCirca   || false;
+            this.backgroundUrl = timelineinfo.backgroundUrl || "";
+            this.aspectRatio = timelineinfo.aspectRatio || null;
 
             this.settings.showFromCirca = this.FromIsCirca;
             this.settings.showToCirca   = this.ToIsCirca;
@@ -875,6 +881,13 @@ var CZ;
 
             this.tooltipEnabled = true; //enable tooltips to timelines
             this.tooltipIsShown = false; // indicates whether tooltip is shown or not
+
+            // Initialize background image for the timeline.
+            if (self.backgroundUrl) {
+                self.backgroundImg = new BackgroundImage(self.vc, layerid, id + "__background__", self.backgroundUrl, self.x, self.y, self.width, self.height);
+                self.settings.gradientOpacity = 0;
+                self.settings.fillStyle = undefined;
+            }
 
             this.onmouseclick = function (e) {
                 return zoomToElementHandler(this, e, 1.0);
@@ -993,8 +1006,13 @@ var CZ;
                     this.settings.gradientOpacity = Math.min(1, Math.max(0, this.settings.gradientOpacity + this.settings.hoverAnimationDelta));
                 }
 
+                // Rendering background.
+                if (typeof self.backgroundImg !== "undefined") {
+                    self.backgroundImg.render(ctx, visibleBox, viewport2d, size_p, 1.0);
+                }
+
                 //rendering itself
-                this.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
+                self.base_render(ctx, visibleBox, viewport2d, size_p, opacity);
 
                 // positioning of last bottom right timeline button - will render buttons moving from right to left
                 var btnX = this.x + this.width - 1.0 * this.titleObject.height;
@@ -2225,6 +2243,78 @@ var CZ;
             self.requestDZI();
 
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
+        }
+
+       /**
+        * Background image for a timeline.
+        * @param vc      Virtual canvas.
+        * @param layerid Name of rendering layer of virtual canvas.
+        * @param id      ID of an element.
+        * @param src     Image source.
+        * @param vx      x of left top corner in virtual space.
+        * @param vy      y of left top corner in virtual space.
+        * @param vw      width of an image in virtual space.
+        * @param vh      height of an image in virtual space.
+        */
+        function BackgroundImage(vc, layerid, id, src, vx, vy, vw, vh) {
+            var self = this;
+            self.base = CanvasElement;
+            self.base(vc, layerid, id, vx, vy, vw, vh);
+
+            var onload = function () {
+                self.vc.requestInvalidate();
+            };
+
+            self.img = new Image();
+            self.img.addEventListener("load", onload, false);
+            self.img.src = src;
+
+            self.render = function (ctx, visibleBox, viewport2d, size_p, opacity) {
+                if (!self.img.complete) return;
+
+                var ptl = viewport2d.pointVirtualToScreen(self.x, self.y),
+                    pbr = viewport2d.pointVirtualToScreen(self.x + self.width, self.y + self.height),
+                    tw = pbr.x - ptl.x,
+                    th = pbr.y - ptl.y,
+                    iw = self.img.width,
+                    ih = self.img.height,
+                    vpw = viewport2d.width,
+                    vph = viewport2d.height,
+                    tiwr = tw / iw,
+                    tihr = th / ih,
+                    sxl = Math.floor(Math.max(0, -ptl.x) / tiwr),
+                    syt = Math.floor(Math.max(0, -ptl.y) / tihr),
+                    sxr = Math.floor(Math.max(0, pbr.x - vpw) / tiwr),
+                    syb = Math.floor(Math.max(0, pbr.y - vph) / tihr),
+                    sx = sxl,
+                    sy = syt,
+                    sw = iw - sxl - sxr,
+                    sh = ih - syt - syb,
+                    vx = sxl > 0 ? sxl * tiwr + ptl.x : ptl.x,
+                    vy = syt > 0 ? syt * tihr + ptl.y : ptl.y,
+                    vw = sw * tiwr,
+                    vh = sh * tihr;
+
+                ctx.globalAlpha = opacity;
+
+                // NOTE: A special case when the image starts twitching.
+                if (sw === 1 && sh === 1) {
+                    vx = Math.max(0, ptl.x);
+                    vy = Math.max(0, ptl.y);
+                    vw = Math.min(vpw, pbr.x) - vx;
+                    vh = Math.min(vph, pbr.y) - vy;
+                }
+
+                if (self.img.naturalWidth && self.img.naturalHeight) {
+                    ctx.drawImage(self.img, sx, sy, sw, sh, vx, vy, vw, vh);
+                }
+            };
+
+            self.onRemove = function () {
+                self.img.removeEventListener("load", onload, false);
+            };
+
+            self.prototype = new CanvasElement(vc, layerid, id, vx, vy, vw, vh);
         }
 
         /*******************************************************************************************************/

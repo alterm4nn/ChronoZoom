@@ -1,4 +1,4 @@
-ChrononZoom Installation Guide
+ChronoZoom Installation Guide
 ==============================
 
 <sup>
@@ -175,7 +175,7 @@ If contributing code changes, the overall steps involved in working with Git are
 
 9.	Starting your next contribution:
 
-    When Alter4mm or other upstream gatekeepers accept your pull request, and
+    When Alterm4nn or other upstream gatekeepers accept your pull request, and
     merge your changes into the main project's master branch, you should repeat
     the steps shown above to pull an updated copy of Alterm4nn's upstream master
     into your local workspace and personal GitHub repository. You should also do this
@@ -278,9 +278,12 @@ Then, for web work, please install [Web Essential 2013 for Update 4](https://vis
 
 ##### ASP.NET MVC
 
-Once Visual Studio is installed, and you're fully patched up-to-date,
-you will need to [install ASP.NET MVC 4](http://www.asp.net/mvc/mvc4) too, if it isn't already present,
-then ensure that you update again to bring it up to the latest version.
+Once Visual Studio is installed, and your system is up-do-date with 
+all important patches, you will need to [install ASP.NET MVC 4](http://www.asp.net/mvc/mvc4) too, 
+if it isn't already present.
+
+After ASP.NET MVC 4 install please check and install new updates that should appear in 
+Windows Update - they are essential for project to run. 
 
 ##### Configuring Web Essentials
 
@@ -372,6 +375,13 @@ if running an Azure web site, is to leave out the connection string
 from web.config and instead place the value in Azure's web site
 configuration panel. This is a safer option so that your connection
 string isn't checked-in.
+
+For simple cases, when you don't have to deal with server-side,
+you can use localdb. Although you have to created ChronoZoom.mdf file 
+by yourself: open server explorer in Visual Studio, right-click on
+Data Connections and choose Add Connection. Browse for 
+Chronozoom.UI/App_Data folder, enter filename ChronoZoom and it will
+create file for you.
 
 When the ChronoZoom web site is started, and it connects to the
 database, it will see there is no schema and will create the schema

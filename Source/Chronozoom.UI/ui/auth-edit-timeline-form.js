@@ -21,6 +21,8 @@ var CZ;
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
+                this.mediaListContainer = container.find(formInfo.mediaListContainer);
+                this.backgroundUrl = container.find(formInfo.backgroundUrl);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.errorMessage = container.find(formInfo.errorMessage);
 
@@ -37,6 +39,11 @@ var CZ;
             }
             FormEditTimeline.prototype.initialize = function () {
                 var _this = this;
+
+                this.mediaInput = {};
+                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.mediaInput, this);
+                this.mediaList.container.find("[title='skydrive']").hide(); // Background Images doesn't support iframes.
+
                 this.saveButton.prop('disabled', false);
                 if (CZ.Authoring.mode === "createTimeline") {
                     this.deleteButton.hide();
@@ -61,6 +68,7 @@ var CZ;
 
                 this.titleInput.val(this.timeline.title);
                 this.startDate.setDate(this.timeline.x, true);
+                this.backgroundUrl.val(this.timeline.backgroundUrl || "");
 
                 if (this.timeline.endDate === 9999) {
                     this.endDate.setDate(this.timeline.endDate, true);
@@ -71,9 +79,11 @@ var CZ;
                 $(_this.startDate.circaSelector).find('input').prop('checked', this.timeline.FromIsCirca);
                 $(_this.endDate.circaSelector  ).find('input').prop('checked', this.timeline.ToIsCirca);
 
-                this.saveButton.click(function (event) {
+                this.saveButton.click(function () {
                     _this.errorMessage.empty();
                     var isDataValid = false;
+                    var backgroundImage;
+                    var backgroundUrl = _this.backgroundUrl.val().trim();
                     isDataValid = CZ.Authoring.validateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
 
                     // Other cases are covered by datepicker
@@ -85,11 +95,11 @@ var CZ;
                         _this.errorMessage.text('Time interval cannot be less than one day');
                     }
 
-                    if (!isDataValid) {
-                        return;
-                    } else {
+                    function onDataValid () {
                         _this.errorMessage.empty();
                         var self = _this;
+                        var aspectRatio = backgroundImage ? backgroundImage.width / backgroundImage.height : null;
+                        var isAspectRatioChanged = aspectRatio !== _this.timeline.aspectRatio;
 
                         _this.timeline.FromIsCirca  = $(_this.startDate.circaSelector).find('input').is(':checked');
                         _this.timeline.ToIsCirca    = $(_this.endDate.circaSelector  ).find('input').is(':checked');
@@ -98,10 +108,24 @@ var CZ;
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
                             start: _this.startDate.getDate(),
-                            end: _this.endDate.getDate()
-                        }).then(function (success) {
+                            end: _this.endDate.getDate(),
+                            backgroundUrl: backgroundUrl,
+                            aspectRatio: aspectRatio
+                        }).then(function () {
                             self.isCancel = false;
                             self.close();
+
+                            // If aspect ratio has changed, then we need to redraw layout.
+                            if (isAspectRatioChanged) {
+                                CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
+                                CZ.Common.reloadData().done(function () {
+                                    self.timeline = CZ.Common.vc.virtualCanvas("findElement", self.timeline.id);
+                                    self.timeline.animation = null;
+
+                                    //Move to new created timeline
+                                    self.timeline.onmouseclick();
+                                });
+                            }
 
                             //Move to new created timeline
                             self.timeline.onmouseclick();
@@ -116,6 +140,24 @@ var CZ;
                             _this.saveButton.prop('disabled', false);
                         });
                     }
+
+                    function onDataInvalid () {
+                        var self = _this;
+                        self.errorMessage.empty();
+                        self.errorMessage.text("Please, set a correct URL for background image.").show().delay(7000).fadeOut();
+                        self.backgroundUrl.val("");
+                    }
+
+                    if (!isDataValid) {
+                        return;
+                    } else if (backgroundUrl !== "") {
+                        backgroundImage = new Image();
+                        backgroundImage.addEventListener("load", onDataValid, false);
+                        backgroundImage.addEventListener("error", onDataInvalid, false);
+                        backgroundImage.src = backgroundUrl;
+                    } else {
+                        onDataValid();
+                    }
                 });
 
                 this.deleteButton.click(function (event) {
@@ -125,6 +167,10 @@ var CZ;
                         _this.close();
                     }
                 });
+            };
+
+            FormEditTimeline.prototype.updateMediaInfo = function () {
+                this.backgroundUrl.val(this.mediaInput.uri || "");
             };
 
             FormEditTimeline.prototype.show = function () {
@@ -153,6 +199,7 @@ var CZ;
                         _this.endDate.remove();
                         _this.startDate.remove();
                         _this.titleInput.hideError();
+                        _this.mediaList.remove();
                     }
                 });
 
