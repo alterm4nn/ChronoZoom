@@ -111,7 +111,7 @@ CREATE TABLE [dbo].[Timelines]
     [Id]                [uniqueidentifier]      NOT NULL,
     [Depth]             [int]                   NOT NULL,
     [Title]             [nvarchar](200)         NULL,
-    [Regime]            [nvarchar](200)         NULL,
+    [Regime]            [nvarchar](4000)        NULL,
     [FromYear]          [decimal](18, 7)        NOT NULL,
     [ToYear]            [decimal](18, 7)        NOT NULL,
     [ForkNode]          [decimal](18, 2)        NOT NULL,
@@ -121,7 +121,7 @@ CREATE TABLE [dbo].[Timelines]
     [SubtreeSize]       [int]                   NOT NULL        DEFAULT (0),
     [FromIsCirca]       [bit]                   NOT NULL        DEFAULT (0),
     [ToIsCirca]         [bit]                   NOT NULL        DEFAULT (0),
-    [BackgroundUrl]     [nvarchar](2000)        NULL,
+    [BackgroundUrl]     [nvarchar](4000)        NULL,
     [AspectRatio]       [decimal](18, 7)        NULL,
     CONSTRAINT [PK_dbo.Timelines] PRIMARY KEY CLUSTERED 
     (

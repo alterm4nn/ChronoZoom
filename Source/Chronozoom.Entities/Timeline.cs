@@ -60,7 +60,7 @@ namespace Chronozoom.Entities
         /// The regime in which the timeline should occur.
         /// </summary>
         [DataMember]
-        [MaxLength(200)]
+        [MaxLength(4000)]
         [Column(TypeName = "nvarchar")]
         public string Regime { get; set; }
 
@@ -108,7 +108,7 @@ namespace Chronozoom.Entities
         /// The URL of background image.
         /// </summary>
         [DataMember(Name = "backgroundUrl")]
-        [MaxLength(2000)]
+        [MaxLength(4000)]
         [Column(TypeName = "nvarchar")]
         public string BackgroundUrl { get; set; }
 
