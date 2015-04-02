@@ -101,6 +101,13 @@ namespace Chronozoom.UI.Utils
             return _flatTimelines;
         }
 
+        public Exhibit ExportExhibit(Guid exhibitId)
+        {
+            Exhibit exhibit = _storage.Exhibits.Where(t => t.Id == exhibitId).Include("ContentItems").FirstOrDefault();
+
+            return exhibit;
+        }
+
         private void IterateTimelineExport(Guid? parentTimelineId, Guid timelineId)
         {
             Timeline timeline =
@@ -437,6 +444,62 @@ namespace Chronozoom.UI.Utils
             }
             
             return "\"" + importContent[0].timeline.Title + "\" has been pasted into \"" + target.Title + "\". " +
+                   "You may need to refresh your browser in order to see any new content.";
+        }
+
+        public string ImportExhibit(Guid intoTimelineId, Exhibit newExhibit)
+        {
+            Timeline target = _storage.Timelines.Where(t => t.Id == intoTimelineId).Include("Collection").FirstOrDefault();
+            DateTime timestamp = DateTime.UtcNow;
+
+            try
+            {
+                if (target == null) { return "The destination timeline, \"" + intoTimelineId.ToString() + "\", where you want to paste to, does not exist."; }
+
+                if (_user == null) { return "In order to change a timeline, you must first be logged in."; }
+
+                if (!UserIsMember(target.Collection.Id)) { return "You do not have permission to alter the \"" + target.Title + "\" timeline."; }
+
+                if (newExhibit.Year < target.FromYear || newExhibit.Year > target.ToYear)
+                {
+                    return "Unable to paste \"" + newExhibit.Title + "\" into \"" + target.Title + "\", since " +
+                            newExhibit.Title + "'s date exceeds that of " + target.Title + ".";
+                }
+
+                // replace GUIDs with new ones since we're cloning rather than moving - and set collection ids to target collection
+
+                // keep cross-reference between old and new timelineIds so child timelines can maintain a pointer to their parents
+                Guid newGUID = Guid.NewGuid();
+
+                newExhibit.Id = newGUID;
+                newExhibit.Collection = target.Collection;
+
+                newExhibit.UpdatedBy = _user;
+                newExhibit.UpdatedTime = timestamp;
+                if (target.Exhibits == null)
+                {
+                    target.Exhibits = new System.Collections.ObjectModel.Collection<Exhibit>();
+                }
+
+                for (int eachItem = 0; eachItem < newExhibit.ContentItems.Count; eachItem++)
+                {
+                    newExhibit.ContentItems[eachItem].Id = Guid.NewGuid();
+                    newExhibit.ContentItems[eachItem].Collection = target.Collection;
+                }
+
+                target.Exhibits.Add(newExhibit);
+                _storage.SaveChanges();
+                }
+            
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                return "Unable to import the exhibit. An unexpected error has occured. " +
+                        "Please feel free to try again.";
+                
+            }
+
+            return "\"" + newExhibit.Title + "\" has been pasted into \"" + target.Title + "\". " +
                    "You may need to refresh your browser in order to see any new content.";
         }
 

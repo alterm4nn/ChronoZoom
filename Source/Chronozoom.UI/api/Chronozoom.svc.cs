@@ -293,6 +293,21 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documented under IChronozoomSVC
         /// </summary>
+        /// <param name="exhibitId"></param>
+        /// <returns></returns>
+        public Exhibit ExportExhibit(string exhibitId)
+        {
+            Guid guid = new Guid(exhibitId);
+
+            using (Utils.ExportImport xfer = new Utils.ExportImport())
+            {
+                return xfer.ExportExhibit(guid);
+            }
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
         public String ImportTimelines(string intoTimelineId, List<Utils.ExportImport.FlatTimeline> newTimelineTree)
         {
             Guid guid = new Guid(intoTimelineId);
@@ -300,6 +315,19 @@ namespace Chronozoom.UI
             using (Utils.ExportImport xfer = new Utils.ExportImport())
             {
                 return xfer.ImportTimelines(guid, newTimelineTree);
+            }
+        }
+
+        /// <summary>
+        /// Documented under IChronozoomSVC
+        /// </summary>
+        public String ImportExhibit(string intoTimelineId, Exhibit newExhibit)
+        {
+            Guid guid = new Guid(intoTimelineId);
+
+            using (Utils.ExportImport xfer = new Utils.ExportImport())
+            {
+                return xfer.ImportExhibit(guid, newExhibit);
             }
         }
 

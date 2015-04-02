@@ -206,6 +206,59 @@ var CZ;
         }
         Service.importTimelines = importTimelines;
 
+        // .../export/exhibit/{exhibitId}
+        function exportExhibit(exhibitId) {
+            if (typeof exhibitId === 'undefined') {
+                throw 'exportExhibit(exhibitId) requires a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(exhibitId) == false) {
+                if (exhibitId != "00000000-0000-0000-0000-000000000000")
+                    throw 'exportExhibit(exhibitId) has an invalid parameter. The provided parameter must be a GUID.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath('export');
+            request.addToPath('exhibit');
+            request.addToPath(exhibitId);
+            return $.ajax
+            ({
+                type: 'GET',
+                cache: false,
+                url: request.url,
+                dataType: 'json'
+            });
+        }
+        Service.exportExhibit = exportExhibit;
+
+        // .../import/exhibit/{intoTimelineId}
+        function importExhibit(intoTimelineId, newExhibit) {
+            if (typeof intoTimelineId === 'undefined' || typeof newExhibit === 'undefined') {
+                throw 'importExhibit(intoTimelineId, newExhibit) is missing a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(intoTimelineId) == false) {
+                if (intoTimelineId != "00000000-0000-0000-0000-000000000000")
+                    throw 'importExhibit(intoTimelineId, newExhibit) has an invalid intoTimelineId parameter. This must be a GUID.';
+            }
+            if (typeof newExhibit !== 'string') {
+                throw 'importExhibit(intoTimelineId, newExhibit) has an invalid newTimelineTree parameter. This must be a JSON.stringify string.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath('import');
+            request.addToPath('exhibit');
+            request.addToPath(intoTimelineId);
+            return $.ajax
+            ({
+                type: 'PUT',
+                cache: false,
+                url: request.url,
+                contentType: 'application/json',
+                dataType: 'json',
+                data: newExhibit     // should already be JSON.stringified
+            });
+        }
+        Service.importExhibit = importExhibit;
+
         // .../import/collection
         function importCollection(collectionTree)
         {

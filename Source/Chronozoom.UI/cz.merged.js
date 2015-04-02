@@ -3308,7 +3308,7 @@ var CZ;
                     this.pasteButton.onmousehover = function (event)
                     {
                         this.vc.element.css('cursor', 'pointer');
-                        this.vc.element.attr('title', 'Paste Timeline');
+                        this.vc.element.attr('title', 'Paste Timeline/Exhibit');
                         this.parent.settings.strokeStyle = "yellow";
                     }
 
@@ -3322,11 +3322,22 @@ var CZ;
                     this.pasteButton.onmouseclick = function (event)
                     {
                         var newTimeline = localStorage.getItem('ExportedTimeline');
+                        var newExhibit = localStorage.getItem('ExportedExhibit');
 
-                        if ((localStorage.getItem('ExportedSchemaVersion') == constants.schemaVersion) && newTimeline != null)
+                        var sameDbSchema = localStorage.getItem('ExportedSchemaVersion') == constants.schemaVersion;
+
+                        if (sameDbSchema && newTimeline != null)
                         {
                             // timeline from same db schema version is on "clipboard" so attempt "paste"
                             CZ.Service.importTimelines(this.parent.guid, newTimeline).then(function (importMessage)
+                            {
+                                CZ.Authoring.showMessageWindow(importMessage);
+                            });
+                        }
+                        else if (sameDbSchema && newExhibit != null)
+                        {
+                            // exhibit from same db schema version is on "clipboard" so attempt "paste"
+                            CZ.Service.importExhibit(this.parent.guid, newExhibit).then(function (importMessage)
                             {
                                 CZ.Authoring.showMessageWindow(importMessage);
                             });
@@ -3377,7 +3388,8 @@ var CZ;
                         CZ.Service.exportTimelines(this.parent.guid).then(function (exportData)
                         {
                             localStorage.setItem('ExportedSchemaVersion', constants.schemaVersion);
-                            localStorage.setItem('ExportedTimeline',      JSON.stringify(exportData));
+                            localStorage.setItem('ExportedTimeline', JSON.stringify(exportData));
+                            localStorage.removeItem('ExportedExhibit');
                             CZ.Authoring.showMessageWindow('"' + exportData[0].timeline.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
                         });
                     }
@@ -4915,12 +4927,14 @@ var CZ;
                         numberOfLines: 2
                     }, titleWidth);
 
-                    //adding edit button
+                    //adding edit and copy button
                     if (CZ.Authoring.isEnabled) {
                         var imageSize = (titleTop - infodot.y) * 0.75;
                         var editButton = VCContent.addImage(infodot, layerid, id + "__edit", time - imageSize / 2, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/edit.svg");
+                        var copyButton = VCContent.addImage(infodot, layerid, id + "__copy", time - imageSize / 2 - imageSize * 1.3, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/copy.svg");
 
                         editButton.reactsOnMouse = true;
+                        copyButton.reactsOnMouse = true;
 
                         editButton.onmouseclick = function () {
                             CZ.Authoring.isActive = true;
@@ -4928,6 +4942,17 @@ var CZ;
                             CZ.Authoring.selectedExhibit = infodot;
                             return true;
                         };
+
+                        copyButton.onmouseclick = function () {
+                            CZ.Service.exportExhibit(this.parent.guid).then(function (exportData) {
+                                localStorage.setItem('ExportedSchemaVersion', constants.schemaVersion);
+                                localStorage.setItem('ExportedExhibit', JSON.stringify(exportData));
+                                localStorage.removeItem('ExportedTimeline');
+                                CZ.Authoring.showMessageWindow('"' + exportData.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
+                            });
+                            return true;
+                        };
+                        
 
                         editButton.onmouseenter = function ()
                         {
@@ -4938,6 +4963,18 @@ var CZ;
 
                         editButton.onmouseleave = function ()
                         {
+                            this.vc.element.css('cursor', 'default');
+                            this.vc.element.attr('title', '');
+                            infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
+                        };
+
+                        copyButton.onmouseenter = function () {
+                            this.vc.element.css('cursor', 'pointer');
+                            this.vc.element.attr('title', 'Copy Exhibit to Clipboard');
+                            infodot.settings.strokeStyle = "yellow";
+                        };
+
+                        copyButton.onmouseleave = function () {
                             this.vc.element.css('cursor', 'default');
                             this.vc.element.attr('title', '');
                             infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
@@ -9858,6 +9895,59 @@ var CZ;
             });
         }
         Service.importTimelines = importTimelines;
+
+        // .../export/exhibit/{exhibitId}
+        function exportExhibit(exhibitId) {
+            if (typeof exhibitId === 'undefined') {
+                throw 'exportExhibit(exhibitId) requires a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(exhibitId) == false) {
+                if (exhibitId != "00000000-0000-0000-0000-000000000000")
+                    throw 'exportExhibit(exhibitId) has an invalid parameter. The provided parameter must be a GUID.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath('export');
+            request.addToPath('exhibit');
+            request.addToPath(exhibitId);
+            return $.ajax
+            ({
+                type: 'GET',
+                cache: false,
+                url: request.url,
+                dataType: 'json'
+            });
+        }
+        Service.exportExhibit = exportExhibit;
+
+        // .../import/exhibit/{intoTimelineId}
+        function importExhibit(intoTimelineId, newExhibit) {
+            if (typeof intoTimelineId === 'undefined' || typeof newExhibit === 'undefined') {
+                throw 'importExhibit(intoTimelineId, newExhibit) is missing a parameter.';
+            }
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(intoTimelineId) == false) {
+                if (intoTimelineId != "00000000-0000-0000-0000-000000000000")
+                    throw 'importExhibit(intoTimelineId, newExhibit) has an invalid intoTimelineId parameter. This must be a GUID.';
+            }
+            if (typeof newExhibit !== 'string') {
+                throw 'importExhibit(intoTimelineId, newExhibit) has an invalid newTimelineTree parameter. This must be a JSON.stringify string.';
+            }
+            CZ.Authoring.resetSessionTimer();
+            var request = new Request(_serviceUrl);
+            request.addToPath('import');
+            request.addToPath('exhibit');
+            request.addToPath(intoTimelineId);
+            return $.ajax
+            ({
+                type: 'PUT',
+                cache: false,
+                url: request.url,
+                contentType: 'application/json',
+                dataType: 'json',
+                data: newExhibit     // should already be JSON.stringified
+            });
+        }
+        Service.importExhibit = importExhibit;
 
         // .../import/collection
         function importCollection(collectionTree)
