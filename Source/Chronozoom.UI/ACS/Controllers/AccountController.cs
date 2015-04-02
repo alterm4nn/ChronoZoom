@@ -56,6 +56,7 @@ namespace Chronozoom.Api.Controllers
                 {
                     string nameIdentifier = "";
                     string identityProvider = "";
+                    string emailAddress = null;
 
                     foreach (var item in user.Claims)
                     {
@@ -67,13 +68,26 @@ namespace Chronozoom.Api.Controllers
                         {
                             identityProvider = item.Value;
                         }
+                        else if (item.ClaimType.EndsWith("emailaddress"))
+                        {
+                            emailAddress = item.Value;
+                        }
+
                     }
 
                     using (Storage storage = new Storage())
                     {
                         Entities.User storedUser = storage.Users.FirstOrDefault(candidate => candidate.IdentityProvider == identityProvider && candidate.NameIdentifier == nameIdentifier);
                         if (storedUser != null)
+                        {
+                            if (String.IsNullOrEmpty(storedUser.Email) && !String.IsNullOrEmpty(emailAddress))
+                            {
+                                storedUser.Email = emailAddress;
+                                storage.SaveChanges();
+                            }
                             return Redirect("/" + storedUser.DisplayName);
+                        }
+                        
                     }
                 }
             }
