@@ -848,6 +848,9 @@ var CZ;
             this.backgroundUrl = timelineinfo.backgroundUrl || "";
             this.aspectRatio = timelineinfo.aspectRatio || null;
 
+            this.offsetY = timelineinfo.offsetY;
+            this.Height = timelineinfo.Height;
+
             this.settings.showFromCirca = this.FromIsCirca;
             this.settings.showToCirca   = this.ToIsCirca;
             this.settings.showInfinite = (timelineinfo.endDate == 9999);
@@ -2583,6 +2586,7 @@ var CZ;
             this.infodotDescription = infodotDescription;
             this.title = infodotDescription.title;
             this.isCirca = infodotDescription.isCirca;
+            this.offsetY = infodotDescription.offsetY;
             this.opacity = typeof infodotDescription.opacity !== 'undefined' ? infodotDescription.opacity : 1;
 
             contentItems.sort(function (a, b) {

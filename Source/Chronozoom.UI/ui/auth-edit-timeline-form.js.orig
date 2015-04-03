@@ -21,10 +21,13 @@ var CZ;
                 this.deleteButton = container.find(formInfo.deleteButton);
                 this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
                 this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
+<<<<<<< HEAD
                 this.mediaListContainer = container.find(formInfo.mediaListContainer);
                 this.backgroundUrl = container.find(formInfo.backgroundUrl);
+=======
                 this.offsetInput = container.find(formInfo.topBoundInput);
                 this.bottomOffsetInput = container.find(formInfo.bottomBoundInput);
+>>>>>>> Timeline manual offset
                 this.titleInput = container.find(formInfo.titleInput);
                 this.offsetLabels = container.find(formInfo.offsetLabels);
                 this.errorMessage = container.find(formInfo.errorMessage);
@@ -67,8 +70,8 @@ var CZ;
                     this.closeButton.hide();
                     this.titleTextblock.text("Create Root Timeline");
                     this.saveButton.text("Create Timeline");
-                    this.offsetInput.hide();
-                    this.bottomOffsetInput.hide();
+                    //this.offsetInput.hide();
+                    //this.bottomOffsetInput.hide();
                     this.offsetLabels.hide();
                 } else {
                     console.log("Unexpected authoring mode in timeline form.");
@@ -89,18 +92,22 @@ var CZ;
                 }
 
                 $(_this.startDate.circaSelector).find('input').prop('checked', this.timeline.FromIsCirca);
-                $(_this.endDate.circaSelector).find('input').prop('checked', this.timeline.ToIsCirca);
+                $(_this.endDate.circaSelector  ).find('input').prop('checked', this.timeline.ToIsCirca);
 
+<<<<<<< HEAD
+                this.saveButton.click(function () {
+=======
                 if (_this.timeline.offsetY === null) {
                     _this.offsetInput.val("");
                     _this.bottomOffsetInput.val("");
-                }
+                } 
                 else {
                     _this.offsetInput.val(_this.timeline.offsetY);
-                    _this.bottomOffsetInput.val(_this.timeline.offsetY + _this.timeline.Height * 100);
+                    _this.bottomOffsetInput.val(_this.timeline.offsetY + _this.timeline.Height*100);
                 }
 
                 this.saveButton.click(function (event) {
+>>>>>>> Timeline manual offset
                     _this.errorMessage.empty();
                     var isDataValid = false;
                     var backgroundImage;
@@ -114,9 +121,8 @@ var CZ;
 
                     if (!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
                         _this.errorMessage.text('Time interval cannot be less than one day');
-                        isDataValid = false;
                     }
-
+                    
                     if (!/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(_this.offsetInput.val())
                         || !/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(_this.bottomOffsetInput.val())) {
                         _this.errorMessage.text("Please enter vertical position in percents or clear the input to select auto mode. For example \"0\", \"100\", \"45\" or \"75.85\"");
@@ -144,38 +150,39 @@ var CZ;
                         }
                     }
 
-                    function onDataValid() {
-
+                    function onDataValid () {
                         _this.errorMessage.empty();
                         var self = _this;
                         var aspectRatio = backgroundImage ? backgroundImage.width / backgroundImage.height : null;
                         var isAspectRatioChanged = aspectRatio !== _this.timeline.aspectRatio;
-                        var isBoundaryChanged = ((Number(_this.offsetInput.val()) !== _this.timeline.offsetY) 
-                            || (Number(_this.bottomOffsetInput.val()) !== (_this.timeline.offsetY + _this.timeline.Height*100)));
 
-                        _this.timeline.FromIsCirca = $(_this.startDate.circaSelector).find('input').is(':checked');
-                        _this.timeline.ToIsCirca = $(_this.endDate.circaSelector).find('input').is(':checked');
-
+                        _this.timeline.FromIsCirca  = $(_this.startDate.circaSelector).find('input').is(':checked');
+                        _this.timeline.ToIsCirca    = $(_this.endDate.circaSelector  ).find('input').is(':checked');
+ 
                         _this.saveButton.prop('disabled', true);
-
+                        
                         var _offset = (_this.offsetInput.val() === "") ? null : Number(_this.offsetInput.val());
-                        var _Height = (_this.bottomOffsetInput.val() === "") ?
+                        var _Height = (_this.bottomOffsetInput.val() === "") ? 
                             null : (Number(_this.bottomOffsetInput.val()) - Number(_this.offsetInput.val()));
-
+                        
                         CZ.Authoring.updateTimeline(_this.timeline, {
                             title: _this.titleInput.val(),
                             start: _this.startDate.getDate(),
                             end: _this.endDate.getDate(),
+<<<<<<< HEAD
                             backgroundUrl: backgroundUrl,
-                            aspectRatio: aspectRatio,
-                            offsetY: _offset,
-                            Height: _Height,
+                            aspectRatio: aspectRatio
                         }).then(function () {
+=======
+                            offsetY: _offset,
+                            Height: _Height, 
+                        }).then(function (success) {
+>>>>>>> Timeline manual offset
                             self.isCancel = false;
                             self.close();
 
-                            // If aspect ratio or boundary have changed, then we need to redraw layout.
-                            if (isAspectRatioChanged || isBoundaryChanged) {
+                            // If aspect ratio has changed, then we need to redraw layout.
+                            if (isAspectRatioChanged) {
                                 CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
                                 CZ.Common.reloadData().done(function () {
                                     self.timeline = CZ.Common.vc.virtualCanvas("findElement", self.timeline.id);
@@ -188,7 +195,8 @@ var CZ;
 
                             //Move to new created timeline
                             self.timeline.onmouseclick();
-
+                            
+                            document.location.reload(true);
                         }, function (error) {
                             if (error !== undefined && error !== null) {
                                 self.errorMessage.text(error).show().delay(7000).fadeOut();
@@ -201,7 +209,7 @@ var CZ;
                         });
                     }
 
-                    function onDataInvalid() {
+                    function onDataInvalid () {
                         var self = _this;
                         self.errorMessage.empty();
                         self.errorMessage.text("Please, set a correct URL for background image.").show().delay(7000).fadeOut();
@@ -209,7 +217,6 @@ var CZ;
                     }
 
                     if (!isDataValid) {
-                        _this.errorMessage.show().delay(7000).fadeOut();
                         return;
                     } else if (backgroundUrl !== "") {
                         backgroundImage = new Image();

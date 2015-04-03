@@ -516,6 +516,33 @@ var CZ;
                     ]);
                 }
 
+<<<<<<< HEAD
+                // Update title.
+                t.title = prop.title;
+                updateTimelineTitle(t);
+
+                // Update background URL and aspect ratio.
+                t.backgroundUrl = prop.backgroundUrl;
+                t.aspectRatio = prop.aspectRatio;
+
+                CZ.Service.putTimeline(t).then(function (success) {
+                    // update ids if existing elements with returned from server
+                    t.id = "t" + success;
+                    t.guid = success;
+                    t.titleObject.id = "t" + success + "__header__";
+
+                    if (!t.parent.guid) {
+                        // Root timeline, refresh page
+                        document.location.reload(true);
+                    } else {
+                        CZ.Common.vc.virtualCanvas("requestInvalidate");
+                    }
+                    deffered.resolve(t);
+                }, function (error) {
+                    deffered.reject(error);
+                });
+=======
+>>>>>>> Timeline manual offset
             } else {
                 temp.height = t.parent.height * prop.Height/100;
                 //We can make a new global constant if we need
@@ -542,10 +569,6 @@ var CZ;
             // Update title.
             t.title = prop.title;
             updateTimelineTitle(t);
-
-                // Update background URL and aspect ratio.
-                t.backgroundUrl = prop.backgroundUrl;
-                t.aspectRatio = prop.aspectRatio;
 
             // Manual offset and height
             // In the case of automatic selection, it will be null

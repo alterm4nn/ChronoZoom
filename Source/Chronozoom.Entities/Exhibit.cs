@@ -69,7 +69,13 @@ namespace Chronozoom.Entities
         [DataMember]
         [Column(TypeName = "datetime")]
         public DateTime UpdatedTime { get; set; }
-
+        
+        /// <summary>
+        /// The offset from the top bound of the box in percents of the box height.
+        /// </summary>
+        [DataMember (Name = "offsetY")]
+        public decimal? OffsetY { get; set; }
+        
         /// <summary>
         /// Specifies the collection of content items that is associated with the exhibit.
         /// </summary>

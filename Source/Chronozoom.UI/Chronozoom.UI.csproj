@@ -54,6 +54,10 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="App_Data\ChronoZoom.mdf" />
+    <Content Include="App_Data\ChronoZoom_log.ldf">
+      <DependentUpon>ChronoZoom.mdf</DependentUpon>
+    </Content>
     <Content Include="css\cz.min.css">
       <DependentUpon>cz.less</DependentUpon>
     </Content>
@@ -531,6 +535,8 @@
     </Content>
     <Content Include="dumps\cz.cosmos.json" />
     <Content Include="dumps\cz.aidstimeline.json" />
+    <None Include="Properties\PublishProfiles\cz-alexn-test - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\cz-alexn-test - Web Deploy.pubxml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
