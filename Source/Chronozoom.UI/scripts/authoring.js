@@ -176,7 +176,7 @@ var CZ;
             });
             
             if (locMax > locMin)
-                return (locMax - locMin) * (1.001 / (Math.max(tc.offsetY,
+                return (locMax - locMin) * (1.0 / (Math.max(tc.offsetY,
                                 100.0 - tc.offsetY - tc.Height) / 100));
             else
                 return 0;
