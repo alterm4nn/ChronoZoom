@@ -15233,15 +15233,15 @@ var CZ;
                                 CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
                                 CZ.Common.reloadData().done(function () {
                                     self.timeline = CZ.Common.vc.virtualCanvas("findElement", self.timeline.id);
-                                    self.timeline.animation = null;
+                                    delete self.timeline.animation;
 
-                                    //Move to new created timeline
+                                    // Move to new created timeline
                                     self.timeline.onmouseclick();
                                 });
+                            } else {
+                                // Move to new created timeline
+                                self.timeline.onmouseclick();
                             }
-
-                            //Move to new created timeline
-                            self.timeline.onmouseclick();
                         }, function (error) {
                             if (error !== undefined && error !== null) {
                                 self.errorMessage.text(error).show().delay(7000).fadeOut();
