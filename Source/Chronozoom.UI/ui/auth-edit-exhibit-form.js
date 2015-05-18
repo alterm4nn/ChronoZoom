@@ -299,11 +299,15 @@ var CZ;
                         CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
                         CZ.Common.reloadData().done(function () {
                             _this.exhibit = CZ.Common.vc.virtualCanvas("findElement", _this.exhibit.id);
-                            _this.exhibit.animation = null;
-
-                            //Move to new created exhibit
-                            _this.exhibit.onmouseclick();
-                        });
+                             delete self.timeline.animation;
+  
+ -                                    //Move to new created timeline
+ +                                    // Move to new created timeline
+                                      self.timeline.onmouseclick();
+                            });
+ +                  } else {
+ +                      // Move to new created timeline
+ +                      self.timeline.onmouseclick();
                     }
                 }, function (error) {
                     var errorMessage = JSON.parse(error.responseText).errorMessage;
