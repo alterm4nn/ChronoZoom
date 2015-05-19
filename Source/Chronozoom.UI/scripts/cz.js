@@ -72,6 +72,7 @@ var CZ;
 
         function UserCanEditCollection(profile)
         {
+
             // can't edit if no profile, no display name or no supercollection
             if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName)
             {
@@ -172,7 +173,7 @@ var CZ;
             };
         }
 
-        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, children: [], parent: { guid: null } };
+        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, offsetY:null, Height:null, children: [], parent: { guid: null } };
 
         $(document).ready(function () {
             // ensures there will be no 'console is undefined' errors
@@ -412,6 +413,9 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            offsetLabels: ".cz-form-offset-label",
+                            topBoundInput: ".cz-form-item-offset",
+                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
                             errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
@@ -431,6 +435,9 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            offsetLabels: ".cz-form-offset-label",
+                            topBoundInput: ".cz-form-item-top-bound-offset",
+                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
                             errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
@@ -449,6 +456,9 @@ var CZ;
                             saveButton: ".cz-form-save",
                             deleteButton: ".cz-form-delete",
                             titleInput: ".cz-form-item-title",
+                            offsetLabels: ".cz-form-offset-label",
+                            topBoundInput: ".cz-form-item-top-bound-offset",
+                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
                             errorMessage: ".cz-form-errormsg",
                             context: timeline
                         });
@@ -462,6 +472,7 @@ var CZ;
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
                             titleInput: ".cz-form-item-title",
+                            offsetInput: ".cz-form-item-offset",
                             datePicker: ".cz-form-time",
                             createArtifactButton: ".cz-form-create-artifact",
                             contentItemsListBox: ".cz-listbox",
@@ -480,6 +491,8 @@ var CZ;
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
                             titleInput: ".cz-form-item-title",
+                            offsetInput: ".cz-form-item-offset",
+                            offsetCheckbox: ".cz-form-item-offset-checkbox",
                             datePicker: ".cz-form-time",
                             createArtifactButton: ".cz-form-create-artifact",
                             contentItemsListBox: ".cz-listbox",

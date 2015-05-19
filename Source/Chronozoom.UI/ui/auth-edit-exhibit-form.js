@@ -20,6 +20,7 @@ var CZ;
                 this.titleTextblock = container.find(formInfo.titleTextblock);
                 this.titleInput = container.find(formInfo.titleInput);
                 this.datePicker = new CZ.UI.DatePicker(container.find(formInfo.datePicker));
+                this.offsetInput = container.find(formInfo.offsetInput);
                 this.createArtifactButton = container.find(formInfo.createArtifactButton);
                 this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), formInfo.contentItemsTemplate, formInfo.context.contentItems);
                 this.errorMessage = container.find(formInfo.errorMessage);
@@ -46,13 +47,6 @@ var CZ;
                 var _this = this;
                 this.saveButton.prop('disabled', false);
 
-                this.titleInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.datePicker.datePicker.change(function () {
-                    _this.isModified = true;
-                });
-
                 if (this.mode === "createExhibit") {
                     this.titleTextblock.text("Create Exhibit");
                     this.saveButton.text("Create Exhibit");
@@ -60,6 +54,7 @@ var CZ;
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.infodotDescription.isCirca || false);
+                    this.offsetInput.val("");
 
                     this.closeButton.show();
                     this.createArtifactButton.show();
@@ -98,6 +93,10 @@ var CZ;
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.infodotDescription.isCirca || false);
+                    if (this.exhibit.offsetY == null)
+                        this.offsetInput.val("");
+                    else
+                        this.offsetInput.val(this.exhibit.offsetY);
 
                     this.closeButton.show();
                     this.createArtifactButton.show();
@@ -130,6 +129,17 @@ var CZ;
                 } else {
                     console.log("Unexpected authoring mode in exhibit form.");
                 }
+
+                this.titleInput.change(function () {
+                    _this.isModified = true;
+                });
+                this.datePicker.datePicker.change(function () {
+                    _this.isModified = true;
+                });
+                this.offsetInput.change(function () {
+                    _this.isModified = true;
+                });
+
             };
 
             FormEditExhibit.prototype.onCreateArtifact = function () {
@@ -142,7 +152,7 @@ var CZ;
                         date: this.datePicker.getDate(),
                         isCirca: $(this.datePicker.circaSelector).find('input').is(':checked')
                     };
-                  //this.exhibit.IsCirca = $(this.datePicker.circaSelector).find('input').is(':checked');
+                    //this.exhibit.IsCirca = $(this.datePicker.circaSelector).find('input').is(':checked');
                     var newContentItem = {
                         title: "",
                         uri: "",
@@ -184,18 +194,24 @@ var CZ;
                     exhibit_y = this.exhibit.parent.y;
                 }
 
+                if (this.offsetInput.val() != "")
+                    this.exhibit.offsetY = Number(this.offsetInput.val());
+                else
+                    this.exhibit.offsetY = null;
+
                 var newExhibit = {
                     title: this.titleInput.val() || "",
                     x: exhibit_x,
                     y: exhibit_y,
                     height: this.exhibit.height,
                     width: this.exhibit.width,
+                    offsetY: this.exhibit.offsetY,
                     infodotDescription:
                     {
-                        date:    CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()),
+                        date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()),
                         isCirca: $(this.datePicker.circaSelector).find('input').is(':checked')
                     },
-                  //IsCirca: $(this.datePicker.circaSelector).find('input').is(':checked'),
+                    //IsCirca: $(this.datePicker.circaSelector).find('input').is(':checked'),
                     contentItems: this.exhibit.contentItems || [],
                     type: "infodot"
                 };
@@ -208,7 +224,12 @@ var CZ;
                     this.errorMessage.text("Exhibit intersects other elemenets");
                 }
 
-                if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems) && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true) && this.exhibit.contentItems.length >= 1 && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount) {
+                if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems)
+                    && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true)
+                    && this.exhibit.contentItems.length >= 1
+                    && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount
+                    && /(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(this.offsetInput.val())) {
+
                     if (this.mode === "editExhibit") {
                         // edit mode - see if someone else has saved edit since we loaded it
                         CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
@@ -217,20 +238,18 @@ var CZ;
                                 _this.onSave_PerformSave(newExhibit);
                             } else {
                                 // someone else has touched - warn and give options
-                                if 
+                                if
                                 (
                                     confirm
                                     (
-                                      //"Someone else has made changes to this exhibit since you began editing it.\n\n" +
+                                    //"Someone else has made changes to this exhibit since you began editing it.\n\n" +
                                         data.split('|')[1] + " has made changes to this exhibit since you began editing it.\n\n" +
                                         "Do you want to replace their changes with yours? This will cause all of their changes to be lost."
                                     )
-                                )
-                                {
+                                ) {
                                     _this.onSave_PerformSave(newExhibit);
                                 }
-                                else
-                                {
+                                else {
                                     alert
                                     (
                                         "Your changes were not saved.\n\n" +
@@ -250,6 +269,12 @@ var CZ;
                     this.errorMessage.text("Cannot create exhibit without artifacts.").show().delay(7000).fadeOut(function () {
                         return self.errorMessage.text(origMsg);
                     });
+                } else if (!/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(this.offsetInput.val())) {
+                    var self = this;
+                    var origMsg = this.errorMessage.text();
+                    this.errorMessage.text("Please enter vertical position in percents or select auto mode. For example \"0\", \"100\", \"45\" or \"75.85\"").show().delay(7000).fadeOut(function () {
+                        return self.errorMessage.text(origMsg);
+                    });
                 } else {
                     this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
                 }
@@ -264,7 +289,20 @@ var CZ;
                     _this.isModified = false;
                     _this.close();
                     _this.exhibit.id = arguments[0].id;
-                    _this.exhibit.onmouseclick();
+                    
+                    // If offset has changed, then we need to redraw layout.
+                    var isOffsetChanged = (Number(_this.offsetInput.val()) !== _this.exhibitCopy.offsetY);
+                    if (isOffsetChanged) {
+                        CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
+                        CZ.Common.reloadData().done(function () {
+                            _this.exhibit = CZ.Common.vc.virtualCanvas("findElement", _this.exhibit.id);
+                            _this.exhibit.onmouseclick();
+                        });
+                    }
+                    else {
+                        _this.exhibit.onmouseclick();
+                    }
+                    
                 }, function (error) {
                     var errorMessage = JSON.parse(error.responseText).errorMessage;
                     if (errorMessage !== "") {
