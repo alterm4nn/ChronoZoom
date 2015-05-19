@@ -2,11 +2,11 @@
 
 CREATE TABLE [dbo].[Users]
 (
-    [Id]                [uniqueidentifier]      NOT NULL,
-    [DisplayName]       [nvarchar](50)          NOT NULL,
-    [Email]             [varchar](100)          NULL,
-    [IdentityProvider]  [varchar](25)           NULL,
-    [NameIdentifier]    [varchar](150)          NULL,
+	[Id]                [uniqueidentifier]      NOT NULL,
+	[DisplayName]       [nvarchar](50)          NOT NULL,
+	[Email]             [varchar](100)          NULL,
+	[IdentityProvider]  [varchar](25)           NULL,
+	[NameIdentifier]    [varchar](150)          NULL,
     CONSTRAINT [PK_dbo.Users] PRIMARY KEY CLUSTERED
     (
         [Id] ASC
@@ -19,13 +19,13 @@ GO
 
 CREATE TABLE [dbo].[Bitmasks]
 (
-    [Id]                [int] IDENTITY(1,1)     NOT NULL,
-    [B1]                [bigint]                NOT NULL,
-    [B2]                [bigint]                NOT NULL,
-    [B3]                [bigint]                NOT NULL,
+	[Id]                [int] IDENTITY(1,1)     NOT NULL,
+	[B1]                [bigint]                NOT NULL,
+	[B2]                [bigint]                NOT NULL,
+	[B3]                [bigint]                NOT NULL,
     CONSTRAINT [PK_dbo.Bitmasks] PRIMARY KEY CLUSTERED 
     (
-        [Id] ASC
+	    [Id] ASC
     )
 )
 GO
@@ -35,12 +35,12 @@ GO
 
 CREATE TABLE [dbo].[SuperCollections]
 (
-    [Id]                [uniqueidentifier]      NOT NULL,
-    [Title]             [varchar](50)           NOT NULL,
-    [User_Id]           [uniqueidentifier]      NOT NULL,
+	[Id]                [uniqueidentifier]      NOT NULL,
+	[Title]             [varchar](50)           NOT NULL,
+	[User_Id]           [uniqueidentifier]      NOT NULL,
     CONSTRAINT [PK_dbo.SuperCollections] PRIMARY KEY CLUSTERED 
     (
-        [Id] ASC
+	    [Id] ASC
     )
 )
 GO
@@ -55,11 +55,11 @@ GO
 
 CREATE TABLE [dbo].[Collections]
 (
-    [Id]                    [uniqueidentifier]  NOT NULL,
-    [User_Id]               [uniqueidentifier]  NOT NULL,
-    [SuperCollection_Id]    [uniqueidentifier]  NOT NULL,
+	[Id]                    [uniqueidentifier]  NOT NULL,
+	[User_Id]               [uniqueidentifier]  NOT NULL,
+	[SuperCollection_Id]    [uniqueidentifier]  NOT NULL,
     [Default]               [bit]               NOT NULL    DEFAULT (0),
-    [MembersAllowed]        [bit]               NOT NULL    DEFAULT (0),
+	[MembersAllowed]        [bit]               NOT NULL    DEFAULT (0),
     [PubliclySearchable]    [bit]               NOT NULL    DEFAULT (0),
     [Title]                 [nvarchar](50)      NOT NULL,
     [Path]                  [varchar](50)       NOT NULL,
@@ -116,6 +116,7 @@ CREATE TABLE [dbo].[Timelines]
     [ToYear]            [decimal](18, 7)        NOT NULL,
     [ForkNode]          [decimal](18, 2)        NOT NULL,
     [Height]            [decimal](18, 2)        NULL,
+    [OffsetY]           [decimal](5, 2)         NULL,
     [Timeline_Id]       [uniqueidentifier]      NULL,
     [Collection_Id]     [uniqueidentifier]      NULL,
     [SubtreeSize]       [int]                   NOT NULL        DEFAULT (0),
@@ -150,6 +151,7 @@ CREATE TABLE [dbo].[Exhibits]
     [Timeline_Id]       [uniqueidentifier]      NULL,
     [UpdatedBy_Id]      [uniqueidentifier]      NULL,
     [UpdatedTime]       [datetime]              NULL            DEFAULT (GETUTCDATE()),
+	[OffsetY]           [decimal] (5, 2)        NULL,
     CONSTRAINT [PK_dbo.Exhibits] PRIMARY KEY CLUSTERED 
     (
         [Id] ASC
@@ -375,4 +377,7 @@ INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('2014081300
 GO
 
 INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201502100000000_AddBackgroundUrlAspectRatio', 'Manual Migration');
+GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201502170000000_AddYOffsetsAttributes',   'Manual Migration');
 GO

@@ -1897,6 +1897,11 @@ footer {
   margin: 5px 0;
   display: block;
 }
+
+.cz-form-percent-tooltip{
+    color:dodgerblue
+}
+
 a {
   color: #0464a2;
 }
@@ -2103,6 +2108,11 @@ a.cz-form-preloadedrecord.time-series-link {
 .cz-form-item-descr {
   font-family: Consolas, "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;
 }
+
+.cz-form-item-offset {
+    display: block;
+}
+
 /* Edit Content Item Form */
 .cz-form-contentitem {
   width: 420px;

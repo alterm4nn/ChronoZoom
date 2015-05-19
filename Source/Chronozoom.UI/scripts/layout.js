@@ -72,6 +72,9 @@ var CZ;
             var timelineWidth = timeline.right - timeline.left;
             timeline.width = timelineWidth;
 
+            //Set content margin
+            timeline.heightEps = parentWidth * CZ.Settings.timelineContentMargin;
+
             //If child timeline has fixed aspect ratio, calculate its height according to it
             if (timeline.AspectRatio && !timeline.height) {
                 timeline.height = timelineWidth / timeline.AspectRatio;
@@ -85,6 +88,9 @@ var CZ;
                     } else if (timeline.height && tl.Height) {
                         //If Child timeline has height in percentage of parent, calculate it before layout pass
                         tl.height = Math.min(timeline.height * tl.Height, (tl.right - tl.left) * CZ.Settings.timelineMinAspect);
+                        if (tl.offsetY!==null && tl.Height) {
+                            tl.height = timeline.height * tl.Height;
+                        }
                     }
 
                     //Calculate layout for each child timeline
@@ -127,44 +133,31 @@ var CZ;
             //Now positioning child content and title
             var exhibitSize = CalcInfodotSize(timeline);
 
+            timeline.realY = 0;
+
             //Layout only timelines to check that they fit into parent timeline
-            var tlRes = LayoutChildTimelinesOnly(timeline);
+            var tlRes = LayoutChildTimelinesOnly(timeline, null, headerPercent);
 
+            var hFlag = (timeline.Height & timeline.offsetY) ? true : false;
             //First layout iteration of full content (taking Sequence in account)
-            var res = LayoutContent(timeline, exhibitSize);
-            if (timeline.height) {
-                var titleObject = GenerateTitleObject(timeline.height, timeline, measureContext);
+            var res = LayoutContent(timeline, exhibitSize, hFlag, timeline.height,
+                headerPercent, exhibitSize);
 
+            if (timeline.height) {
                 if (timeline.exhibits instanceof Array) {
                     if (timeline.exhibits.length > 0 && (tlRes.max - tlRes.min) < timeline.height) {
-                        while ((res.max - res.min) > (timeline.height - titleObject.bboxHeight) && exhibitSize > timelineWidth / 20.0) {
+                        while ((res.max - res.min) > timeline.height && exhibitSize > timelineWidth / 20.0) {
                             exhibitSize /= 1.5;
-                            res = LayoutContent(timeline, exhibitSize);
+                            res = LayoutContent(timeline, exhibitSize, hFlag, timeline.height, headerPercent);
                         }
                     }
                 }
 
-                if ((res.max - res.min) > (timeline.height - titleObject.bboxHeight)) {
+                if ((res.max - res.min) > timeline.height) {
                     //console.log("Warning: Child timelines and exhibits doesn't fit into parent. Timeline name: " + timeline.title);
-                    var contentHeight = res.max - res.min;
-                    var fullHeight = contentHeight / (1 - headerPercent);
-                    var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
-                    timeline.height = fullHeight;
-                } else {
-                    //var scale = (timeline.height - titleObject.bboxHeight) / (res.max - res.min);
-                    //if (scale > 1) {
-                    //    timeline.timelines.forEach(function (tl) {
-                    //        tl.realY *= scale;
-                    //        if (!tl.AspectRatio)
-                    //            Scale(tl, scale, measureContext);
-                    //    });
-                    //    timeline.exhibits.forEach(function (eb) {
-                    //        eb.realY *= scale;
-                    //    });
-                    //}
+                    timeline.height = res.max - res.min;
                 }
 
-                timeline.titleRect = titleObject;
             } else {
                 var min = res.min;
                 var max = res.max;
@@ -173,16 +166,14 @@ var CZ;
                 var minHeight = timelineWidth / minAspect;
 
                 //Measure title
-                var contentHeight = Math.max((1 - headerPercent) * minHeight, max - min);
-                var fullHeight = contentHeight / (1 - headerPercent);
-                var titleObject = GenerateTitleObject(fullHeight, timeline, measureContext);
-                timeline.titleRect = titleObject;
-                timeline.height = fullHeight;
-            }
+                var contentHeight = Math.max(minHeight, max - min);
+                timeline.height = contentHeight;
+             }
 
-            timeline.heightEps = parentWidth * CZ.Settings.timelineContentMargin;
-            timeline.realHeight = timeline.height + 2 * timeline.heightEps;
-            timeline.realY = 0;
+            if (timeline.Height & timeline.offsetY)
+                timeline.realHeight = timeline.height;
+            else
+                timeline.realHeight = timeline.height + 2 * timeline.heightEps;
 
             if (timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (infodot) {
@@ -197,9 +188,10 @@ var CZ;
             }
         }
 
+
         function PositionContent(contentArray, arrangedArray, intersectionFunc) {
             contentArray.forEach(function (el) {
-                var usedY = new Array();
+                var usedY = [];
 
                 arrangedArray.forEach(function (ael) {
                     if (intersectionFunc(el, ael)) {
@@ -211,17 +203,20 @@ var CZ;
 
                 if (usedY.length > 0) {
                     //Find free segments
-                    var segmentPoints = new Array();
+                    var segmentPoints = [];
                     usedY.forEach(function (segment) {
                         segmentPoints.push({ type: "bottom", value: segment.bottom });
                         segmentPoints.push({ type: "top", value: segment.top });
                     });
 
+                    segmentPoints.push({ type: "bottom", value: 0 });
+                    segmentPoints.push({ type: "top", value: 0 });
+
                     segmentPoints.sort(function (l, r) {
                         return l.value - r.value;
                     });
 
-                    var freeSegments = new Array();
+                    var freeSegments = [];
                     var count = 0;
                     for (i = 0; i < segmentPoints.length - 1; i++) {
                         if (segmentPoints[i].type == "top")
@@ -242,7 +237,6 @@ var CZ;
                             break;
                         }
                     }
-                    ;
 
                     if (!foundPlace) {
                         y = segmentPoints[segmentPoints.length - 1].value;
@@ -250,21 +244,189 @@ var CZ;
                 }
 
                 el.realY = y;
+
                 arrangedArray.push(el);
             });
+
         }
 
-        function LayoutContent(timeline, exhibitSize) {
+        function PositionContentAutoManual(manualArray, sequencedArray,
+            unsequencedArray, arrangedArray, tlHFlag, tlHeight, headerPercent, infodotSize) {
+            var arranged = false;
+
+            var max;
+            var tempArrArray;
+            var arrangedManually = 0;
+
+            while (!arranged) {
+                tempArrArray = [];
+
+                //We do so if we are sure that the manual objects do not intersect. 
+                //Otherwise, we need to pass a temporary array to PositionContent separately
+                tempArrArray = tempArrArray.concat(arrangedArray);
+
+                PositionContent(sequencedArray, tempArrArray, function (el, ael) {
+                    return el.left < ael.right;
+                });
+
+                PositionContent(unsequencedArray, tempArrArray, function (el, ael) {
+                    return !(el.left >= ael.right || ael.left >= el.right);
+                });
+
+                if (arrangedArray.length) {
+                    tempArrArray = tempArrArray.slice(arrangedArray.length);
+                }
+
+
+                
+                max = (tlHeight!=undefined)? tlHeight:Number.MIN_VALUE;
+
+                tempArrArray.forEach(function (element) {
+                   if ((element.realY + element.realHeight) > max)
+                       max = element.realY + element.realHeight;
+                });
+
+               
+                if (!tlHFlag)
+                    max = max / (1 - headerPercent);
+
+                if (arrangedArray.length) {
+                    var tmax;
+                    if (arrangedArray[0].Height == undefined)
+                        tmax = arrangedArray[0].realY / arrangedArray[0].offsetY * 100 + arrangedArray[0].realHeight/2;
+                    else
+                        tmax = arrangedArray[0].realY / arrangedArray[0].offsetY * 100;
+                    if (tmax > max)
+                        max = tmax;
+                }
+                arranged = true;
+                
+                for (; ((arrangedManually < manualArray.length) && (arranged == true)) ; arrangedManually++) {
+                    var usedY = [];
+                    tempArrArray.forEach(function (ael) {
+                        if (!(manualArray[arrangedManually].left >= ael.right
+                            || ael.left >= manualArray[arrangedManually].right)) {
+                            usedY.push({ top: ael.realY + ael.realHeight, bottom: ael.realY });
+                        }
+                    });
+
+                    //First try
+                    if (manualArray[arrangedManually].Height === undefined)
+                        max -= infodotSize;
+                    manualArray[arrangedManually].realY = max * manualArray[arrangedManually].offsetY / 100;
+                    if (manualArray[arrangedManually].offsetY !== null && manualArray[arrangedManually].Height) {
+                        manualArray[arrangedManually].height = max * manualArray[arrangedManually].Height;
+                        manualArray[arrangedManually].realHeight = max * manualArray[arrangedManually].Height;
+                    }
+                    if (manualArray[arrangedManually].Height === undefined)
+                        max += infodotSize;
+
+                    //realY
+                    var locMin = manualArray[arrangedManually].realY;
+                    var locMax = Number.MIN_VALUE
+
+                    //Finding the area of intersection
+                    usedY.forEach(function (ael) {
+                        if (!((ael.top <= (manualArray[arrangedManually].realY))
+                            || (manualArray[arrangedManually].realY + manualArray[arrangedManually].realHeight <= ael.bottom))) {
+                            arranged = false;
+                            if (ael.top > locMax)
+                                locMax = ael.top;
+                        }
+                    });
+
+                    //Adding the area size multiplayed by worse case coefficient
+                    if (arranged === false) {
+                        if (manualArray[arrangedManually].Height == undefined)
+                            max += (locMax - locMin + infodotSize) * (1.001 / (Math.max(manualArray[arrangedManually].offsetY, 100.0 - manualArray[arrangedManually].offsetY) / 100));
+                        else
+                            max += (locMax - locMin) * (1.001 / (Math.max(manualArray[arrangedManually].offsetY,
+                                100.0 - manualArray[arrangedManually].offsetY - manualArray[arrangedManually].Height*100) / 100));
+                        arrangedArray.forEach(function (ael) {
+                            if (ael.offsetY !== null && ael.Height) {
+                                ael.realY = max * ael.offsetY / 100;
+                                ael.height = max * ael.Height;
+                                ael.realHeight = ael.height;
+                            }
+                            else {
+                                ael.realY = max * ael.offsetY / 100 - infodotSize/2;
+                            }
+                        });
+                    }
+
+                    if (manualArray[arrangedManually].offsetY !== null && manualArray[arrangedManually].Height) {
+                        manualArray[arrangedManually].realY = max * manualArray[arrangedManually].offsetY / 100;
+                        manualArray[arrangedManually].height = max * manualArray[arrangedManually].Height;
+                        manualArray[arrangedManually].realHeight = max * manualArray[arrangedManually].Height;
+                    } else {
+                        manualArray[arrangedManually].realY = max * manualArray[arrangedManually].offsetY / 100 - infodotSize/2;
+                    }
+
+                    arrangedArray.push(manualArray[arrangedManually]);
+                }
+
+                //Check that all exhibits are in their timeline
+                for (var i = 0; i < arrangedArray.length; i++){
+                    if (arrangedArray[i].realY < 0)
+                        arrangedArray[i].realY = 0;
+                    if (arrangedArray[i].realY + arrangedArray[i].realHeight > max)
+                        arrangedArray[i].realY = max - arrangedArray[i].realHeight;
+                }
+            }
+
+            if (arrangedArray.length) {
+                max = Number.MIN_VALUE;
+                for (var i = 0; i < arrangedArray.length; i++) {
+                    var tmax;
+                    if (arrangedArray[i].Height === undefined) {
+                        if (arrangedArray[i].offsetY === 0)
+                            tmax = 0;
+                        else
+                            tmax = (arrangedArray[i].realY + arrangedArray[i].realHeight / 2 )/ arrangedArray[i].offsetY * 100;
+                        if (arrangedArray[i].realY + arrangedArray[i].realHeight > tmax)
+                            tmax = arrangedArray[i].realY + arrangedArray[i].realHeight;
+                    }
+                    else {
+                        if (arrangedArray[i].offsetY === 0)
+                            tmax = 0;
+                        else
+                            tmax = arrangedArray[i].realY / arrangedArray[i].offsetY * 100;
+                    }
+                    if (max < tmax)
+                        max = tmax;
+                }
+            }
+                
+            for (var i = 0; i < tempArrArray.length; i++) {
+                arrangedArray.push(tempArrArray[i]);
+            }
+
+            return max;
+        }
+
+        function LayoutContent(timeline, exhibitSize, tlHFlag, tlHeight, headerPercent) {
             //Prepare arrays for ordered and unordered content
-            var sequencedContent = new Array();
-            var unsequencedContent = new Array();
+            var sequencedContent = [];
+            var unsequencedContent = [];
+            var manualContent = [];
+
+            //Prepare measure arrays
+            var arrangedElements = [];
+
 
             if (timeline.timelines instanceof Array) {
                 timeline.timelines.forEach(function (tl) {
-                    if (tl.Sequence)
-                        sequencedContent.push(tl);
-                    else
-                        unsequencedContent.push(tl);
+                    //if y-offset of timeline is user-defined calculate realY
+                    //else prepare it to auto-calculation
+                    if (tl.offsetY != null) {
+                        manualContent.push(tl);
+                    }
+                    else {
+                        if (tl.Sequence)
+                            sequencedContent.push(tl);
+                        else
+                            unsequencedContent.push(tl);
+                    }
                 });
             }
 
@@ -285,10 +447,17 @@ var CZ;
                         eb.isDeposed = true;
                     }
 
-                    if (eb.Sequence)
-                        sequencedContent.push(eb);
-                    else
-                        unsequencedContent.push(eb);
+                    //if y-offset of exhibit is user-defined calculate realY
+                    //else prepare it to auto-calculation
+                    if (eb.offsetY != null) {
+                        manualContent.push(eb);
+                    }
+                    else {
+                        if (eb.Sequence)
+                            sequencedContent.push(eb);
+                        else
+                            unsequencedContent.push(eb);
+                    }
                 });
             }
 
@@ -296,52 +465,55 @@ var CZ;
                 return l.Sequence - r.Sequence;
             });
 
-            //Prepare measure arrays
-            var arrangedElements = new Array();
-
-            PositionContent(sequencedContent, arrangedElements, function (el, ael) {
-                return el.left < ael.right;
-            });
-            PositionContent(unsequencedContent, arrangedElements, function (el, ael) {
-                return !(el.left >= ael.right || ael.left >= el.right);
-            });
+            var max = PositionContentAutoManual(manualContent, sequencedContent,
+                unsequencedContent, arrangedElements, tlHFlag, tlHeight, headerPercent, exhibitSize)
 
             var min = Number.MAX_VALUE;
-            var max = Number.MIN_VALUE;
-
-            arrangedElements.forEach(function (element) {
-                if (element.realY < min)
-                    min = element.realY;
-                if ((element.realY + element.realHeight) > max)
-                    max = element.realY + element.realHeight;
-            });
-
-            if (arrangedElements.length == 0) {
-                max = 0;
-                min = 0;
+            
+            for (var i = 0; i < arrangedElements.length; i++) {
+                if ((arrangedElements[i].realY) < min)
+                    min = arrangedElements[i].realY;
             }
+            
+            if (manualContent.length != 0)
+                min = 0;
 
-            return { max: max, min: min };
+            return { min: min, max: max };
         }
 
-        function LayoutChildTimelinesOnly(timeline) {
-            var arrangedElements = new Array();
+        function LayoutChildTimelinesOnly(timeline, tlHFlag, headerPercent) {
+
+            //Prepare measure arrays
+            var arrangedElements = [];
+            var autoContent = [];
+            var manualContent = [];
+
             if (timeline.timelines instanceof Array) {
-                PositionContent(timeline.timelines, arrangedElements, function (el, ael) {
-                    return !(el.left >= ael.right || ael.left >= el.right);
+                timeline.timelines.forEach(function (tl) {
+                    //if y-offset of timeline is user-defined calculate realY
+                    //else prepare it to auto-calculation
+                    if (tl.offsetY != null) {
+                        manualContent.push(tl);
+                    }
+                    else {
+                        autoContent.push(tl);
+                    }
                 });
+
+                PositionContentAutoManual(manualContent, [], autoContent,
+                    arrangedElements, tlHFlag, timeline.height, headerPercent);
             }
 
             var min = Number.MAX_VALUE;
             var max = Number.MIN_VALUE;
 
-            arrangedElements.forEach(function (element) {
-                if (element.realY < min)
-                    min = element.realY;
-                if ((element.realY + element.realHeight) > max)
-                    max = element.realY + element.realHeight;
-            });
-
+            for (var i = 0; i < arrangedElements.length; i++) {
+                if (arrangedElements[i].realY < min)
+                    min = arrangedElements[i].realY;
+                if ((arrangedElements[i].realY + arrangedElements[i].realHeight) > max)
+                    max = arrangedElements[i].realY + arrangedElements[i].realHeight;
+            }
+            
             if (arrangedElements.length == 0) {
                 max = 0;
                 min = 0;
@@ -373,8 +545,11 @@ var CZ;
             }
         }
 
-        function Arrange(timeline) {
-            timeline.y = timeline.realY + timeline.heightEps;
+        function Arrange(timeline, measureContext) {
+            if (timeline.offsetY!==null && timeline.Height) 
+                timeline.y = timeline.realY;
+            else
+                timeline.y = timeline.realY + timeline.heightEps;
 
             if (timeline.exhibits instanceof Array) {
                 timeline.exhibits.forEach(function (infodot) {
@@ -384,10 +559,26 @@ var CZ;
 
             if (timeline.timelines instanceof Array) {
                 timeline.timelines.forEach(function (tl) {
+                    if (tl.offsetY !== null && tl.Height) {
+                        var exhibitSize = CalcInfodotSize(timeline);
+                        var headerPercent = CZ.Settings.timelineHeaderSize + 2 * CZ.Settings.timelineHeaderMargin;
+                        var res = LayoutContent(tl, exhibitSize, true, tl.height,
+                            headerPercent);
+                        while ((res.max - res.min) > timeline.height && exhibitSize > timeline.width / 20.0) {
+                            exhibitSize /= 1.5;
+                            res = LayoutContent(timeline, exhibitSize, true, tl.height, headerPercent);
+                        }
+                    }    
                     tl.realY += timeline.y;
-                    Arrange(tl);
+
+                    tl.height = Math.max(tl.height, CZ.Settings.timelineMinAspect/4 * (tl.right - tl.left));
+                    tl.height = Math.min(tl.height, (tl.right - tl.left)*3 / CZ.Settings.timelineMinAspect);
+                        
+                    Arrange(tl, measureContext);
                 });
             }
+            var titleObject = GenerateTitleObject(timeline.height, timeline, measureContext);
+            timeline.titleRect = titleObject;
         }
 
         function CalcInfodotSize(timeline) {
@@ -440,7 +631,9 @@ var CZ;
                 ToIsCirca: timeline.ToIsCirca || false,
                 opacity: 0,
                 backgroundUrl: timeline.backgroundUrl,
-                aspectRatio: timeline.aspectRatio
+                aspectRatio: timeline.aspectRatio,
+                offsetY: timeline.offsetY,
+                Height: timeline.Height
             });
 
             //Creating Infodots
@@ -459,6 +652,7 @@ var CZ;
                         isBuffered: false,
                         guid: childInfodot.id,
                         title: childInfodot.title,
+                        offsetY: childInfodot.offsetY,
                         date: childInfodot.time,
                         isCirca: childInfodot.IsCirca,
                         opacity: 1
@@ -536,13 +730,12 @@ var CZ;
             if (timeline) {
                 //Transform timeline start and end dates
                 Prepare(timeline);
-
                 //Measure child content for each timiline in tree
                 var measureContext = document.createElement("canvas").getContext('2d');
                 LayoutTimeline(timeline, 0, measureContext);
 
                 //Calculating final placement of the data
-                Arrange(timeline);
+                Arrange(timeline, measureContext);
 
                 //Load timline to Virtual Canvas
                 LoadTimeline(root, timeline);
@@ -559,7 +752,7 @@ var CZ;
         // and returns a corresponding scenegraph (x, y, width, height)
         // todo: remove dependency on virtual canvas (vc)
         function generateLayout(tmd, tsg) {
-            try  {
+            try {
                 if (!tmd.AspectRatio)
                     tmd.height = tsg.height;
                 var root = new CZ.VCContent.CanvasRootElement(tsg.vc, undefined, "__root__", -Infinity, -Infinity, Infinity, Infinity);
