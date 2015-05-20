@@ -14643,6 +14643,10 @@ var CZ;
 
                 $(form).on("closecompleted", function (event) {
                     $(window).off("resize", onWindowResize);
+                    $(mediaPicker).off();
+                    mediaPicker.searchResultsBox.empty();
+                    mediaPicker.searchTextbox.val("");
+                    
                 });
 
                 form.show();
@@ -14722,7 +14726,8 @@ var CZ;
                     'Search',
                     'Bing Search',
                     mediaType
-                ]);
+                ]);
+
                 this.searchResultsBox.empty();
                 this.showProgressBar();
 
