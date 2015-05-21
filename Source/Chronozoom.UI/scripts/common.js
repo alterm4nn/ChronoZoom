@@ -66,7 +66,7 @@ var CZ;
         {
             if (typeof url != 'string') url = window.location.pathname;
 
-            var path    = url.toLowerCase().split('#')[0];
+            var path    = url.toLowerCase().replace("/czmin","").split('#')[0];
             var matches = ['/', '/chronozoom', '/chronozoom/', '/chronozoom/cosmos', '/chronozoom/cosmos/'];
 
             return $.inArray(path, matches) > -1;

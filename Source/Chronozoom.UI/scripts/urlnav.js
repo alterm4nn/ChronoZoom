@@ -223,6 +223,7 @@ var CZ;
 
             var loc = document.location.toString().split("#");
             var path = loc[0];
+            path = path.replace("/czmin", "");
             var hash = loc[1];
             var expr = new RegExp("^(https|http):\/\/([a-z_0-9\-.]{4,})(?:\:([0-9]{1,5}))?(?:\/*)([a-z\-_0-9\/.%]*)[?]?([a-z\-_0-9=&]*)$", "i");
             var result = path.match(expr);

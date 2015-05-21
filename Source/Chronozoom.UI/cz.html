@@ -1,32 +1,31 @@
-﻿<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml">
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta name="Description" content="ChronoZoom is an open-source community project dedicated to visualizing the history of everything." />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>ChronoZoom</title>
-    <style  type="text/css">
-        #splash /* hide all until styling loaded */
-        {
-            position:       absolute;
-            top:            0;
-            bottom:         0;
-            left:           0;
-            right:          0;
-            padding-top:    235px;
-            background:     #232323;
-            color:          #91895c;
-            font-family:    Georgia, Times, 'Times New Roman', serif;
-            font-size:      2em;
-            font-style:     italic;
-            text-align:     center;
-            z-index:        2000;
+    <style type="text/css">
+        #splash /* hide all until styling loaded */ {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding-top: 235px;
+            background: #232323;
+            color: #91895c;
+            font-family: Georgia, Times, 'Times New Roman', serif;
+            font-size: 2em;
+            font-style: italic;
+            text-align: center;
+            z-index: 2000;
         }
     </style>
     <script type="text/javascript" id="constants"></script>
     <script data-airbrake-onload="initAirbrake">
-        function initAirbrake(client)
-        {
+        function initAirbrake(client) {
             client.setProject(constants.airbrakeProjectId, constants.airbrakeProjectKey);
             client.setEnvironmentName(constants.airbrakeEnvironment + ' (JS)');
         }
@@ -44,7 +43,6 @@
             var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
             ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-
             var lastHashData = null;
             window.onhashchange = function () {
                 var hashData = window.location.hash.split("@")[0];
@@ -75,56 +73,41 @@
     <script type="text/javascript" src="/scripts/external/nouislider/jquery.nouislider.min.js"></script>
     <script type="text/javascript" src="/scripts/external/FileSaver.min.js"></script>
     <script type="text/javascript">
-        $(document).ready(function ()
-        {
-
-            function AddCSS(path)
-            {
-                var link    = document.createElement('link');
-                link.type   = 'text/css';
-                link.rel    = 'stylesheet';
-                if (!constants.environment || constants.environment == 'Localhost')
-                {
-                    link.href = path                             + '?v=' + constants.cssFileVersion;    // developer - use standard .css files
+        $(document).ready(function () {
+            function AddCSS(path) {
+                var link = document.createElement('link');
+                link.type = 'text/css';
+                link.rel = 'stylesheet';
+                if (!constants.environment || constants.environment == 'Localhost') {
+                    link.href = path + '?v=' + constants.cssFileVersion;    // developer - use standard .css files
                 }
-                else
-                {
+                else {
                     link.href = path.replace('.css', '.min.css') + '?v=' + constants.cssFileVersion;    // test/prod - use minified .css files
                 }
                 document.getElementsByTagName('head')[0].appendChild(link);
             }
-
-            function AddScript(path)
-            {
-                var script  = document.createElement("script");
+            function AddScript(path) {
+                var script = document.createElement("script");
                 script.type = "text/javascript";
-                if (!constants.useMinifiedJSFiles)
-                {
-                    script.src = path                           + '?v=' + constants.jsFileVersion;      // use standard .js files
+                if (!constants.useMinifiedJSFiles) {
+                    script.src = path + '?v=' + constants.jsFileVersion;      // use standard .js files
                 }
-                else
-                {
+                else {
                     script.src = path.replace('.js', '.min.js') + '?v=' + constants.jsFileVersion;      // use minified .js files
                 }
                 document.getElementsByTagName("head")[0].appendChild(script);
             }
-
             AddCSS('/css/cz.css');
             AddCSS('/scripts/external/spectrum/spectrum.css');
             AddCSS('/scripts/external/nouislider/jquery.nouislider.css');
-
-            if (!Modernizr.canvas)
-            {
+            if (!Modernizr.canvas) {
                 window.location = "/fallback.html";
             }
-            else
-            {
-                if (constants.useMergedJSFiles)
-                {
+            else {
+                if (constants.useMergedJSFiles) {
                     AddScript("/cz.merged.js");
                 }
-                else
-                {
+                else {
                     AddScript("/scripts/settings.js");
                     AddScript("/scripts/common.js");
                     AddScript("/scripts/viewport.js");
@@ -183,7 +166,6 @@
                     AddScript("/scripts/cz.js");
                 }
             }
-
         });
     </script>
 </head>
@@ -212,40 +194,51 @@
         <ul id="mnu">
             <!-- Keep this three tier example for potential future use - chevron class is required -->
             <!--
-            <li class="active">(Example)
-                <ul>
-                    <li>Three Tier Menu<span class="chevron">&#9654;</span>
-                        <ul>
-                            <li>Sub-Choice #1</li>
-                            <li>Sub-Choice #2</li>
-                            <li>Sub-Choice #3</li>
-                        </ul>
-                    </li>
-                    <li>Main Choice #2</li>
-                    <li>Main Choice #3</li>
-                </ul>
-            </li>
-            -->
-            <li id="mnuView" class="active">View
+        <li class="active">(Example)
+            <ul>
+                <li>Three Tier Menu<span class="chevron">&#9654;</span>
+                    <ul>
+                        <li>Sub-Choice #1</li>
+                        <li>Sub-Choice #2</li>
+                        <li>Sub-Choice #3</li>
+                    </ul>
+                </li>
+                <li>Main Choice #2</li>
+                <li>Main Choice #3</li>
+            </ul>
+        </li>
+        -->
+            <li id="mnuView" class="active">
+                View
                 <ul>
                     <li id="mnuViewTours">Guided Tours</li>
                     <li id="mnuViewSeries" title="Time Series Charts">Time Series</li>
                 </ul>
             </li>
-            <li id="mnuCurate" class="active">Create
+            <li id="mnuCurate" class="active">
+                Create
                 <ul>
                     <li id="mnuCreateCollection">Create Collection</li>
                     <li id="mnuCreateTimeline">Create Timeline</li>
                     <li id="mnuCreateExhibit">Create Exhibit</li>
                     <li id="mnuCreateTour">Create Tour</li>
                     <li id="mnuEditTours">Edit   Tours</li>
-                    <li id="mnuExportAbout"      title="What's included in exports" class="hr">About Exports</li>
-                    <li id="mnuExportCollection" title="Backup collection to file"            >Export Collection</li>
-                    <li id="mnuImportCollection" title="Restore collection from file"         >Import Collection</li>
+                    <li id="mnuExportAbout" title="What's included in exports" class="hr">About Exports</li>
+                    <li id="mnuExportCollection" title="Backup collection to file">Export Collection</li>
+                    <li id="mnuImportCollection" title="Restore collection from file">Import Collection</li>
+                </ul>
+            </li>
+            <li id="mnuEmbed" class="active">
+                Embed
+                <ul>
+                    <li>
+                        Text to copy:
+                        <textarea id="mnuEmbedText" style="height:100px; width:100%; resize:none" readonly="readonly"></textarea>
+                    </li>
                 </ul>
             </li>
             <li id="mnuMine">My Collections</li>
-            <li id="mnuSearch"  title="Search ChronoZoom" ><img src="/images/search-icon.png"  alt="" /></li>
+            <li id="mnuSearch" title="Search ChronoZoom"><img src="/images/search-icon.png" alt="" /></li>
             <li id="mnuProfile" title="Register / Sign In"><img src="/images/profile-icon.png" alt="" /></li>
         </ul>
         <div id="mnuFile">
@@ -360,7 +353,7 @@
                     <a class="footer-link" target="_blank" href="http://chronozoom.tumblr.com/notices">Notices</a>
                 </li>
                 <li class="fright">
-                    <a class="footer-link" id="maillist"   href="mailto:mail@list?subject=Feedback">Feedback</a>
+                    <a class="footer-link" id="maillist" href="mailto:mail@list?subject=Feedback">Feedback</a>
                 </li>
                 <li class="fright">
                     <a class="footer-link" target="_blank" href="https://github.com/alterm4nn/ChronoZoom/wiki">Help</a>

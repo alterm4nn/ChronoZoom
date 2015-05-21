@@ -93,7 +93,9 @@
     <Content Include="css\_vars.css">
       <DependentUpon>_vars.less</DependentUpon>
     </Content>
+    <Content Include="czmin.html" />
     <Content Include="cz.merged.js" />
+    <Content Include="czmin.merged.js" />
     <Content Include="dumps\extensions\GaribaldiTourJSON.js" />
     <Content Include="dumps\extensions\narrative.js" />
     <Content Include="dumps\extensions\rin-sample.js" />
@@ -114,6 +116,7 @@
     <Content Include="featured\tile-chinesemedicine.jpg" />
     <Content Include="featured\tile-environment.jpg" />
     <Content Include="featured\tile-frenchrevolution.jpg" />
+    <Content Include="iframedemo.html" />
     <Content Include="images\add-hover.png" />
     <Content Include="images\add.png" />
     <Content Include="images\copy.svg" />
@@ -169,6 +172,7 @@
     <Content Include="scripts\common.min.js.map">
       <DependentUpon>common.js</DependentUpon>
     </Content>
+    <Content Include="scripts\czmin.js" />
     <Content Include="scripts\cz.min.js">
       <DependentUpon>cz.js</DependentUpon>
     </Content>
@@ -244,6 +248,7 @@
     <Content Include="scripts\menus.min.js">
       <DependentUpon>menus.js</DependentUpon>
     </Content>
+    <Content Include="scripts\miniMenus.js" />
     <Content Include="scripts\plugins\error-plugin.min.js">
       <DependentUpon>error-plugin.js</DependentUpon>
     </Content>
