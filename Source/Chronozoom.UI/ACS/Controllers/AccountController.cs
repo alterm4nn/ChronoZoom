@@ -21,7 +21,8 @@ namespace Chronozoom.Api.Controllers
             hrdClient = client;
         }
 
-        public AccountController(): this(new HrdClient())
+        public AccountController()
+            : this(new HrdClient())
         {
         }
 
@@ -57,6 +58,7 @@ namespace Chronozoom.Api.Controllers
                     string nameIdentifier = "";
                     string identityProvider = "";
                     string emailAddress = null;
+                    string subject = null;
 
                     foreach (var item in user.Claims)
                     {
@@ -72,20 +74,33 @@ namespace Chronozoom.Api.Controllers
                         {
                             emailAddress = item.Value;
                         }
+                        else if (item.ClaimType.EndsWith("subject"))
+                        {
+                            subject = item.Value;
+                        }
 
                     }
 
                     using (Storage storage = new Storage())
                     {
                         Entities.User storedUser = storage.Users.FirstOrDefault(candidate => candidate.IdentityProvider == identityProvider && candidate.NameIdentifier == nameIdentifier);
+
                         if (storedUser != null)
+                        {
                             if (String.IsNullOrEmpty(storedUser.Email) && !String.IsNullOrEmpty(emailAddress))
                             {
                                 storedUser.Email = emailAddress;
                                 storage.SaveChanges();
                             }
 
-                            return Redirect("/" + storedUser.DisplayName);
+                            if (String.IsNullOrEmpty(storedUser.subject) && !String.IsNullOrEmpty(subject))
+                            {
+                                storedUser.Subject = subject;
+                                storage.SaveChanges();
+                            }
+                        }
+
+                        return Redirect("/" + storedUser.DisplayName);
                     }
                 }
             }

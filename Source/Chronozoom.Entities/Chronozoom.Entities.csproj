@@ -171,6 +171,7 @@
     <Content Include="SQL\ManualMigration\201408130000000_MultipleCollections.sql" />
     <Content Include="SQL\ManualMigration\201409250000000_PubliclySearchableChange.sql" />
     <Content Include="SQL\ManualMigration\201502100000000_AddBackgroundUrlAspectRatio.sql" />
+    <Content Include="SQL\ManualMigration\201506010000000_AddUserSubject.sql" />
     <Content Include="SQL\ManualMigration\201502170000000_AddYOffsetsAttributes.sql" />
     <Content Include="SQL\ManualMigration\CreateEntireSchema.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

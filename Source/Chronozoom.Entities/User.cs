@@ -43,5 +43,9 @@ namespace Chronozoom.Entities
         [MaxLength(150)]
         [Column(TypeName = "varchar")]
         public string NameIdentifier { get; set; }
+
+        [MaxLength(150)]
+        [Column(TypeName = "varchar")]
+        public string Subject { get; set; }
     }
 }

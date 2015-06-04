@@ -924,6 +924,7 @@ namespace Chronozoom.UI
                     User newUser = new User { Id = Guid.NewGuid(), DisplayName = userRequest.DisplayName, Email = userRequest.Email };
                     newUser.NameIdentifier = user.NameIdentifier;
                     newUser.IdentityProvider = user.IdentityProvider;
+                    newUser.Subject = user.Subject;
                     collectionUri = EnsurePersonalCollection(storage, newUser);
                 }
                 else
