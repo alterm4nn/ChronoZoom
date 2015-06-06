@@ -93,7 +93,7 @@ namespace Chronozoom.Api.Controllers
                                 storage.SaveChanges();
                             }
 
-                            if (String.IsNullOrEmpty(storedUser.subject) && !String.IsNullOrEmpty(subject))
+                            if (String.IsNullOrEmpty(storedUser.Subject) && !String.IsNullOrEmpty(subject))
                             {
                                 storedUser.Subject = subject;
                                 storage.SaveChanges();

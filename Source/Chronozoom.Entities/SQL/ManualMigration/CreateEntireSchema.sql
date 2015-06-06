@@ -381,3 +381,6 @@ GO
 
 INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201502170000000_AddYOffsetsAttributes',   'Manual Migration');
 GO
+
+INSERT INTO [MigrationHistory] (MigrationId, ProductVersion) VALUES ('201506010000000_AddUserSubject',   'Manual Migration');
+GO

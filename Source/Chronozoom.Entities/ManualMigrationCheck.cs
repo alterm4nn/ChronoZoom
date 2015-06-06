@@ -350,6 +350,7 @@ namespace Chronozoom.Entities
             if (!migrated.ContainsKey("201409250000000")) sql += Properties.Resources._201409250000000_PubliclySearchableChange;
             if (!migrated.ContainsKey("201502100000000")) sql += Properties.Resources._201502100000000_AddBackgroundUrlAspectRatio;
             if (!migrated.ContainsKey("201502170000000")) sql += Properties.Resources._201502170000000_AddYOffsetsAttributes;
+            if (!migrated.ContainsKey("201506010000000")) sql += Properties.Resources._201506010000000_AddUserSubject;
             
             return sql;
         }
