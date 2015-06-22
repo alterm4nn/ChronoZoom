@@ -32,6 +32,7 @@ namespace Chronozoom.UI
         public bool   UseMinifiedJSFiles    { get; private set; }
         public string CSSFileVersion        { get; private set; }
         public string JSFileVersion         { get; private set; }
+        public string JSMinFileVersion      { get; private set; }
         public string SchemaVersion         { get; private set; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -57,6 +58,7 @@ namespace Chronozoom.UI
             UseMinifiedJSFiles  = ConfigurationManager.AppSettings["UseMinifiedJavaScriptFiles" ].ToLower() == "true" ? true : false;
             CSSFileVersion      = GetFileVersion("/css/cz.min.css");
             JSFileVersion       = GetFileVersion("/cz.merged.js");
+            JSMinFileVersion = GetFileVersion("/czmin.merged.js");
             SchemaVersion       = GetLastSchemaUpdate();
             Images              = new List<string>();
         }
@@ -109,6 +111,7 @@ namespace Chronozoom.UI
     public class DefaultHttpHandler : IHttpHandler
     {
         private const string _mainPageName = @"cz.html";
+        private const string _minifiedPageName = @"czmin.html";
         private static readonly Storage _storage = new Storage();
 
         private static readonly Lazy<string> _mainPage = new Lazy<string>(() =>
@@ -139,17 +142,33 @@ namespace Chronozoom.UI
             context.Response.ContentType = "text/html";
 
             PageInformation pageInformation;
-            if (PageIsDynamic(HttpContext.Current.Request.Url, out pageInformation))
+            string page = _mainPageName;
+            bool isMinified = false; 
+            var uri = HttpContext.Current.Request.Url;
+                //if we need minified version of ChronoZoom
+            
+            if (uri.Segments[1] == "czmin/")
             {
-                context.Response.Write(GenerateDefaultPage(pageInformation));
+                page = _minifiedPageName;
+                isMinified = true;
+                // we need ChronoZoom to think it works as usual
+                string uriString = uri.OriginalString;
+                uriString = uriString.Remove(uriString.IndexOf("/czmin"),"/czmin".Length);
+                uri = new Uri(uriString);
+            }
+            bool isDynamic = PageIsDynamic(uri,out pageInformation);
+            if (isDynamic || isMinified)
+            {          
+                context.Response.Write(GenerateDefaultPage(pageInformation, page));
             }
             else
             {
                 context.Response.Write(_mainPage.Value);
             }
+            
         }
 
-        private static bool PageIsDynamic(Uri pageUrl, out PageInformation pageInformation)
+        private static bool PageIsDynamic(Uri pageUrl, out PageInformation pageInformation, bool isMinimized = false)
         {
             pageInformation = new PageInformation();
 
@@ -181,12 +200,19 @@ namespace Chronozoom.UI
                 if (collectionSegment != "")
                 {
                     // redirect to the default collection for the specified supercollection
-                    HttpContext.Current.Response.Redirect("/" + superCollectionSegment + "#");
+                    if (isMinimized)
+                        HttpContext.Current.Response.Redirect("/czmin/" + superCollectionSegment + "#");
+                    else
+                        HttpContext.Current.Response.Redirect("/" + superCollectionSegment + "#");
                     return false;
                 }
 
                 // otherwise redirect to the default supercollection's default collection
-                HttpContext.Current.Response.Redirect("/#");
+                if(isMinimized)
+                   HttpContext.Current.Response.Redirect("/czmin/#");
+                else
+                    HttpContext.Current.Response.Redirect("/#");
+
                 return false;
             }
 
@@ -227,11 +253,11 @@ namespace Chronozoom.UI
             }
         }
 
-        internal static string GenerateDefaultPage(PageInformation pageInformation)
+        internal static string GenerateDefaultPage(PageInformation pageInformation, string pageName = _mainPageName)
         {
             try
             {
-                using (StreamReader streamReader = new StreamReader(_baseDirectory.Value + _mainPageName))
+                using (StreamReader streamReader = new StreamReader(_baseDirectory.Value + pageName))
                 {
                     XmlReader xmlReader = new XmlTextReader(streamReader);
                     XDocument pageRoot = XDocument.Load(xmlReader);

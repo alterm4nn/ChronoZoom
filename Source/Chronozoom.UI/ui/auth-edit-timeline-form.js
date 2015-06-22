@@ -126,7 +126,7 @@ var CZ;
                         if (!(((_this.offsetInput.val() === "") === (_this.bottomOffsetInput.val() === "")))) {
                             _this.errorMessage.text("To select auto mode clear both fields.");
                             isDataValid = false;
-                    }
+                        }
 
                         if (_this.offsetInput.val() !== "") {
                             if (Number(_this.offsetInput.val()) < 0
@@ -181,16 +181,14 @@ var CZ;
                                     self.timeline = CZ.Common.vc.virtualCanvas("findElement", self.timeline.id);
                                     delete self.timeline.animation;
 
-                                    // Move to new created timeline
+                                    //Move to new created timeline
                                     self.timeline.onmouseclick();
                                 });
                             } else {
-                                // Move to new created timeline
+                                //Move to new created timeline
                                 self.timeline.onmouseclick();
                             }
 
-                            //Move to new created timeline
-                            self.timeline.onmouseclick();
                         }, function (error) {
                             if (error !== undefined && error !== null) {
                                 self.errorMessage.text(error).show().delay(7000).fadeOut();

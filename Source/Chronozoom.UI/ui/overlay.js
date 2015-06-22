@@ -85,6 +85,9 @@ var CZ;
 
         function Hide()
         {
+            CZ.Menus.isOverlay = false;
+            CZ.Menus.Refresh();
+
             if (CZ.Settings.isCosmosCollection)
             {
                 $('.header-regimes' ).visible();
@@ -101,6 +104,9 @@ var CZ;
             CZ.HomePageViewModel.closeAllForms();
             $('.header-regimes'     ).invisible();
             $('.header-breadcrumbs' ).invisible();
+
+            CZ.Menus.isOverlay = true;
+            CZ.Menus.Refresh();
 
             if (initialized)
             {

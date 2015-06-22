@@ -55,7 +55,7 @@ var CZ;
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.infodotDescription.isCirca || false);
                     this.offsetInput.val("");
-
+                
                     this.closeButton.show();
                     this.createArtifactButton.show();
                     this.saveButton.show();
@@ -89,7 +89,7 @@ var CZ;
                     CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
                         _this.saveButton.data('lastUpdate', data);
                     });
-
+                    
                     this.titleInput.val(this.exhibit.title || "");
                     this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
                     $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.infodotDescription.isCirca || false);
@@ -152,7 +152,7 @@ var CZ;
                         date: this.datePicker.getDate(),
                         isCirca: $(this.datePicker.circaSelector).find('input').is(':checked')
                     };
-                    //this.exhibit.IsCirca = $(this.datePicker.circaSelector).find('input').is(':checked');
+                  //this.exhibit.IsCirca = $(this.datePicker.circaSelector).find('input').is(':checked');
                     var newContentItem = {
                         title: "",
                         uri: "",
@@ -174,7 +174,7 @@ var CZ;
                     });
                 }
             };
-
+  
             FormEditExhibit.prototype.onSave = function () {
                 var _this = this;
                 var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
@@ -208,10 +208,10 @@ var CZ;
                     offsetY: this.exhibit.offsetY,
                     infodotDescription:
                     {
-                        date: CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()),
+                        date:    CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()),
                         isCirca: $(this.datePicker.circaSelector).find('input').is(':checked')
                     },
-                    //IsCirca: $(this.datePicker.circaSelector).find('input').is(':checked'),
+                  //IsCirca: $(this.datePicker.circaSelector).find('input').is(':checked'),
                     contentItems: this.exhibit.contentItems || [],
                     type: "infodot"
                 };
@@ -229,7 +229,7 @@ var CZ;
                     && this.exhibit.contentItems.length >= 1
                     && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount
                     && /(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(this.offsetInput.val())) {
-
+                    
                     if (this.mode === "editExhibit") {
                         // edit mode - see if someone else has saved edit since we loaded it
                         CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
@@ -238,18 +238,20 @@ var CZ;
                                 _this.onSave_PerformSave(newExhibit);
                             } else {
                                 // someone else has touched - warn and give options
-                                if
+                                if 
                                 (
                                     confirm
                                     (
-                                    //"Someone else has made changes to this exhibit since you began editing it.\n\n" +
+                                      //"Someone else has made changes to this exhibit since you began editing it.\n\n" +
                                         data.split('|')[1] + " has made changes to this exhibit since you began editing it.\n\n" +
                                         "Do you want to replace their changes with yours? This will cause all of their changes to be lost."
                                     )
-                                ) {
+                                )
+                                {
                                     _this.onSave_PerformSave(newExhibit);
                                 }
-                                else {
+                                else
+                                {
                                     alert
                                     (
                                         "Your changes were not saved.\n\n" +
@@ -283,26 +285,29 @@ var CZ;
             FormEditExhibit.prototype.onSave_PerformSave = function (newExhibit) {
                 var _this = this;
                 this.saveButton.prop('disabled', true);
-
+                
                 CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
                     _this.isCancel = false;
                     _this.isModified = false;
                     _this.close();
                     _this.exhibit.id = arguments[0].id;
-                    
+                    _this.exhibit.onmouseclick();
+
                     // If offset has changed, then we need to redraw layout.
                     var isOffsetChanged = (Number(_this.offsetInput.val()) !== _this.exhibitCopy.offsetY);
                     if (isOffsetChanged) {
                         CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
                         CZ.Common.reloadData().done(function () {
                             _this.exhibit = CZ.Common.vc.virtualCanvas("findElement", _this.exhibit.id);
-                            _this.exhibit.onmouseclick();
-                        });
-                    }
-                    else {
-                        _this.exhibit.onmouseclick();
-                    }
-                    
+                             delete self.timeline.animation;
+  
+                             // Move to new created timeline
+                             self.timeline.onmouseclick();
+                            });
+                   } else {
+                       // Move to new created timeline
+                       self.timeline.onmouseclick();
+                   }
                 }, function (error) {
                     var errorMessage = JSON.parse(error.responseText).errorMessage;
                     if (errorMessage !== "") {
