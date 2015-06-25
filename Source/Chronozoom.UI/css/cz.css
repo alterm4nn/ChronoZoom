@@ -114,7 +114,6 @@ input.error {
   color: #dd4b39;
 }
 /***********************************************************
-
                         Media List
       
 ***********************************************************/
@@ -131,7 +130,6 @@ input.error {
   display: block;
 }
 /***********************************************************
-
                     Custom Media Pickers
       
 ***********************************************************/
@@ -256,6 +254,15 @@ iframe[sutra=picker] + div {
   color: #fff;
 }
 /* level 1 */
+#miniMenu {
+  color: #eee;
+  display: inline;
+  float: right;
+  position: relative;
+  margin: 3px 0 3px 0;
+  padding: 0;
+  z-index: 2100;
+}
 #mnu {
   color: #eee;
   display: inline;
@@ -265,6 +272,16 @@ iframe[sutra=picker] + div {
   padding: 0;
   z-index: 2100;
 }
+
+#miniMenu > li {
+  display: inline;
+  float: left;
+  list-style-type: none;
+  padding: 2px 8px 2px 8px;
+  border-radius: 4px;
+  line-height: 26px;
+}
+
 #mnu > li {
   cursor: pointer;
   display: inline;
@@ -288,6 +305,38 @@ iframe[sutra=picker] + div {
   cursor: not-allowed !important;
 }
 /* level 2 */
+#miniMenu > li > ul {
+  background-color: #232323;
+  display: none;
+  position: absolute;
+  margin: 0 0 0 -8px;
+  padding: 0;
+  border: solid 2px #0464a2;
+  border-radius: 0 8px 8px 8px;
+  z-index: 2100;
+}
+
+#miniMenuText {
+    overflow-y:auto;
+    right:0;
+    width: 475px; 
+    height: 280px;
+    max-width:95%;
+    max-height:80%;
+    float:right;
+    bottom:25px;
+}
+#miniMenuCZhref {
+    text-shadow: 0 0 1px #0464a2;
+    color:deepskyblue;
+    font-size:20px;
+    display: table;
+}
+
+#miniMenuCZhref:hover {
+    text-shadow: 0 0 1px #81f7ff;
+}
+
 #mnu > li > ul {
   background-color: #232323;
   display: none;
@@ -806,7 +855,6 @@ div.preview {
   opacity: 0.7;
 }
 /***********************************************************
-
                             Header            
       
 ***********************************************************/
@@ -840,9 +888,18 @@ div.preview {
   background-position: center;
   background-image: url('/images/chronozoom.png');
   margin-left: 3px;
-  cursor: pointer;
-  z-index: 1;
+  cursor:pointer;
 }
+
+.miniMenu-logo {
+    cursor:default;
+    box-shadow: inset 2px 2px 0 #0388E5;
+    background-color:black; 
+    border-color:#0388E5;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
 .header-regimes {
   -webkit-transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
   -moz-transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
@@ -894,9 +951,7 @@ div.preview {
   margin-top: -8px;
 }
 /***********************************************************
-
                             Content
-
 ***********************************************************/
 #content {
   -webkit-box-sizing: border-box;
@@ -909,6 +964,18 @@ div.preview {
   height: -moz-calc(100% - 36px - 25px - 25px + 8px);
   height: -webkit-calc(100% - 36px - 25px - 25px + 8px);
   height: -o-calc(100% - 36px - 25px - 25px + 8px);
+}
+
+#embedContent {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  height: calc(100% - 25px);
+  height: -moz-calc(100% - 25px);
+  height: -webkit-calc(100% - 25px);
+  height: -o-calc(100% - 25px);
 }
 #vc-container {
   -webkit-box-sizing: border-box;
@@ -980,7 +1047,6 @@ div.preview {
   margin-right: 0px;
 }
 /***********************************************************
-
                         Bibliography
                    
 ***********************************************************/
@@ -1101,9 +1167,7 @@ div.preview {
   cursor: auto;
 }
 /***********************************************************
-
                         Tooltip
-
 ***********************************************************/
 .bubbleInfo {
   position: absolute;
@@ -1151,7 +1215,6 @@ div.preview {
   white-space: nowrap;
 }
 /***********************************************************
-
                         Welcome Screen
        
 ***********************************************************/
@@ -1271,9 +1334,7 @@ div.preview {
   height: 100%;
 }
 /***********************************************************
-
                         Fallbackpage
-
 ***********************************************************/
 img.fallbackBackground {
   position: fixed;
@@ -1391,9 +1452,7 @@ img.fallbackBackground {
   height: 100%;
 }
 /***********************************************************
-
                             Footer
-
 ***********************************************************/
 footer {
   position: absolute;
@@ -1464,9 +1523,7 @@ footer {
   color: #aaa;
 }
 /***********************************************************
-
                         Breadcrumbs
-
 ***********************************************************/
 .breadcrumbs-nav {
   width: 25px;
@@ -1540,9 +1597,7 @@ footer {
   color: #ee6;
 }
 /***********************************************************
-
                             Auxiliary
-
 ***********************************************************/
 .border-box {
   -moz-box-sizing: border-box;
@@ -1697,9 +1752,7 @@ footer {
   transition: none;
 }
 /***********************************************************
-
                         Form Base
-
 ***********************************************************/
 .cz-form {
   position: absolute;
@@ -1897,6 +1950,11 @@ footer {
   margin: 5px 0;
   display: block;
 }
+
+.cz-form-percent-tooltip{
+    color:dodgerblue
+}
+
 a {
   color: #0464a2;
 }
@@ -1904,9 +1962,7 @@ a {
   margin-left: 0px;
 }
 /***********************************************************
-
                         Custom Forms
-
 ***********************************************************/
 .cz-form-color,
 .cz-form-range,
@@ -2103,6 +2159,11 @@ a.cz-form-preloadedrecord.time-series-link {
 .cz-form-item-descr {
   font-family: Consolas, "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;
 }
+
+.cz-form-item-offset {
+    display: block;
+}
+
 /* Edit Content Item Form */
 .cz-form-contentitem {
   width: 420px;
@@ -2406,9 +2467,7 @@ a.cz-form-preloadedrecord.time-series-link {
   margin-right: 10px;
 }
 /***********************************************************
-
                     ListBox Base
-
 ***********************************************************/
 .cz-listbox {
   margin: 15px 0;
@@ -2455,9 +2514,7 @@ a.cz-form-preloadedrecord.time-series-link {
   font-size: 14px;
 }
 /***********************************************************
-
                 ContentItem ListBox
-
 ***********************************************************/
 .cz-contentitem-listitem-icon {
   width: 15%;
@@ -2611,7 +2668,6 @@ a.cz-form-preloadedrecord.time-series-link {
     The initial/default theme is Midnight Blue, (.theme-midnight,) which should not
     have any styling here, since the default styling, without applying any specific
     theme styles, is Midnight Blue.
-
     The only entries here should be for anything that differs from the default theme.
 */
 .theme-library #overlay {

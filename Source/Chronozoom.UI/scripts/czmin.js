@@ -10,14 +10,6 @@
 /// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../ui/controls/datepicker.ts'/>
 /// <reference path='../ui/controls/medialist.ts'/>
-/// <reference path='../ui/auth-edit-timeline-form.ts'/>
-/// <reference path='../ui/auth-edit-exhibit-form.ts'/>
-/// <reference path='../ui/auth-edit-contentitem-form.ts'/>
-/// <reference path='../ui/auth-edit-tour-form.ts'/>
-/// <reference path='../ui/auth-edit-collection-form.ts'/>
-/// <reference path='../ui/auth-edit-collection-editors.ts'/>
-/// <reference path='../ui/header-edit-form.ts' />
-/// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
 /// <reference path='../ui/header-search-form.ts' />
 /// <reference path='../ui/timeseries-graph-form.ts'/>
@@ -39,19 +31,11 @@ var CZ;
     CZ.timeSeriesChart;
     CZ.leftDataSet;
     CZ.rightDataSet;
-
     (function (HomePageViewModel) {
         // Contains mapping of jQuery selector to HTML file, which is used to initialize the various panels via CZ.UILoader.
         var _uiMap =
         {
-            "#header-edit-form": "/ui/header-edit-form.html",
-            "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
-            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
-            "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
             "$('<div></div>')": "/ui/contentitem-listbox.html",
-            "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html",
-            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
             "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
             "#toursList": "/ui/tourslist-form.html",
             "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
@@ -59,39 +43,28 @@ var CZ;
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
             "#message-window": "/ui/message-window.html",
             "#header-search-form": "/ui/header-search-form.html",
-            "#header-session-expired-form": "/ui/header-session-expired-form.html",
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
             "#overlay": "/ui/overlay.html",
-            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html",
-            "#auth-edit-collection-editors": "/ui/auth-edit-collection-editors.html"
         };
 
         HomePageViewModel.sessionForm;
         HomePageViewModel.rootCollection;
 
-        function UserCanEditCollection(profile) {
-
-            // can't edit if no profile, no display name or no supercollection
-            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName) {
-                return false;
-            }
-
-            // override - anyone can edit the sandbox
-            if (CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
-                return true;
-            }
-
-            // if here then logged in and on a page (other than sandbox) with a supercollection and collection
-            // so return canEdit Boolean, which was previously set after looking up permissions in db.
-            return CZ.Service.canEdit;
+        function UserCanEditCollection(profile)
+        {
+            //it's always false because we are in minified version
+            return false;
+           
         }
 
-        function InitializeToursUI(profile, forms) {
-            CZ.Tours.tourCaptionFormContainer = forms[16];
-            var allowEditing = UserCanEditCollection(profile);
+        function InitializeToursUI(profile, forms)
+        {
+            CZ.Tours.tourCaptionFormContainer = forms[8];
+            var allowEditing =UserCanEditCollection(profile);
 
-            CZ.Tours.takeTour = function (tour) {
+            CZ.Tours.takeTour = function(tour)
+            {
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption
                 (
@@ -115,15 +88,18 @@ var CZ;
                 CZ.Tours.activateTour(tour, undefined);
             };
 
-            CZ.HomePageViewModel.panelShowToursList = function (canEdit) {
+            CZ.HomePageViewModel.panelShowToursList = function (canEdit)
+            {
                 // canEdit undefined    = use allowEditing
                 // canEdit false        = read only rendering
                 // canEdit true         = edit rights rendering
                 if (typeof canEdit == 'undefined') canEdit = allowEditing;
 
 
-                if (canEdit && CZ.Tours.tours) {
-                    if (CZ.Tours.tours.length === 0) {
+                if (canEdit && CZ.Tours.tours)
+                {
+                    if (CZ.Tours.tours.length === 0)
+                    {
                         // if there are no tours to show and user has tour editing rights, lets fire off the add a tour dialog instead
                         CZ.Overlay.Hide();
                         CZ.HomePageViewModel.closeAllForms();
@@ -133,24 +109,27 @@ var CZ;
                 }
 
                 var toursListForm = getFormById("#toursList");
-                if (toursListForm.isFormVisible) {
+                if (toursListForm.isFormVisible)
+                {
                     toursListForm.close();
                 }
-                else {
+                else
+                {
                     CZ.Overlay.Hide();
                     closeAllForms();
                     var form = new CZ.UI.FormToursList
                     (
-                        forms[9],
+                        forms[2],
                         {
                             activationSource: $(this),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
-                            tourTemplate: forms[10],
+                            tourTemplate: forms[3],
                             tours: CZ.Tours.tours,
                             takeTour: CZ.Tours.takeTour,
-                            editTour: canEdit ? function (tour) {
+                            editTour: canEdit ? function (tour)
+                            {
                                 if (CZ.Authoring.showEditTourForm) CZ.Authoring.showEditTourForm(tour);
                             }
                             : null,
@@ -162,7 +141,7 @@ var CZ;
             };
         }
 
-        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, offsetY: null, Height: null, children: [], parent: { guid: null } };
+        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, offsetY:null, Height:null, children: [], parent: { guid: null } };
 
         $(document).ready(function () {
             // ensures there will be no 'console is undefined' errors
@@ -179,7 +158,7 @@ var CZ;
             $('#wait').hide();
 
             $(document).ajaxStart(function () {
-                $('#wait').show();
+               // $('#wait').show();
             });
             $(document).ajaxStop(function () {
                 $('#wait').hide();
@@ -187,12 +166,14 @@ var CZ;
 
             // overlay & general wrapper theme
             var theme = localStorage.getItem('theme') || '';
-            if (theme === '') {
+            if (theme === '')
+            {
                 theme = 'theme-linen'; // initial
                 localStorage.setItem('theme', theme);
             }
             $('body').addClass(theme);
 
+            // change the URL to make ChronoZoom think that it works as usual
             // populate collection names from URL
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;
@@ -208,44 +189,41 @@ var CZ;
             CZ.Media.initialize();
             CZ.Common.initialize();
 
-            // hook logo click
-            $('.header-logo').click(function () {
-                //window.location.href = '/';
-                CZ.Overlay.Show(false);  // false = home page overlay
-            });
-
             // ensure we have a supercollection for getCanEdit and other API calls.
             if (typeof CZ.Service.superCollectionName === 'undefined' && CZ.Common.isInCosmos()) CZ.Service.superCollectionName = 'chronozoom';
 
             // check if current user has edit permissions before continuing with load
             // since other parts of load need to know if can display edit buttons etc.
-            CZ.Service.getCanEdit().done(function (result) {
+            CZ.Service.getCanEdit().done(function (result)
+            {
                 CZ.Service.canEdit = (result === true);
                 finishLoad();
             });
         });
 
-        function finishLoad() {
+        function finishLoad()
+        {
             // only invoked after user's edit permissions are checked (AJAX callback)
-            CZ.UILoader.loadAll(_uiMap).done(function () {
+            CZ.UILoader.loadAll(_uiMap).done(function ()
+            {
                 var forms = arguments;
 
-                CZ.Settings.isCosmosCollection = CZ.Common.isInCosmos();
+                CZ.Settings.isCosmosCollection = true;
                 if (CZ.Settings.isCosmosCollection) $('.header-regimes').show();
 
-                CZ.Menus.isEditor = CZ.Service.canEdit;
-                CZ.Menus.Refresh();
-                CZ.Overlay.Initialize();
+                //CZ.Overlay.Initialize();
 
-                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
+                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[4]);
 
-                CZ.HomePageViewModel.panelToggleTimeSeries = function () {
+                CZ.HomePageViewModel.panelToggleTimeSeries = function ()
+                {
                     CZ.Overlay.Hide();
                     var tsForm = getFormById('#timeSeriesDataForm');
-                    if (tsForm === false) {
+                    if (tsForm === false)
+                    {
                         closeAllForms();
 
-                        var timeSeriesDataFormDiv = forms[12];
+                        var timeSeriesDataFormDiv = forms[5];
                         var timeSeriesDataForm = new CZ.UI.TimeSeriesDataForm
                         (
                             timeSeriesDataFormDiv,
@@ -256,24 +234,29 @@ var CZ;
                         );
                         timeSeriesDataForm.show();
                     }
-                    else {
-                        if (tsForm.isFormVisible) {
+                    else
+                    {
+                        if (tsForm.isFormVisible)
+                        {
                             tsForm.close();
                         }
-                        else {
+                        else
+                        {
                             closeAllForms();
                             tsForm.show();
                         }
                     }
                 };
-
-                CZ.HomePageViewModel.panelToggleSearch = function () {
+                
+                CZ.HomePageViewModel.panelToggleSearch = function ()
+                {
                     var searchForm = getFormById("#header-search-form");
-                    if (searchForm === false) {
+                    if (searchForm === false)
+                    {
                         closeAllForms();
                         var form = new CZ.UI.FormHeaderSearch
                         (
-                            forms[14],
+                            forms[7],
                             {
                                 activationSource: $(this),
                                 navButton: ".cz-form-nav",
@@ -288,61 +271,23 @@ var CZ;
                         );
                         form.show();
                     }
-                    else {
-                        if (searchForm.isFormVisible) {
+                    else
+                    {
+                        if (searchForm.isFormVisible)
+                        {
                             searchForm.close();
                         }
-                        else {
+                        else
+                        {
                             closeAllForms();
                             searchForm.show();
                         }
                     }
                 };
 
-                $("#editCollectionButton img").click(function () {
-                    closeAllForms();
-                    var form = new CZ.UI.FormEditCollection(forms[19], {
-                        activationSource: $(),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        deleteButton: '.cz-form-delete',
-                        titleTextblock: ".cz-form-title",
-                        saveButton: ".cz-form-save",
-                        errorMessage: '.cz-form-errormsg',
-                        collectionName: '#cz-collection-name',
-                        collectionPath: '#cz-collection-path',
-                        collectionTheme: CZ.Settings.theme,
-                        backgroundInput: $(".cz-form-collection-background"),
-                        kioskmodeInput: $(".cz-form-collection-kioskmode"),
-                        mediaListContainer: ".cz-form-medialist",
-                        timelineBackgroundColorInput: $(".cz-form-timeline-background"),
-                        timelineBackgroundOpacityInput: $(".cz-form-timeline-background-opacity"),
-                        timelineBorderColorInput: $(".cz-form-timeline-border"),
-                        exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
-                        exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
-                        exhibitBorderColorInput: $(".cz-form-exhibit-border"),
-                        chkDefault: '#cz-form-collection-default',
-                        chkPublic: '#cz-form-public-search',
-                        chkEditors: '#cz-form-multiuser-enable',
-                        btnEditors: '#cz-form-multiuser-manage'
-                    });
-                    form.show();
-                });
-
-                $('body').on('click', '#cz-form-multiuser-manage', function (event) {
-                    var form = new CZ.UI.FormManageEditors(forms[20], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        titleTextblock: ".cz-form-title",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        saveButton: ".cz-form-save"
-                    });
-                    form.show();
-                });
-
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showMessageWindow: function (message, title, onClose) {
-                        var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
+                        var wnd = new CZ.UI.MessageWindow(forms[6], message, title);
                         if (onClose)
                             wnd.container.bind("close", function () {
                                 wnd.container.unbind("close", onClose);
@@ -351,326 +296,93 @@ var CZ;
                         wnd.show();
                     },
                     hideMessageWindow: function () {
-                        var wnd = forms[13].data("form");
+                        var wnd = forms[6].data("form");
                         if (wnd)
                             wnd.close();
-                    },
-                    showEditTourForm: function (tour) {
-                        CZ.Tours.removeActiveTour();
-                        var form = new CZ.UI.FormEditTour(forms[7], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            addStopButton: ".cz-form-tour-addstop",
-                            titleInput: ".cz-form-title",
-                            tourStopsListBox: "#stopsList",
-                            tourStopsTemplate: forms[8],
-                            context: tour
-                        });
-                        form.show();
-                    },
-                    showCreateTimelineForm: function (timeline) {
-                        CZ.Authoring.hideMessageWindow();
-                        CZ.Authoring.mode = "createTimeline";
-                        var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            startDate: ".cz-form-time-start",
-                            endDate: ".cz-form-time-end",
-                            mediaListContainer: ".cz-form-medialist",
-                            backgroundUrl: ".cz-form-background-url",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            offsetLabels: ".cz-form-offset-label",
-                            topBoundInput: ".cz-form-item-offset",
-                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
-                            errorMessage: ".cz-form-errormsg",
-                            context: timeline
-                        });
-                        form.show();
-                    },
-                    showCreateRootTimelineForm: function (timeline) {
-                        CZ.Authoring.mode = "createRootTimeline";
-                        var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            startDate: ".cz-form-time-start",
-                            endDate: ".cz-form-time-end",
-                            mediaListContainer: ".cz-form-medialist",
-                            backgroundUrl: ".cz-form-background-url",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            offsetLabels: ".cz-form-offset-label",
-                            topBoundInput: ".cz-form-item-top-bound-offset",
-                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
-                            errorMessage: ".cz-form-errormsg",
-                            context: timeline
-                        });
-                        form.show();
-                    },
-                    showEditTimelineForm: function (timeline) {
-                        var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            startDate: ".cz-form-time-start",
-                            endDate: ".cz-form-time-end",
-                            mediaListContainer: ".cz-form-medialist",
-                            backgroundUrl: ".cz-form-background-url",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            offsetLabels: ".cz-form-offset-label",
-                            topBoundInput: ".cz-form-item-top-bound-offset",
-                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
-                            errorMessage: ".cz-form-errormsg",
-                            context: timeline
-                        });
-                        form.show();
-                    },
-                    showCreateExhibitForm: function (exhibit) {
-                        CZ.Authoring.hideMessageWindow();
-                        var form = new CZ.UI.FormEditExhibit(forms[2], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            titleInput: ".cz-form-item-title",
-                            offsetInput: ".cz-form-item-offset",
-                            datePicker: ".cz-form-time",
-                            createArtifactButton: ".cz-form-create-artifact",
-                            contentItemsListBox: ".cz-listbox",
-                            errorMessage: ".cz-form-errormsg",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            contentItemsTemplate: forms[4],
-                            context: exhibit
-                        });
-                        form.show();
-                    },
-                    showEditExhibitForm: function (exhibit) {
-                        var form = new CZ.UI.FormEditExhibit(forms[2], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            titleInput: ".cz-form-item-title",
-                            offsetInput: ".cz-form-item-offset",
-                            offsetCheckbox: ".cz-form-item-offset-checkbox",
-                            datePicker: ".cz-form-time",
-                            createArtifactButton: ".cz-form-create-artifact",
-                            contentItemsListBox: ".cz-listbox",
-                            errorMessage: ".cz-form-errormsg",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            contentItemsTemplate: forms[4],
-                            context: exhibit
-                        });
-                        form.show();
-                    },
-                    showEditContentItemForm: function (ci, e, prevForm, noAnimation) {
-                        var form = new CZ.UI.FormEditCI(forms[3], {
-                            activationSource: $(),
-                            prevForm: prevForm,
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            errorMessage: ".cz-form-errormsg",
-                            saveButton: ".cz-form-save",
-                            titleInput: ".cz-form-item-title",
-                            mediaSourceInput: ".cz-form-item-mediasource",
-                            mediaInput: ".cz-form-item-mediaurl",
-                            descriptionInput: ".cz-form-item-descr",
-                            attributionInput: ".cz-form-item-attribution",
-                            mediaTypeInput: ".cz-form-item-media-type",
-                            mediaListContainer: ".cz-form-medialist",
-                            context: {
-                                exhibit: e,
-                                contentItem: ci
+                    }
+                });
+             
+                var canEdit = false;
+                CZ.Authoring.isEnabled = false;
+                CZ.Settings.isAuthorized = false;
+
+                InitializeToursUI(null, forms);
+
+                // *****************************
+                // *** Collection Load Logic ***
+                // *****************************
+
+                // load the entire collection
+                CZ.Common.loadData().then(function (response) {
+                    // if collection is empty
+                    if (!response) {
+                        // if user has edit rights
+                        if (CZ.Authoring.isEnabled) {
+                            // show a form to create the root timeline
+                            if (CZ.Authoring.showCreateRootTimelineForm) {
+                                CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
                             }
-                        });
-                        form.show(noAnimation);
+                        }
+                        else {
+                            // tell the user there is no content
+                            CZ.Authoring.showMessageWindow
+                            (
+                                'There is no content in this collection yet. ' +
+                                'Please click on the ChronoZoom logo, (found just above this message,) ' +
+                                'to see some other collections that you can view.',
+                                "Collection Has No Content"
+                            );
+                        }
                     }
                 });
 
-                HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
-                    activationSource: $(),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    titleInput: ".cz-form-item-title",
-                    context: "",
-                    sessionTimeSpan: "#session-time",
-                    sessionButton: "#session-button"
+                // get and store the collection title and owner
+                CZ.Service.getCollection().done(function (collection) {
+                    if (collection != null) {
+                        CZ.Common.collectionTitle = collection.Title || '';
+                        CZ.Settings.collectionOwner = collection.User.DisplayName;
+                    }
                 });
 
-                var loginForm = new CZ.UI.FormLogin
-                (
-                    forms[6],
-                    {
-                        activationSource: $(),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        titleInput: ".cz-form-item-title",
-                        context: ""
+
+                // **************************************
+                // *** Start-Up Overlay Display Logic ***
+                // **************************************
+
+
+                // if logged in and user hasn't completed profile
+                if (CZ.Menus.isSignedIn && CZ.Settings.userSuperCollectionName === '') {
+                    // show profile form on top of home page overlay
+                    CZ.Overlay.Show();
+                    profileForm.show();
+                    $('#username').focus();
+                }
+                    // else if logged in and my collections was requested
+                else if (CZ.Menus.isSignedIn && sessionStorage.getItem('showMyCollections') === 'requested') {
+                    // show my collections overlay
+                    CZ.Overlay.Show(true);
+                }
+                else {
+                    if  // if no auto-tour and collection is Big History collection
+                    (
+                        CZ.Tours.getAutoTourGUID() === ''   // <--  Always check first as fn must fire.
+                        &&                                  //      This fn sets up tours.js's parseTours
+                        (                                   //      to auto-start a tour, if specified.
+                            (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
+                            window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                        )
+                    ) {
+                        // show home page overlay
+                        //        CZ.Overlay.Show();
                     }
-                );
-                CZ.HomePageViewModel.panelToggleLogin = function () {
-                    if (loginForm.isFormVisible) {
-                        loginForm.close();
-                    }
-                    else {
-                        closeAllForms();
-                        loginForm.show();
-                    }
-                };
+                }
 
-                var profileForm = new CZ.UI.FormEditProfile
-                (
-                    forms[5],
-                    {
-                        activationSource: $(),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        saveButton: "#cz-form-save",
-                        logoutButton: "#cz-form-logout",
-                        titleInput: ".cz-form-item-title",
-                        usernameInput: ".cz-form-username",
-                        emailInput: ".cz-form-email",
-                        agreeInput: ".cz-form-agree",
-                        loginPanel: "#login-panel",
-                        profilePanel: "#profile-panel",
-                        loginPanelLogin: "#profile-panel.auth-panel-login",
-                        context: "",
-                        allowRedirect: true
-                    }
-                );
-                CZ.HomePageViewModel.panelToggleProfile = function () {
-                    if (profileForm.isFormVisible) {
-                        profileForm.close();
-                    }
-                    else {
-                        closeAllForms();
-                        profileForm.show();
-                    }
-                };
+                // remove any my collections queued request
+                sessionStorage.removeItem('showMyCollections');
 
-                CZ.Service.getProfile().done(function (data) {
-                    if (data !== '') {
-                        CZ.Settings.isAuthorized = true;
-                        CZ.Menus.isSignedIn = true;
-                        CZ.Menus.Refresh();
-                        CZ.Settings.userSuperCollectionName = data.DisplayName || '';
-                        CZ.Settings.userCollectionName = data.DisplayName || '';
-                        CZ.Settings.userDisplayName = data.DisplayName || '';
-                        CZ.Authoring.timer = setTimeout(function () {
-                            CZ.Authoring.showSessionForm();
-                        }, (CZ.Settings.sessionTime - 60) * 1000);
-                    }
-
-                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
-                    InitializeToursUI(data, forms);
-                })
-                .fail(function (error) {
-                    var canEdit = UserCanEditCollection(null);
-                    CZ.Authoring.isEnabled = canEdit;
-                    CZ.Settings.isAuthorized = canEdit;
-
-                    InitializeToursUI(null, forms);
-                })
-                .always(function () {
-                    // *****************************
-                    // *** Collection Load Logic ***
-                    // *****************************
-
-                    // load the entire collection
-                    CZ.Common.loadData().then(function (response) {
-                        // if collection is empty
-                        if (!response) {
-                            // if user has edit rights
-                            if (CZ.Authoring.isEnabled) {
-                                // show a form to create the root timeline
-                                if (CZ.Authoring.showCreateRootTimelineForm) {
-                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
-                                }
-                            }
-                            else {
-                                // tell the user there is no content
-                                CZ.Authoring.showMessageWindow
-                                (
-                                    'There is no content in this collection yet. ' +
-                                    'Please click on the ChronoZoom logo, (found just above this message,) ' +
-                                    'to see some other collections that you can view.',
-                                    "Collection Has No Content"
-                                );
-                            }
-                        }
-                    });
-
-                    // get and store the collection title and owner
-                    CZ.Service.getCollection().done(function (collection) {
-                        if (collection != null) {
-                            CZ.Common.collectionTitle = collection.Title || '';
-                            CZ.Settings.collectionOwner = collection.User.DisplayName;
-                        }
-
-                        //  set the canvas edit collection icon title
-                        $('#editCollectionButton').find('.title').text(CZ.Common.collectionTitle);
-                    });
-
-
-                    // **************************************
-                    // *** Start-Up Overlay Display Logic ***
-                    // **************************************
-
-                    // if user can edit collection then unhide the canvas edit collection icon
-                    if (CZ.Authoring.isEnabled) $('#editCollectionButton').find('.hidden').removeClass('hidden');
-
-                    // if logged in and user hasn't completed profile
-                    if (CZ.Menus.isSignedIn && CZ.Settings.userSuperCollectionName === '') {
-                        // show profile form on top of home page overlay
-                        CZ.Overlay.Show();
-                        profileForm.show();
-                        $('#username').focus();
-                    }
-                        // else if logged in and my collections was requested
-                    else if (CZ.Menus.isSignedIn && sessionStorage.getItem('showMyCollections') === 'requested') {
-                        // show my collections overlay
-                        CZ.Overlay.Show(true);
-                    }
-                    else {
-                        if  // if no auto-tour and collection is Big History collection
-                        (
-                            CZ.Tours.getAutoTourGUID() === ''   // <--  Always check first as fn must fire.
-                            &&                                  //      This fn sets up tours.js's parseTours
-                            (                                   //      to auto-start a tour, if specified.
-                                (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
-                                window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
-                            )
-                        ) {
-                            // show home page overlay
-                            CZ.Overlay.Show();
-                        }
-                    }
-
-                    // remove any my collections queued request
-                    sessionStorage.removeItem('showMyCollections');
-
-                    // remove splash screen
-                    $('#splash').fadeOut('slow');
-                });
+                // remove splash screen
+                $('#splash').fadeOut('slow');
+                
 
             });
 
@@ -684,19 +396,22 @@ var CZ;
             CZ.Settings.applyTheme(null, CZ.Service.superCollectionName != null);
 
             // If not the default supercollection's default collection then look up the appropriate collection's theme
-            if (CZ.Service.superCollectionName) {
-                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+            if (CZ.Service.superCollectionName)
+            {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response)
+                {
                     $(response).each(function (index) {
-                        if 
+                        if
                         (
                             response[index] &&
                             (
                                 (response[index].Default && ((typeof CZ.Service.collectionName) === 'undefined')) ||
                                 (response[index].Path === CZ.Service.collectionName)
                             )
-                        ) {
+                        )
+                        {
                             var themeData = null;
-                            try {
+                            try  {
                                 themeData = JSON.parse(response[index].theme);
                             } catch (e) {
                             }
@@ -813,11 +528,13 @@ var CZ;
                 //CZ.Common.ax.axis("enableThresholds", true);
                 //if (window.console && console.log("thresholds enabled"));
             });
+
             //Axis: disable showing thresholds
             CZ.Common.controller.onAnimationStarted.push(function () {
                 //CZ.Common.ax.axis("enableThresholds", true);
                 //if (window.console && console.log("thresholds disabled"));
             });
+
             // Axis: enable showing thresholds
             CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
                 if (oldId != undefined && newId == undefined) {
@@ -828,7 +545,7 @@ var CZ;
                 }
             });
             */
-
+    
             //Tour: notifyng tour that the bookmark is reached
             CZ.Common.controller.onAnimationComplete.push(function (id) {
                 if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)

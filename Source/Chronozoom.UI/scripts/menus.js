@@ -29,7 +29,31 @@ jQuery.fn.extend
 
             $(this).on(event, handler);
         });
+    },
+    clicktouchoff: function () {
+        return this.each(function () {
+            // touchstart       = standard touch screen event (not supported by IE.)
+            // pointerdown      = IE11+ mouse or touch screen event, other browsers adopting.
+            // mspointerdown    = IE10  mouse or touch screen event, other browsers adopting.
+            // click            = standard mouse event (not supported by some touch screens.)
+
+            var event;
+
+            if ('ontouchstart' in window) event = 'touchstart'
+            else if ('onpointerdown' in window) event = 'pointerdown'
+            else if ('onmspointerdown' in window) event = 'mspointerdown'
+            else event = 'click';
+
+            // if Chrome under Windows then always override with click event.
+            // See https://trello.com/c/3QjK5OlK/226-chrome-on-w8-1-touchscreen-bug.
+            if (Boolean(window.chrome) && navigator.platform.indexOf('Win32') > -1) {
+                event = 'click';
+            }
+
+            $(this).off(event);
+        });
     }
+
 });
 
 
@@ -61,7 +85,8 @@ var CZ;
         Menus.isSignedIn = false;   // Set to true while user is logged in
         Menus.isEditor   = false;   // Set to true if user has edit rights to the current collection - Note that isEditor should not be true unless isSignedIn is true
         Menus.isDisabled = false;   // Set to true while displaying a panel that is pseudo-modal
-        Menus.isHidden   = false;   // Set to true for "Kiosk Mode"
+        Menus.isHidden = false;   // Set to true for "Kiosk Mode"
+        Menus.isOverlay = false;   // Set to true while user is on the homescreen
 
 
 
@@ -115,6 +140,14 @@ var CZ;
             {
                 $('#mnuCurate').hide();                                     // if Curate can be hidden
               //$('#mnuCurate').removeClass('active');                      // if keeping Curate visible
+            }
+
+            if (Menus.isOverlay) {
+                $('#mnuEmbed').hide();
+            }
+            else
+            {
+                $('#mnuEmbed').show();
             }
         }
         Menus.Refresh = Refresh;
@@ -343,6 +376,11 @@ var CZ;
                 // toggle display of search pane
                 CZ.HomePageViewModel.panelToggleSearch();
             });
+
+            $('#mnuEmbed').children("ul").children("li").clicktouchoff();
+            
+            var addressArray = window.location.href.split('#');
+            $('#mnuEmbedText').val("<iframe src=\"" + addressArray[0] + "czmin/#" + addressArray[1] + "\" style=\"height:600px; width:1024px;\"></iframe>");
 
             $('#mnuProfile').clicktouch(function (event)
             {

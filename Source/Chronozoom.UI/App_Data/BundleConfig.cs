@@ -26,6 +26,11 @@ namespace Chronozoom.UI
             (   // comma separated list:
                 "~/cz.merged.js"
             ));
+
+            bundles.Add(new ScriptBundle("~/czmin.merged.min.js").Include
+            (   // comma separated list:
+                "~/czmin.merged.js"
+            ));
         }
     }
 }

@@ -3311,7 +3311,7 @@ var CZ;
                     this.pasteButton.onmousehover = function (event)
                     {
                         this.vc.element.css('cursor', 'pointer');
-                        this.vc.element.attr('title', 'Paste Timeline/Exhibit');
+                        this.vc.element.attr('title', 'Paste Timeline');
                         this.parent.settings.strokeStyle = "yellow";
                     }
 
@@ -3325,22 +3325,11 @@ var CZ;
                     this.pasteButton.onmouseclick = function (event)
                     {
                         var newTimeline = localStorage.getItem('ExportedTimeline');
-                        var newExhibit = localStorage.getItem('ExportedExhibit');
 
-                        var sameDbSchema = localStorage.getItem('ExportedSchemaVersion') == constants.schemaVersion;
-
-                        if (sameDbSchema && newTimeline != null)
+                        if ((localStorage.getItem('ExportedSchemaVersion') == constants.schemaVersion) && newTimeline != null)
                         {
                             // timeline from same db schema version is on "clipboard" so attempt "paste"
                             CZ.Service.importTimelines(this.parent.guid, newTimeline).then(function (importMessage)
-                            {
-                                CZ.Authoring.showMessageWindow(importMessage);
-                            });
-                        }
-                        else if (sameDbSchema && newExhibit != null)
-                        {
-                            // exhibit from same db schema version is on "clipboard" so attempt "paste"
-                            CZ.Service.importExhibit(this.parent.guid, newExhibit).then(function (importMessage)
                             {
                                 CZ.Authoring.showMessageWindow(importMessage);
                             });
@@ -3391,8 +3380,7 @@ var CZ;
                         CZ.Service.exportTimelines(this.parent.guid).then(function (exportData)
                         {
                             localStorage.setItem('ExportedSchemaVersion', constants.schemaVersion);
-                            localStorage.setItem('ExportedTimeline', JSON.stringify(exportData));
-                            localStorage.removeItem('ExportedExhibit');
+                            localStorage.setItem('ExportedTimeline',      JSON.stringify(exportData));
                             CZ.Authoring.showMessageWindow('"' + exportData[0].timeline.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
                         });
                     }
@@ -4931,14 +4919,12 @@ var CZ;
                         numberOfLines: 2
                     }, titleWidth);
 
-                    //adding edit and copy button
+                    //adding edit button
                     if (CZ.Authoring.isEnabled) {
                         var imageSize = (titleTop - infodot.y) * 0.75;
                         var editButton = VCContent.addImage(infodot, layerid, id + "__edit", time - imageSize / 2, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/edit.svg");
-                        var copyButton = VCContent.addImage(infodot, layerid, id + "__copy", time - imageSize / 2 - imageSize * 1.3, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/copy.svg");
 
                         editButton.reactsOnMouse = true;
-                        copyButton.reactsOnMouse = true;
 
                         editButton.onmouseclick = function () {
                             CZ.Authoring.isActive = true;
@@ -4946,17 +4932,6 @@ var CZ;
                             CZ.Authoring.selectedExhibit = infodot;
                             return true;
                         };
-
-                        copyButton.onmouseclick = function () {
-                            CZ.Service.exportExhibit(this.parent.guid).then(function (exportData) {
-                                localStorage.setItem('ExportedSchemaVersion', constants.schemaVersion);
-                                localStorage.setItem('ExportedExhibit', JSON.stringify(exportData));
-                                localStorage.removeItem('ExportedTimeline');
-                                CZ.Authoring.showMessageWindow('"' + exportData.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
-                            });
-                            return true;
-                        };
-                        
 
                         editButton.onmouseenter = function ()
                         {
@@ -4967,18 +4942,6 @@ var CZ;
 
                         editButton.onmouseleave = function ()
                         {
-                            this.vc.element.css('cursor', 'default');
-                            this.vc.element.attr('title', '');
-                            infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
-                        };
-
-                        copyButton.onmouseenter = function () {
-                            this.vc.element.css('cursor', 'pointer');
-                            this.vc.element.attr('title', 'Copy Exhibit to Clipboard');
-                            infodot.settings.strokeStyle = "yellow";
-                        };
-
-                        copyButton.onmouseleave = function () {
                             this.vc.element.css('cursor', 'default');
                             this.vc.element.attr('title', '');
                             infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
@@ -10166,59 +10129,6 @@ var CZ;
         }
         Service.importTimelines = importTimelines;
 
-        // .../export/exhibit/{exhibitId}
-        function exportExhibit(exhibitId) {
-            if (typeof exhibitId === 'undefined') {
-                throw 'exportExhibit(exhibitId) requires a parameter.';
-            }
-            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(exhibitId) == false) {
-                if (exhibitId != "00000000-0000-0000-0000-000000000000")
-                    throw 'exportExhibit(exhibitId) has an invalid parameter. The provided parameter must be a GUID.';
-            }
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath('export');
-            request.addToPath('exhibit');
-            request.addToPath(exhibitId);
-            return $.ajax
-            ({
-                type: 'GET',
-                cache: false,
-                url: request.url,
-                dataType: 'json'
-            });
-        }
-        Service.exportExhibit = exportExhibit;
-
-        // .../import/exhibit/{intoTimelineId}
-        function importExhibit(intoTimelineId, newExhibit) {
-            if (typeof intoTimelineId === 'undefined' || typeof newExhibit === 'undefined') {
-                throw 'importExhibit(intoTimelineId, newExhibit) is missing a parameter.';
-            }
-            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(intoTimelineId) == false) {
-                if (intoTimelineId != "00000000-0000-0000-0000-000000000000")
-                    throw 'importExhibit(intoTimelineId, newExhibit) has an invalid intoTimelineId parameter. This must be a GUID.';
-            }
-            if (typeof newExhibit !== 'string') {
-                throw 'importExhibit(intoTimelineId, newExhibit) has an invalid newTimelineTree parameter. This must be a JSON.stringify string.';
-            }
-            CZ.Authoring.resetSessionTimer();
-            var request = new Request(_serviceUrl);
-            request.addToPath('import');
-            request.addToPath('exhibit');
-            request.addToPath(intoTimelineId);
-            return $.ajax
-            ({
-                type: 'PUT',
-                cache: false,
-                url: request.url,
-                contentType: 'application/json',
-                dataType: 'json',
-                data: newExhibit     // should already be JSON.stringified
-            });
-        }
-        Service.importExhibit = importExhibit;
-
         // .../import/collection
         function importCollection(collectionTree)
         {
@@ -13125,67 +13035,7 @@ var CZ;
     })(CZ.Media || (CZ.Media = {}));
     var Media = CZ.Media;
 })(CZ || (CZ = {}));
-﻿// The following jQuery extension is used by menus to stop click ghosting on touch-screen devices.
-// This can occur when looking for either click or touchstart events (both can fire on some touch
-// devices) without wanting to preventPropagation. Use $(elements).clicktouch(... instead of
-// .on('click touchstart' or similar. See https://patrickhlauke.github.io/touch/tests/results/.
-jQuery.fn.extend
-({
-    clicktouch: function (handler)
-    {
-        return this.each(function ()
-        {
-            // touchstart       = standard touch screen event (not supported by IE.)
-            // pointerdown      = IE11+ mouse or touch screen event, other browsers adopting.
-            // mspointerdown    = IE10  mouse or touch screen event, other browsers adopting.
-            // click            = standard mouse event (not supported by some touch screens.)
-
-            var event;
-
-            if      ('ontouchstart'     in window)  event = 'touchstart'
-            else if ('onpointerdown'    in window)  event = 'pointerdown'
-            else if ('onmspointerdown'  in window)  event = 'mspointerdown'
-            else                                    event = 'click';
-
-            // if Chrome under Windows then always override with click event.
-            // See https://trello.com/c/3QjK5OlK/226-chrome-on-w8-1-touchscreen-bug.
-            if (Boolean(window.chrome) && navigator.platform.indexOf('Win32') > -1)
-            {
-                event = 'click';
-            }
-
-            $(this).on(event, handler);
-        });
-    },
-    clicktouchoff: function () {
-        return this.each(function () {
-            // touchstart       = standard touch screen event (not supported by IE.)
-            // pointerdown      = IE11+ mouse or touch screen event, other browsers adopting.
-            // mspointerdown    = IE10  mouse or touch screen event, other browsers adopting.
-            // click            = standard mouse event (not supported by some touch screens.)
-
-            var event;
-
-            if ('ontouchstart' in window) event = 'touchstart'
-            else if ('onpointerdown' in window) event = 'pointerdown'
-            else if ('onmspointerdown' in window) event = 'mspointerdown'
-            else event = 'click';
-
-            // if Chrome under Windows then always override with click event.
-            // See https://trello.com/c/3QjK5OlK/226-chrome-on-w8-1-touchscreen-bug.
-            if (Boolean(window.chrome) && navigator.platform.indexOf('Win32') > -1) {
-                event = 'click';
-            }
-
-            $(this).off(event);
-        });
-    }
-
-});
-
-
-
-/*********
+﻿/*********
  * Menus *
  *********/
 
@@ -13222,59 +13072,22 @@ var CZ;
          ******************/
         function Refresh()          // Call after any properties changed
         {
-            $('#btnToggleSignedIn').attr('data-active', Menus.isSignedIn);
-            $('#btnToggleEditor'  ).attr('data-active', Menus.isEditor);
-            $('#btnToggleDisable' ).attr('data-active', Menus.isDisabled);
-            $('#btnToggleHide'    ).attr('data-active', Menus.isHidden);
-
             if (Menus.isHidden)
             {
-                $('#mnu').hide();
+                $('#miniMenu').hide();
             }
             else
             {
-                $('#mnu').show();
+                $('#miniMenu').show();
             }
 
             if (Menus.isDisabled)
             {
-                $('#mnu').removeClass('disabled').addClass('disabled');
+                $('#miniMenu').removeClass('disabled').addClass('disabled');
             }
             else
             {
-                $('#mnu').removeClass('disabled');
-            }
-
-            if (Menus.isSignedIn)
-            {
-                $('#mnuProfile')
-                    .attr('title', 'My Profile / Sign Out')
-                    .find('img').attr('src', '/images/profile-icon-green.png');
-            }
-            else
-            {
-                $('#mnuProfile')
-                    .attr('title', 'Register / Sign In')
-                    .find('img').attr('src', '/images/profile-icon.png');
-            }
-
-            if (Menus.isEditor)
-            {
-                $('#mnuCurate').show();                                     // if Curate can be hidden
-              //$('#mnuCurate').removeClass('active').addClass('active');   // if keeping Curate visible
-            }
-            else
-            {
-                $('#mnuCurate').hide();                                     // if Curate can be hidden
-              //$('#mnuCurate').removeClass('active');                      // if keeping Curate visible
-            }
-
-            if (Menus.isOverlay) {
-                $('#mnuEmbed').hide();
-            }
-            else
-            {
-                $('#mnuEmbed').show();
+                $('#miniMenu').removeClass('disabled');
             }
         }
         Menus.Refresh = Refresh;
@@ -13298,12 +13111,12 @@ var CZ;
 
             // *** primary menu ***
 
-            $('#mnu').children('li')
+            $('#miniMenu').children('li')
 
                 .mouseenter(function (event)
                 {
                     // show
-                    if ($(this).hasClass('active') && !$('#mnu').hasClass('disabled'))
+                    if ($(this).hasClass('active') && !$('#miniMenu').hasClass('disabled'))
                     {
                         $(this).children('ul').slideDown(slideDownSpeed);
                     }
@@ -13313,257 +13126,14 @@ var CZ;
                     // hide
                     $(this).children('ul').slideUp(slideUpSpeed);
                 })
-                .on('touchstart', function (event)
-                {
-                    // if has secondary menu then sticky toggle for touch events
-                    if ($(this).children('ul').length === 1)
-                    {
-                        if ($(this).children('ul').is(':visible'))
-                        {
-                            $(this).trigger('mouseleave');
-                        }
-                        else
-                        {
-                            $(this).trigger('mouseenter');
-                        }
-                    }
-                })
-
-
-                // *** secondary menu ***
-
-                .children('ul').children('li').clicktouch(function (event)
-                {
-                    event.stopPropagation();
-
-                    if ($(this).children().hasClass('chevron'))
-                    {
-                        // has tertiary menu - sticky expand/hide
-                        if ($(this).hasClass('active'))
-                        {
-                            // hide
-                            $(this).children('.chevron').html('&#9654;'); // right chevron
-                            $(this).removeClass('active').children('ul').slideUp(slideUpSpeed);
-                        }
-                        else
-                        {
-                            // show
-                            $(this).children('.chevron').html('&#9698;'); // down chevron
-                            $(this).addClass('active').children('ul').slideDown(slideDownSpeed);
-                        }
-                    }
-                    else
-                    {
-                        // has no sub-menu - immediately hide drop-down
-                        $(this).parent().slideUp(slideUpSpeed);
-                    }
-                })
-
-
-                // *** tertiary menu ***
-
-                .children('ul').children('li').clicktouch(function (event)
-                {
-                    event.stopPropagation();
-
-                    // has no sub-menu - immediately hide drop-down
-                    $(this).parent().parent().parent().slideUp(slideUpSpeed);
-                });
-
-
-
+                
+                
             /*******************
              * Menu Item Hooks *
              *******************/
-
-            $('#mnuViewTours').clicktouch(function (event)
-            {
-                event.stopPropagation();
-                // show tours list pane (hide edit options)
-                CZ.HomePageViewModel.panelShowToursList(false);
-            });
-
-            $('#mnuViewSeries').clicktouch(function (event)
-            {
-                event.stopPropagation();
-                // toggle display of time series pane
-                CZ.HomePageViewModel.panelToggleTimeSeries();
-            });
-
-            $('#mnuCurate').hide().clicktouch(function (event)
-            {
-                if (Menus.isDisabled) return;
-                if (!Menus.isSignedIn)
-                {
-                    // toggle display of register / log in pane
-                    CZ.HomePageViewModel.panelToggleLogin();
-                }
-                else
-                {
-                    if (!Menus.isEditor)
-                    {
-                        CZ.Authoring.showMessageWindow
-                        (
-                            'Sorry, you do not have edit rights to this collection.',
-                            'Unable to Curate'
-                        );
-                    }
-                }
-            });
-
-            $('#mnuCreateCollection').clicktouch(function (event)
-            {
-                event.stopPropagation();
-                // show create collection dialog
-                CZ.HomePageViewModel.closeAllForms();
-                AddCollection();
-            });
-
-            $('#mnuCreateTimeline').clicktouch(function (event)
-            {
-                event.stopPropagation();
-                // show create timeline dialog
-                CZ.HomePageViewModel.closeAllForms();
-                CZ.Overlay.Hide();
-                CZ.Authoring.UI.createTimeline();
-            });
-
-            $('#mnuCreateExhibit').clicktouch(function (event)
-            {
-                event.stopPropagation();
-                // show create exhibit dialog
-                CZ.HomePageViewModel.closeAllForms();
-                CZ.Overlay.Hide();
-                CZ.Authoring.UI.createExhibit();
-            });
-
-            $('#mnuCreateTour').clicktouch(function (event)
-            {
-                event.stopPropagation();
-                // show create tour dialog
-                CZ.HomePageViewModel.closeAllForms();
-                CZ.Overlay.Hide();
-                CZ.Authoring.UI.createTour();
-            });
-
-            $('#mnuExportAbout').clicktouch(function (event)
-            {
-                event.stopPropagation();
-                // show quick information regarding exports
-                ExportInformation();
-            });
-
-            $('#mnuEditTours').clicktouch(function (event)
-            {
-                event.stopPropagation();
-                // show tours list pane (with edit options)
-                CZ.HomePageViewModel.panelShowToursList(true);
-            });
-
-            $('#mnuExportCollection').clicktouch(function (event)
-            {
-                event.stopPropagation();
-                // initiate export and inform user when complete
-                CZ.HomePageViewModel.closeAllForms();
-                ExportCollection();
-            });
-
-            $('#mnuImportCollection').clicktouch(function (event)
-            {
-                event.stopPropagation();
-                // prompt user to pick file then import
-                CZ.HomePageViewModel.closeAllForms();
-                $('#mnuFileJSON')
-                    .data('mnuItem', '#mnuImportCollection')
-                    .val('')
-                    .trigger('click');
-            });
-
-            $('#mnuMine').clicktouch(function (event)
-            {
-                if (Menus.isDisabled) return;
-                if (!Menus.isSignedIn)
-                {
-                    // note that we want to show my collections after a successful log in
-                    sessionStorage.setItem('showMyCollections', 'requested');
-
-                    // toggle display of register / log in pane
-                    CZ.HomePageViewModel.panelToggleLogin();
-                }
-                else
-                {
-                    // show my collections overlay (with preference for display of My Collections if viewing Cosmos)
-                    CZ.Overlay.Show(true);
-                }
-            });
-
-            $('#mnuSearch').clicktouch(function (event)
-            {
-                if (Menus.isDisabled) return;
-                // toggle display of search pane
-                CZ.HomePageViewModel.panelToggleSearch();
-            });
-
-            $('#mnuEmbed').children("ul").children("li").clicktouchoff();
-            
-            var addressArray = window.location.href.split('#');
-            $('#mnuEmbedText').val("<iframe src=\"" + addressArray[0] + "czmin/#" + addressArray[1] + "\" style=\"height:600px; width:1024px;\"></iframe>");
-
-            $('#mnuProfile').clicktouch(function (event)
-            {
-                if (Menus.isDisabled) return;
-                if (Menus.isSignedIn)
-                {
-                    // toggle display of profile pane (contains log out option)
-                    CZ.HomePageViewModel.panelToggleProfile();
-                }
-                else
-                {
-                    // toggle display of register / log in pane
-                    CZ.HomePageViewModel.panelToggleLogin();
-                }
-            });
-
-            $('#mnuFileJSON').on('input, change', function (event)
-            {
-                // mnuFileJSON is used for picking which file to upload
-                // and can be shared over several menu items if desired
-
-                if (this.value === '' || this.files.length < 1) return;
-
-                var json;
-
-                // setup to catch when file has finished loading OK
-                var file    = new FileReader();
-                file.onload = function (event)
-                {
-                    // tell user if invalid JSON (faster to parse client-side)
-                    try
-                    {
-                        json = $.parseJSON(file.result);
-                    }
-                    catch(error)
-                    {
-                        CZ.Authoring.showMessageWindow
-                        (
-                            "This file is not a valid .json file.",
-                            "Invalid File Format"
-                        );
-                        return;
-                    }
-
-                    // hand data off to appropriate menu item's fn
-                    switch ($('#mnuFileJSON').data('mnuItem'))
-                    {
-                        case '#mnuImportCollection':
-                            ImportCollection(file.result);
-                            break;
-                    }
-                };
-
-                // initiate the file load
-                file.readAsText(this.files[0], 'utf8');
-            });
+  
+            var addressArray = window.location.href.split('czmin/');
+            $('#miniMenuCZhref').attr("href", addressArray[0] + addressArray[1]);
 
         });
 
@@ -15514,2349 +15084,6 @@ var CZ;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormEditTimeline = (function (_super) {
-            __extends(FormEditTimeline, _super);
-            // We only need to add additional initialization in constructor.
-            function FormEditTimeline(container, formInfo) {
-                var _this = this;
-                _super.call(this, container, formInfo);
-
-                this.saveButton = container.find(formInfo.saveButton);
-                this.deleteButton = container.find(formInfo.deleteButton);
-                this.startDate = new CZ.UI.DatePicker(container.find(formInfo.startDate));
-                this.endDate = new CZ.UI.DatePicker(container.find(formInfo.endDate));
-                this.mediaListContainer = container.find(formInfo.mediaListContainer);
-                this.backgroundUrl = container.find(formInfo.backgroundUrl);
-                this.offsetInput = container.find(formInfo.topBoundInput);
-                this.bottomOffsetInput = container.find(formInfo.bottomBoundInput);
-                this.titleInput = container.find(formInfo.titleInput);
-                this.offsetLabels = container.find(formInfo.offsetLabels);
-                this.errorMessage = container.find(formInfo.errorMessage);
-
-                this.timeline = formInfo.context;
-
-                this.saveButton.off();
-                this.deleteButton.off();
-
-                this.titleInput.focus(function () {
-                    _this.titleInput.hideError();
-                });
-
-                this.initialize();
-            }
-            FormEditTimeline.prototype.initialize = function () {
-                var _this = this;
-
-                this.mediaInput = {};
-                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.mediaInput, this);
-                this.mediaList.container.find("[title='skydrive']").hide(); // Background Images doesn't support iframes.
-
-                this.saveButton.prop('disabled', false);
-                if (CZ.Authoring.mode === "createTimeline") {
-                    this.deleteButton.hide();
-                    this.titleTextblock.text("Create Timeline");
-                    this.saveButton.text("Create Timeline");
-                } else if (CZ.Authoring.mode === "editTimeline") {
-                    this.deleteButton.show();
-                    this.titleTextblock.text("Edit Timeline");
-                    this.saveButton.text("Update Timeline");
-                    //Root timeline
-                    if (!this.timeline.parent.guid) {
-                        this.offsetInput.hide();
-                        this.bottomOffsetInput.hide();
-                        this.offsetLabels.hide();
-                    }
-                } else if (CZ.Authoring.mode === "createRootTimeline") {
-                    this.deleteButton.hide();
-                    this.closeButton.hide();
-                    this.titleTextblock.text("Create Root Timeline");
-                    this.saveButton.text("Create Timeline");
-                    this.offsetInput.hide();
-                    this.bottomOffsetInput.hide();
-                    this.offsetLabels.hide();
-                } else {
-                    console.log("Unexpected authoring mode in timeline form.");
-                    this.close();
-                }
-
-                this.isCancel = true;
-                this.endDate.addEditMode_Infinite();
-
-                this.titleInput.val(this.timeline.title);
-                this.startDate.setDate(this.timeline.x, true);
-                this.backgroundUrl.val(this.timeline.backgroundUrl || "");
-
-                if (this.timeline.endDate === 9999) {
-                    this.endDate.setDate(this.timeline.endDate, true);
-                } else {
-                    this.endDate.setDate(this.timeline.x + this.timeline.width, true);
-                }
-
-                $(_this.startDate.circaSelector).find('input').prop('checked', this.timeline.FromIsCirca);
-                $(_this.endDate.circaSelector).find('input').prop('checked', this.timeline.ToIsCirca);
-
-                if (_this.timeline.offsetY === null) {
-                    _this.offsetInput.val("");
-                    _this.bottomOffsetInput.val("");
-                }
-                else {
-                    _this.offsetInput.val(_this.timeline.offsetY);
-                    _this.bottomOffsetInput.val(_this.timeline.offsetY + _this.timeline.Height * 100);
-                }
-
-                this.saveButton.click(function (event) {
-                    _this.errorMessage.empty();
-                    var isDataValid = false;
-                    var backgroundImage;
-                    var backgroundUrl = _this.backgroundUrl.val().trim();
-                    isDataValid = CZ.Authoring.validateTimelineData(_this.startDate.getDate(), _this.endDate.getDate(), _this.titleInput.val());
-
-                    // Other cases are covered by datepicker
-                    if (!CZ.Authoring.isNotEmpty(_this.titleInput.val())) {
-                        _this.titleInput.showError("Title cannot be empty");
-                    }
-
-                    if (!CZ.Authoring.isIntervalPositive(_this.startDate.getDate(), _this.endDate.getDate())) {
-                        _this.errorMessage.text('Time interval cannot be less than one day');
-                        isDataValid = false;
-                    }
-
-                    if (!/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(_this.offsetInput.val())
-                        || !/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(_this.bottomOffsetInput.val())) {
-                        _this.errorMessage.text("Please enter vertical position in percents or clear the input to select auto mode. For example \"0\", \"100\", \"45\" or \"75.85\"");
-                        isDataValid = false;
-                    } else {
-
-                        if (!(((_this.offsetInput.val() === "") === (_this.bottomOffsetInput.val() === "")))) {
-                            _this.errorMessage.text("To select auto mode clear both fields.");
-                            isDataValid = false;
-                        }
-
-                        if (_this.offsetInput.val() !== "") {
-                            if (Number(_this.offsetInput.val()) < 0
-                                || Number(_this.bottomOffsetInput.val()) < 0
-                                || Number(_this.offsetInput.val()) > 100
-                                || Number(_this.bottomOffsetInput.val()) > 100) {
-                                _this.errorMessage.text("Vertical position must be less than of equal to 100% but more than or equal to 0%");
-                                isDataValid = false;
-                            }
-
-                            if (Number(_this.offsetInput.val()) >= Number(_this.bottomOffsetInput.val())) {
-                                _this.errorMessage.text("Top position must be less then bottom position");
-                                isDataValid = false;
-                            }
-                        }
-                    }
-
-                    function onDataValid() {
-
-                        _this.errorMessage.empty();
-                        var self = _this;
-                        var aspectRatio = backgroundImage ? backgroundImage.width / backgroundImage.height : null;
-                        var isAspectRatioChanged = aspectRatio !== _this.timeline.aspectRatio;
-                        var isBoundaryChanged = ((Number(_this.offsetInput.val()) !== _this.timeline.offsetY) 
-                            || (Number(_this.bottomOffsetInput.val()) !== (_this.timeline.offsetY + _this.timeline.Height*100)));
-
-                        _this.timeline.FromIsCirca = $(_this.startDate.circaSelector).find('input').is(':checked');
-                        _this.timeline.ToIsCirca = $(_this.endDate.circaSelector).find('input').is(':checked');
-
-                        _this.saveButton.prop('disabled', true);
-
-                        var _offset = (_this.offsetInput.val() === "") ? null : Number(_this.offsetInput.val());
-                        var _Height = (_this.bottomOffsetInput.val() === "") ?
-                            null : (Number(_this.bottomOffsetInput.val()) - Number(_this.offsetInput.val()));
-
-                        CZ.Authoring.updateTimeline(_this.timeline, {
-                            title: _this.titleInput.val(),
-                            start: _this.startDate.getDate(),
-                            end: _this.endDate.getDate(),
-                            backgroundUrl: backgroundUrl,
-                            aspectRatio: aspectRatio,
-                            offsetY: _offset,
-                            Height: _Height,
-                        }).then(function () {
-                            self.isCancel = false;
-                            self.close();
-
-                            // If aspect ratio or boundary have changed, then we need to redraw layout.
-                            if (isAspectRatioChanged || isBoundaryChanged) {
-                                CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
-                                CZ.Common.reloadData().done(function () {
-                                    self.timeline = CZ.Common.vc.virtualCanvas("findElement", self.timeline.id);
-                                    delete self.timeline.animation;
-
-                                    //Move to new created timeline
-                                    self.timeline.onmouseclick();
-                                });
-                            } else {
-                                //Move to new created timeline
-                                self.timeline.onmouseclick();
-                            }
-
-                        }, function (error) {
-                            if (error !== undefined && error !== null) {
-                                self.errorMessage.text(error).show().delay(7000).fadeOut();
-                            } else {
-                                self.errorMessage.text("Sorry, internal server error :(").show().delay(7000).fadeOut();
-                            }
-                            console.log(error);
-                        }).always(function () {
-                            _this.saveButton.prop('disabled', false);
-                        });
-                    }
-
-                    function onDataInvalid() {
-                        var self = _this;
-                        self.errorMessage.empty();
-                        self.errorMessage.text("Please, set a correct URL for background image.").show().delay(7000).fadeOut();
-                        self.backgroundUrl.val("");
-                    }
-
-                    if (!isDataValid) {
-                        _this.errorMessage.show().delay(7000).fadeOut();
-                        return;
-                    } else if (backgroundUrl !== "") {
-                        backgroundImage = new Image();
-                        backgroundImage.addEventListener("load", onDataValid, false);
-                        backgroundImage.addEventListener("error", onDataInvalid, false);
-                        backgroundImage.src = backgroundUrl;
-                    } else {
-                        onDataValid();
-                    }
-                });
-
-                this.deleteButton.click(function (event) {
-                    if (confirm("Are you sure want to delete timeline and all of its nested timelines and exhibits? Delete can't be undone!")) {
-                        var isDataValid = true;
-                        CZ.Authoring.removeTimeline(_this.timeline);
-                        _this.close();
-                    }
-                });
-            };
-
-            FormEditTimeline.prototype.updateMediaInfo = function () {
-                this.backgroundUrl.val(this.mediaInput.uri || "");
-            };
-
-            FormEditTimeline.prototype.show = function () {
-                CZ.Menus.isDisabled = true;
-                CZ.Menus.Refresh();
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormEditTimeline.prototype.close = function () {
-                var _this = this;
-                this.errorMessage.empty();
-
-                CZ.Menus.isDisabled = false;
-                CZ.Menus.Refresh();
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        _this.endDate.remove();
-                        _this.startDate.remove();
-                        _this.titleInput.hideError();
-                        _this.mediaList.remove();
-                    }
-                });
-
-                if (this.isCancel && CZ.Authoring.mode === "createTimeline") {
-                    CZ.VCContent.removeChild(this.timeline.parent, this.timeline.id);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                }
-
-                CZ.Authoring.isActive = false;
-
-                this.activationSource.removeClass("active");
-
-                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
-            };
-            return FormEditTimeline;
-        })(CZ.UI.FormUpdateEntity);
-        UI.FormEditTimeline = FormEditTimeline;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-/// <reference path='contentitem-listbox.ts' />
-/// <reference path='../ui/controls/formbase.ts' />
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormEditExhibit = (function (_super) {
-            __extends(FormEditExhibit, _super);
-            function FormEditExhibit(container, formInfo) {
-                var _this = this;
-                _super.call(this, container, formInfo);
-
-                this.titleTextblock = container.find(formInfo.titleTextblock);
-                this.titleInput = container.find(formInfo.titleInput);
-                this.datePicker = new CZ.UI.DatePicker(container.find(formInfo.datePicker));
-                this.offsetInput = container.find(formInfo.offsetInput);
-                this.createArtifactButton = container.find(formInfo.createArtifactButton);
-                this.contentItemsListBox = new CZ.UI.ContentItemListBox(container.find(formInfo.contentItemsListBox), formInfo.contentItemsTemplate, formInfo.context.contentItems);
-                this.errorMessage = container.find(formInfo.errorMessage);
-                this.saveButton = container.find(formInfo.saveButton);
-                this.deleteButton = container.find(formInfo.deleteButton);
-
-                this.titleInput.focus(function () {
-                    _this.titleInput.hideError();
-                });
-
-                this.contentItemsTemplate = formInfo.contentItemsTemplate;
-
-                this.exhibit = formInfo.context;
-                this.exhibitCopy = $.extend({}, formInfo.context, { children: null }); // shallow copy of exhibit (without children)
-                this.exhibitCopy = $.extend(true, {}, this.exhibitCopy); // deep copy of exhibit
-                delete this.exhibitCopy.children;
-
-                this.mode = CZ.Authoring.mode; // deep copy mode. it never changes throughout the lifecycle of the form.
-                this.isCancel = true;
-                this.isModified = false;
-                this.initUI();
-            }
-            FormEditExhibit.prototype.initUI = function () {
-                var _this = this;
-                this.saveButton.prop('disabled', false);
-
-                if (this.mode === "createExhibit") {
-                    this.titleTextblock.text("Create Exhibit");
-                    this.saveButton.text("Create Exhibit");
-
-                    this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-                    $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.infodotDescription.isCirca || false);
-                    this.offsetInput.val("");
-                
-                    this.closeButton.show();
-                    this.createArtifactButton.show();
-                    this.saveButton.show();
-                    this.deleteButton.hide();
-
-                    // this.closeButton.click() is handled by base
-                    this.createArtifactButton.off();
-                    this.createArtifactButton.click(function () {
-                        return _this.onCreateArtifact();
-                    });
-                    this.saveButton.off();
-                    this.saveButton.click(function () {
-                        return _this.onSave();
-                    });
-
-                    this.contentItemsListBox.itemDblClick(function (item, index) {
-                        return _this.onContentItemDblClick(item, index);
-                    });
-                    this.contentItemsListBox.itemRemove(function (item, index) {
-                        return _this.onContentItemRemoved(item, index);
-                    });
-                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
-                        return _this.onContentItemMove(item, indexStart, indexStop);
-                    });
-                } else if (this.mode === "editExhibit") {
-                    this.titleTextblock.text("Edit Exhibit");
-                    this.saveButton.text("Update Exhibit");
-
-                    // store when exhibit last updated
-                    // exhibit.id = letter "e" followed by exhibitId GUID, so strip off leading "e" before passing
-                    CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
-                        _this.saveButton.data('lastUpdate', data);
-                    });
-                    
-                    this.titleInput.val(this.exhibit.title || "");
-                    this.datePicker.setDate(Number(this.exhibit.infodotDescription.date) || "", true);
-                    $(this.datePicker.circaSelector).find('input').prop('checked', this.exhibit.infodotDescription.isCirca || false);
-                    if (this.exhibit.offsetY == null)
-                        this.offsetInput.val("");
-                    else
-                        this.offsetInput.val(this.exhibit.offsetY);
-
-                    this.closeButton.show();
-                    this.createArtifactButton.show();
-                    this.saveButton.show();
-                    this.deleteButton.show();
-
-                    // this.closeButton.click() is handled by base
-                    this.createArtifactButton.off();
-                    this.createArtifactButton.click(function () {
-                        return _this.onCreateArtifact();
-                    });
-                    this.saveButton.off();
-                    this.saveButton.click(function () {
-                        return _this.onSave();
-                    });
-                    this.deleteButton.off();
-                    this.deleteButton.click(function () {
-                        return _this.onDelete();
-                    });
-
-                    this.contentItemsListBox.itemDblClick(function (item, index) {
-                        return _this.onContentItemDblClick(item, index);
-                    });
-                    this.contentItemsListBox.itemRemove(function (item, index) {
-                        return _this.onContentItemRemoved(item, index);
-                    });
-                    this.contentItemsListBox.itemMove(function (item, indexStart, indexStop) {
-                        return _this.onContentItemMove(item, indexStart, indexStop);
-                    });
-                } else {
-                    console.log("Unexpected authoring mode in exhibit form.");
-                }
-
-                this.titleInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.datePicker.datePicker.change(function () {
-                    _this.isModified = true;
-                });
-                this.offsetInput.change(function () {
-                    _this.isModified = true;
-                });
-
-            };
-
-            FormEditExhibit.prototype.onCreateArtifact = function () {
-                this.isModified = true;
-                if (this.exhibit.contentItems.length < CZ.Settings.infodotMaxContentItemsCount) {
-                    this.exhibit.title = this.titleInput.val() || "";
-                    this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
-                    this.exhibit.infodotDescription =
-                    {
-                        date: this.datePicker.getDate(),
-                        isCirca: $(this.datePicker.circaSelector).find('input').is(':checked')
-                    };
-                  //this.exhibit.IsCirca = $(this.datePicker.circaSelector).find('input').is(':checked');
-                    var newContentItem = {
-                        title: "",
-                        uri: "",
-                        mediaSource: "",
-                        mediaType: "",
-                        attribution: "",
-                        description: "",
-                        order: this.exhibit.contentItems.length
-                    };
-                    this.exhibit.contentItems.push(newContentItem);
-                    this.hide(true);
-                    CZ.Authoring.contentItemMode = "createContentItem";
-                    CZ.Authoring.showEditContentItemForm(newContentItem, this.exhibit, this, true);
-                } else {
-                    var self = this;
-                    var origMsg = this.errorMessage.text();
-                    this.errorMessage.text("Sorry, only 10 artifacts are allowed in one exhibit").show().delay(7000).fadeOut(function () {
-                        return self.errorMessage.text(origMsg);
-                    });
-                }
-            };
-  
-            FormEditExhibit.prototype.onSave = function () {
-                var _this = this;
-                var exhibit_x = this.datePicker.getDate() - this.exhibit.width / 2;
-                var exhibit_y = this.exhibit.y;
-
-                if (exhibit_x + this.exhibit.width >= this.exhibit.parent.x + this.exhibit.parent.width) {
-                    exhibit_x = this.exhibit.parent.x + this.exhibit.parent.width - this.exhibit.width;
-                }
-                if (exhibit_x <= this.exhibit.parent.x) {
-                    exhibit_x = this.exhibit.parent.x;
-                }
-
-                if (exhibit_y + this.exhibit.height >= this.exhibit.parent.y + this.exhibit.parent.height) {
-                    exhibit_y = this.exhibit.parent.y + this.exhibit.parent.height - this.exhibit.height;
-                }
-                if (exhibit_y <= this.exhibit.parent.y) {
-                    exhibit_y = this.exhibit.parent.y;
-                }
-
-                if (this.offsetInput.val() != "")
-                    this.exhibit.offsetY = Number(this.offsetInput.val());
-                else
-                    this.exhibit.offsetY = null;
-
-                var newExhibit = {
-                    title: this.titleInput.val() || "",
-                    x: exhibit_x,
-                    y: exhibit_y,
-                    height: this.exhibit.height,
-                    width: this.exhibit.width,
-                    offsetY: this.exhibit.offsetY,
-                    infodotDescription:
-                    {
-                        date:    CZ.Dates.getDecimalYearFromCoordinate(this.datePicker.getDate()),
-                        isCirca: $(this.datePicker.circaSelector).find('input').is(':checked')
-                    },
-                  //IsCirca: $(this.datePicker.circaSelector).find('input').is(':checked'),
-                    contentItems: this.exhibit.contentItems || [],
-                    type: "infodot"
-                };
-
-                if (!CZ.Authoring.isNotEmpty(this.titleInput.val())) {
-                    this.titleInput.showError("Title can't be empty");
-                }
-
-                if (CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true)) {
-                    this.errorMessage.text("Exhibit intersects other elemenets");
-                }
-
-                if (CZ.Authoring.validateExhibitData(this.datePicker.getDate(), this.titleInput.val(), this.exhibit.contentItems)
-                    && CZ.Authoring.checkExhibitIntersections(this.exhibit.parent, newExhibit, true)
-                    && this.exhibit.contentItems.length >= 1
-                    && this.exhibit.contentItems.length <= CZ.Settings.infodotMaxContentItemsCount
-                    && /(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(this.offsetInput.val())) {
-                    
-                    if (this.mode === "editExhibit") {
-                        // edit mode - see if someone else has saved edit since we loaded it
-                        CZ.Service.getExhibitLastUpdate(this.exhibit.id.substring(1)).done(function (data) {
-                            if (data == _this.saveButton.data('lastUpdate')) {
-                                // no-one else has touched - save without warning
-                                _this.onSave_PerformSave(newExhibit);
-                            } else {
-                                // someone else has touched - warn and give options
-                                if 
-                                (
-                                    confirm
-                                    (
-                                      //"Someone else has made changes to this exhibit since you began editing it.\n\n" +
-                                        data.split('|')[1] + " has made changes to this exhibit since you began editing it.\n\n" +
-                                        "Do you want to replace their changes with yours? This will cause all of their changes to be lost."
-                                    )
-                                )
-                                {
-                                    _this.onSave_PerformSave(newExhibit);
-                                }
-                                else
-                                {
-                                    alert
-                                    (
-                                        "Your changes were not saved.\n\n" +
-                                        "You can click on your artifacts to copy off any changes you've made before closing the Edit Exhibit pane. " +
-                                        "After closing the Edit Exhibits pane, you can then refresh your browser to see the latest changes."
-                                    );
-                                }
-                            }
-                        });
-                    } else {
-                        // create mode - just save
-                        this.onSave_PerformSave(newExhibit);
-                    }
-                } else if (this.exhibit.contentItems.length === 0) {
-                    var self = this;
-                    var origMsg = this.errorMessage.text();
-                    this.errorMessage.text("Cannot create exhibit without artifacts.").show().delay(7000).fadeOut(function () {
-                        return self.errorMessage.text(origMsg);
-                    });
-                } else if (!/(^(([1-9]{0,1}[0-9](\.[0-9]{1,13}){0,1})|(100))$)|(^$)/.test(this.offsetInput.val())) {
-                    var self = this;
-                    var origMsg = this.errorMessage.text();
-                    this.errorMessage.text("Please enter vertical position in percents or select auto mode. For example \"0\", \"100\", \"45\" or \"75.85\"").show().delay(7000).fadeOut(function () {
-                        return self.errorMessage.text(origMsg);
-                    });
-                } else {
-                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
-                }
-            };
-
-            FormEditExhibit.prototype.onSave_PerformSave = function (newExhibit) {
-                var _this = this;
-                this.saveButton.prop('disabled', true);
-                
-                CZ.Authoring.updateExhibit(this.exhibitCopy, newExhibit).then(function (success) {
-                    _this.isCancel = false;
-                    _this.isModified = false;
-                    _this.close();
-                    _this.exhibit.id = arguments[0].id;
-                    _this.exhibit.onmouseclick();
-
-                    // If offset has changed, then we need to redraw layout.
-                    var isOffsetChanged = (Number(_this.offsetInput.val()) !== _this.exhibitCopy.offsetY);
-                    if (isOffsetChanged) {
-                        CZ.VCContent.clear(CZ.Common.vc.virtualCanvas("getLayerContent"));
-                        CZ.Common.reloadData().done(function () {
-                            _this.exhibit = CZ.Common.vc.virtualCanvas("findElement", _this.exhibit.id);
-                             delete self.timeline.animation;
-  
-                             // Move to new created timeline
-                             self.timeline.onmouseclick();
-                            });
-                   } else {
-                       // Move to new created timeline
-                       self.timeline.onmouseclick();
-                   }
-                }, function (error) {
-                    var errorMessage = JSON.parse(error.responseText).errorMessage;
-                    if (errorMessage !== "") {
-                        _this.errorMessage.text(errorMessage);
-                        var that = _this;
-                        var errCI = CZ.Authoring.erroneousContentItemsList(error.responseText);
-                        errCI.forEach(function (contentItemIndex) {
-                            var item = that.contentItemsListBox.items[contentItemIndex];
-                            item.container.find(".cz-listitem").css("border-color", "red");
-                        });
-                        errorMessage = "(1/" + errCI.length + ") " + JSON.parse(error.responseText).errorMessage;
-                        ;
-                        _this.errorMessage.text(errorMessage);
-                    } else {
-                        _this.errorMessage.text("Sorry, internal server error :(");
-                    }
-                    _this.errorMessage.show().delay(7000).fadeOut();
-                }).always(function () {
-                    _this.saveButton.prop('disabled', false);
-                });
-            };
-
-            FormEditExhibit.prototype.onDelete = function () {
-                if (confirm("Are you sure want to delete the exhibit and all of its content items? Delete can't be undone!")) {
-                    CZ.Authoring.removeExhibit(this.exhibit);
-                    this.isCancel = false;
-                    this.isModified = false;
-                    this.close();
-                }
-            };
-
-            FormEditExhibit.prototype.onContentItemDblClick = function (item, _) {
-                var idx;
-                if (typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
-                    idx = item.data.order;
-                } else if (typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
-                    idx = this.exhibit.contentItems.map(function (ci) {
-                        return ci.guid;
-                    }).indexOf(item.data.guid);
-                } else {
-                    idx = -1;
-                }
-
-                var item = this.contentItemsListBox.items[idx];
-                item.container.find(".cz-listitem").css("border-color", "#c7c7c7");
-
-                if (idx >= 0) {
-                    this.clickedListItem = item;
-                    this.exhibit.title = this.titleInput.val() || "";
-                    this.exhibit.x = this.datePicker.getDate() - this.exhibit.width / 2;
-                    this.exhibit.infodotDescription = { date: this.datePicker.getDate() };
-                    this.hide(true);
-                    CZ.Authoring.contentItemMode = "editContentItem";
-                    CZ.Authoring.showEditContentItemForm(this.exhibit.contentItems[idx], this.exhibit, this, true);
-                }
-            };
-
-            FormEditExhibit.prototype.onContentItemRemoved = function (item, _) {
-                var idx;
-                this.isModified = true;
-                if (typeof item.data.order !== 'undefined' && item.data.order !== null && item.data.order >= 0 && item.data.order < CZ.Settings.infodotMaxContentItemsCount) {
-                    idx = item.data.order;
-                } else if (typeof item.data.guid !== 'undefined' && item.data.guid !== null) {
-                    idx = this.exhibit.contentItems.map(function (ci) {
-                        return ci.guid;
-                    }).indexOf(item.data.guid);
-                } else {
-                    idx = -1;
-                }
-
-                if (idx >= 0) {
-                    this.exhibit.contentItems.splice(idx, 1);
-                    for (var i = 0; i < this.exhibit.contentItems.length; i++)
-                        this.exhibit.contentItems[i].order = i;
-                    this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                    CZ.Common.vc.virtualCanvas("requestInvalidate");
-                }
-            };
-
-            FormEditExhibit.prototype.onContentItemMove = function (item, indexStart, indexStop) {
-                this.isModified = true;
-                var ci = this.exhibit.contentItems.splice(indexStart, 1)[0];
-                this.exhibit.contentItems.splice(indexStop, 0, ci);
-                for (var i = 0; i < this.exhibit.contentItems.length; i++)
-                    this.exhibit.contentItems[i].order = i;
-                this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                CZ.Common.vc.virtualCanvas("requestInvalidate");
-            };
-
-            FormEditExhibit.prototype.show = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                CZ.Authoring.isActive = true;
-                this.activationSource.addClass("active");
-                this.errorMessage.hide();
-                CZ.Menus.isDisabled = true;
-                CZ.Menus.Refresh();
-                _super.prototype.show.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-            };
-
-            FormEditExhibit.prototype.hide = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                _super.prototype.close.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-                this.activationSource.removeClass("active");
-            };
-
-            FormEditExhibit.prototype.close = function (noAnimation) {
-                var _this = this;
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                if (this.isModified) {
-                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
-                        this.isModified = false;
-                    } else {
-                        return;
-                    }
-                }
-
-                CZ.Menus.isDisabled = false;
-                CZ.Menus.Refresh();
-                _super.prototype.close.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        _this.datePicker.remove();
-                        _this.contentItemsListBox.clear();
-                        _this.titleInput.hideError();
-                    }
-                });
-                if (this.isCancel) {
-                    if (this.mode === "createExhibit") {
-                        CZ.VCContent.removeChild(this.exhibit.parent, this.exhibit.id);
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    } else if (this.mode === "editExhibit") {
-                        delete this.exhibit.contentItems;
-                        $.extend(this.exhibit, this.exhibitCopy);
-                        this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                        CZ.Common.vc.virtualCanvas("requestInvalidate");
-                    }
-                }
-                this.activationSource.removeClass("active");
-                CZ.Authoring.isActive = false;
-
-                CZ.Common.vc.virtualCanvas("showNonRootVirtualSpace");
-            };
-            return FormEditExhibit;
-        })(UI.FormUpdateEntity);
-        UI.FormEditExhibit = FormEditExhibit;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../scripts/media.ts'/>
-/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormEditCI = (function (_super) {
-            __extends(FormEditCI, _super);
-            function FormEditCI(container, formInfo) {
-                var _this = this;
-                _super.call(this, container, formInfo);
-
-                this.titleTextblock = container.find(formInfo.titleTextblock);
-                this.titleInput = container.find(formInfo.titleInput);
-                this.mediaInput = container.find(formInfo.mediaInput);
-                this.mediaSourceInput = container.find(formInfo.mediaSourceInput);
-                this.mediaTypeInput = container.find(formInfo.mediaTypeInput);
-                this.attributionInput = container.find(formInfo.attributionInput);
-                this.descriptionInput = container.find(formInfo.descriptionInput);
-                this.previewButton = container.find('a.preview');
-                this.previewBox = container.find('div.preview');
-                this.errorMessage = container.find(formInfo.errorMessage);
-                this.saveButton = container.find(formInfo.saveButton);
-                this.mediaListContainer = container.find(formInfo.mediaListContainer);
-
-                this.titleInput.focus(function () {
-                    _this.titleInput.hideError();
-                });
-
-                this.mediaInput.focus(function () {
-                    _this.mediaInput.hideError();
-                });
-
-                this.mediaSourceInput.focus(function () {
-                    _this.mediaSourceInput.hideError();
-                });
-
-                this.prevForm = formInfo.prevForm;
-
-                this.exhibit = formInfo.context.exhibit;
-                this.contentItem = formInfo.context.contentItem;
-
-                this.mode = CZ.Authoring.mode; // deep copy mode. it never changes throughout the lifecycle of the form.
-                this.isCancel = true;
-                this.isModified = false;
-                this.initUI();
-            }
-            FormEditCI.prototype.initUI = function () {
-                var _this = this;
-                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
-                var that = this;
-                this.saveButton.prop('disabled', false);
-
-                this.titleInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.mediaInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.mediaSourceInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.mediaTypeInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.attributionInput.change(function () {
-                    _this.isModified = true;
-                });
-                this.descriptionInput.change(function () {
-                    _this.isModified = true;
-                });
-
-                this.descriptionInput.on('keyup', function (e) {
-                    if (e.which == 13) {
-                        that.saveButton.click(function () {
-                            return that.onSave();
-                        });
-                    }
-                });
-                this.descriptionInput.on('keydown', function (e) {
-                    if (e.which == 13) {
-                        that.saveButton.off();
-                    }
-                });
-
-                if (CZ.Media.SkyDriveMediaPicker.isEnabled && this.mediaTypeInput.find("option[value='skydrive-image']").length === 0) {
-                    $("<option></option>", {
-                        value: "skydrive-image",
-                        text: " OneDrive Image "
-                    }).appendTo(this.mediaTypeInput);
-                    $("<option></option>", {
-                        value: "skydrive-document",
-                        text: " OneDrive Document "
-                    }).appendTo(this.mediaTypeInput);
-                }
-
-                this.titleInput.val(this.contentItem.title || "");
-                this.mediaInput.val(this.contentItem.uri || "");
-                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                this.attributionInput.val(this.contentItem.attribution || "");
-                this.descriptionInput.val(this.contentItem.description || "");
-
-                this.renderPreviewButton = function ()
-                {
-                    if (_this.previewBox.is(':visible'))
-                    {
-                        _this.previewButton.text('edit');
-                        _this.previewButton.attr('title', 'Return to editing the description');
-                    }
-                    else
-                    {
-                        _this.previewButton.text('preview');
-                        _this.previewButton.attr('title', 'See what the description looks like using Markdown');
-                    }
-                };
-
-                this.renderPreviewButton(); // call to set initial label and text
-
-                this.previewButton.off().on('click', function (event)
-                {
-                    _this.previewBox.html(marked(_this.descriptionInput.val()));
-                    _this.descriptionInput.toggle();
-                    _this.previewBox.toggle();
-                    _this.renderPreviewButton();
-                });
-
-                this.saveButton.off();
-                this.saveButton.click(function () {
-                    return _this.onSave();
-                });
-
-                if (CZ.Authoring.contentItemMode === "createContentItem") {
-                    this.titleTextblock.text("Create New");
-                    this.saveButton.text("Create Artifiact");
-
-                    this.closeButton.hide();
-                } else if (CZ.Authoring.contentItemMode === "editContentItem") {
-                    this.titleTextblock.text("Edit");
-                    this.saveButton.text("Update Artifact");
-
-                    if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit)
-                        this.closeButton.hide();
-                    else
-                        this.closeButton.show();
-                } else {
-                    console.log("Unexpected authoring mode in content item form.");
-                    this.close();
-                }
-
-                this.saveButton.show();
-            };
-
-            FormEditCI.prototype.onSave = function () {
-                var _this = this;
-                var newContentItem = {
-                    title: this.titleInput.val() || "",
-                    uri: this.mediaInput.val() || "",
-                    mediaSource: this.mediaSourceInput.val() || "",
-                    mediaType: this.mediaTypeInput.val() || "",
-                    attribution: this.attributionInput.val() || "",
-                    description: this.descriptionInput.val() || "",
-                    order: this.contentItem.order
-                };
-
-                if (!CZ.Authoring.isNotEmpty(newContentItem.title)) {
-                    this.titleInput.showError("Title can't be empty");
-                }
-
-                if (!CZ.Authoring.isNotEmpty(newContentItem.uri)) {
-                    this.mediaInput.showError("URL can't be empty");
-                }
-                if (!CZ.Authoring.isValidURL(newContentItem.uri)) {
-                    this.mediaInput.showError("URL is wrong");
-                }
-
-                if ((CZ.Authoring.validateContentItems([newContentItem], this.mediaInput)) && (CZ.Authoring.isValidURL(newContentItem.uri))) {
-                    if (CZ.Authoring.contentItemMode === "createContentItem") {
-                        if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
-                            this.isCancel = false;
-                            this.prevForm.contentItemsListBox.add(newContentItem);
-                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
-                            this.prevForm.exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                            CZ.Common.vc.virtualCanvas("requestInvalidate");
-                            this.isModified = false;
-                            this.back();
-                        }
-                    } else if (CZ.Authoring.contentItemMode === "editContentItem") {
-                        if (this.prevForm && this.prevForm instanceof UI.FormEditExhibit) {
-                            this.isCancel = false;
-                            var clickedListItem = this.prevForm.clickedListItem;
-                            clickedListItem.iconImg.attr("src", newContentItem.uri);
-                            clickedListItem.titleTextblock.text(newContentItem.title);
-                            clickedListItem.descrTextblock.text(newContentItem.description);
-                            $.extend(this.exhibit.contentItems[this.contentItem.order], newContentItem);
-                            this.prevForm.exhibit = this.exhibit = CZ.Authoring.renewExhibit(this.exhibit);
-                            this.prevForm.isModified = true;
-                            CZ.Common.vc.virtualCanvas("requestInvalidate");
-                            this.isModified = false;
-                            this.back();
-                        } else {
-                            this.saveButton.prop('disabled', true);
-                            CZ.Authoring.updateContentItem(this.exhibit, this.contentItem, newContentItem).then(function (response) {
-                                _this.isCancel = false;
-                                _this.isModified = false;
-                                _this.close();
-                            }, function (error) {
-                                var errorMessage = error.statusText;
-
-                                if (errorMessage.match(/Media Source/)) {
-                                    _this.errorMessage.text("One or more fields filled wrong");
-                                    _this.mediaSourceInput.showError("Media Source URL is not a valid URL");
-                                } else {
-                                    _this.errorMessage.text("Sorry, internal server error :(");
-                                }
-
-                                _this.errorMessage.show().delay(7000).fadeOut();
-                            }).always(function () {
-                                _this.saveButton.prop('disabled', false);
-                            });
-                        }
-                    }
-                } else {
-                    this.errorMessage.text("One or more fields filled wrong").show().delay(7000).fadeOut();
-                }
-            };
-
-            FormEditCI.prototype.updateMediaInfo = function () {
-                this.mediaInput.val(this.contentItem.uri || "");
-                this.mediaSourceInput.val(this.contentItem.mediaSource || "");
-                this.mediaTypeInput.val(this.contentItem.mediaType || "");
-                this.attributionInput.val(this.contentItem.attribution || "");
-            };
-
-            FormEditCI.prototype.show = function (noAnimation) {
-                CZ.Authoring.isActive = true;
-                this.activationSource.addClass("active");
-                this.errorMessage.hide();
-                CZ.Menus.isDisabled = true;
-                CZ.Menus.Refresh();
-                _super.prototype.show.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-            };
-
-            FormEditCI.prototype.close = function (noAnimation) {
-                var _this = this;
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                if (this.isModified) {
-                    if (window.confirm("There is unsaved data. Do you want to close without saving?")) {
-                        this.isModified = false;
-                    } else {
-                        return;
-                    }
-                }
-
-                CZ.Menus.isDisabled = false;
-                CZ.Menus.Refresh();
-                _super.prototype.close.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        _this.mediaList.remove();
-                        _this.mediaInput.hideError();
-                        _this.titleInput.hideError();
-                        _this.mediaSourceInput.hideError();
-                    }
-                });
-                if (this.isCancel) {
-                    if (CZ.Authoring.contentItemMode === "createContentItem") {
-                        this.exhibit.contentItems.pop();
-                    }
-                }
-                this.activationSource.removeClass("active");
-                CZ.Authoring.isActive = false;
-            };
-            return FormEditCI;
-        })(CZ.UI.FormUpdateEntity);
-        UI.FormEditCI = FormEditCI;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-/// <reference path='../ui/tourstop-listbox.ts' />
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var TourStop = (function () {
-            function TourStop(target, title) {
-                if (target == undefined || target == null)
-                    throw "target element of a tour stop is null or undefined";
-                if (typeof target.type == "undefined")
-                    throw "type of the tour stop target element is undefined";
-                this.targetElement = target;
-                if (target.type === "Unknown") {
-                    this.type = target.type;
-                    this.title = title;
-                } else if (target.type === "contentItem") {
-                    this.type = "Content Item";
-                    this.title = title ? title : target.contentItem.title;
-                } else {
-                    this.type = target.type === "timeline" ? "Timeline" : "Event";
-                    this.title = title ? title : target.title;
-                }
-            }
-            Object.defineProperty(TourStop.prototype, "Target", {
-                get: function () {
-                    return this.targetElement;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(TourStop.prototype, "Title", {
-                get: function () {
-                    return this.title;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(TourStop.prototype, "Description", {
-                get: function () {
-                    return this.description;
-                },
-                set: function (d) {
-                    this.description = d;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-
-            Object.defineProperty(TourStop.prototype, "LapseTime", {
-                get: function () {
-                    return this.lapseTime;
-                },
-                set: function (value) {
-                    this.lapseTime = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(TourStop.prototype, "Type", {
-                get: function () {
-                    return this.type;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(TourStop.prototype, "NavigationUrl", {
-                get: function () {
-                    return CZ.UrlNav.vcelementToNavString(this.targetElement);
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(TourStop.prototype, "ThumbnailUrl", {
-                get: function () {
-                    if (!this.thumbUrl)
-                        this.thumbUrl = this.GetThumbnail(this.targetElement);
-                    return this.thumbUrl;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            TourStop.prototype.GetThumbnail = function (element) {
-                // uncomment for debug: return "http://upload.wikimedia.org/wikipedia/commons/7/71/Ivan_kramskoy_self_portrait_tr.gif";
-                var defaultThumb = "/images/Temp-Thumbnail2.png";
-                try  {
-                    if (!element)
-                        return defaultThumb;
-                    if (element.type === "contentItem") {
-                        var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + element.id + '.png';
-                        return thumbnailUri;
-                    }
-                    if (element.type === "infodot") {
-                        if (element.contentItems && element.contentItems.length > 0) {
-                            var child = element.contentItems[0];
-                            var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x64/' + child.id + '.png';
-                            return thumbnailUri;
-                        }
-                    } else if (element.type === "timeline") {
-                        for (var n = element.children.length, i = 0; i < n; i++) {
-                            var child = element.children[i];
-                            if (child.type === "infodot" || child.type === "timeline") {
-                                var thumb = this.GetThumbnail(child);
-                                if (thumb && thumb !== defaultThumb)
-                                    return thumb;
-                            }
-                        }
-                    }
-                } catch (exc) {
-                    if (console && console.error)
-                        console.error("Failed to get a thumbnail url: " + exc);
-                }
-                return defaultThumb;
-            };
-            return TourStop;
-        })();
-        UI.TourStop = TourStop;
-
-        var Tour = (function () {
-            function Tour(id, title, description, audio, category, sequence, stops) {
-                this.id = id;
-                this.title = title;
-                this.description = description;
-                this.audio = audio;
-                this.sequence = sequence;
-                this.stops = stops;
-                this.category = category;
-            }
-            Object.defineProperty(Tour.prototype, "Id", {
-                get: function () {
-                    return this.id;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(Tour.prototype, "Title", {
-                get: function () {
-                    return this.title;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(Tour.prototype, "Category", {
-                get: function () {
-                    return this.category;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(Tour.prototype, "Sequence", {
-                get: function () {
-                    return this.sequence;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-            Object.defineProperty(Tour.prototype, "Description", {
-                get: function () {
-                    return this.description;
-                },
-                set: function (val) {
-                    this.description = val;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-
-            Object.defineProperty(Tour.prototype, "Audio", {
-                get: function () {
-                    return this.audio;
-                },
-                set: function (val) {
-                    this.audio = val;
-                },
-                enumerable: true,
-                configurable: true
-            });
-
-
-            Object.defineProperty(Tour.prototype, "Stops", {
-                get: function () {
-                    return this.stops;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return Tour;
-        })();
-        UI.Tour = Tour;
-
-        var FormEditTour = (function (_super) {
-            __extends(FormEditTour, _super);
-            // We only need to add additional initialization in constructor.
-            function FormEditTour(container, formInfo) {
-                _super.call(this, container, formInfo);
-
-                this.saveButton = container.find(formInfo.saveButton);
-                this.deleteButton = container.find(formInfo.deleteButton);
-                this.addStopButton = container.find(formInfo.addStopButton);
-                this.titleInput = container.find(formInfo.titleInput);
-
-                this.tourTitleInput = this.container.find(".cz-form-tour-title");
-                this.tourDescriptionInput = this.container.find(".cz-form-tour-description");
-                this.tourAudioPicker = this.container.find('.cz-medialist-item-icon');
-                this.tourAudioInput = this.container.find('#cz-form-tour-audio');
-                this.tourAudioControls = this.container.find('.audiojs');
-                this.clean();
-
-                this.saveButton.off();
-                this.deleteButton.off();
-
-                this.tour = formInfo.context;
-                var stops = [];
-                var self = this;
-                if (this.tour) {
-                    this.tourTitleInput.val(this.tour.title);
-                    this.tourDescriptionInput.val(this.tour.description);
-                    this.tourAudioInput.val(this.tour.audio);
-                    for (var i = 0, len = this.tour.bookmarks.length; i < len; i++) {
-                        var bookmark = this.tour.bookmarks[i];
-                        var stop = FormEditTour.bookmarkToTourstop(bookmark);
-                        stops.push(stop);
-                    }
-                } else {
-                    this.tourTitleInput.val("");
-                    this.tourDescriptionInput.val("");
-                }
-                this.tourStopsListBox = new CZ.UI.TourStopListBox(container.find(formInfo.tourStopsListBox), formInfo.tourStopsTemplate, stops);
-                this.tourStopsListBox.itemMove(function (item, startPos, endPos) {
-                    return self.onStopsReordered.apply(self, [item, startPos, endPos]);
-                });
-                this.tourStopsListBox.itemRemove(function (item, index) {
-                    return self.onStopRemoved.apply(self, [item, index]);
-                });
-                this.initialize();
-            }
-            FormEditTour.bookmarkToTourstop = function (bookmark) {
-                var target = CZ.Tours.bookmarkUrlToElement(bookmark.url);
-                if (target == null) {
-                    target = {
-                        type: "Unknown"
-                    };
-                }
-                var stop = new TourStop(target, (!bookmark.caption || $.trim(bookmark.caption) === "") ? undefined : bookmark.caption);
-                stop.Description = bookmark.text;
-                stop.LapseTime = bookmark.lapseTime;
-                return stop;
-            };
-
-            FormEditTour.tourstopToBookmark = function (tourstop, index) {
-                var url = CZ.UrlNav.vcelementToNavString(tourstop.Target);
-                var title = tourstop.Title;
-                var bookmark = new CZ.Tours.TourBookmark(url, title, tourstop.LapseTime, tourstop.Description);
-                bookmark.number = index + 1;
-                return bookmark;
-            };
-
-            FormEditTour.prototype.deleteTourAsync = function () {
-                return CZ.Service.deleteTour(this.tour.id);
-            };
-
-            // Creates new tour instance from the current state of the UI.
-            // Returns a promise of the created tour. May fail.
-            FormEditTour.prototype.putTourAsync = function (sequenceNum) {
-                var deferred = $.Deferred();
-                var self = this;
-                var stops = this.getStops();
-
-                // Add the tour to the local tours collection
-                var name = this.tourTitleInput.val();
-                var descr = this.tourDescriptionInput.val();
-                var audio = this.tourAudioInput.val();
-                var category = "tours";
-                var n = stops.length;
-                var tourId = undefined;
-                if (this.tour) {
-                    category = this.tour.category;
-                    tourId = this.tour.id;
-                }
-
-                // Posting the tour to the service
-                var request = CZ.Service.putTour2(new CZ.UI.Tour(tourId, name, descr, audio, category, n, stops));
-
-                request.done(function (q) {
-                    // build array of bookmarks of current tour
-                    var tourBookmarks = new Array();
-                    for (var j = 0; j < n; j++) {
-                        var tourstop = stops[j];
-                        var bookmark = FormEditTour.tourstopToBookmark(tourstop, j);
-                        tourBookmarks.push(bookmark);
-                    }
-
-                    var tour = new CZ.Tours.Tour(q.TourId, name, tourBookmarks, CZ.Tours.bookmarkTransition, CZ.Common.vc, category, audio, sequenceNum, descr);
-                    deferred.resolve(tour);
-                }).fail(function (q) {
-                    deferred.reject(q);
-                });
-                return deferred.promise();
-            };
-
-            FormEditTour.prototype.initializeAsEdit = function () {
-                this.deleteButton.show();
-                this.titleTextblock.text("Edit Tour");
-                this.saveButton.text("Update Tour");
-            };
-
-            FormEditTour.prototype.initialize = function () {
-                var _this = this;
-                this.saveButton.prop('disabled', false);
-                if (this.tour == null) {
-                    this.deleteButton.hide();
-                    this.titleTextblock.text("Create Tour");
-                    this.saveButton.text("Create Tour");
-                } else {
-                    this.initializeAsEdit();
-                }
-
-                var self = this;
-
-                // ensure Windows Live API initialized for OneDrive
-                WL.init
-                ({
-                    client_id:      CZ.Settings.WLAPIClientID,
-                    redirect_uri:   CZ.Settings.WLAPIRedirectUrl
-                });
-
-                // OneDrive audio picker - see https://msdn.microsoft.com/en-us/library/jj219328.aspx
-                this.tourAudioPicker.click(function (event)
-                {
-                    WL.login
-                    ({
-                        scope: ['wl.skydrive', 'wl.signin']
-                    })
-                    .then
-                    (
-                        function(response)
-                        {
-                            WL.fileDialog
-                            ({
-                                mode:   'open',
-                                select: 'single'
-                            })
-                            .then
-                            (
-                                function (response)
-                                {
-                                    var file = response.data.files[0];
-                                    if (file.type === 'audio' && file.name.toLowerCase().match('\.mp3$'))
-                                    {
-                                        _this.tourAudioInput.val(file.source);
-                                        _this.renderAudioControls();
-                                    }
-                                    else
-                                    {
-                                        // Don't use CZ.Authoring.showMessageWindow to warn as
-                                        // currently not noticeable on top of Edit Tour pane.
-                                        alert('Sorry, you need to pick an MP3 file.');
-                                    }
-                                }
-                            );
-                        }
-                    );
-                });
-
-                this.renderAudioControls();
-                this.tourAudioInput.on('change input', function (event) {
-                    _this.renderAudioControls();
-                });
-
-                this.addStopButton.click(function (event) {
-                    CZ.Authoring.isActive = true; // for now we do not watch for mouse moves
-                    CZ.Authoring.mode = "editTour-selectTarget";
-                    CZ.Authoring.callback = function (arg) {
-                        return self.onTargetElementSelected(arg);
-                    };
-                    self.hide();
-                    setTimeout(function () {
-                        if (CZ.Authoring.mode == "editTour-selectTarget") {
-                            CZ.Authoring.showMessageWindow("Click an element to select it as a tour stop.", "New tour stop", function () {
-                                if (CZ.Authoring.mode == "editTour-selectTarget")
-                                    self.onTargetElementSelected(null);
-                            });
-                        }
-                    }, 500);
-                });
-
-                this.saveButton.click(function (event) {
-                    var message = '';
-
-                    if (!_this.tourTitleInput.val())
-                        message += "Please enter a title.\n";
-
-                    // audio URL validation
-                    _this.tourAudioInput.val($.trim(_this.tourAudioInput.val())); // first trim excess space
-                    if (_this.tourAudioInput.val() != '' && !CZ.Data.validURL(_this.tourAudioInput.val())) {
-                        // content has been entered and is not a validly formed URL
-                        message += 'Please provide a valid audio URL.\n';
-                    }
-
-                    if (_this.tourStopsListBox.items.length == 0)
-                        message += "Please add a tour stop to the tour.\n";
-
-                    if (message) {
-                        alert(message);
-                        return;
-                    }
-
-                    var self = _this;
-
-                    _this.saveButton.prop('disabled', true);
-
-                    // create new tour
-                    if (_this.tour == null) {
-                        // Add the tour to the local tours collection
-                        _this.putTourAsync(CZ.Tours.tours.length).done(function (tour) {
-                            self.tour = tour;
-                            CZ.Tours.tours.push(tour);
-                            _this.hide();
-                        }).fail(function (f) {
-                            if (console && console.error) {
-                                console.error("Failed to create a tour: " + f.status + " " + f.statusText);
-                            }
-                            alert("Failed to create a tour");
-                        }).done(function () {
-                            _this.saveButton.prop('disabled', false);
-                        });
-                    } else {
-                        for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
-                            if (CZ.Tours.tours[i] === _this.tour) {
-                                _this.putTourAsync(i).done(function (tour) {
-                                    _this.tour = CZ.Tours.tours[i] = tour;
-                                    _this.hide();
-                                }).fail(function (f) {
-                                    if (console && console.error) {
-                                        console.error("Failed to update a tour: " + f.status + " " + f.statusText);
-                                    }
-                                    alert("Failed to update a tour");
-                                }).always(function () {
-                                    _this.saveButton.prop('disabled', false);
-                                });
-                                break;
-                            }
-                        }
-                    }
-                });
-
-                this.deleteButton.click(function (event) {
-                    if (_this.tour == null)
-                        return;
-                    _this.deleteTourAsync().done(function (q) {
-                        for (var i = 0, n = CZ.Tours.tours.length; i < n; i++) {
-                            if (CZ.Tours.tours[i] === _this.tour) {
-                                _this.tour = null;
-                                CZ.Tours.tours.splice(i, 1);
-                                _this.close();
-                                break;
-                            }
-                        }
-                    }).fail(function (f) {
-                        if (console && console.error) {
-                            console.error("Failed to delete a tour: " + f.status + " " + f.statusText);
-                        }
-                        alert("Failed to delete a tour");
-                    });
-                });
-            };
-
-            // Gets an array of TourStops as they are currently in the listbox.
-            FormEditTour.prototype.getStops = function () {
-                var n = this.tourStopsListBox.items.length;
-                var stops = new Array(n);
-                for (; --n >= 0;) {
-                    stops[n] = this.tourStopsListBox.items[n].data;
-                }
-                return stops;
-            };
-
-            FormEditTour.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormEditTour.prototype.hide = function (noAnimation) {
-                if (typeof noAnimation === "undefined") { noAnimation = false; }
-                _super.prototype.close.call(this, noAnimation ? undefined : {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-                this.activationSource.removeClass("active");
-            };
-
-            FormEditTour.prototype.close = function () {
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                    }
-                });
-
-                CZ.Authoring.isActive = false;
-                this.clean();
-            };
-
-            FormEditTour.prototype.clean = function () {
-                this.activationSource.removeClass("active");
-                this.container.find(".cz-form-errormsg").hide();
-                this.container.find(".cz-listbox").empty();
-                this.tourTitleInput.val("");
-                this.tourDescriptionInput.val("");
-                this.tourAudioInput.val('');
-            };
-
-            FormEditTour.prototype.renderAudioControls = function () {
-                this.tourAudioControls.find('audio').stop();
-                this.tourAudioControls.find('audio').html('<source src="' + this.tourAudioInput.val() + '" />');
-
-                if (CZ.Data.validURL(this.tourAudioInput.val())) {
-                    this.tourAudioControls.show();
-                } else {
-                    this.tourAudioControls.hide();
-                }
-            };
-
-            FormEditTour.prototype.onStopsReordered = function () {
-                this.updateSequence();
-            };
-
-            FormEditTour.prototype.onStopRemoved = function () {
-                this.updateSequence();
-            };
-
-            FormEditTour.prototype.updateSequence = function () {
-                var stops = this.getStops();
-                var n = stops.length;
-                var lapseTime = 0;
-                for (var i = 0; i < n; i++) {
-                    var stop = stops[i];
-                    stop.LapseTime = lapseTime;
-                    lapseTime += CZ.Settings.tourDefaultTransitionTime;
-                }
-            };
-
-            // New tour stop is added.
-            FormEditTour.prototype.onTargetElementSelected = function (targetElement) {
-                CZ.Authoring.mode = "editTour";
-                CZ.Authoring.hideMessageWindow();
-                CZ.Authoring.isActive = false;
-                CZ.Authoring.callback = null;
-
-                if (targetElement) {
-                    var n = this.tourStopsListBox.items.length;
-                    var stop = new TourStop(targetElement);
-                    stop.LapseTime = n == 0 ? 0 : this.tourStopsListBox.items[this.tourStopsListBox.items.length - 1].data.LapseTime + CZ.Settings.tourDefaultTransitionTime;
-                    this.tourStopsListBox.add(stop);
-                }
-                this.show();
-            };
-            return FormEditTour;
-        })(CZ.UI.FormBase);
-        UI.FormEditTour = FormEditTour;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/settings.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-/// <reference path='../scripts/media.ts'/>
-/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormEditCollection = (function (_super) {
-            __extends(FormEditCollection, _super);
-            // We only need to add additional initialization in constructor.
-            function FormEditCollection(container, formInfo) {
-                var _this = this;
-                _super.call(this, container, formInfo);
-                this.contentItem = {};
-
-                this.saveButton             = container.find(formInfo.saveButton);
-                this.deleteButton           = container.find(formInfo.deleteButton);
-                this.errorMessage           = container.find(formInfo.errorMessage);
-                this.colorPickers           = container.find('input[type="color"]');
-                this.rangePickers           = container.find('.cz-form-range');
-                this.collectionName         = container.find(formInfo.collectionName);
-                this.collectionPath         = container.find(formInfo.collectionPath);
-                this.originalPath           = this.collectionPath;
-                this.backgroundInput        = container.find(formInfo.backgroundInput);
-                this.collectionTheme        = formInfo.collectionTheme;
-                this.activeCollectionTheme  = jQuery.extend(true, {}, formInfo.collectionTheme);
-                this.mediaListContainer     = container.find(formInfo.mediaListContainer);
-                this.kioskmodeInput         = formInfo.kioskmodeInput;
-                this.chkPublic              = container.find(formInfo.chkPublic);
-                this.chkDefault             = container.find(formInfo.chkDefault);
-                this.chkEditors             = container.find(formInfo.chkEditors);
-                this.btnEditors             = container.find(formInfo.btnEditors);
-                this.lnkUseDefaultImage     = container.find('.cz-form-default-image');
-
-                this.timelineBackgroundColorInput = formInfo.timelineBackgroundColorInput;
-                this.timelineBackgroundOpacityInput = formInfo.timelineBackgroundOpacityInput;
-                this.timelineBorderColorInput = formInfo.timelineBorderColorInput;
-                this.exhibitBackgroundColorInput = formInfo.exhibitBackgroundColorInput;
-                this.exhibitBackgroundOpacityInput = formInfo.exhibitBackgroundOpacityInput;
-                this.exhibitBorderColorInput = formInfo.exhibitBorderColorInput;
-
-                this.collectionName.on('input change', function ()
-                {
-                    _this.updateCollectionPath();
-                });
-
-                this.lnkUseDefaultImage.click(function ()
-                {
-                    _this.backgroundInput.val('/images/background.jpg');
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.backgroundInput.on('input change', function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.kioskmodeInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.timelineBackgroundColorInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.timelineBackgroundOpacityInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.timelineBorderColorInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.exhibitBackgroundColorInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.exhibitBackgroundOpacityInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.exhibitBorderColorInput.change(function () {
-                    _this.updateCollectionTheme(true);
-                });
-
-                this.backgroundInput.focus(function () {
-                    _this.backgroundInput.hideError();
-                });
-
-                try  {
-                    this.initialize();
-                } catch (e) {
-                    console.log("Error initializing collection form attributes");
-                }
-
-                this.saveButton.off().click(function (event)
-                {
-                    _this.errorMessage.hide();
-
-                    CZ.Service.isUniqueCollectionName(_this.collectionName.val()).done(function (isUniqueCollectionName)
-                    {
-                        if (!isUniqueCollectionName)
-                        {
-                            _this.errorMessage.html
-                            (
-                                "This collection name or URL has already been used. &nbsp;" +
-                                "Please try a different collection name."
-                            ).show();
-                            return;
-                        }
-
-                        _this.updateCollectionTheme(true);
-                        _this.activeCollectionTheme = _this.collectionTheme;
-
-                        var collectionData =
-                        {
-                            Title:              $.trim(_this.collectionName.val()),
-                            Path:               _this.collectionName.val().replace(/[^a-zA-Z0-9\-]/g, ''),
-                            theme:              JSON.stringify(_this.collectionTheme),
-                            PubliclySearchable: $(_this.chkPublic ).prop('checked'),
-                            MembersAllowed:     $(_this.chkEditors).prop('checked'),
-                            Default:            $(_this.chkDefault).prop('checked')
-                        };
-
-                        CZ.Service.putCollection(CZ.Service.superCollectionName, CZ.Service.collectionName, collectionData)
-                        .done(function ()
-                        {
-                            _this.close();
-                            if (_this.collectionPath.val() != _this.originalPath) window.location = _this.collectionPath.val();
-                        })
-                        .fail(function ()
-                        {
-                            _this.errorMessage.html('An unexpected error occured.').show();
-                        });
-                    });
-                });
-
-                this.deleteButton.off().click(function (event)
-                {
-                    _this.errorMessage.hide();
-
-                    CZ.Service.deleteCollection().done(function (success)
-                    {
-                        if (success)
-                        {
-                            window.location =
-                            (
-                                window.location.protocol + '//' + window.location.host + '/' + CZ.Service.superCollectionName
-                            )
-                            .toLowerCase();
-                        }
-                        else
-                        {
-                            CZ.Authoring.showMessageWindow
-                            (
-                                "An unexpected error occured.",
-                                "Unable to Delete Collection"
-                            );
-                        }
-                    });
-                });
-            }
-            FormEditCollection.prototype.initialize = function () {
-                var _this = this;
-                this.saveButton.prop('disabled', false);
-
-                // see http://refreshless.com/nouislider
-                if (!this.rangePickers.hasClass('noUi-target'))
-                {
-                    this.rangePickers.noUiSlider
-                    ({
-                        connect:    'lower',
-                        start:      0.5,
-                        step:       0.05,
-                        range:
-                        {
-                            'min':  0,
-                            'max':  1
-                        }
-                    });
-                }
-
-                this.backgroundInput.val(this.collectionTheme.backgroundUrl);
-                this.mediaList = new CZ.UI.MediaList(this.mediaListContainer, CZ.Media.mediaPickers, this.contentItem, this);
-                this.kioskmodeInput.prop('checked', false);
-
-                if (!this.collectionTheme.timelineColor) this.collectionTheme.timelineColor = CZ.Settings.timelineColorOverride;
-                this.timelineBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineColor));
-                this.timelineBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.timelineColor).toString());
-                this.timelineBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.timelineStrokeStyle));
-
-                this.exhibitBackgroundColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotFillColor));
-                this.exhibitBackgroundOpacityInput.val(this.getOpacityFromRGBA(this.collectionTheme.infoDotFillColor).toString());
-                this.exhibitBorderColorInput.val(this.getHexColorFromColor(this.collectionTheme.infoDotBorderColor));
-
-                // see http://bgrins.github.io/spectrum
-                this.colorPickers.spectrum();
-                $.each(this.colorPickers, function (index, value)
-                {
-                    var $this = $(this);
-                    $this.next().find('.sp-preview').attr('title', $this.attr('title'));
-                });
-
-                CZ.Service.getCollection().done(function (data)
-                {
-                    var themeFromDb = JSON.parse(data.theme);
-                    if (themeFromDb == null) {
-                        $(_this.kioskmodeInput).prop('checked', false);
-                    } else {
-                        $(_this.kioskmodeInput).prop('checked', themeFromDb.kioskMode);
-                    }
-                    $(_this.collectionName).val(data.Title);
-                    _this.updateCollectionPath();
-                    _this.originalPath = _this.collectionPath.val();
-                    $(_this.chkDefault).prop('checked', data.Default);
-                    $(_this.chkDefault).parent().attr('title', 'The default for ' + window.location.protocol + '//' + window.location.host + '/' + CZ.Service.superCollectionName);
-                    if (data.Default)
-                    {
-                        $(_this.chkDefault).prop('disabled', true);
-                        $(_this.deleteButton).hide();
-                    }
-                    $(_this.chkPublic ).prop('checked', data.PubliclySearchable);
-                    $(_this.chkEditors).prop('checked', data.MembersAllowed);
-                    _this.renderManageEditorsButton();
-                });
-
-                this.chkEditors.off().click(function (event) {
-                    _this.renderManageEditorsButton();
-                });
-            };
-
-            FormEditCollection.prototype.updateCollectionPath = function ()
-            {
-                this.collectionPath.val
-                (
-                    (
-                        window.location.protocol + '//' + window.location.host + '/' +
-                        CZ.Service.superCollectionName + '/' +
-                        this.collectionName.val().replace(/[^a-zA-Z0-9\-]/g, '')
-                    )
-                    .toLowerCase()
-                );
-            };
-
-            FormEditCollection.prototype.colorIsRgba = function (color) {
-                return color ? color.substr(0, 5) === "rgba(" : false;
-            };
-
-            FormEditCollection.prototype.colorIsRgb = function (color) {
-                return color ? color.substr(0, 4) === "rgb(" : false;
-            };
-
-            FormEditCollection.prototype.colorIsHex = function (color) {
-                return color ? color.substr(0, 1) === "#" && color.length >= 7 : false;
-            };
-
-            FormEditCollection.prototype.rgbaFromColor = function (color, alpha) {
-                if (!color)
-                    return color;
-
-                if (this.colorIsRgba(color)) {
-                    var parts = color.substr(5, color.length - 5 - 1).split(",");
-                    if (parts.length > 3)
-                        parts[parts.length - 1] = alpha.toString();
-                    else
-                        parts.push(alpha.toString());
-                    return "rgba(" + parts.join(",") + ")";
-                }
-
-                var red = parseInt("0x" + color.substr(1, 2));
-                var green = parseInt("0x" + color.substr(3, 2));
-                var blue = parseInt("0x" + color.substr(5, 2));
-
-                return "rgba(" + red + "," + green + "," + blue + "," + alpha + ")";
-            };
-
-            FormEditCollection.prototype.getOpacityFromRGBA = function (rgba) {
-                if (!rgba)
-                    return null;
-                if (!this.colorIsRgba(rgba))
-                    return 1.0;
-
-                var parts = rgba.split(",");
-                var lastPart = parts[parts.length - 1].split(")")[0];
-                return parseFloat(lastPart);
-            };
-
-            FormEditCollection.prototype.getHexColorFromColor = function (color) {
-                if (this.colorIsHex(color))
-                    return color;
-
-                if (!this.colorIsRgb(color) && !this.colorIsRgba(color))
-                    return null;
-
-                var offset = this.colorIsRgb(color) ? 4 : 5;
-                var parts = color.substr(offset, color.length - offset - 1).split(",");
-                var lastPart = parts[parts.length - 1].split(")")[0];
-                return "#" + this.colorHexFromInt(parts[0]) + this.colorHexFromInt(parts[1]) + this.colorHexFromInt(parts[2]);
-            };
-
-            FormEditCollection.prototype.colorHexFromInt = function (colorpart) {
-                var hex = Number(colorpart).toString(16);
-                if (hex.length === 1)
-                    return "0" + hex;
-
-                return hex;
-            };
-
-            FormEditCollection.prototype.renderManageEditorsButton = function () {
-                if (this.chkEditors.prop('checked')) {
-                    this.btnEditors.slideDown('fast');
-                } else {
-                    this.btnEditors.slideUp('fast');
-                }
-            };
-
-            FormEditCollection.prototype.updateCollectionTheme = function (clearError)
-            {
-                this.collectionTheme =
-                {
-                    backgroundUrl:          this.backgroundInput.val(),
-                    backgroundColor:        "#232323",
-                    kioskMode:              this.kioskmodeInput.prop("checked"),
-                    /*
-                    // native color picker:
-                    timelineColor:          this.rgbaFromColor(this.timelineBackgroundColorInput.val(), this.timelineBackgroundOpacityInput.val()),
-                    timelineStrokeStyle:    this.timelineBorderColorInput.val(),
-                    infoDotFillColor:       this.rgbaFromColor(this.exhibitBackgroundColorInput.val(),  this.exhibitBackgroundOpacityInput.val()),
-                    infoDotBorderColor:     this.exhibitBorderColorInput.val()
-                    */
-                    // spectrum color picker:
-                    timelineColor:          this.rgbaFromColor(this.timelineBackgroundColorInput.spectrum('get').toHexString(), this.timelineBackgroundOpacityInput.val()),
-                    timelineStrokeStyle:    this.timelineBorderColorInput.spectrum('get').toHexString(),
-                    infoDotFillColor:       this.rgbaFromColor(this.exhibitBackgroundColorInput.spectrum( 'get').toHexString(), this.exhibitBackgroundOpacityInput.val()),
-                    infoDotBorderColor:     this.exhibitBorderColorInput.spectrum( 'get').toHexString()
-                };
-
-                // if input has rgba color then update textbox with new alpha
-                if (this.colorIsRgb(this.timelineBackgroundColorInput.val()))
-                {
-                    this.timelineBackgroundColorInput.val(this.collectionTheme.timelineColor);
-                    this.exhibitBackgroundColorInput.val(this.collectionTheme.infoDotFillColor);
-                }
-
-                if (clearError) this.backgroundInput.hideError();
-
-                this.updateCollectionThemeFromTheme(this.collectionTheme);
-            };
-
-            FormEditCollection.prototype.updateCollectionThemeFromTheme = function (theme) {
-                CZ.Settings.applyTheme(theme, false);
-
-                CZ.Common.vc.virtualCanvas("forEachElement", function (element) {
-                    if (element.type === "timeline") {
-                        element.settings.fillStyle = theme.timelineColor;
-                        element.settings.strokeStyle = theme.timelineStrokeStyle;
-                        element.settings.gradientFillStyle = theme.timelineStrokeStyle;
-                    } else if (element.type === "infodot") {
-                        element.settings.fillStyle = theme.infoDotFillColor;
-                        element.settings.strokeStyle = theme.infoDotBorderColor;
-                    }
-                });
-
-                CZ.Common.vc.virtualCanvas("requestInvalidate");
-            };
-
-            FormEditCollection.prototype.updateMediaInfo = function () {
-                var clearError = true;
-
-                // Using tempSource is less than ideal; however, SkyDrive does not support any permanent link to the file and therefore we will warn users. Future: Create an image cache in the server.
-                if (this.contentItem.mediaType == "skydrive-image") {
-                    this.backgroundInput.val(this.contentItem.tempSource || "");
-                    clearError = false;
-                    this.backgroundInput.showError("OneDrive static links are not permanent. Consider hosting it as a public image instead.");
-                } else {
-                    this.backgroundInput.val(this.contentItem.uri || "");
-                }
-
-                this.updateCollectionTheme(clearError);
-            };
-
-            FormEditCollection.prototype.show = function () {
-                CZ.Menus.isDisabled = true;
-                CZ.Menus.Refresh();
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormEditCollection.prototype.close = function () {
-                var _this = this;
-                CZ.Menus.isDisabled = false;
-                CZ.Menus.Refresh();
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "left",
-                    duration: 500,
-                    complete: function () {
-                        _this.backgroundInput.hideError();
-                        _this.mediaList.remove();
-                    }
-                });
-
-                this.backgroundInput.hideError();
-                this.updateCollectionThemeFromTheme(this.activeCollectionTheme);
-            };
-            return FormEditCollection;
-        })(CZ.UI.FormUpdateEntity);
-        UI.FormEditCollection = FormEditCollection;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-﻿/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/settings.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormManageEditors = (function (_super) {
-            __extends(FormManageEditors, _super);
-            function FormManageEditors(container, formInfo) {
-                _super.call(this, container, formInfo);
-
-                // populate list of existing editors
-                CZ.Service.getMembers().done(function (data) {
-                    if (data.length == 0) {
-                        $('#tblDelEditors tbody').html('<tr class="none"><td colspan="2" class="cz-lightgray center">&mdash; None &mdash;</td></tr>');
-                    } else {
-                        $('#tblDelEditors tbody').html('');
-                        data.forEach(function (member) {
-                            $('#tblDelEditors tbody').append('<tr data-id="' + member.Id + '">' + '<td class="delete" title="Remove Editor"></td>' + '<td title="' + member.DisplayName + '">' + member.DisplayName + '</td>' + '</tr>');
-                        });
-                    }
-                });
-
-                // populate search results every time find input is altered
-                $('#tblAddEditors input[type="search"]').off('input').on('input', function (event) {
-                    var _this = this;
-                    CZ.Service.findUsers($(this).val()).done(function (data) {
-                        $(_this).closest('table').find('tbody').html('');
-                        $(_this).closest('tr').find('input[type="checkbox"]').prop('checked', false);
-                        data.forEach(function (user) {
-                            $('#tblAddEditors tbody').append('<tr data-id="' + user.Id + '">' + '<td class="select" title="Select/Unselect This User"><input type="checkbox" /></td>' + '<td title="' + user.DisplayName + '">' + user.DisplayName + '</td>' + '</tr>');
-                        });
-                        if (data.length == 0) {
-                            $(_this).closest('table').find('tfoot').hide();
-                        } else {
-                            $(_this).closest('table').find('tfoot').show();
-                        }
-                    });
-                });
-
-                // send chosen list of user ids when save button is clicked
-                $('#auth-edit-collection-editors .cz-form-save').off().click(function (event) {
-                    var userIds = new Array();
-
-                    $('#tblDelEditors tbody tr:not(.none)').each(function (index) {
-                        userIds.push($(this).attr('data-id'));
-                    });
-
-                    CZ.Service.putMembers(CZ.Service.superCollectionName, CZ.Service.collectionName, userIds).always(function () {
-                        $('#auth-edit-collection-editors').hide();
-                    });
-                });
-            }
-            return FormManageEditors;
-        })(UI.FormUpdateEntity);
-        UI.FormManageEditors = FormManageEditors;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormHeaderEdit = (function (_super) {
-            __extends(FormHeaderEdit, _super);
-            // We only need to add additional initialization in constructor.
-            function FormHeaderEdit(container, formInfo) {
-                _super.call(this, container, formInfo);
-
-                this.createTimelineBtn = this.container.find(formInfo.createTimeline);
-                this.createExhibitBtn = this.container.find(formInfo.createExhibit);
-                this.createTourBtn = this.container.find(formInfo.createTour);
-
-                this.initialize();
-            }
-            FormHeaderEdit.prototype.initialize = function () {
-                var _this = this;
-                this.createTimelineBtn.off();
-                this.createExhibitBtn.off();
-                this.createTourBtn.off();
-
-                this.createTimelineBtn.click(function (event) {
-                    CZ.Authoring.UI.createTimeline();
-                    _this.close();
-                });
-
-                this.createExhibitBtn.click(function (event) {
-                    CZ.Authoring.UI.createExhibit();
-                    _this.close();
-                });
-
-                this.createTourBtn.click(function (event) {
-                    CZ.Authoring.UI.createTour();
-                    _this.close();
-                });
-            };
-
-            FormHeaderEdit.prototype.show = function () {
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-                this.activationSource.addClass("active");
-            };
-
-            FormHeaderEdit.prototype.close = function () {
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-                this.activationSource.removeClass("active");
-            };
-            return FormHeaderEdit;
-        })(CZ.UI.FormBase);
-        UI.FormHeaderEdit = FormHeaderEdit;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-﻿/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../ui/media/skydrive-mediapicker.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormEditProfile = (function (_super) {
-            __extends(FormEditProfile, _super);
-            function FormEditProfile(container, formInfo) {
-                _super.call(this, container, formInfo);
-                this.saveButton = container.find(formInfo.saveButton);
-                this.logoutButton = container.find(formInfo.logoutButton);
-                this.usernameInput = container.find(formInfo.usernameInput);
-                this.emailInput = container.find(formInfo.emailInput);
-                this.agreeInput = container.find(formInfo.agreeInput);
-                this.loginPanel = $(document.body).find(formInfo.loginPanel).first();
-                this.profilePanel = $(document.body).find(formInfo.profilePanel).first();
-                this.loginPanelLogin = $(document.body).find(formInfo.loginPanelLogin).first();
-                this.allowRedirect = formInfo.allowRedirect;
-
-                this.usernameInput.off("keypress");
-                this.emailInput.off("keypress");
-
-                this.initialize();
-            }
-            FormEditProfile.prototype.validEmail = function (e) {
-                // Maximum length is 254: http://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
-                if (String(e).length > 254)
-                    return false;
-                var filter = /^([\w^_]+((?:([-_.\+][\w^_]+)|))+|(xn--[\w^_]+))@([\w^_]+(?:(-+[\w^_]+)|)|(xn--[\w^_]+))(?:\.([\w^_]+(?:([\w-_\.\+][\w^_]+)|)|(xn--[\w^_]+)))$/i;
-                return String(e).search(filter) != -1;
-            };
-
-            FormEditProfile.prototype.validUsername = function (e) {
-                var filter = /^[a-z0-9\-_]{4,20}$/i;
-                return String(e).search(filter) != -1;
-            };
-
-            FormEditProfile.prototype.initialize = function () {
-                var _this = this;
-                var profile = CZ.Service.getProfile();
-
-                profile.done(function (data) {
-                    if (data.DisplayName != null) {
-                        _this.usernameInput.val(data.DisplayName);
-                        if (data.DisplayName != "") {
-                            _this.usernameInput.prop('disabled', true);
-                        }
-                        _this.emailInput.val(data.Email);
-                        if (data.Email !== undefined && data.Email !== '' && data.Email != null) {
-                            _this.agreeInput.attr('checked', 'true');
-                            _this.agreeInput.prop('disabled', true);
-                        }
-                    }
-                });
-
-                this.saveButton.click(function (event) {
-                    var isValid = _this.validUsername(_this.usernameInput.val());
-                    if (!isValid) {
-                        alert("Provided incorrect username, \n'a-z', '0-9', '-', '_' - characters allowed only. ");
-                        return;
-                    }
-
-                    var emailAddress = "";
-                    if (_this.emailInput.val()) {
-                        var emailIsValid = _this.validEmail(_this.emailInput.val());
-                        if (!emailIsValid) {
-                            alert("Provided incorrect email address");
-                            return;
-                        }
-
-                        var agreeTerms = _this.agreeInput.prop("checked");
-                        if (!agreeTerms) {
-                            alert("Please agree with provided terms");
-                            return;
-                        }
-
-                        emailAddress = _this.emailInput.val();
-                    }
-
-                    CZ.Service.getProfile().done(function (curUser) {
-                        CZ.Service.getProfile(_this.usernameInput.val()).done(function (getUser) {
-                            if (curUser.DisplayName == null && typeof getUser.DisplayName != "undefined") {
-                                //such username exists
-                                alert("Sorry, this username is already in use. Please try again.");
-                                return;
-                            }
-                            CZ.Service.putProfile(_this.usernameInput.val(), emailAddress).then(function (success) {
-                                if (_this.allowRedirect) {
-                                    window.location.assign("/" + success);
-                                } else {
-                                    _this.close();
-                                }
-                            }, function (error) {
-                                alert("Unable to save changes. Please try again later.");
-                                console.log(error);
-                            });
-                        });
-                    });
-                });
-
-                this.logoutButton.click(function (event) {
-                    WL.logout();
-                    window.location.assign("/pages/logoff.aspx");
-                });
-
-                // Prevent default behavior of Enter key for input elements.
-                var preventEnterKeyPress = function (event) {
-                    if (event.which == 13) {
-                        event.preventDefault();
-                    }
-                };
-                this.usernameInput.keypress(preventEnterKeyPress);
-                this.emailInput.keypress(preventEnterKeyPress);
-            };
-
-            FormEditProfile.prototype.show = function () {
-                CZ.Menus.isDisabled = true;
-                CZ.Menus.Refresh();
-                _super.prototype.show.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-
-                this.activationSource.addClass("active");
-            };
-
-            FormEditProfile.prototype.close = function () {
-                CZ.Menus.isDisabled = false;
-                CZ.Menus.Refresh();
-                _super.prototype.close.call(this, {
-                    effect: "slide",
-                    direction: "right",
-                    duration: 500
-                });
-
-                this.activationSource.removeClass("active");
-            };
-            return FormEditProfile;
-        })(CZ.UI.FormUpdateEntity);
-        UI.FormEditProfile = FormEditProfile;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
 ﻿/// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../scripts/authoring.ts'/>
 /// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
@@ -17898,42 +15125,6 @@ var CZ;
             return FormLogin;
         })(CZ.UI.FormBase);
         UI.FormLogin = FormLogin;
-    })(CZ.UI || (CZ.UI = {}));
-    var UI = CZ.UI;
-})(CZ || (CZ = {}));
-﻿/// <reference path='../ui/controls/formbase.ts'/>
-/// <reference path='../scripts/authoring.ts'/>
-/// <reference path='../scripts/typings/jquery/jquery.d.ts'/>
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var CZ;
-(function (CZ) {
-    (function (UI) {
-        var FormLogoutProfile = (function (_super) {
-            __extends(FormLogoutProfile, _super);
-            function FormLogoutProfile(container, formInfo) {
-                _super.call(this, container, formInfo);
-            }
-            FormLogoutProfile.prototype.show = function () {
-                CZ.Menus.isDisabled = true;
-                CZ.Menus.Refresh();
-                _super.prototype.show.call(this);
-                this.activationSource.addClass("active");
-            };
-
-            FormLogoutProfile.prototype.close = function () {
-                CZ.Menus.isDisabled = false;
-                CZ.Menus.Refresh();
-                _super.prototype.close.call(this);
-                this.activationSource.removeClass("active");
-            };
-            return FormLogoutProfile;
-        })(CZ.UI.FormBase);
-        UI.FormLogoutProfile = FormLogoutProfile;
     })(CZ.UI || (CZ.UI = {}));
     var UI = CZ.UI;
 })(CZ || (CZ = {}));
@@ -20132,14 +17323,6 @@ var CZ;
 /// <reference path='../ui/controls/formbase.ts'/>
 /// <reference path='../ui/controls/datepicker.ts'/>
 /// <reference path='../ui/controls/medialist.ts'/>
-/// <reference path='../ui/auth-edit-timeline-form.ts'/>
-/// <reference path='../ui/auth-edit-exhibit-form.ts'/>
-/// <reference path='../ui/auth-edit-contentitem-form.ts'/>
-/// <reference path='../ui/auth-edit-tour-form.ts'/>
-/// <reference path='../ui/auth-edit-collection-form.ts'/>
-/// <reference path='../ui/auth-edit-collection-editors.ts'/>
-/// <reference path='../ui/header-edit-form.ts' />
-/// <reference path='../ui/header-edit-profile-form.ts'/>
 /// <reference path='../ui/header-login-form.ts'/>
 /// <reference path='../ui/header-search-form.ts' />
 /// <reference path='../ui/timeseries-graph-form.ts'/>
@@ -20161,19 +17344,11 @@ var CZ;
     CZ.timeSeriesChart;
     CZ.leftDataSet;
     CZ.rightDataSet;
-
     (function (HomePageViewModel) {
         // Contains mapping of jQuery selector to HTML file, which is used to initialize the various panels via CZ.UILoader.
         var _uiMap =
         {
-            "#header-edit-form": "/ui/header-edit-form.html",
-            "#auth-edit-timeline-form": "/ui/auth-edit-timeline-form.html",
-            "#auth-edit-exhibit-form": "/ui/auth-edit-exhibit-form.html",
-            "#auth-edit-contentitem-form": "/ui/auth-edit-contentitem-form.html",
             "$('<div></div>')": "/ui/contentitem-listbox.html",
-            "#profile-form": "/ui/header-edit-profile-form.html",
-            "#login-form": "/ui/header-login-form.html",
-            "#auth-edit-tours-form": "/ui/auth-edit-tour-form.html",
             "$('<div><!--Tours Authoring--></div>')": "/ui/tourstop-listbox.html",
             "#toursList": "/ui/tourslist-form.html",
             "$('<div><!--Tours list item --></div>')": "/ui/tour-listbox.html",
@@ -20181,39 +17356,28 @@ var CZ;
             "#timeSeriesDataForm": "/ui/timeseries-data-form.html",
             "#message-window": "/ui/message-window.html",
             "#header-search-form": "/ui/header-search-form.html",
-            "#header-session-expired-form": "/ui/header-session-expired-form.html",
             "#tour-caption-form": "/ui/tour-caption-form.html",
             "#mediapicker-form": "/ui/mediapicker-form.html",
             "#overlay": "/ui/overlay.html",
-            "#auth-edit-collection-form": "/ui/auth-edit-collection-form.html",
-            "#auth-edit-collection-editors": "/ui/auth-edit-collection-editors.html"
         };
 
         HomePageViewModel.sessionForm;
         HomePageViewModel.rootCollection;
 
-        function UserCanEditCollection(profile) {
-
-            // can't edit if no profile, no display name or no supercollection
-            if (!profile || !profile.DisplayName || !CZ.Service.superCollectionName) {
-                return false;
-            }
-
-            // override - anyone can edit the sandbox
-            if (CZ.Service.superCollectionName.toLowerCase() === "sandbox") {
-                return true;
-            }
-
-            // if here then logged in and on a page (other than sandbox) with a supercollection and collection
-            // so return canEdit Boolean, which was previously set after looking up permissions in db.
-            return CZ.Service.canEdit;
+        function UserCanEditCollection(profile)
+        {
+            //it's always false because we are in minified version
+            return false;
+           
         }
 
-        function InitializeToursUI(profile, forms) {
-            CZ.Tours.tourCaptionFormContainer = forms[16];
-            var allowEditing = UserCanEditCollection(profile);
+        function InitializeToursUI(profile, forms)
+        {
+            CZ.Tours.tourCaptionFormContainer = forms[8];
+            var allowEditing =UserCanEditCollection(profile);
 
-            CZ.Tours.takeTour = function (tour) {
+            CZ.Tours.takeTour = function(tour)
+            {
                 CZ.HomePageViewModel.closeAllForms();
                 CZ.Tours.tourCaptionForm = new CZ.UI.FormTourCaption
                 (
@@ -20237,15 +17401,18 @@ var CZ;
                 CZ.Tours.activateTour(tour, undefined);
             };
 
-            CZ.HomePageViewModel.panelShowToursList = function (canEdit) {
+            CZ.HomePageViewModel.panelShowToursList = function (canEdit)
+            {
                 // canEdit undefined    = use allowEditing
                 // canEdit false        = read only rendering
                 // canEdit true         = edit rights rendering
                 if (typeof canEdit == 'undefined') canEdit = allowEditing;
 
 
-                if (canEdit && CZ.Tours.tours) {
-                    if (CZ.Tours.tours.length === 0) {
+                if (canEdit && CZ.Tours.tours)
+                {
+                    if (CZ.Tours.tours.length === 0)
+                    {
                         // if there are no tours to show and user has tour editing rights, lets fire off the add a tour dialog instead
                         CZ.Overlay.Hide();
                         CZ.HomePageViewModel.closeAllForms();
@@ -20255,24 +17422,27 @@ var CZ;
                 }
 
                 var toursListForm = getFormById("#toursList");
-                if (toursListForm.isFormVisible) {
+                if (toursListForm.isFormVisible)
+                {
                     toursListForm.close();
                 }
-                else {
+                else
+                {
                     CZ.Overlay.Hide();
                     closeAllForms();
                     var form = new CZ.UI.FormToursList
                     (
-                        forms[9],
+                        forms[2],
                         {
                             activationSource: $(this),
                             navButton: ".cz-form-nav",
                             closeButton: ".cz-form-close-btn > .cz-form-btn",
                             titleTextblock: ".cz-form-title",
-                            tourTemplate: forms[10],
+                            tourTemplate: forms[3],
                             tours: CZ.Tours.tours,
                             takeTour: CZ.Tours.takeTour,
-                            editTour: canEdit ? function (tour) {
+                            editTour: canEdit ? function (tour)
+                            {
                                 if (CZ.Authoring.showEditTourForm) CZ.Authoring.showEditTourForm(tour);
                             }
                             : null,
@@ -20284,7 +17454,7 @@ var CZ;
             };
         }
 
-        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, offsetY: null, Height: null, children: [], parent: { guid: null } };
+        var defaultRootTimeline = { title: "My Timeline", x: 1950, endDate: 9999, offsetY:null, Height:null, children: [], parent: { guid: null } };
 
         $(document).ready(function () {
             // ensures there will be no 'console is undefined' errors
@@ -20301,7 +17471,7 @@ var CZ;
             $('#wait').hide();
 
             $(document).ajaxStart(function () {
-                $('#wait').show();
+               // $('#wait').show();
             });
             $(document).ajaxStop(function () {
                 $('#wait').hide();
@@ -20309,12 +17479,14 @@ var CZ;
 
             // overlay & general wrapper theme
             var theme = localStorage.getItem('theme') || '';
-            if (theme === '') {
+            if (theme === '')
+            {
                 theme = 'theme-linen'; // initial
                 localStorage.setItem('theme', theme);
             }
             $('body').addClass(theme);
 
+            // change the URL to make ChronoZoom think that it works as usual
             // populate collection names from URL
             var url = CZ.UrlNav.getURL();
             HomePageViewModel.rootCollection = url.superCollectionName === undefined;
@@ -20330,44 +17502,41 @@ var CZ;
             CZ.Media.initialize();
             CZ.Common.initialize();
 
-            // hook logo click
-            $('.header-logo').click(function () {
-                //window.location.href = '/';
-                CZ.Overlay.Show(false);  // false = home page overlay
-            });
-
             // ensure we have a supercollection for getCanEdit and other API calls.
             if (typeof CZ.Service.superCollectionName === 'undefined' && CZ.Common.isInCosmos()) CZ.Service.superCollectionName = 'chronozoom';
 
             // check if current user has edit permissions before continuing with load
             // since other parts of load need to know if can display edit buttons etc.
-            CZ.Service.getCanEdit().done(function (result) {
+            CZ.Service.getCanEdit().done(function (result)
+            {
                 CZ.Service.canEdit = (result === true);
                 finishLoad();
             });
         });
 
-        function finishLoad() {
+        function finishLoad()
+        {
             // only invoked after user's edit permissions are checked (AJAX callback)
-            CZ.UILoader.loadAll(_uiMap).done(function () {
+            CZ.UILoader.loadAll(_uiMap).done(function ()
+            {
                 var forms = arguments;
 
-                CZ.Settings.isCosmosCollection = CZ.Common.isInCosmos();
+                CZ.Settings.isCosmosCollection = true;
                 if (CZ.Settings.isCosmosCollection) $('.header-regimes').show();
 
-                CZ.Menus.isEditor = CZ.Service.canEdit;
-                CZ.Menus.Refresh();
-                CZ.Overlay.Initialize();
+                //CZ.Overlay.Initialize();
 
-                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[11]);
+                CZ.timeSeriesChart = new CZ.UI.LineChart(forms[4]);
 
-                CZ.HomePageViewModel.panelToggleTimeSeries = function () {
+                CZ.HomePageViewModel.panelToggleTimeSeries = function ()
+                {
                     CZ.Overlay.Hide();
                     var tsForm = getFormById('#timeSeriesDataForm');
-                    if (tsForm === false) {
+                    if (tsForm === false)
+                    {
                         closeAllForms();
 
-                        var timeSeriesDataFormDiv = forms[12];
+                        var timeSeriesDataFormDiv = forms[5];
                         var timeSeriesDataForm = new CZ.UI.TimeSeriesDataForm
                         (
                             timeSeriesDataFormDiv,
@@ -20378,24 +17547,29 @@ var CZ;
                         );
                         timeSeriesDataForm.show();
                     }
-                    else {
-                        if (tsForm.isFormVisible) {
+                    else
+                    {
+                        if (tsForm.isFormVisible)
+                        {
                             tsForm.close();
                         }
-                        else {
+                        else
+                        {
                             closeAllForms();
                             tsForm.show();
                         }
                     }
                 };
-
-                CZ.HomePageViewModel.panelToggleSearch = function () {
+                
+                CZ.HomePageViewModel.panelToggleSearch = function ()
+                {
                     var searchForm = getFormById("#header-search-form");
-                    if (searchForm === false) {
+                    if (searchForm === false)
+                    {
                         closeAllForms();
                         var form = new CZ.UI.FormHeaderSearch
                         (
-                            forms[14],
+                            forms[7],
                             {
                                 activationSource: $(this),
                                 navButton: ".cz-form-nav",
@@ -20410,61 +17584,23 @@ var CZ;
                         );
                         form.show();
                     }
-                    else {
-                        if (searchForm.isFormVisible) {
+                    else
+                    {
+                        if (searchForm.isFormVisible)
+                        {
                             searchForm.close();
                         }
-                        else {
+                        else
+                        {
                             closeAllForms();
                             searchForm.show();
                         }
                     }
                 };
 
-                $("#editCollectionButton img").click(function () {
-                    closeAllForms();
-                    var form = new CZ.UI.FormEditCollection(forms[19], {
-                        activationSource: $(),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        deleteButton: '.cz-form-delete',
-                        titleTextblock: ".cz-form-title",
-                        saveButton: ".cz-form-save",
-                        errorMessage: '.cz-form-errormsg',
-                        collectionName: '#cz-collection-name',
-                        collectionPath: '#cz-collection-path',
-                        collectionTheme: CZ.Settings.theme,
-                        backgroundInput: $(".cz-form-collection-background"),
-                        kioskmodeInput: $(".cz-form-collection-kioskmode"),
-                        mediaListContainer: ".cz-form-medialist",
-                        timelineBackgroundColorInput: $(".cz-form-timeline-background"),
-                        timelineBackgroundOpacityInput: $(".cz-form-timeline-background-opacity"),
-                        timelineBorderColorInput: $(".cz-form-timeline-border"),
-                        exhibitBackgroundColorInput: $(".cz-form-exhibit-background"),
-                        exhibitBackgroundOpacityInput: $(".cz-form-exhibit-background-opacity"),
-                        exhibitBorderColorInput: $(".cz-form-exhibit-border"),
-                        chkDefault: '#cz-form-collection-default',
-                        chkPublic: '#cz-form-public-search',
-                        chkEditors: '#cz-form-multiuser-enable',
-                        btnEditors: '#cz-form-multiuser-manage'
-                    });
-                    form.show();
-                });
-
-                $('body').on('click', '#cz-form-multiuser-manage', function (event) {
-                    var form = new CZ.UI.FormManageEditors(forms[20], {
-                        activationSource: $(this),
-                        navButton: ".cz-form-nav",
-                        titleTextblock: ".cz-form-title",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        saveButton: ".cz-form-save"
-                    });
-                    form.show();
-                });
-
                 CZ.Authoring.initialize(CZ.Common.vc, {
                     showMessageWindow: function (message, title, onClose) {
-                        var wnd = new CZ.UI.MessageWindow(forms[13], message, title);
+                        var wnd = new CZ.UI.MessageWindow(forms[6], message, title);
                         if (onClose)
                             wnd.container.bind("close", function () {
                                 wnd.container.unbind("close", onClose);
@@ -20473,326 +17609,93 @@ var CZ;
                         wnd.show();
                     },
                     hideMessageWindow: function () {
-                        var wnd = forms[13].data("form");
+                        var wnd = forms[6].data("form");
                         if (wnd)
                             wnd.close();
-                    },
-                    showEditTourForm: function (tour) {
-                        CZ.Tours.removeActiveTour();
-                        var form = new CZ.UI.FormEditTour(forms[7], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            addStopButton: ".cz-form-tour-addstop",
-                            titleInput: ".cz-form-title",
-                            tourStopsListBox: "#stopsList",
-                            tourStopsTemplate: forms[8],
-                            context: tour
-                        });
-                        form.show();
-                    },
-                    showCreateTimelineForm: function (timeline) {
-                        CZ.Authoring.hideMessageWindow();
-                        CZ.Authoring.mode = "createTimeline";
-                        var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            startDate: ".cz-form-time-start",
-                            endDate: ".cz-form-time-end",
-                            mediaListContainer: ".cz-form-medialist",
-                            backgroundUrl: ".cz-form-background-url",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            offsetLabels: ".cz-form-offset-label",
-                            topBoundInput: ".cz-form-item-offset",
-                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
-                            errorMessage: ".cz-form-errormsg",
-                            context: timeline
-                        });
-                        form.show();
-                    },
-                    showCreateRootTimelineForm: function (timeline) {
-                        CZ.Authoring.mode = "createRootTimeline";
-                        var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            startDate: ".cz-form-time-start",
-                            endDate: ".cz-form-time-end",
-                            mediaListContainer: ".cz-form-medialist",
-                            backgroundUrl: ".cz-form-background-url",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            offsetLabels: ".cz-form-offset-label",
-                            topBoundInput: ".cz-form-item-top-bound-offset",
-                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
-                            errorMessage: ".cz-form-errormsg",
-                            context: timeline
-                        });
-                        form.show();
-                    },
-                    showEditTimelineForm: function (timeline) {
-                        var form = new CZ.UI.FormEditTimeline(forms[1], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            startDate: ".cz-form-time-start",
-                            endDate: ".cz-form-time-end",
-                            mediaListContainer: ".cz-form-medialist",
-                            backgroundUrl: ".cz-form-background-url",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            titleInput: ".cz-form-item-title",
-                            offsetLabels: ".cz-form-offset-label",
-                            topBoundInput: ".cz-form-item-top-bound-offset",
-                            bottomBoundInput: ".cz-form-item-bottom-bound-offset",
-                            errorMessage: ".cz-form-errormsg",
-                            context: timeline
-                        });
-                        form.show();
-                    },
-                    showCreateExhibitForm: function (exhibit) {
-                        CZ.Authoring.hideMessageWindow();
-                        var form = new CZ.UI.FormEditExhibit(forms[2], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            titleInput: ".cz-form-item-title",
-                            offsetInput: ".cz-form-item-offset",
-                            datePicker: ".cz-form-time",
-                            createArtifactButton: ".cz-form-create-artifact",
-                            contentItemsListBox: ".cz-listbox",
-                            errorMessage: ".cz-form-errormsg",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            contentItemsTemplate: forms[4],
-                            context: exhibit
-                        });
-                        form.show();
-                    },
-                    showEditExhibitForm: function (exhibit) {
-                        var form = new CZ.UI.FormEditExhibit(forms[2], {
-                            activationSource: $(),
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            titleInput: ".cz-form-item-title",
-                            offsetInput: ".cz-form-item-offset",
-                            offsetCheckbox: ".cz-form-item-offset-checkbox",
-                            datePicker: ".cz-form-time",
-                            createArtifactButton: ".cz-form-create-artifact",
-                            contentItemsListBox: ".cz-listbox",
-                            errorMessage: ".cz-form-errormsg",
-                            saveButton: ".cz-form-save",
-                            deleteButton: ".cz-form-delete",
-                            contentItemsTemplate: forms[4],
-                            context: exhibit
-                        });
-                        form.show();
-                    },
-                    showEditContentItemForm: function (ci, e, prevForm, noAnimation) {
-                        var form = new CZ.UI.FormEditCI(forms[3], {
-                            activationSource: $(),
-                            prevForm: prevForm,
-                            navButton: ".cz-form-nav",
-                            closeButton: ".cz-form-close-btn > .cz-form-btn",
-                            titleTextblock: ".cz-form-title",
-                            errorMessage: ".cz-form-errormsg",
-                            saveButton: ".cz-form-save",
-                            titleInput: ".cz-form-item-title",
-                            mediaSourceInput: ".cz-form-item-mediasource",
-                            mediaInput: ".cz-form-item-mediaurl",
-                            descriptionInput: ".cz-form-item-descr",
-                            attributionInput: ".cz-form-item-attribution",
-                            mediaTypeInput: ".cz-form-item-media-type",
-                            mediaListContainer: ".cz-form-medialist",
-                            context: {
-                                exhibit: e,
-                                contentItem: ci
+                    }
+                });
+             
+                var canEdit = false;
+                CZ.Authoring.isEnabled = false;
+                CZ.Settings.isAuthorized = false;
+
+                InitializeToursUI(null, forms);
+
+                // *****************************
+                // *** Collection Load Logic ***
+                // *****************************
+
+                // load the entire collection
+                CZ.Common.loadData().then(function (response) {
+                    // if collection is empty
+                    if (!response) {
+                        // if user has edit rights
+                        if (CZ.Authoring.isEnabled) {
+                            // show a form to create the root timeline
+                            if (CZ.Authoring.showCreateRootTimelineForm) {
+                                CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
                             }
-                        });
-                        form.show(noAnimation);
+                        }
+                        else {
+                            // tell the user there is no content
+                            CZ.Authoring.showMessageWindow
+                            (
+                                'There is no content in this collection yet. ' +
+                                'Please click on the ChronoZoom logo, (found just above this message,) ' +
+                                'to see some other collections that you can view.',
+                                "Collection Has No Content"
+                            );
+                        }
                     }
                 });
 
-                HomePageViewModel.sessionForm = new CZ.UI.FormHeaderSessionExpired(forms[15], {
-                    activationSource: $(),
-                    navButton: ".cz-form-nav",
-                    closeButton: ".cz-form-close-btn > .cz-form-btn",
-                    titleTextblock: ".cz-form-title",
-                    titleInput: ".cz-form-item-title",
-                    context: "",
-                    sessionTimeSpan: "#session-time",
-                    sessionButton: "#session-button"
+                // get and store the collection title and owner
+                CZ.Service.getCollection().done(function (collection) {
+                    if (collection != null) {
+                        CZ.Common.collectionTitle = collection.Title || '';
+                        CZ.Settings.collectionOwner = collection.User.DisplayName;
+                    }
                 });
 
-                var loginForm = new CZ.UI.FormLogin
-                (
-                    forms[6],
-                    {
-                        activationSource: $(),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        titleInput: ".cz-form-item-title",
-                        context: ""
+
+                // **************************************
+                // *** Start-Up Overlay Display Logic ***
+                // **************************************
+
+
+                // if logged in and user hasn't completed profile
+                if (CZ.Menus.isSignedIn && CZ.Settings.userSuperCollectionName === '') {
+                    // show profile form on top of home page overlay
+                    CZ.Overlay.Show();
+                    profileForm.show();
+                    $('#username').focus();
+                }
+                    // else if logged in and my collections was requested
+                else if (CZ.Menus.isSignedIn && sessionStorage.getItem('showMyCollections') === 'requested') {
+                    // show my collections overlay
+                    CZ.Overlay.Show(true);
+                }
+                else {
+                    if  // if no auto-tour and collection is Big History collection
+                    (
+                        CZ.Tours.getAutoTourGUID() === ''   // <--  Always check first as fn must fire.
+                        &&                                  //      This fn sets up tours.js's parseTours
+                        (                                   //      to auto-start a tour, if specified.
+                            (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
+                            window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
+                        )
+                    ) {
+                        // show home page overlay
+                        //        CZ.Overlay.Show();
                     }
-                );
-                CZ.HomePageViewModel.panelToggleLogin = function () {
-                    if (loginForm.isFormVisible) {
-                        loginForm.close();
-                    }
-                    else {
-                        closeAllForms();
-                        loginForm.show();
-                    }
-                };
+                }
 
-                var profileForm = new CZ.UI.FormEditProfile
-                (
-                    forms[5],
-                    {
-                        activationSource: $(),
-                        navButton: ".cz-form-nav",
-                        closeButton: ".cz-form-close-btn > .cz-form-btn",
-                        titleTextblock: ".cz-form-title",
-                        saveButton: "#cz-form-save",
-                        logoutButton: "#cz-form-logout",
-                        titleInput: ".cz-form-item-title",
-                        usernameInput: ".cz-form-username",
-                        emailInput: ".cz-form-email",
-                        agreeInput: ".cz-form-agree",
-                        loginPanel: "#login-panel",
-                        profilePanel: "#profile-panel",
-                        loginPanelLogin: "#profile-panel.auth-panel-login",
-                        context: "",
-                        allowRedirect: true
-                    }
-                );
-                CZ.HomePageViewModel.panelToggleProfile = function () {
-                    if (profileForm.isFormVisible) {
-                        profileForm.close();
-                    }
-                    else {
-                        closeAllForms();
-                        profileForm.show();
-                    }
-                };
+                // remove any my collections queued request
+                sessionStorage.removeItem('showMyCollections');
 
-                CZ.Service.getProfile().done(function (data) {
-                    if (data !== '') {
-                        CZ.Settings.isAuthorized = true;
-                        CZ.Menus.isSignedIn = true;
-                        CZ.Menus.Refresh();
-                        CZ.Settings.userSuperCollectionName = data.DisplayName || '';
-                        CZ.Settings.userCollectionName = data.DisplayName || '';
-                        CZ.Settings.userDisplayName = data.DisplayName || '';
-                        CZ.Authoring.timer = setTimeout(function () {
-                            CZ.Authoring.showSessionForm();
-                        }, (CZ.Settings.sessionTime - 60) * 1000);
-                    }
-
-                    CZ.Authoring.isEnabled = UserCanEditCollection(data);
-                    InitializeToursUI(data, forms);
-                })
-                .fail(function (error) {
-                    var canEdit = UserCanEditCollection(null);
-                    CZ.Authoring.isEnabled = canEdit;
-                    CZ.Settings.isAuthorized = canEdit;
-
-                    InitializeToursUI(null, forms);
-                })
-                .always(function () {
-                    // *****************************
-                    // *** Collection Load Logic ***
-                    // *****************************
-
-                    // load the entire collection
-                    CZ.Common.loadData().then(function (response) {
-                        // if collection is empty
-                        if (!response) {
-                            // if user has edit rights
-                            if (CZ.Authoring.isEnabled) {
-                                // show a form to create the root timeline
-                                if (CZ.Authoring.showCreateRootTimelineForm) {
-                                    CZ.Authoring.showCreateRootTimelineForm(defaultRootTimeline);
-                                }
-                            }
-                            else {
-                                // tell the user there is no content
-                                CZ.Authoring.showMessageWindow
-                                (
-                                    'There is no content in this collection yet. ' +
-                                    'Please click on the ChronoZoom logo, (found just above this message,) ' +
-                                    'to see some other collections that you can view.',
-                                    "Collection Has No Content"
-                                );
-                            }
-                        }
-                    });
-
-                    // get and store the collection title and owner
-                    CZ.Service.getCollection().done(function (collection) {
-                        if (collection != null) {
-                            CZ.Common.collectionTitle = collection.Title || '';
-                            CZ.Settings.collectionOwner = collection.User.DisplayName;
-                        }
-
-                        //  set the canvas edit collection icon title
-                        $('#editCollectionButton').find('.title').text(CZ.Common.collectionTitle);
-                    });
-
-
-                    // **************************************
-                    // *** Start-Up Overlay Display Logic ***
-                    // **************************************
-
-                    // if user can edit collection then unhide the canvas edit collection icon
-                    if (CZ.Authoring.isEnabled) $('#editCollectionButton').find('.hidden').removeClass('hidden');
-
-                    // if logged in and user hasn't completed profile
-                    if (CZ.Menus.isSignedIn && CZ.Settings.userSuperCollectionName === '') {
-                        // show profile form on top of home page overlay
-                        CZ.Overlay.Show();
-                        profileForm.show();
-                        $('#username').focus();
-                    }
-                        // else if logged in and my collections was requested
-                    else if (CZ.Menus.isSignedIn && sessionStorage.getItem('showMyCollections') === 'requested') {
-                        // show my collections overlay
-                        CZ.Overlay.Show(true);
-                    }
-                    else {
-                        if  // if no auto-tour and collection is Big History collection
-                        (
-                            CZ.Tours.getAutoTourGUID() === ''   // <--  Always check first as fn must fire.
-                            &&                                  //      This fn sets up tours.js's parseTours
-                            (                                   //      to auto-start a tour, if specified.
-                                (CZ.Settings.isCosmosCollection && window.location.hash === '') ||
-                                window.location.hash === '#/t00000000-0000-0000-0000-000000000000'
-                            )
-                        ) {
-                            // show home page overlay
-                            CZ.Overlay.Show();
-                        }
-                    }
-
-                    // remove any my collections queued request
-                    sessionStorage.removeItem('showMyCollections');
-
-                    // remove splash screen
-                    $('#splash').fadeOut('slow');
-                });
+                // remove splash screen
+                $('#splash').fadeOut('slow');
+                
 
             });
 
@@ -20806,19 +17709,22 @@ var CZ;
             CZ.Settings.applyTheme(null, CZ.Service.superCollectionName != null);
 
             // If not the default supercollection's default collection then look up the appropriate collection's theme
-            if (CZ.Service.superCollectionName) {
-                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response) {
+            if (CZ.Service.superCollectionName)
+            {
+                CZ.Service.getCollections(CZ.Service.superCollectionName).then(function (response)
+                {
                     $(response).each(function (index) {
-                        if 
+                        if
                         (
                             response[index] &&
                             (
                                 (response[index].Default && ((typeof CZ.Service.collectionName) === 'undefined')) ||
                                 (response[index].Path === CZ.Service.collectionName)
                             )
-                        ) {
+                        )
+                        {
                             var themeData = null;
-                            try {
+                            try  {
                                 themeData = JSON.parse(response[index].theme);
                             } catch (e) {
                             }
@@ -20935,11 +17841,13 @@ var CZ;
                 //CZ.Common.ax.axis("enableThresholds", true);
                 //if (window.console && console.log("thresholds enabled"));
             });
+
             //Axis: disable showing thresholds
             CZ.Common.controller.onAnimationStarted.push(function () {
                 //CZ.Common.ax.axis("enableThresholds", true);
                 //if (window.console && console.log("thresholds disabled"));
             });
+
             // Axis: enable showing thresholds
             CZ.Common.controller.onAnimationUpdated.push(function (oldId, newId) {
                 if (oldId != undefined && newId == undefined) {
@@ -20950,7 +17858,7 @@ var CZ;
                 }
             });
             */
-
+    
             //Tour: notifyng tour that the bookmark is reached
             CZ.Common.controller.onAnimationComplete.push(function (id) {
                 if (CZ.Tours.tourBookmarkTransitionCompleted != undefined)
