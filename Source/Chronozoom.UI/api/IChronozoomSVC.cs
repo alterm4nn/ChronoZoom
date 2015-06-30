@@ -31,6 +31,18 @@ namespace Chronozoom.UI
         List<Utils.ExportImport.FlatTimeline> ExportTimelines(string topmostTimelineId);
 
         /// <summary>
+        /// For exporting an exhibit to temporary storage so can be imported later
+        /// as a copy.
+        /// </summary>
+        /// <param name="exhibitId">Must be a GUID, provided as a string.</param>
+        /// <returns>
+        /// A json formatted Exhibit
+        /// </returns>
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json, UriTemplate = "/export/exhibit/{exhibitId}")]
+        Exhibit ExportExhibit(string exhibitId);
+
+        /// <summary>
         /// For importing a timeline and it's descendant sub-timelines into an existing timeline.
         /// Typically this is a timeline from a different collection that is being copied.
         /// It should be noted that the supplied new timeline tree to import must fit within the
@@ -42,6 +54,19 @@ namespace Chronozoom.UI
         [OperationContract]
         [WebInvoke(Method = "PUT", UriTemplate = "/import/timeline/{intoTimelineId}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
         String ImportTimelines(string intoTimelineId, List<Utils.ExportImport.FlatTimeline> newTimelineTree);
+
+        /// <summary>
+        /// For importing an exhibit into an existing timeline.
+        /// It should be noted that the supplied exhibit to import must fit within the
+        /// date bounds of the target destination timeline's start and end dates.
+        /// </summary>
+        /// <param name="intoTimelineId">Must be a GUID, provided as a string.</param>
+        /// <param name="newExhibit">Must be a structure created by an IChronozoomSVC.ExportExhibit implementation, provided as a JSON.stringify string.</param>
+        /// <returns>A success, warning about date bounds exceeded, or general error message.</returns>
+        [OperationContract]
+        [WebInvoke(Method = "PUT", UriTemplate = "/import/exhibit/{intoTimelineId}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json)]
+        String ImportExhibit(string intoTimelineId, Exhibit newExhibit);
+
 
         /// <summary>
         /// For importing a collection from a file provided by the user as a new collection under the existing user, with new GUIDs.
