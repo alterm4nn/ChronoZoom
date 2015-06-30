@@ -4934,9 +4934,9 @@ var CZ;
                     //adding edit and copy button
                     if (CZ.Authoring.isEnabled) {
                         var imageSize = (titleTop - infodot.y) * 0.75;
-                        var editButton = VCContent.addImage(infodot, layerid, id + "__edit", time - imageSize / 2, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/edit.svg");
-                        var copyButton = VCContent.addImage(infodot, layerid, id + "__copy", time - imageSize / 2 - imageSize * 1.3, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/copy.svg");
-
+                        var copyButton = VCContent.addImage(infodot, layerid, id + "__copy", time - imageSize, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/copy.svg");
+                        var editButton = VCContent.addImage(infodot, layerid, id + "__edit", time, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/edit.svg");
+                        
                         editButton.reactsOnMouse = true;
                         copyButton.reactsOnMouse = true;
 
