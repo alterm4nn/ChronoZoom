@@ -2720,15 +2720,21 @@ namespace Chronozoom.UI
         /// <summary>
         /// Documentation under IChronozoomSVC
         /// </summary>
-        public IEnumerable<SuperCollection> GetSuperCollections()
+        public IEnumerable<SuperCollectionInfo> GetSuperCollections()
         {
             return ApiOperation(delegate(User user, Storage storage)
             {
-                return storage.SuperCollections
+                var list = storage.SuperCollections
                     .Where(s => s.Title != _sandboxSuperCollectionName) // skip the sandbox collection since it's currently a test-only collection
                     .Include("Collections")
                     .OrderBy(s => s.Title)
                     .ToList();
+
+                List<SuperCollectionInfo> infos = new List<SuperCollectionInfo>();
+
+                foreach (var sc in list)
+                    infos.Add(new SuperCollectionInfo(sc));
+                return infos;
             });
         }
 
