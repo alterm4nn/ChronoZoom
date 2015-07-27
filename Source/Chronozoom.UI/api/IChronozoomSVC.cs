@@ -876,7 +876,7 @@ namespace Chronozoom.UI
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         [OperationContract]
         [WebGet(UriTemplate = "/supercollections", ResponseFormat = WebMessageFormat.Json)]
-        IEnumerable<SuperCollection> GetSuperCollections();
+        IEnumerable<SuperCollectionInfo> GetSuperCollections();
 
         /// <summary>
         /// Retrieve the list of all collections.
