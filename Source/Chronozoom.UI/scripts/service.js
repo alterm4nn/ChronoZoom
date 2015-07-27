@@ -108,6 +108,18 @@ var CZ;
         var _dumpTimelinesUrl = "/dumps/home/timelines.json";
         var _testLogin = false;
 
+        /*In the case of https connection changes uri's protocol to https if it needed
+        * @param uri (string) any uri to change
+        * @returns (string) changed uri
+        */
+        function makeSecureUri(uri) {
+            if (window.location.protocol == "https:")
+                uri = uri.replace(/^http:/, "https:");
+            return uri;
+        }
+
+        Service.MakeSecureUri = makeSecureUri;
+
         function Request(urlBase) {
             var _url = urlBase;
             var _hasParameters = false;

@@ -19,7 +19,7 @@ namespace Chronozoom.UI
             return uri.Scheme + Uri.SchemeDelimiter + uri.Host + ":" + uri.Port;
         });
 
-        protected static IEnumerable<SuperCollection> Collections()
+        protected static IEnumerable<SuperCollectionInfo> Collections()
         {
             return ChronozoomSVC.Instance.GetSuperCollections();
         }
