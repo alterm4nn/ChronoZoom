@@ -379,8 +379,8 @@ var CZ;
 
             $('#mnuEmbed').children("ul").children("li").clicktouchoff();
             
-            var addressArray = window.location.href.split('#');
-            $('#mnuEmbedText').val("<iframe src=\"" + addressArray[0] + "czmin/#" + addressArray[1] + "\" style=\"height:600px; width:1024px;\"></iframe>");
+            var address = window.location;
+            $('#mnuEmbedText').val("<iframe src=\"https://" + address.host + "/czmin" + address.pathname + "\" style=\"height:600px; width:1024px;\"></iframe>");
 
             $('#mnuProfile').clicktouch(function (event)
             {

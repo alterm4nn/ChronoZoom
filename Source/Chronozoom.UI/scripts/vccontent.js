@@ -39,6 +39,7 @@ var CZ;
             return true;
         };
 
+
         /*  Represents a base element that can be added to the VirtualCanvas.
         @remarks CanvasElement has extension in virtual space, that enables to check visibility of an object and render it.
         @param vc   (jquery to virtual canvas) note that vc.element[0] is the virtual canvas object
@@ -887,6 +888,7 @@ var CZ;
 
             // Initialize background image for the timeline.
             if (self.backgroundUrl) {
+                self.backgroundUrl = CZ.Service.MakeSecureUri(self.backgroundUrl);
                 self.backgroundImg = new BackgroundImage(self.vc, layerid, id + "__background__", self.backgroundUrl, self.x, self.y, self.width, self.height);
                 self.settings.gradientOpacity = 0;
                 self.settings.fillStyle = undefined;
@@ -1712,7 +1714,6 @@ var CZ;
             var img = new Image();
             this.img = img;
             this.img.isLoaded = false;
-
             var self = this;
             var onCanvasImageLoad = function (s) {
                 img['isLoading'] = false;
@@ -2035,7 +2036,6 @@ var CZ;
             elem.setAttribute("src", videoSrc);
             elem.setAttribute("visible", 'true');
             elem.setAttribute("controls", 'true');
-
             this.initializeContent(elem);
 
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
@@ -2358,6 +2358,8 @@ var CZ;
         /*******************************************************************************************************/
         /* Infodots & content items                                                                            */
         /*******************************************************************************************************/
+
+
         /*  Represents an image on a virtual canvas with support of dynamic level of detail.
         @param layerid   (any type) id of the layer for this element
         @param id   (any type) id of an element
@@ -2422,6 +2424,7 @@ var CZ;
             };
 
             var self = this;
+
             this.changeZoomLevel = function (curZl, newZl) {
                 var vy = self.newY;
                 var mediaTop = vy + verticalMargin;
@@ -2436,6 +2439,10 @@ var CZ;
 
                     // Media
                     var mediaID = id + "__media__";
+
+                    var uri = this.contentItem.uri;
+                    this.contentItem.uri = CZ.Service.MakeSecureUri(uri);
+
                     var imageElem = null;
                     if (this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
                         imageElem = VCContent.addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
@@ -2555,7 +2562,7 @@ var CZ;
                     }
                     var sz = 1 << zl;
                     var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.guid + '.png';
-
+                    thumbnailUri = CZ.Service.MakeSecureUri(thumbnailUri);
                     return {
                         zoomLevel: newZl,
                         content: new CanvasImage(vc, layerid, id + "@" + 1, thumbnailUri, vx, vy, vw, vh)

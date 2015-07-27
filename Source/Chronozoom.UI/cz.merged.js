@@ -2176,6 +2176,7 @@ var CZ;
             return true;
         };
 
+
         /*  Represents a base element that can be added to the VirtualCanvas.
         @remarks CanvasElement has extension in virtual space, that enables to check visibility of an object and render it.
         @param vc   (jquery to virtual canvas) note that vc.element[0] is the virtual canvas object
@@ -3024,6 +3025,7 @@ var CZ;
 
             // Initialize background image for the timeline.
             if (self.backgroundUrl) {
+                self.backgroundUrl = CZ.Service.MakeSecureUri(self.backgroundUrl);
                 self.backgroundImg = new BackgroundImage(self.vc, layerid, id + "__background__", self.backgroundUrl, self.x, self.y, self.width, self.height);
                 self.settings.gradientOpacity = 0;
                 self.settings.fillStyle = undefined;
@@ -3849,7 +3851,6 @@ var CZ;
             var img = new Image();
             this.img = img;
             this.img.isLoaded = false;
-
             var self = this;
             var onCanvasImageLoad = function (s) {
                 img['isLoading'] = false;
@@ -4172,7 +4173,6 @@ var CZ;
             elem.setAttribute("src", videoSrc);
             elem.setAttribute("visible", 'true');
             elem.setAttribute("controls", 'true');
-
             this.initializeContent(elem);
 
             this.prototype = new CanvasDomItem(vc, layerid, id, vx, vy, vw, vh, z);
@@ -4495,6 +4495,8 @@ var CZ;
         /*******************************************************************************************************/
         /* Infodots & content items                                                                            */
         /*******************************************************************************************************/
+
+
         /*  Represents an image on a virtual canvas with support of dynamic level of detail.
         @param layerid   (any type) id of the layer for this element
         @param id   (any type) id of an element
@@ -4559,6 +4561,7 @@ var CZ;
             };
 
             var self = this;
+
             this.changeZoomLevel = function (curZl, newZl) {
                 var vy = self.newY;
                 var mediaTop = vy + verticalMargin;
@@ -4573,6 +4576,10 @@ var CZ;
 
                     // Media
                     var mediaID = id + "__media__";
+
+                    var uri = this.contentItem.uri;
+                    this.contentItem.uri = CZ.Service.MakeSecureUri(uri);
+
                     var imageElem = null;
                     if (this.contentItem.mediaType.toLowerCase() === 'image' || this.contentItem.mediaType.toLowerCase() === 'picture') {
                         imageElem = VCContent.addImage(container, layerid, mediaID, vx + leftOffset, mediaTop, contentWidth, mediaHeight, this.contentItem.uri);
@@ -4692,7 +4699,7 @@ var CZ;
                     }
                     var sz = 1 << zl;
                     var thumbnailUri = CZ.Settings.contentItemThumbnailBaseUri + 'x' + sz + '/' + contentItem.guid + '.png';
-
+                    thumbnailUri = CZ.Service.MakeSecureUri(thumbnailUri);
                     return {
                         zoomLevel: newZl,
                         content: new CanvasImage(vc, layerid, id + "@" + 1, thumbnailUri, vx, vy, vw, vh)
@@ -10065,6 +10072,18 @@ var CZ;
         var _dumpTimelinesUrl = "/dumps/home/timelines.json";
         var _testLogin = false;
 
+        /*In the case of https connection changes uri's protocol to https if it needed
+        * @param uri (string) any uri to change
+        * @returns (string) changed uri
+        */
+        function makeSecureUri(uri) {
+            if (window.location.protocol == "https:")
+                uri = uri.replace(/^http:/, "https:");
+            return uri;
+        }
+
+        Service.MakeSecureUri = makeSecureUri;
+
         function Request(urlBase) {
             var _url = urlBase;
             var _hasParameters = false;
@@ -13506,8 +13525,8 @@ var CZ;
 
             $('#mnuEmbed').children("ul").children("li").clicktouchoff();
             
-            var addressArray = window.location.href.split('#');
-            $('#mnuEmbedText').val("<iframe src=\"" + addressArray[0] + "czmin/#" + addressArray[1] + "\" style=\"height:600px; width:1024px;\"></iframe>");
+            var address = window.location;
+            $('#mnuEmbedText').val("<iframe src=\"https://" + address.host + "/czmin" + address.pathname + "\" style=\"height:600px; width:1024px;\"></iframe>");
 
             $('#mnuProfile').clicktouch(function (event)
             {
@@ -19897,11 +19916,12 @@ var CZ;
 
                 $.each(json, function (index, item)
                 {
-                    var year =  CZ.Dates.convertCoordinateToYear(item.Year);
+                    var year = CZ.Dates.convertCoordinateToYear(item.Year);
+                    var image = CZ.Service.MakeSecureUri(item.CustomBackground);
                     var tile =  $templateExhibit
                                 .replace(           '{{collectionTitle}}',      simpleClean(item.CollectionName))
                                 .replace(           '{{collectionCurator}}',    item.CuratorName)
-                                .replace(           '{{exhibitImage}}',         item.CustomBackground)
+                                .replace(           '{{exhibitImage}}',         image)
                                 .replace(new RegExp('{{exhibitTitle}}', 'g'),   simpleClean(item.Title))
                                 .replace(           '{{exhibitYear}}',          year.year + '&nbsp;' + year.regime)
                                 .replace(           '{{exhibitURL}}',           item.Link)
@@ -19945,12 +19965,13 @@ var CZ;
                 $.each(json, function (index, item)
                 {
                     var url     = item.TimelineUrl  || '';
-                    var image   = item.ImageUrl     || '';
+                    var image = item.ImageUrl || '';
 
                     if (hasDefaultBackground(image))        image   = '';
                     if (image === '' && isInCosmos(url))    image   = cosmosImage;
                     if (item.CurrentCollection)             url     = '';
 
+                    image = CZ.Service.MakeSecureUri(image);
                     var tile =  $templateCollection
                                 .replace(           '{{collectionURL}}',            url)
                                 .replace(           '{{collectionBackground}}',     image)
@@ -19996,6 +20017,7 @@ var CZ;
                     if (hasDefaultBackground(image))    image   = '';
                     if (item.IsCosmosCollection)        image   = cosmosImage;
 
+                    image = CZ.Service.MakeSecureUri(image);
                     var tile =  $templateTimeline
                                 .replace(new RegExp('{{timelineTitle}}', 'g'),  simpleClean(item.Title)             || '')
                                 .replace(           '{{timelineURL}}',          item.Link                           || '')

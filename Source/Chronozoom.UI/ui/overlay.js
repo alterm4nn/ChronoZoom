@@ -269,11 +269,12 @@ var CZ;
 
                 $.each(json, function (index, item)
                 {
-                    var year =  CZ.Dates.convertCoordinateToYear(item.Year);
+                    var year = CZ.Dates.convertCoordinateToYear(item.Year);
+                    var image = CZ.Service.MakeSecureUri(item.CustomBackground);
                     var tile =  $templateExhibit
                                 .replace(           '{{collectionTitle}}',      simpleClean(item.CollectionName))
                                 .replace(           '{{collectionCurator}}',    item.CuratorName)
-                                .replace(           '{{exhibitImage}}',         item.CustomBackground)
+                                .replace(           '{{exhibitImage}}',         image)
                                 .replace(new RegExp('{{exhibitTitle}}', 'g'),   simpleClean(item.Title))
                                 .replace(           '{{exhibitYear}}',          year.year + '&nbsp;' + year.regime)
                                 .replace(           '{{exhibitURL}}',           item.Link)
@@ -317,12 +318,13 @@ var CZ;
                 $.each(json, function (index, item)
                 {
                     var url     = item.TimelineUrl  || '';
-                    var image   = item.ImageUrl     || '';
+                    var image = item.ImageUrl || '';
 
                     if (hasDefaultBackground(image))        image   = '';
                     if (image === '' && isInCosmos(url))    image   = cosmosImage;
                     if (item.CurrentCollection)             url     = '';
 
+                    image = CZ.Service.MakeSecureUri(image);
                     var tile =  $templateCollection
                                 .replace(           '{{collectionURL}}',            url)
                                 .replace(           '{{collectionBackground}}',     image)
@@ -368,6 +370,7 @@ var CZ;
                     if (hasDefaultBackground(image))    image   = '';
                     if (item.IsCosmosCollection)        image   = cosmosImage;
 
+                    image = CZ.Service.MakeSecureUri(image);
                     var tile =  $templateTimeline
                                 .replace(new RegExp('{{timelineTitle}}', 'g'),  simpleClean(item.Title)             || '')
                                 .replace(           '{{timelineURL}}',          item.Link                           || '')

@@ -53,4 +53,53 @@ namespace Chronozoom.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification="Automatically implemented properties must define both get and set accessors.")]
         public virtual Collection<Entities.Collection> Collections { get; set; }
     }
+
+    /// <summary>
+    /// Represents a supercollection info.
+    /// </summary>
+    [DataContract]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "SuperCollection in an inherent ChronoZoom concept")]
+    public class SuperCollectionInfo
+    {
+        /// <summary>
+        ///Create info based on real SuperCollection.
+        /// </summary>
+        public SuperCollectionInfo(SuperCollection coll)
+        {
+            Id = coll.Id;
+            Title = coll.Title;
+            User = coll.User;
+            CollectionsCount = coll.Collections.Count;
+        }
+
+        /// <summary>
+        /// The ID of the supercollection.
+        /// </summary>
+        [Key]
+        [DataMember]
+        public Guid Id { get; set; }
+
+        /// <summary>
+        /// The path from the web root to the the supercollection. Title must therefore have a globally unique value.
+        /// Is programmatically derived as a URL-sanitized version of user's display name using a-z, 0-9 and hyphen only.
+        /// </summary>
+        [DataMember]
+        [Required]
+        [MaxLength(50)]
+        [Column(TypeName = "varchar")]
+        public string Title { get; set; }
+
+        /// <summary>
+        /// The user who owns the supercollection.
+        /// </summary>
+        [DataMember]
+        [Required]
+        public User User { get; set; }
+
+        /// <summary>
+        /// A collection of collections that belong to the supercollection.
+        /// </summary>
+        [DataMember]
+        public int CollectionsCount { get; set; }
+    }
 }
