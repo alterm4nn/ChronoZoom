@@ -7292,9 +7292,12 @@ var CZ;
                 this.isTourPlayRequested = false;
                 this.isAudioLoaded = false;
                 this.isAudioEnabled = false;
+
                 if (!bookmarks || bookmarks.length == 0) {
                     throw "Tour has no bookmarks";
                 }
+
+                this.audio = CZ.Service.MakeSecureUri(audio);
 
                 var self = this;
                 this.thumbnailUrl = CZ.Settings.contentItemThumbnailBaseUri + id + '.jpg';
