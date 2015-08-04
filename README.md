@@ -1,6 +1,8 @@
 ChronoZoom
 ==========
 
+[![Join the chat at https://gitter.im/alterm4nn/ChronoZoom](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/alterm4nn/ChronoZoom?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ChronoZoom is an interactive timeline for all of history: [http://www.chronozoom.com](http://www.chronozoom.com)
 
 Explore all of the past - from the Big Bang, to the dinosaurs, to ancient and modern history.
