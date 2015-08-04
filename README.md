@@ -13,7 +13,7 @@ Community
 ----------
 
 * [Mailing List for Developers](https://groups.google.com/d/forum/chronozoom-dev)
-* IRC: `#ChronoZoom` channel on Freenode.org
+* [Gitter Chat](https://gitter.im/alterm4nn/ChronoZoom)
 * [Documentation](https://github.com/alterm4nn/ChronoZoom/wiki)
 * [File a Bug](https://github.com/alterm4nn/ChronoZoom/issues)
 
