@@ -4938,33 +4938,21 @@ var CZ;
                         numberOfLines: 2
                     }, titleWidth);
 
+                    var imageSize = (titleTop - infodot.y) * 0.75;
+                    
                     //adding edit and copy button
                     if (CZ.Authoring.isEnabled) {
-                        var imageSize = (titleTop - infodot.y) * 0.75;
-                        var copyButton = VCContent.addImage(infodot, layerid, id + "__copy", time - imageSize, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/copy.svg");
                         var editButton = VCContent.addImage(infodot, layerid, id + "__edit", time, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/edit.svg");
-                        
-                        editButton.reactsOnMouse = true;
-                        copyButton.reactsOnMouse = true;
+                        var copyButton = VCContent.addImage(infodot, layerid, id + "__copy", time - imageSize, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/copy.svg");
 
+                        editButton.reactsOnMouse = true;
                         editButton.onmouseclick = function () {
                             CZ.Authoring.isActive = true;
                             CZ.Authoring.mode = "editExhibit";
                             CZ.Authoring.selectedExhibit = infodot;
                             return true;
                         };
-
-                        copyButton.onmouseclick = function () {
-                            CZ.Service.exportExhibit(this.parent.guid).then(function (exportData) {
-                                localStorage.setItem('ExportedSchemaVersion', constants.schemaVersion);
-                                localStorage.setItem('ExportedExhibit', JSON.stringify(exportData));
-                                localStorage.removeItem('ExportedTimeline');
-                                CZ.Authoring.showMessageWindow('"' + exportData.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
-                            });
-                            return true;
-                        };
-                        
-
+ 
                         editButton.onmouseenter = function ()
                         {
                             this.vc.element.css('cursor', 'pointer');
@@ -4979,18 +4967,37 @@ var CZ;
                             infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
                         };
 
-                        copyButton.onmouseenter = function () {
-                            this.vc.element.css('cursor', 'pointer');
-                            this.vc.element.attr('title', 'Copy Exhibit to Clipboard');
-                            infodot.settings.strokeStyle = "yellow";
-                        };
-
-                        copyButton.onmouseleave = function () {
-                            this.vc.element.css('cursor', 'default');
-                            this.vc.element.attr('title', '');
-                            infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
-                        };
                     }
+                    else
+                    {
+                        var copyButton = VCContent.addImage(infodot, layerid, id + "__copy", time - imageSize / 2, infodot.y + imageSize * 0.2, imageSize, imageSize, "/images/copy.svg");
+                    }
+                    copyButton.reactsOnMouse = true;
+
+                    copyButton.onmouseclick = function () {
+                        CZ.Service.exportExhibit(this.parent.guid).then(function (exportData) {
+                            localStorage.setItem('ExportedSchemaVersion', constants.schemaVersion);
+                            localStorage.setItem('ExportedExhibit', JSON.stringify(exportData));
+                            localStorage.removeItem('ExportedTimeline');
+                            CZ.Authoring.showMessageWindow('"' + exportData.title + '" has been copied to your clip-board. You can paste this into a different timeline.');
+                        });
+                        return true;
+                    };
+
+                    copyButton.onmouseenter = function () {
+                        this.vc.element.css('cursor', 'pointer');
+                        this.vc.element.attr('title', 'Copy Exhibit to Clipboard');
+                        infodot.settings.strokeStyle = "yellow";
+                    };
+
+                    copyButton.onmouseleave = function () {
+                        this.vc.element.css('cursor', 'default');
+                        this.vc.element.attr('title', '');
+                        infodot.settings.strokeStyle = CZ.Settings.infoDotBorderColor;
+                    };
+
+
+
 
                     var biblBottom = vyc + centralSquareSize + 63.0 / 450 * 2 * radv;
                     var biblHeight = CZ.Settings.infodotBibliographyHeight * radv * 2;
