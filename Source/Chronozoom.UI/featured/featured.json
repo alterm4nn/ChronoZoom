@@ -1,44 +1,50 @@
 [
     {
-        "Title":        "Big Bang to Present Day",
-        "Curator":      "ChronoZoom",
-        "Background":   "/images/tile-bighistory.jpg",
-        "Link":         "/#/t00000000-0000-0000-0000-000000000000@x=0"
+        "Title": "Big Bang to Present Day",
+        "Curator": "ChronoZoom",
+        "Background": "/images/tile-bighistory.jpg",
+        "Link": "/#/t00000000-0000-0000-0000-000000000000@x=0"
     },
     {
-        "Title":        "Introductory Tour",
-        "Curator":      "Walter Alvarez",
-        "Background":   "/images/fallbackWalterImageDefault.jpg",
-        "Link":         "/#/t00000000-0000-0000-0000-000000000000@auto-tour=cd44d92d-8af3-4c4e-ab28-bf9a9397ea27"
+        "Title": "Introductory Tour",
+        "Curator": "Walter Alvarez",
+        "Background": "/images/fallbackWalterImageDefault.jpg",
+        "Link": "/#/t00000000-0000-0000-0000-000000000000@auto-tour=cd44d92d-8af3-4c4e-ab28-bf9a9397ea27"
     },
     {
-        "Title":        "A 30 Year History of AIDS",
-        "Curator":      "ChronoZoomer",
-        "Background":   "/featured/tile-aidsquilt.jpg",
-        "Link":         "/chronozoomer#/t39e69fbe-6857-42cd-bd77-e12624ced37b/t3220d102-53dd-4c0e-9349-abaa38dfdd66"
+        "Title": "A 30 Year History of AIDS",
+        "Curator": "ChronoZoomer",
+        "Background": "/featured/tile-aidsquilt.jpg",
+        "Link": "/chronozoomer#/t39e69fbe-6857-42cd-bd77-e12624ced37b/t3220d102-53dd-4c0e-9349-abaa38dfdd66"
     },
     {
-        "Title":        "CERN",
-        "Curator":      "European Organization for Nuclear Research",
-        "Background":   "/featured/tile-cern.jpg",
-        "Link":         "/cern/#/t29b28831-5999-46ae-a724-636d23eb1e99"
+        "Title": "CERN",
+        "Curator": "European Organization for Nuclear Research",
+        "Background": "/featured/tile-cern.jpg",
+        "Link": "/cern/#/t29b28831-5999-46ae-a724-636d23eb1e99"
     },
     {
-        "Title":        "Chinese History of Medicine",
-        "Curator":      "Lori Guidos",
-        "Background":   "/featured/tile-chinesemedicine.jpg",
-        "Link":         "/loriguidos#/tb2e64574-ab32-4689-8dd1-e3ab6d96ce6d"
+        "Title": "Chinese History of Medicine",
+        "Curator": "Lori Guidos",
+        "Background": "/featured/tile-chinesemedicine.jpg",
+        "Link": "/loriguidos#/tb2e64574-ab32-4689-8dd1-e3ab6d96ce6d"
     },
     {
-        "Title":        "Earth Environments",
-        "Curator":      "Big History Labs",
-        "Background":   "/featured/tile-environment.jpg",
-        "Link":         "/bighistorylabs#/t65834e9d-8fd8-43dd-b7f8-80ef42059f74/tc9908dba-0442-4650-bde6-47e21844215e"
+        "Title": "Nobel Prize",
+        "Curator": "Roland Saekow",
+        "Background": "/featured/tile-nobel.jpg",
+        "Link": "/nobelprize/nobel#/t5bae864a-11af-4f74-b425-1194970307b2/t452588fd-3a36-4575-933e-64196f1d90d0/tdfcb3f03-98af-4641-ae2f-a0d342da4f55/td4ff2b34-7d94-4187-8aff-58d78bb8e280/t6fb551e7-c586-4845-849b-bfb4e60abe9a/t03a07eb9-df92-4488-bff5-9591d5f2b11e/t21cf8d08-7904-4bd6-b53e-8dc2b5b9af3d/te4aff1c1-d0db-4089-8110-2bb3e683a26d/t28017b86-74d1-46be-a782-d107250831b9/t8b558c8b-f380-4962-b8c6-50f8c1fa551c/t5326284f-a5d1-4ba4-a87b-fe08d1858dce/t30e9cf43-d479-4a9e-91ee-de0f4d840bae"
     },
     {
-        "Title":        "The French Revolution",
-        "Curator":      "Antonia Avila",
-        "Background":   "/featured/tile-frenchrevolution.jpg",
-        "Link":         "/antoniaavila#/t14135f31-b806-484c-ba2b-4b95b8c08bf0"
+        "Title": "Earth Environments",
+        "Curator": "Big History Labs",
+        "Background": "/featured/tile-environment.jpg",
+        "Link": "/bighistorylabs#/t65834e9d-8fd8-43dd-b7f8-80ef42059f74/tc9908dba-0442-4650-bde6-47e21844215e"
+    },
+    {
+        "Title": "The French Revolution",
+        "Curator": "Antonia Avila",
+        "Background": "/featured/tile-frenchrevolution.jpg",
+        "Link": "/antoniaavila#/t14135f31-b806-484c-ba2b-4b95b8c08bf0"
     }
 ]

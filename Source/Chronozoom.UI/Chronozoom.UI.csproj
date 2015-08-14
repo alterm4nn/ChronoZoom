@@ -116,6 +116,7 @@
     <Content Include="featured\tile-chinesemedicine.jpg" />
     <Content Include="featured\tile-environment.jpg" />
     <Content Include="featured\tile-frenchrevolution.jpg" />
+    <Content Include="featured\tile-nobel.jpg" />
     <Content Include="iframedemo.html" />
     <Content Include="images\add-hover.png" />
     <Content Include="images\add.png" />
