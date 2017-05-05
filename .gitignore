@@ -72,3 +72,6 @@ packages/
 *Test/chronozoom20.test/Tests.BL/Scripts/Utils/*
 *Test/chronozoom20.test/Tests.Unit/Scripts/Js/*
 *Test/chronozoom20.test/Tests.Unit/Scripts/Utils/*
+/.vs/slnx.sqlite
+/.vs
+/Source/.vs/config
