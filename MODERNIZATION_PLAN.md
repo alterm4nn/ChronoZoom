@@ -62,24 +62,44 @@ The frontend requires a significant modernization to improve maintainability and
 *   **Orchestration:** `docker-compose.yml` for local development (orchestrating API, Frontend, and SQL Server container).
 *   **CI/CD:** GitHub Actions or Azure DevOps pipelines to build and push images to a container registry.
 
-### 2.4 Hosting Alternatives (Non-Docker)
+### 2.4 Minimal Cost Cloud Deployment (Azure Focused)
 
-While Docker/Containerization provides excellent portability and consistency, there are other viable hosting strategies:
+To achieve a "Minimal Cost" public cloud deployment while adhering to the Docker requirement, we recommend the following Azure-based architecture. This setup minimizes fixed monthly costs while providing scalability.
 
-1.  **Azure App Service (PaaS):**
-    *   **Pros:** Native support for .NET and Node.js (Frontend). Easiest to set up and scale. Built-in features like SSL, Auto-scaling, and Authentication. No need to manage container orchestration.
-    *   **Cons:** Less portable than containers (vendor lock-in to Azure).
-    *   **Verdict:** Strong contender if you are already in the Azure ecosystem and want minimal operational overhead.
+#### 2.4.1 Hosting: Azure Container Apps (Serverless Containers)
+While **Azure App Service (Web App for Containers)** is the standard choice, its cheapest plan supporting custom Docker containers (Basic B1) starts around **~$13/month**.
 
-2.  **IIS on Windows Server (VM/VPS):**
-    *   **Pros:** Familiarity (matches current hosting model). Full control over the OS.
-    *   **Cons:** "Pet vs. Cattle" problem (manual server maintenance). Harder to scale horizontally. Heavier resource usage.
-    *   **Verdict:** Not recommended for a modernization project unless strict regulatory requirements demand specific OS configurations.
+**Recommendation:** **Azure Container Apps (Consumption Plan)**
+*   **Cost:** The first 180,000 vCPU-seconds and 360,000 GiB-seconds each month are **Free**.
+*   **Pros:** Supports Docker containers natively. Scales to zero (no cost when idle). Ideal for low-traffic or hobbyist deployments.
+*   **Cons:** "Cold starts" when scaling from zero.
+*   **Verdict:** Use Container Apps for absolute lowest cost (potentially $0/mo). Use App Service B1 (~$13/mo) if you need always-on availability.
 
-3.  **Serverless (Azure Functions / AWS Lambda):**
-    *   **Pros:** Extreme scalability and cost-efficiency (pay-per-execution).
-    *   **Cons:** Requires significant re-architecture of the backend (statelessness, cold starts). "Big Bang" migration to Serverless is very risky and complex for a legacy app.
-    *   **Verdict:** Good for specific background tasks (e.g., search indexing), but likely too disruptive for the main API migration initially.
+#### 2.4.2 Database: Azure SQL Database (Basic Tier)
+*   **Recommendation:** **Azure SQL Database (Basic DTU Model)**
+*   **Cost:** **~$4.90 / month** (5 DTUs, 2GB Storage).
+*   **Pros:** Fully managed SQL Server. Predictable pricing. Sufficient performance for development and light production.
+*   **Cons:** Limited performance (5 DTUs is low).
+*   **Verdict:** The most reliable and cost-effective relational database option on Azure.
+
+#### 2.4.3 Storage: Azure Blob Storage
+*   **Recommendation:** **Azure Blob Storage (LRS - Locally Redundant Storage)**
+*   **Cost:** **~$0.02 / GB / month** (Hot Tier).
+*   **Strategy:** Store user uploads (images, documents) here instead of the database. Use the **Cool Tier** for older, infrequently accessed data to save further.
+*   **Verdict:** Extremely cheap and durable.
+
+#### 2.4.4 Authentication: Azure AD B2C
+*   **Recommendation:** **Azure Active Directory B2C**
+*   **Cost:** **Free** for the first 50,000 Monthly Active Users (MAUs).
+*   **Pros:** Enterprise-grade security. Supports Social Logins (Google, Facebook) and Email/Password. Removes the burden of managing user credentials securely from your backend.
+*   **Verdict:** The industry standard for minimal cost, secure identity management in the Azure ecosystem.
+
+### **Estimated Monthly Cost (Low Traffic Scenario):**
+*   **Compute (Container Apps):** ~$0.00 (within free grant)
+*   **Database (SQL Basic):** ~$5.00
+*   **Storage (Blob):** < $1.00
+*   **Auth (B2C):** $0.00
+*   **Total:** **~$6.00 / month**
 
 ## 3. High-Level Execution Plan
 
