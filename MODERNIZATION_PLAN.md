@@ -135,10 +135,10 @@ While **Azure App Service (Web App for Containers)** is the standard choice, its
 
 ```mermaid
 graph TD
-    Client[Browser (React SPA)]
-    LB[Load Balancer / Nginx]
-    API[ASP.NET Core Web API (.NET 10)]
-    DB[(SQL Server / PostgreSQL)]
+    Client["Browser (React SPA)"]
+    LB["Load Balancer / Nginx"]
+    API["ASP.NET Core Web API (.NET 10)"]
+    DB[("SQL Server / PostgreSQL")]
 
     Client -- HTTPS/JSON --> LB
     LB --> API
